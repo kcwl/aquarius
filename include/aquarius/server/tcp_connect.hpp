@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/server/connect.hpp>
 #include <aquarius/context/invoke.hpp>
+#include <aquarius/context/context.hpp>
 
 namespace aquarius
 {

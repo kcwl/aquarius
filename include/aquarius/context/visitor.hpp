@@ -10,10 +10,15 @@ namespace aquarius
 
 	namespace ctx
 	{
-		class context;
+		class basic_visitor
+		{
+		public:
+			basic_visitor() = default;
+			virtual ~basic_visitor() = default;
+		};
 
 		template <typename _Request, typename _Return>
-		class visitor
+		class visitor : public basic_visitor
 		{
 		public:
 			visitor() = default;
@@ -31,11 +36,12 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual _Return accept(std::shared_ptr<context> ctx, std::shared_ptr<srv::basic_connector> conn_ptr) = 0;
+			virtual _Return accept(std::shared_ptr<basic_visitor> ctx,
+								   std::shared_ptr<srv::basic_connector> conn_ptr) = 0;
 		};
 
 		template <typename _Return, typename _Request>
-		static _Return accept_impl(_Request* req, std::shared_ptr<context> ctx,
+		static _Return accept_impl(_Request* req, std::shared_ptr<basic_visitor> ctx,
 								   std::shared_ptr<srv::basic_connector> conn_ptr)
 		{
 			using visitor_t = ctx::visitor<_Request, int>;
@@ -54,7 +60,7 @@ namespace aquarius
 		}
 
 #define DEFINE_VISITABLE(_Return)                                                                                      \
-	virtual _Return accept(std::shared_ptr<aquarius::ctx::context> ctx,                                               \
+	virtual _Return accept(std::shared_ptr<aquarius::ctx::basic_visitor> ctx,                                               \
 						   std::shared_ptr<aquarius::srv::basic_connector> conn_ptr)                                  \
 	{                                                                                                                  \
 		return accept_impl<_Return>(this, ctx, conn_ptr);                                                              \
