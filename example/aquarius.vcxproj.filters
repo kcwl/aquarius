@@ -59,20 +59,17 @@
     <ClInclude Include="..\include\aquarius\async_control.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\header.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="test.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\common.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\message_body.hpp">
-      <Filter>aquarius\detail</Filter>
+    <ClInclude Include="..\include\aquarius\header.hpp">
+      <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\message.hpp">
-      <Filter>aquarius\detail</Filter>
+    <ClInclude Include="..\include\aquarius\message.hpp">
+      <Filter>aquarius</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
