@@ -32,10 +32,9 @@
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\type_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\header.hpp" />
+    <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\message.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\message_body.hpp" />
+    <ClInclude Include="..\include\aquarius\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />

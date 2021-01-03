@@ -98,7 +98,6 @@ int main()
 
 	//boost::asio::io_service io_service;
 	//local_client client{ io_service,"127.0.0.1","9100" };
-
 	std::cin.get();
 }
 
