@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "header.hpp"
+#include "detail/streambuf.hpp"
 
 namespace aquarius
 {
@@ -32,18 +33,33 @@ namespace aquarius
 		}
 
 	public:
-		virtual std::size_t parse_bytes(iostream&&, std::size_t) = 0;
+		constexpr std::size_t proto()
+		{
+			return Number;
+		}
 
-		virtual void* to_bytes() = 0;
+
+	public:
+	public:
+		std::size_t parse_bytes(const detail::streambuf& ios) override
+		{
+			//处理header
+
+			//处理body
+
+			return 0;
+		}
+
+		std::size_t to_bytes(const detail::streambuf& ios)
+		{
+			//转换header
+
+			//处理body
+			return 0;
+		}
 
 	private:
 		std::shared_ptr<header_t> header_ptr_;
 		std::shared_ptr<body_t> body_ptr_;
 	};
-
-	template<class Body, std::size_t Number>
-	using request = message<proto_header, Body, Number>;
-
-	template<class Body, std::size_t Number>
-	using response = message<proto_header, Body, Number>;
 }

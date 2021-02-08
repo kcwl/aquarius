@@ -28,6 +28,8 @@
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\common.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\router.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\streambuf.hpp" />
     <ClInclude Include="..\include\aquarius\detail\factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
@@ -113,7 +115,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_SSL_SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../Aquarius/;E:\boost_1_72_0;D:\OpenSSL\include;E:\git\Aquarius-Buffer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Aquarius/;E:\git\boost_1_74_0;D:\OpenSSL\include;E:\git\Aquarius-Buffer</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,7 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>F:\技术\boost_1_72_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\git\boost_1_74_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
