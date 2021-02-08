@@ -41,10 +41,10 @@ public:
 	int result_;
 };
 
-using login_request = aquarius::aqnet::tcp_request<login_request_body, 10001>;
-using login_response = aquarius::aqnet::tcp_request<login_response_body, 10002>;
+using login_request = aquarius::net::tcp_request<login_request_body, 10001>;
+using login_response = aquarius::net::tcp_request<login_response_body, 10002>;
 
-class handler : public aquarius::aqnet::context<login_request, login_response>
+class handler : public aquarius::net::context<login_request, login_response>
 {
 public:
 	virtual bool handle() override
@@ -55,4 +55,4 @@ public:
 	}
 };
 
-static aquarius::detail::ContextRegister<aquarius::aqnet::basic_context,handler> hanle_context(10001);
+static aquarius::detail::ContextRegister<aquarius::net::basic_context,handler> hanle_context(10001);

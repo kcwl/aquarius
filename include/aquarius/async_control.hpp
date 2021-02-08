@@ -2,13 +2,11 @@
 #include <cstddef>
 #include <future>
 #include "context.hpp"
-#include "detail/factory.hpp"
-#include <aquarius/qualify.hpp>
-#include "test.hpp"
+#include "detail/router.hpp"
 
 namespace aquarius
 {
-	namespace aqnet
+	namespace net
 	{
 		class async_control
 		{
@@ -18,45 +16,13 @@ namespace aquarius
 			}
 
 		public:
-			template<std::size_t N>
-			void collect(std::array<std::byte, N>&& buff, std::size_t bytes_transferred)
+			void complete(const detail::streambuf& stream,detail::streambuf& os_buf)
 			{
-				std::for_each_n(buff.begin(), bytes_transferred,
-					[this](auto iter)
-					{
-						buffer_.push_back(iter);
-					});
-			}
-
-			void complete(iostream&& stream, std::size_t bytes_transferred, int error)
-			{
-				//if(stream.size() != bytes_transferred)
-				//	return;
-
-				this->bytes_transferred_ = bytes_transferred;
-
-				this->error_ = error;
-
-
-				auto protocol_id = std::forward<iostream>(stream).get<uint32_t>();
+				auto protocol_id = stream.get_first<uint32_t>();
 
 				//处理message
-				auto context = detail::context_register<basic_context>::instance().attach(std::move(protocol_id));
-
-				if(!context.has_value())
-					return;
-
-				auto context_ptr = context.value()();
-
-				context_ptr->process(std::forward<iostream>(stream));
+				detail::router::get().route(std::to_string(protocol_id), stream,os_buf);
 			}
-
-		private:
-			std::size_t bytes_transferred_;
-
-			int error_;
-
-			std::vector<std::byte> buffer_;
 		};
 	}
 }

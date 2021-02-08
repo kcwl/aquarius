@@ -47,7 +47,7 @@ std::string str_b = "10002";
 
 int main()
 {
-	aquarius::aqnet::server aq_server{ "9100" ,4};
+	aquarius::net::server aq_server{ "9100" ,4};
 	aq_server.run();
 
 	//handle_ptr->process();

@@ -6,13 +6,15 @@
 #include <vector>
 #include <boost/asio.hpp>
 #include "common.hpp"
-#include "detail/noncopyable.hpp"
 #include "async_control.hpp"
-#include <aquarius/qualify.hpp>
+#include "detail/noncopyable.hpp"
+
+
+
 
 namespace aquarius
 {
-	namespace aqnet
+	namespace net
 	{
 		using tcp =  boost::asio::ip::tcp;
 
@@ -36,7 +38,6 @@ namespace aquarius
 	#endif
 				, buffer_()
 				, control_ptr_(new async_control())
-				, body_length_(0)
 			{
 			}
 
@@ -71,10 +72,10 @@ namespace aquarius
 #endif
 			}
 
-			template<class T,std::size_t N>
-			void async_write_some(const std::array<T,N>& buf)
+			
+			void async_write_some(const detail::streambuf& buf)
 			{
-				socket_.async_write_some(boost::asio::buffer(buf.data(), buf.size()), [](const boost::system::error_code& ec,std::size_t bytes_transferred)
+				socket_.async_write_some(boost::asio::buffer(buf.data(),buf.size()), [](const boost::system::error_code& ec,std::size_t bytes_transferred)
 					{
 
 					});
@@ -84,58 +85,20 @@ namespace aquarius
 			void async_read()
 			{
 				auto self = shared_from_this();
-				boost::asio::async_read(socket_,boost::asio::buffer(buffer_.data(),static_cast<int>(MessageLength::max_message_head_length)),
-					[this,self](const boost::system::error_code& error, std::size_t bytes_transferred)
-					{
+				socket_.async_read_some(boost::asio::buffer(buffer_.data(),1024),
+					[this, self] (const boost::system::error_code& error, std::size_t bytes_transferred){
 						if (error)
 						{
 							std::cout << error.value() << ":" << error.message() << std::endl;
 							return;
 						}
 
-						//conn_buffer_.set_read_size(bytes_transferred);
-						handle_read(error, bytes_transferred);
+						buffer_.commit(bytes_transferred);
+
+						detail::streambuf os_buffer;
+
+						control_ptr_->complete(buffer_,os_buffer);
 					});
-			}
-
-			void read_body()
-			{
-				auto self = this->shared_from_this();
-				boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), body_length_),
-					[this,self](const boost::system::error_code& error, std::size_t bytes_transferred)
-					{
-						if(error)
-						{
-							std::cout << error.value() << ":" << error.message() << std::endl;
-							return;
-						}
-
-						//control_ptr_->collect(std::move(buffer_), bytes_transferred);
-						control_ptr_->complete(std::move(buffer_), bytes_transferred,1);
-
-						async_read();
-					});
-			}
-
-			void handle_read(const boost::system::error_code& error, size_t bytes_transferred)
-			{
-				if (error || bytes_transferred < 20)
-					return;
-
-				//std::vector<std::byte> buf{};
-				//std::for_each_n(buffer_.begin(), 20, [&](auto iter)
-				//	{
-				//		buf.push_back(iter);
-				//	});
-
-				//获取body长度
-				constexpr uint32_t length = sizeof(uint32_t);
-				//std::memcpy(&body_length_, reinterpret_cast<int*>(&buffer_.at(length*2)), length);
-				body_length_ = buffer_.get<uint32_t>(length * 2);
-
-				body_length_ > static_cast<int>(MessageLength::max_message_body_length) ? body_length_ = static_cast<int>(MessageLength::max_message_body_length) : 0;
-			
-				read_body();
 			}
 
 		private:
@@ -145,12 +108,9 @@ namespace aquarius
 #else 
 			tcp::socket socket_;
 #endif
-			//std::array<std::byte, 8192> buffer_;
-			iostream buffer_;
+			detail::streambuf buffer_;
 
 			std::shared_ptr<async_control> control_ptr_;
-
-			uint32_t body_length_;
 		};
 	}
 }

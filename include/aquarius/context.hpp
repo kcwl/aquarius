@@ -1,36 +1,31 @@
 ﻿#pragma once
 #include <memory>
 #include <future>
-#include <aquarius/qualify.hpp>
+#include "detail/streambuf.hpp"
 
 namespace aquarius
 {
-	namespace aqnet
+	namespace net
 	{
-		class basic_context 
-		{
-		public:
-			int process(iostream&& stream)
-			{
-				return attach(std::forward<iostream>(stream));
-			}
-
-		private:
-			virtual int attach(iostream&& stream) = 0;
-		};
-
 		template<class Request, class Response>
-		class context : public basic_context
+		class context
 		{
 		public:
+			context() 
+				: request_ptr_(new Request{})
+				, resp_()
+			{ }
+
 			virtual ~context() = default;
 
 		public:
-			virtual int attach(iostream&& stream) override
+			int attach(const detail::streambuf& stream, detail::streambuf& os_buf)
 			{
-				msg_future_ = std::async(&context::message_proc,this, std::forward<iostream>(stream));
+				msg_future_ = std::async(&context::message_proc,this, stream);
 
-				return attach_context();
+				attach_context();
+
+				return resp_.to_bytes(os_buf);
 			}
 
 			int attach_context()
@@ -40,24 +35,15 @@ namespace aquarius
 				if(!handle())
 					return 0;
 
-				return send_response();
-			}
-
-			int send_response()
-			{
 				return 1;
 			}
 
 			virtual bool handle() = 0;
 
 		private:
-			void message_proc(iostream&& stream)
+			void message_proc(const detail::streambuf& stream)
 			{
-				//login_request lr;
-				//lr.parse_bytes(stream, 36);
-
-				//promise.set_value(lr);
-				request_ptr_->parse_bytes(std::forward<iostream>(stream),0);
+				request_ptr_->parse_bytes(stream);
 			}
 
 		public:

@@ -2,11 +2,10 @@
 #include <boost/asio.hpp>
 #include <type_traits>
 #include "detail/type_traits.hpp"
-#include <aquarius/qualify.hpp>
 
 namespace aquarius
 {
-	namespace aqnet
+	namespace net
 	{
 		class basic_client
 		{
@@ -56,9 +55,9 @@ namespace aquarius
 			}
 
 			//template<class T, std::size_t N>
-			void async_write(const iostream& buf)
+			void async_write(const detail::streambuf& buf)
 			{
-				boost::asio::async_write(socket_, boost::asio::buffer(buf.str(),20),
+				boost::asio::async_write(socket_, boost::asio::buffer(buf.data(),buf.size()),
 					[this](boost::system::error_code ec, std::size_t)
 					{
 						if(ec)

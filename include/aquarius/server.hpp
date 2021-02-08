@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	namespace aqnet
+	namespace net
 	{
 		class server
 		{
