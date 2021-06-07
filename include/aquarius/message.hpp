@@ -1,13 +1,17 @@
 ﻿#pragma once
 #include <memory>
 #include "header.hpp"
-#include "detail/streambuf.hpp"
+#include "parse.hpp"
+#include "context.hpp"
 
 namespace aquarius
 {
+	class basic_message
+		: public parse {};
 
 	template<class Header, class Body, std::size_t Number>
-	class message
+	class message 
+		: public basic_message
 	{
 		using header_t = Header;
 		using body_t = Body;
@@ -31,35 +35,42 @@ namespace aquarius
 		{
 			return body_ptr_;
 		}
+		
+		template<typename T>
+		int accept(std::shared_ptr<T> msg_ptr, std::shared_ptr<context> ctx_ptr,std::shared_ptr<connect> conn_ptr)
+		{
+			using request_type = visitor<T, int>;
 
-	public:
+			auto request_ptr = std::dynamic_pointer_cast<request_type>(ctx_ptr);
+
+			if(request_ptr == nullptr)
+				return ctx_ptr->visit(msg_ptr,conn_ptr);
+
+			return request_ptr->visit(msg_ptr,conn_ptr);
+		}
+
 		constexpr std::size_t proto()
 		{
 			return Number;
 		}
 
-
-	public:
-	public:
-		std::size_t parse_bytes(const detail::streambuf& ios) override
+		void set_conn_ptr(std::shared_ptr<connect> conn_ptr)
 		{
-			//处理header
-
-			//处理body
-
-			return 0;
+			conn_ptr_ = conn_ptr;
 		}
 
-		std::size_t to_bytes(const detail::streambuf& ios)
+		auto get_conn_ptr()
 		{
-			//转换header
-
-			//处理body
-			return 0;
+			return conn_ptr_;
 		}
 
 	private:
 		std::shared_ptr<header_t> header_ptr_;
+
+		std::shared_ptr<connect> conn_ptr_;
+
 		std::shared_ptr<body_t> body_ptr_;
 	};
+
+
 }
