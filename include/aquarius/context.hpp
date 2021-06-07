@@ -1,71 +1,72 @@
 ﻿#pragma once
 #include <memory>
-#include <future>
-#include <aquarius/qualify.hpp>
+#include "visitor.hpp"
+#include "detail/streambuf.hpp"
+#include "connect.hpp"
 
 namespace aquarius
 {
-	namespace aqnet
+	class basic_message;
+
+	class context 
+		: public visitor<basic_message>
 	{
-		class basic_context 
+	};
+
+	template<class Request, class Response>
+	class handler 
+		: public context
+		, public visitor<Request,int>
+	{
+	public:
+		handler()
+			: request_ptr_(new Request{})
+			, resp_()
 		{
-		public:
-			int process(iostream&& stream)
-			{
-				return attach(std::forward<iostream>(stream));
-			}
+		}
 
-		private:
-			virtual int attach(iostream&& stream) = 0;
-		};
+		virtual ~handler() = default;
 
-		template<class Request, class Response>
-		class context : public basic_context
+	public:
+		virtual int visit(std::shared_ptr<Request> request, std::shared_ptr<connect> conn_ptr)
 		{
-		public:
-			virtual ~context() = default;
+			request_ptr_.swap(request);
 
-		public:
-			virtual int attach(iostream&& stream) override
-			{
-				msg_future_ = std::async(&context::message_proc,this, std::forward<iostream>(stream));
+			conn_ptr_ = conn_ptr;
 
-				return attach_context();
-			}
+			if(!handle())
+				return 0;
 
-			int attach_context()
-			{
-				msg_future_.get();
+			send_response(1);
 
-				if(!handle())
-					return 0;
+			return 1;
+		}
 
-				return send_response();
-			}
+		virtual int visit(std::shared_ptr<basic_message> msg_ptr, std::shared_ptr<connect> conn_ptr)
+		{
+			return 1;
+		}
 
-			int send_response()
-			{
-				return 1;
-			}
+	protected:
+		virtual bool handle() = 0;
 
-			virtual bool handle() = 0;
+		virtual bool send_response(int result)
+		{
+			resp_.set_result(result);
 
-		private:
-			void message_proc(iostream&& stream)
-			{
-				//login_request lr;
-				//lr.parse_bytes(stream, 36);
+			detail::streambuf buf;
+			resp_.to_bytes(buf);
 
-				//promise.set_value(lr);
-				request_ptr_->parse_bytes(std::forward<iostream>(stream),0);
-			}
+			conn_ptr_->async_write_some(buf);
 
-		public:
-			std::shared_ptr<Request> request_ptr_;
+			return true;
+		}
 
-			Response resp_;
+	protected:
+		std::shared_ptr<Request> request_ptr_;
 
-			std::future<void> msg_future_;
-		};
-	}
+		std::shared_ptr<connect> conn_ptr_;
+
+		Response resp_;
+	};
 }
