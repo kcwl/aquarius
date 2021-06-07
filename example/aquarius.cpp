@@ -2,8 +2,12 @@
 //
 #include <iostream>
 #include <locale>
+//#include "aquarius/detail/streambuf.hpp"
+//#include "aquarius/detail/router.hpp"
+//#include "aquarius/request.hpp"
+//#include "aquarius/async_control.hpp"
+#include "test.hpp"
 #include "aquarius.hpp"
-//#include "aquarius/detail/factory.hpp"
 
 //class local_client : public aquarius::aqnet::aquarius_client
 //{
@@ -18,36 +22,13 @@
 //	virtual int handler() { return 1; }
 //};
 
-class C { };
-
-class A : public C 
-{
-	enum
-	{
-		key = 10001
-	};
-
-public:
-	A(int i=0) { }
-};
-
-class B : public C 
-{
-public:
-	B() { }
-};
-
-
-std::string_view str = "10001";
-std::string str_b = "10002";
-
 //static aquarius::detail::ContextRegister<A> a(std::size_t(10001));
 
-#define fxx(f) std::make_shared<f>()
+
 
 int main()
 {
-	aquarius::net::server aq_server{ "9100" ,4};
+	aquarius::server aq_server{ "9100" ,4};
 	aq_server.run();
 
 	//handle_ptr->process();
@@ -76,11 +57,11 @@ int main()
 	//	std::cout << static_cast<int>(iter) << std::endl;
 	//}
 
-	std::string str{"hello world"};
-	for(auto it =str.begin();it != str.end();it++)
-	{
-		std::cout << *it << std::endl;
-	}
+	//std::string str{"hello world"};
+	//for(auto it =str.begin();it != str.end();it++)
+	//{
+	//	std::cout << *it << std::endl;
+	//}
 
 
 

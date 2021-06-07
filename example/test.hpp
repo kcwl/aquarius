@@ -1,22 +1,26 @@
 #pragma once
 #include <string>
+#include <aquarius/message_body.hpp>
 #include <aquarius/request.hpp>
+#include <aquarius/response.hpp>
+#include <aquarius/context.hpp>
+#include <aquarius/detail/router.hpp>
 
 
-class login_request_body : public aquarius::detail::message_body<login_request_body>
+class login_request_body : public aquarius::message_body
 {
 public:
-	virtual std::size_t parse_bytes(aquarius::iostream&& stream, std::size_t length)
+	virtual std::size_t parse_bytes(aquarius::detail::streambuf& stream) override
 	{
-		user_name_ = "user";
-		passwd_ = "123456";
+		stream << user_name_ << passwd_;
 
 		return 12;
 	}
 
-	void* to_bytes()
+	virtual std::size_t to_bytes(aquarius::detail::streambuf& stream) override
 	{
-		return this;
+		stream >> user_name_ >> passwd_;
+		return 12;
 	}
 
 public:
@@ -24,27 +28,29 @@ public:
 	std::string passwd_;
 };
 
-class login_response_body : public aquarius::detail::message_body<login_response_body>
+class login_response_body : public aquarius::message_body
 {
 public:
-	virtual std::size_t parse_bytes(aquarius::iostream&&, std::size_t)
+	virtual std::size_t parse_bytes(aquarius::detail::streambuf& stream)
 	{
-		return 0;
+		stream >> result_;
+		return 4;
 	}
 
-	void* to_bytes()
+	virtual std::size_t to_bytes(aquarius::detail::streambuf& stream)
 	{
-		return this;
+		stream << result_;
+		return 4;
 	}
 
 public:
 	int result_;
 };
 
-using login_request = aquarius::net::tcp_request<login_request_body, 10001>;
-using login_response = aquarius::net::tcp_request<login_response_body, 10002>;
+using login_request = aquarius::request<login_request_body, 10001>;
+using login_response = aquarius::response<login_response_body, 10002>;
 
-class handler : public aquarius::net::context<login_request, login_response>
+class login_handler : public aquarius::handler<login_request, login_response>
 {
 public:
 	virtual bool handle() override
@@ -55,4 +61,5 @@ public:
 	}
 };
 
-static aquarius::detail::ContextRegister<aquarius::net::basic_context,handler> hanle_context(10001);
+static aquarius::detail::CtxRegist<login_handler> hanle_context("10001");
+static aquarius::detail::MsgRegist<login_request> msg_login("10001");

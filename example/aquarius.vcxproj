@@ -37,9 +37,12 @@
     <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
+    <ClInclude Include="..\include\aquarius\message_body.hpp" />
+    <ClInclude Include="..\include\aquarius\parse.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
+    <ClInclude Include="..\include\aquarius\visitor.hpp" />
     <ClInclude Include="test.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -115,7 +118,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_SSL_SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../Aquarius/;E:\git\boost_1_74_0;D:\OpenSSL\include;E:\git\Aquarius-Buffer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Aquarius/;E:\git\boost_1_74_0;D:\OpenSSL\include;E:\git\Aquarius-Buffer;E:\git\reflect\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -128,14 +131,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;BOOST_ASIO_DISABLE_CONCEPTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>E:\git\boost_1_74_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\git\boost_1_74_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/;E:\git\reflect\include;F:\git仓库\reflect\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
