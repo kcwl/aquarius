@@ -6,6 +6,8 @@
 
 #include "aquarius/context.hpp"
 
-#include "aquarius/detail/header.hpp"
+#include "aquarius/header.hpp"
 
 #include "aquarius/detail/factory.hpp"
+
+#include "aquarius/detail/streambuf.hpp"
