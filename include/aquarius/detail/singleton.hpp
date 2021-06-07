@@ -5,7 +5,13 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template<class T>
+		template<typename T>
+		class singleton_wrapper : public T
+		{
+			
+		};
+
+		template<typename T>
 		class singleton
 		{
 		public:
@@ -13,23 +19,23 @@ namespace aquarius
 			{
 				return get_instance();
 			}
+
 		private:
 			static T& get_instance()
 			{
-				class singleton_wrapper : public T {};
+				static singleton_wrapper<T> t;
 
-				static singleton_wrapper* t = nullptr;
-
-				!t ? t = new singleton_wrapper() : 0;
-
-				return static_cast<T&>(*std::add_const_t<singleton_wrapper*>(t));
+				return static_cast<T&>(t);
 			}
 
-		private:
-			static T& instance_;
-		};
+		protected:
+			singleton() {}
 
-		template<class T>
-		T& singleton<T>::instance_ = singleton<T>::instance();
+		private:
+			static T* instance_;
+		};
 	}
 }
+
+template<typename T>
+T* aquarius::detail::singleton<T>::instance_ = &singleton<T>::instance();
