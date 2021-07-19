@@ -37,8 +37,6 @@
     <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
-    <ClInclude Include="..\include\aquarius\message_body.hpp" />
-    <ClInclude Include="..\include\aquarius\parse.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
