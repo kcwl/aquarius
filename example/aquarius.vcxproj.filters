@@ -77,5 +77,14 @@
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\message_body.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\parse.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\visitor.hpp">
+      <Filter>aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

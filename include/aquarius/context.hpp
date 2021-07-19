@@ -1,57 +1,72 @@
 ﻿#pragma once
 #include <memory>
-#include <future>
+#include "visitor.hpp"
 #include "detail/streambuf.hpp"
+#include "connect.hpp"
 
 namespace aquarius
 {
-	namespace net
+	class basic_message;
+
+	class context 
+		: public visitor<basic_message>
 	{
-		template<class Request, class Response>
-		class context
+	};
+
+	template<class Request, class Response>
+	class handler 
+		: public context
+		, public visitor<Request,int>
+	{
+	public:
+		handler()
+			: request_ptr_(new Request{})
+			, resp_()
 		{
-		public:
-			context() 
-				: request_ptr_(new Request{})
-				, resp_()
-			{ }
+		}
 
-			virtual ~context() = default;
+		virtual ~handler() = default;
 
-		public:
-			int attach(const detail::streambuf& stream, detail::streambuf& os_buf)
-			{
-				msg_future_ = std::async(&context::message_proc,this, stream);
+	public:
+		virtual int visit(std::shared_ptr<Request> request, std::shared_ptr<connect> conn_ptr)
+		{
+			request_ptr_.swap(request);
 
-				attach_context();
+			conn_ptr_ = conn_ptr;
 
-				return resp_.to_bytes(os_buf);
-			}
+			if(!handle())
+				return 0;
 
-			int attach_context()
-			{
-				msg_future_.get();
+			send_response(1);
 
-				if(!handle())
-					return 0;
+			return 1;
+		}
 
-				return 1;
-			}
+		virtual int visit(std::shared_ptr<basic_message> msg_ptr, std::shared_ptr<connect> conn_ptr)
+		{
+			return 1;
+		}
 
-			virtual bool handle() = 0;
+	protected:
+		virtual bool handle() = 0;
 
-		private:
-			void message_proc(const detail::streambuf& stream)
-			{
-				request_ptr_->parse_bytes(stream);
-			}
+		virtual bool send_response(int result)
+		{
+			resp_.set_result(result);
 
-		public:
-			std::shared_ptr<Request> request_ptr_;
+			detail::streambuf buf;
+			resp_.to_bytes(buf);
 
-			Response resp_;
+			conn_ptr_->async_write_some(buf);
 
-			std::future<void> msg_future_;
-		};
-	}
+			return true;
+		}
+
+	protected:
+		std::shared_ptr<Request> request_ptr_;
+
+		std::shared_ptr<connect> conn_ptr_;
+
+		Response resp_;
+	};
 }

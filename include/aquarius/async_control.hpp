@@ -1,28 +1,27 @@
 ﻿#pragma once
 #include <cstddef>
 #include <future>
-#include "context.hpp"
 #include "detail/router.hpp"
 
 namespace aquarius
 {
-	namespace net
+	class async_control
 	{
-		class async_control
+	public:
+		virtual ~async_control()
 		{
-		public:
-			virtual ~async_control()
-			{
-			}
+		}
 
-		public:
-			void complete(const detail::streambuf& stream,detail::streambuf& os_buf)
-			{
-				auto protocol_id = stream.get_first<uint32_t>();
+	public:
+		template<typename T>
+		void complete(detail::streambuf& stream,std::shared_ptr<connect> conn_ptr)
+		{
+			T proto_id{};
 
-				//处理message
-				detail::router::get().route(std::to_string(protocol_id), stream,os_buf);
-			}
-		};
-	}
+			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(T));
+
+			//处理message
+			detail::router::instance().route_invoke("msg_" + std::to_string(proto_id), stream,conn_ptr);
+		}
+	};
 }

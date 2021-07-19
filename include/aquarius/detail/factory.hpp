@@ -63,12 +63,12 @@ namespace aquarius
 		};
 
 		template<class T>
-		using context_register = factory<std::size_t, T>;
+		using message_register = factory<std::size_t, T>;
 
 		template<class Base,class Context>
 		class ContextRegister
 		{
-			using key_t = typename context_register<Base>::key_t;
+			using key_t = typename message_register<Base>::key_t;
 		public:
 			template<class... Args>
 			ContextRegister(key_t&& topic, Args&&... args)
@@ -80,7 +80,7 @@ namespace aquarius
 			template<class... Args>
 			void regist(key_t&& topic, Args&&... args, std::enable_if_t<!std::is_void_v<Context>>* = 0)
 			{
-				context_register<Base>::instance().regist
+				message_register<Base>::instance().regist
 				(std::forward<key_t>(topic),
 					[&]
 					{
