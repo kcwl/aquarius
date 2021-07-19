@@ -1,13 +1,11 @@
 ﻿#pragma once
 #include <memory>
 #include "header.hpp"
-#include "parse.hpp"
 #include "context.hpp"
 
 namespace aquarius
 {
-	class basic_message
-		: public parse {};
+	class basic_message {};
 
 	template<class Header, class Body, std::size_t Number>
 	class message 
@@ -19,21 +17,21 @@ namespace aquarius
 	public:
 		message()
 			: header_ptr_(new header_t())
-			, body_ptr_(new body_t())
+			, body_()
 		{
 		}
 
 		virtual ~message() = default;
 
 	public:
-		auto header() ->std::shared_ptr<header_t>
+		std::shared_ptr<header_t> header()
 		{
 			return header_ptr_;
 		}
 
-		auto body() ->std::shared_ptr<body_t>
+		body_t& body()
 		{
-			return body_ptr_;
+			return body_;
 		}
 		
 		template<typename T>
@@ -69,7 +67,7 @@ namespace aquarius
 
 		std::shared_ptr<connect> conn_ptr_;
 
-		std::shared_ptr<body_t> body_ptr_;
+		body_t body_;
 	};
 
 
