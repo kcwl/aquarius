@@ -67,9 +67,12 @@ namespace aquarius
 #endif
 		}
 
-
-		void async_write_some(const detail::streambuf& buf)
+		template<typename T>
+		void async_write_some(T resp)
 		{
+			detail::streambuf buf{};
+			resp.to_bytes(buf);
+
 			socket_.async_write_some(boost::asio::buffer(buf.data(), buf.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)

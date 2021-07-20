@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "detail/streambuf.hpp"
 #include "connect.hpp"
 
 namespace aquarius
@@ -37,8 +36,6 @@ namespace aquarius
 			if(!handle())
 				return 0;
 
-			send_response(1);
-
 			return 1;
 		}
 
@@ -54,10 +51,7 @@ namespace aquarius
 		{
 			resp_.set_result(result);
 
-			detail::streambuf buf;
-			resp_.to_bytes(buf);
-
-			conn_ptr_->async_write_some(buf);
+			conn_ptr_->async_write_some(resp_);
 
 			return true;
 		}
