@@ -9,5 +9,3 @@
 #include "aquarius/header.hpp"
 
 #include "aquarius/detail/factory.hpp"
-
-#include "aquarius/detail/streambuf.hpp"

@@ -70,10 +70,10 @@ namespace aquarius
 		template<typename T>
 		void async_write_some(T resp)
 		{
-			detail::streambuf buf{};
-			resp.to_bytes(buf);
+			easybuffers::convert _convert{};
+			resp.to_bytes(_convert);
 
-			socket_.async_write_some(boost::asio::buffer(buf.data(), buf.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
+			socket_.async_write_some(boost::asio::buffer(_convert. data(), _convert.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)
 										 {
