@@ -50,9 +50,6 @@
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\type_traits.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -70,9 +67,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message.hpp">
       <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\streambuf.hpp">
-      <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>aquarius\detail</Filter>

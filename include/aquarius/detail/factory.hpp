@@ -4,7 +4,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include "singleton.hpp"
-#include "type_traits.hpp"
 #include "noncopyable.hpp"
 #include <optional>
 

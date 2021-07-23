@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <functional>
 #include "singleton.hpp"
-#include "streambuf.hpp"
+#include "easybuffers/include/easybuffers.hpp"
 
 namespace aquarius
 {
@@ -14,10 +14,12 @@ namespace aquarius
 	{
 		class basic_message {};
 
+		using streambuf = easybuffers::stream_buf<4096>;
+
 		template<class Func>
 		struct invoker
 		{
-			static inline void apply(const Func& func, detail::streambuf& buf,std::shared_ptr<connect> conn_ptr)
+			static inline void apply(const Func& func, streambuf& buf,std::shared_ptr<connect> conn_ptr)
 			{
 				auto msg_ptr = func();
 
@@ -59,7 +61,7 @@ namespace aquarius
 				map_funcs_.insert({key, std::forward<Func>(f)});
 			}
 
-			void route_invoke(const std::string& key, detail::streambuf& buf,std::shared_ptr<connect> conn_ptr)
+			void route_invoke(const std::string& key, streambuf& buf,std::shared_ptr<connect> conn_ptr)
 			{
 				auto iter = map_invokes_.find(key);
 				if (iter == map_invokes_.end())
@@ -82,7 +84,7 @@ namespace aquarius
 
 			router(router&&) = delete;
 
-			std::unordered_map<std::string, std::function<void(detail::streambuf&,std::shared_ptr<connect>)>> map_invokes_;
+			std::unordered_map<std::string, std::function<void(streambuf&,std::shared_ptr<connect>)>> map_invokes_;
 
 			std::unordered_map<std::string, std::function<std::shared_ptr<context>()>> map_funcs_;
 		};

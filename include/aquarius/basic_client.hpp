@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <boost/asio.hpp>
 #include <type_traits>
-#include "detail/type_traits.hpp"
 
 namespace aquarius
 {

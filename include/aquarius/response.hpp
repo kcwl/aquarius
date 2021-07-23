@@ -22,7 +22,7 @@ namespace aquarius
 			return this->header()->result_;
 		}
 
-		void parse_bytes(detail::streambuf& ios)
+		void parse_bytes(easybuffers::convert& ios)
 		{
 			// 处理header
 			ios >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->result_;
@@ -32,7 +32,7 @@ namespace aquarius
 			ios >> _body;
 		}
 
-		void to_bytes(detail::streambuf& ios)
+		void to_bytes(easybuffers::convert& ios)
 		{
 			// 处理header
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->result_;

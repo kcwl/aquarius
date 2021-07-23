@@ -1,0 +1,3 @@
+[submodule "include/aquarius/detail/easybuffers"]
+	path = include/aquarius/detail/easybuffers
+	url = https://github.com/kcwl/easybuffers.git
