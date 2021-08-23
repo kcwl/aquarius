@@ -28,10 +28,12 @@
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\common.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\dead_timer.hpp" />
     <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
