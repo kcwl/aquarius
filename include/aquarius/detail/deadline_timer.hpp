@@ -48,9 +48,9 @@ public:
 
 		time_t des_time = std::mktime(t);
 
-		des_time < now ? des_time += 24 * 60 * 60 : 0;
+		des_time < now.count() ? des_time += 24 * 60 * 60 : 0;
 
-		return async_wait<decltype(f()),Func>(des_time,std::move(f))
+		return async_wait<decltype(f()), Func>(des_time, std::move(f));
 	}
 
 private:
@@ -92,7 +92,7 @@ private:
 						  {
 							  if(!is_expirse_)
 							  {
-								  is_use_.stroe(false);
+								  is_use_.store(false);
 								  break;
 							  }
 
