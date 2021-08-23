@@ -8,6 +8,7 @@
 #include "common.hpp"
 #include "async_control.hpp"
 #include "detail/noncopyable.hpp"
+#include "detail/deadline_timer.hpp"
 
 namespace aquarius
 {
@@ -36,6 +37,11 @@ namespace aquarius
 		{
 		}
 
+		virtual ~connect()
+		{
+			shut_down();
+		}
+
 #ifdef _SSL_SERVER
 		ssl_socket_t::lowest_layer_type& socket()
 		{
@@ -50,6 +56,8 @@ namespace aquarius
 
 		void start()
 		{
+			establish();
+
 			std::cout << "connect : " << size_++ << std::endl;
 #ifdef _SSL_SERVER
 			socket_.async_handshake(boost::asio::ssl::stream_base::server,
@@ -73,7 +81,7 @@ namespace aquarius
 			easybuffers::convert _convert{};
 			resp.to_bytes(_convert);
 
-			socket_.async_write_some(boost::asio::buffer(_convert. data(), _convert.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
+			socket_.async_write_some(boost::asio::buffer(_convert.data(), _convert.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)
 										 {
@@ -105,6 +113,38 @@ namespace aquarius
 									});
 		}
 
+		void establish()
+		{
+			heart_timer_.async_wait_for<int>(60s, [this]
+											 {
+												 if(!state_)
+													 return;
+
+												 //发送心跳
+												 //socket_.async_write_some();
+											 });
+		}
+
+		void shut_down()
+		{
+			if(!state_)
+				return;
+
+			heart_timer_.cancel();
+
+			state_ = 0;
+
+			if(socket_.is_open())
+			{
+				boost::system::error_code ec;
+				socket_.shutdown(tcp::socket::shutdown_both, ec);
+			}
+
+			socket_.close();
+			
+		}
+
+
 	private:
 		static inline int size_ = 0;
 #ifdef _SSL_SERVER
@@ -115,5 +155,9 @@ namespace aquarius
 		detail::streambuf buffer_;
 
 		std::shared_ptr<async_control> control_ptr_;
+
+		deadline_timer heart_timer_;
+
+		int state_;
 	};
 }
