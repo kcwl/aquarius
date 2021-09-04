@@ -64,6 +64,8 @@ private:
 
 		std::thread t([f = std::move(func), seconds, &promise, this]
 					  {
+						  std::chrono::seconds sec(seconds);
+
 						  std::this_thread::sleep_for(std::chrono::seconds(seconds));
 
 						  promise.set_value(f());
@@ -73,7 +75,7 @@ private:
 
 		t.detach();
 
-		return std::move(promise.get_future());
+		return std::move(promise);
 	}
 
 	template<class T, class Func>
@@ -106,7 +108,7 @@ private:
 
 		t.detach();
 
-		return std::move(promise.get_future());
+		return std::move(promise);
 	}
 
 private:
