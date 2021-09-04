@@ -62,13 +62,13 @@ private:
 		if(is_use_)
 			return promise;
 
-		std::thread t([f = std::move(func), seconds, &promise, &is_use_]
+		std::thread t([f = std::move(func), seconds, &promise, this]
 					  {
-						  std::this_thread::sleep_for(seconds);
+						  std::this_thread::sleep_for(std::chrono::seconds(seconds));
 
 						  promise.set_value(f());
 
-						  is_use_.store(false);
+						  this->is_use_.store(false);
 					  });
 
 		t.detach();
