@@ -15,9 +15,9 @@ namespace aquarius
 		virtual ~request() = default;
 
 	public:
-		void parse_bytes(detail::streambuf& ios)
+		void parse_bytes(eb_stream& ios)
 		{
-			easybuffers::convert cvt(ios);
+			easybuffers::ebstream cvt(ios);
 
 			// 处理header
 			cvt >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->src_id_ >> this->header()->session_id_;
@@ -36,7 +36,7 @@ namespace aquarius
 			this->accept(this->shared_from_this(), ctx_ptr, this->get_conn_ptr());
 		}
 
-		void to_bytes(detail::streambuf& ios)
+		void to_bytes(eb_stream& ios)
 		{
 			// 处理header
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->src_id_ <<  this->header()->session_id_;
