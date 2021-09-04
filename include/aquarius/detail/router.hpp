@@ -14,7 +14,7 @@ namespace aquarius
 	{
 		class basic_message {};
 
-		using streambuf = easybuffers::stream_buf<4096>;
+		using streambuf = easybuffers::ebstream<>;
 
 		template<class Func>
 		struct invoker
