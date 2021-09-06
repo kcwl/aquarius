@@ -9,6 +9,7 @@
 #include "async_control.hpp"
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
+#include "detail/easybuffers/include/easybuffers.hpp"
 
 namespace aquarius
 {
@@ -75,13 +76,13 @@ namespace aquarius
 #endif
 		}
 
-		template<typename T>
-		void async_write_some(T resp)
+		template<class Response>
+		void async_write_some(Response&& resp)
 		{
-			easybuffers::convert _convert{};
-			resp.to_bytes(_convert);
+			easybuffers::ebstream stream{};
+			resp.to_bytes(stream);
 
-			socket_.async_write_some(boost::asio::buffer(_convert.data(), _convert.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
+			socket_.async_write_some(boost::asio::buffer(stream.data(), stream.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)
 										 {
@@ -122,6 +123,39 @@ namespace aquarius
 
 												 //发送心跳
 												 //socket_.async_write_some();
+											 });
+		}
+
+		void shut_down()
+		{
+			if(!state_)
+				return;
+
+			heart_timer_.cancel();
+
+			state_ = 0;
+
+			if(socket_.is_open())
+			{
+				boost::system::error_code ec;
+				socket_.shutdown(tcp::socket::shutdown_both, ec);
+			}
+
+			socket_.close();
+			
+		}
+
+		void establish()
+		{
+			heart_timer_.async_wait_for<int>(60s, [this]
+											 {
+												 if(!state_)
+													 return 0;
+
+												 //发送心跳
+												 //socket_.async_write_some();
+
+												 return 1;
 											 });
 		}
 
