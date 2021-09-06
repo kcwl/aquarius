@@ -8,7 +8,6 @@
 namespace aquarius
 {
 	class context;
-	class connect;
 
 	namespace detail
 	{
@@ -19,14 +18,12 @@ namespace aquarius
 		template<class Func>
 		struct invoker
 		{
-			static inline void apply(const Func& func, streambuf& buf,std::shared_ptr<connect> conn_ptr)
+			static inline void apply(const Func& func, streambuf& buf)
 			{
 				auto msg_ptr = func();
 
 				if(msg_ptr == nullptr)
 					return;
-
-				msg_ptr->set_conn_ptr(conn_ptr);
 
 				msg_ptr->parse_bytes(buf);
 			}
@@ -52,7 +49,7 @@ namespace aquarius
 			template<class Func>
 			void regist_invoke(const std::string& key, Func&& func)
 			{
-				map_invokes_.insert({key,std::bind(&invoker<Func>::apply,std::forward<Func>(func),std::placeholders::_1,std::placeholders::_2)});
+				map_invokes_.insert({key,std::bind(&invoker<Func>::apply,std::forward<Func>(func),std::placeholders::_1)});
 			}
 
 			template<typename Func>
@@ -61,13 +58,13 @@ namespace aquarius
 				map_funcs_.insert({key, std::forward<Func>(f)});
 			}
 
-			void route_invoke(const std::string& key, streambuf& buf,std::shared_ptr<connect> conn_ptr)
+			void route_invoke(const std::string& key, streambuf& buf)
 			{
 				auto iter = map_invokes_.find(key);
 				if (iter == map_invokes_.end())
 					return;
 
-				iter->second(buf,conn_ptr);
+				iter->second(buf);
 			}
 
 			std::shared_ptr<context> route_func(const std::string& key)
@@ -84,7 +81,7 @@ namespace aquarius
 
 			router(router&&) = delete;
 
-			std::unordered_map<std::string, std::function<void(streambuf&,std::shared_ptr<connect>)>> map_invokes_;
+			std::unordered_map<std::string, std::function<void(streambuf&)>> map_invokes_;
 
 			std::unordered_map<std::string, std::function<std::shared_ptr<context>()>> map_funcs_;
 		};
