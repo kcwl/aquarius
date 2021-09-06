@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "detail/easybuffers/include/easybuffers.hpp"
 
 namespace aquarius
 {
@@ -15,4 +15,6 @@ namespace aquarius
 		Tcp,
 		Http
 	};
+
+	using streambuf = easybuffers::ebstream<>;
 }

@@ -5,11 +5,10 @@
 #include <iostream>
 #include <vector>
 #include <boost/asio.hpp>
-#include "common.hpp"
-#include "async_control.hpp"
+#include "context.hpp"
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
-#include "detail/easybuffers/include/easybuffers.hpp"
+
 
 namespace aquarius
 {
@@ -34,7 +33,7 @@ namespace aquarius
 			:socket_(io_service)
 #endif
 			, buffer_()
-			, control_ptr_(new async_control())
+			, control_ptr_(new context())
 		{
 		}
 
@@ -106,7 +105,7 @@ namespace aquarius
 
 										buffer_.commit(bytes_transferred);
 
-										control_ptr_->complete<uint32_t>(buffer_,self);
+										control_ptr_->process<uint32_t>(self, buffer_);
 
 										async_read();
 									});
@@ -128,23 +127,6 @@ namespace aquarius
 			socket_.close();
 		}
 
-		void shut_down()
-		{
-			if(!state_)
-				return;
-
-			state_ = 0;
-
-			if(socket_.is_open())
-			{
-				boost::system::error_code ec;
-				socket_.shutdown(tcp::socket::shutdown_both, ec);
-			}
-
-			socket_.close();
-		}
-
-
 	private:
 		static inline int size_ = 0;
 #ifdef _SSL_SERVER
@@ -152,9 +134,9 @@ namespace aquarius
 #else 
 		tcp::socket socket_;
 #endif
-		detail::streambuf buffer_;
+		streambuf buffer_;
 
-		std::shared_ptr<async_control> control_ptr_;
+		std::shared_ptr<context> control_ptr_;
 
 		int state_;
 	};

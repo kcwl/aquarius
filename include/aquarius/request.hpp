@@ -33,7 +33,7 @@ namespace aquarius
 			if(ctx_ptr == nullptr)
 				return;
 
-			this->accept(this->shared_from_this(), ctx_ptr, this->get_conn_ptr());
+			this->accept(this->shared_from_this(), ctx_ptr);
 		}
 
 		void to_bytes(eb_stream& ios)

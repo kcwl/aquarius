@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <cstddef>
 #include <future>
-#include "detail/router.hpp"
+#include "common.hpp"
 
 namespace aquarius
 {
+	template<typename Connect>
 	class async_control
 	{
 	public:
@@ -14,14 +15,22 @@ namespace aquarius
 
 	public:
 		template<typename T>
-		void complete(detail::streambuf& stream,std::shared_ptr<connect> conn_ptr)
+		void process(std::shared_ptr<Connect> conn_ptr, streambuf& stream)
 		{
-			T proto_id{};
+			conn_ptr_ = conn_ptr;
 
-			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(T));
-
-			//处理message
-			detail::router::instance().route_invoke("msg_" + std::to_string(proto_id), stream,conn_ptr);
+			return complete(stream);
 		}
+
+		virtual void complete(streambuf& stream) = 0;
+
+		template<typename Response>
+		void send_msg(Response&& resp)
+		{
+			conn_ptr_->async_write_some(resp);
+		}
+
+	private:
+		std::shared_ptr<Connect> conn_ptr_;
 	};
 }
