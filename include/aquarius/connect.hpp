@@ -57,8 +57,6 @@ namespace aquarius
 
 		void start()
 		{
-			establish();
-
 			std::cout << "connect : " << size_++ << std::endl;
 #ifdef _SSL_SERVER
 			socket_.async_handshake(boost::asio::ssl::stream_base::server,
@@ -114,26 +112,10 @@ namespace aquarius
 									});
 		}
 
-		void establish()
-		{
-			heart_timer_.async_wait_for<int>(60s, [this]
-											 {
-												 if(!state_)
-													 return 0;
-
-												 //发送心跳
-												 //socket_.async_write_some();
-
-												 return 1;
-											 });
-		}
-
 		void shut_down()
 		{
 			if(!state_)
 				return;
-
-			heart_timer_.cancel();
 
 			state_ = 0;
 
@@ -144,7 +126,22 @@ namespace aquarius
 			}
 
 			socket_.close();
-			
+		}
+
+		void shut_down()
+		{
+			if(!state_)
+				return;
+
+			state_ = 0;
+
+			if(socket_.is_open())
+			{
+				boost::system::error_code ec;
+				socket_.shutdown(tcp::socket::shutdown_both, ec);
+			}
+
+			socket_.close();
 		}
 
 
@@ -158,8 +155,6 @@ namespace aquarius
 		detail::streambuf buffer_;
 
 		std::shared_ptr<async_control> control_ptr_;
-
-		deadline_timer heart_timer_;
 
 		int state_;
 	};
