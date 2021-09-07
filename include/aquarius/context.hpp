@@ -62,11 +62,11 @@ namespace aquarius
 	protected:
 		virtual bool handle() = 0;
 
-		virtual bool send_response(int result)
+		bool send_response(int result)
 		{
 			resp_.set_result(result);
 
-			this->send_msg(resp_);
+			send_response(resp_);
 
 			return true;
 		}
