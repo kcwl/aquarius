@@ -7,8 +7,6 @@ namespace aquarius
 {
 	class basic_message {};
 
-	using eb_stream = easybuffers::ebstream<>;
-
 	template<class Header, class Body, std::size_t Number>
 	class message 
 		: public basic_message
