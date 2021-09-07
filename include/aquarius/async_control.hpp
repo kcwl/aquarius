@@ -25,7 +25,7 @@ namespace aquarius
 		virtual void complete(streambuf& stream) = 0;
 
 		template<typename Response>
-		void send_msg(Response&& resp)
+		void send_response(Response&& resp)
 		{
 			conn_ptr_->async_write_some(resp);
 		}
