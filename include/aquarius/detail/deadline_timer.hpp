@@ -5,114 +5,118 @@
 #include <future>
 
 using namespace std::chrono_literals;
-class deadline_timer
+
+namespace aquarius
 {
-public:
-	deadline_timer()
+	class deadline_timer
 	{
-		is_expirse_.store(false);
+	public:
+		deadline_timer()
+		{
+			is_expirse_.store(false);
 
-		is_use_.store(false);
-	}
+			is_use_.store(false);
+		}
 
-public:
-	void cancel()
-	{
-		is_expirse_.store(true);
-	}
+	public:
+		void cancel()
+		{
+			is_expirse_.store(true);
+		}
 
-	template<class T, class Func>
-	auto async_wait_for(std::chrono::seconds second,Func&& f)
-	{
-		if(is_use_)
-			return std::promise<T>();
+		template<class T, class Func>
+		auto async_wait_for(std::chrono::seconds second, Func&& f)
+		{
+			if(is_use_)
+				return std::promise<T>();
 
-		return async_wait_for<T, Func>(second.count(), std::forward<Func>(f));
-	}
+			return async_wait_for<T, Func>(second.count(), std::forward<Func>(f));
+		}
 
-	template<class T, class Func>
-	auto async_wait(Func&& f, std::chrono::hours hour = std::chrono::hours::zero(), std::chrono::minutes min = std::chrono::minutes::zero(), std::chrono::seconds second = std::chrono::seconds::zero())
-	{
-		if(is_use_)
-			return std::promise<T>();
+		template<class T, class Func>
+		auto async_wait(Func&& f, std::chrono::hours hour = std::chrono::hours::zero(), std::chrono::minutes min = std::chrono::minutes::zero(), std::chrono::seconds second = std::chrono::seconds::zero())
+		{
+			if(is_use_)
+				return std::promise<T>();
 
-		auto now = std::chrono::system_clock::now().time_since_epoch();
+			auto now = std::chrono::system_clock::now().time_since_epoch();
 
-		tm* t = std::localtime(now);
-		if(t == nullptr)
-			return;
+			tm* t = std::localtime(now);
+			if(t == nullptr)
+				return;
 
-		t->tm_hour = hour.count();
-		t->tm_min = min.count();
-		t->tm_sec = second.count();
+			t->tm_hour = hour.count();
+			t->tm_min = min.count();
+			t->tm_sec = second.count();
 
-		time_t des_time = std::mktime(t);
+			time_t des_time = std::mktime(t);
 
-		des_time < now.count() ? des_time += 24 * 60 * 60 : 0;
+			des_time < now.count() ? des_time += 24 * 60 * 60 : 0;
 
-		return async_wait<decltype(f()), Func>(des_time, std::move(f));
-	}
+			return async_wait<decltype(f()), Func>(des_time, std::move(f));
+		}
 
-private:
-	template<class T, class Func>
-	auto async_wait_for(time_t seconds, Func&& func)
-	{
-		std::promise<T> promise;
+	private:
+		template<class T, class Func>
+		auto async_wait_for(time_t seconds, Func&& func)
+		{
+			std::promise<T> promise;
 
-		if(is_use_)
-			return promise;
+			if(is_use_)
+				return promise;
 
-		std::thread t([f = std::move(func), seconds, &promise, this]
-					  {
-						  std::chrono::seconds sec(seconds);
-
-						  std::this_thread::sleep_for(std::chrono::seconds(seconds));
-
-						  promise.set_value(f());
-
-						  this->is_use_.store(false);
-					  });
-
-		t.detach();
-
-		return std::move(promise);
-	}
-
-	template<class T, class Func>
-	auto async_wait(time_t seconds, Func&& func)
-	{
-		std::promise<T> promise;
-
-		if(is_use_)
-			return promise;
-
-		is_use_.store(true);
-
-		std::thread t([f = std::move(func), &seconds, &promise, &is_use_]
-					  {
-						  for(;;)
+			std::thread t([f = std::move(func), seconds, &promise, this]
 						  {
-							  if(!is_expirse_)
-							  {
-								  is_use_.store(false);
-								  break;
-							  }
+							  std::chrono::seconds sec(seconds);
 
-							  std::this_thread::sleep_until(seconds);
-		                  
+							  std::this_thread::sleep_for(std::chrono::seconds(seconds));
+
 							  promise.set_value(f());
 
-							  seconds += 24 * 60 * 60;
-						  }
-					  });
+							  this->is_use_.store(false);
+						  });
 
-		t.detach();
+			t.detach();
 
-		return std::move(promise);
-	}
+			return std::move(promise);
+		}
 
-private:
-	std::atomic_bool is_expirse_;
+		template<class T, class Func>
+		auto async_wait(time_t seconds, Func&& func)
+		{
+			std::promise<T> promise;
 
-	std::atomic_bool is_use_;
-};
+			if(is_use_)
+				return promise;
+
+			is_use_.store(true);
+
+			std::thread t([f = std::move(func), &seconds, &promise, &is_use_]
+						  {
+							  for(;;)
+							  {
+								  if(!is_expirse_)
+								  {
+									  is_use_.store(false);
+									  break;
+								  }
+
+								  std::this_thread::sleep_until(seconds);
+
+								  promise.set_value(f());
+
+								  seconds += 24 * 60 * 60;
+							  }
+						  });
+
+			t.detach();
+
+			return std::move(promise);
+		}
+
+	private:
+		std::atomic_bool is_expirse_;
+
+		std::atomic_bool is_use_;
+	};
+}
