@@ -15,32 +15,36 @@ namespace aquarius
 		virtual ~request() = default;
 
 	public:
-		virtual std::size_t parse_bytes(detail::streambuf& ios) override
+		void parse_bytes(streambuf& ios)
 		{
+			easybuffers::ebstream cvt(ios);
+
 			// 处理header
-			ios >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->src_id_ >> this->header()->session_id_;
+			cvt >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->src_id_ >> this->header()->session_id_;
 
 			// 处理body
-			this->body()->parse_bytes(ios);
+			auto& _body = this->body();
+
+			cvt >> _body;
 
 			//触发ctx
 			auto ctx_ptr = detail::router::instance().route_func("ctx_" + std::to_string(this->header()->proto_id_));
 
 			if(ctx_ptr == nullptr)
-				return 0;
+				return;
 
-			return this->accept(this->shared_from_this(), ctx_ptr, this->get_conn_ptr());
+			this->accept(this->shared_from_this(), ctx_ptr);
 		}
 
-		virtual std::size_t to_bytes(detail::streambuf& ios) override
+		void to_bytes(streambuf& ios)
 		{
 			// 处理header
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->src_id_ <<  this->header()->session_id_;
 
 			// 处理body
-			this->body()->to_bytes(ios);
+			auto& _body = this->body();
 
-			return 1;
+			ios << _body;
 		}
 
 	public:

@@ -1,16 +1,34 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "detail/streambuf.hpp"
-#include "connect.hpp"
+#include "async_control.hpp"
+#include "detail/router.hpp"
 
 namespace aquarius
 {
 	class basic_message;
 
+	class connect;
+
 	class context 
 		: public visitor<basic_message>
+		, public async_control<connect>
 	{
+	public:
+		virtual int visit(std::shared_ptr<basic_message>)
+		{
+			return 0;
+		}
+	private:
+		virtual void complete(streambuf& stream)
+		{
+			protocol_type proto_id{};
+
+			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(protocol_type));
+
+			//处理message
+			detail::router::instance().route_invoke("msg_" + std::to_string(proto_id), stream);
+		}
 	};
 
 	template<class Request, class Response>
@@ -28,21 +46,17 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual int visit(std::shared_ptr<Request> request, std::shared_ptr<connect> conn_ptr)
+		virtual int visit(std::shared_ptr<Request> request)
 		{
 			request_ptr_.swap(request);
-
-			conn_ptr_ = conn_ptr;
 
 			if(!handle())
 				return 0;
 
-			send_response(1);
-
 			return 1;
 		}
 
-		virtual int visit(std::shared_ptr<basic_message> msg_ptr, std::shared_ptr<connect> conn_ptr)
+		virtual int visit(std::shared_ptr<basic_message> msg_ptr)
 		{
 			return 1;
 		}
@@ -50,22 +64,17 @@ namespace aquarius
 	protected:
 		virtual bool handle() = 0;
 
-		virtual bool send_response(int result)
+		bool send_response(int result)
 		{
 			resp_.set_result(result);
 
-			detail::streambuf buf;
-			resp_.to_bytes(buf);
-
-			conn_ptr_->async_write_some(buf);
+			send_response(resp_);
 
 			return true;
 		}
 
 	protected:
 		std::shared_ptr<Request> request_ptr_;
-
-		std::shared_ptr<connect> conn_ptr_;
 
 		Response resp_;
 	};

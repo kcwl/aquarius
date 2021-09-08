@@ -5,9 +5,10 @@
 #include <iostream>
 #include <vector>
 #include <boost/asio.hpp>
-#include "common.hpp"
-#include "async_control.hpp"
+#include "context.hpp"
 #include "detail/noncopyable.hpp"
+#include "detail/deadline_timer.hpp"
+
 
 namespace aquarius
 {
@@ -32,8 +33,13 @@ namespace aquarius
 			:socket_(io_service)
 #endif
 			, buffer_()
-			, control_ptr_(new async_control())
+			, control_ptr_(new context())
 		{
+		}
+
+		virtual ~connect()
+		{
+			shut_down();
 		}
 
 #ifdef _SSL_SERVER
@@ -67,10 +73,13 @@ namespace aquarius
 #endif
 		}
 
-
-		void async_write_some(const detail::streambuf& buf)
+		template<class Response>
+		void async_write_some(Response&& resp)
 		{
-			socket_.async_write_some(boost::asio::buffer(buf.data(), buf.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
+			easybuffers::ebstream stream{};
+			resp.to_bytes(stream);
+
+			socket_.async_write_some(boost::asio::buffer(stream.data(), stream.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)
 										 {
@@ -96,10 +105,26 @@ namespace aquarius
 
 										buffer_.commit(bytes_transferred);
 
-										control_ptr_->complete<uint32_t>(buffer_,self);
+										control_ptr_->process(self, buffer_);
 
 										async_read();
 									});
+		}
+
+		void shut_down()
+		{
+			if(state_ == ConnectState::connecting)
+				return;
+
+			state_ = ConnectState::shutdown;
+
+			if(socket_.is_open())
+			{
+				boost::system::error_code ec;
+				socket_.shutdown(tcp::socket::shutdown_both, ec);
+			}
+
+			socket_.close();
 		}
 
 	private:
@@ -109,8 +134,10 @@ namespace aquarius
 #else 
 		tcp::socket socket_;
 #endif
-		detail::streambuf buffer_;
+		streambuf buffer_;
 
-		std::shared_ptr<async_control> control_ptr_;
+		std::shared_ptr<context> control_ptr_;
+
+		ConnectState state_;
 	};
 }

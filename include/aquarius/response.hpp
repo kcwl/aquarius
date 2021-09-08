@@ -22,25 +22,25 @@ namespace aquarius
 			return this->header()->result_;
 		}
 
-		virtual std::size_t parse_bytes(detail::streambuf& ios) override
+		void parse_bytes(streambuf& ios)
 		{
 			// 处理header
 			ios >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->result_;
 
 			// 处理body
-			this->body()->parse_bytes(ios);
-
-			return 0;
+			auto& _body = this->body();
+			ios >> _body;
 		}
 
-		virtual std::size_t to_bytes(detail::streambuf& ios) override
+		void to_bytes(streambuf& ios)
 		{
 			// 处理header
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->result_;
 
 			// 处理body
-			this->body()->to_bytes(ios);
-			return 0;
+			auto& _body = this->body();
+			ios << _body;
+
 		}
 	};
 }

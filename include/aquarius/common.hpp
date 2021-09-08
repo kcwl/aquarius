@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "detail/easybuffers/include/easybuffers.hpp"
 
 namespace aquarius
 {
@@ -15,4 +15,14 @@ namespace aquarius
 		Tcp,
 		Http
 	};
+
+	enum class ConnectState : int
+	{
+		connecting,
+		shutdown
+	};
+
+	using streambuf = easybuffers::ebstream<>;
+
+	using protocol_type = uint32_t;
 }

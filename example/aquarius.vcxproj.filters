@@ -41,16 +41,10 @@
     <ClInclude Include="..\include\aquarius\server.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\factory.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\type_traits.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -71,19 +65,13 @@
     <ClInclude Include="..\include\aquarius\message.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\streambuf.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message_body.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\parse.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\visitor.hpp">
+      <Filter>aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>

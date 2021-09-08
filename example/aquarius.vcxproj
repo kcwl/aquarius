@@ -28,17 +28,13 @@
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\common.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\streambuf.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
-    <ClInclude Include="..\include\aquarius\message_body.hpp" />
-    <ClInclude Include="..\include\aquarius\parse.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
@@ -138,7 +134,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>E:\git\boost_1_74_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/;E:\git\reflect\include;F:\git仓库\reflect\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\git\boost_1_74_0;F:\code\qualify\include;F:\code\reflect\include;$(ProjectDir)../include/;E:\git\reflect\include;E:\git\flatbuffers\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>

@@ -82,11 +82,10 @@ namespace aquarius
 
 		tcp::acceptor acceptor_;
 
-		int size_;
+		inline static int number_ = 0;
 
 #ifdef _SSL_SERVER
 		boost::asio::ssl::context ssl_context_;
 #endif
-		std::shared_ptr<connect> new_connection_ptr_;
 	};
 }
