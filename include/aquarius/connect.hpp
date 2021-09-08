@@ -113,10 +113,10 @@ namespace aquarius
 
 		void shut_down()
 		{
-			if(!state_)
+			if(state_ == ConnectState::connecting)
 				return;
 
-			state_ = 0;
+			state_ = ConnectState::shutdown;
 
 			if(socket_.is_open())
 			{
@@ -138,6 +138,6 @@ namespace aquarius
 
 		std::shared_ptr<context> control_ptr_;
 
-		int state_;
+		ConnectState state_;
 	};
 }

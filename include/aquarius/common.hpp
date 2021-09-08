@@ -16,6 +16,12 @@ namespace aquarius
 		Http
 	};
 
+	enum class ConnectState : int
+	{
+		connecting,
+		shutdown
+	};
+
 	using streambuf = easybuffers::ebstream<>;
 
 	using protocol_type = uint32_t;
