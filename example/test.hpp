@@ -32,5 +32,5 @@ public:
 	}
 };
 
-static aquarius::detail::CtxRegist<login_handler> hanle_context("10001");
-static aquarius::detail::MsgRegist<login_request> msg_login("10001");
+static aquarius::detail::ctx_regist<login_handler> hanle_context("10001");
+static aquarius::detail::msg_regist<login_request> msg_login("10001");
