@@ -8,6 +8,8 @@ namespace aquarius
 {
 	class basic_message;
 
+	class connect;
+
 	class context 
 		: public visitor<basic_message>
 		, public async_control<connect>
