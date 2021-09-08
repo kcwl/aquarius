@@ -105,7 +105,7 @@ namespace aquarius
 
 										buffer_.commit(bytes_transferred);
 
-										control_ptr_->process<uint32_t>(self, buffer_);
+										control_ptr_->process(self, buffer_);
 
 										async_read();
 									});

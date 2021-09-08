@@ -14,7 +14,6 @@ namespace aquarius
 		}
 
 	public:
-		template<typename T>
 		void process(std::shared_ptr<Connect> conn_ptr, streambuf& stream)
 		{
 			conn_ptr_ = conn_ptr;

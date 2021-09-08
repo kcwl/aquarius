@@ -17,4 +17,6 @@ namespace aquarius
 	};
 
 	using streambuf = easybuffers::ebstream<>;
+
+	using protocol_type = uint32_t;
 }
