@@ -20,9 +20,9 @@ namespace aquarius
 	private:
 		virtual void complete(streambuf& stream)
 		{
-			uint32_t proto_id{};
+			protocol_type proto_id{};
 
-			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(uint32_t));
+			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(protocol_type));
 
 			//处理message
 			detail::router::instance().route_invoke("msg_" + std::to_string(proto_id), stream);
