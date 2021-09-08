@@ -2,8 +2,6 @@
 
 namespace aquarius
 {
-	class connect;
-
 	template <typename FinalT, typename ReturnT = int>
 	class visitor
 	{
