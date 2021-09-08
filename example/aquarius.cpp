@@ -28,8 +28,14 @@
 
 int main()
 {
-	aquarius::server aq_server{ "9100" ,4};
-	aq_server.run();
+	//aquarius::server aq_server{ "9100" ,4};
+	//aq_server.run();
+
+	aquarius::streambuf buf;
+	buf << 10001 << 2 << 3 << 4 << 5;
+
+	aquarius::context ctx;
+	ctx.process(nullptr, buf);
 
 	//handle_ptr->process();
 
