@@ -43,8 +43,6 @@ namespace aquarius
 		{
 			auto new_connect_ptr = std::make_shared<connect>(io_service_pool_.get_io_service());
 
-			connect_pools_.insert({number_++,new_connect_ptr});
-
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& error)
 								   {
@@ -61,8 +59,6 @@ namespace aquarius
 		void handle_stop()
 		{
 			io_service_pool_.stop();
-
-			connect_pools_.clear();
 		}
 
 #ifdef _SSL_SERVER
@@ -91,7 +87,5 @@ namespace aquarius
 #ifdef _SSL_SERVER
 		boost::asio::ssl::context ssl_context_;
 #endif
-		//std::shared_ptr<connect> new_connection_ptr_;
-		std::unordered_multimap<int, std::shared_ptr<connect>> connect_pools_;
 	};
 }
