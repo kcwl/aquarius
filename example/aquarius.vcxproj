@@ -33,7 +33,6 @@
     <ClInclude Include="..\include\aquarius\detail\factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\dead_timer.hpp" />
     <ClInclude Include="..\include\aquarius\header.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />

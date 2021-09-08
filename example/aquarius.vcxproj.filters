@@ -74,9 +74,6 @@
     <ClInclude Include="..\include\aquarius\visitor.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\dead_timer.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
