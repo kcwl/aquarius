@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "async_control.hpp"
-#include "detail/router.hpp"
+#include "schedule.hpp"
 
 namespace aquarius
 {
@@ -12,22 +11,11 @@ namespace aquarius
 
 	class context 
 		: public visitor<basic_message>
-		, public async_control<connect>
 	{
 	public:
-		virtual int visit(std::shared_ptr<basic_message>)
+		virtual int visit(std::shared_ptr<FinalType> visited)
 		{
 			return 0;
-		}
-	private:
-		virtual void complete(streambuf& stream)
-		{
-			protocol_type proto_id{};
-
-			std::memcpy(&proto_id, reinterpret_cast<void*>(stream.data()), sizeof(protocol_type));
-
-			//处理message
-			detail::router::instance().route_invoke("msg_" + std::to_string(proto_id), stream);
 		}
 	};
 
