@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <boost/asio.hpp>
 #include <type_traits>
+#include "common.hpp"
 
 namespace aquarius
 {
@@ -52,7 +53,7 @@ namespace aquarius
 		}
 
 		//template<class T, std::size_t N>
-		void async_write(const detail::streambuf& buf)
+		void async_write(const streambuf& buf)
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.data(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
