@@ -5,9 +5,9 @@
 #include <iostream>
 #include <vector>
 #include <boost/asio.hpp>
-#include "context.hpp"
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
+#include "schedule.hpp"
 
 
 namespace aquarius
@@ -33,7 +33,7 @@ namespace aquarius
 			:socket_(io_service)
 #endif
 			, buffer_()
-			, control_ptr_(new context())
+			, schedule_ptr_(new schedule())
 		{
 		}
 
@@ -105,7 +105,7 @@ namespace aquarius
 
 										buffer_.commit(bytes_transferred);
 
-										control_ptr_->process(self, buffer_);
+										schedule_ptr_->process(self, buffer_);
 
 										async_read();
 									});
@@ -136,7 +136,7 @@ namespace aquarius
 #endif
 		streambuf buffer_;
 
-		std::shared_ptr<context> control_ptr_;
+		std::shared_ptr<schedule> schedule_ptr_;
 
 		ConnectState state_;
 	};
