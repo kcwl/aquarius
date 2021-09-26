@@ -52,6 +52,11 @@ namespace aquarius
 			return Number;
 		}
 
+	public:
+		virtual void parse_bytes(streambuf& ios) = 0;
+
+		virtual void to_bytes(streambuf& ios) = 0;
+
 	private:
 		std::shared_ptr<header_t> header_ptr_;
 
