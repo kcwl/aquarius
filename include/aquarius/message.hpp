@@ -33,19 +33,6 @@ namespace aquarius
 		{
 			return body_;
 		}
-		
-		template<typename T>
-		int accept(std::shared_ptr<T> msg_ptr, std::shared_ptr<context> ctx_ptr)
-		{
-			using request_type = visitor<T, int>;
-
-			auto request_ptr = std::dynamic_pointer_cast<request_type>(ctx_ptr);
-
-			if(request_ptr == nullptr)
-				return ctx_ptr->visit(msg_ptr);
-
-			return request_ptr->visit(msg_ptr);
-		}
 
 		constexpr std::size_t proto()
 		{
