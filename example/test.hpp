@@ -3,7 +3,7 @@
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/context.hpp>
-#include <aquarius/detail/router.hpp>
+#include <aquarius/router.hpp>
 
 
 struct login_request_body
@@ -32,5 +32,5 @@ public:
 	}
 };
 
-static aquarius::detail::ctx_regist<login_handler> hanle_context("10001");
-static aquarius::detail::msg_regist<login_request> msg_login("10001");
+static aquarius::ctx_regist<login_handler> hanle_context("10001");
+static aquarius::msg_regist<login_request> msg_login("10001");

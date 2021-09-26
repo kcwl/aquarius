@@ -26,6 +26,7 @@
 
 
 
+
 int main()
 {
 	//aquarius::server aq_server{ "9100" ,4};
@@ -34,8 +35,8 @@ int main()
 	aquarius::streambuf buf;
 	buf << 10001 << 2 << 3 << 4 << 5;
 
-	aquarius::context ctx;
-	ctx.process(nullptr, buf);
+	auto ctx= std::make_shared<aquarius::schedule>();
+	ctx->process(nullptr, buf);
 
 	//handle_ptr->process();
 
