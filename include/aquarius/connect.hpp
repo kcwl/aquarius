@@ -73,13 +73,9 @@ namespace aquarius
 #endif
 		}
 
-		template<class Response>
-		void async_write_some(Response&& resp)
+		void async_write_some(streambuf&& resp)
 		{
-			easybuffers::ebstream stream{};
-			resp.to_bytes(stream);
-
-			socket_.async_write_some(boost::asio::buffer(stream.data(), stream.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
+			socket_.async_write_some(boost::asio::buffer(resp.data(), resp.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 									 {
 										 if(ec)
 										 {

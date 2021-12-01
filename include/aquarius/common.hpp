@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "detail/easybuffers/include/easybuffers.hpp"
+#include "../third_party/fastbuffers/include/fastbuffers.hpp"
 
 namespace aquarius
 {
@@ -22,7 +22,7 @@ namespace aquarius
 		shutdown
 	};
 
-	using streambuf = easybuffers::ebstream<>;
+	using streambuf = fastbuffers::stream<>;
 
 	using protocol_type = uint32_t;
 }
