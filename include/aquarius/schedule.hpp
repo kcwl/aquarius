@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <future>
 #include "basic_schedule.hpp"
+#include "visitor.hpp"
 
 namespace aquarius
 {

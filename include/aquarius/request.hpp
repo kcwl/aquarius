@@ -3,10 +3,10 @@
 
 namespace aquarius
 {
-	template<class Body, std::size_t Number>
+	template<class _Body, std::size_t Number>
 	class request
-		: public message<request_header, Body, Number>
-		, public std::enable_shared_from_this<request<Body, Number>>
+		: public message<request_header, _Body, Number>
+		, public std::enable_shared_from_this<request<_Body, Number>>
 	{
 	public:
 		request() = default;
@@ -15,24 +15,16 @@ namespace aquarius
 	public:
 		virtual void parse_bytes(streambuf& ios)
 		{
-			// 处理header
 			ios >> this->header()->proto_id_ >> this->header()->part_id_ >> this->header()->reserve_ >> this->header()->src_id_ >> this->header()->session_id_;
 
-			// 处理body
-			auto& _body = this->body();
-
-			ios >> _body;
+			this->body().parse_bytes(ios);
 		}
 
 		virtual void to_bytes(streambuf& ios)
 		{
-			// 处理header
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->src_id_ <<  this->header()->session_id_;
 
-			// 处理body
-			auto& _body = this->body();
-
-			ios << _body;
+			this->body().to_bytes(ios);
 		}
 
 	public:
