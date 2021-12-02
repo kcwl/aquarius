@@ -17,26 +17,31 @@ namespace aquarius
 	using tcp = boost::asio::ip::tcp;
 
 	constexpr int heart_time_interval = 10;
- 
+
 #ifdef _SSL_SERVER
-	using ssl_socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
+	using socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
+#else
+	using socket_t = tcp::socket;
 #endif
+
 	class connect
 		: public detail::callback<connect>
 		, public std::enable_shared_from_this<connect>
 		, private detail::noncopyable
 	{
 	public:
+
+		explicit connect(boost::asio::io_service& io_service
 #ifdef _SSL_SERVER
-		explicit connect(boost::asio::io_service& io_service, boost::asio::ssl::context& context)
-#else
-		explicit connect(boost::asio::io_service& io_service)
+			, boost::asio::ssl::context& context
 #endif
+		)
+			: socket_(io_service
 #ifdef _SSL_SERVER
-			: socket_(io_service_, context)
-#else
-			:socket_(io_service)
+				, context
 #endif
+			)
+
 			, buffer_()
 			, schedule_ptr_(new schedule())
 			, heart_timer_(io_service)
@@ -49,12 +54,12 @@ namespace aquarius
 		}
 
 #ifdef _SSL_SERVER
-		ssl_socket_t::lowest_layer_type& socket()
+		socket_t::lowest_layer_type& socket()
 		{
 			return socket_.lowest_layer();
 		}
 #else
-		boost::asio::ip::tcp::socket& socket()
+		socket_t& socket()
 		{
 			return socket_;
 		}
@@ -65,33 +70,33 @@ namespace aquarius
 			std::cout << "connect : " << size_++ << std::endl;
 #ifdef _SSL_SERVER
 			socket_.async_handshake(boost::asio::ssl::stream_base::server,
-									[this](const boost::system::error_code& error)
-									{
-										if(error)
-										{
-											std::cout << error.message() << std::endl;
-											return;
-										}
+				[this](const boost::system::error_code& error)
+				{
+					if (error)
+					{
+						std::cout << error.message() << std::endl;
+						return;
+					}
 #endif
-										establish();
+					establish();
 
-										async_read();
+					async_read();
 #ifdef _SSL_SERVER
-									});
+				});
 #endif
 		}
 
 		void async_write_some(streambuf&& resp)
 		{
 			socket_.async_write_some(boost::asio::buffer(resp.data(), resp.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
-									 {
-										 if(ec)
-										 {
-											 std::cout << ec.message() << std::endl;
-										 }
+				{
+					if (ec)
+					{
+						std::cout << ec.message() << std::endl;
+					}
 
-										 std::cout << "complete " << bytes_transferred << "字节" << std::endl;
-									 });
+					std::cout << "complete " << bytes_transferred << "字节" << std::endl;
+				});
 		}
 
 		void set_connect_cb(connect_callback cb)
@@ -110,30 +115,25 @@ namespace aquarius
 			auto self = shared_from_this();
 
 			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.max_size()),
-									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred){
-										if(error)
-										{
-											shut_down();
+				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) {
+					if (error)
+					{
+						shut_down();
 
-											return;
-										}
+						return;
+					}
 
-										buffer_.commit(bytes_transferred);
+					buffer_.commit(bytes_transferred);
 
-										schedule_ptr_->process(self, buffer_);
+					schedule_ptr_->process(self, buffer_);
 
-										async_read();
-									});
+					async_read();
+				});
 		}
 
 		void shut_down()
 		{
-			if(state_ == ConnectState::connecting)
-				return;
-
-			state_ = ConnectState::shutdown;
-
-			if(socket_.is_open())
+			if (socket_.is_open())
 			{
 				boost::system::error_code ec;
 				socket_.shutdown(tcp::socket::shutdown_both, ec);
@@ -167,16 +167,12 @@ namespace aquarius
 
 	private:
 		static inline int size_ = 0;
-#ifdef _SSL_SERVER
-		ssl_socket_t socket_;
-#else 
-		tcp::socket socket_;
-#endif
+
+		socket_t socket_;
+
 		streambuf buffer_;
 
 		std::shared_ptr<schedule> schedule_ptr_;
-
-		ConnectState state_;
 
 		detail::deadline_timer heart_timer_;
 	};
