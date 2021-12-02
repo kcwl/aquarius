@@ -7,6 +7,7 @@
 namespace aquarius
 {
 	class server
+		: public detail::callback<connect>
 	{
 	public:
 		explicit server(const std::string& port, int io_service_pool_size)
@@ -38,21 +39,35 @@ namespace aquarius
 			io_service_pool_.run();
 		}
 
+		void set_connect_cb(connect_callback cb)
+		{
+			conn_cb_ = cb;
+		}
+
+		void set_disconnect_cb(disconnect_callback cb)
+		{
+			disconn_cb_ = cb;
+		}
+
 	private:
 		void start_accept()
 		{
 			auto new_connect_ptr = std::make_shared<connect>(io_service_pool_.get_io_service());
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
-								   [this, new_connect_ptr](const boost::system::error_code& error)
-								   {
-									   if(!error)
-									   {
-										   new_connect_ptr->start();
+				[this, new_connect_ptr](const boost::system::error_code& error)
+				{
+					if (!error)
+					{
+						new_connect_ptr->set_connect_cb(conn_cb_);
+						
+						new_connect_ptr->set_disconnect_cb(disconn_cb_);
 
-										   start_accept();
-									   }
-								   }
+						new_connect_ptr->start();
+					}
+
+					start_accept();
+				}
 			);
 		}
 
