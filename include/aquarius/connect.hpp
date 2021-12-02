@@ -8,6 +8,7 @@
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
 #include "schedule.hpp"
+#include "detail/callback.hpp"
 
 
 namespace aquarius
@@ -18,7 +19,8 @@ namespace aquarius
 	using ssl_socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 #endif
 	class connect
-		: public std::enable_shared_from_this<connect>
+		: public detail::callback<connect>
+		, public std::enable_shared_from_this<connect>
 		, private detail::noncopyable
 	{
 	public:
@@ -84,6 +86,16 @@ namespace aquarius
 
 										 std::cout << "complete " << bytes_transferred << "字节" << std::endl;
 									 });
+		}
+
+		void set_connect_cb(connect_callback cb)
+		{
+			conn_cb_ = cb;
+		}
+
+		void set_disconnect_cb(disconnect_callback cb)
+		{
+			disconn_cb_ = cb;
 		}
 
 	private:
