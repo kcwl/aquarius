@@ -9,12 +9,15 @@
 #include "detail/deadline_timer.hpp"
 #include "schedule.hpp"
 #include "detail/callback.hpp"
+#include "detail/deadline_timer.hpp"
 
 
 namespace aquarius
 {
 	using tcp = boost::asio::ip::tcp;
 
+	constexpr int heart_time_interval = 10;
+ 
 #ifdef _SSL_SERVER
 	using ssl_socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 #endif
@@ -36,6 +39,7 @@ namespace aquarius
 #endif
 			, buffer_()
 			, schedule_ptr_(new schedule())
+			, heart_timer_(io_service)
 		{
 		}
 
@@ -69,6 +73,8 @@ namespace aquarius
 											return;
 										}
 #endif
+										establish();
+
 										async_read();
 #ifdef _SSL_SERVER
 									});
@@ -107,7 +113,8 @@ namespace aquarius
 									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred){
 										if(error)
 										{
-											std::cout << error.value() << ":" << error.message() << std::endl;
+											shut_down();
+
 											return;
 										}
 
@@ -132,7 +139,30 @@ namespace aquarius
 				socket_.shutdown(tcp::socket::shutdown_both, ec);
 			}
 
+			heart_timer_.cancel();
+
 			socket_.close();
+
+			disconn_cb_ != nullptr ? disconn_cb_(shared_from_this()) : void();
+		}
+
+		void establish()
+		{
+			conn_cb_ != nullptr ? conn_cb_(shared_from_this()) : void();
+
+			heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
+			heart_timer_.async_wait(std::bind(&connect::heart_deadline, shared_from_this()));
+		}
+
+		void heart_deadline()
+		{
+			if (heart_timer_.expires_at() <= detail::deadline_timer::traits_type::now())
+			{
+				async_write_some({});
+			}
+
+			heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
+			heart_timer_.async_wait(std::bind(&connect::heart_deadline, shared_from_this()));
 		}
 
 	private:
@@ -147,5 +177,7 @@ namespace aquarius
 		std::shared_ptr<schedule> schedule_ptr_;
 
 		ConnectState state_;
+
+		detail::deadline_timer heart_timer_;
 	};
 }
