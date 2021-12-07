@@ -22,7 +22,7 @@ namespace aquarius
 		shutdown
 	};
 
-	using streambuf = fastbuffers::stream<>;
+	using streambuf = fastbuffers::ftstream<>;
 
 	using protocol_type = uint32_t;
 }
