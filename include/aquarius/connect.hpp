@@ -114,7 +114,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.max_size()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.size()),
 				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) {
 					if (error)
 					{
