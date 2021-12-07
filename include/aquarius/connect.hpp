@@ -10,6 +10,7 @@
 #include "schedule.hpp"
 #include "detail/callback.hpp"
 #include "detail/deadline_timer.hpp"
+#include "header.hpp"
 
 
 namespace aquarius
@@ -114,7 +115,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.size()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.max_size()),
 				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) {
 					if (error)
 					{
@@ -123,10 +124,13 @@ namespace aquarius
 						return;
 					}
 
-					buffer_.commit(bytes_transferred);
+					if (bytes_transferred >= sizeof(tcp_header))
+					{
+						buffer_.commit(bytes_transferred);
 
-					schedule_ptr_->process(self, buffer_);
-
+						schedule_ptr_->process(self, buffer_);
+					}
+					
 					async_read();
 				});
 		}
