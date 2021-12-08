@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "schedule.hpp"
+#include "common.hpp"
 
 namespace aquarius
 {
@@ -10,19 +10,19 @@ namespace aquarius
 	class connect;
 
 	class context 
-		: public visitor<basic_message>
+		: public visitor<basic_message, send_response_t>
 	{
 	public:
-		virtual int visit(std::shared_ptr<FinalType> visited)
+		virtual int visit(std::shared_ptr<basic_message> visited, send_response_t&&)
 		{
 			return 0;
 		}
 	};
 
 	template<class Request, class Response>
-	class handler 
+	class handler
 		: public context
-		, public visitor<Request,int>
+		, public visitor<Request, send_response_t>
 	{
 	public:
 		handler()
@@ -34,9 +34,11 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual int visit(std::shared_ptr<Request> request)
+		virtual int visit(std::shared_ptr<Request> request, send_response_t&& send_reponse)
 		{
 			request_ptr_.swap(request);
+
+			send_response_func_.swap(send_reponse);
 
 			if(!handle())
 				return 0;
@@ -44,26 +46,27 @@ namespace aquarius
 			return 1;
 		}
 
-		virtual int visit(std::shared_ptr<basic_message> msg_ptr)
-		{
-			return 1;
-		}
-
 	protected:
 		virtual bool handle() = 0;
 
-		bool send_response(int result)
+		void send_response(int result)
 		{
 			resp_.set_result(result);
 
-			send_response(resp_);
+			resp_.to_bytes(buffer_);
 
-			return true;
+			send_response_func_(std::move(buffer_));
+
+			buffer_.clear();
 		}
 
 	protected:
 		std::shared_ptr<Request> request_ptr_;
 
 		Response resp_;
+
+		send_response_t send_response_func_;
+
+		streambuf buffer_;
 	};
 }
