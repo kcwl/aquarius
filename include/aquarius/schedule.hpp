@@ -1,56 +1,69 @@
 ﻿#pragma once
 #include <cstddef>
 #include <future>
-#include "basic_schedule.hpp"
+#include "common.hpp"
 #include "visitor.hpp"
 
 namespace aquarius
 {
-	class connect;
+	class router;
 
 	class schedule
 		: public std::enable_shared_from_this<schedule>
-		, public basic_schedule<connect>
 		
 	{
 	public:
-		virtual ~schedule()
-		{
-		}
+		schedule() = default;
+		virtual ~schedule() = default;
 
-		virtual void complete(protocol_type proto_id, streambuf& stream, std::shared_ptr<context> ctx_ptr)
+	public:
+		template<typename Func>
+		void parse_package(streambuf& buf, Func&& f)
 		{
+			protocol_type proto_id = make_proto_id(buf);
+
+			if (proto_id == static_cast<protocol_type>(-1))
+				return;
+
+			//触发ctx
+			auto ctx_ptr = router::instance().route_func("ctx_" + std::to_string(proto_id));
+
 			//处理message
-			return router::instance().route_invoke("msg_" + std::to_string(proto_id), stream, shared_from_this(), ctx_ptr);
+			router::instance().route_invoke("msg_" + std::to_string(proto_id), shared_from_this(), buf, ctx_ptr,std::forward<Func>(f));
+
+			return buf.clear();
 		}
 
-		template<typename Request, typename Context>
-		int accept(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr)
+		template<typename Request, typename Context, typename Func>
+		int accept(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, Func&& f)
 		{
-			using request_type = visitor<Request, int>;
+			using request_type = visitor<Request, Func, int>;
 
 			auto request_ptr = std::dynamic_pointer_cast<request_type>(ctx_ptr);
 
-			if(request_ptr == nullptr)
-				return ctx_ptr->visit(msg_ptr);
+			if (request_ptr == nullptr)
+				return ctx_ptr->visit(msg_ptr, std::forward<Func>(f));
 
-			return request_ptr->visit(msg_ptr);
+			return request_ptr->visit(msg_ptr, std::forward<Func>(f));
 		}
-	};
 
-	template<class Func>
-	struct invoker
-	{
-		static inline void apply(const Func& func, streambuf& buf, std::shared_ptr<schedule> schedule_ptr, std::shared_ptr<context> ctx_ptr)
+	private:
+		protocol_type make_proto_id(streambuf& stream)
 		{
-			auto msg_ptr = func();
+			protocol_type proto_id{};
 
-			if(msg_ptr == nullptr)
-				return;
+			uint32_t length{};
 
-			msg_ptr->parse_bytes(buf);
+			std::size_t stream_length = stream.size();
 
-			schedule_ptr->accept(msg_ptr, ctx_ptr);
+			stream >> proto_id >> length;
+
+			if (length > stream_length)
+				return static_cast<protocol_type>(-1);
+
+			return proto_id;
 		}
+
+		
 	};
 }

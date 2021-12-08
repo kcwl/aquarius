@@ -25,4 +25,6 @@ namespace aquarius
 	using streambuf = fastbuffers::ftstream<>;
 
 	using protocol_type = uint32_t;
+
+	using send_response_t = std::function<void(streambuf&&)>;
 }

@@ -7,10 +7,10 @@
 #include <boost/asio.hpp>
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
-#include "schedule.hpp"
 #include "detail/callback.hpp"
 #include "detail/deadline_timer.hpp"
 #include "header.hpp"
+#include "schedule.hpp"
 
 
 namespace aquarius
@@ -128,7 +128,10 @@ namespace aquarius
 					{
 						buffer_.commit(bytes_transferred);
 
-						schedule_ptr_->process(self, buffer_);
+						schedule_ptr_->parse_package(buffer_, [this](streambuf&& buf) 
+							{
+								this->async_write_some(std::move(buf));
+							});
 					}
 					
 					async_read();

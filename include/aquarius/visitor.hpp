@@ -2,14 +2,11 @@
 
 namespace aquarius
 {
-	template <typename FinalT, typename ReturnT = int>
+	template <typename Request, typename Func, typename ReturnT = int>
 	class visitor
 	{
 	public:
-		typedef ReturnT ReturnType;
-		typedef FinalT FinalType;
-
 		virtual ~visitor() {}
-		virtual ReturnType visit(std::shared_ptr<FinalType> visited) = 0;
+		virtual ReturnT visit(std::shared_ptr<Request> visited,Func&& f) = 0;
 	};
 }
