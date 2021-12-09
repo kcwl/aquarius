@@ -10,13 +10,10 @@ namespace aquarius
 	class connect;
 
 	class context 
-		: public visitor<basic_message, send_response_t>
+		: public visitor<basic_message,send_response_t>
 	{
 	public:
-		virtual int visit(std::shared_ptr<basic_message> visited, send_response_t&&)
-		{
-			return 0;
-		}
+		virtual int visit(std::shared_ptr<basic_message>, send_response_t&&) { return 0; };
 	};
 
 	template<class Request, class Response>
@@ -24,6 +21,10 @@ namespace aquarius
 		: public context
 		, public visitor<Request, send_response_t>
 	{
+	public:
+		using request_t = Request;
+		using response_t = Response;
+
 	public:
 		handler()
 			: request_ptr_(new Request{})
@@ -34,9 +35,9 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual int visit(std::shared_ptr<Request> request, send_response_t&& send_reponse)
+		virtual int visit(std::shared_ptr<Request> request_ptr, send_response_t&& send_reponse)
 		{
-			request_ptr_.swap(request);
+			request_ptr_.swap(request_ptr);
 
 			send_response_func_.swap(send_reponse);
 

@@ -12,19 +12,40 @@ namespace aquarius
 	class connect;
 	class schedule;
 
+	template<typename _Ty>
+	struct unpack_request
+	{
+		static inline std::shared_ptr<_Ty> pack(streambuf& buf)
+		{
+			auto request_ptr = std::make_shared<_Ty>();
+
+			if (request_ptr == nullptr)
+				return nullptr;
+
+			request_ptr->parse_bytes(buf);
+
+			return request_ptr;
+		}
+	};
+
 	template<class Func>
 	struct invoker
 	{
-		static inline void apply(const Func& func, std::shared_ptr<schedule> schedule_ptr, streambuf& buf, std::shared_ptr<context> ctx_ptr, send_response_t&& send_reponse)
+		static inline void apply(const Func& func, streambuf& buf, send_response_t&& send_reponse)
 		{
-			auto msg_ptr = func();
+			auto ctx_ptr = func();
+
+			if (ctx_ptr == nullptr)
+				return;
+
+			using Request = typename decltype(ctx_ptr)::element_type::request_t;
+
+			auto msg_ptr = unpack_request<Request>::pack(buf);
 
 			if (msg_ptr == nullptr)
 				return;
 
-			msg_ptr->parse_bytes(buf);
-
-			schedule_ptr->accept(msg_ptr, ctx_ptr, std::forward<send_response_t>(send_reponse));
+			msg_ptr->accept(ctx_ptr, std::forward<send_response_t>(send_reponse));
 		}
 	};
 
@@ -37,31 +58,21 @@ namespace aquarius
 		template<class Func>
 		void regist_invoke(const std::string& key, Func&& func)
 		{
-			map_invokes_.insert({ key,std::bind(&invoker<Func>::apply,std::forward<Func>(func),std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4) });
+			std::lock_guard lk(mutex_);
+
+			map_invokes_.insert({ key,std::bind(&invoker<Func>::apply,std::forward<Func>(func),std::placeholders::_1,std::placeholders::_2) });
 		}
 
-		template<typename Func>
-		void regist_func(const std::string& key, Func&& f)
+		void route_invoke(const std::string& key, streambuf& buf, send_response_t&& f)
 		{
-			map_funcs_.insert({key, std::forward<Func>(f)});
-		}
+			std::lock_guard lk(mutex_);
 
-		void route_invoke(const std::string& key, std::shared_ptr<schedule> schedule_ptr, streambuf& buf, std::shared_ptr<context> ctx_ptr, send_response_t&& f)
-		{
 			auto iter = map_invokes_.find(key);
+
 			if(iter == map_invokes_.end())
 				return;
 
-			return iter->second(schedule_ptr, buf, ctx_ptr,std::forward<send_response_t>(f));
-		}
-
-		std::shared_ptr<context> route_func(const std::string& key)
-		{
-			auto iter = map_funcs_.find(key);
-			if(iter == map_funcs_.end())
-				return nullptr;
-
-			return iter->second();
+			return iter->second(buf, std::forward<send_response_t>(f));
 		}
 
 	private:
@@ -69,22 +80,9 @@ namespace aquarius
 
 		router(router&&) = delete;
 
-		std::unordered_map<std::string, std::function<void(std::shared_ptr<schedule>, streambuf&, std::shared_ptr<context> ctx_ptr, send_response_t)>> map_invokes_;
+		std::unordered_map<std::string, std::function<void(streambuf&,  send_response_t)>> map_invokes_;
 
-		std::unordered_map<std::string, std::function<std::shared_ptr<context>()>> map_funcs_;
-	};
-
-	template<typename Request>
-	struct msg_regist
-	{
-		msg_regist(const std::string& key)
-		{
-			std::string _key = "msg_" + key;
-			router::instance().regist_invoke(_key, []()
-											 {
-												 return std::make_shared<Request>();
-											 });
-		}
+		std::mutex mutex_;
 	};
 
 	template<typename Context>
@@ -93,7 +91,7 @@ namespace aquarius
 		ctx_regist(const std::string& key)
 		{
 			std::string _key = "ctx_" + key;
-			router::instance().regist_func(_key, []()
+			router::instance().regist_invoke(_key, []()
 										   {
 											   return std::make_shared<Context>();
 										   });
