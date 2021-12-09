@@ -128,9 +128,9 @@ namespace aquarius
 					{
 						buffer_.commit(bytes_transferred);
 
-						schedule_ptr_->parse_package(buffer_, [this](streambuf&& buf) 
+						schedule_ptr_->parse_package(buffer_, [this, self](streambuf&& buf) 
 							{
-								this->async_write_some(std::move(buf));
+								async_write_some(std::move(buf));
 							});
 					}
 					
