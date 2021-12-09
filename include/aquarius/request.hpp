@@ -5,7 +5,8 @@ namespace aquarius
 {
 	template<class _Body, std::size_t Number>
 	class request
-		: public message<request_header, _Body, Number>
+		: protected message<request_header, _Body, Number>
+		, protected visiable<context, send_response_t>
 		, public std::enable_shared_from_this<request<_Body, Number>>
 	{
 	public:
@@ -25,6 +26,11 @@ namespace aquarius
 			ios << this->header()->proto_id_ << this->header()->part_id_ << this->header()->reserve_ << this->header()->src_id_ <<  this->header()->session_id_;
 
 			this->body().to_bytes(ios);
+		}
+
+		virtual int accept(std::shared_ptr<context> ctx_ptr, send_response_t&& f)
+		{
+			return accept_impl(this->shared_from_this(), ctx_ptr, std::forward<send_response_t>(f));
 		}
 
 	public:
