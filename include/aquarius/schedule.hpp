@@ -26,10 +26,7 @@ namespace aquarius
 				return;
 
 			//触发ctx
-			auto ctx_ptr = router::instance().route_func("ctx_" + std::to_string(proto_id));
-
-			//处理message
-			router::instance().route_invoke("msg_" + std::to_string(proto_id), shared_from_this(), buf, ctx_ptr,std::forward<Func>(f));
+			router::instance().route_invoke("ctx_" + std::to_string(proto_id), buf, std::forward<Func>(f));
 
 			return buf.clear();
 		}
