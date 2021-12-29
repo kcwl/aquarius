@@ -7,16 +7,13 @@ namespace aquarius
 {
 	class basic_message {};
 
-	template<class Header, class Body, std::size_t Number>
+	template<class _Header, class _Body, std::size_t Number>
 	class message 
 		: public basic_message
 	{
-		using header_t = Header;
-		using body_t = Body;
-
 	public:
 		message()
-			: header_ptr_(new header_t())
+			: header_ptr_(new _Header())
 			, body_()
 		{
 		}
@@ -24,30 +21,25 @@ namespace aquarius
 		virtual ~message() = default;
 
 	public:
-		std::shared_ptr<header_t> header()
+		std::shared_ptr<_Header> header()
 		{
 			return header_ptr_;
 		}
 
-		body_t& body()
+		_Body& body()
 		{
 			return body_;
 		}
 
-		constexpr std::size_t proto()
+		inline constexpr static std::size_t proto()
 		{
 			return Number;
 		}
 
-	public:
-		virtual void parse_bytes(streambuf& ios) = 0;
-
-		virtual void to_bytes(streambuf& ios) = 0;
-
 	private:
-		std::shared_ptr<header_t> header_ptr_;
+		std::shared_ptr<_Header> header_ptr_;
 
-		body_t body_;
+		_Body body_;
 	};
 
 
