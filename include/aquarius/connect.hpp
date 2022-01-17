@@ -5,24 +5,24 @@
 #include <iostream>
 #include <vector>
 #include <boost/asio.hpp>
-#include "detail/noncopyable.hpp"
-#include "detail/deadline_timer.hpp"
+#include "session.hpp"
 #include "detail/callback.hpp"
+#include "detail/noncopyable.hpp"
+#include "tcp/protocol_enum.hpp"
 #include "detail/deadline_timer.hpp"
-#include "header.hpp"
-#include "schedule.hpp"
+#include "detail/stream.hpp"
 
 
 namespace aquarius
 {
-	using tcp = boost::asio::ip::tcp;
+	using btcp = boost::asio::ip::tcp;
 
 	constexpr int heart_time_interval = 10;
 
 #ifdef _SSL_SERVER
 	using socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 #else
-	using socket_t = tcp::socket;
+	using socket_t = btcp::socket;
 #endif
 
 	class connect
@@ -44,9 +44,18 @@ namespace aquarius
 			)
 
 			, buffer_()
-			, schedule_ptr_(new schedule())
+			, session_ptr_(new session())
 			, heart_timer_(io_service)
 		{
+			auto self = shared_from_this();
+
+			auto send_f = [self](streambuf buf)
+			{
+				self->async_write_some(std::move(buf));
+			};
+
+
+			session_ptr_->attach(send_f);
 		}
 
 		virtual ~connect()
@@ -124,14 +133,16 @@ namespace aquarius
 						return;
 					}
 
-					if (bytes_transferred >= sizeof(tcp_header))
+					if (bytes_transferred >= 4)
 					{
 						buffer_.commit(bytes_transferred);
 
-						schedule_ptr_->parse_package(buffer_, [this, self](streambuf&& buf) 
-							{
-								async_write_some(std::move(buf));
-							});
+						//schedule_ptr_->parse_package(buffer_, [this, self](streambuf&& buf) 
+						//	{
+						//		async_write_some(std::move(buf));
+						//	});
+
+						session_ptr_->run(buffer_);
 					}
 					
 					async_read();
@@ -143,7 +154,7 @@ namespace aquarius
 			if (socket_.is_open())
 			{
 				boost::system::error_code ec;
-				socket_.shutdown(tcp::socket::shutdown_both, ec);
+				socket_.shutdown(btcp::socket::shutdown_both, ec);
 			}
 
 			heart_timer_.cancel();
@@ -179,8 +190,8 @@ namespace aquarius
 
 		streambuf buffer_;
 
-		std::shared_ptr<schedule> schedule_ptr_;
-
 		detail::deadline_timer heart_timer_;
+
+		std::shared_ptr<session> session_ptr_;
 	};
 }

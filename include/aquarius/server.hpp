@@ -1,8 +1,7 @@
 #pragma once
 #pragma warning(disable:4996)
-#include <boost/asio.hpp>
-#include "io_service_pool.hpp"
 #include "connect.hpp"
+#include "io_service_pool.hpp"
 
 namespace aquarius
 {
@@ -95,7 +94,7 @@ namespace aquarius
 
 		boost::asio::signal_set signals_;
 
-		tcp::acceptor acceptor_;
+		btcp::acceptor acceptor_;
 
 		inline static int number_ = 0;
 
