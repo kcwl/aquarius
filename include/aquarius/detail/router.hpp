@@ -11,8 +11,6 @@ namespace aquarius
 
 	namespace detail
 	{
-		class basic_message {};
-
 		using streambuf = easybuffers::ebstream<>;
 
 		template<class Func>
@@ -26,17 +24,6 @@ namespace aquarius
 					return;
 
 				msg_ptr->parse_bytes(buf);
-			}
-
-			template<typename T>
-			static inline void apply_ctx(const Func& func,T&& t)
-			{
-				auto ctx_ptr = func();
-
-				if(ctx_ptr == nullptr)
-					return;
-
-				ctx_ptr->visit(std::forward<T>(t));
 			}
 		};
 
@@ -87,9 +74,9 @@ namespace aquarius
 		};
 
 		template<typename Request>
-		struct MsgRegist
+		struct msg_regist
 		{
-			MsgRegist(const std::string& key)
+			msg_regist(const std::string& key)
 			{
 				std::string _key = "msg_" + key;
 				router::instance().regist_invoke(_key, []()
@@ -100,9 +87,9 @@ namespace aquarius
 		};
 
 		template<typename Context>
-		struct CtxRegist
+		struct ctx_regist
 		{
-			CtxRegist(const std::string& key)
+			ctx_regist(const std::string& key)
 			{
 				std::string _key = "ctx_" + key;
 				router::instance().regist_func(_key, []()
