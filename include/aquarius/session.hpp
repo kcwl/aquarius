@@ -2,6 +2,7 @@
 #include <memory>
 #include "router.hpp"
 #include "tcp/message.hpp"
+#include "detail/stream.hpp"
 
 namespace aquarius
 {
@@ -30,6 +31,16 @@ namespace aquarius
 		void async_send(T t)
 		{
 			return send_f_(t);
+		}
+
+		void on_close()
+		{
+			return;
+		}
+
+		void on_connect()
+		{
+			return;
 		}
 
 	private:

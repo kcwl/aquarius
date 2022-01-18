@@ -10,7 +10,6 @@
 #include "detail/noncopyable.hpp"
 #include "tcp/protocol_enum.hpp"
 #include "detail/deadline_timer.hpp"
-#include "detail/stream.hpp"
 
 
 namespace aquarius
