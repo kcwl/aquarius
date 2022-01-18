@@ -51,9 +51,7 @@ namespace aquarius
 			if (proto_id == static_cast<uint32_t>(-1))
 				return;
 
-			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>>::invoke("ctx_" + std::to_string(proto_id));
-
-			ctx_ptr->attach_session(shared_from_this());
+			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + std::to_string(proto_id), shared_from_this());
 
 			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + std::to_string(proto_id), std::move(ctx_ptr), std::ref(buf));
 

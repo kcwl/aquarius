@@ -3,12 +3,13 @@
 #include "type_traits.hpp"
 #include "dispatch.hpp"
 #include "tcp/message.hpp"
-#include "context.hpp"
 
 namespace aquarius
 {
+	class context;
+
 	class session;
-	
+
 	template<bool Token, typename R, typename Func, typename... Args>
 	struct invoker;
 
@@ -17,12 +18,12 @@ namespace aquarius
 	{
 		static inline R apply(const Func& func, Args&&... args)
 		{
-			//auto ctx_ptr = func();
+			auto ctx_ptr = func();
 
-			//if (ctx_ptr == nullptr)
-			//	return;
+			if (ctx_ptr == nullptr)
+				return nullptr;
 
-			//dispatch::accept(ctx_ptr, std::forward<Args>(args)...);
+			ctx_ptr->attach_session(std::forward<Args>(args)...);
 
 			return func();
 		}
@@ -44,7 +45,7 @@ namespace aquarius
 		}
 	};
 
-	using ctx_router = detail::router<std::shared_ptr<context>>;
+	using ctx_router = detail::router<std::shared_ptr<context>,std::shared_ptr<session>>;
 
 	using msg_router = detail::router<void, std::shared_ptr<context>, streambuf&>;
 
@@ -57,7 +58,7 @@ namespace aquarius
 
 			auto f = [] {return std::dynamic_pointer_cast<Basic>(std::make_shared<Context>()); };
 
-			ctx_router::instance().regist(_key, std::bind(&invoker<true, std::shared_ptr<Basic>, decltype(f)>::apply, f));
+			ctx_router::instance().regist(_key, std::bind(&invoker<true, std::shared_ptr<Basic>, decltype(f), std::shared_ptr<session>>::apply, f, std::placeholders::_1));
 		}
 	};
 
