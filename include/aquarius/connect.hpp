@@ -48,7 +48,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			auto send_f = [self](streambuf buf)
+			auto send_f = [self](streambuf&& buf)
 			{
 				self->async_write_some(std::move(buf));
 			};

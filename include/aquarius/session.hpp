@@ -30,7 +30,9 @@ namespace aquarius
 		template<typename T>
 		void async_send(T t)
 		{
-			return send_f_(t);
+			buf_ << t;
+
+			return send_f_(std::move(buf_));
 		}
 
 		void on_close()
@@ -79,6 +81,8 @@ namespace aquarius
 		}
 
 	private:
-		std::function<void(streambuf)> send_f_;
+		std::function<void(streambuf&&)> send_f_;
+
+		streambuf buf_;
 	};
 }
