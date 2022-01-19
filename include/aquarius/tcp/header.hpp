@@ -24,6 +24,8 @@ namespace aquarius
 
 			header(header&&) = default;
 
+			header& operator=(const header&) = default;
+
 			~header() = default;
 		};
 
