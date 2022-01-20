@@ -70,7 +70,8 @@ namespace aquarius
 
 			stream >> proto_id >> length;
 
-			stream.reset(sizeof(proto_id) + sizeof(length));
+			//stream.reset(sizeof(proto_id) + sizeof(length));
+			stream.consume(static_cast<int>(0 - sizeof(proto_id) - sizeof(length)));
 
 			if (length != stream_length)
 			{
