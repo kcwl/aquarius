@@ -1,26 +1,40 @@
 #pragma once
-#include "filed.hpp"
-
+#include <array>
+#include "../detail/stream.hpp"
 
 namespace aquarius
 {
 	namespace tcp
 	{
-		template<typename Body, typename Fields>
-		class basic_body : public Fields
+		struct body_helpter
 		{
-		public:
-			using is_request_body = std::true_type;
-
-		public:
-			basic_body()
-				: Fields()
+			template<typename T>
+			static inline void serialize(T* body, streambuf& buf)
 			{
-				
+				buf >> *body;
+			}
+
+			template<typename T>
+			static inline streambuf& deserialize(T* body)
+			{
+				static streambuf buf;
+
+				buf.clear();
+
+				buf << *body;
+
+				return buf;
 			}
 		};
-
-		template<typename T>
-		using body = basic_body<T, body_fields<T>>;
 	}
+}
+
+#define SERIALIZATION \
+void serialize(aquarius::streambuf& buf)\
+{ \
+	return aquarius::tcp::body_helpter::serialize(this, buf);\
+}\
+aquarius::streambuf& deserialize()\
+{\
+	return aquarius::tcp::body_helpter::deserialize(this);\
 }
