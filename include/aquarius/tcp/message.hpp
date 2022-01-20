@@ -56,11 +56,15 @@ namespace aquarius
 
 			int parse_bytes(streambuf& buf)
 			{
+				body_.serialize(buf);
+
 				return 1;
 			}
 
 			int to_bytes(streambuf& buf)
 			{
+				buf = body_.deserialize();
+
 				return 1;
 			}
 
