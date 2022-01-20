@@ -134,7 +134,7 @@ namespace aquarius
 
 					if (bytes_transferred >= 4)
 					{
-						buffer_.commit(bytes_transferred);
+						buffer_.commit(static_cast<int>(bytes_transferred));
 
 						//schedule_ptr_->parse_package(buffer_, [this, self](streambuf&& buf) 
 						//	{
