@@ -2,6 +2,7 @@
 #include <memory>
 #include "router.hpp"
 #include "tcp/message.hpp"
+#include "detail/stream.hpp"
 
 namespace aquarius
 {
@@ -29,7 +30,19 @@ namespace aquarius
 		template<typename T>
 		void async_send(T t)
 		{
-			return send_f_(t);
+			buf_ << t;
+
+			return send_f_(std::move(buf_));
+		}
+
+		void on_close()
+		{
+			return;
+		}
+
+		void on_connect()
+		{
+			return;
 		}
 
 	private:
@@ -40,9 +53,7 @@ namespace aquarius
 			if (proto_id == static_cast<uint32_t>(-1))
 				return;
 
-			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>>::invoke("ctx_" + std::to_string(proto_id));
-
-			ctx_ptr->attach_session(shared_from_this());
+			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + std::to_string(proto_id), shared_from_this());
 
 			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + std::to_string(proto_id), std::move(ctx_ptr), std::ref(buf));
 
@@ -70,6 +81,8 @@ namespace aquarius
 		}
 
 	private:
-		std::function<void(streambuf)> send_f_;
+		std::function<void(streambuf&&)> send_f_;
+
+		streambuf buf_;
 	};
 }

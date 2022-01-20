@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "filed.hpp"
 #include "header.hpp"
 #include "header_value.hpp"
@@ -57,11 +56,15 @@ namespace aquarius
 
 			int parse_bytes(streambuf& buf)
 			{
+				body_.serialize(buf);
+
 				return 1;
 			}
 
 			int to_bytes(streambuf& buf)
 			{
+				buf = body_.deserialize();
+
 				return 1;
 			}
 
@@ -69,12 +72,4 @@ namespace aquarius
 			Body body_;
 		};
 	}
-
-	using null_request = tcp::message<true, std::string, -1>;
-
-	template<class Body, std::size_t Number>
-	using request = tcp::message<true, Body, Number>;
-
-	template<class Body, std::size_t Number>
-	using response = tcp::message<false, Body, Number>;
 }

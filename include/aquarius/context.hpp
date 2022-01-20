@@ -1,29 +1,39 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "tcp/message.hpp"
+#include "tcp/null_message.hpp"
+#include "session.hpp"
 
 namespace aquarius
 {
-	class session;
-	 
 	class context 
-		: public visitor<null_request>
+		: public visitor<null_message>
 	{
 	public:
-		virtual int visit(std::shared_ptr<null_request>)
-		{ 
-			return 0; 
-		};
+		virtual int visit(std::shared_ptr<null_message> req)
+		{
+			return 0;
+		}
 
 		void attach_session(std::shared_ptr<session> session_ptr)
 		{
 			session_ptr_ = session_ptr;
 		}
 
-		virtual void send_response(int result)
+		template<typename Response>
+		void send_response(Response&& resp)
 		{
-			result = 1;
+			session_ptr_->async_send(std::forward<Response>(resp));
+		}
+
+		void on_close()
+		{
+			return session_ptr_->on_close();
+		}
+
+		void on_connect()
+		{
+			return session_ptr_->on_connect();
 		}
 
 	public:
@@ -35,10 +45,6 @@ namespace aquarius
 		: public context
 		, public visitor<Request>
 	{
-	public:
-		using request_t = Request;
-		using response_t = Response;
-
 	public:
 		handler()
 			: request_ptr_(new Request{})
@@ -53,32 +59,22 @@ namespace aquarius
 		{
 			request_ptr_.swap(request_ptr);
 
-			if(!handle())
-				return 0;
+			if (!handle())
+			{
+				on_close();
 
+				return 0;
+			}
+				
 			return 1;
 		}
 
 	protected:
 		virtual bool handle() = 0;
 
-		virtual void send_response(int result) override
-		{
-			//resp_.set_result(result);
-
-			//resp_.to_bytes(buffer_);
-
-			//buffer_.clear();
-
-			//session_ptr_->async_send(buffer_);
-			result = 1;
-		}
-
 	protected:
 		std::shared_ptr<Request> request_ptr_;
 
 		Response resp_;
-
-		streambuf buffer_;
 	};
 }

@@ -10,7 +10,6 @@
 #include "detail/noncopyable.hpp"
 #include "tcp/protocol_enum.hpp"
 #include "detail/deadline_timer.hpp"
-#include "detail/stream.hpp"
 
 
 namespace aquarius
@@ -49,7 +48,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			auto send_f = [self](streambuf buf)
+			auto send_f = [self](streambuf&& buf)
 			{
 				self->async_write_some(std::move(buf));
 			};
