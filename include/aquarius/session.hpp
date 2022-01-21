@@ -15,9 +15,6 @@ namespace aquarius
 
 		void run(streambuf& buf)
 		{
-			if (buf.size() == 0)
-				return;
-
 			return parse_package(buf);
 		}
 
@@ -48,16 +45,29 @@ namespace aquarius
 	private:
 		void parse_package(streambuf& buf)
 		{
-			uint32_t proto_id = get_id(buf);
+			auto hv = parse_header<tcp::header_fields::value_t>(buf);
 
-			if (proto_id == static_cast<uint32_t>(-1))
+			if (hv == decltype(hv)())
 				return;
 
-			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + std::to_string(proto_id), shared_from_this());
+			auto str_proto_id = std::to_string(hv.proto_);
 
-			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + std::to_string(proto_id), std::move(ctx_ptr), std::ref(buf));
+			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
 
-			return boost::asio::post(std::bind(&session::parse_package, shared_from_this(), std::ref(buf)));
+			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::ref(buf));
+		}
+
+		template<typename T>
+		T parse_header(streambuf& buf)
+		{
+			if (buf.size() < sizeof(T))
+				return T();
+
+			T value;
+
+			buf >> value;
+
+			return value;
 		}
 
 		uint32_t get_id(streambuf& stream)

@@ -124,7 +124,8 @@ namespace aquarius
 			auto self = shared_from_this();
 
 			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.max_size()),
-				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) {
+				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) 
+				{
 					if (error)
 					{
 						shut_down();
@@ -132,17 +133,9 @@ namespace aquarius
 						return;
 					}
 
-					if (bytes_transferred >= 4)
-					{
-						buffer_.commit(static_cast<int>(bytes_transferred));
+					buffer_.commit(static_cast<int>(bytes_transferred));
 
-						//schedule_ptr_->parse_package(buffer_, [this, self](streambuf&& buf) 
-						//	{
-						//		async_write_some(std::move(buf));
-						//	});
-
-						session_ptr_->run(buffer_);
-					}
+					session_ptr_->run(buffer_);
 					
 					async_read();
 				});
