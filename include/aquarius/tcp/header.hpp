@@ -20,6 +20,12 @@ namespace aquarius
 
 			}
 
+			header(Fields::value_t value)
+				: Fields(value)
+			{
+
+			}
+
 			header(const header&) = default;
 
 			header(header&&) = default;

@@ -20,6 +20,12 @@ namespace aquarius
 		public:
 			message() = default;
 
+			message(header_fields::value_t header)
+				: header_type(header)
+			{
+
+			}
+
 			message(message&&) = default;
 
 			message(message const&) = default;
