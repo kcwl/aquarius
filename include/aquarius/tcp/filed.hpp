@@ -27,9 +27,14 @@ namespace aquarius
 			}
 
 		public:
-			Allocator get() const
+			Allocator& get()
 			{
-				return this->get();
+				return base_type::get();
+			}
+
+			const Allocator& get() const
+			{
+				return base_type::get();
 			}
 		};
 	}
