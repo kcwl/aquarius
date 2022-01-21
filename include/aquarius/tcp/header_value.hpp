@@ -6,7 +6,7 @@ namespace  aquarius
 	namespace tcp
 	{
 		template<typename T, typename Off, typename ProtoType, typename Result>
-		struct value_type
+		struct header_value
 		{
 			T type_;
 			Off length_;
@@ -14,6 +14,6 @@ namespace  aquarius
 			Result result_;
 		};
 
-		using header_fields = basic_fileds<std::allocator<value_type<int, int, int, int>>>;
+		using header_fields = basic_fileds<std::allocator<header_value<int, int, int, int>>>;
 	}
 }
