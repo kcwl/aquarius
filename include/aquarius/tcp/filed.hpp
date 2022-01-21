@@ -10,7 +10,7 @@ namespace aquarius
 		class basic_fileds : private detail::empty_value<Allocator, N>
 		{
 		public:
-			using value_t = Allocator;
+			using value_t = typename Allocator::value_type;
 
 			using base_type = detail::empty_value<Allocator, N>;
 		public:

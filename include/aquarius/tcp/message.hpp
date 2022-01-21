@@ -62,14 +62,23 @@ namespace aquarius
 
 			int parse_bytes(streambuf& buf)
 			{
+				if (buf.size() != sizeof(Body))
+				{
+					buf.consume(static_cast<int>(0 - sizeof(header_fields::value_t)));
+
+					return 0;
+				}
+
 				body_.serialize(buf);
+
+				buf.complete();
 
 				return 1;
 			}
 
 			int to_bytes(streambuf& buf)
 			{
-				buf = body_.deserialize();
+				buf << body_.deserialize();
 
 				return 1;
 			}
