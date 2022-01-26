@@ -118,6 +118,11 @@ namespace aquarius
 			disconn_cb_ = cb;
 		}
 
+		std::string remote_address()
+		{
+			return socket_.local_endpoint().address().to_string();
+		}
+
 	private:
 		void async_read()
 		{
