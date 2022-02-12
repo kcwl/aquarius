@@ -1,3 +1,0 @@
-[submodule "third_party/fastbuffers"]
-	path = third_party/fastbuffers
-	url = https://github.com/kcwl/fastbuffers.git
