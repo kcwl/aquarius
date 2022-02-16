@@ -1,5 +1,5 @@
 #pragma once
-#include "filed.hpp"
+#include "field.hpp"
 #include "header.hpp"
 #include "header_value.hpp"
 #include "../stream.hpp"
@@ -18,10 +18,15 @@ namespace aquarius
 			using header_type = header<Request, header_fields>;
 
 		public:
-			message() = default;
+			message()
+				: body_()
+			{
 
-			message(header_fields::value_t header)
+			}
+
+			message(header_type header)
 				: header_type(header)
+				, body_()
 			{
 
 			}
@@ -79,6 +84,11 @@ namespace aquarius
 				buf << body_.deserialize();
 
 				return 1;
+			}
+
+			void copy(const typename header_type::value_t& hv)
+			{
+				header_type::copy(hv);
 			}
 
 		private:

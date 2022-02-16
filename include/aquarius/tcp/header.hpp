@@ -20,7 +20,7 @@ namespace aquarius
 
 			}
 
-			header(Fields::value_t value)
+			header(Fields::alloc_t value)
 				: Fields(value)
 			{
 
