@@ -54,7 +54,7 @@ namespace aquarius
 
 			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
 
-			invoke_helper<false, void, std::shared_ptr<context>, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::ref(buf));
+			invoke_helper<false, void, std::shared_ptr<context>, tcp::header_value, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::move(hv), std::ref(buf));
 		}
 
 		template<typename T>

@@ -24,10 +24,12 @@ namespace aquarius
 			return request_ptr->visit(msg_ptr);
 		}
 
-		template<typename Request, typename Context, typename... Args>
-		void parse_bytes(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, Args&&... args)
+		template<typename Request, typename Context>
+		void parse_bytes(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, tcp::header_value header, ftstream& buf)
 		{
-			msg_ptr->parse_bytes(std::forward<Args>(args)...);
+			msg_ptr->copy(header);
+
+			msg_ptr->parse_bytes(buf);
 
 			dispatch::accept(ctx_ptr, msg_ptr);
 		}
