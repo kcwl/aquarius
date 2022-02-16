@@ -71,8 +71,6 @@ namespace aquarius
 
 				body_.serialize(buf);
 
-				buf.complete();
-
 				return 1;
 			}
 
