@@ -47,7 +47,7 @@ namespace aquarius
 
 	using ctx_router = detail::router<std::shared_ptr<context>,std::shared_ptr<session>>;
 
-	using msg_router = detail::router<void, std::shared_ptr<context>, streambuf&>;
+	using msg_router = detail::router<void, std::shared_ptr<context>, ftstream&>;
 
 	template<typename Basic, typename Context>
 	struct ctx_regist
@@ -72,7 +72,7 @@ namespace aquarius
 			auto f = [] {return std::make_shared<Message>(); };
 
 			msg_router::instance().regist(_key, 
-				std::bind(&invoker<false,void, decltype(f), std::shared_ptr<context>, streambuf&>::apply, f, std::placeholders::_1, std::placeholders::_2));
+				std::bind(&invoker<false,void, decltype(f), std::shared_ptr<context>, ftstream&>::apply, f, std::placeholders::_1, std::placeholders::_2));
 		}
 	};
 

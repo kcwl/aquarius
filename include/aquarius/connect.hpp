@@ -48,7 +48,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			auto send_f = [self](streambuf&& buf)
+			auto send_f = [self](ftstream&& buf)
 			{
 				self->async_write_some(std::move(buf));
 			};
@@ -95,7 +95,7 @@ namespace aquarius
 #endif
 		}
 
-		void async_write_some(streambuf&& resp)
+		void async_write_some(ftstream&& resp)
 		{
 			socket_.async_write_some(boost::asio::buffer(resp.data(), resp.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
 				{
@@ -185,7 +185,7 @@ namespace aquarius
 
 		socket_t socket_;
 
-		streambuf buffer_;
+		ftstream buffer_;
 
 		detail::deadline_timer heart_timer_;
 
