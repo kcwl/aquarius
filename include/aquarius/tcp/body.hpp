@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "../detail/stream.hpp"
+#include "../stream.hpp"
 
 namespace aquarius
 {
@@ -9,15 +9,15 @@ namespace aquarius
 		struct body_helpter
 		{
 			template<typename T>
-			static inline void serialize(T* body, streambuf& buf)
+			static inline void serialize(T* body, ftstream& buf)
 			{
 				buf >> *body;
 			}
 
 			template<typename T>
-			static inline streambuf& deserialize(T* body)
+			static inline ftstream& deserialize(T* body)
 			{
-				static streambuf buf;
+				static ftstream buf;
 
 				buf.clear();
 
@@ -30,11 +30,11 @@ namespace aquarius
 }
 
 #define SERIALIZATION \
-void serialize(aquarius::streambuf& buf)\
+void serialize(aquarius::ftstream& buf)\
 { \
 	return aquarius::tcp::body_helpter::serialize(this, buf);\
 }\
-aquarius::streambuf& deserialize()\
+aquarius::ftstream& deserialize()\
 {\
 	return aquarius::tcp::body_helpter::deserialize(this);\
 }

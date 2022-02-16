@@ -2,7 +2,7 @@
 #include <memory>
 #include "router.hpp"
 #include "tcp/message.hpp"
-#include "detail/stream.hpp"
+#include "stream.hpp"
 
 namespace aquarius
 {
@@ -13,7 +13,7 @@ namespace aquarius
 
 		virtual ~session() = default;
 
-		void run(streambuf& buf)
+		void run(ftstream& buf)
 		{
 			return parse_package(buf);
 		}
@@ -43,7 +43,7 @@ namespace aquarius
 		}
 
 	private:
-		void parse_package(streambuf& buf)
+		void parse_package(ftstream& buf)
 		{
 			auto hv = parse_header<tcp::header_fields::value_t>(buf);
 
@@ -54,11 +54,13 @@ namespace aquarius
 
 			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
 
-			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::ref(buf));
+			invoke_helper<false, void, std::shared_ptr<context>, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::ref(buf));
+
+			return boost::asio::post(std::bind(&session::parse_package, shared_from_this(), buf));
 		}
 
 		template<typename T>
-		T parse_header(streambuf& buf)
+		T parse_header(ftstream& buf)
 		{
 			if (buf.size() < sizeof(T))
 				return T();
@@ -70,7 +72,7 @@ namespace aquarius
 			return value;
 		}
 
-		uint32_t get_id(streambuf& stream)
+		uint32_t get_id(ftstream& stream)
 		{
 			uint32_t proto_id{};
 
@@ -92,8 +94,8 @@ namespace aquarius
 		}
 
 	private:
-		std::function<void(streambuf&&)> send_f_;
+		std::function<void(ftstream&&)> send_f_;
 
-		streambuf buf_;
+		ftstream buf_;
 	};
 }

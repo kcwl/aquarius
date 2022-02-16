@@ -2,7 +2,7 @@
 #include "filed.hpp"
 #include "header.hpp"
 #include "header_value.hpp"
-#include "../detail/stream.hpp"
+#include "../stream.hpp"
 
 #pragma warning(disable:4100)
 
@@ -60,7 +60,7 @@ namespace aquarius
 				return std::to_string(Number);
 			}
 
-			int parse_bytes(streambuf& buf)
+			int parse_bytes(ftstream& buf)
 			{
 				if (buf.size() != sizeof(Body))
 				{
@@ -76,7 +76,7 @@ namespace aquarius
 				return 1;
 			}
 
-			int to_bytes(streambuf& buf)
+			int to_bytes(ftstream& buf)
 			{
 				buf << body_.deserialize();
 
