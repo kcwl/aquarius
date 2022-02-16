@@ -8,7 +8,6 @@
 #include "session.hpp"
 #include "detail/callback.hpp"
 #include "detail/noncopyable.hpp"
-#include "tcp/protocol_enum.hpp"
 #include "detail/deadline_timer.hpp"
 
 
@@ -29,8 +28,8 @@ namespace aquarius
 		, public std::enable_shared_from_this<connect>
 		, private detail::noncopyable
 	{
+		inline constexpr static std::size_t header_max_size = sizeof(tcp::header_value);
 	public:
-
 		explicit connect(boost::asio::io_service& io_service
 #ifdef _SSL_SERVER
 						 , boost::asio::ssl::context& context
@@ -128,7 +127,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), static_cast<std::size_t>(MessageLength::max_message_head_length)),
+			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), header_max_size),
 									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred)
 									{
 										if (error)
@@ -146,7 +145,7 @@ namespace aquarius
 
 		void async_read_body(std::size_t length)
 		{
-			if (length > static_cast<std::size_t>(MessageLength::max_message_body_length))
+			if (length > buffer_.max_size() - header_max_size)
 				return;
 
 			auto self = shared_from_this();
