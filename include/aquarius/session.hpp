@@ -70,27 +70,6 @@ namespace aquarius
 			return value;
 		}
 
-		uint32_t get_id(ftstream& stream)
-		{
-			uint32_t proto_id{};
-
-			uint32_t length{};
-
-			std::size_t stream_length = stream.size();
-
-			stream >> proto_id >> length;
-
-			//stream.reset(sizeof(proto_id) + sizeof(length));
-			stream.consume(static_cast<int>(0 - sizeof(proto_id) - sizeof(length)));
-
-			if (length != stream_length)
-			{
-				return static_cast<uint32_t>(-1);
-			}
-
-			return proto_id;
-		}
-
 	private:
 		std::function<void(ftstream&&)> send_f_;
 
