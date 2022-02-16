@@ -33,12 +33,12 @@ namespace aquarius
 
 		explicit connect(boost::asio::io_service& io_service
 #ifdef _SSL_SERVER
-			, boost::asio::ssl::context& context
+						 , boost::asio::ssl::context& context
 #endif
 		)
 			: socket_(io_service
 #ifdef _SSL_SERVER
-				, context
+					  , context
 #endif
 			)
 
@@ -46,15 +46,15 @@ namespace aquarius
 			, session_ptr_(new session())
 			, heart_timer_(io_service)
 		{
-			auto self = shared_from_this();
+			//auto self = shared_from_this();
 
-			auto send_f = [self](ftstream&& buf)
-			{
-				self->async_write_some(std::move(buf));
-			};
+			//auto send_f = [self](ftstream&& buf)
+			//{
+			//	self->async_write_some(std::move(buf));
+			//};
 
 
-			session_ptr_->attach(send_f);
+			//session_ptr_->attach(send_f);
 		}
 
 		virtual ~connect()
@@ -79,33 +79,33 @@ namespace aquarius
 			std::cout << "connect : " << size_++ << std::endl;
 #ifdef _SSL_SERVER
 			socket_.async_handshake(boost::asio::ssl::stream_base::server,
-				[this](const boost::system::error_code& error)
-				{
-					if (error)
-					{
-						std::cout << error.message() << std::endl;
-						return;
-					}
+									[this](const boost::system::error_code& error)
+									{
+										if (error)
+										{
+											std::cout << error.message() << std::endl;
+											return;
+										}
 #endif
-					establish();
+										establish();
 
-					async_read();
+										async_read();
 #ifdef _SSL_SERVER
-				});
+									});
 #endif
 		}
 
 		void async_write_some(ftstream&& resp)
 		{
 			socket_.async_write_some(boost::asio::buffer(resp.data(), resp.size()), [](const boost::system::error_code& ec, std::size_t bytes_transferred)
-				{
-					if (ec)
-					{
-						std::cout << ec.message() << std::endl;
-					}
+									 {
+										 if (ec)
+										 {
+											 std::cout << ec.message() << std::endl;
+										 }
 
-					std::cout << "complete " << bytes_transferred << "字节" << std::endl;
-				});
+										 std::cout << "complete " << bytes_transferred << "字节" << std::endl;
+									 });
 		}
 
 		void set_connect_cb(connect_callback cb)
@@ -128,22 +128,41 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.max_size()),
-				[this, self](const boost::system::error_code& error, std::size_t bytes_transferred) 
-				{
-					if (error)
-					{
-						shut_down();
+			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), static_cast<std::size_t>(MessageLength::max_message_head_length)),
+									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred)
+									{
+										if (error)
+										{
+											shut_down();
 
-						return;
-					}
+											return;
+										}
 
-					buffer_.commit(static_cast<int>(bytes_transferred));
+										buffer_.commit(static_cast<int>(bytes_transferred));
 
-					session_ptr_->run(buffer_);
-					
-					async_read();
-				});
+										async_read_body(buffer_.cat<uint32_t>());
+									});
+		}
+
+		void async_read_body(std::size_t length)
+		{
+			if (length > static_cast<std::size_t>(MessageLength::max_message_body_length))
+				return;
+
+			auto self = shared_from_this();
+
+			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), length),
+									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred)
+									{
+										if (error)
+											return;
+
+										buffer_.commit(static_cast<int>(bytes_transferred));
+
+										session_ptr_->run(buffer_);
+
+										async_read();
+									});
 		}
 
 		void shut_down()

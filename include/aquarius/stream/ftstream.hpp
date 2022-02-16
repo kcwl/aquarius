@@ -26,7 +26,7 @@ namespace aquarius
 		{
 			for (auto iter : data)
 			{
-				push_back(iter);
+				push(iter);
 			}
 		}
 
@@ -45,9 +45,18 @@ namespace aquarius
 			return *this;
 		}
 
-		void complete()
+		template<typename T>
+		T cat()
 		{
+			T result{};
 
+			constexpr auto sz = sizeof(T);
+
+			basic_ftstream bf(std::span<_T>(data(), sz));
+
+			bf >> result;
+
+			return result;
 		}
 
 		void clear()
