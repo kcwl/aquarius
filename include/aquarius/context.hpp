@@ -69,6 +69,11 @@ namespace aquarius
 			return 1;
 		}
 
+		void send_result(int error)
+		{
+			return send_response(resp_);
+		}
+
 	protected:
 		virtual bool handle() = 0;
 

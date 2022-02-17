@@ -25,11 +25,11 @@ namespace aquarius
 		}
 
 		template<typename Request, typename Context>
-		void parse_bytes(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, tcp::header_value header, ftstream& buf)
+		void serialize(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, tcp::header_value header, ftstream& buf)
 		{
 			msg_ptr->copy(header);
 
-			msg_ptr->parse_bytes(buf);
+			msg_ptr->serialize(buf);
 
 			dispatch::accept(ctx_ptr, msg_ptr);
 		}
