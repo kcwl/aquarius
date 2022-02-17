@@ -25,7 +25,7 @@ namespace aquarius
 
 			ctx_ptr->attach_session(std::forward<Args>(args)...);
 
-			return func();
+			return ctx_ptr;
 		}
 	};
 
@@ -41,7 +41,7 @@ namespace aquarius
 
 			//msg_ptr->parse_bytes(std::forward<Args>(args)...);
 
-			return dispatch::parse_bytes(msg_ptr, std::forward<Args>(args)...);
+			return dispatch::serialize(msg_ptr, std::forward<Args>(args)...);
 		}
 	};
 

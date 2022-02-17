@@ -45,15 +45,7 @@ namespace aquarius
 			, session_ptr_(new session())
 			, heart_timer_(io_service)
 		{
-			//auto self = shared_from_this();
 
-			//auto send_f = [self](ftstream&& buf)
-			//{
-			//	self->async_write_some(std::move(buf));
-			//};
-
-
-			//session_ptr_->attach(send_f);
 		}
 
 		virtual ~connect()
@@ -157,6 +149,11 @@ namespace aquarius
 											return;
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
+
+										session_ptr_->attach([self](ftstream&& buf)
+															 {
+																 self->async_write_some(std::move(buf));
+															 });
 
 										session_ptr_->run(buffer_);
 

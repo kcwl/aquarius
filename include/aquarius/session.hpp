@@ -9,7 +9,11 @@ namespace aquarius
 	class session : public std::enable_shared_from_this<session>
 	{
 	public:
-		session() = default;
+		session()
+			: buf_()
+		{
+
+		}
 
 		virtual ~session() = default;
 
@@ -27,7 +31,7 @@ namespace aquarius
 		template<typename T>
 		void async_send(T t)
 		{
-			buf_ << t;
+			t.deserialize(buf_);
 
 			return send_f_(std::move(buf_));
 		}

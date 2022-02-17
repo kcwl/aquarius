@@ -65,25 +65,20 @@ namespace aquarius
 				return std::to_string(Number);
 			}
 
-			int parse_bytes(ftstream& buf)
+			bool serialize(ftstream& buf)
 			{
-				if (buf.size() != sizeof(Body))
-				{
-					buf.consume(static_cast<int>(0 - sizeof(header_fields::value_t)));
+				std::size_t body_size = body_.ByteSizeLong();
+				if (buf.size() < body_size)
+					return false;
 
-					return 0;
-				}
+				body_.SerializeToArray(buf.data(), static_cast<int>(body_size));
 
-				body_.serialize(buf);
-
-				return 1;
+				return true;
 			}
 
-			int to_bytes(ftstream& buf)
+			void deserialize(ftstream& buf)
 			{
-				buf << body_.deserialize();
-
-				return 1;
+				body_.ParseFromArray(buf.data(), static_cast<int>(buf.size()));
 			}
 
 			void copy(const typename header_type::value_t& hv)
