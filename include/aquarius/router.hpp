@@ -52,9 +52,9 @@ namespace aquarius
 	template<typename Basic, typename Context>
 	struct ctx_regist
 	{
-		ctx_regist(const std::string& key)
+		ctx_regist(const std::size_t& key)
 		{
-			std::string _key = "ctx_" + key;
+			std::string _key = "ctx_" + std::to_string(key);
 
 			auto f = [] {return std::dynamic_pointer_cast<Basic>(std::make_shared<Context>()); };
 
@@ -65,9 +65,9 @@ namespace aquarius
 	template<typename Message>
 	struct msg_regist
 	{
-		msg_regist(const std::string& key)
+		msg_regist()
 		{
-			std::string _key = "msg_" + key;
+			std::string _key = "msg_" + std::to_string(Message::NUMBER);
 
 			auto f = [] {return std::make_shared<Message>(); };
 
