@@ -15,6 +15,9 @@ namespace aquarius
 			: public header<Request,header_fields>
 		{
 		public:
+			enum { NUMBER = Number };
+
+		public:
 			using header_type = header<Request, header_fields>;
 
 		public:
