@@ -23,16 +23,25 @@ namespace aquarius
 		template<typename Response>
 		void send_response(Response&& resp)
 		{
+			if (session_ptr_ == nullptr)
+				return;
+
 			session_ptr_->async_send(std::forward<Response>(resp));
 		}
 
 		void on_close()
 		{
+			if (session_ptr_ == nullptr)
+				return;
+
 			return session_ptr_->on_close();
 		}
 
 		void on_connect()
 		{
+			if (session_ptr_ == nullptr)
+				return;
+
 			return session_ptr_->on_connect();
 		}
 
