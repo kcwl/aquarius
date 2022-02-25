@@ -81,6 +81,8 @@ namespace aquarius
 
 			void deserialize(ftstream& buf)
 			{
+				buf << header().get();
+
 				body_.ParseFromArray(buf.data(), static_cast<int>(buf.size()));
 			}
 
