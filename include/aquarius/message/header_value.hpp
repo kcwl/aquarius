@@ -4,7 +4,7 @@
 
 namespace  aquarius
 {
-	namespace tcp
+	namespace msg
 	{
 		struct header_value
 		{
@@ -18,6 +18,6 @@ namespace  aquarius
 			}
 		};
 
-		using header_fields = basic_fields<std::allocator<header_value>>;
+		using header_fields = basic_fields<header_value>;
 	}
 }

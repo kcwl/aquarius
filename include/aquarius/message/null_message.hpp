@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace tcp
+	namespace msg
 	{
 		struct null_body {};
 
@@ -31,5 +31,5 @@ namespace aquarius
 		};
 	}
 
-	using null_message = tcp::null_baisc_message<true, tcp::null_body, 0>;
+	using null_message = msg::null_baisc_message<true, msg::null_body, 0>;
 }

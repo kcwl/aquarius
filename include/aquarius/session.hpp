@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "router.hpp"
-#include "tcp/message.hpp"
+#include "message/message.hpp"
 #include "stream.hpp"
 
 namespace aquarius
@@ -31,7 +31,7 @@ namespace aquarius
 		template<typename T>
 		void async_send(T t)
 		{
-			t.deserialize(buf_);
+			//t.deserialize(buf_);
 
 			return send_f_(std::move(buf_));
 		}
@@ -49,16 +49,16 @@ namespace aquarius
 	private:
 		void parse_package(ftstream& buf)
 		{
-			auto hv = parse_header<tcp::header_fields::value_t>(buf);
+			//auto hv = parse_header<tcp::header_fields::value_t>(buf);
 
-			if (hv == decltype(hv)())
-				return;
+			//if (hv == decltype(hv)())
+			//	return;
 
-			auto str_proto_id = std::to_string(hv.proto_);
+			//auto str_proto_id = std::to_string(hv.proto_);
 
-			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
+			//auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
 
-			invoke_helper<false, void, std::shared_ptr<context>, tcp::header_value, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::move(hv), std::ref(buf));
+			//invoke_helper<false, void, std::shared_ptr<context>, tcp::header_value, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::move(hv), std::ref(buf));
 		}
 
 		template<typename T>

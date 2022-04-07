@@ -94,7 +94,7 @@ namespace aquarius
 
 		boost::asio::signal_set signals_;
 
-		btcp::acceptor acceptor_;
+		tcp::acceptor acceptor_;
 
 		inline static int number_ = 0;
 
