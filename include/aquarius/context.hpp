@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "tcp/null_message.hpp"
+#include "message/null_message.hpp"
 #include "session.hpp"
 
 namespace aquarius

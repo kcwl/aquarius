@@ -13,14 +13,14 @@
 
 namespace aquarius
 {
-	using btcp = boost::asio::ip::tcp;
+	using tcp = boost::asio::ip::tcp;
 
 	constexpr int heart_time_interval = 10;
 
 #ifdef _SSL_SERVER
 	using socket_t = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 #else
-	using socket_t = btcp::socket;
+	using socket_t = tcp::socket;
 #endif
 
 	class connect
@@ -28,7 +28,7 @@ namespace aquarius
 		, public std::enable_shared_from_this<connect>
 		, private detail::noncopyable
 	{
-		inline constexpr static std::size_t header_max_size = sizeof(tcp::header_value);
+		inline constexpr static std::size_t header_max_size = sizeof(msg::header_value);
 	public:
 		explicit connect(boost::asio::io_service& io_service
 #ifdef _SSL_SERVER
@@ -166,7 +166,7 @@ namespace aquarius
 			if (socket_.is_open())
 			{
 				boost::system::error_code ec;
-				socket_.shutdown(btcp::socket::shutdown_both, ec);
+				socket_.shutdown(tcp::socket::shutdown_both, ec);
 			}
 
 			heart_timer_.cancel();

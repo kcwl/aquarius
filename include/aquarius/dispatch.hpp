@@ -1,6 +1,6 @@
 #pragma once
 #include "visitor.hpp"
-#include "tcp/null_message.hpp"
+#include "message/null_message.hpp"
 
 namespace aquarius
 {
@@ -25,11 +25,11 @@ namespace aquarius
 		}
 
 		template<typename Request, typename Context>
-		void serialize(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, tcp::header_value header, ftstream& buf)
+		void serialize(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, msg::header_value header, ftstream& buf)
 		{
-			msg_ptr->copy(header);
+			//msg_ptr->copy(header);
 
-			msg_ptr->serialize(buf);
+			//msg_ptr->serialize(buf);
 
 			dispatch::accept(ctx_ptr, msg_ptr);
 		}
