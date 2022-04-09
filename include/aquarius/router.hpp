@@ -39,7 +39,7 @@ namespace aquarius
 			if (msg_ptr == nullptr)
 				return;
 
-			return dispatch::deserialize(msg_ptr, std::forward<Args>(args)...);
+			return dispatch(msg_ptr, std::forward<Args>(args)...);
 		}
 	};
 
