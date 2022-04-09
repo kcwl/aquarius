@@ -2,7 +2,6 @@
 #include "field.hpp"
 #include "header.hpp"
 #include "header_value.hpp"
-#include "../stream.hpp"
 
 #pragma warning(disable:4100)
 
@@ -23,13 +22,7 @@ namespace aquarius
 			using body_type = Body;
 
 		public:
-			message() {}
-
-			message(header_type header)
-				: header_type(header)
-			{
-
-			}
+			message() = default;
 
 			message(message&&) = default;
 
@@ -40,14 +33,14 @@ namespace aquarius
 			message& operator=(message const&) = default;
 
 		public:
-			header_type& header()noexcept 
+			typename header_type::value_type& header()noexcept 
 			{
-				return *this;
+				return header_type::get();
 			}
 
-			header_type& header() const noexcept
+			typename header_type::value_type& header() const noexcept
 			{
-				return *this;
+				return header_type::get();
 			}
 
 			Body& body() noexcept
@@ -61,4 +54,60 @@ namespace aquarius
 			}
 		};
 	}
+}
+
+template<typename Body, std::size_t Number>
+aquarius::ftstream& operator<<(aquarius::ftstream& stream, aquarius::msg::message<true, Body, Number>& req)
+{
+	auto& header = req.header();
+
+	stream << header;
+
+	auto& body = req.body();
+
+	body.SerializeToArray(stream.data(), static_cast<int>(stream.size()));
+
+	return stream;
+}
+
+template<typename Body, std::size_t Number>
+aquarius::ftstream& operator<<(aquarius::ftstream& stream, aquarius::msg::message<false, Body, Number>& req)
+{
+	auto& header = req.header();
+
+	stream << header;
+
+	auto& body = req.body();
+
+	body.SerializeToArray(stream.data(), static_cast<int>(stream.size()));
+
+	return stream;
+}
+
+template<typename Body, std::size_t Number>
+aquarius::ftstream& operator>>(aquarius::ftstream& stream, aquarius::msg::message<true, Body, Number>& req)
+{
+	auto& header = req.header();
+
+	stream >> header;
+
+	auto& body = req.body();
+
+	body.ParseFromArray(stream.data(), static_cast<int>(stream.size()));
+
+	return stream;
+}
+
+template<typename Body, std::size_t Number>
+aquarius::ftstream& operator>>(aquarius::ftstream& stream, aquarius::msg::message<false, Body, Number>& req)
+{
+	auto& header = req.header();
+
+	stream >> header;
+
+	auto& body = req.body();
+
+	body.ParseFromArray(stream.data(), static_cast<int>(stream.size()));
+
+	return stream;
 }
