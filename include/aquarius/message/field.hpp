@@ -7,7 +7,7 @@ namespace aquarius
 	namespace msg
 	{
 		template<typename  T, std::size_t N = 0>
-		class basic_fields : private detail::empty_value<typename T, N>
+		class basic_fields : public detail::empty_value<typename T, N>
 		{
 		public:
 			static_assert(std::is_trivial_v<T>&& std::is_standard_layout_v<T>, "header field is not pod type!");

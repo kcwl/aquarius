@@ -1,11 +1,27 @@
 #pragma once
 #include "visitor.hpp"
+#include "stream.hpp"
 #include "message/null_message.hpp"
 
 namespace aquarius
 {
 	namespace dispatch
 	{
+		namespace
+		{
+			template<typename T, typename Archive>
+			void serialize(T& value, Archive&& ar)
+			{
+				ar << value;
+			}
+
+			template<typename T, typename Archive>
+			void deserialize(T& value, Archive&& ar)
+			{
+				ar >> value;
+			}
+		}
+
 		template<typename Request, typename Context>
 		int accept(std::shared_ptr<Context> ctx_ptr, std::shared_ptr<Request> msg_ptr)
 		{
@@ -25,11 +41,9 @@ namespace aquarius
 		}
 
 		template<typename Request, typename Context>
-		void serialize(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, msg::header_value header, ftstream& buf)
+		void deserialize(std::shared_ptr<Request> msg_ptr, std::shared_ptr<Context> ctx_ptr, msg::header_value header, ftstream& buf)
 		{
-			//msg_ptr->copy(header);
-
-			//msg_ptr->serialize(buf);
+			dispatch::deserialize(*msg_ptr, buf);
 
 			dispatch::accept(ctx_ptr, msg_ptr);
 		}
