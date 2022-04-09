@@ -141,7 +141,7 @@ namespace aquarius
 		template<std::size_t I, typename _Ty>
 		auto make_element()
 		{
-			auto element = boost::pfr::get<I>(_Ty{});
+			auto element = reflect::get<I>(_Ty{});
 
 			using element_t = decltype(element);
 
@@ -161,7 +161,7 @@ namespace aquarius
 			return _Ty{ make_element<I,_Ty>()... };
 		}
 
-		template<typename _Ty, std::size_t N = boost::pfr::tuple_size_v<_Ty>, typename Indices = std::make_index_sequence<N>>
+		template<typename _Ty, std::size_t N = reflect::rf_size_v<_Ty>, typename Indices = std::make_index_sequence<N>>
 		_Ty pop()
 		{
 			return pop_impl<_Ty>(Indices{});
