@@ -23,11 +23,24 @@ namespace aquarius
 			if (ctx_ptr == nullptr)
 				return nullptr;
 
-			ctx_ptr->attach_session(std::forward<Args>(args)...);
-
 			return ctx_ptr;
 		}
 	};
+
+	template<typename Request, typename Context>
+	void dispatch(std::shared_ptr<Request> msg_ptr, ftstream& buf)
+	{
+		try
+		{
+			buf >> *msg_ptr;
+		}
+		catch (...)
+		{
+			return;
+		}
+
+		msg_ptr->accept(ctx_ptr);
+	}
 
 	template<typename R, typename Func, typename... Args>
 	struct invoker<false, R, Func, Args...>
@@ -43,9 +56,9 @@ namespace aquarius
 		}
 	};
 
-	using ctx_router = detail::router<std::shared_ptr<context>,std::shared_ptr<session>>;
+	using ctx_router = detail::router<std::shared_ptr<context>>;
 
-	using msg_router = detail::router<void, std::shared_ptr<context>, msg::header_value, ftstream&>;
+	using msg_router = detail::router<void, ftstream&>;
 
 	template<typename Basic, typename Context>
 	struct ctx_regist
@@ -56,7 +69,7 @@ namespace aquarius
 
 			auto f = [] {return std::dynamic_pointer_cast<Basic>(std::make_shared<Context>()); };
 
-			ctx_router::instance().regist(_key, std::bind(&invoker<true, std::shared_ptr<Basic>, decltype(f), std::shared_ptr<session>>::apply, f, std::placeholders::_1));
+			ctx_router::instance().regist(_key, std::bind(&invoker<true, std::shared_ptr<Basic>, decltype(f)>::apply, f));
 		}
 	};
 
@@ -70,7 +83,7 @@ namespace aquarius
 			auto f = [] {return std::make_shared<Message>(); };
 
 			msg_router::instance().regist(_key, 
-				std::bind(&invoker<false,void, decltype(f), std::shared_ptr<context>, msg::header_value, ftstream&>::apply, f, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+				std::bind(&invoker<false,void, decltype(f), ftstream&>::apply, f, std::placeholders::_1));
 		}
 	};
 
@@ -85,7 +98,7 @@ namespace aquarius
 	{
 		static inline R invoke(const std::string& key, Args&&... args)
 		{
-			return ctx_router::instance().invoke(key, std::forward<Args>(args)...);
+			return ctx_router::instance().invoke(key);
 		}
 	};
 

@@ -44,6 +44,8 @@ namespace aquarius
 			, buffer_()
 			, session_ptr_(new session())
 			, heart_timer_(io_service)
+			, remote_addr_(socket_.remote_endpoint().address())
+			, remote_port_(socket_.remote_endpoint().port())
 		{
 
 		}
@@ -111,7 +113,18 @@ namespace aquarius
 
 		std::string remote_address()
 		{
-			return socket_.local_endpoint().address().to_string();
+			return remote_addr_.to_string();
+		}
+
+		uint16_t remote_port()
+		{
+			return remote_port_;
+		}
+
+		void set_delay(bool enable)
+		{
+			boost::system::error_code ec;
+			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 		}
 
 	private:
@@ -119,7 +132,7 @@ namespace aquarius
 		{
 			auto self = shared_from_this();
 
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), header_max_size),
+			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.size()),
 									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred)
 									{
 										if (error)
@@ -131,31 +144,10 @@ namespace aquarius
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
-										async_read_body(buffer_.cat<uint32_t>());
-									});
-		}
-
-		void async_read_body(std::size_t length)
-		{
-			if (length > buffer_.max_size() - header_max_size)
-				return;
-
-			auto self = shared_from_this();
-
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer_.data(), length),
-									[this, self](const boost::system::error_code& error, std::size_t bytes_transferred)
-									{
-										if (error)
+										if (!handle_data())
+										{
 											return;
-
-										buffer_.commit(static_cast<int>(bytes_transferred));
-
-										session_ptr_->attach([self](ftstream&& buf)
-															 {
-																 self->async_write_some(std::move(buf));
-															 });
-
-										session_ptr_->run(buffer_);
+										}
 
 										async_read();
 									});
@@ -195,6 +187,22 @@ namespace aquarius
 			heart_timer_.async_wait(std::bind(&connect::heart_deadline, shared_from_this()));
 		}
 
+		bool handle_data()
+		{
+			if (buffer_.size() < sizeof(uint32_t))
+				return false;
+
+			auto proto = buffer_.cat<uint32_t>();
+
+			auto str_proto_id = std::to_string(proto);
+
+			//auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>>::invoke("ctx_" + str_proto_id);
+
+			invoke_helper<false, void, ftstream&>::invoke("msg_" + str_proto_id, std::ref(buffer_));
+
+			return true;
+		}
+
 	private:
 		static inline int size_ = 0;
 
@@ -205,5 +213,9 @@ namespace aquarius
 		detail::deadline_timer heart_timer_;
 
 		std::shared_ptr<session> session_ptr_;
+
+		boost::asio::ip::address remote_addr_;
+
+		boost::asio::ip::port_type remote_port_;
 	};
 }

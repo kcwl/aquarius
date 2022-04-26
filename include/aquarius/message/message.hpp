@@ -11,7 +11,8 @@ namespace aquarius
 	{
 		template<bool Request, typename Body, std::size_t Number>
 		class message 
-			: private header<Request,header_fields>
+			: public std::enable_shared_from_this<message<Request, Body, Number>>
+			, private header<Request,header_fields>
 			, private detail::empty_value<Body>
 		{
 		public:
@@ -51,6 +52,15 @@ namespace aquarius
 			Body& body() const noexcept
 			{
 				return this->detail::empty_value<body_type>::get();
+			}
+
+			template<typename Context>
+			int accept(std::shared_ptr<Context> ctx_ptr)
+			{
+				if (ctx_ptr == nullptr)
+					return 1;
+
+				return ctx_ptr->visit(this->shared_from_this());
 			}
 		};
 	}
