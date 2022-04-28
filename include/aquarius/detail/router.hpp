@@ -12,7 +12,7 @@ namespace aquarius
 		struct invoker;
 
 		template<typename R, typename... Args>
-		class router : public detail::singleton<router<R, Args...>>
+		class router
 		{
 		public:
 			router() = default;
@@ -22,7 +22,7 @@ namespace aquarius
 			{
 				std::lock_guard lk(mutex_);
 
-				map_invokes_.insert({ key,std::forward<std::function<R(Args...)>>(func)});
+				map_invokes_.insert({ key,std::forward<std::function<R(Args...)>>(func) });
 			}
 
 			R invoke(const std::string& key, Args&&... args)
@@ -45,6 +45,14 @@ namespace aquarius
 			std::unordered_map<std::string, std::function<R(Args...)>> map_invokes_;
 
 			std::mutex mutex_;
+		};
+
+		template<typename R, typename... Args>
+		class single_router
+			: public router<R, Args...>
+			, public detail::singleton<router<R, Args...>>
+		{
+
 		};
 	}
 }

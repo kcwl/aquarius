@@ -2,16 +2,21 @@
 #include "field.hpp"
 #include "header.hpp"
 #include "header_value.hpp"
+#include "null_message.hpp"
 
 #pragma warning(disable:4100)
 
 namespace aquarius
 {
+	class context;
+
+
 	namespace msg
 	{
 		template<bool Request, typename Body, std::size_t Number>
 		class message 
 			: public std::enable_shared_from_this<message<Request, Body, Number>>
+			, public null_message
 			, private header<Request,header_fields>
 			, private detail::empty_value<Body>
 		{
@@ -54,13 +59,24 @@ namespace aquarius
 				return this->detail::empty_value<body_type>::get();
 			}
 
-			template<typename Context>
-			int accept(std::shared_ptr<Context> ctx_ptr)
+			virtual int accept(std::shared_ptr<context> ctx_ptr)
 			{
-				if (ctx_ptr == nullptr)
-					return 1;
+				return accept_impl<null_message>(this, ctx_ptr);
+			}
 
-				return ctx_ptr->visit(this->shared_from_this());
+			virtual bool parse(ftstream& ar)
+			{
+				try
+				{
+					ar >> *this;
+				}
+				catch (...)
+				{
+					return false;
+				}
+
+
+				return true;
 			}
 		};
 	}
