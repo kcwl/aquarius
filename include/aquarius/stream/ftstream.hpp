@@ -99,9 +99,9 @@ namespace aquarius
 			return buffer_.consume(length);
 		}
 
-		void reset(std::size_t n) noexcept
+		void reset() noexcept
 		{
-			return buffer_.reset(n);
+			return buffer_.reset();
 		}
 
 	private:
