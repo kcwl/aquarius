@@ -1,23 +1,24 @@
 #pragma once
 #include <memory>
 #include "router.hpp"
-#include "tcp/message.hpp"
-#include "detail/stream.hpp"
+#include "message/message.hpp"
+#include "stream.hpp"
 
 namespace aquarius
 {
 	class session : public std::enable_shared_from_this<session>
 	{
 	public:
-		session() = default;
+		session()
+			: buf_()
+		{
+
+		}
 
 		virtual ~session() = default;
 
-		void run(streambuf& buf)
+		void run(ftstream& buf)
 		{
-			if (buf.size() == 0)
-				return;
-
 			return parse_package(buf);
 		}
 
@@ -30,7 +31,7 @@ namespace aquarius
 		template<typename T>
 		void async_send(T t)
 		{
-			buf_ << t;
+			//t.deserialize(buf_);
 
 			return send_f_(std::move(buf_));
 		}
@@ -46,43 +47,36 @@ namespace aquarius
 		}
 
 	private:
-		void parse_package(streambuf& buf)
+		void parse_package(ftstream& buf)
 		{
-			uint32_t proto_id = get_id(buf);
+			//auto hv = parse_header<tcp::header_fields::value_t>(buf);
 
-			if (proto_id == static_cast<uint32_t>(-1))
-				return;
+			//if (hv == decltype(hv)())
+			//	return;
 
-			auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + std::to_string(proto_id), shared_from_this());
+			//auto str_proto_id = std::to_string(hv.proto_);
 
-			invoke_helper<false, void, std::shared_ptr<context>, streambuf&>::invoke("msg_" + std::to_string(proto_id), std::move(ctx_ptr), std::ref(buf));
+			//auto ctx_ptr = invoke_helper<true, std::shared_ptr<context>, std::shared_ptr<session>>::invoke("ctx_" + str_proto_id, shared_from_this());
 
-			return boost::asio::post(std::bind(&session::parse_package, shared_from_this(), std::ref(buf)));
+			//invoke_helper<false, void, std::shared_ptr<context>, tcp::header_value, ftstream&>::invoke("msg_" + str_proto_id, std::move(ctx_ptr), std::move(hv), std::ref(buf));
 		}
 
-		uint32_t get_id(streambuf& stream)
+		template<typename T>
+		T parse_header(ftstream& buf)
 		{
-			uint32_t proto_id{};
+			if (buf.size() < sizeof(T))
+				return T();
 
-			uint32_t length{};
+			T value;
 
-			std::size_t stream_length = stream.size();
+			buf >> value;
 
-			stream >> proto_id >> length;
-
-			stream.reset(sizeof(proto_id) + sizeof(length));
-
-			if (length != stream_length)
-			{
-				return static_cast<uint32_t>(-1);
-			}
-
-			return proto_id;
+			return value;
 		}
 
 	private:
-		std::function<void(streambuf&&)> send_f_;
+		std::function<void(ftstream&&)> send_f_;
 
-		streambuf buf_;
+		ftstream buf_;
 	};
 }

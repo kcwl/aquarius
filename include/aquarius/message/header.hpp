@@ -2,7 +2,7 @@
 
 namespace aquarius
 {
-	namespace tcp
+	namespace msg
 	{
 		template<bool Request,typename Fields>
 		class header;
@@ -16,6 +16,12 @@ namespace aquarius
 		public:
 			header()
 				: Fields()
+			{
+
+			}
+
+			header(Fields::value_type value)
+				: Fields(value)
 			{
 
 			}
@@ -48,11 +54,5 @@ namespace aquarius
 
 			~header() = default;
 		};
-
-		template<typename Fields>
-		using reqeust_header = header<true, Fields>;
-		
-		template<typename Fields>
-		using response_header = header<false, Fields>;
 	}
 }

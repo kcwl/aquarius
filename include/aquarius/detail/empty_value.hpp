@@ -12,6 +12,8 @@ namespace aquarius
 		class empty_value
 		{
 		public:
+			empty_value() = default;
+
 			empty_value(empty_init_t)
 				: value_()
 			{
@@ -30,7 +32,7 @@ namespace aquarius
 				return value_;
 			}
 
-			const T& get() noexcept
+			T& get() const noexcept
 			{
 				return value_;
 			}
@@ -43,6 +45,8 @@ namespace aquarius
 		class empty_value<T, N, true> : private T
 		{
 		public:
+			empty_value() = default;
+
 			empty_value(empty_init_t)
 				: T()
 			{
@@ -61,7 +65,7 @@ namespace aquarius
 				return *this;
 			}
 
-			T& get() const noexcept
+			const T& get() const noexcept
 			{
 				return *this;
 			}

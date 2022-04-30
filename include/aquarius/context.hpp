@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "visitor.hpp"
-#include "tcp/null_message.hpp"
-#include "session.hpp"
+#include "connect.hpp"
 
 namespace aquarius
 {
@@ -10,34 +9,28 @@ namespace aquarius
 		: public visitor<null_message>
 	{
 	public:
-		virtual int visit(std::shared_ptr<null_message> req)
+		virtual int visit(null_message* req)
 		{
 			return 0;
 		}
 
-		void attach_session(std::shared_ptr<session> session_ptr)
+
+		void attach_connect(std::shared_ptr<connect> conn_ptr)
 		{
-			session_ptr_ = session_ptr;
+			conn_ptr_ = conn_ptr;
 		}
 
 		template<typename Response>
 		void send_response(Response&& resp)
 		{
-			session_ptr_->async_send(std::forward<Response>(resp));
-		}
+			if (conn_ptr_ == nullptr)
+				return;
 
-		void on_close()
-		{
-			return session_ptr_->on_close();
-		}
-
-		void on_connect()
-		{
-			return session_ptr_->on_connect();
+			conn_ptr_->queue_packet(std::forward<Response>(resp));
 		}
 
 	public:
-		std::shared_ptr<session> session_ptr_;
+		std::shared_ptr<connect> conn_ptr_;
 	};
 
 	template<class Request, class Response>
@@ -55,18 +48,21 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual int visit(std::shared_ptr<Request> request_ptr)
+		virtual int visit(Request* request_ptr)
 		{
-			request_ptr_.swap(request_ptr);
+			request_ptr_.reset(request_ptr);
 
 			if (!handle())
 			{
-				on_close();
-
 				return 0;
 			}
 				
 			return 1;
+		}
+
+		void send_result(int error)
+		{
+			return send_response(resp_);
 		}
 
 	protected:
