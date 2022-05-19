@@ -9,7 +9,7 @@ namespace aquarius
 		: public visitor<null_message>
 	{
 	public:
-		virtual int visit(null_message* req)
+		virtual int visit(std::shared_ptr<null_message>)
 		{
 			return 0;
 		}
@@ -41,16 +41,14 @@ namespace aquarius
 	public:
 		handler()
 			: request_ptr_(new Request{})
-			, resp_()
+			, response_ptr_(new Response{})
 		{
 		}
 
-		virtual ~handler() = default;
-
 	public:
-		virtual int visit(Request* request_ptr)
+		virtual int visit(std::shared_ptr<Request> request_ptr)
 		{
-			request_ptr_.reset(request_ptr);
+			request_ptr_ = request_ptr;
 
 			if (!handle())
 			{
@@ -62,7 +60,7 @@ namespace aquarius
 
 		void send_result(int error)
 		{
-			return send_response(resp_);
+			return send_response(response_ptr_);
 		}
 
 	protected:
@@ -71,6 +69,6 @@ namespace aquarius
 	protected:
 		std::shared_ptr<Request> request_ptr_;
 
-		Response resp_;
+		std::shared_ptr<Response> response_ptr_;
 	};
 }

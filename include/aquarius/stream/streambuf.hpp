@@ -1,17 +1,16 @@
 ﻿#pragma once
-#include <array>
-#include <algorithm>
-#include <streambuf>
+#include <vector>
+#include <cstdint>
 
 namespace aquarius
 {
-	template<typename T, std::size_t N>
-	class streambuf : public std::basic_streambuf<T,std::char_traits<T>>
-	{
-		using base_type = std::basic_streambuf<T, std::char_traits<T>>;
+	inline static constexpr std::size_t buffer_capacity = 4096;
 
+	template<typename T = uint8_t>
+	class message_streambuf
+	{
 	public:
-		using iterator = std::array<T,N>::iterator;
+		using iterator = std::vector<T>::iterator;
 		using const_iterator = const iterator;
 		using value_type = T;
 		using size_type = std::size_t;
@@ -20,122 +19,145 @@ namespace aquarius
 		using pointer = T*;
 		using const_pointer = const pointer;
 
-		streambuf()
-			: buffer_()
+		message_streambuf()
+			: buffer_(buffer_capacity)
 		{
-			reset();
+
 		}
 
-		streambuf(std::span<T> data)
-			: streambuf()
+		message_streambuf(std::size_t capacity)
+			: buffer_(capacity)
 		{
-			for (auto iter = data.begin(); iter != data.end(); iter++)
+		}
+
+		message_streambuf(const message_streambuf& other)
+			: wpos_(other.wpos_)
+			, rpos_(other.rpos_)
+			, buffer_(other.buffer_)
+		{
+			
+		}
+
+		message_streambuf(message_streambuf&& other)
+			: wpos_(std::move(other.wpos_))
+			, rpos_(std::move(other.rpos_))
+			, buffer_(std::move(other.buffer_))
+		{
+
+		}
+
+		virtual ~message_streambuf() = default;
+
+	public:
+		message_streambuf& operator=(const message_streambuf& other)
+		{
+			if (this != &other)
 			{
-				push_back(*iter);
+				rpos_ = other.rpos_;
+				wpos_ = other.wpos_;
+				buffer_ = other.buffer_;
 			}
+
+			return *this;
 		}
 
-		streambuf(const streambuf& buf)
-			: streambuf(std::span<T>(buf.data(),buf.size()))
+		message_streambuf& operator=(message_streambuf&& other)
 		{
+			if (this != other)
+			{
+				wpos_ = std::move(other.wpos_);
+				rpos_ = std::move(other.rpos_);
+				buffer_ = std::move(other.buffer_);
+			}
 
+			return *this;
 		}
-
-		virtual ~streambuf() = default;
 
 	public:
-		value_type& operator[](size_type pos)
+		pointer write_pointer() noexcept
 		{
-			return buffer_.at(pos);
+			return buffer_.data() + wpos_;
 		}
 
-	public:
-		std::size_t size() noexcept
+		pointer read_pointer() noexcept
 		{
-			return base_type::pptr() - base_type::gptr();
+			return buffer_.data() + rpos_;
 		}
 
-		std::size_t size() const noexcept
+		size_type remain_size() noexcept
 		{
-			return base_type::pptr() - base_type::gptr();
+			return buffer_.size() - wpos_;
 		}
 
-		constexpr std::size_t max_size() noexcept
+		size_type active() noexcept
 		{
-			return buffer_.max_size();
+			return wpos_ - rpos_;
 		}
 
-		pointer data() noexcept
+		size_type active() const noexcept
 		{
-			return base_type::gptr();
+			return wpos_ - rpos_;
 		}
 
-		pointer data() const noexcept
-		{
-			return base_type::gptr();
-		}
-		
 		void clear() noexcept
 		{
-			buffer_.fill(T{});
-
-			reset();
+			wpos_ = 0;
+			rpos_ = 0;
+			buffer_.clear();
 		}
 
-		template<typename _Ty>
-		void push_back(_Ty&& value)
+		void write(const void* value, size_type sz)
 		{
-			size() == 0 ? clear() : void();
+			if (sz <= 0)
+				return;
 
-			constexpr std::size_t sz = sizeof(_Ty);
-
-			std::memcpy(base_type::pptr(), &value, sz);
+			std::memcpy(write_pointer(), value, sz);
 
 			commit(sz);
 		}
 
-		void commit(int n) noexcept
+		void commit(size_type n) noexcept
 		{
-			n = static_cast<int>(std::min<std::size_t>(n, base_type::epptr() - base_type::pptr()));
-
-			base_type::pbump(n);
-
-			base_type::setg(base_type::eback(), base_type::gptr(), base_type::pptr());
+			wpos_ += n;
 		}
 
-		void consume(int n) noexcept
+		void consume(size_type n) noexcept
 		{
-			if(base_type::egptr() < base_type::pptr())
-				base_type::setg(&buffer_[0], base_type::gptr(), base_type::pptr());
-
-			if(base_type::gptr() + n > base_type::pptr())
-				n = static_cast<int>(base_type::pptr() - base_type::gptr());
-
-			base_type::gbump(n);
+			rpos_ += n;
 		}
 
-		void reset()
+		void normalize()
 		{
-			base_type::setg(&buffer_[0], &buffer_[0], &buffer_[0]);
+			if (rpos_ == 0)
+				return;
 
-			base_type::setp(&buffer_[0], &buffer_[0] + buffer_.max_size());
+			std::memmove(buffer_.data(), buffer_.data() + rpos_, wpos_ - rpos_);
+
+			rpos_ = 0;
+			wpos_ -= rpos_;
 		}
 
-		template<typename _Ty>
-		_Ty get()
+		void ensure()
 		{
-			_Ty element{};
+			if (buffer_.size() != wpos_)
+				return;
 
-			constexpr auto I = sizeof(_Ty);
+			buffer_.resize(buffer_.size() * 2);
+		}
 
-			std::memcpy(&element, reinterpret_cast<_Ty*>(data()), I);
+		void resize(size_type sz)
+		{
+			if (sz <= buffer_.size())
+				return;
 
-			consume(I);
-
-			return element;
+			buffer_.resize(sz);
 		}
 
 	private:
-		std::array<T,N> buffer_;
+		size_type wpos_;
+
+		size_type rpos_;
+
+		std::vector<T> buffer_;
 	};
 }

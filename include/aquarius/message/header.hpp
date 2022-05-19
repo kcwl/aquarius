@@ -1,58 +1,16 @@
 #pragma once
+#include "detail/header.hpp"
+#include "detail/header_fields.hpp"
+#include "detail/field.hpp"
 
 namespace aquarius
 {
 	namespace msg
 	{
-		template<bool Request,typename Fields>
-		class header;
+		using aquarius_tcp_request_header = detail::header<true, detail::request_header>;
 
-		template<typename Fields>
-		class header<true, Fields> : public Fields
-		{
-		public:
-			using is_request = std::true_type;
+		using aquarius_tcp_response_header = detail::header<false, detail::response_header>;
 
-		public:
-			header()
-				: Fields()
-			{
-
-			}
-
-			header(Fields::value_type value)
-				: Fields(value)
-			{
-
-			}
-
-			header(const header&) = default;
-
-			header(header&&) = default;
-
-			header& operator=(const header&) = default;
-
-			~header() = default;
-		};
-
-
-		template<typename Fields>
-		class header<false, Fields> : public Fields
-		{
-		public:
-			using is_request = std::false_type;
-
-			header()
-				: Fields()
-			{
-
-			}
-
-			header(const header&) = default;
-
-			header(header&&) = default;
-
-			~header() = default;
-		};
+		using common_header = detail::tcp_header;
 	}
 }

@@ -11,6 +11,7 @@
 #include "police/callback_police.hpp"
 #include "detail/noncopyable.hpp"
 #include "detail/deadline_timer.hpp"
+#include "message/header.hpp"
 
 namespace aquarius
 {
@@ -28,10 +29,10 @@ namespace aquarius
 		template<typename... Args>
 		explicit basic_connect(boost::asio::io_service& io_service, Args&&... args)
 			: socket_(io_service, std::forward<Args>(args)...)
-			, buffer_()
+			, read_buffer_()
 			, heart_timer_(io_service)
-			, remote_addr_(socket_.remote_endpoint().address())
-			, remote_port_(socket_.remote_endpoint().port())
+			, remote_addr_()
+			, remote_port_()
 		{
 
 		}
@@ -56,12 +57,12 @@ namespace aquarius
 
 		std::string remote_address()
 		{
-			return remote_addr_.to_string();
+			return socket_.remote_endpoint().address().to_string();
 		}
 
 		uint16_t remote_port()
 		{
-			return remote_port_;
+			return socket_.remote_endpoint().port();
 		}
 
 		void set_delay(bool enable)
@@ -74,9 +75,15 @@ namespace aquarius
 		void queue_packet(T&& response)
 		{
 			ftstream fs;
-			fs << response;
+
+			std::forward<T>(response)->to_bytes(fs);
 
 			write_queue_.push(std::move(fs));
+		}
+
+		void set_buffer(ftstream buf)
+		{
+			read_buffer_ = buf;
 		}
 
 	protected:
@@ -109,21 +116,19 @@ namespace aquarius
 	private:
 		void async_read()
 		{
-			socket_.async_read_some(boost::asio::buffer(buffer_.data(), buffer_.size()),
+			socket_.async_read_some(boost::asio::buffer(read_buffer_.data(), read_buffer_.size()),
 				[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
 			{
 				if (error)
 				{
-					shut_down();
-
-					return;
+					return shut_down();
 				}
 
-				buffer_.commit(static_cast<int>(bytes_transferred));
+				read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 				if (!handle_data())
 				{
-					return;
+					return shut_down();
 				}
 
 				async_read();
@@ -165,33 +170,37 @@ namespace aquarius
 			heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
 			heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
 		}
-
+		public:
 		bool handle_data()
 		{
-			if (buffer_.size() < sizeof(uint32_t))
-				return false;
-
-			auto proto = buffer_.cat<uint32_t>();
-
-			auto str_proto_id = std::to_string(proto);
-
-			auto msg_ptr = invoke_helper<false>::invoke("msg_" + str_proto_id, std::ref(buffer_));
-
-			if (msg_ptr == nullptr)
+			while (true)
 			{
-				buffer_.reset();
+				if (read_buffer_.active() == 0)
+					break;
 
-				return false;
+				if (read_buffer_.active() < sizeof(msg::common_header))
+					return false;
+
+				msg::common_header* header = (msg::common_header*)read_buffer_.read_pointer();
+
+				auto str_proto_id = std::to_string(header->proto_id_);
+
+				auto msg_ptr = invoke_helper<false>::invoke("msg_" + str_proto_id, std::ref(read_buffer_));
+
+				if (msg_ptr == nullptr)
+				{
+					return false;
+				}
+
+				auto ctx_ptr = invoke_helper<true>::invoke("ctx_" + str_proto_id);
+
+				if (ctx_ptr == nullptr)
+					return false;
+
+				ctx_ptr->attach_connect(this->shared_from_this());
+
+				msg_ptr->accept(ctx_ptr); 
 			}
-
-			auto ctx_ptr = invoke_helper<true>::invoke("ctx_" + str_proto_id);
-
-			if (ctx_ptr == nullptr)
-				return false;
-
-			ctx_ptr->attach_connect(this->shared_from_this());
-
-			msg_ptr->accept(ctx_ptr);
 
 			return true;
 		}
@@ -206,7 +215,7 @@ namespace aquarius
 
 		SocketPolice::socket_t socket_;
 
-		ftstream buffer_;
+		ftstream read_buffer_;
 
 		detail::deadline_timer heart_timer_;
 
