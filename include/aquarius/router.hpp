@@ -2,7 +2,6 @@
 #include "detail/router.hpp"
 #include "type_traits.hpp"
 #include "stream.hpp"
-#include "visitor.hpp"
 #include "message/null_message.hpp"
 
 
@@ -23,16 +22,10 @@ namespace aquarius
 	};
 
 	template<typename Request>
-	auto dispatch(std::shared_ptr<Request> msg_ptr, ftstream& buf)
+	auto dispatch(std::shared_ptr<Request> msg_ptr, aquarius::ftstream& buf)
 	{
-		try
-		{
-			msg_ptr->parse(buf);
-		}
-		catch (...)
-		{
+		if(!msg_ptr->parse_bytes(buf))
 			msg_ptr = nullptr;
-		}
 
 		return msg_ptr;
 	}
@@ -50,7 +43,7 @@ namespace aquarius
 
 	using ctx_router = detail::single_router<std::shared_ptr<context>>;
 
-	using msg_router = detail::single_router<std::shared_ptr<null_message>, ftstream&>;
+	using msg_router = detail::single_router<std::shared_ptr<null_message>, aquarius::ftstream&>;
 
 	template<typename Context>
 	struct ctx_regist

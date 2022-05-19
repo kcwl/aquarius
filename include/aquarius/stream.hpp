@@ -1,8 +1,7 @@
 #pragma once
-
-#include "stream/ftstream.hpp"
+#include "stream/streambuf.hpp"
 
 namespace aquarius
 {
-	using ftstream = basic_ftstream<>;
+	using ftstream = message_streambuf<>;
 }

@@ -9,7 +9,7 @@ namespace aquarius
 	{
 	public:
 		virtual ~visitor() {}
-		virtual ReturnT visit(Request* req_ptr) = 0;
+		virtual ReturnT visit(std::shared_ptr<Request> req_ptr) = 0;
 	};
 
 	template<typename R = int>
@@ -22,7 +22,7 @@ namespace aquarius
 
 	protected:
 		template<typename BasicMessage, typename T>
-		R accept_impl(T* msg_ptr, std::shared_ptr<context> ctx_ptr)
+		R accept_impl(std::shared_ptr<T> msg_ptr, std::shared_ptr<context> ctx_ptr)
 		{
 			using visitor_type = visitor<T, int> ;
 			using base_type =  visitor<BasicMessage, int>;

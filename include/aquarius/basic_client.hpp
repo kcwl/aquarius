@@ -51,9 +51,9 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(const ftstream& buf)
+		void async_write(ftstream&& buf)
 		{
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.data(), buf.size()),
+			boost::asio::async_write(socket_, boost::asio::buffer(buf.read_pointer(), buf.active()),
 									 [this](boost::system::error_code ec, std::size_t)
 									 {
 										 if(ec)

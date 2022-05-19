@@ -7,35 +7,32 @@ namespace aquarius
 
 	namespace msg
 	{
-		struct null_body {};
+		class ftstream;
 
-		template<bool Request, typename Body, std::size_t N>
-		class null_baisc_message : public visiable<>
+		class basic_message : public visiable<>
 		{
 		public:
-			null_baisc_message() = default;
-			
-			~null_baisc_message() = default;
+			using header_type = int;
+		public:
+			basic_message() = default;
+
+			~basic_message() = default;
+
 
 		public:
-			null_baisc_message(null_baisc_message const&) = default;
+			basic_message(basic_message const&) = default;
 
-			null_baisc_message(null_baisc_message&&) = default;
+			basic_message(basic_message&&) = default;
 
-			null_baisc_message& operator=(null_baisc_message const&) = default;
+			basic_message& operator=(const basic_message&) = default;
 
-			virtual int accept(std::shared_ptr<context> ctx_ptr)
-			{
-				//return accept_impl<null_baisc_message>(this, ctx_ptr);
-				return 0;
-			}
+			virtual int accept(std::shared_ptr<context> ctx_ptr) { return 0; }
 
-			virtual bool parse(ftstream& ar)
-			{
-				return false;
-			}
+			virtual bool parse_bytes(aquarius::ftstream&) { return false; }
+
+			virtual bool to_bytes(aquarius::ftstream&) { return false; }
 		};
 	}
 
-	using null_message = msg::null_baisc_message<true, msg::null_body, 0>;
+	using null_message = msg::basic_message;
 }
