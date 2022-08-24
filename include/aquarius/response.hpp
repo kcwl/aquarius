@@ -1,10 +1,15 @@
 ﻿#pragma once
-#include "header.hpp"
+#include "message/field.hpp"
 #include "message/message.hpp"
 
 namespace aquarius
 {
-	template<class Body, std::size_t Number>
-	using response = msg::message<false, msg::aquarius_tcp_response_header, Body, Number>;
+	template<typename _Header, typename _Body, std::size_t Number>
+	class response : public message::basic_message<false, _Header, _Body, Number>
+	{
+	public:
+		response() = default;
+		~response() = default;
+	};
 }
 

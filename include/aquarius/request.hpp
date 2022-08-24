@@ -1,9 +1,13 @@
 ﻿#pragma once
-#include "header.hpp"
 #include "message/message.hpp"
 
 namespace aquarius
 {
-	template<class Body, std::size_t Number>
-	using request = msg::message<true, msg::aquarius_tcp_request_header, Body, Number>;
+	template<typename _Header, typename _Body, std::size_t Number>
+	class request : public message::basic_message<true, _Header, _Body, Number>
+	{
+	public:
+		request() = default;
+		~request() = default;
+	};
 }
