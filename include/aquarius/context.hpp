@@ -1,74 +1,121 @@
 ﻿#pragma once
 #include <memory>
-#include "visitor.hpp"
-#include "connect.hpp"
 
 namespace aquarius
 {
-	class context 
-		: public visitor<null_message>
+	template<typename _Request, typename _Response>
+	class service
 	{
 	public:
-		virtual int visit(std::shared_ptr<null_message>)
+		service()
+			: request_ptr_(new _Request{})
+			, response_()
+		{
+
+		}
+
+		virtual ~service() = default;
+
+	public:
+		template<typename _Stream>
+		void serialize(_Stream& stream)
+		{
+			request_ptr_->parse_message(stream);
+		}
+
+		template<typename _Stream>
+		void deserialize(_Stream& stream)
+		{
+			response_.to_message(stream);
+		}
+
+	public:
+		std::shared_ptr<_Request> request_ptr_;
+		_Response response_;
+	};
+
+	template<typename _Request, typename _Ty>
+	class vst
+	{
+	public:
+		virtual int visit(std::shared_ptr<_Request> request_ptr, _Ty) = 0;
+	};
+
+
+	template<typename _Session, typename _Request, typename _Response>
+	class context
+		: public service<_Request, _Response>
+		, vst<_Request, long>
+	{
+	public:
+		context() = default;
+
+		context(const context&) = delete;
+
+		context(context&&) = default;
+
+		virtual ~context() = default;
+
+		context& operator=(const context&) = delete;
+
+		void attach(_Session* session_ptr)
+		{
+			session_ptr_ = session_ptr;
+		}
+
+	public:
+		virtual int visit(std::shared_ptr<_Request> request_ptr, long) override
 		{
 			return 0;
 		}
 
-
-		void attach_connect(std::shared_ptr<connect> conn_ptr)
+		void send_response(uint32_t status)
 		{
-			conn_ptr_ = conn_ptr;
-		}
-
-		template<typename Response>
-		void send_response(Response&& resp)
-		{
-			if (conn_ptr_ == nullptr)
+			if (!session_ptr_)
 				return;
 
-			conn_ptr_->queue_packet(std::forward<Response>(resp));
+			session_ptr_->queue_packet(std::move(this->response_));
 		}
 
-	public:
-		std::shared_ptr<connect> conn_ptr_;
+	private:
+		_Session* session_ptr_;
 	};
 
-	template<class Request, class Response>
+
+	template<typename _Session, typename _Request, typename _Response>
 	class handler
-		: public context
-		, public visitor<Request>
+		: public context<_Session, _Request, _Response>
+		, public vst<_Request, int>
 	{
 	public:
-		handler()
-			: request_ptr_(new Request{})
-			, response_ptr_(new Response{})
+		handler(_Session* session_ptr)
+			: context<_Session, _Request, _Response>(session_ptr)
 		{
+
 		}
 
 	public:
-		virtual int visit(std::shared_ptr<Request> request_ptr)
+		virtual int visit(std::shared_ptr<_Request> request_ptr, int) override
 		{
-			request_ptr_ = request_ptr;
+			if (!request_ptr)
+				return visit(request_ptr, 0L);
+
+			this->request_ptr_.swap(request_ptr);
 
 			if (!handle())
-			{
 				return 0;
-			}
-				
-			return 1;
+
+			this->send_response(status_);
 		}
 
-		void send_result(int error)
+		void set_status(uint32_t status)
 		{
-			return send_response(response_ptr_);
+			status_ = status;
 		}
 
-	protected:
 		virtual bool handle() = 0;
 
-	protected:
-		std::shared_ptr<Request> request_ptr_;
-
-		std::shared_ptr<Response> response_ptr_;
+	private:
+		uint32_t status_;
 	};
 }
