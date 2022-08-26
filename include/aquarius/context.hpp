@@ -4,17 +4,17 @@
 namespace aquarius
 {
 	template<typename _Request, typename _Response>
-	class service
+	class message_service
 	{
 	public:
-		service()
+		message_service()
 			: request_ptr_(new _Request{})
 			, response_()
 		{
 
 		}
 
-		virtual ~service() = default;
+		virtual ~message_service() = default;
 
 	public:
 		template<typename _Stream>
@@ -29,26 +29,32 @@ namespace aquarius
 			response_.to_message(stream);
 		}
 
-	public:
+		auto& request() noexcept
+		{
+			return request_ptr_;
+		}
+
+		auto& response() noexcept
+		{
+			return response_;
+		}
+
+	private:
 		std::shared_ptr<_Request> request_ptr_;
+
 		_Response response_;
 	};
 
-	template<typename _Request, typename _Ty>
-	class vst
-	{
-	public:
-		virtual int visit(std::shared_ptr<_Request> request_ptr, _Ty) = 0;
-	};
-
-
 	template<typename _Session, typename _Request, typename _Response>
 	class context
-		: public service<_Request, _Response>
-		, vst<_Request, long>
+		: public message_service<_Request, _Response>
 	{
 	public:
-		context() = default;
+		explicit context(std::shared_ptr<_Session> session_ptr)
+			: session_ptr_(session_ptr)
+		{
+
+		}
 
 		context(const context&) = delete;
 
@@ -58,15 +64,18 @@ namespace aquarius
 
 		context& operator=(const context&) = delete;
 
-		void attach(_Session* session_ptr)
-		{
-			session_ptr_ = session_ptr;
-		}
-
 	public:
-		virtual int visit(std::shared_ptr<_Request> request_ptr, long) override
+		template<typename _Stream>
+		int accept(int id, _Stream& stream)
 		{
-			return 0;
+			this->serialize(stream);
+
+			if (!handle())
+				return 0;
+
+			send_response(status_);
+
+			return 1;
 		}
 
 		void send_response(uint32_t status)
@@ -74,48 +83,14 @@ namespace aquarius
 			if (!session_ptr_)
 				return;
 
-			session_ptr_->queue_packet(std::move(this->response_));
-		}
-
-	private:
-		_Session* session_ptr_;
-	};
-
-
-	template<typename _Session, typename _Request, typename _Response>
-	class handler
-		: public context<_Session, _Request, _Response>
-		, public vst<_Request, int>
-	{
-	public:
-		handler(_Session* session_ptr)
-			: context<_Session, _Request, _Response>(session_ptr)
-		{
-
-		}
-
-	public:
-		virtual int visit(std::shared_ptr<_Request> request_ptr, int) override
-		{
-			if (!request_ptr)
-				return visit(request_ptr, 0L);
-
-			this->request_ptr_.swap(request_ptr);
-
-			if (!handle())
-				return 0;
-
-			this->send_response(status_);
-		}
-
-		void set_status(uint32_t status)
-		{
-			status_ = status;
+			session_ptr_->queue_packet(this->response());
 		}
 
 		virtual bool handle() = 0;
 
 	private:
+		std::shared_ptr<_Session> session_ptr_;
+
 		uint32_t status_;
 	};
 }

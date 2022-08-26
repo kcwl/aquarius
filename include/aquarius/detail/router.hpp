@@ -8,9 +8,6 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template<typename Func, typename... Args>
-		struct invoker;
-
 		template<typename R, typename... Args>
 		class router
 		{
