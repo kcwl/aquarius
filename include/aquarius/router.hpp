@@ -61,9 +61,20 @@ namespace aquarius
 	{
 		ctx_regist(const std::size_t& key)
 		{
-			std::string _key = std::to_string(key);
+			std::string _key = "aquarius_" + std::to_string(key);
 
 			ctx_router::instance().regist(_key, std::bind(&invoke<session, ftstream>::dispatch<Context>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+		}
+	};
+
+	struct invoke_helper
+	{
+		template<typename... _Args>
+		static void invoke(std::size_t key, _Args&&... args)
+		{
+			std::string _key = "aquarius_" + std::to_string(key);
+
+			aquarius::ctx_router::instance().invoke(_key,std::forward<_Args>(args)...);
 		}
 	};
 
