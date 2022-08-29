@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		template<typename _Ty, typename Func, std::size_t... I>
 		constexpr void for_each_impl(_Ty&& val, Func func, std::index_sequence<I...>)

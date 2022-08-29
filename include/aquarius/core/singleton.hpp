@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		template<typename T>
 		class singleton_wrapper : public T
@@ -38,4 +38,4 @@ namespace aquarius
 }
 
 template<typename T>
-T* aquarius::detail::singleton<T>::instance_ = &singleton<T>::instance();
+T* aquarius::core::singleton<T>::instance_ = &singleton<T>::instance();

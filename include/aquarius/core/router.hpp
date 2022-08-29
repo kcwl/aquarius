@@ -6,11 +6,8 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
-		template<typename Func, typename... Args>
-		struct invoker;
-
 		template<typename R, typename... Args>
 		class router
 		{
@@ -50,7 +47,7 @@ namespace aquarius
 		template<typename R, typename... Args>
 		class single_router
 			: public router<R, Args...>
-			, public detail::singleton<router<R, Args...>>
+			, public core::singleton<router<R, Args...>>
 		{
 
 		};

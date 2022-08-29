@@ -1,82 +1,65 @@
 #pragma once
-#include "../detail/empty_value.hpp"
-#include "null_message.hpp"
-#include "parse_packet.hpp"
-
-#pragma warning(disable:4100)
+#include <cstddef>
+#include "body.hpp"
+#include "field.hpp"
+#include "header.hpp"
 
 namespace aquarius
 {
-	class context;
-
-	namespace msg
+	namespace message
 	{
-		template<bool Request, typename Header, typename Body, std::size_t Number>
-		class message
-			: public null_message
-			, private Header
-			, private aquarius::detail::empty_value<Body>
-			, public std::enable_shared_from_this<message<Request,Header,Body,Number>>
+		template<bool Request, typename _Header, typename _Body, std::size_t N>
+		class basic_message : protected header<Request, fields<_Header>>
 		{
 		public:
-			enum { NUMBER = Number };
+			using header_type =_Header;
+			using body_type = _Body;
 
-			using header_type = Header::value_type;
-			using body_type = aquarius::detail::empty_value<Body>;
 
-		public:
-			message() = default;
-
-			message(message&&) = default;
-
-			message(message const&) = default;
-
-			message& operator=(message&&) = default;
-
-			message& operator=(message const&) = default;
-
-			message& operator=(const header_type& header)
-			{
-				header_type::operator=(header);
-
-				return *this;
-			}
+			enum { Number = N };
 
 		public:
-			auto& header() noexcept
+			header_type& header() noexcept
 			{
-				return *this;
+				return this->get();
 			}
 
-			auto& header() const noexcept
+			const header_type& header() const noexcept
 			{
-				return *this;
+				return this->get();
 			}
 
-			Body& body() noexcept
+			body_type& body() noexcept
 			{
-				return body_type::get();
+				return body_.get();
 			}
 
-			Body& body() const noexcept
+			const body_type& body() const noexcept
 			{
-				return body_type::get();
+				return body_.get();
 			}
 
-			virtual int accept(std::shared_ptr<context> ctx_ptr)
+			template<typename _Stream>
+			bool parse_message(_Stream& stream)
 			{
-				return accept_impl<null_message>(this->shared_from_this(), ctx_ptr);
+				if (this->parse_bytes(stream))
+					return false;
+
+				return body_.parse_bytes(stream);
 			}
 
-			virtual bool parse_bytes(aquarius::ftstream& archive)
+			template<typename _Stream>
+			bool to_message(_Stream& stream)
 			{
-				return parse<0>::parse_bytes(this->shared_from_this(), archive);
+				if (!this->to_bytes(stream))
+					return false;
+
+				return body_.to_bytes(stream);
 			}
 
-			virtual bool to_bytes(aquarius::ftstream& archive)
-			{
-				return parse<0>::to_bytes(this->shared_from_this(), archive);
-			}
+		private:
+			body_of<fields<body_type>> body_;
 		};
+
 	}
 }

@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		template<typename _Time>
 		struct time_traits;
