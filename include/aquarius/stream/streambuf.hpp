@@ -153,6 +153,25 @@ namespace aquarius
 			buffer_.resize(sz);
 		}
 
+		size_type size()
+		{
+			return buffer_.size();
+		}
+
+		template<typename _Ty>
+		_Ty get()
+		{
+			_Ty value{};
+
+			constexpr auto sz = sizeof(_Ty);
+
+			std::memcpy(&value, &buffer_[rpos_], sz);
+
+			consume(sz);
+
+			return value;
+		}
+
 	private:
 		size_type wpos_;
 

@@ -65,5 +65,5 @@ namespace aquarius
 		inline static int number_ = 0;
 	};
 
-	using server = basic_server<session>;
+	using server = basic_server<tcp_no_ssl_session>;
 }

@@ -3,6 +3,7 @@
 #include "type_traits.hpp"
 #include "stream.hpp"
 #include "context.hpp"
+#include "session.hpp"
 
 namespace aquarius
 {
@@ -39,10 +40,8 @@ namespace aquarius
 	//		return dispatch(msg_ptr, std::forward<Args>(args)...);
 	//	}
 	//};
-
-	class session;
-
-	using ctx_router = detail::single_router<void, std::shared_ptr<session>, int, ftstream&>;
+	template<typename _Session>
+	using ctx_router = detail::single_router<void, std::shared_ptr<_Session>, ftstream&>;
 
 	//using msg_router = detail::single_router<std::shared_ptr<null_message>, aquarius::ftstream&>;
 
@@ -50,31 +49,31 @@ namespace aquarius
 	struct invoke
 	{
 		template<typename _Service>
-		static void dispatch(std::shared_ptr<_Session> session_ptr, int id, _Stream& buffer)
+		static void dispatch(std::shared_ptr<_Session> session_ptr, _Stream& buffer)
 		{
-			_Service(session_ptr).accept(id, buffer);
+			_Service(session_ptr).accept(buffer);
 		}
 	};
 
-	template<typename Context>
+	template<typename _Session, typename Context>
 	struct ctx_regist
 	{
 		ctx_regist(const std::size_t& key)
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router::instance().regist(_key, std::bind(&invoke<session, ftstream>::dispatch<Context>, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+			ctx_router<_Session>::instance().regist(_key, std::bind(&invoke<_Session, ftstream>::template dispatch<Context>, std::placeholders::_1, std::placeholders::_2));
 		}
 	};
 
 	struct invoke_helper
 	{
-		template<typename... _Args>
-		static void invoke(std::size_t key, _Args&&... args)
+		template<typename _Session, typename... _Args>
+		static void invoke(uint32_t key, std::shared_ptr<_Session>&& session_ptr, _Args&&... args)
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			aquarius::ctx_router::instance().invoke(_key,std::forward<_Args>(args)...);
+			aquarius::ctx_router<_Session>::instance().invoke(_key, std::move(session_ptr), std::forward<_Args>(args)...);
 		}
 	};
 

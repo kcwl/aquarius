@@ -66,7 +66,7 @@ namespace aquarius
 
 	public:
 		template<typename _Stream>
-		int accept(int id, _Stream& stream)
+		int accept(_Stream& stream)
 		{
 			this->serialize(stream);
 

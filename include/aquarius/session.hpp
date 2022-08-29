@@ -1,31 +1,18 @@
 #pragma once
-#include <memory>
-#include "router.hpp"
-#include "message/message.hpp"
-#include "stream.hpp"
-#include "connect.hpp"
+#include "connect/connect.hpp"
+#include "connect/session.hpp"
+
+
 
 namespace aquarius
 {
-	class session : public socket_connect
-	{
-	public:
-		session(boost::asio::io_service& io_service)
-			: socket_connect(io_service)
-		{
+	using tcp_no_ssl_session = aquarius::conn::basic_session<conn::tcp_session, socket_connect>;
 
-		}
+	using http_no_sll_session = aquarius::conn::basic_session<conn::http_session, socket_connect>;
 
-		virtual ~session() = default;
+#if ENABLE_SSL
+	using tcp_ssl_session = aquarius::conn::basic_session<conn::tcp_session, ssl_socket_connect>;
 
-		void start()
-		{
-			async_read();
-		}
-
-		void on_close() 
-		{
-			return;
-		}
-	};
+	using http_ssl_session = aquarius::conn::basic_session<conn::http_session, ssl_socket_connect>;
+#endif
 }
