@@ -13,6 +13,7 @@ namespace aquarius
 		}
 	};
 
+#if ENABLE_SSL
 	template<typename _Socket>
 	struct socket_traits<boost::asio::ssl::stream<_Socket>>
 	{
@@ -22,4 +23,5 @@ namespace aquarius
 			return shared_this->socket_.lowest_layer();
 		}
 	};
+#endif
 }
