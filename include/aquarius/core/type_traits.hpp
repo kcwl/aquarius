@@ -5,41 +5,41 @@ namespace aquarius
 {
 	namespace  core
 	{
-		template<typename T>
+		template<typename _Ty>
 		struct use_empty_value_base
 		{
-			static constexpr bool value = std::is_empty_v<T> && !std::is_final_v<T>;
+			static constexpr bool value = std::is_empty_v<_Ty> && !std::is_final_v<_Ty>;
 		};
 
-		template<typename T>
-		static constexpr bool use_empty_value_base_v = use_empty_value_base<T>::value;
+		template<typename _Ty>
+		static constexpr bool use_empty_value_base_v = use_empty_value_base<_Ty>::value;
 
-		template<typename T>
+		template<typename _Ty>
 		struct is_pod : std::false_type {};
 
-		template<typename T>
-			requires(std::is_standard_layout_v<T>&& std::is_trivial_v<T>)
-		struct is_pod<T> : std::true_type {};
+		template<typename _Ty>
+			requires(std::is_standard_layout_v<_Ty>&& std::is_trivial_v<_Ty>)
+		struct is_pod<_Ty> : std::true_type {};
 
-		template<typename T>
-		constexpr static bool is_pod_v = is_pod<std::remove_cvref_t<T>>::value;
+		template<typename _Ty>
+		constexpr static bool is_pod_v = is_pod<std::remove_cvref_t<_Ty>>::value;
 
-		template<typename T, typename _ = std::void_t<>>
+		template<typename _Ty, typename _ = std::void_t<>>
 		struct is_container : std::false_type {};
 
-		template<typename T>
-		struct is_container<T, std::void_t<typename T::value_type,
-			typename T::size_type,
-			typename T::allocator_type,
-			typename T::iterator,
-			typename T::const_iterator,
-			decltype(std::declval<T>().size()),
-			decltype(std::declval<T>().begin()),
-			decltype(std::declval<T>().end()),
-			decltype(std::declval<T>().cbegin()),
-			decltype(std::declval<T>().cend())>> : std::true_type{};
+		template<typename _Ty>
+		struct is_container<_Ty, std::void_t<typename _Ty::value_type,
+			typename _Ty::size_type,
+			typename _Ty::allocator_type,
+			typename _Ty::iterator,
+			typename _Ty::const_iterator,
+			decltype(std::declval<_Ty>().size()),
+			decltype(std::declval<_Ty>().begin()),
+			decltype(std::declval<_Ty>().end()),
+			decltype(std::declval<_Ty>().cbegin()),
+			decltype(std::declval<_Ty>().cend())>> : std::true_type{};
 
-		template<typename T>
-		constexpr static bool is_container_v = is_container<T>::value;
+		template<typename _Ty>
+		constexpr static bool is_container_v = is_container<_Ty>::value;
 	}
 }

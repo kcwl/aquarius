@@ -15,15 +15,15 @@ namespace aquarius
 			do_connect(endpoints);
 		}
 
-		template<class... Args, class = std::enable_if_t<(sizeof...(Args) > 1)>>
-		basic_client(boost::asio::io_service& io_service, Args&&... args)
+		template<class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
+		basic_client(boost::asio::io_service& io_service, _Args&&... args)
 			: io_service_(io_service)
 			, socket_(io_service)
 		{
 			if constexpr(sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
 
-			auto endpoint_list = std::make_tuple(std::forward<Args>(args)...);
+			auto endpoint_list = std::make_tuple(std::forward<_Args>(args)...);
 
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
@@ -38,8 +38,8 @@ namespace aquarius
 		}
 
 	public:
-		template<class T, std::size_t N>
-		void async_write(const std::array<T, N>& buf)
+		template<class _Ty, std::size_t N>
+		void async_write(const std::array<_Ty, N>& buf)
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
 									 [this](boost::system::error_code ec, std::size_t)
@@ -102,7 +102,6 @@ namespace aquarius
 
 		boost::asio::ip::tcp::socket socket_;
 
-		//iostream conn_buffer_;
 		std::array<std::byte, 8192> buffer_;
 	};
 }
