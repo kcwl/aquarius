@@ -8,7 +8,7 @@ namespace aquarius
 	{
 		struct empty_init_t {};
 
-		template<typename T, std::size_t N = 0, bool E = use_empty_value_base_v<T>>
+		template<typename _Ty, std::size_t N = 0, bool E = use_empty_value_base_v<_Ty>>
 		class empty_value
 		{
 		public:
@@ -20,52 +20,52 @@ namespace aquarius
 
 			}
 
-			template<typename U, typename... Args>
-			empty_value(empty_init_t, U&& value, Args&&... args)
-				: value_(std::forward<U>(value), std::forward<Args>(args)...)
+			template<typename _U, typename... _Args>
+			empty_value(empty_init_t, _U&& value, _Args&&... args)
+				: value_(std::forward<_U>(value), std::forward<_Args>(args)...)
 			{
 
 			}
 
-			T& get() noexcept
+			_Ty& get() noexcept
 			{
 				return value_;
 			}
 
-			T& get() const noexcept
+			_Ty& get() const noexcept
 			{
 				return value_;
 			}
 
 		private:
-			T value_;
+			_Ty value_;
 		};
 
-		template<typename T, std::size_t N>
-		class empty_value<T, N, true> : private T
+		template<typename _Ty, std::size_t N>
+		class empty_value<_Ty, N, true> : private _Ty
 		{
 		public:
 			empty_value() = default;
 
 			empty_value(empty_init_t)
-				: T()
+				: _Ty()
 			{
 
 			}
 
-			template<typename U, typename... Args>
-			empty_value(empty_init_t, U&& value, Args&&... args)
-				: T(std::forward<U>(value), std::forward<Args>(args)...)
+			template<typename _U, typename... _Args>
+			empty_value(empty_init_t, _U&& value, _Args&&... args)
+				: _Ty(std::forward<_U>(value), std::forward<_Args>(args)...)
 			{
 
 			}
 
-			T& get() noexcept
+			_Ty& get() noexcept
 			{
 				return *this;
 			}
 
-			const T& get() const noexcept
+			const _Ty& get() const noexcept
 			{
 				return *this;
 			}

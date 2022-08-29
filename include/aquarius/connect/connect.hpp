@@ -63,12 +63,12 @@ namespace aquarius
 				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 			}
 
-			template<typename T>
-			void queue_packet(T&& response)
+			template<typename _Ty>
+			void queue_packet(_Ty&& response)
 			{
 				ftstream fs;
 
-				std::forward<T>(response).to_message(fs);
+				std::forward<_Ty>(response).to_message(fs);
 
 				write_queue_.push(std::move(fs));
 			}
