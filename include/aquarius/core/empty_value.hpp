@@ -1,14 +1,14 @@
 #pragma once
 #include <cstddef>
-#include "../type_traits.hpp"
+#include "type_traits.hpp"
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		struct empty_init_t {};
 
-		template<typename T, std::size_t N = 0, bool E = aquarius::use_empty_value_base_v<T>>
+		template<typename T, std::size_t N = 0, bool E = use_empty_value_base_v<T>>
 		class empty_value
 		{
 		public:

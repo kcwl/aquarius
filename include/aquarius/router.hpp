@@ -1,6 +1,5 @@
 #pragma once
-#include "detail/router.hpp"
-#include "type_traits.hpp"
+#include "core/router.hpp"
 #include "stream.hpp"
 #include "context.hpp"
 #include "session.hpp"
@@ -41,7 +40,7 @@ namespace aquarius
 	//	}
 	//};
 	template<typename _Session>
-	using ctx_router = detail::single_router<void, std::shared_ptr<_Session>, ftstream&>;
+	using ctx_router = core::single_router<void, std::shared_ptr<_Session>, ftstream&>;
 
 	//using msg_router = detail::single_router<std::shared_ptr<null_message>, aquarius::ftstream&>;
 

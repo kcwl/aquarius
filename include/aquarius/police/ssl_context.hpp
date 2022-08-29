@@ -2,11 +2,11 @@
 #ifdef ENABLE_SSL
 #include <boost/asio/ssl.hpp>
 #endif
-#include "../detail/singleton.hpp"
+#include "../core/singleton.hpp"
 
 namespace aquarius
 {
-	class ssl_context : public detail::singleton<ssl_context>
+	class ssl_context : public core::singleton<ssl_context>
 	{
 #ifdef ENABLE_SSL
 	public:

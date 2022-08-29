@@ -8,8 +8,8 @@
 #include <queue>
 #include "../router.hpp"
 #include "../police/socket_police.hpp"
-#include "../detail/noncopyable.hpp"
-#include "../detail/deadline_timer.hpp"
+#include "../core/noncopyable.hpp"
+#include "../core/deadline_timer.hpp"
 #include "../message/header.hpp"
 
 namespace aquarius
@@ -21,7 +21,7 @@ namespace aquarius
 		template<typename _Socket>
 		class basic_connect
 			: public std::enable_shared_from_this<basic_connect<_Socket>>
-			, private detail::noncopyable
+			, private core::noncopyable
 		{
 			template<typename _Socket>
 			friend struct socket_traits;
@@ -161,7 +161,7 @@ namespace aquarius
 
 			void heart_deadline()
 			{
-				if (heart_timer_.expires_at() <= detail::deadline_timer::traits_type::now())
+				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
 				{
 					queue_packet("");
 				}
@@ -177,7 +177,7 @@ namespace aquarius
 
 			ftstream read_buffer_;
 
-			detail::deadline_timer heart_timer_;
+			core::deadline_timer heart_timer_;
 
 			boost::asio::ip::address remote_addr_;
 
