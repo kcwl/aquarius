@@ -5,37 +5,37 @@ namespace aquarius
 {
 	namespace core
 	{
-		template<typename T>
-		class singleton_wrapper : public T
+		template<typename _Ty>
+		class singleton_wrapper : public _Ty
 		{
 			
 		};
 
-		template<typename T>
+		template<typename _Ty>
 		class singleton
 		{
 		public:
-			static T& instance()
+			static _Ty& instance()
 			{
 				return get_instance();
 			}
 
 		private:
-			static T& get_instance()
+			static _Ty& get_instance()
 			{
-				static singleton_wrapper<T> t;
+				static singleton_wrapper<_Ty> t;
 
-				return static_cast<T&>(t);
+				return static_cast<_Ty&>(t);
 			}
 
 		protected:
 			singleton() {}
 
 		private:
-			static T* instance_;
+			static _Ty* instance_;
 		};
 	}
 }
 
-template<typename T>
-T* aquarius::core::singleton<T>::instance_ = &singleton<T>::instance();
+template<typename _Ty>
+_Ty* aquarius::core::singleton<_Ty>::instance_ = &singleton<_Ty>::instance();

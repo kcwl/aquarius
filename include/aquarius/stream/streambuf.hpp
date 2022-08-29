@@ -6,17 +6,17 @@ namespace aquarius
 {
 	inline static constexpr std::size_t buffer_capacity = 4096;
 
-	template<typename T = uint8_t>
+	template<typename _Ty = uint8_t>
 	class message_streambuf
 	{
 	public:
-		using iterator = std::vector<T>::iterator;
+		using iterator = std::vector<_Ty>::iterator;
 		using const_iterator = const iterator;
-		using value_type = T;
+		using value_type = _Ty;
 		using size_type = std::size_t;
-		using reference = T&;
-		using const_reference = const T&;
-		using pointer = T*;
+		using reference = _Ty&;
+		using const_reference = const _Ty&;
+		using pointer = _Ty*;
 		using const_pointer = const pointer;
 
 		message_streambuf()
@@ -177,6 +177,6 @@ namespace aquarius
 
 		size_type rpos_;
 
-		std::vector<T> buffer_;
+		std::vector<_Ty> buffer_;
 	};
 }
