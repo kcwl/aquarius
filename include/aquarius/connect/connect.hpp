@@ -71,6 +71,8 @@ namespace aquarius
 				std::forward<_Ty>(response).to_message(fs);
 
 				write_queue_.push(std::move(fs));
+
+				async_process_queue();
 			}
 
 			void set_buffer(ftstream buf)
