@@ -1,6 +1,6 @@
 #pragma once
 #include "session.hpp"
-#include "io_service_pool.hpp"
+#include "core/io_service_pool.hpp"
 
 namespace aquarius
 {
@@ -56,7 +56,7 @@ namespace aquarius
 		}
 
 	private:
-		io_service_pool io_service_pool_;
+		core::io_service_pool io_service_pool_;
 
 		boost::asio::signal_set signals_;
 

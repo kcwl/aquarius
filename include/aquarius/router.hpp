@@ -1,6 +1,6 @@
 #pragma once
 #include "core/router.hpp"
-#include "stream.hpp"
+#include "stream/streambuf.hpp"
 #include "context.hpp"
 #include "session.hpp"
 
