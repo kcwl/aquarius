@@ -67,6 +67,10 @@ namespace aquarius
 			void queue_packet(_Ty&& response)
 			{
 				ftstream fs;
+				
+				constexpr auto Number = _Ty::Number;
+
+				fs.write(Number, sizeof(Number));
 
 				std::forward<_Ty>(response).to_message(fs);
 
