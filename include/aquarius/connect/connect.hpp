@@ -82,6 +82,12 @@ namespace aquarius
 
 			void async_read()
 			{
+				if (!socket_.is_open())
+					return;
+
+				read_buffer_.normalize();
+				read_buffer_.ensure();
+
 				socket_.async_read_some(boost::asio::buffer(read_buffer_.read_pointer(), read_buffer_.remain_size()),
 					[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
 				{
