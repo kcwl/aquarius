@@ -1,8 +1,8 @@
 #pragma once
+#include "ping.pb.h"
+#include "header.pb.h"
 #include "../request.hpp"
 #include "../response.hpp"
-#include "header.pb.h"
-#include "ping.pb.h"
 
 namespace aquarius
 {

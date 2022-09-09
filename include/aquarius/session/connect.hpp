@@ -1,21 +1,17 @@
 ﻿#pragma once
-#pragma warning(disable:4996)
 #include <array>
+#include <queue>
 #include <memory>
-#include <iostream>
 #include <vector>
 #include <boost/asio.hpp>
-#include <queue>
-#include "../router.hpp"
 #include "../socket/socket.hpp"
+#include "../proto/proto_def.hpp"
 #include "../core/noncopyable.hpp"
 #include "../core/deadline_timer.hpp"
-#include "../message/header.hpp"
-#include "../proto/proto_def.hpp"
 
 namespace aquarius
 {
-	namespace conn
+	namespace session
 	{
 		constexpr int heart_time_interval = 10;
 
@@ -25,7 +21,7 @@ namespace aquarius
 			, private core::noncopyable
 		{
 			template<typename _Socket>
-			friend struct socket_traits;
+			friend struct sock::socket_traits;
 
 		public:
 			explicit basic_connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
@@ -46,7 +42,7 @@ namespace aquarius
 
 			auto& socket()
 			{
-				return socket_traits<_Socket>::socket(this->shared_from_this());
+				return sock::socket_traits<_Socket>::socket(this->shared_from_this());
 			}
 
 			std::string remote_address()
@@ -196,8 +192,6 @@ namespace aquarius
 			}
 
 		private:
-			static inline int size_ = 0;
-
 			_Socket socket_;
 
 			ftstream read_buffer_;
@@ -216,10 +210,10 @@ namespace aquarius
 		};
 	}
 
-	using socket_connect = conn::basic_connect<boost::asio::ip::tcp::socket>;
+	using socket_connect = session::basic_connect<boost::asio::ip::tcp::socket>;
 
 #if ENABLE_SSL
-	using ssl_connect = conn::basic_connect<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
+	using ssl_connect = session::basic_connect<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
 #endif
 }
 

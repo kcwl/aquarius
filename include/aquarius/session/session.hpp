@@ -1,14 +1,13 @@
 #pragma once
+#include "../router.hpp"
 #include "../stream/streambuf.hpp"
 
 namespace aquarius
 {
-	namespace conn
+	namespace session
 	{
-		struct tcp_session {};
-
+		struct tcp_session{};
 		struct http_session {};
-
 
 		template<typename _Ty, typename _Conn>
 		class basic_session : public _Conn
