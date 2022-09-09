@@ -151,6 +151,8 @@ namespace aquarius
 				heart_timer_.cancel();
 
 				socket_.close();
+
+				on_close();
 			}
 
 			void establish_async_read()
