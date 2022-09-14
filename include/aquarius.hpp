@@ -10,4 +10,4 @@
 
 #include "aquarius/context.hpp"
 
-#include "aquarius/basic_client.hpp"
+#include "aquarius/client.hpp"
