@@ -1,28 +1,44 @@
 #pragma once
+#include <boost/asio.hpp>
 #include "ssl_context.hpp"
 
 namespace aquarius
 {
 	namespace sock
 	{
-		template<typename _Socket>
-		struct socket_traits
+		struct default_socket{};
+		struct ssl_socket{};
+
+
+		template<typename _Sock_Type = void>
+		class socket : public boost::asio::ip::tcp::socket
 		{
-			template<typename _Ty>
-			static auto& socket(std::shared_ptr<_Ty> shared_this)
+		public:
+			template<typename _Execution_Context>
+			socket(_Execution_Context& executor)
+				: boost::asio::ip::tcp::socket(executor) {}
+
+		public:
+			auto& sock()
 			{
-				return shared_this->socket_;
+				return *this;
 			}
 		};
 
 #if ENABLE_SSL
-		template<typename _Socket>
-		struct socket_traits<boost::asio::ssl::stream<_Socket>>
+		template<>
+		class socket<ssl_socket> : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
 		{
-			template<typename _Ty>
-			static auto& socket(std::shared_ptr<_Ty> shared_this)
+			using executor_type = boost::asio::ip::tcp::socket::executor_type;
+
+		public:
+			socket(const executor_type& executor)
+				: boost::asio::ip::tcp::socket(executor) {}
+
+		public:
+			auto& sock()
 			{
-				return shared_this->socket_.lowest_layer();
+				return this->lowest_layer();
 			}
 		};
 #endif

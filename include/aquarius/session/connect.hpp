@@ -3,7 +3,6 @@
 #include <queue>
 #include <memory>
 #include <vector>
-#include <boost/asio.hpp>
 #include "../socket/socket.hpp"
 #include "../proto/proto_def.hpp"
 #include "../core/noncopyable.hpp"
@@ -20,9 +19,6 @@ namespace aquarius
 			: public std::enable_shared_from_this<basic_connect<_Socket>>
 			, private core::noncopyable
 		{
-			template<typename _Socket>
-			friend struct sock::socket_traits;
-
 		public:
 			explicit basic_connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
 				: socket_(io_service)
@@ -42,7 +38,7 @@ namespace aquarius
 
 			auto& socket()
 			{
-				return sock::socket_traits<_Socket>::socket(this->shared_from_this());
+				return socket_.sock();
 			}
 
 			std::string remote_address()
@@ -210,10 +206,10 @@ namespace aquarius
 		};
 	}
 
-	using socket_connect = session::basic_connect<boost::asio::ip::tcp::socket>;
+	using socket_connect = session::basic_connect<sock::socket<>>;
 
 #if ENABLE_SSL
-	using ssl_connect = session::basic_connect<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
+	using ssl_connect = session::basic_connect<sock::socket<ssl_socket>>;
 #endif
 }
 
