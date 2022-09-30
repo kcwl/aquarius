@@ -1,68 +1,13 @@
 #pragma once
+#include "server/basic_server.hpp"
 #include "session.hpp"
-#include "core/io_service_pool.hpp"
+
 
 namespace aquarius
 {
-	template<typename _Session>
-	class basic_server
-	{
-	public:
-		explicit basic_server(const std::string& port, int io_service_pool_size)
-			: io_service_pool_(io_service_pool_size)
-			, signals_(io_service_pool_.get_io_service())
-			, acceptor_(io_service_pool_.get_io_service(), boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(std::atoi(port.data()))))
-			{
-				signals_.add(SIGINT);
-				signals_.add(SIGTERM);
-#ifdef SIGQUIT
-				signals_.add(SIGQUIT);
+	using server = srv::basic_server<tcp_no_ssl_session>;
+
+#ifdef ENABLE_SSL
+	using ssl_server = srv::basic_server<tcp_ssl_session>
 #endif
-				signals_.async_wait(std::bind(&basic_server::handle_stop, this));
-
-				start_accept();
-			}
-
-		virtual~basic_server() = default;
-
-	public:
-		void run()
-		{
-			io_service_pool_.run();
-		}
-
-	private:
-		void start_accept()
-		{
-			acceptor_.set_option(boost::asio::socket_base::reuse_address());
-
-			auto new_connect_ptr = std::make_shared<_Session>(io_service_pool_.get_io_service());
-
-			acceptor_.async_accept(new_connect_ptr->socket(),
-				[this, new_connect_ptr](const boost::system::error_code& error)
-				{
-					if (!error)
-					{
-						new_connect_ptr->start();
-					}
-
-					start_accept();
-				}
-			);
-		}
-
-		void handle_stop()
-		{
-			io_service_pool_.stop();
-		}
-
-	private:
-		core::io_service_pool io_service_pool_;
-
-		boost::asio::signal_set signals_;
-
-		boost::asio::ip::tcp::acceptor acceptor_;
-	};
-
-	using server = basic_server<tcp_no_ssl_session>;
 }
