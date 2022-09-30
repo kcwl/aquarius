@@ -34,6 +34,7 @@ namespace aquarius
 	private:
 		void start_accept()
 		{
+			acceptor_.set_option(boost::asio::socket_base::reuse_address());
 
 			auto new_connect_ptr = std::make_shared<_Session>(io_service_pool_.get_io_service());
 
@@ -61,8 +62,6 @@ namespace aquarius
 		boost::asio::signal_set signals_;
 
 		boost::asio::ip::tcp::acceptor acceptor_;
-
-		inline static int number_ = 0;
 	};
 
 	using server = basic_server<tcp_no_ssl_session>;
