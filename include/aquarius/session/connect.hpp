@@ -1,20 +1,16 @@
 ﻿#pragma once
-#pragma warning(disable:4996)
 #include <array>
-#include <memory>
-#include <iostream>
-#include <vector>
-#include <boost/asio.hpp>
 #include <queue>
-#include "../router.hpp"
+#include <memory>
+#include <vector>
 #include "../socket/socket.hpp"
+#include "../proto/proto_def.hpp"
 #include "../core/noncopyable.hpp"
 #include "../core/deadline_timer.hpp"
-#include "../message/header.hpp"
 
 namespace aquarius
 {
-	namespace conn
+	namespace session
 	{
 		constexpr int heart_time_interval = 10;
 
@@ -23,16 +19,14 @@ namespace aquarius
 			: public std::enable_shared_from_this<basic_connect<_Socket>>
 			, private core::noncopyable
 		{
-			template<typename _Socket>
-			friend struct socket_traits;
-
 		public:
-			explicit basic_connect(boost::asio::io_service& io_service)
+			explicit basic_connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
 				: socket_(io_service)
 				, read_buffer_()
 				, heart_timer_(io_service)
 				, remote_addr_()
 				, remote_port_()
+				, heart_deadline_(heart_time)
 			{
 
 			}
@@ -44,7 +38,7 @@ namespace aquarius
 
 			auto& socket()
 			{
-				return socket_traits<_Socket>::socket(this->shared_from_this());
+				return socket_.sock();
 			}
 
 			std::string remote_address()
@@ -67,6 +61,10 @@ namespace aquarius
 			void queue_packet(_Ty&& response)
 			{
 				ftstream fs;
+				
+				constexpr auto Number = _Ty::Number;
+
+				fs.write(&Number, sizeof(Number));
 
 				std::forward<_Ty>(response).to_message(fs);
 
@@ -82,6 +80,12 @@ namespace aquarius
 
 			void async_read()
 			{
+				if (!socket_.is_open())
+					return;
+
+				read_buffer_.normalize();
+				read_buffer_.ensure();
+
 				socket_.async_read_some(boost::asio::buffer(read_buffer_.read_pointer(), read_buffer_.remain_size()),
 					[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
 				{
@@ -97,8 +101,18 @@ namespace aquarius
 						return shut_down();
 					}
 
+					last_operators_.exchange(std::chrono::system_clock::now().time_since_epoch().count());
+
 					async_read();
 				});
+			}
+
+			void establish_async_read()
+			{
+				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_));
+				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this(), last_operators_.load()));
+
+				async_read();
 			}
 
 			auto& get_read_buffer()
@@ -120,7 +134,7 @@ namespace aquarius
 
 				auto& buffer = write_queue_.front();
 
-				socket_.async_write_some(boost::asio::buffer(buffer.data(), buffer.size()), [this, self = this->shared_from_this()](const boost::system::error_code& ec, std::size_t bytes_transferred)
+				socket_.async_write_some(boost::asio::buffer(buffer.write_pointer(), buffer.remain_size()), [this, self = this->shared_from_this()](const boost::system::error_code& ec, std::size_t bytes_transferred)
 				{
 					if (ec)
 					{
@@ -151,30 +165,29 @@ namespace aquarius
 				heart_timer_.cancel();
 
 				socket_.close();
+
+				on_close();
 			}
 
-			void establish_async_read()
+			void heart_deadline(uint64_t last_op)
 			{
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
-
-				async_read();
-			}
-
-			void heart_deadline()
-			{
-				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
+				if (last_operators_.load() == last_op)
 				{
-					queue_packet("");
+					return shut_down();
 				}
 
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
+				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
+				{
+					ping_response resp{};
+
+					queue_packet(std::move(resp));
+				}
+
+				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_));
+				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this(), last_operators_.load()));
 			}
 
 		private:
-			static inline int size_ = 0;
-
 			_Socket socket_;
 
 			ftstream read_buffer_;
@@ -186,13 +199,17 @@ namespace aquarius
 			boost::asio::ip::port_type remote_port_;
 
 			std::queue<ftstream> write_queue_;
+
+			std::atomic_uint64_t last_operators_;
+
+			std::atomic_int heart_deadline_;
 		};
 	}
 
-	using socket_connect = conn::basic_connect<boost::asio::ip::tcp::socket>;
+	using socket_connect = session::basic_connect<sock::socket<>>;
 
 #if ENABLE_SSL
-	using ssl_connect = conn::basic_connect<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
+	using ssl_connect = session::basic_connect<sock::socket<ssl_socket>>;
 #endif
 }
 
