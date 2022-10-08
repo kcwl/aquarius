@@ -1,5 +1,5 @@
 #pragma once
-#include "../stream.hpp"
+#include "../stream/streambuf.hpp"
 
 namespace aquarius
 {
