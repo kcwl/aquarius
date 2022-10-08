@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include <unordered_map>
 #include <functional>
+#include <unordered_map>
 #include "singleton.hpp"
 
 namespace aquarius

@@ -1,6 +1,7 @@
 #pragma once
-#include "time_traits.hpp"
 #include <boost/asio/deadline_timer.hpp>
+#include "time_traits.hpp"
+
 
 namespace aquarius
 {

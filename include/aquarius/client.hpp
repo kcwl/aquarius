@@ -1,13 +1,14 @@
 ﻿#pragma once
-#include <boost/asio.hpp>
 #include <type_traits>
+#include <boost/asio.hpp>
+#include "stream/streambuf.hpp"
 
 namespace aquarius
 {
-	class basic_client
+	class client
 	{
 	public:
-		explicit basic_client(boost::asio::io_service& io_service, const boost::asio::ip::tcp::resolver::results_type& endpoints)
+		explicit client(boost::asio::io_service& io_service, const boost::asio::ip::tcp::resolver::results_type& endpoints)
 			: io_service_(io_service)
 			, socket_(io_service)
 			, buffer_()
@@ -16,7 +17,7 @@ namespace aquarius
 		}
 
 		template<class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
-		basic_client(boost::asio::io_service& io_service, _Args&&... args)
+		client(boost::asio::io_service& io_service, _Args&&... args)
 			: io_service_(io_service)
 			, socket_(io_service)
 		{
