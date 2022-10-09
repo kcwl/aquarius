@@ -64,7 +64,7 @@ namespace aquarius
 				
 				constexpr auto Number = _Ty::Number;
 
-				fs.write(&Number, sizeof(Number));
+				fs.put(&Number, sizeof(Number));
 
 				std::forward<_Ty>(response).to_message(fs);
 

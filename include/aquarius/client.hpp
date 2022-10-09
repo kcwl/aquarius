@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <type_traits>
 #include <boost/asio.hpp>
-#include "stream/streambuf.hpp"
+#include "io.hpp"
 
 namespace aquarius
 {

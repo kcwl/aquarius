@@ -1,6 +1,6 @@
 #pragma once
 #include "../router.hpp"
-#include "../stream/streambuf.hpp"
+#include "../io.hpp"
 
 namespace aquarius
 {
