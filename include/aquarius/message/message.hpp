@@ -8,6 +8,8 @@ namespace aquarius
 {
 	namespace message
 	{
+		struct empty_body{};
+
 		template<bool Request, typename _Header, typename _Body, uint32_t N>
 		class basic_message : protected header<Request, fields<_Header>>
 		{
