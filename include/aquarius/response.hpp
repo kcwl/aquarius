@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	template<typename _Header, typename _Body, std::size_t Number>
+	template<typename _Header, typename _Body, uint32_t Number>
 	class response : public message::basic_message<false, _Header, _Body, Number>
 	{
 	public:
