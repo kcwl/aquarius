@@ -5,7 +5,6 @@ namespace aquarius
 {
 	struct tcp_header
 	{
-		uint32_t opcode_;
 		int32_t size_;
 	};
 
