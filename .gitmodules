@@ -1,6 +1,0 @@
-[submodule "deps/reflect"]
-	path = deps/reflect
-	url = https://github.com/kcwl/reflect.git
-[submodule "deps/protobuf"]
-	path = deps/protobuf
-	url = https://github.com/protocolbuffers/protobuf.git
