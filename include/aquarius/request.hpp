@@ -10,4 +10,7 @@ namespace aquarius
 		request() = default;
 		~request() = default;
 	};
+
+	template<typename _Header, uint32_t Number>
+	using null_body_request = request<_Header, message::empty_body, Number>;
 }
