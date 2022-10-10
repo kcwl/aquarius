@@ -41,5 +41,11 @@ namespace aquarius
 
 		template<typename _Ty>
 		constexpr static bool is_container_v = is_container<_Ty>::value;
+
+		template<typename _Ty>
+		struct is_string : std::false_type {};
+
+		template<>
+		struct is_string<std::string> : std::true_type {};
 	}
 }
