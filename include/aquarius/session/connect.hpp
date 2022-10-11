@@ -206,11 +206,5 @@ namespace aquarius
 			bool last_operator_;
 		};
 	}
-
-	using socket_connect = session::basic_connect<sock::socket<>>;
-
-#if ENABLE_SSL
-	using ssl_connect = session::basic_connect<sock::socket<ssl_socket>>;
-#endif
 }
 
