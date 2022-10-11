@@ -18,18 +18,18 @@ namespace aquarius
 
 	public:
 		template<typename _Stream>
-		void serialize(_Stream& stream)
+		bool serialize(_Stream& stream)
 		{
-			request_ptr_->parse_message(stream);
+			return request_ptr_->parse_message(stream);
 		}
 
 		template<typename _Stream>
-		void deserialize(_Stream& stream)
+		bool deserialize(_Stream& stream)
 		{
-			response_.to_message(stream);
+			return response_.to_message(stream);
 		}
 
-		auto& request() noexcept
+		auto request() noexcept
 		{
 			return request_ptr_;
 		}
@@ -68,7 +68,8 @@ namespace aquarius
 		template<typename _Stream>
 		int accept(_Stream& stream)
 		{
-			this->serialize(stream);
+			if (!this->serialize(stream))
+				return 0;
 
 			if (!handle())
 				return 0;

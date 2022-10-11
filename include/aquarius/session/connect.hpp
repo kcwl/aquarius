@@ -27,8 +27,8 @@ namespace aquarius
 				, remote_addr_()
 				, remote_port_()
 				, heart_deadline_(heart_time)
+				, last_operator_(true)
 			{
-
 			}
 
 			virtual ~basic_connect()
@@ -86,7 +86,7 @@ namespace aquarius
 				read_buffer_.normalize();
 				read_buffer_.ensure();
 
-				socket_.async_read_some(boost::asio::buffer(read_buffer_.read_pointer(), read_buffer_.remain_size()),
+				socket_.async_read_some(boost::asio::buffer(read_buffer_.write_pointer(), read_buffer_.remain_size()),
 					[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
 				{
 					if (error)
@@ -96,12 +96,12 @@ namespace aquarius
 
 					read_buffer_.commit(static_cast<int>(bytes_transferred));
 
+					!last_operator_ ? last_operator_ = true : 0;
+
 					if (!read_handle())
 					{
 						return shut_down();
 					}
-
-					last_operators_.exchange(std::chrono::system_clock::now().time_since_epoch().count());
 
 					async_read();
 				});
@@ -109,8 +109,8 @@ namespace aquarius
 
 			void establish_async_read()
 			{
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this(), last_operators_.load()));
+				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
+				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
 
 				async_read();
 			}
@@ -134,23 +134,22 @@ namespace aquarius
 
 				auto& buffer = write_queue_.front();
 
-				socket_.async_write_some(boost::asio::buffer(buffer.write_pointer(), buffer.remain_size()), [this, self = this->shared_from_this()](const boost::system::error_code& ec, std::size_t bytes_transferred)
-				{
-					if (ec)
+				socket_.async_write_some(boost::asio::buffer(buffer.read_pointer(), buffer.active()), 
+					[this, self = this->shared_from_this(), &buffer](const boost::system::error_code& ec, std::size_t bytes_transferred)
 					{
-						std::cout << ec.message() << std::endl;
-						return;
-					}
+						if (ec)
+						{
+							std::cout << ec.message() << std::endl;
+							shut_down();
+							return;
+						}
 
-					if (write_queue_.front().size() == 0)
-					{
 						write_queue_.pop();
-					}
 
-					async_process_queue();
+						async_process_queue();
 
-					std::cout << "complete " << bytes_transferred << "字节" << std::endl;
-				});
+						std::cout << "complete " << bytes_transferred << "字节" << std::endl;
+					});
 			}
 
 		private:
@@ -169,22 +168,24 @@ namespace aquarius
 				on_close();
 			}
 
-			void heart_deadline(uint64_t last_op)
+			void heart_deadline()
 			{
-				if (last_operators_.load() == last_op)
+				if (!last_operator_)
 				{
 					return shut_down();
 				}
 
 				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
 				{
-					ping_response resp{};
+					ping_request resp{};
 
 					queue_packet(std::move(resp));
 				}
 
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this(), last_operators_.load()));
+				last_operator_ ? last_operator_ = false : 0;
+
+				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
+				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
 			}
 
 		private:
@@ -200,16 +201,10 @@ namespace aquarius
 
 			std::queue<ftstream> write_queue_;
 
-			std::atomic_uint64_t last_operators_;
-
 			std::atomic_int heart_deadline_;
+
+			bool last_operator_;
 		};
 	}
-
-	using socket_connect = session::basic_connect<sock::socket<>>;
-
-#if ENABLE_SSL
-	using ssl_connect = session::basic_connect<sock::socket<ssl_socket>>;
-#endif
 }
 

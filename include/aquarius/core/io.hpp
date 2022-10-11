@@ -21,6 +21,7 @@ namespace aquarius
 			: buffer_(buffer_capacity)
 			, wpos_(0)
 			, rpos_(0)
+			, start_pos_(0)
 		{
 
 		}
@@ -29,21 +30,24 @@ namespace aquarius
 			: buffer_(capacity)
 			, wpos_(0)
 			, rpos_(0)
+			, start_pos_(0)
 		{
 		}
 
 		io(const io& other)
-			: wpos_(other.wpos_)
+			: buffer_(other.buffer_)
+			, wpos_(other.wpos_)
 			, rpos_(other.rpos_)
-			, buffer_(other.buffer_)
+			, start_pos_(0)
 		{
 
 		}
 
 		io(io&& other)
-			: wpos_(std::move(other.wpos_))
+			: buffer_(std::move(other.buffer_))
+			, wpos_(std::move(other.wpos_))
 			, rpos_(std::move(other.rpos_))
-			, buffer_(std::move(other.buffer_))
+			, start_pos_(0)
 		{
 
 		}
@@ -125,6 +129,32 @@ namespace aquarius
 			rpos_ += n;
 		}
 
+		template<io_state s>
+		void start()
+		{
+			if constexpr (s == io_state::read)
+			{
+				start_pos_ = rpos_;
+			}
+			else
+			{
+				start_pos_ = wpos_;
+			}
+		}
+
+		template<io_state s>
+		void transback()
+		{
+			if constexpr (s == io_state::read)
+			{
+				rpos_ = start_pos_ > 0 ? start_pos_ : 0;
+			}
+			else
+			{
+				wpos_ = start_pos_ > 0 ? start_pos_ : 0;
+			}
+		}
+
 		void normalize()
 		{
 			if (rpos_ == 0)
@@ -172,10 +202,12 @@ namespace aquarius
 		}
 
 	private:
+		std::vector<_Ty> buffer_;
+
 		size_type wpos_;
 
 		size_type rpos_;
 
-		std::vector<_Ty> buffer_;
+		size_type start_pos_;
 	};
 }
