@@ -19,11 +19,20 @@ namespace aquarius
 		public:
 			bool parse_bytes(value_type* ptr, ftstream& archive)
 			{
+				constexpr auto sz = sizeof(value_type);
+
+				if (archive.size() < sz)
+					return false;
+
+				*ptr = archive.get<value_type>();
+
 				return true;
 			}
 
 			bool to_bytes(value_type* ptr, ftstream& archive)
 			{
+				archive.put(ptr, sizeof(value_type));
+
 				return true;
 			}
 		};

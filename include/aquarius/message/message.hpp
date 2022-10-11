@@ -8,7 +8,9 @@ namespace aquarius
 {
 	namespace message
 	{
-		template<bool Request, typename _Header, typename _Body, std::size_t N>
+		struct empty_body{};
+
+		template<bool Request, typename _Header, typename _Body, uint32_t N>
 		class basic_message : protected header<Request, fields<_Header>>
 		{
 		public:
@@ -42,19 +44,45 @@ namespace aquarius
 			template<typename _Stream>
 			bool parse_message(_Stream& stream)
 			{
-				if (this->parse_bytes(stream))
-					return false;
+				stream.template start<io_state::read>();
 
-				return body_.parse_bytes(stream);
+				if (!this->parse_bytes(stream))
+				{
+					stream.template transback<io_state::read>();
+
+					return false;
+				}
+
+				if (!body_.parse_bytes(stream))
+				{
+					stream.template transback<io_state::read>();
+
+					return false;
+				}
+
+				return true;
 			}
 
 			template<typename _Stream>
 			bool to_message(_Stream& stream)
 			{
-				if (!this->to_bytes(stream))
-					return false;
+				stream.template start<io_state::write>();
 
-				return body_.to_bytes(stream);
+				if (!this->to_bytes(stream))
+				{
+					stream.template transback<io_state::write>();
+
+					return false;
+				}
+				
+				if (!body_.to_bytes(stream))
+				{
+					stream.template transback<io_state::write>();
+
+					return false;
+				}
+
+				return true;
 			}
 
 		private:

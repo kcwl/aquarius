@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <boost/asio.hpp>
 #include "io.hpp"
+#include "core/type_traits.hpp"
 
 namespace aquarius
 {
@@ -29,7 +30,7 @@ namespace aquarius
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
 
-			if constexpr(!is_string<decltype(host)>::value || !is_string<decltype(port)>::value)
+			if constexpr(!core::is_string<decltype(host)>::value || !core::is_string<decltype(port)>::value)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
 			boost::asio::ip::tcp::resolver resolver(io_service);
@@ -86,16 +87,47 @@ namespace aquarius
 
 		void do_read()
 		{
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer_),
-									[this](boost::system::error_code ec, std::size_t)
+			socket_.async_read_some(boost::asio::buffer(buffer_.write_pointer(),buffer_.remain_size()),
+									[this](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if(ec)
 											return;
 
-										read_handler();
+										buffer_.commit(bytes_transferred);
+
+										if(!system_call())
+											read_handler();
 
 										do_read();
 									});
+		}
+
+		bool system_call()
+		{
+			buffer_.start<io_state::read>();
+
+			auto proto_id = buffer_.get<uint32_t>();
+
+			if (proto_id != 1000)
+			{
+				buffer_.transback<io_state::read>();
+				return false;
+			}
+
+			buffer_.consume(sizeof(tcp_request_header) + 1);
+			
+			ping_response pr{};
+
+			ftstream fs;
+			constexpr auto Number = ping_response::Number;
+
+			fs.put(&Number, sizeof(Number));
+
+			pr.to_message(fs);
+
+			async_write(std::move(fs));
+
+			return true;
 		}
 
 	private:
@@ -103,6 +135,6 @@ namespace aquarius
 
 		boost::asio::ip::tcp::socket socket_;
 
-		std::array<std::byte, 8192> buffer_;
+		ftstream buffer_;
 	};
 }
