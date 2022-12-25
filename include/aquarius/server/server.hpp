@@ -6,10 +6,10 @@ namespace aquarius
 	namespace srv
 	{
 		template<typename _Session>
-		class basic_server
+		class server
 		{
 		public:
-			explicit basic_server(const std::string& port, int io_service_pool_size)
+			explicit server(const std::string& port, int io_service_pool_size)
 				: io_service_pool_(io_service_pool_size)
 				, signals_(io_service_pool_.get_io_service())
 				, acceptor_(io_service_pool_.get_io_service(), boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(std::atoi(port.data()))))
@@ -19,12 +19,12 @@ namespace aquarius
 #ifdef SIGQUIT
 				signals_.add(SIGQUIT);
 #endif
-				signals_.async_wait(std::bind(&basic_server::handle_stop, this));
+				signals_.async_wait(std::bind(&server::handle_stop, this));
 
 				start_accept();
 			}
 
-			virtual~basic_server() = default;
+			virtual~server() = default;
 
 		public:
 			void run()

@@ -19,15 +19,15 @@ namespace aquarius
 		constexpr int heart_time_interval = 10;
 
 		template<typename _Socket>
-		class basic_connect
-			: public std::enable_shared_from_this<basic_connect<_Socket>>
+		class connector
+			: public std::enable_shared_from_this<connector<_Socket>>
 			, private core::noncopyable
 		{
 			template<typename _Socket>
 			friend struct socket_traits;
 
 		public:
-			explicit basic_connect(boost::asio::io_service& io_service)
+			explicit connector(boost::asio::io_service& io_service)
 				: socket_(io_service)
 				, read_buffer_()
 				, heart_timer_(io_service)
@@ -37,7 +37,7 @@ namespace aquarius
 
 			}
 
-			virtual ~basic_connect()
+			virtual ~connector()
 			{
 				shut_down();
 			}
@@ -156,7 +156,7 @@ namespace aquarius
 			void establish_async_read()
 			{
 				heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
+				heart_timer_.async_wait(std::bind(&connector::heart_deadline, this->shared_from_this()));
 
 				async_read();
 			}
@@ -169,7 +169,7 @@ namespace aquarius
 				}
 
 				heart_timer_.expires_from_now(std::chrono::seconds(heart_time_interval));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
+				heart_timer_.async_wait(std::bind(&connector::heart_deadline, this->shared_from_this()));
 			}
 
 		private:
@@ -189,10 +189,10 @@ namespace aquarius
 		};
 	}
 
-	using socket_connect = conn::basic_connect<boost::asio::ip::tcp::socket>;
+	using socket_connect = conn::connector<boost::asio::ip::tcp::socket>;
 
 #if ENABLE_SSL
-	using ssl_connect = conn::basic_connect<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
+	using ssl_connect = conn::connector<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>;
 #endif
 }
 

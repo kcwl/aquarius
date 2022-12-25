@@ -1,5 +1,5 @@
 #pragma once
-#include "../stream.hpp"
+#include "../io.hpp"
 
 namespace aquarius
 {
@@ -11,16 +11,16 @@ namespace aquarius
 
 
 		template<typename _Ty, typename _Conn>
-		class basic_session : public _Conn
+		class session : public _Conn
 		{
 		public:
-			basic_session(boost::asio::io_service& io_service)
+			session(boost::asio::io_service& io_service)
 				: _Conn(io_service)
 			{
 
 			}
 
-			virtual ~basic_session() = default;
+			virtual ~session() = default;
 
 			void start()
 			{
@@ -50,16 +50,16 @@ namespace aquarius
 		};
 
 		template<typename _Conn>
-		class basic_session<http_session, _Conn> : public _Conn
+		class session<http_session, _Conn> : public _Conn
 		{
 		public:
-			basic_session(boost::asio::io_service& io_service)
+			session(boost::asio::io_service& io_service)
 				: _Conn(io_service)
 			{
 
 			}
 
-			virtual ~basic_session() = default;
+			virtual ~session() = default;
 
 			void start()
 			{
