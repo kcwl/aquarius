@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include "io.hpp"
 #include "core/type_traits.hpp"
+#include <aquarius/core/heart/heart_proto.hpp>
 
 namespace aquarius
 {
@@ -53,9 +54,9 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(ftstream&& buf)
+		void async_write(iostream&& buf)
 		{
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.read_pointer(), buf.active()),
+			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
 									 {
 										 if(ec)
@@ -114,14 +115,11 @@ namespace aquarius
 				return false;
 			}
 
-			buffer_.consume(sizeof(tcp_request_header) + 1);
+			buffer_.consume(sizeof(proto::tcp_request_header) + 1);
 			
-			ping_response pr{};
+			core::ping_response pr{};
 
-			ftstream fs;
-			constexpr auto Number = ping_response::Number;
-
-			fs.put(&Number, sizeof(Number));
+			iostream fs;
 
 			pr.to_message(fs);
 

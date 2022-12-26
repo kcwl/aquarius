@@ -1,0 +1,65 @@
+#pragma once
+#include "parse.hpp"
+#include <aquarius/proto/field.hpp>
+#include <io.h>
+
+namespace aquarius
+{
+	namespace proto
+	{
+		template<typename _Ty, typename _Parse>
+		class header_of 
+			: public fields<_Ty>
+		{
+		public:
+			using stream_type = typename _Parse::stream_type;
+
+			using value_type = _Ty;
+
+		public:
+			header_of()
+			{
+				this->alloc(header_ptr_);
+			}
+
+			header_of(const header_of&) = default;
+
+			header_of(header_of&&) = default;
+
+			header_of& operator=(const header_of&) = default;
+
+			~header_of()
+			{
+				this->dealloc(header_ptr_);
+			}
+
+		public:
+			value_type* get() noexcept
+			{
+				return header_ptr_;
+			}
+
+			const value_type* get() const noexcept
+			{
+				return header_ptr_;
+			}
+
+			virtual bool parse_bytes(stream_type& stream)
+			{
+				stream >> *header_ptr_;
+
+				return true;
+			}
+
+			virtual bool to_bytes(stream_type& stream)
+			{
+				stream << *header_ptr_;
+
+				return true;
+			}
+
+		private:
+			value_type* header_ptr_;
+		};
+	}
+}

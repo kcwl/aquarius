@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include "message/message.hpp"
+#include "proto/message.hpp"
 
 namespace aquarius
 {
 	template<typename _Header, typename _Body, uint32_t Number>
-	class request : public message::basic_message<true, _Header, _Body, Number>
+	class request : public message<_Header, _Body, Number>
 	{
 	public:
 		request() = default;
@@ -12,5 +12,5 @@ namespace aquarius
 	};
 
 	template<typename _Header, uint32_t Number>
-	using null_body_request = request<_Header, message::empty_body, Number>;
+	using null_body_request = request<_Header, proto::empty_body, Number>;
 }

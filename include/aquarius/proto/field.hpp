@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace message
+	namespace proto
 	{
 		namespace detail
 		{

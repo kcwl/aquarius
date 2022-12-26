@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 #include "../socket/socket.hpp"
-#include "../proto/proto_def.hpp"
 #include "../core/noncopyable.hpp"
 #include "../core/deadline_timer.hpp"
+#include <aquarius/io.hpp>
 
 namespace aquarius
 {
@@ -60,22 +60,13 @@ namespace aquarius
 			template<typename _Ty>
 			void queue_packet(_Ty&& response)
 			{
-				ftstream fs;
-				
-				constexpr auto Number = _Ty::Number;
-
-				fs.put(&Number, sizeof(Number));
+				iostream fs;
 
 				std::forward<_Ty>(response).to_message(fs);
 
 				write_queue_.push(std::move(fs));
 
 				async_process_queue();
-			}
-
-			void set_buffer(ftstream buf)
-			{
-				read_buffer_ = buf;
 			}
 
 			void async_read()
@@ -134,7 +125,7 @@ namespace aquarius
 
 				auto& buffer = write_queue_.front();
 
-				socket_.async_write_some(boost::asio::buffer(buffer.read_pointer(), buffer.active()), 
+				socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()), 
 					[this, self = this->shared_from_this(), &buffer](const boost::system::error_code& ec, std::size_t bytes_transferred)
 					{
 						if (ec)
@@ -177,7 +168,7 @@ namespace aquarius
 
 				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
 				{
-					ping_request resp{};
+					core::ping_request resp{};
 
 					queue_packet(std::move(resp));
 				}
@@ -199,7 +190,7 @@ namespace aquarius
 
 			boost::asio::ip::port_type remote_port_;
 
-			std::queue<ftstream> write_queue_;
+			std::queue<iostream> write_queue_;
 
 			std::atomic_int heart_deadline_;
 
