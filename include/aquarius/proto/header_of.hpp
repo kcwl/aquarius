@@ -46,14 +46,16 @@ namespace aquarius
 
 			virtual bool parse_bytes(stream_type& stream)
 			{
-				stream >> *header_ptr_;
+				elastic::binary_iarchive ia(stream);
+				ia >> *header_ptr_;
 
 				return true;
 			}
 
 			virtual bool to_bytes(stream_type& stream)
 			{
-				stream << *header_ptr_;
+				elastic::binary_oarchive oa(stream);
+				oa << *header_ptr_;
 
 				return true;
 			}

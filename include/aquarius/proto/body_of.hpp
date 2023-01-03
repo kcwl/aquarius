@@ -49,7 +49,11 @@ namespace aquarius
 				if (buf.empty())
 					return false;
 
-				stream << buf;
+				elastic::binary_oarchive oa(stream);
+
+				oa << buf;
+
+				return true;
 			}
 
 			value_type* get() noexcept

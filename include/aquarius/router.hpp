@@ -8,7 +8,7 @@
 namespace aquarius
 {
 	template<typename _Session>
-	using ctx_router = core::single_router<void, std::shared_ptr<_Session>, ftstream&>;
+	using ctx_router = core::single_router<void, std::shared_ptr<_Session>, flex_buffer_t&>;
 
 	template<typename _Session, typename _Stream>
 	struct invoke
@@ -27,7 +27,7 @@ namespace aquarius
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router<_Session>::instance().regist(_key, std::bind(&invoke<_Session, ftstream>::template dispatch<Context>, std::placeholders::_1, std::placeholders::_2));
+			ctx_router<_Session>::instance().regist(_key, std::bind(&invoke<_Session, flex_buffer_t>::template dispatch<Context>, std::placeholders::_1, std::placeholders::_2));
 		}
 	};
 

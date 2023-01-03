@@ -7,6 +7,7 @@
 #include "../core/noncopyable.hpp"
 #include "../core/deadline_timer.hpp"
 #include <aquarius/io.hpp>
+#include <aquarius/core/heart/heart_proto.hpp>
 
 namespace aquarius
 {
@@ -60,7 +61,7 @@ namespace aquarius
 			template<typename _Ty>
 			void queue_packet(_Ty&& response)
 			{
-				iostream fs;
+				flex_buffer_t fs;
 
 				std::forward<_Ty>(response).to_message(fs);
 
@@ -77,7 +78,7 @@ namespace aquarius
 				read_buffer_.normalize();
 				read_buffer_.ensure();
 
-				socket_.async_read_some(boost::asio::buffer(read_buffer_.write_pointer(), read_buffer_.remain_size()),
+				socket_.async_read_some(boost::asio::buffer(read_buffer_.wdata(), read_buffer_.active()),
 					[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
 				{
 					if (error)
@@ -182,7 +183,7 @@ namespace aquarius
 		private:
 			_Socket socket_;
 
-			ftstream read_buffer_;
+			flex_buffer_t read_buffer_;
 
 			core::deadline_timer heart_timer_;
 
@@ -190,7 +191,7 @@ namespace aquarius
 
 			boost::asio::ip::port_type remote_port_;
 
-			std::queue<iostream> write_queue_;
+			std::queue<flex_buffer_t> write_queue_;
 
 			std::atomic_int heart_deadline_;
 

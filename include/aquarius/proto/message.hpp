@@ -67,7 +67,8 @@ namespace aquarius
 
 			bool to_message(stream_type& stream)
 			{
-				stream << Number;
+				elastic::binary_oarchive oa(stream);
+				oa << Number;
 
 				if (!this->to_bytes(stream))
 				{
@@ -88,5 +89,5 @@ namespace aquarius
 	}
 
 	template<typename _Header, typename _Body, uint32_t N>
-	using message = proto::basic_message<proto::parse<iostream>, _Header, _Body, N>;
+	using message = proto::basic_message<proto::parse<flex_buffer_t>, _Header, _Body, N>;
 }

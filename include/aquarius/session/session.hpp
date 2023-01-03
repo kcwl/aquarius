@@ -33,12 +33,15 @@ namespace aquarius
 
 			virtual bool read_handle()
 			{
-				ftstream& read_buffer = this->get_read_buffer();
+				flex_buffer_t& read_buffer = this->get_read_buffer();
 
 				if (read_buffer.size() < sizeof(uint32_t))
 					return false;
 
-				auto proto_id = read_buffer.get<uint32_t>();
+				int32_t proto_id = 0;
+
+				elastic::binary_iarchive ia(read_buffer);
+				ia >> proto_id;
 
 				auto shared_this = _Conn::shared_from_this();
 

@@ -54,7 +54,7 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(iostream&& buf)
+		void async_write(flex_buffer_t&& buf)
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
@@ -88,13 +88,13 @@ namespace aquarius
 
 		void do_read()
 		{
-			socket_.async_read_some(boost::asio::buffer(buffer_.write_pointer(),buffer_.remain_size()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(),buffer_.active()),
 									[this](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if(ec)
 											return;
 
-										buffer_.commit(bytes_transferred);
+										buffer_.commit(static_cast<int>(bytes_transferred));
 
 										if(!system_call())
 											read_handler();
@@ -105,13 +105,14 @@ namespace aquarius
 
 		bool system_call()
 		{
-			buffer_.start<io_state::read>();
+			elastic::binary_iarchive ia(buffer_);
 
-			auto proto_id = buffer_.get<uint32_t>();
+			int proto_id = 0;
+
+			ia >> proto_id;
 
 			if (proto_id != 1000)
 			{
-				buffer_.transback<io_state::read>();
 				return false;
 			}
 
@@ -119,7 +120,7 @@ namespace aquarius
 			
 			core::ping_response pr{};
 
-			iostream fs;
+			flex_buffer_t fs;
 
 			pr.to_message(fs);
 
@@ -133,6 +134,6 @@ namespace aquarius
 
 		boost::asio::ip::tcp::socket socket_;
 
-		ftstream buffer_;
+		flex_buffer_t buffer_;
 	};
 }

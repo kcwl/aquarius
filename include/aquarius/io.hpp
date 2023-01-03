@@ -1,10 +1,7 @@
 #pragma once
-#include "core/io.hpp"
 #include <elastic.hpp>
 
 namespace aquarius
 {
-	using ftstream = io<>;
-
-	using iostream = elastic::iostream;
+	using flex_buffer_t = elastic::serialize_streambuf<char,std::char_traits<char>>;
 }

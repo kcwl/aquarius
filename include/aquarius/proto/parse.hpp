@@ -5,7 +5,7 @@ namespace aquarius
 {
 	namespace proto
 	{
-		template<typename _Stream = ftstream>
+		template<typename _Stream = flex_buffer_t>
 		class parse
 		{
 		public:
