@@ -12,9 +12,9 @@ namespace aquarius
 	using ssl_connect = session::connector<sock::socket<ssl_socket>>;
 #endif
 
-	using tcp_no_ssl_session = aquarius::session::session<session::tcp_session, socket_connect>;
+	//using tcp_no_ssl_session = aquarius::session::session<socket_connect>;
 
-	using http_no_sll_session = aquarius::session::session<session::http_session, socket_connect>;
+	//using http_no_sll_session = aquarius::session::session<session::http_session, socket_connect>;
 
 #if ENABLE_SSL
 	using tcp_ssl_session = aquarius::conn::session<conn::tcp_session, ssl_socket_connect>;

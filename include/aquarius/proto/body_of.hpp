@@ -1,18 +1,17 @@
 #pragma once
-#include "parse.hpp"
 #include <aquarius/proto/field.hpp>
 
 namespace aquarius
 {
 	namespace proto
 	{
-		template<typename _Ty, typename _Parse>
+		template<typename _Ty, typename _Streambuf>
 		class body_of
 			: public fields<_Ty>
 		{
 			using value_type = _Ty;
 
-			using stream_type = typename _Parse::stream_type;
+			using streambuf_t = _Streambuf;
 
 		public:
 			body_of()
@@ -30,7 +29,7 @@ namespace aquarius
 			}
 
 		public:
-			virtual bool parse_bytes(stream_type& stream)
+			virtual bool parse_bytes(streambuf_t& stream)
 			{
 				if (!body_ptr_->ParseFromArray(stream.data(),stream.size()))
 				{
@@ -42,7 +41,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_bytes(stream_type& stream)
+			virtual bool to_bytes(streambuf_t& stream)
 			{
 				auto buf = body_ptr_->SerializeAsString();
 

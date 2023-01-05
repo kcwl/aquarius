@@ -4,7 +4,7 @@
 namespace aquarius
 {
 	template<typename _Header, typename _Body, uint32_t Number>
-	class request : public message<_Header, _Body, Number>
+	class request : public proto::message<_Header, _Body, Number>
 	{
 	public:
 		request() = default;

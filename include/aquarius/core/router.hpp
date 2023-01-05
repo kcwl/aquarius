@@ -2,34 +2,36 @@
 #include <string>
 #include <functional>
 #include <unordered_map>
+#include <mutex>
 #include "singleton.hpp"
 
 namespace aquarius
 {
 	namespace core
 	{
-		template<typename _R, typename... _Args>
+		template<typename _Return, typename... _Args>
 		class router
 		{
 		public:
 			router() = default;
 
 		public:
-			void regist(const std::string& key, std::function<_R(_Args...)>&& func)
+			template<typename _Func>
+			void regist(const std::string& key, _Func&& func)
 			{
 				std::lock_guard lk(mutex_);
 
-				map_invokes_.insert({ key,std::forward<std::function<_R(_Args...)>>(func) });
+				map_invokes_.insert({ key, std::forward<_Func>(func) });
 			}
 
-			_R invoke(const std::string& key, _Args&&... args)
+			_Return invoke(const std::string& key, _Args&&... args)
 			{
 				std::lock_guard lk(mutex_);
 
 				auto iter = map_invokes_.find(key);
 
 				if (iter == map_invokes_.end())
-					return _R();
+					return _Return{};
 
 				return iter->second(std::forward<_Args>(args)...);
 			}
@@ -39,15 +41,15 @@ namespace aquarius
 
 			router(router&&) = delete;
 
-			std::unordered_map<std::string, std::function<_R(_Args...)>> map_invokes_;
+			std::unordered_map<std::string, std::function<_Return(_Args...)>> map_invokes_;
 
 			std::mutex mutex_;
 		};
 
-		template<typename _R, typename... _Args>
+		template<typename _Return, typename... _Args>
 		class single_router
-			: public router<_R, _Args...>
-			, public core::singleton<router<_R, _Args...>>
+			: public router<_Return, _Args...>
+			, public core::singleton<router<_Return, _Args...>>
 		{
 
 		};

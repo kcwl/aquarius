@@ -1,82 +1,85 @@
 #pragma once
 #include "../router.hpp"
 #include "../io.hpp"
+#include <aquarius/proto/message.hpp>
+#include <aquarius/session/connect.hpp>
 
 namespace aquarius
 {
 	namespace session
 	{
-		struct tcp_session{};
-		struct http_session {};
-
-		template<typename _Ty, typename _Conn>
-		class session : public _Conn
+		template<typename _Conn>
+		class session 
+			: public std::enable_shared_from_this<session<_Conn>>
 		{
 		public:
-			session(boost::asio::io_service& io_service)
-				: _Conn(io_service)
+			session(std::shared_ptr<_Conn> conn_ptr)
+				: conn_ptr_(conn_ptr)
 			{
 
 			}
 
 			virtual ~session() = default;
 
-			void start()
+			void async_run()
 			{
-				this->establish_async_read();
+				std::async(std::launch::deferred, &session::process, this->shared_from_this());
 			}
 
-			void on_close()
+		public:
+			void process()
 			{
-				return;
+				if (auto request = read())
+				{
+					using request_t = decltype(request);
+					invoke_helper<request_t>::invoke(request->unique_key(), std::move(request));
+				}
 			}
 
-			virtual bool read_handle()
+			template<typename _Message>
+			bool write(_Message* msg, int time_out)
 			{
-				flex_buffer_t& read_buffer = this->get_read_buffer();
+
+			}
+
+			std::shared_ptr<proto::xmessage> read()
+			{
+				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
 
 				if (read_buffer.size() < sizeof(uint32_t))
-					return false;
+					return nullptr;
 
-				int32_t proto_id = 0;
+				uint32_t id{};
 
 				elastic::binary_iarchive ia(read_buffer);
-				ia >> proto_id;
+				ia >> id;
 
-				auto shared_this = _Conn::shared_from_this();
-
-				invoke_helper::invoke(proto_id, std::move(shared_this), read_buffer);
-
-				return true;
+				return invoke_msg_helper<std::shared_ptr<proto::xmessage>>::invoke(id);
 			}
-		};
 
-		template<typename _Conn>
-		class session<http_session, _Conn> : public _Conn
-		{
-		public:
-			session(boost::asio::io_service& io_service)
-				: _Conn(io_service)
+			template<typename _Context>
+			void attach_context(_Context* context)
 			{
 
 			}
 
-			virtual ~session() = default;
-
-			void start()
+			template<typename _Context>
+			_Context* use_context()
 			{
-				this->async_read();
+				return nullptr;
 			}
 
-			void on_close()
+			virtual int visit(proto::xmessage* req)
 			{
-				return;
+				req;
+				return 0;
 			}
 
-			virtual bool read_handle()
-			{
-				return true;
-			}
+		private:
+
+
+		private:
+			std::shared_ptr<_Conn> conn_ptr_;
 		};
 	}
 }

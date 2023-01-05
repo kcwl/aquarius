@@ -118,11 +118,11 @@ namespace aquarius
 
 			buffer_.consume(sizeof(proto::tcp_request_header) + 1);
 			
-			core::ping_response pr{};
+			//core::ping_response pr{};
 
 			flex_buffer_t fs;
 
-			pr.to_message(fs);
+			//pr.to_message(fs);
 
 			async_write(std::move(fs));
 

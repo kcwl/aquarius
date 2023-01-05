@@ -2,7 +2,7 @@
 #include <cstddef>
 #include "body_of.hpp"
 #include "header_of.hpp"
-#include <aquarius/proto/parse.hpp>
+#include <aquarius/core/visitor.hpp>
 
 namespace aquarius
 {
@@ -18,14 +18,34 @@ namespace aquarius
 			int ByteSize() { return 0; }
 		};
 
-		template<typename _Parse, typename _Header, typename _Body, uint32_t N>
-		class basic_message : private header_of<_Header, _Parse>
+		template<typename _Streambuf = flex_buffer_t>
+		class basic_message : public aquarius::core::visitable<int>
+		{
+		public:
+			using streambuf_t = _Streambuf;
+
+		public:
+			virtual uint32_t unique_key() = 0;
+
+			virtual bool parse_message(streambuf_t& archive) = 0;
+
+			virtual bool to_message(streambuf_t& archive) = 0;
+		};
+
+		using xmessage = basic_message<>;
+
+		template<typename _Header, typename _Body, uint32_t N>
+		class message
+			: public xmessage
+			, private header_of<_Header, basic_message<>::streambuf_t>
 		{
 		public:
 			using header_type = _Header;
 			using body_type = _Body;
 
-			using stream_type = typename _Parse::stream_type;
+			using streambuf_t = typename basic_message<>::streambuf_t;
+
+			using base_type = header_of<_Header, basic_message<>::streambuf_t>;
 
 			constexpr static uint32_t Number = N;
 
@@ -50,7 +70,17 @@ namespace aquarius
 				return *body_.get();
 			}
 
-			bool parse_message(stream_type& stream)
+			virtual uint32_t unique_key() override
+			{
+				return Number;
+			}
+
+			virtual int accept(aquarius::context* v) override
+			{
+				return accept_impl(this, v);
+			}
+
+			virtual bool parse_message(streambuf_t& stream) override
 			{
 				if (!this->parse_bytes(stream))
 				{
@@ -65,7 +95,7 @@ namespace aquarius
 				return true;
 			}
 
-			bool to_message(stream_type& stream)
+			virtual bool to_message(streambuf_t& stream) override
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << Number;
@@ -84,10 +114,7 @@ namespace aquarius
 			}
 
 		private:
-			body_of<body_type, _Parse> body_;
+			body_of<body_type, basic_message<>::streambuf_t> body_;
 		};
 	}
-
-	template<typename _Header, typename _Body, uint32_t N>
-	using message = proto::basic_message<proto::parse<flex_buffer_t>, _Header, _Body, N>;
 }

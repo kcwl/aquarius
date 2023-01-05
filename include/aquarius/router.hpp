@@ -7,38 +7,57 @@
 
 namespace aquarius
 {
-	template<typename _Session>
-	using ctx_router = core::single_router<void, std::shared_ptr<_Session>, flex_buffer_t&>;
+	using ctx_router = core::single_router<int, std::shared_ptr<proto::xmessage>>;
 
-	template<typename _Session, typename _Stream>
-	struct invoke
-	{
-		template<typename _Service>
-		static void dispatch(std::shared_ptr<_Session> session_ptr, _Stream& buffer)
-		{
-			_Service(session_ptr).accept(buffer);
-		}
-	};
-
-	template<typename _Session, typename Context>
+	template<typename _Context>
 	struct ctx_regist
 	{
 		ctx_regist(const std::size_t& key)
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router<_Session>::instance().regist(_key, std::bind(&invoke<_Session, flex_buffer_t>::template dispatch<Context>, std::placeholders::_1, std::placeholders::_2));
+			ctx_router::instance().regist(_key, []<typename _Message>(std::shared_ptr<_Message> req_ptr)
+			{
+				std::make_shared<_Context>()->visit(req_ptr);
+			});
 		}
 	};
-
+	template<typename... _Args>
 	struct invoke_helper
 	{
-		template<typename _Session, typename... _Args>
-		static void invoke(uint32_t key, std::shared_ptr<_Session>&& session_ptr, _Args&&... args)
+		static int invoke(uint32_t key, _Args&&... args)
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			aquarius::ctx_router<_Session>::instance().invoke(_key, std::move(session_ptr), std::forward<_Args>(args)...);
+			return aquarius::ctx_router::instance().invoke(_key, std::forward<_Args>(args)...);
 		}
 	};
+
+	template<typename _Message>
+	using msg_router = core::single_router<_Message>;
+
+
+	template<typename _BaseMessage, typename _Message>
+	struct msg_regist
+	{
+		msg_regist(const std::size_t& key)
+		{
+			std::string _key = "aquarius_" + std::to_string(key);
+
+			msg_router<_BaseMessage>::instance().regist(_key, [] {return std::make_shared<_Message>(); });
+		}
+	};
+	template<typename _Message, typename... _Args>
+	struct invoke_msg_helper
+	{
+		static _Message invoke(uint32_t key, _Args&&... args)
+		{
+			std::string _key = "aquarius_" + std::to_string(key);
+
+			return aquarius::msg_router<_Message>::instance().invoke(_key, std::forward<_Args>(args)...);
+		}
+	};
+
+#define MESSAGE_DEFINE(base_type,type) static msg_regist<base_type,type> req##type(type::Number);
+#define CONTEXT_DEFINE(base_type,type) static ctx_regist<base_type,type> ctx##type(type::Number);
 }

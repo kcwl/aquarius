@@ -15,6 +15,8 @@ namespace aquarius
 	{
 		constexpr int heart_time_interval = 10;
 
+		template<typename _Conn> class session;
+
 		template<typename _Socket>
 		class connector
 			: public std::enable_shared_from_this<connector<_Socket>>
@@ -90,10 +92,9 @@ namespace aquarius
 
 					!last_operator_ ? last_operator_ = true : 0;
 
-					if (!read_handle())
-					{
-						return shut_down();
-					}
+					auto session_ptr = std::make_shared<session<connector<_Socket>>>(this->shared_from_this());
+
+					session_ptr->process();
 
 					async_read();
 				});
@@ -112,11 +113,12 @@ namespace aquarius
 				return read_buffer_;
 			}
 
-			virtual void start() = 0;
+			virtual void start()
+			{
+				establish_async_read();
+			}
 
 			virtual void on_close() {}
-
-			virtual bool read_handle() = 0;
 
 		protected:
 			void async_process_queue()
@@ -171,7 +173,7 @@ namespace aquarius
 				{
 					core::ping_request resp{};
 
-					queue_packet(std::move(resp));
+					//queue_packet(std::move(resp));
 				}
 
 				last_operator_ ? last_operator_ = false : 0;

@@ -1,57 +1,58 @@
 ﻿#pragma once
 #include <memory>
+#include <aquarius/core/visitor.hpp>
 
 namespace aquarius
 {
-	template<typename _Request, typename _Response>
-	class message_service
-	{
-	public:
-		message_service()
-			: request_ptr_(new _Request{})
-			, response_()
-		{
+	//template<typename _Request, typename _Response>
+	//class message_service
+	//{
+	//public:
+	//	message_service()
+	//		: request_ptr_(new _Request{})
+	//		, response_()
+	//	{
 
-		}
+	//	}
 
-		virtual ~message_service() = default;
+	//	virtual ~message_service() = default;
 
-	public:
-		template<typename _Stream>
-		bool serialize(_Stream& stream)
-		{
-			return request_ptr_->parse_message(stream);
-		}
+	//public:
+	//	template<typename _StreamBuf>
+	//	bool serialize(_StreamBuf& stream)
+	//	{
+	//		return request_ptr_->parse_message(stream);
+	//	}
 
-		template<typename _Stream>
-		bool deserialize(_Stream& stream)
-		{
-			return response_.to_message(stream);
-		}
+	//	template<typename _StreamBuf>
+	//	bool deserialize(_StreamBuf& stream)
+	//	{
+	//		return response_.to_message(stream);
+	//	}
 
-		auto request() noexcept
-		{
-			return request_ptr_;
-		}
+	//	auto request() noexcept
+	//	{
+	//		return request_ptr_;
+	//	}
 
-		auto& response() noexcept
-		{
-			return response_;
-		}
+	//	auto& response() noexcept
+	//	{
+	//		return response_;
+	//	}
 
-	private:
-		std::shared_ptr<_Request> request_ptr_;
+	//private:
+	//	std::shared_ptr<_Request> request_ptr_;
 
-		_Response response_;
-	};
+	//	_Response response_;
+	//};
 
-	template<typename _Session, typename _Request, typename _Response>
+	//template<typename _Request, typename _Response>
 	class context
-		: public message_service<_Request, _Response>
+		//: public message_service<_Request, _Response>
+		: public core::visitor<proto::xmessage, int>
 	{
 	public:
-		explicit context(std::shared_ptr<_Session> session_ptr)
-			: session_ptr_(session_ptr)
+		explicit context()
 		{
 
 		}
@@ -65,11 +66,11 @@ namespace aquarius
 		context& operator=(const context&) = delete;
 
 	public:
-		template<typename _Stream>
-		int accept(_Stream& stream)
+		template<typename _StreamBuf>
+		int accept(_StreamBuf& stream)
 		{
-			if (!this->serialize(stream))
-				return 0;
+			//if (!this->serialize(stream))
+			//	return 0;
 
 			if (!handle())
 				return 0;
@@ -81,17 +82,15 @@ namespace aquarius
 
 		void send_response(uint32_t status)
 		{
-			if (!session_ptr_)
+			//if (!session_ptr_)
 				return;
 
-			session_ptr_->queue_packet(this->response());
+			//session_ptr_->queue_packet(this->response());
 		}
 
 		virtual bool handle() = 0;
 
 	private:
-		std::shared_ptr<_Session> session_ptr_;
-
 		uint32_t status_;
 	};
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "parse.hpp"
 #include <aquarius/proto/field.hpp>
 #include <io.h>
 
@@ -7,12 +6,12 @@ namespace aquarius
 {
 	namespace proto
 	{
-		template<typename _Ty, typename _Parse>
+		template<typename _Ty, typename _Streambuf>
 		class header_of 
 			: public fields<_Ty>
 		{
 		public:
-			using stream_type = typename _Parse::stream_type;
+			using streambuf_t = _Streambuf;
 
 			using value_type = _Ty;
 
@@ -44,7 +43,7 @@ namespace aquarius
 				return header_ptr_;
 			}
 
-			virtual bool parse_bytes(stream_type& stream)
+			virtual bool parse_bytes(streambuf_t& stream)
 			{
 				elastic::binary_iarchive ia(stream);
 				ia >> *header_ptr_;
@@ -52,7 +51,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_bytes(stream_type& stream)
+			virtual bool to_bytes(streambuf_t& stream)
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << *header_ptr_;
