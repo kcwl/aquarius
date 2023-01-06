@@ -3,7 +3,6 @@
 #include "session.hpp"
 #include "core/router.hpp"
 #include "io.hpp"
-#include <aquarius/session/session.hpp>
 
 namespace aquarius
 {

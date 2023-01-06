@@ -4,55 +4,20 @@
 
 namespace aquarius
 {
-	//template<typename _Request, typename _Response>
-	//class message_service
-	//{
-	//public:
-	//	message_service()
-	//		: request_ptr_(new _Request{})
-	//		, response_()
-	//	{
+	namespace session
+	{
+		class session;
+	}
+}
 
-	//	}
-
-	//	virtual ~message_service() = default;
-
-	//public:
-	//	template<typename _StreamBuf>
-	//	bool serialize(_StreamBuf& stream)
-	//	{
-	//		return request_ptr_->parse_message(stream);
-	//	}
-
-	//	template<typename _StreamBuf>
-	//	bool deserialize(_StreamBuf& stream)
-	//	{
-	//		return response_.to_message(stream);
-	//	}
-
-	//	auto request() noexcept
-	//	{
-	//		return request_ptr_;
-	//	}
-
-	//	auto& response() noexcept
-	//	{
-	//		return response_;
-	//	}
-
-	//private:
-	//	std::shared_ptr<_Request> request_ptr_;
-
-	//	_Response response_;
-	//};
-
-	//template<typename _Request, typename _Response>
+namespace aquarius
+{
 	class context
-		//: public message_service<_Request, _Response>
 		: public core::visitor<proto::xmessage, int>
 	{
 	public:
-		explicit context()
+		context(std::shared_ptr<session::session> session_ptr)
+			: session_ptr_(session_ptr)
 		{
 
 		}
@@ -66,31 +31,83 @@ namespace aquarius
 		context& operator=(const context&) = delete;
 
 	public:
-		template<typename _StreamBuf>
-		int accept(_StreamBuf& stream)
-		{
-			//if (!this->serialize(stream))
-			//	return 0;
+		virtual int on_connected() = 0;
 
-			if (!handle())
-				return 0;
+		virtual int on_closed(std::shared_ptr<session::session>) = 0;
 
-			send_response(status_);
-
-			return 1;
-		}
-
-		void send_response(uint32_t status)
-		{
-			//if (!session_ptr_)
-				return;
-
-			//session_ptr_->queue_packet(this->response());
-		}
+		virtual int on_timeout() = 0;
 
 		virtual bool handle() = 0;
 
-	private:
-		uint32_t status_;
+	protected:
+		virtual void on_error(int result) = 0;
+
+	protected:
+		std::shared_ptr<session::session> session_ptr_;
+	};
+
+	template<typename _Request, typename _Response>
+	class context_impl 
+		: public context
+		, public core::visitor<_Request, int>
+	{
+	public:
+		context_impl(const std::string& name)
+			: context(name, 0)
+		{
+
+		}
+
+	public:
+		virtual int on_connected(std::shared_ptr<session::session> session_ptr) override
+		{
+			return session_ptr->close();
+		}
+
+		virtual int on_closed(std::shared_ptr<session::session> session_ptr) override
+		{
+			return session_ptr->close();
+		}
+
+		virtual int on_timeout() override
+		{
+			return 0;
+		}
+
+		virtual int visit(std::shared_ptr<proto::xmessage> msg)
+		{
+			return 0;
+		}
+
+		virtual int visit(std::shared_ptr<_Request> req)
+		{
+			request_ptr_.swap(req);
+
+			return handle();
+		}
+
+	protected:
+		virtual int handle() = 0;
+
+		virtual void on_error(int result) override
+		{
+
+		}
+
+		bool send_response(int result, int timeout = 1000)
+		{
+			response_.header() = request_ptr_->header();
+			response_.set_result(result);
+
+			if (!session_ptr_->write(&response_, timeout))
+				return false;
+
+			return true;
+		}
+
+	protected:
+		std::shared_ptr<_Request> request_ptr_;
+
+		_Response response_;
 	};
 }

@@ -50,9 +50,9 @@ namespace aquarius
 			constexpr static uint32_t Number = N;
 
 		public:
-			header_type* header() noexcept
+			header_type& header() noexcept
 			{
-				return this->get();
+				return *this->get();
 			}
 
 			const header_type* header() const noexcept
