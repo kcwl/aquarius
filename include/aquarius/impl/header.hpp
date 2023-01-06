@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace proto
+	namespace impl
 	{
 		struct tcp_header
 		{
@@ -15,10 +15,11 @@ namespace aquarius
 		struct tcp_request_header : tcp_header
 		{
 			uint32_t uid_;
+
 		private:
 			friend class elastic::access;
 
-			template<typename _Archive>
+			template <typename _Archive>
 			void serialize(_Archive& ar)
 			{
 				ar& elastic::serialize::base_object<tcp_header>(*this);
@@ -33,12 +34,12 @@ namespace aquarius
 		private:
 			friend class elastic::access;
 
-			template<typename _Archive>
+			template <typename _Archive>
 			void serialize(_Archive& ar)
 			{
 				ar& elastic::serialize::base_object<tcp_header>(*this);
 				ar& result_;
 			}
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

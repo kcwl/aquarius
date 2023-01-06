@@ -1,28 +1,26 @@
 #pragma once
-#include "../router.hpp"
-#include "../io.hpp"
-#include <aquarius/proto/message.hpp>
-#include <aquarius/session/connect.hpp>
+#include <aquarius/router.hpp>
+#include <aquarius/impl/connect.hpp>
+#include <aquarius/impl/io.hpp>
+#include <aquarius/impl/message.hpp>
 
 namespace aquarius
 {
-	namespace session
+	namespace impl
 	{
-		class session 
-			: public std::enable_shared_from_this<session>
+		class session : public std::enable_shared_from_this<session>
 		{
 		public:
-			session(std::shared_ptr<connector<sock::socket<>>> conn_ptr)
+			session(std::shared_ptr<connector<socket<>>> conn_ptr)
 				: conn_ptr_(conn_ptr)
-			{
-
-			}
+			{}
 
 			virtual ~session() = default;
 
 			void async_run()
 			{
-				[[maybe_unused]] auto res = std::async(std::launch::deferred, &session::process, this->shared_from_this());
+				[[maybe_unused]] auto res =
+					std::async(std::launch::deferred, &session::process, this->shared_from_this());
 			}
 
 		public:
@@ -38,13 +36,11 @@ namespace aquarius
 				}
 			}
 
-			template<typename _Message>
+			template <typename _Message>
 			bool write(_Message* msg, int time_out)
-			{
+			{}
 
-			}
-
-			std::shared_ptr<proto::xmessage> read()
+			std::shared_ptr<xmessage> read()
 			{
 				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
 
@@ -56,32 +52,32 @@ namespace aquarius
 				elastic::binary_iarchive ia(read_buffer);
 				ia >> id;
 
-				return invoke_msg_helper<std::shared_ptr<proto::xmessage>>::invoke(id);
+				return invoke_msg_helper<std::shared_ptr<xmessage>>::invoke(id);
 			}
 
-			template<typename _Context>
+			template <typename _Context>
 			void attach_context(_Context* context)
-			{
+			{}
 
-			}
-
-			template<typename _Context>
+			template <typename _Context>
 			_Context* use_context()
 			{
 				return nullptr;
 			}
 
-			virtual int visit(proto::xmessage* req)
+			virtual int visit(xmessage* req)
 			{
 				req;
 				return 0;
 			}
 
-		private:
+			int close()
+			{
+				return 0;
+			}
 
-
 		private:
-			std::shared_ptr<connector<sock::socket<>>> conn_ptr_;
+			std::shared_ptr<connector<socket<>>> conn_ptr_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

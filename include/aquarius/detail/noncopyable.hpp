@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 namespace aquarius
 {
 	namespace core
@@ -14,5 +13,5 @@ namespace aquarius
 			noncopyable(const noncopyable&) = delete;
 			noncopyable& operator=(const noncopyable&) = delete;
 		};
-	}
-}
+	} // namespace core
+} // namespace aquarius

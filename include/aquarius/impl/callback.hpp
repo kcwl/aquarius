@@ -1,12 +1,11 @@
 #pragma once
 #include <functional>
 
-
 namespace aquarius
 {
 	namespace detail
 	{
-		template<typename _T>
+		template <typename _T>
 		class callback
 		{
 		public:
@@ -23,5 +22,5 @@ namespace aquarius
 
 			disconnect_callback disconn_cb_;
 		};
-	}
-}
+	} // namespace detail
+} // namespace aquarius

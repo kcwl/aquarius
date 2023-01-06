@@ -1,16 +1,16 @@
 ﻿#pragma once
-#include "proto/message.hpp"
+#include <aquarius/impl/message.hpp>
 
 namespace aquarius
 {
-	template<typename _Header, typename _Body, uint32_t Number>
-	class request : public proto::message<_Header, _Body, Number>
+	template <typename _Header, typename _Body, uint32_t Number>
+	class request : public impl::message<_Header, _Body, Number>
 	{
 	public:
 		request() = default;
 		~request() = default;
 	};
 
-	template<typename _Header, uint32_t Number>
-	using null_body_request = request<_Header, proto::empty_body, Number>;
-}
+	template <typename _Header, uint32_t Number>
+	using null_body_request = request<_Header, impl::empty_body, Number>;
+} // namespace aquarius

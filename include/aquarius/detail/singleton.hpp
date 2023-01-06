@@ -5,13 +5,11 @@ namespace aquarius
 {
 	namespace core
 	{
-		template<typename _Ty>
+		template <typename _Ty>
 		class singleton_wrapper : public _Ty
-		{
-			
-		};
+		{};
 
-		template<typename _Ty>
+		template <typename _Ty>
 		class singleton
 		{
 		public:
@@ -29,13 +27,14 @@ namespace aquarius
 			}
 
 		protected:
-			singleton() {}
+			singleton()
+			{}
 
 		private:
 			static _Ty* instance_;
 		};
-	}
-}
+	} // namespace core
+} // namespace aquarius
 
-template<typename _Ty>
+template <typename _Ty>
 _Ty* aquarius::core::singleton<_Ty>::instance_ = &singleton<_Ty>::instance();

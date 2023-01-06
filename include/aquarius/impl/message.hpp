@@ -1,25 +1,35 @@
 #pragma once
+#include <aquarius/impl/body_of.hpp>
+#include <aquarius/impl/header_of.hpp>
+#include <aquarius/impl/io.hpp>
+#include <aquarius/impl/visitor.hpp>
 #include <cstddef>
-#include "body_of.hpp"
-#include "header_of.hpp"
-#include <aquarius/core/visitor.hpp>
 
 namespace aquarius
 {
-	namespace proto
+	namespace impl
 	{
 		struct empty_body
 		{
-			std::string SerializeAsString() { return {}; }
+			std::string SerializeAsString()
+			{
+				return {};
+			}
 
-			template<typename _Ty>
-			bool ParseFromArray([[maybe_unused]] _Ty* data, [[maybe_unused]] std::size_t bytes) { return true; }
+			template <typename _Ty>
+			bool ParseFromArray([[maybe_unused]] _Ty* data, [[maybe_unused]] std::size_t bytes)
+			{
+				return true;
+			}
 
-			int ByteSize() { return 0; }
+			int ByteSize()
+			{
+				return 0;
+			}
 		};
 
-		template<typename _Streambuf = flex_buffer_t>
-		class basic_message : public aquarius::core::visitable<int>
+		template <typename _Streambuf = flex_buffer_t>
+		class basic_message : public visitable<int>
 		{
 		public:
 			using streambuf_t = _Streambuf;
@@ -34,10 +44,8 @@ namespace aquarius
 
 		using xmessage = basic_message<>;
 
-		template<typename _Header, typename _Body, uint32_t N>
-		class message
-			: public xmessage
-			, private header_of<_Header, basic_message<>::streambuf_t>
+		template <typename _Header, typename _Body, uint32_t N>
+		class message : public xmessage, private header_of<_Header, basic_message<>::streambuf_t>
 		{
 		public:
 			using header_type = _Header;
@@ -116,5 +124,5 @@ namespace aquarius
 		private:
 			body_of<body_type, basic_message<>::streambuf_t> body_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

@@ -1,14 +1,13 @@
 #pragma once
-#include <aquarius/proto/field.hpp>
+#include <aquarius/impl/field.hpp>
 #include <io.h>
 
 namespace aquarius
 {
-	namespace proto
+	namespace impl
 	{
-		template<typename _Ty, typename _Streambuf>
-		class header_of 
-			: public fields<_Ty>
+		template <typename _Ty, typename _Streambuf>
+		class header_of : public fields<_Ty>
 		{
 		public:
 			using streambuf_t = _Streambuf;
@@ -62,5 +61,5 @@ namespace aquarius
 		private:
 			value_type* header_ptr_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

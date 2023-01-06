@@ -2,19 +2,19 @@
 
 namespace aquarius
 {
-	namespace proto
+	namespace impl
 	{
-		template<typename _Streambuf>
+		template <typename _Streambuf>
 		class basic_message;
 
 		using xmessage = basic_message<flex_buffer_t>;
-	}
+	} // namespace impl
 
 	class context;
 
-	namespace core
+	namespace impl
 	{
-		template<typename _Request, typename _Return>
+		template <typename _Request, typename _Return>
 		class visitor
 		{
 		public:
@@ -25,7 +25,7 @@ namespace aquarius
 			virtual _Return visit(_Request* visited) = 0;
 		};
 
-		template<typename _Return>
+		template <typename _Return>
 		class visitable
 		{
 		public:
@@ -36,11 +36,11 @@ namespace aquarius
 			virtual _Return accept(aquarius::context* visitor) = 0;
 
 		protected:
-			template<typename _Request>
+			template <typename _Request>
 			static _Return accept_impl(_Request* req, aquarius::context* v)
 			{
 				using visitor_t = visitor<_Request, _Return>;
-				using msg_visitor_t = visitor<proto::xmessage, _Return>;
+				using msg_visitor_t = visitor<impl::xmessage, _Return>;
 
 				if (auto visit_ptr = dynamic_cast<visitor_t*>(v))
 				{
@@ -54,5 +54,5 @@ namespace aquarius
 				return _Return{};
 			}
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

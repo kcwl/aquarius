@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include <thread>
-#include <functional>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <functional>
+#include <thread>
 
 namespace aquarius
 {
-	namespace core
+	namespace impl
 	{
 		class io_service_pool
 		{
@@ -36,23 +36,17 @@ namespace aquarius
 			void run()
 			{
 				std::vector<std::shared_ptr<std::thread>> threads;
-				std::for_each(io_services_.begin(), io_services_.end(), [&threads](auto iter)
-					{
-						threads.push_back(std::make_shared<std::thread>([it = std::move(iter)] {it->run(); }));
-					});
+				std::for_each(
+					io_services_.begin(), io_services_.end(),
+					[&threads](auto iter)
+					{ threads.push_back(std::make_shared<std::thread>([it = std::move(iter)] { it->run(); })); });
 
-				std::for_each(threads.begin(), threads.end(), [](auto iter)
-					{
-						iter->join();
-					});
+				std::for_each(threads.begin(), threads.end(), [](auto iter) { iter->join(); });
 			}
 
 			void stop()
 			{
-				std::for_each(io_services_.begin(), io_services_.end(), [](auto iter)
-					{
-						iter->stop();
-					});
+				std::for_each(io_services_.begin(), io_services_.end(), [](auto iter) { iter->stop(); });
 			}
 
 			boost::asio::io_service& get_io_service()
@@ -72,5 +66,5 @@ namespace aquarius
 			int pool_size_;
 			std::vector<work_ptr_t> works_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

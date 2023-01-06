@@ -1,15 +1,15 @@
 #pragma once
-#include <chrono>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
-		template<typename _Time>
+		template <typename _Time>
 		struct time_traits;
 
-		template<>
+		template <>
 		struct time_traits<std::chrono::system_clock::time_point>
 		{
 			using time_type = std::chrono::system_clock::time_point;
@@ -47,5 +47,5 @@ namespace aquarius
 				return boost::posix_time::time_duration(hour.count(), min.count(), min.count());
 			}
 		};
-	}
-}
+	} // namespace detail
+} // namespace aquarius

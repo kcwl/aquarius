@@ -1,13 +1,12 @@
 #pragma once
-#include <aquarius/proto/field.hpp>
+#include <aquarius/impl/field.hpp>
 
 namespace aquarius
 {
-	namespace proto
+	namespace impl
 	{
-		template<typename _Ty, typename _Streambuf>
-		class body_of
-			: public fields<_Ty>
+		template <typename _Ty, typename _Streambuf>
+		class body_of : public fields<_Ty>
 		{
 			using value_type = _Ty;
 
@@ -31,7 +30,7 @@ namespace aquarius
 		public:
 			virtual bool parse_bytes(streambuf_t& stream)
 			{
-				if (!body_ptr_->ParseFromArray(stream.data(),stream.size()))
+				if (!body_ptr_->ParseFromArray(stream.data(), stream.size()))
 				{
 					return false;
 				}
@@ -68,5 +67,5 @@ namespace aquarius
 		private:
 			value_type* body_ptr_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

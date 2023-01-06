@@ -1,22 +1,22 @@
 #pragma once
-#include <string>
+#include <aquarius/detail/singleton.hpp>
 #include <functional>
-#include <unordered_map>
 #include <mutex>
-#include "singleton.hpp"
+#include <string>
+#include <unordered_map>
 
 namespace aquarius
 {
 	namespace core
 	{
-		template<typename _Return, typename... _Args>
+		template <typename _Return, typename... _Args>
 		class router
 		{
 		public:
 			router() = default;
 
 		public:
-			template<typename _Func>
+			template <typename _Func>
 			void regist(const std::string& key, _Func&& func)
 			{
 				std::lock_guard lk(mutex_);
@@ -46,13 +46,8 @@ namespace aquarius
 			std::mutex mutex_;
 		};
 
-		template<typename _Return, typename... _Args>
-		class single_router
-			: public router<_Return, _Args...>
-			, public core::singleton<router<_Return, _Args...>>
-		{
-
-		};
-	}
-}
-
+		template <typename _Return, typename... _Args>
+		class single_router : public router<_Return, _Args...>, public core::singleton<router<_Return, _Args...>>
+		{};
+	} // namespace core
+} // namespace aquarius

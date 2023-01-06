@@ -1,14 +1,15 @@
 #pragma once
+#include <aquarius/detail/type_traits.hpp>
 #include <cstddef>
-#include "type_traits.hpp"
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
-		struct empty_init_t {};
+		struct empty_init_t
+		{};
 
-		template<typename _Ty, std::size_t N = 0, bool E = use_empty_value_base_v<_Ty>>
+		template <typename _Ty, std::size_t N = 0, bool E = use_empty_value_base_v<_Ty>>
 		class empty_value
 		{
 		public:
@@ -16,16 +17,12 @@ namespace aquarius
 
 			empty_value(empty_init_t)
 				: value_()
-			{
+			{}
 
-			}
-
-			template<typename _U, typename... _Args>
+			template <typename _U, typename... _Args>
 			empty_value(empty_init_t, _U&& value, _Args&&... args)
 				: value_(std::forward<_U>(value), std::forward<_Args>(args)...)
-			{
-
-			}
+			{}
 
 			_Ty& get() noexcept
 			{
@@ -41,7 +38,7 @@ namespace aquarius
 			_Ty value_;
 		};
 
-		template<typename _Ty, std::size_t N>
+		template <typename _Ty, std::size_t N>
 		class empty_value<_Ty, N, true> : private _Ty
 		{
 		public:
@@ -49,16 +46,12 @@ namespace aquarius
 
 			empty_value(empty_init_t)
 				: _Ty()
-			{
+			{}
 
-			}
-
-			template<typename _U, typename... _Args>
+			template <typename _U, typename... _Args>
 			empty_value(empty_init_t, _U&& value, _Args&&... args)
 				: _Ty(std::forward<_U>(value), std::forward<_Args>(args)...)
-			{
-
-			}
+			{}
 
 			_Ty& get() noexcept
 			{
@@ -71,6 +64,6 @@ namespace aquarius
 			}
 		};
 
-		inline static constexpr  empty_init_t empty_init = empty_init_t{};
-	}
-}
+		inline static constexpr empty_init_t empty_init = empty_init_t{};
+	} // namespace detail
+} // namespace aquarius

@@ -1,10 +1,10 @@
 #pragma once
-#include "../core/io_service_pool.hpp"
+#include <aquarius/impl/io_service_pool.hpp>
 #include <aquarius/session.hpp>
 
 namespace aquarius
 {
-	namespace srv
+	namespace impl
 	{
 		class server
 		{
@@ -12,7 +12,9 @@ namespace aquarius
 			explicit server(const std::string& port, int io_service_pool_size)
 				: io_service_pool_(io_service_pool_size)
 				, signals_(io_service_pool_.get_io_service())
-				, acceptor_(io_service_pool_.get_io_service(), boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(std::atoi(port.data()))))
+				, acceptor_(io_service_pool_.get_io_service(),
+							boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
+														   static_cast<unsigned short>(std::atoi(port.data()))))
 			{
 				signals_.add(SIGINT);
 				signals_.add(SIGTERM);
@@ -24,7 +26,7 @@ namespace aquarius
 				start_accept();
 			}
 
-			virtual~server() = default;
+			virtual ~server() = default;
 
 		public:
 			void run()
@@ -40,16 +42,15 @@ namespace aquarius
 				auto new_connect_ptr = std::make_shared<socket_connect>(io_service_pool_.get_io_service());
 
 				acceptor_.async_accept(new_connect_ptr->socket(),
-					[this, new_connect_ptr](const boost::system::error_code& error)
-					{
-						if (!error)
-						{
-							new_connect_ptr->start();
-						}
+									   [this, new_connect_ptr](const boost::system::error_code& error)
+									   {
+										   if (!error)
+										   {
+											   new_connect_ptr->start();
+										   }
 
-						start_accept();
-					}
-				);
+										   start_accept();
+									   });
 			}
 
 			void handle_stop()
@@ -58,11 +59,11 @@ namespace aquarius
 			}
 
 		private:
-			core::io_service_pool io_service_pool_;
+			io_service_pool io_service_pool_;
 
 			boost::asio::signal_set signals_;
 
 			boost::asio::ip::tcp::acceptor acceptor_;
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

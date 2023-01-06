@@ -1,26 +1,23 @@
 ﻿#pragma once
+#include <aquarius/detail/deadline_timer.hpp>
+#include <aquarius/detail/noncopyable.hpp>
+#include <aquarius/impl/io.hpp>
+#include <aquarius/impl/socket.hpp>
 #include <array>
-#include <queue>
 #include <memory>
+#include <queue>
 #include <vector>
-#include "../socket/socket.hpp"
-#include "../core/noncopyable.hpp"
-#include "../core/deadline_timer.hpp"
-#include <aquarius/io.hpp>
-#include <aquarius/core/heart/heart_proto.hpp>
 
 namespace aquarius
 {
-	namespace session
+	namespace impl
 	{
 		constexpr int heart_time_interval = 10;
 
-		class session;
+		class impl;
 
-		template<typename _Socket>
-		class connector
-			: public std::enable_shared_from_this<connector<_Socket>>
-			, private core::noncopyable
+		template <typename _Socket>
+		class connector : public std::enable_shared_from_this<connector<_Socket>>, private core::noncopyable
 		{
 		public:
 			explicit connector(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
@@ -31,8 +28,7 @@ namespace aquarius
 				, remote_port_()
 				, heart_deadline_(heart_time)
 				, last_operator_(true)
-			{
-			}
+			{}
 
 			virtual ~connector()
 			{
@@ -60,7 +56,7 @@ namespace aquarius
 				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 			}
 
-			template<typename _Ty>
+			template <typename _Ty>
 			void queue_packet(_Ty&& response)
 			{
 				flex_buffer_t fs;
@@ -81,23 +77,24 @@ namespace aquarius
 				read_buffer_.ensure();
 
 				socket_.async_read_some(boost::asio::buffer(read_buffer_.wdata(), read_buffer_.active()),
-					[this, self = this->shared_from_this()](const boost::system::error_code& error, std::size_t bytes_transferred)
-				{
-					if (error)
-					{
-						return shut_down();
-					}
+										[this, self = this->shared_from_this()](const boost::system::error_code& error,
+																				std::size_t bytes_transferred)
+										{
+											if (error)
+											{
+												return shut_down();
+											}
 
-					read_buffer_.commit(static_cast<int>(bytes_transferred));
+											read_buffer_.commit(static_cast<int>(bytes_transferred));
 
-					!last_operator_ ? last_operator_ = true : 0;
+											!last_operator_ ? last_operator_ = true : 0;
 
-					auto session_ptr = std::make_shared<session>(this->shared_from_this());
+											auto session_ptr = std::make_shared<session>(this->shared_from_this());
 
-					session_ptr->process();
+											session_ptr->process();
 
-					async_read();
-				});
+											async_read();
+										});
 			}
 
 			void establish_async_read()
@@ -118,7 +115,8 @@ namespace aquarius
 				establish_async_read();
 			}
 
-			virtual void on_close() {}
+			virtual void on_close()
+			{}
 
 		protected:
 			void async_process_queue()
@@ -128,22 +126,23 @@ namespace aquarius
 
 				auto& buffer = write_queue_.front();
 
-				socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()), 
-					[this, self = this->shared_from_this(), &buffer](const boost::system::error_code& ec, std::size_t bytes_transferred)
-					{
-						if (ec)
-						{
-							std::cout << ec.message() << std::endl;
-							shut_down();
-							return;
-						}
+				socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
+										 [this, self = this->shared_from_this(),
+										  &buffer](const boost::system::error_code& ec, std::size_t bytes_transferred)
+										 {
+											 if (ec)
+											 {
+												 std::cout << ec.message() << std::endl;
+												 shut_down();
+												 return;
+											 }
 
-						write_queue_.pop();
+											 write_queue_.pop();
 
-						async_process_queue();
+											 async_process_queue();
 
-						std::cout << "complete " << bytes_transferred << "字节" << std::endl;
-					});
+											 std::cout << "complete " << bytes_transferred << "字节" << std::endl;
+										 });
 			}
 
 		private:
@@ -169,11 +168,11 @@ namespace aquarius
 					return shut_down();
 				}
 
-				if (heart_timer_.expires_at() <= core::deadline_timer::traits_type::now())
+				if (heart_timer_.expires_at() <= detail::deadline_timer::traits_type::now())
 				{
-					core::ping_request resp{};
+					// core::ping_request resp{};
 
-					//queue_packet(std::move(resp));
+					// queue_packet(std::move(resp));
 				}
 
 				last_operator_ ? last_operator_ = false : 0;
@@ -187,7 +186,7 @@ namespace aquarius
 
 			flex_buffer_t read_buffer_;
 
-			core::deadline_timer heart_timer_;
+			detail::deadline_timer heart_timer_;
 
 			boost::asio::ip::address remote_addr_;
 
@@ -199,6 +198,5 @@ namespace aquarius
 
 			bool last_operator_;
 		};
-	}
-}
-
+	} // namespace impl
+} // namespace aquarius

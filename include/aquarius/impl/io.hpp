@@ -3,5 +3,8 @@
 
 namespace aquarius
 {
-	using flex_buffer_t = elastic::serialize_streambuf<char,std::char_traits<char>>;
-}
+	namespace impl
+	{
+		using flex_buffer_t = elastic::serialize_streambuf<char, std::char_traits<char>>;
+	}
+} // namespace aquarius
