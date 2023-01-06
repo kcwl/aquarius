@@ -8,12 +8,11 @@ namespace aquarius
 {
 	namespace session
 	{
-		template<typename _Conn>
 		class session 
-			: public std::enable_shared_from_this<session<_Conn>>
+			: public std::enable_shared_from_this<session>
 		{
 		public:
-			session(std::shared_ptr<_Conn> conn_ptr)
+			session(std::shared_ptr<connector<sock::socket<>>> conn_ptr)
 				: conn_ptr_(conn_ptr)
 			{
 
@@ -23,7 +22,7 @@ namespace aquarius
 
 			void async_run()
 			{
-				std::async(std::launch::deferred, &session::process, this->shared_from_this());
+				[[maybe_unused]] auto res = std::async(std::launch::deferred, &session::process, this->shared_from_this());
 			}
 
 		public:
@@ -32,7 +31,10 @@ namespace aquarius
 				if (auto request = read())
 				{
 					using request_t = decltype(request);
-					invoke_helper<request_t>::invoke(request->unique_key(), std::move(request));
+
+					auto self = shared_from_this();
+
+					invoke_helper::invoke(request->unique_key(), std::move(self), std::move(request));
 				}
 			}
 
@@ -79,7 +81,7 @@ namespace aquarius
 
 
 		private:
-			std::shared_ptr<_Conn> conn_ptr_;
+			std::shared_ptr<connector<sock::socket<>>> conn_ptr_;
 		};
 	}
 }

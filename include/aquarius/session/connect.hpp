@@ -15,7 +15,7 @@ namespace aquarius
 	{
 		constexpr int heart_time_interval = 10;
 
-		template<typename _Conn> class session;
+		class session;
 
 		template<typename _Socket>
 		class connector
@@ -92,7 +92,7 @@ namespace aquarius
 
 					!last_operator_ ? last_operator_ = true : 0;
 
-					auto session_ptr = std::make_shared<session<connector<_Socket>>>(this->shared_from_this());
+					auto session_ptr = std::make_shared<session>(this->shared_from_this());
 
 					session_ptr->process();
 

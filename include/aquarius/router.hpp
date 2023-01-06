@@ -3,11 +3,11 @@
 #include "session.hpp"
 #include "core/router.hpp"
 #include "io.hpp"
-
+#include <aquarius/session/session.hpp>
 
 namespace aquarius
 {
-	using ctx_router = core::single_router<int, std::shared_ptr<proto::xmessage>>;
+	using ctx_router = core::single_router<int, std::shared_ptr<session::session>, std::shared_ptr<proto::xmessage>>;
 
 	template<typename _Context>
 	struct ctx_regist
@@ -16,15 +16,16 @@ namespace aquarius
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router::instance().regist(_key, []<typename _Message>(std::shared_ptr<_Message> req_ptr)
+			ctx_router::instance().regist(_key, []<typename _Session, typename _Message>(std::shared_ptr<session::session> session_ptr, std::shared_ptr<_Message> req_ptr)
 			{
-				std::make_shared<_Context>()->visit(req_ptr);
+				std::make_shared<_Context>(session_ptr)->visit(req_ptr);
 			});
 		}
 	};
-	template<typename... _Args>
+	
 	struct invoke_helper
 	{
+		template<typename... _Args>
 		static int invoke(uint32_t key, _Args&&... args)
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
