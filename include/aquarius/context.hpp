@@ -23,7 +23,7 @@ namespace aquarius
 	public:
 		virtual int on_connected() = 0;
 
-		virtual int on_closed(std::shared_ptr<impl::impl>) = 0;
+		virtual int on_closed(std::shared_ptr<impl::session>) = 0;
 
 		virtual int on_timeout() = 0;
 

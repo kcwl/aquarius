@@ -14,8 +14,6 @@ namespace aquarius
 	{
 		constexpr int heart_time_interval = 10;
 
-		class impl;
-
 		template <typename _Socket>
 		class connector : public std::enable_shared_from_this<connector<_Socket>>, private core::noncopyable
 		{
