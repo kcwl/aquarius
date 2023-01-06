@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/router.hpp>
+#include <aquarius/impl/router.hpp>
 #include <aquarius/impl/connect.hpp>
 #include <aquarius/impl/io.hpp>
 #include <aquarius/impl/message.hpp>

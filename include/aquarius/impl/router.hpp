@@ -8,14 +8,13 @@ namespace aquarius
 	namespace impl
 	{
 		class session;
-		
+
 		template <typename _Streambuf>
 		class basic_message;
 
 		using xmessage = basic_message<flex_buffer_t>;
-	}
-}
-
+	} // namespace impl
+} // namespace aquarius
 
 namespace aquarius
 {
@@ -28,10 +27,10 @@ namespace aquarius
 		{
 			std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router::instance().regist(
-				_key, []<typename _Session, typename _Message>(std::shared_ptr<_Session> session_ptr,
-															   std::shared_ptr<_Message> req_ptr)
-				{ std::make_shared<_Context>(session_ptr)->visit(req_ptr); });
+			ctx_router::instance().regist(_key,
+										  []<typename _Session, typename _Message>(
+											  std::shared_ptr<_Session> session_ptr, std::shared_ptr<_Message> req_ptr)
+										  { std::make_shared<_Context>(session_ptr)->visit(req_ptr); });
 		}
 	};
 
@@ -69,7 +68,4 @@ namespace aquarius
 			return aquarius::msg_router<_Message>::instance().invoke(_key, std::forward<_Args>(args)...);
 		}
 	};
-
-#define MESSAGE_DEFINE(base_type, type) static msg_regist<base_type, type> req##type(type::Number);
-#define CONTEXT_DEFINE(base_type, type) static ctx_regist<base_type, type> ctx##type(type::Number);
 } // namespace aquarius
