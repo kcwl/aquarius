@@ -12,6 +12,8 @@ namespace aquarius
 {
 	namespace impl
 	{
+		class session;
+
 		constexpr int heart_time_interval = 10;
 
 		template <typename _Socket>

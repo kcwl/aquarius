@@ -4,6 +4,7 @@
 #include <aquarius/impl/io.hpp>
 #include <aquarius/impl/visitor.hpp>
 #include <cstddef>
+#include <aquarius/impl/context.hpp>
 
 namespace aquarius
 {
@@ -28,34 +29,44 @@ namespace aquarius
 			}
 		};
 
-		template <typename _Streambuf = flex_buffer_t>
-		class basic_message : public visitable<int>
+		class xmessage : public visitable<int>
 		{
 		public:
-			using streambuf_t = _Streambuf;
+			using streambuf_t = flex_buffer_t;
+
+			DEFINE_VISITOR()
 
 		public:
-			virtual uint32_t unique_key() = 0;
+			virtual uint32_t unique_key()
+			{
+				return 0;
+			};
 
-			virtual bool parse_message(streambuf_t& archive) = 0;
+			virtual bool parse_message([[maybe_unused]] streambuf_t& archive)
+			{
+				return false;
+			}
 
-			virtual bool to_message(streambuf_t& archive) = 0;
+			virtual bool to_message([[maybe_unused]] streambuf_t& archive)
+			{
+				return false;
+			}
 		};
 
-		using xmessage = basic_message<>;
-
 		template <typename _Header, typename _Body, uint32_t N>
-		class message : public xmessage, private header_of<_Header, basic_message<>::streambuf_t>
+		class message : public xmessage, private header_of<_Header, xmessage::streambuf_t>
 		{
 		public:
 			using header_type = _Header;
 			using body_type = _Body;
 
-			using streambuf_t = typename basic_message<>::streambuf_t;
+			using streambuf_t = typename xmessage::streambuf_t;
 
-			using base_type = header_of<_Header, basic_message<>::streambuf_t>;
+			using base_type = header_of<_Header, streambuf_t>;
 
 			constexpr static uint32_t Number = N;
+
+			DEFINE_VISITOR()
 
 		public:
 			header_type& header() noexcept
@@ -81,11 +92,6 @@ namespace aquarius
 			virtual uint32_t unique_key() override
 			{
 				return Number;
-			}
-
-			virtual int accept(aquarius::context* v) override
-			{
-				return accept_impl(this, v);
 			}
 
 			virtual bool parse_message(streambuf_t& stream) override
@@ -122,7 +128,7 @@ namespace aquarius
 			}
 
 		private:
-			body_of<body_type, basic_message<>::streambuf_t> body_;
+			body_of<body_type, streambuf_t> body_;
 		};
 	} // namespace impl
 } // namespace aquarius

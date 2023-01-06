@@ -30,7 +30,7 @@ namespace aquarius
 		public:
 			virtual bool parse_bytes(streambuf_t& stream)
 			{
-				if (!body_ptr_->ParseFromArray(stream.data(), stream.size()))
+				if (!body_ptr_->ParseFromArray(stream.data(), static_cast<int>(stream.size())))
 				{
 					return false;
 				}

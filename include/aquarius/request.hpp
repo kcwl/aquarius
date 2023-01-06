@@ -9,6 +9,8 @@ namespace aquarius
 	public:
 		request() = default;
 		~request() = default;
+
+		DEFINE_VISITOR()
 	};
 
 	template <typename _Header, uint32_t Number>

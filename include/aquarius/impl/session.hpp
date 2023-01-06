@@ -1,8 +1,7 @@
 #pragma once
-#include <aquarius/impl/router.hpp>
 #include <aquarius/impl/connect.hpp>
 #include <aquarius/impl/io.hpp>
-#include <aquarius/impl/message.hpp>
+#include <aquarius/impl/router.hpp>
 
 namespace aquarius
 {
@@ -26,33 +25,30 @@ namespace aquarius
 		public:
 			void process()
 			{
-				if (auto request = read())
-				{
-					using request_t = decltype(request);
+				auto [request,id] = read();
 
-					auto self = shared_from_this();
+				auto self = shared_from_this();
 
-					invoke_helper::invoke(request->unique_key(), std::move(self), std::move(request));
-				}
+				invoke_helper::invoke(id, std::move(self), std::move(request));
 			}
 
 			template <typename _Message>
 			bool write(_Message* msg, int time_out)
 			{}
 
-			std::shared_ptr<xmessage> read()
+			std::pair<std::shared_ptr<xmessage>,uint32_t> read()
 			{
 				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
 
 				if (read_buffer.size() < sizeof(uint32_t))
-					return nullptr;
+					return std::pair<std::shared_ptr<xmessage>, uint32_t>{};
 
 				uint32_t id{};
 
 				elastic::binary_iarchive ia(read_buffer);
 				ia >> id;
 
-				return invoke_msg_helper<std::shared_ptr<xmessage>>::invoke(id);
+				return { invoke_msg_helper<std::shared_ptr<xmessage>>::invoke(id), id };
 			}
 
 			template <typename _Context>

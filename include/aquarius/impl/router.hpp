@@ -8,64 +8,61 @@ namespace aquarius
 	namespace impl
 	{
 		class session;
-
-		template <typename _Streambuf>
-		class basic_message;
-
-		using xmessage = basic_message<flex_buffer_t>;
+		class xmessage;
 	} // namespace impl
 } // namespace aquarius
 
 namespace aquarius
 {
-	using ctx_router = core::single_router<int, std::shared_ptr<impl::session>, std::shared_ptr<impl::xmessage>>;
-
-	template <typename _Context>
-	struct ctx_regist
+	namespace impl
 	{
-		ctx_regist(const std::size_t& key)
+		using ctx_router = core::single_router<int, std::shared_ptr<impl::session>, std::shared_ptr<impl::xmessage>>;
+
+		template <typename _Context>
+		struct ctx_regist
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
+			ctx_regist(const std::size_t& key)
+			{
+				std::string _key = "aquarius_" + std::to_string(key);
 
-			ctx_router::instance().regist(_key,
-										  []<typename _Session, typename _Message>(
-											  std::shared_ptr<_Session> session_ptr, std::shared_ptr<_Message> req_ptr)
-										  { std::make_shared<_Context>(session_ptr)->visit(req_ptr); });
-		}
-	};
+				ctx_router::instance().regist(
+					_key, [](std::shared_ptr<impl::session> session_ptr, std::shared_ptr<impl::xmessage> req_ptr)
+					{ std::make_shared<_Context>(session_ptr)->visit(req_ptr); });
+			}
+		};
 
-	struct invoke_helper
-	{
-		template <typename... _Args>
-		static int invoke(uint32_t key, _Args&&... args)
+		struct invoke_helper
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
+			template <typename... _Args>
+			static int invoke(uint32_t key, _Args&&... args)
+			{
+				std::string _key = "aquarius_" + std::to_string(key);
 
-			return aquarius::ctx_router::instance().invoke(_key, std::forward<_Args>(args)...);
-		}
-	};
+				return ctx_router::instance().invoke(_key, std::forward<_Args>(args)...);
+			}
+		};
 
-	template <typename _Message>
-	using msg_router = core::single_router<_Message>;
+		using msg_router = core::single_router<std::shared_ptr<impl::xmessage>>;
 
-	template <typename _BaseMessage, typename _Message>
-	struct msg_regist
-	{
-		msg_regist(const std::size_t& key)
+		template <typename _Message, typename = std::is_base_of<impl::xmessage, _Message>>
+		struct msg_regist
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
+			msg_regist(const std::size_t& key)
+			{
+				std::string _key = "aquarius_" + std::to_string(key);
 
-			msg_router<_BaseMessage>::instance().regist(_key, [] { return std::make_shared<_Message>(); });
-		}
-	};
-	template <typename _Message, typename... _Args>
-	struct invoke_msg_helper
-	{
-		static _Message invoke(uint32_t key, _Args&&... args)
+				msg_router::instance().regist(_key, [] { return std::make_shared<_Message>(); });
+			}
+		};
+		template <typename _Message, typename... _Args>
+		struct invoke_msg_helper
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
+			static _Message invoke(uint32_t key, _Args&&... args)
+			{
+				std::string _key = "aquarius_" + std::to_string(key);
 
-			return aquarius::msg_router<_Message>::instance().invoke(_key, std::forward<_Args>(args)...);
-		}
-	};
+				return msg_router::instance().invoke(_key, std::forward<_Args>(args)...);
+			}
+		};
+	} // namespace impl
 } // namespace aquarius

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <aquarius/impl/session.hpp>
-#include <aquarius/impl/visitor.hpp>
 #include <memory>
 
 namespace aquarius
