@@ -29,20 +29,20 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual _Return accept(context* visitor) = 0;
+			virtual _Return accept(std::shared_ptr<context> ctx) = 0;
 		};
 
 		template <typename _Request>
-		static int accept_impl(_Request* req, context* v)
+		static int accept_impl(_Request* req, std::shared_ptr<context> ctx)
 		{
 			using visitor_t = impl::visitor<_Request, int>;
 			using visitor_msg_t = impl::visitor<xmessage, int>;
 
-			if (visitor_t* visit_ptr = dynamic_cast<visitor_t*>(v))
+			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
 			{
 				return visit_ptr->visit(req);
 			}
-			else if (visitor_msg_t* visitor_ptr = dynamic_cast<visitor_msg_t*>(v))
+			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
 			{
 				return visitor_ptr->visit(req);
 			}
@@ -51,9 +51,9 @@ namespace aquarius
 		}
 
 #define DEFINE_VISITOR()                                                                                               \
-	virtual int accept(aquarius::impl::context* v)                                                                     \
+	virtual int accept(std::shared_ptr<aquarius::impl::context> ctx)                                                   \
 	{                                                                                                                  \
-		return accept_impl(this, v);                                                                                   \
+		return accept_impl(this, ctx);                                                                                 \
 	}
 	} // namespace impl
 } // namespace aquarius

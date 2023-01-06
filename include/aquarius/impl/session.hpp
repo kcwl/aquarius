@@ -25,30 +25,30 @@ namespace aquarius
 		public:
 			void process()
 			{
-				auto [request,id] = read();
+				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
+
+				auto id = read(read_buffer);
 
 				auto self = shared_from_this();
 
-				invoke_helper::invoke(id, std::move(self), std::move(request));
+				invoke_helper::invoke(id, self, read_buffer);
 			}
 
 			template <typename _Message>
 			bool write(_Message* msg, int time_out)
 			{}
 
-			std::pair<std::shared_ptr<xmessage>,uint32_t> read()
+			uint32_t read(flex_buffer_t& buffer)
 			{
-				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
-
-				if (read_buffer.size() < sizeof(uint32_t))
-					return std::pair<std::shared_ptr<xmessage>, uint32_t>{};
+				if (buffer.size() < sizeof(uint32_t))
+					return 0;
 
 				uint32_t id{};
 
-				elastic::binary_iarchive ia(read_buffer);
+				elastic::binary_iarchive ia(buffer);
 				ia >> id;
 
-				return { invoke_msg_helper<std::shared_ptr<xmessage>>::invoke(id), id };
+				return id;
 			}
 
 			template <typename _Context>

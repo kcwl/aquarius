@@ -8,7 +8,7 @@ namespace aquarius
 {
 	namespace impl
 	{
-		class ssl_context : public core::singleton<ssl_context>
+		class ssl_context : public detail::singleton<ssl_context>
 		{
 #ifdef ENABLE_SSL
 		public:

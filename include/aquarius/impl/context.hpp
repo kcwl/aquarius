@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <aquarius/impl/session.hpp>
+#include <aquarius/impl/visitor.hpp>
 #include <memory>
 
 namespace aquarius
@@ -9,8 +10,9 @@ namespace aquarius
 		class context : public impl::visitor<impl::xmessage, int>
 		{
 		public:
-			context(std::shared_ptr<impl::session> session_ptr)
-				: session_ptr_(session_ptr)
+			context(const std::string& name, int timeout)
+				: name_(name)
+				, timeout_(timeout)
 			{}
 
 			context(const context&) = delete;
@@ -22,19 +24,31 @@ namespace aquarius
 			context& operator=(const context&) = delete;
 
 		public:
-			virtual int on_connected() = 0;
+			virtual int on_connected(std::shared_ptr<impl::session>) = 0;
 
 			virtual int on_closed(std::shared_ptr<impl::session>) = 0;
 
 			virtual int on_timeout() = 0;
 
-			virtual bool handle() = 0;
+			virtual int visit([[maybe_unused]] impl::xmessage* msg) override
+			{
+				return 0;
+			}
+
+			void attach_session(std::shared_ptr<session> session_ptr)
+			{
+				session_ptr_ = session_ptr;
+			}
 
 		protected:
 			virtual void on_error(int result) = 0;
 
 		protected:
 			std::shared_ptr<impl::session> session_ptr_;
+
+			std::string name_;
+
+			int timeout_;
 		};
 
 		template <typename _Request, typename _Response>
@@ -61,14 +75,9 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int visit(std::shared_ptr<impl::xmessage> msg)
+			virtual int visit(_Request* req)
 			{
-				return 0;
-			}
-
-			virtual int visit(std::shared_ptr<_Request> req)
-			{
-				request_ptr_.swap(req);
+				request_ptr_.reset(req);
 
 				return handle();
 			}
@@ -76,7 +85,7 @@ namespace aquarius
 		protected:
 			virtual int handle() = 0;
 
-			virtual void on_error(int result) override
+			virtual void on_error([[maybe_unused]] int result) override
 			{}
 
 			bool send_response(int result, int timeout = 1000)
