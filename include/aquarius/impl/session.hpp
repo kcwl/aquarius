@@ -19,7 +19,7 @@ namespace aquarius
 			void async_run()
 			{
 				[[maybe_unused]] auto res =
-					std::async(std::launch::deferred, &session::process, this->shared_from_this());
+					std::async(std::launch::async, &session::process, this->shared_from_this());
 			}
 
 		public:
