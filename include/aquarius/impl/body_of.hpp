@@ -30,17 +30,18 @@ namespace aquarius
 		public:
 			virtual bool parse_bytes(streambuf_t& stream)
 			{
-				int length = 0;
+				std::string stream_data{};
 
 				elastic::binary_iarchive ia(stream);
-				ia >> length;
+				ia >> stream_data;
 
-				if (!body_ptr_->ParseFromArray(stream.rdata(), length))
+				if (stream_data.empty())
+					return false;
+
+				if (!body_ptr_->ParseFromArray(stream_data.data(), static_cast<int>(stream_data.size())))
 				{
 					return false;
 				}
-
-				stream.commit(body_ptr_->ByteSize());
 
 				return true;
 			}

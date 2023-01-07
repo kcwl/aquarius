@@ -91,7 +91,7 @@ namespace aquarius
 
 											auto session_ptr = std::make_shared<session>(this->shared_from_this());
 
-											session_ptr->process();
+											session_ptr->async_run();
 
 											async_read();
 										});
