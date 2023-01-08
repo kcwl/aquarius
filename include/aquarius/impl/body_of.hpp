@@ -30,18 +30,12 @@ namespace aquarius
 		public:
 			virtual bool parse_bytes(streambuf_t& stream)
 			{
-				std::string stream_data{};
-
-				elastic::binary_iarchive ia(stream);
-				ia >> stream_data;
-
-				if (stream_data.empty())
-					return false;
-
-				if (!body_ptr_->ParseFromArray(stream_data.data(), static_cast<int>(stream_data.size())))
+				if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
 				{
 					return false;
 				}
+
+				stream.commit(body_ptr_->ByteSize());
 
 				return true;
 			}
@@ -50,12 +44,9 @@ namespace aquarius
 			{
 				auto buf = body_ptr_->SerializeAsString();
 
-				if (buf.empty())
-					return false;
-
 				elastic::binary_oarchive oa(stream);
 
-				oa << buf;
+				oa.append(buf.data());
 
 				return true;
 			}
