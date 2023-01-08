@@ -18,8 +18,7 @@ namespace aquarius
 
 			void async_run()
 			{
-				[[maybe_unused]] auto res =
-					std::async(std::launch::async, &session::process, this->shared_from_this());
+				[[maybe_unused]] auto res = std::async(std::launch::async, &session::process, this->shared_from_this());
 			}
 
 		public:
@@ -35,8 +34,12 @@ namespace aquarius
 			}
 
 			template <typename _Message>
-			bool write(_Message* msg, int time_out)
-			{}
+			bool write(_Message&& msg, [[maybe_unused]] int time_out)
+			{
+				conn_ptr_->queue_packet(std::forward<_Message>(msg));
+
+				return true;
+			}
 
 			uint32_t read(flex_buffer_t& buffer)
 			{

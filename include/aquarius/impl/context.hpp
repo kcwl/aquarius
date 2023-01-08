@@ -90,10 +90,11 @@ namespace aquarius
 
 			bool send_response(int result, int timeout = 1000)
 			{
-				response_.header() = request_ptr_->header();
-				response_.set_result(result);
+				response_.header().clone(request_ptr_->header());
 
-				if (!session_ptr_->write(&response_, timeout))
+				response_.header().result_ = result;
+
+				if (!session_ptr_->write(std::move(response_), timeout))
 					return false;
 
 				return true;

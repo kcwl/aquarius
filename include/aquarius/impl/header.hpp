@@ -10,6 +10,12 @@ namespace aquarius
 		{
 			uint32_t magic_;
 			int32_t size_;
+
+			void clone(const tcp_header& header)
+			{
+				magic_ = header.magic_;
+				size_ = header.size_;
+			}
 		};
 
 		struct tcp_request_header : tcp_header
