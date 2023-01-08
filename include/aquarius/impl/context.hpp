@@ -77,7 +77,7 @@ namespace aquarius
 
 			virtual int visit(_Request* req)
 			{
-				request_ptr_.reset(req);
+				request_ptr_ = req;
 
 				return handle();
 			}
@@ -101,7 +101,7 @@ namespace aquarius
 			}
 
 		protected:
-			std::shared_ptr<_Request> request_ptr_;
+			_Request* request_ptr_;
 
 			_Response response_;
 		};
