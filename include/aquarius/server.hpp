@@ -1,12 +1,10 @@
 #pragma once
 #include <aquarius/impl/server.hpp>
-#include <aquarius/session.hpp>
+#include <aquarius/connect.hpp>
 
 namespace aquarius
 {
-	using tcp_no_ssl_server = impl::server;
+	using no_ssl_server = impl::server<nossl_connect>;
 
-#ifdef ENABLE_SSL
-	using ssl_server = impl::server<tcp_ssl_session>
-#endif
+	using ssl_server = impl::server<ssl_connect>;
 } // namespace aquarius

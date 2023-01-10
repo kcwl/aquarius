@@ -1,11 +1,12 @@
 #pragma once
 #include <aquarius/impl/io_service_pool.hpp>
-#include <aquarius/session.hpp>
+#include <aquarius/connect.hpp>
 
 namespace aquarius
 {
 	namespace impl
 	{
+		template<typename _Connector>
 		class server
 		{
 		public:
@@ -39,7 +40,7 @@ namespace aquarius
 			{
 				acceptor_.set_option(boost::asio::socket_base::reuse_address());
 
-				auto new_connect_ptr = std::make_shared<socket_connect>(io_service_pool_.get_io_service());
+				auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
 
 				acceptor_.async_accept(new_connect_ptr->socket(),
 									   [this, new_connect_ptr](const boost::system::error_code& error)
