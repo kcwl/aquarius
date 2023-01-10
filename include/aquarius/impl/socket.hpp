@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/impl/ssl_context.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/asio.hpp>
 
 namespace aquarius
@@ -11,39 +11,49 @@ namespace aquarius
 		struct ssl_socket
 		{};
 
-		template <typename _Sock_Type = void>
-		class socket : public boost::asio::ip::tcp::socket
+		template <typename _SocketType, typename _SocketBase = boost::asio::ip::tcp::socket>
+		class multi_socket
 		{
 		public:
-			template <typename _Execution_Context>
-			socket(_Execution_Context& executor)
-				: boost::asio::ip::tcp::socket(executor)
-			{}
+			template <typename _Execution>
+			multi_socket(_Execution& executor,
+						 boost::asio::ssl::context ctx = boost::asio::ssl::context(boost::asio::ssl::context::sslv23))
+				: socket_(executor)
+				, ssl_context_(ctx)
+			{
+				init();
+			}
 
 		public:
-			auto& sock()
+			auto& socket()
 			{
-				return *this;
+				return socket_->lowest_layer();
 			}
+
+		private:
+			void init()
+			{
+				if constexpr (std::same_as<_SocketType, ssl_socket>)
+				{
+					boost::system::error_code ec;
+
+					std::string certificate_chain_file;
+					std::string private_key_file;
+
+					ssl_context_.set_options(boost::asio::ssl::context::no_sslv3, ec);
+					ssl_context_.use_certificate_chain_file(certificate_chain_file, ec);
+					ssl_context_.use_private_key_file(private_key_file, boost::asio::ssl::context::pem, ec);
+				}
+			}
+
+		private:
+			boost::asio::ssl::stream<_SocketBase> socket_;
+
+			boost::asio::ssl::context ssl_context_;
 		};
 
-#if ENABLE_SSL
-		template <>
-		class socket<ssl_socket> : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
-		{
-			using executor_type = boost::asio::ip::tcp::socket::executor_type;
+	} // namespace impl
 
-		public:
-			socket(const executor_type& executor)
-				: boost::asio::ip::tcp::socket(executor)
-			{}
-
-		public:
-			auto& sock()
-			{
-				return this->lowest_layer();
-			}
-		};
-#endif
-	} // namespace sock
+	using nossl_socket = impl::multi_socket<void>;
+	using ssl_socket = impl::multi_socket<impl::ssl_socket>;
 } // namespace aquarius
