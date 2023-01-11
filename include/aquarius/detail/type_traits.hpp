@@ -50,5 +50,8 @@ namespace aquarius
 		template <>
 		struct is_string<std::string> : std::true_type
 		{};
+
+		struct http
+		{};
 	} // namespace detail
 } // namespace aquarius

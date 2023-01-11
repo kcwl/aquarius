@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	using no_ssl_server = impl::server<nossl_connect>;
+	using no_ssl_server = impl::server<nossl_tcp_connect>;
 
-	using ssl_server = impl::server<ssl_connect>;
+	using ssl_server = impl::server<ssl_tcp_connect>;
 } // namespace aquarius

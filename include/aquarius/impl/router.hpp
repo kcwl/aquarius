@@ -75,28 +75,30 @@ namespace aquarius
 		template <typename _Request, typename _Context>
 		struct invoker
 		{
-			static inline void apply(std::shared_ptr<session> session_ptr, flex_buffer_t& buffer)
+			static inline bool apply(std::shared_ptr<session> trans_ptr, flex_buffer_t& buffer)
 			{
 				auto ctx_ptr = std::make_shared<_Context>();
 
 				if (!ctx_ptr)
-					return;
+					return false;
 
-				ctx_ptr->attach_session(session_ptr);
+				ctx_ptr->attach(trans_ptr);
 
 				auto msg_ptr = std::make_shared<_Request>();
 
 				if (!msg_ptr)
-					return;
+					return false;
 
 				if (!msg_ptr->parse_message(buffer))
-					return;
+					return false;
 
 				msg_ptr->accept(ctx_ptr);
+
+				return true;
 			}
 		};
 
-		using ctx_router = detail::single_router<void, std::shared_ptr<session>, flex_buffer_t&>;
+		using ctx_router = detail::single_router<bool, std::shared_ptr<session>, flex_buffer_t&>;
 
 		template <typename _Request, typename _Context>
 		struct ctx_regist
@@ -113,11 +115,11 @@ namespace aquarius
 		struct invoke_helper
 		{
 			template <typename... _Args>
-			static void invoke(uint32_t key, _Args&... args)
+			static auto invoke(uint32_t key, _Args&... args)
 			{
 				std::string _key = "aquarius_" + std::to_string(key);
 
-				ctx_router::instance().invoke(_key, args...);
+				return ctx_router::instance().invoke(_key, args...);
 			}
 		};
 

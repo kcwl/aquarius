@@ -14,11 +14,23 @@ namespace aquarius
 	{
 		constexpr int heart_time_interval = 10;
 
-		template <typename _Socket>
-		class basic_connect : public std::enable_shared_from_this<basic_connect<_Socket>>, private core::noncopyable
+		class session;
+
+		class connector
 		{
 		public:
-			explicit basic_connect(boost::asio::io_service& io_service, int heart_time)
+			virtual void write(flex_buffer_t&&, int) = 0;
+
+			virtual void close() = 0;
+
+			virtual flex_buffer_t& get_read_buffer() = 0;
+		};
+
+		template <typename _Socket, typename _ConnectType = void>
+		class connect : private core::noncopyable, public connector,public std::enable_shared_from_this<connect<_Socket,_ConnectType>>
+		{
+		public:
+			explicit connect(boost::asio::io_service& io_service, int heart_time)
 				: socket_(io_service)
 				, read_buffer_()
 				, heart_timer_(io_service)
@@ -28,7 +40,7 @@ namespace aquarius
 				, last_operator_(true)
 			{}
 
-			virtual ~basic_connect()
+			virtual ~connect()
 			{
 				shut_down();
 			}
@@ -54,7 +66,7 @@ namespace aquarius
 				socket().set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 			}
 
-			void push_back(flex_buffer_t&& resp_buf)
+			void write(flex_buffer_t&& resp_buf, [[maybe_unused]] int timeout)
 			{
 				write_queue_.push(std::move(resp_buf));
 
@@ -82,8 +94,9 @@ namespace aquarius
 
 											 !last_operator_ ? last_operator_ = true : 0;
 
-											 if (!read())
-												 return;
+											 if (!session_ptr_)
+												 session_ptr_.swap(std::make_shared<transfer<_ConnectType>>(
+													 this->shared_from_this()));
 
 											 async_read();
 										 });
@@ -92,12 +105,12 @@ namespace aquarius
 			void establish_async_read()
 			{
 				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
+				heart_timer_.async_wait(std::bind(&connect::heart_deadline, this->shared_from_this()));
 
 				async_read();
 			}
 
-			auto& get_read_buffer()
+			virtual flex_buffer_t& get_read_buffer() override
 			{
 				return read_buffer_;
 			}
@@ -125,6 +138,13 @@ namespace aquarius
 
 					async_read();
 				}
+			}
+
+			virtual void close() override
+			{
+				shut_down();
+
+				on_close();
 			}
 
 			virtual void on_start() = 0;
@@ -163,8 +183,6 @@ namespace aquarius
 		private:
 			void shut_down()
 			{
-				on_close();
-
 				if (socket().is_open())
 				{
 					boost::system::error_code ec;
@@ -193,7 +211,7 @@ namespace aquarius
 				last_operator_ ? last_operator_ = false : 0;
 
 				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
-				heart_timer_.async_wait(std::bind(&basic_connect::heart_deadline, this->shared_from_this()));
+				heart_timer_.async_wait(std::bind(&connect::heart_deadline, this->shared_from_this()));
 			}
 
 		private:
@@ -212,77 +230,8 @@ namespace aquarius
 			std::atomic_int heart_deadline_;
 
 			bool last_operator_;
+
+			std::shared_ptr<session> session_ptr_;
 		};
-
-		struct http
-		{};
-
-		template <typename _Socket, typename _Type = void>
-		class connect : public basic_connect<_Socket>
-		{
-		public:
-			explicit connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
-				: basic_connect<_Socket>(io_service, heart_time)
-			{}
-
-		public:
-			virtual bool read() override
-			{
-				flex_buffer_t& read_buffer = this->get_read_buffer();
-
-				if (read_buffer.size() < sizeof(uint32_t))
-					return;
-
-				uint32_t id{};
-
-				elastic::binary_iarchive ia(read_buffer);
-				ia >> id;
-
-				auto res = invoke_helper::invoke(id, this->shared_from_this(), read_buffer);
-
-				if (!res)
-				{
-					return false;
-				}
-
-				return true;
-			}
-
-			virtual void on_start() override
-			{}
-
-			virtual void on_close() override
-			{}
-
-			template <typename _Message>
-			void write(_Message&& resp)
-			{
-				flex_buffer_t fs;
-
-				std::forward<_Message>(resp).to_message(fs);
-
-				this->push_back(std::move(fs));
-			}
-		};
-
-		template <typename _Socket>
-		class connect<_Socket, http> : public basic_connect<_Socket>
-		{
-		public:
-			explicit connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
-				: basic_connect<_Socket>(io_service, heart_time)
-			{}
-
-		public:
-			virtual void on_start() override
-			{}
-
-			virtual void on_close() override
-			{}
-
-			virtual bool read() override
-			{}
-		};
-
 	} // namespace impl
 } // namespace aquarius

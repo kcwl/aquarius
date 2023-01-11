@@ -23,7 +23,7 @@ namespace aquarius
 				map_invokes_.insert({ key, std::forward<std::function<_R(_Args...)>>(func) });
 			}
 
-			_R invoke(const std::string& key, _Args... args)
+			_R invoke(const std::string& key, _Args&... args)
 			{
 				std::lock_guard lk(mutex_);
 

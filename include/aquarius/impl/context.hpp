@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <aquarius/impl/session.hpp>
 #include <aquarius/impl/visitor.hpp>
 #include <memory>
 
@@ -23,9 +24,9 @@ namespace aquarius
 			context& operator=(const context&) = delete;
 
 		public:
-			virtual int on_connected(std::shared_ptr<impl::session>) = 0;
+			virtual int on_connected() = 0;
 
-			virtual int on_closed(std::shared_ptr<impl::session>) = 0;
+			virtual int on_closed() = 0;
 
 			virtual int on_timeout() = 0;
 
@@ -34,16 +35,16 @@ namespace aquarius
 				return 0;
 			}
 
-			void attach_session(std::shared_ptr<session> session_ptr)
+			void attach(std::shared_ptr<session> trans_ptr)
 			{
-				session_ptr_ = session_ptr;
+				session_ptr_ = trans_ptr;
 			}
 
 		protected:
 			virtual void on_error(int result) = 0;
 
 		protected:
-			std::shared_ptr<impl::session> session_ptr_;
+			std::shared_ptr<session> session_ptr_;
 
 			std::string name_;
 
@@ -59,14 +60,18 @@ namespace aquarius
 			{}
 
 		public:
-			virtual int on_connected(std::shared_ptr<impl::session> session_ptr) override
+			virtual int on_connected() override
 			{
-				return session_ptr->close();
+				session_ptr_->close();
+
+				return 0;
 			}
 
-			virtual int on_closed(std::shared_ptr<impl::session> session_ptr) override
+			virtual int on_closed() override
 			{
-				return session_ptr->close();
+				session_ptr_->close();
+
+				return 0;
 			}
 
 			virtual int on_timeout() override

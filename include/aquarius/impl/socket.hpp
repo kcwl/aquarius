@@ -27,7 +27,7 @@ namespace aquarius
 		public:
 			auto& socket()
 			{
-				return socket_->lowest_layer();
+				return socket_.lowest_layer();
 			}
 
 		private:
