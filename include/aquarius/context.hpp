@@ -3,8 +3,6 @@
 
 namespace aquarius
 {
-#define CONTEXT_DEFINE_SERVER(req, context) static aquarius::impl::ctx_regist<req, context> ctx##context(req::Number);
-#define CONTEXT_DEFINE_CLIENT(resp, context)                                                                           \
-	static aquarius::impl::ctx_regist<resp, context> ctx##context(resp::Number);
+#define CONTEXT_DEFINE(msg, context) static aquarius::impl::ctx_regist<msg, context> ctx##context(msg::Number);
 
 } // namespace aquarius
