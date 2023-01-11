@@ -22,7 +22,7 @@ namespace aquarius
 
 				std::forward<_Message>(resp).to_message(fs);
 
-				this->write(std::move(fs));
+				conn_ptr_->write(std::move(fs), timeout);
 
 				return true;
 			}

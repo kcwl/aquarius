@@ -27,10 +27,12 @@ namespace aquarius
 		};
 
 		template <typename _Socket, typename _ConnectType = void>
-		class connect : private core::noncopyable, public connector,public std::enable_shared_from_this<connect<_Socket,_ConnectType>>
+		class connect : private core::noncopyable,
+						public connector,
+						public std::enable_shared_from_this<connect<_Socket, _ConnectType>>
 		{
 		public:
-			explicit connect(boost::asio::io_service& io_service, int heart_time)
+			explicit connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
 				: socket_(io_service)
 				, read_buffer_()
 				, heart_timer_(io_service)
@@ -75,7 +77,7 @@ namespace aquarius
 
 			void async_read()
 			{
-				if (!socket_.is_open())
+				if (!socket().is_open())
 					return;
 
 				read_buffer_.normalize();
@@ -95,8 +97,13 @@ namespace aquarius
 											 !last_operator_ ? last_operator_ = true : 0;
 
 											 if (!session_ptr_)
-												 session_ptr_.swap(std::make_shared<transfer<_ConnectType>>(
-													 this->shared_from_this()));
+											 {
+												 auto session_ptr = std::make_shared<session>(this->shared_from_this());
+
+												 session_ptr_.swap(session_ptr);
+
+												 session_ptr_->read();
+											 }
 
 											 async_read();
 										 });
@@ -147,11 +154,11 @@ namespace aquarius
 				on_close();
 			}
 
-			virtual void on_start() = 0;
+			virtual void on_start()
+			{}
 
-			virtual void on_close() = 0;
-
-			virtual bool read() = 0;
+			virtual void on_close()
+			{}
 
 		protected:
 			void async_process_queue()

@@ -1,6 +1,6 @@
 #pragma once
-#include <boost/asio/ssl.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 
 namespace aquarius
 {
@@ -16,10 +16,10 @@ namespace aquarius
 		{
 		public:
 			template <typename _Execution>
-			multi_socket(_Execution& executor,
-						 boost::asio::ssl::context ctx = boost::asio::ssl::context(boost::asio::ssl::context::sslv23))
-				: socket_(executor)
-				, ssl_context_(ctx)
+			multi_socket(_Execution& executor)
+				: socket_(executor) 
+				, ssl_context_(boost::asio::ssl::context::sslv23)
+				, ssl_socket_(std::move(socket_), ssl_context_)
 			{
 				init();
 			}
@@ -27,7 +27,14 @@ namespace aquarius
 		public:
 			auto& socket()
 			{
-				return socket_.lowest_layer();
+				if constexpr (std::same_as<_SocketType, ssl_socket>)
+				{
+					return ssl_socket_.lowest_layer();
+				}
+				else
+				{
+					return socket_;
+				}
 			}
 
 		private:
@@ -47,9 +54,11 @@ namespace aquarius
 			}
 
 		private:
-			boost::asio::ssl::stream<_SocketBase> socket_;
+			_SocketBase socket_;
 
 			boost::asio::ssl::context ssl_context_;
+
+			boost::asio::ssl::stream<_SocketBase> ssl_socket_;
 		};
 
 	} // namespace impl
