@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/impl/server.hpp>
 #include <aquarius/connect.hpp>
+#include <aquarius/impl/server.hpp>
 
 namespace aquarius
 {

@@ -57,6 +57,7 @@ namespace aquarius
 		public:
 			context_impl(const std::string& name)
 				: context(name, 0)
+				, request_ptr_(nullptr)
 			{}
 
 		public:

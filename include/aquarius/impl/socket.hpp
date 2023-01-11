@@ -6,8 +6,6 @@ namespace aquarius
 {
 	namespace impl
 	{
-		struct default_socket
-		{};
 		struct ssl_socket
 		{};
 
@@ -17,7 +15,7 @@ namespace aquarius
 		public:
 			template <typename _Execution>
 			multi_socket(_Execution& executor)
-				: socket_(executor) 
+				: socket_(executor)
 				, ssl_context_(boost::asio::ssl::context::sslv23)
 				, ssl_socket_(std::move(socket_), ssl_context_)
 			{

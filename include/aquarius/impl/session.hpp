@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/impl/connect.hpp>
 #include <aquarius/detail/type_traits.hpp>
+#include <aquarius/impl/connect.hpp>
 #include <aquarius/impl/router.hpp>
 
 namespace aquarius

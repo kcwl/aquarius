@@ -46,7 +46,7 @@ namespace aquarius
 		};
 
 		template <typename _R, typename... _Args>
-		class single_router : public router<_R, _Args...>, public detail::singleton<router<_R, _Args...>>
+		class single_router : public router<_R, _Args...>, public singleton<router<_R, _Args...>>
 		{};
 	} // namespace detail
 } // namespace aquarius

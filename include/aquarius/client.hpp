@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <aquarius/detail/type_traits.hpp>
-#include <aquarius/impl/io.hpp>
+#include <aquarius/impl/flex_buffer.hpp>
+#include <aquarius/impl/header.hpp>
 #include <boost/asio.hpp>
 #include <type_traits>
-#include <aquarius/impl/header.hpp>
 
 namespace aquarius
 {

@@ -35,7 +35,7 @@ namespace aquarius
 					return false;
 				}
 
-				stream.commit(body_ptr_->ByteSize());
+				stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
 
 				return true;
 			}

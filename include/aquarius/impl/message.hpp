@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/impl/body_of.hpp>
 #include <aquarius/impl/context.hpp>
+#include <aquarius/impl/flex_buffer.hpp>
 #include <aquarius/impl/header_of.hpp>
-#include <aquarius/impl/io.hpp>
 #include <aquarius/impl/visitor.hpp>
 #include <cstddef>
 

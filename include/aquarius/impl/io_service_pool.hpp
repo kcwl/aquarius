@@ -16,8 +16,10 @@ namespace aquarius
 
 		public:
 			explicit io_service_pool(int pool_size)
-				: pool_size_(pool_size)
+				: io_services_()
+				, pool_size_(pool_size)
 				, next_to_service_(0)
+				, works_()
 			{
 				if (pool_size == 0)
 					throw std::runtime_error("io_service_pool size is 0");
@@ -62,8 +64,11 @@ namespace aquarius
 
 		private:
 			std::vector<io_service_ptr_t> io_services_;
-			int next_to_service_;
+
 			int pool_size_;
+
+			int next_to_service_;
+
 			std::vector<work_ptr_t> works_;
 		};
 	} // namespace impl

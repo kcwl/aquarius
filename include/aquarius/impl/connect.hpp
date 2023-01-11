@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
-#include <aquarius/impl/io.hpp>
+#include <aquarius/impl/defines.hpp>
+#include <aquarius/impl/flex_buffer.hpp>
 #include <aquarius/impl/socket.hpp>
-#include <array>
 #include <memory>
 #include <queue>
 #include <vector>
@@ -12,8 +12,6 @@ namespace aquarius
 {
 	namespace impl
 	{
-		constexpr int heart_time_interval = 10;
-
 		class session;
 
 		class connector
@@ -38,8 +36,10 @@ namespace aquarius
 				, heart_timer_(io_service)
 				, remote_addr_()
 				, remote_port_()
+				, write_queue_()
 				, heart_deadline_(heart_time)
 				, last_operator_(true)
+				, session_ptr_(nullptr)
 			{}
 
 			virtual ~connect()

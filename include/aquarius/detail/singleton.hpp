@@ -33,7 +33,7 @@ namespace aquarius
 		private:
 			static _Ty* instance_;
 		};
-	} // namespace core
+	} // namespace detail
 } // namespace aquarius
 
 template <typename _Ty>
