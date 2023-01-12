@@ -36,10 +36,8 @@ namespace aquarius
 			}
 
 		private:
-			virtual void start_accept()
+			void start_accept()
 			{
-				acceptor_.set_option(boost::asio::socket_base::reuse_address());
-
 				auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
 
 				acceptor_.async_accept(new_connect_ptr->socket(),
