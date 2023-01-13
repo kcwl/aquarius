@@ -2,7 +2,7 @@
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
 		class noncopyable
 		{
