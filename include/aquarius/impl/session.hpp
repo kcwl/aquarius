@@ -20,7 +20,7 @@ namespace aquarius
 			{
 				flex_buffer_t fs;
 
-				std::forward<_Message>(resp).to_message(fs);
+				std::forward<_Message>(resp).visit(&fs, visit_mode::output);
 
 				conn_ptr_->write(std::move(fs), timeout);
 

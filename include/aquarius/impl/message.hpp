@@ -20,20 +20,10 @@ namespace aquarius
 			{
 				return 0;
 			};
-
-			virtual bool parse_message([[maybe_unused]] flex_buffer_t& archive)
-			{
-				return false;
-			}
-
-			virtual bool to_message([[maybe_unused]] flex_buffer_t& archive)
-			{
-				return false;
-			}
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
-		class message : public xmessage, private header_of<_Header>
+		class message : public xmessage, private header_of<_Header>, public visitor<flex_buffer_t, int>
 		{
 		public:
 			using header_type = _Header;
@@ -71,7 +61,18 @@ namespace aquarius
 				return Number;
 			}
 
-			virtual bool parse_message(flex_buffer_t& stream) override
+			virtual int visit(flex_buffer_t* stream, visit_mode mode) override
+			{
+				if (mode == visit_mode::input)
+				{
+					return parse_message(*stream);
+				}
+
+				return to_message(*stream);
+			}
+
+		private:
+			bool parse_message(flex_buffer_t& stream)
 			{
 				if (!this->parse_bytes(stream))
 				{
@@ -86,7 +87,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_message(flex_buffer_t& stream) override
+			bool to_message(flex_buffer_t& stream)
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << Number;

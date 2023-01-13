@@ -18,7 +18,7 @@ namespace aquarius
 			virtual ~visitor() = default;
 
 		public:
-			virtual _Return visit(_Request* visited) = 0;
+			virtual _Return visit(_Request* visited, visit_mode mode = visit_mode::input) = 0;
 		};
 
 		template <typename _Return>

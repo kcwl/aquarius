@@ -33,7 +33,7 @@ namespace aquarius
 				if (!msg_ptr)
 					return false;
 
-				if (!msg_ptr->parse_message(buffer))
+				if (!msg_ptr->visit(&buffer, visit_mode::input))
 					return false;
 
 				msg_ptr->accept(ctx_ptr);

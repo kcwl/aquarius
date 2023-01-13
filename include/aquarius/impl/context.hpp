@@ -30,7 +30,7 @@ namespace aquarius
 
 			virtual int on_timeout() = 0;
 
-			virtual int visit([[maybe_unused]] impl::xmessage* msg) override
+			virtual int visit([[maybe_unused]] impl::xmessage* msg, [[maybe_unused]] visit_mode mode) override
 			{
 				return 0;
 			}
@@ -80,7 +80,7 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int visit(_Request* req)
+			virtual int visit(_Request* req, [[maybe_unused]] visit_mode mode)
 			{
 				request_ptr_ = req;
 
