@@ -6,12 +6,10 @@ namespace aquarius
 {
 	namespace impl
 	{
-		template <typename _Ty, typename _Streambuf>
+		template <typename _Ty>
 		class header_of : public fields<_Ty>
 		{
 		public:
-			using streambuf_t = _Streambuf;
-
 			using value_type = _Ty;
 
 		public:
@@ -42,7 +40,7 @@ namespace aquarius
 				return header_ptr_;
 			}
 
-			virtual bool parse_bytes(streambuf_t& stream)
+			virtual bool parse_bytes(flex_buffer_t& stream)
 			{
 				elastic::binary_iarchive ia(stream);
 				ia >> *header_ptr_;
@@ -50,7 +48,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_bytes(streambuf_t& stream)
+			virtual bool to_bytes(flex_buffer_t& stream)
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << *header_ptr_;

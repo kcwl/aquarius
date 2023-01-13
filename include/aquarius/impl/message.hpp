@@ -32,8 +32,6 @@ namespace aquarius
 		class xmessage : public visitable<int>
 		{
 		public:
-			using streambuf_t = flex_buffer_t;
-
 			DEFINE_VISITOR()
 
 		public:
@@ -42,27 +40,25 @@ namespace aquarius
 				return 0;
 			};
 
-			virtual bool parse_message([[maybe_unused]] streambuf_t& archive)
+			virtual bool parse_message([[maybe_unused]] flex_buffer_t& archive)
 			{
 				return false;
 			}
 
-			virtual bool to_message([[maybe_unused]] streambuf_t& archive)
+			virtual bool to_message([[maybe_unused]] flex_buffer_t& archive)
 			{
 				return false;
 			}
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
-		class message : public xmessage, private header_of<_Header, xmessage::streambuf_t>
+		class message : public xmessage, private header_of<_Header>
 		{
 		public:
 			using header_type = _Header;
 			using body_type = _Body;
 
-			using streambuf_t = typename xmessage::streambuf_t;
-
-			using base_type = header_of<_Header, streambuf_t>;
+			using base_type = header_of<_Header>;
 
 			constexpr static uint32_t Number = N;
 
@@ -94,7 +90,7 @@ namespace aquarius
 				return Number;
 			}
 
-			virtual bool parse_message(streambuf_t& stream) override
+			virtual bool parse_message(flex_buffer_t& stream) override
 			{
 				if (!this->parse_bytes(stream))
 				{
@@ -109,7 +105,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_message(streambuf_t& stream) override
+			virtual bool to_message(flex_buffer_t& stream) override
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << Number;
@@ -128,7 +124,7 @@ namespace aquarius
 			}
 
 		private:
-			body_of<body_type, streambuf_t> body_;
+			body_of<body_type> body_;
 		};
 	} // namespace impl
 } // namespace aquarius

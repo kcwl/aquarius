@@ -5,12 +5,10 @@ namespace aquarius
 {
 	namespace impl
 	{
-		template <typename _Ty, typename _Streambuf>
+		template <typename _Ty>
 		class body_of : public fields<_Ty>
 		{
 			using value_type = _Ty;
-
-			using streambuf_t = _Streambuf;
 
 		public:
 			body_of()
@@ -28,7 +26,7 @@ namespace aquarius
 			}
 
 		public:
-			virtual bool parse_bytes(streambuf_t& stream)
+			virtual bool parse_bytes(flex_buffer_t& stream)
 			{
 				if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
 				{
@@ -40,7 +38,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_bytes(streambuf_t& stream)
+			virtual bool to_bytes(flex_buffer_t& stream)
 			{
 				auto buf = body_ptr_->SerializeAsString();
 
