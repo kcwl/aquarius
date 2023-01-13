@@ -10,25 +10,6 @@ namespace aquarius
 {
 	namespace impl
 	{
-		struct empty_body
-		{
-			std::string SerializeAsString()
-			{
-				return {};
-			}
-
-			template <typename _Ty>
-			bool ParseFromArray([[maybe_unused]] _Ty* data, [[maybe_unused]] std::size_t bytes)
-			{
-				return true;
-			}
-
-			int ByteSize()
-			{
-				return 0;
-			}
-		};
-
 		class xmessage : public visitable<int>
 		{
 		public:

@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdint>
 #include <aquarius/impl/flex_buffer.hpp>
+#include <cstdint>
 
 namespace aquarius
 {
@@ -31,6 +31,23 @@ namespace aquarius
 				ar& elastic::serialize::base_object<tcp_header>(*this);
 				ar& uid_;
 			}
+
+		public:
+			bool parse_bytes(flex_buffer_t& stream)
+			{
+				iarchive ia(stream);
+				ia >> *this;
+
+				return true;
+			}
+
+			bool to_bytes(flex_buffer_t& stream)
+			{
+				oarchive oa(stream);
+				oa << *this;
+
+				return true;
+			}
 		};
 
 		struct tcp_response_header : tcp_header
@@ -45,6 +62,23 @@ namespace aquarius
 			{
 				ar& elastic::serialize::base_object<tcp_header>(*this);
 				ar& result_;
+			}
+
+		public:
+			bool parse_bytes(flex_buffer_t& stream)
+			{
+				iarchive ia(stream);
+				ia >> *this;
+
+				return true;
+			}
+
+			bool to_bytes(flex_buffer_t& stream)
+			{
+				oarchive oa(stream);
+				oa << *this;
+
+				return true;
 			}
 		};
 	} // namespace impl

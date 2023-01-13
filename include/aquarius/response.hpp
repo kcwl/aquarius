@@ -13,5 +13,5 @@ namespace aquarius
 	};
 
 	template <typename _Header, uint32_t Number>
-	using null_body_response = response<_Header, impl::empty_body, Number>;
+	using null_body_response = response<_Header, void, Number>;
 } // namespace aquarius

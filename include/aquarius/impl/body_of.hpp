@@ -28,24 +28,30 @@ namespace aquarius
 		public:
 			bool parse_bytes(flex_buffer_t& stream)
 			{
-				if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
+				if constexpr (!std::same_as<value_type, void>)
 				{
-					return false;
+					if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
+					{
+						return false;
+					}
+
+					stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
 				}
-
-				stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
-
+				
 				return true;
 			}
 
 			bool to_bytes(flex_buffer_t& stream)
 			{
-				auto buf = body_ptr_->SerializeAsString();
+				if constexpr (!std::same_as<value_type, void>)
+				{
+					auto buf = body_ptr_->SerializeAsString();
 
-				elastic::binary_oarchive oa(stream);
+					elastic::binary_oarchive oa(stream);
 
-				oa.append(buf.data());
-
+					oa.append(buf.data());
+				}
+				
 				return true;
 			}
 

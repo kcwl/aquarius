@@ -42,18 +42,12 @@ namespace aquarius
 
 			bool parse_bytes(flex_buffer_t& stream)
 			{
-				iarchive ia(stream);
-				ia >> *header_ptr_;
-
-				return true;
+				return header_ptr_->parse_bytes(stream);
 			}
 
 			bool to_bytes(flex_buffer_t& stream)
 			{
-				oarchive oa(stream);
-				oa << *header_ptr_;
-
-				return true;
+				return header_ptr_->to_bytes(stream);
 			}
 
 		private:
