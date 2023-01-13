@@ -25,7 +25,7 @@ namespace aquarius
 		};
 
 		template <typename _Socket, typename _ConnectType = void>
-		class connect : private core::noncopyable,
+		class connect : private detail::noncopyable,
 						public connector,
 						public std::enable_shared_from_this<connect<_Socket, _ConnectType>>
 		{
