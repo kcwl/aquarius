@@ -10,7 +10,7 @@ namespace aquarius
 		class context : public impl::visitor<impl::xmessage, int>
 		{
 		public:
-			context(const std::string& name, int timeout)
+			context(const std::string& name, std::chrono::steady_clock::duration timeout)
 				: name_(name)
 				, timeout_(timeout)
 			{}
@@ -48,7 +48,7 @@ namespace aquarius
 
 			std::string name_;
 
-			int timeout_;
+			std::chrono::steady_clock::duration timeout_;
 		};
 
 		template <typename _Request, typename _Response>
@@ -56,7 +56,7 @@ namespace aquarius
 		{
 		public:
 			context_impl(const std::string& name)
-				: context(name, 0)
+				: context(name, 0s)
 				, request_ptr_(nullptr)
 			{}
 
@@ -93,7 +93,7 @@ namespace aquarius
 			virtual void on_error([[maybe_unused]] int result) override
 			{}
 
-			bool send_response(int result, int timeout = 1000)
+			bool send_response(int result, std::chrono::steady_clock::duration timeout = 10s)
 			{
 				response_.header().clone(request_ptr_->header());
 

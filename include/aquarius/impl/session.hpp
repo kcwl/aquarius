@@ -16,7 +16,7 @@ namespace aquarius
 
 		public:
 			template <typename _Message>
-			bool write(_Message&& resp, int timeout)
+			bool write(_Message&& resp, std::chrono::steady_clock::duration timeout)
 			{
 				flex_buffer_t fs;
 

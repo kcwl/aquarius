@@ -8,6 +8,8 @@
 #include <queue>
 #include <vector>
 
+using namespace std::chrono_literals;
+
 namespace aquarius
 {
 	namespace impl
@@ -17,7 +19,7 @@ namespace aquarius
 		class connector
 		{
 		public:
-			virtual void write(flex_buffer_t&&, int) = 0;
+			virtual void write(flex_buffer_t&&, std::chrono::steady_clock::duration) = 0;
 
 			virtual void close() = 0;
 
@@ -40,6 +42,7 @@ namespace aquarius
 				, heart_deadline_(heart_time)
 				, last_operator_(true)
 				, session_ptr_(nullptr)
+				, conn_timer_(io_service)
 			{}
 
 			virtual ~connect()
@@ -68,11 +71,11 @@ namespace aquarius
 				socket().set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 			}
 
-			void write(flex_buffer_t&& resp_buf, [[maybe_unused]] int timeout)
+			void write(flex_buffer_t&& resp_buf, std::chrono::steady_clock::duration timeout)
 			{
 				write_queue_.push(std::move(resp_buf));
 
-				async_process_queue();
+				async_process_queue(timeout);
 			}
 
 			void async_read()
@@ -161,16 +164,29 @@ namespace aquarius
 			{}
 
 		protected:
-			void async_process_queue()
+			void async_process_queue(std::chrono::steady_clock::duration dura)
 			{
 				if (write_queue_.empty())
 					return;
 
+				if (dura > 0s)
+				{
+					conn_timer_.expires_from_now(dura);
+					conn_timer_.async_wait(
+						[this, self = this->shared_from_this()](const boost::system::error_code& ec)
+						{
+							if (ec)
+								return;
+
+							shut_down();
+						});
+				}
+
 				auto& buffer = write_queue_.front();
 
 				socket().async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
-										  [this, self = this->shared_from_this(),
-										   &buffer](const boost::system::error_code& ec, std::size_t bytes_transferred)
+										  [this, self = this->shared_from_this(), &buffer,
+										   dura](const boost::system::error_code& ec, std::size_t bytes_transferred)
 										  {
 											  if (ec)
 											  {
@@ -179,9 +195,11 @@ namespace aquarius
 												  return;
 											  }
 
+											  conn_timer_.cancel();
+
 											  write_queue_.pop();
 
-											  async_process_queue();
+											  async_process_queue(dura);
 
 											  std::cout << "complete " << bytes_transferred << "字节" << std::endl;
 										  });
@@ -239,6 +257,8 @@ namespace aquarius
 			bool last_operator_;
 
 			std::shared_ptr<session> session_ptr_;
+
+			detail::steady_timer conn_timer_;
 		};
 	} // namespace impl
 } // namespace aquarius
