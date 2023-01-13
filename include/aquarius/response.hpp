@@ -4,14 +4,14 @@
 
 namespace aquarius
 {
-	template <typename _Header, typename _Body, uint32_t Number>
-	class response : public impl::message<_Header, _Body, Number>
+	template <typename _Body, uint32_t Number>
+	class response : public impl::message<impl::tcp_response_header, _Body, Number>
 	{
 	public:
 		response() = default;
 		~response() = default;
 	};
 
-	template <typename _Header, uint32_t Number>
-	using null_body_response = response<_Header, void, Number>;
+	template <uint32_t Number>
+	using null_body_response = response<void, Number>;
 } // namespace aquarius
