@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/context.hpp>
 #include <aquarius/detail/router.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
 

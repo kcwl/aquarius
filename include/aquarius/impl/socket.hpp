@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/impl/defines.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
@@ -6,9 +7,6 @@ namespace aquarius
 {
 	namespace impl
 	{
-		struct ssl_socket
-		{};
-
 		template <typename _SocketType, typename _SocketBase = boost::asio::ip::tcp::socket>
 		class multi_socket
 		{
@@ -32,6 +30,23 @@ namespace aquarius
 				else
 				{
 					return socket_;
+				}
+			}
+
+			template <typename _Func>
+			void async_handshake(_Func&& f)
+			{
+				if constexpr (std::same_as<_SocketType, ssl_socket>)
+				{
+					ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
+												[this](const boost::system::error_code& ec)
+												{
+													std::forward<_Func>(f)(ec);
+												});
+				}
+				else
+				{
+					f({});
 				}
 			}
 
@@ -61,6 +76,6 @@ namespace aquarius
 
 	} // namespace impl
 
-	using nossl_socket = impl::multi_socket<void>;
-	using ssl_socket = impl::multi_socket<impl::ssl_socket>;
+	using nossl_socket_t = impl::multi_socket<void>;
+	using ssl_socket_t = impl::multi_socket<impl::ssl_socket>;
 } // namespace aquarius

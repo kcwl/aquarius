@@ -12,5 +12,8 @@ namespace aquarius
 			input,
 			output
 		};
+
+		struct ssl_socket
+		{};
 	} // namespace impl
 } // namespace aquarius

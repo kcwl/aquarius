@@ -3,10 +3,8 @@
 #include <aquarius/detail/noncopyable.hpp>
 #include <aquarius/impl/defines.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
-#include <aquarius/impl/socket.hpp>
 #include <memory>
 #include <queue>
-#include <vector>
 
 using namespace std::chrono_literals;
 
@@ -127,27 +125,19 @@ namespace aquarius
 
 			void start()
 			{
-				if constexpr (std::same_as<_Socket, ssl_socket>)
-				{
-					socket().async_handshake(boost::asio::ssl::stream_base::server,
-											 [this](const boost::system::error_code& ec)
-											 {
-												 if (ec)
-												 {
-													 return shut_down();
-												 }
+				socket_.async_handshake(
+					[this, self = this->shared_from_this()](const boost::system::error_code& ec)
+					{
+						if (ec)
+						{
+							return shut_down();
+						}
 
-												 on_start();
+						on_start();
 
-												 async_read();
-											 });
-				}
-				else
-				{
-					on_start();
+						async_read();
+					});
 
-					async_read();
-				}
 			}
 
 			virtual void close() override
