@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace impl
 	{
-		template <typename _Alloc>
+		template <typename _Alloc, typename _Traits>
 		class basic_fields : private detail::empty_value<_Alloc>
 		{
 		public:
@@ -26,14 +26,14 @@ namespace aquarius
 		protected:
 			void alloc(value_type*& ptr)
 			{
-				auto p = this->get().allocate(sizeof(value_type));
+				auto mem = _Traits::allocate(this->get(), 1);
 
-				ptr = ::new (p) value_type();
+				ptr = ::new (mem) value_type{};
 			}
 
 			void dealloc(value_type*& ptr)
 			{
-				this->get().deallocate(ptr, sizeof(value_type));
+				_Traits::deallocate(this->get(), ptr, 1);
 
 				ptr = nullptr;
 			}
@@ -41,5 +41,5 @@ namespace aquarius
 	} // namespace impl
 
 	template <typename _Ty>
-	using fields = impl::basic_fields<std::allocator<_Ty>>;
+	using fields = impl::basic_fields<std::allocator<_Ty>, std::allocator_traits<std::allocator<_Ty>>>;
 } // namespace aquarius
