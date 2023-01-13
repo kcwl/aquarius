@@ -40,7 +40,7 @@ namespace aquarius
 				return header_ptr_;
 			}
 
-			virtual bool parse_bytes(flex_buffer_t& stream)
+			bool parse_bytes(flex_buffer_t& stream)
 			{
 				elastic::binary_iarchive ia(stream);
 				ia >> *header_ptr_;
@@ -48,7 +48,7 @@ namespace aquarius
 				return true;
 			}
 
-			virtual bool to_bytes(flex_buffer_t& stream)
+			bool to_bytes(flex_buffer_t& stream)
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << *header_ptr_;
