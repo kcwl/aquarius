@@ -216,6 +216,8 @@ namespace aquarius
 
 				heart_timer_.cancel();
 
+				conn_timer_.cancel();
+
 				socket().close();
 			}
 
