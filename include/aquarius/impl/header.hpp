@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <elastic.hpp>
+#include <aquarius/impl/flex_buffer.hpp>
 
 namespace aquarius
 {

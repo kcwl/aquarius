@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/impl/field.hpp>
-#include <io.h>
+#include <aquarius/impl/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -42,7 +42,7 @@ namespace aquarius
 
 			bool parse_bytes(flex_buffer_t& stream)
 			{
-				elastic::binary_iarchive ia(stream);
+				iarchive ia(stream);
 				ia >> *header_ptr_;
 
 				return true;
@@ -50,7 +50,7 @@ namespace aquarius
 
 			bool to_bytes(flex_buffer_t& stream)
 			{
-				elastic::binary_oarchive oa(stream);
+				oarchive oa(stream);
 				oa << *header_ptr_;
 
 				return true;
