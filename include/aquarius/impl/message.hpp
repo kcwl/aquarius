@@ -23,7 +23,7 @@ namespace aquarius
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
-		class message : public xmessage, private header_of<_Header>, public visitor<flex_buffer_t, int>
+		class message : public xmessage, public fields<_Header>, public visitor<flex_buffer_t, int>
 		{
 		public:
 			using header_type = _Header;
@@ -36,14 +36,25 @@ namespace aquarius
 			DEFINE_VISITOR()
 
 		public:
-			header_type& header() noexcept
+			message()
 			{
-				return *this->get();
+				this->alloc(header_ptr_);
 			}
 
-			const header_type* header() const noexcept
+			virtual ~message()
 			{
-				return this->get();
+				this->dealloc(header_ptr_);
+			}
+
+		public:
+			header_type& header() noexcept
+			{
+				return *header_ptr_;
+			}
+
+			const header_type& header() const noexcept
+			{
+				return *header_ptr_;
 			}
 
 			body_type& body() noexcept
@@ -74,7 +85,7 @@ namespace aquarius
 		private:
 			bool parse_message(flex_buffer_t& stream)
 			{
-				if (!this->parse_bytes(stream))
+				if (!header_ptr_->parse_bytes(stream))
 				{
 					return false;
 				}
@@ -92,7 +103,7 @@ namespace aquarius
 				elastic::binary_oarchive oa(stream);
 				oa << Number;
 
-				if (!this->to_bytes(stream))
+				if (!header_ptr_->to_bytes(stream))
 				{
 					return false;
 				}
@@ -106,6 +117,8 @@ namespace aquarius
 			}
 
 		private:
+			header_type* header_ptr_;
+
 			body_of<body_type> body_;
 		};
 	} // namespace impl
