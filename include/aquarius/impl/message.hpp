@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/impl/body_of.hpp>
-#include <aquarius/impl/context.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
 #include <aquarius/impl/visitor.hpp>
 #include <cstddef>
@@ -9,10 +8,15 @@ namespace aquarius
 {
 	namespace impl
 	{
-		class xmessage : public visitable<int>
+		class xmessage : public visitable<int>, public visitor<flex_buffer_t, int>
 		{
 		public:
 			DEFINE_VISITOR()
+
+			virtual int visit([[maybe_unused]]flex_buffer_t* stream, [[maybe_unused]]visit_mode mode) override
+			{
+				return 0;
+			}
 
 		public:
 			virtual uint32_t unique_key()
@@ -22,13 +26,11 @@ namespace aquarius
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
-		class message : public xmessage, public fields<_Header>, public visitor<flex_buffer_t, int>
+		class message : public xmessage, public fields<_Header>
 		{
 		public:
 			using header_type = _Header;
 			using body_type = _Body;
-
-			using base_type = header_of<_Header>;
 
 			constexpr static uint32_t Number = N;
 

@@ -24,11 +24,20 @@ namespace aquarius
 			context& operator=(const context&) = delete;
 
 		public:
-			virtual int on_connected() = 0;
+			virtual int on_connected()
+			{
+				return 0;
+			}
 
-			virtual int on_closed() = 0;
+			virtual int on_closed()
+			{
+				return 0;
+			}
 
-			virtual int on_timeout() = 0;
+			virtual int on_timeout()
+			{
+				return 0;
+			}
 
 			virtual int visit([[maybe_unused]] impl::xmessage* msg, [[maybe_unused]] visit_mode mode) override
 			{
@@ -41,7 +50,7 @@ namespace aquarius
 			}
 
 		protected:
-			virtual void on_error(int result) = 0;
+			virtual void on_error([[maybe_unused]] int result){};
 
 		protected:
 			std::shared_ptr<session> session_ptr_;
