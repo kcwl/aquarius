@@ -244,7 +244,12 @@ namespace aquarius
 					session_ptr_.swap(session_ptr);
 				}
 
-				session_ptr_->read();
+				auto res = session_ptr_->read();
+
+				if (res == read_handle_result::error)
+				{
+					return shut_down();
+				}
 
 				async_read();
 			}

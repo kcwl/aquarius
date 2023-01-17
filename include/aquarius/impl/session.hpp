@@ -29,17 +29,19 @@ namespace aquarius
 				return true;
 			}
 
-			bool read()
+			read_handle_result read()
 			{
 				flex_buffer_t& read_buffer = conn_ptr_->get_read_buffer();
 
-				if (read_buffer.size() < sizeof(uint32_t))
-					return false;
-
-				uint32_t id{};
+				uint32_t id = 0;
 
 				elastic::binary_iarchive ia(read_buffer);
 				ia >> id;
+
+				if (id == 0)
+				{
+					return read_handle_result::waiting_for_query;
+				}
 
 				auto ctx = use_context(id);
 
@@ -61,16 +63,24 @@ namespace aquarius
 
 				if (!req_ptr)
 				{
-					return false;
+					return read_handle_result::error;
 				}
 
-				if (!req_ptr->visit(read_buffer, visit_mode::input))
-					return false;
+				auto res = req_ptr->visit(read_buffer, visit_mode::input);
 
-				if (!req_ptr->accept(ctx, shared_from_this()))
-					return false;
+				if (res != read_handle_result::ok)
+				{
+					return res;
+				}
 
-				return true;
+				auto result = req_ptr->accept(ctx, shared_from_this());
+
+				if (result == 0)
+				{
+					std::cout << "warning: no ctx for req\n";
+				}
+
+				return read_handle_result::ok;
 			}
 
 			std::shared_ptr<context> use_context(uint32_t id)

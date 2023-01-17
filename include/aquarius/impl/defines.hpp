@@ -15,5 +15,12 @@ namespace aquarius
 
 		struct ssl_socket
 		{};
+
+		enum class read_handle_result
+		{
+			ok = 1,
+			error = 2,
+			waiting_for_query = 3
+		};
 	} // namespace impl
 } // namespace aquarius

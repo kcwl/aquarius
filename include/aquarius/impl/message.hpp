@@ -19,9 +19,9 @@ namespace aquarius
 				return 0;
 			};
 
-			virtual int visit(flex_buffer_t&, visit_mode)
+			virtual read_handle_result visit(flex_buffer_t&, visit_mode)
 			{
-				return 0;
+				return read_handle_result::error;
 			}
 		};
 
@@ -73,7 +73,7 @@ namespace aquarius
 				return Number;
 			}
 
-			virtual int visit(flex_buffer_t& stream, visit_mode mode) override
+			virtual read_handle_result visit(flex_buffer_t& stream, visit_mode mode) override
 			{
 				if (mode == visit_mode::input)
 				{
@@ -84,37 +84,43 @@ namespace aquarius
 			}
 
 		private:
-			bool parse_message(flex_buffer_t& stream)
+			read_handle_result parse_message(flex_buffer_t& stream)
 			{
-				if (!header_ptr_->parse_bytes(stream))
+				auto res = header_ptr_->parse_bytes(stream);
+
+				if (res != read_handle_result::ok)
+					return res;
+
+				res = body_.parse_bytes(stream);
+
+				if (res != read_handle_result::ok)
 				{
-					return false;
+					return res;
 				}
 
-				if (!body_.parse_bytes(stream))
-				{
-					return false;
-				}
-
-				return true;
+				return read_handle_result::ok;
 			}
 
-			bool to_message(flex_buffer_t& stream)
+			read_handle_result to_message(flex_buffer_t& stream)
 			{
 				elastic::binary_oarchive oa(stream);
 				oa << Number;
 
-				if (!header_ptr_->to_bytes(stream))
+				auto res = header_ptr_->to_bytes(stream);
+
+				if (res != read_handle_result::ok)
 				{
-					return false;
+					return res;
 				}
 
-				if (!body_.to_bytes(stream))
+				res = body_.to_bytes(stream);
+
+				if (res != read_handle_result::ok)
 				{
-					return false;
+					return res;
 				}
 
-				return true;
+				return read_handle_result::ok;
 			}
 
 		private:

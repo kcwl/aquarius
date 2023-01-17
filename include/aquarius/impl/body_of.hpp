@@ -26,22 +26,22 @@ namespace aquarius
 			}
 
 		public:
-			bool parse_bytes(flex_buffer_t& stream)
+			read_handle_result parse_bytes(flex_buffer_t& stream)
 			{
 				if constexpr (!std::same_as<value_type, void>)
 				{
 					if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
 					{
-						return false;
+						return read_handle_result::waiting_for_query;
 					}
 
 					stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
 				}
 				
-				return true;
+				return read_handle_result::ok;
 			}
 
-			bool to_bytes(flex_buffer_t& stream)
+			read_handle_result to_bytes(flex_buffer_t& stream)
 			{
 				if constexpr (!std::same_as<value_type, void>)
 				{
@@ -52,7 +52,7 @@ namespace aquarius
 					oa.append(buf.data());
 				}
 				
-				return true;
+				return read_handle_result::ok;
 			}
 
 			value_type* get() noexcept

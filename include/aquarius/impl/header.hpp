@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/impl/flex_buffer.hpp>
 #include <cstdint>
+#include <aquarius/impl/defines.hpp>
 
 namespace aquarius
 {
@@ -33,20 +34,20 @@ namespace aquarius
 			}
 
 		public:
-			bool parse_bytes(flex_buffer_t& stream)
+			read_handle_result parse_bytes(flex_buffer_t& stream)
 			{
 				iarchive ia(stream);
 				ia >> *this;
 
-				return true;
+				return read_handle_result::ok;
 			}
 
-			bool to_bytes(flex_buffer_t& stream)
+			read_handle_result to_bytes(flex_buffer_t& stream)
 			{
 				oarchive oa(stream);
 				oa << *this;
 
-				return true;
+				return read_handle_result::ok;
 			}
 		};
 
@@ -65,20 +66,20 @@ namespace aquarius
 			}
 
 		public:
-			bool parse_bytes(flex_buffer_t& stream)
+			read_handle_result parse_bytes(flex_buffer_t& stream)
 			{
 				iarchive ia(stream);
 				ia >> *this;
 
-				return true;
+				return read_handle_result::ok;
 			}
 
-			bool to_bytes(flex_buffer_t& stream)
+			read_handle_result to_bytes(flex_buffer_t& stream)
 			{
 				oarchive oa(stream);
 				oa << *this;
 
-				return true;
+				return read_handle_result::ok;
 			}
 		};
 	} // namespace impl
