@@ -1,10 +1,14 @@
 #pragma once
+#include <aquarius/impl/defines.hpp>
 #include <aquarius/impl/field.hpp>
 
 namespace aquarius
 {
 	namespace impl
 	{
+		struct null_body
+		{};
+
 		template <typename _Ty>
 		class body_of : public fields<_Ty>
 		{
@@ -22,7 +26,7 @@ namespace aquarius
 		public:
 			read_handle_result parse_bytes(flex_buffer_t& stream)
 			{
-				if constexpr (!std::same_as<value_type, void>)
+				if constexpr (!std::same_as<value_type, null_body>)
 				{
 					if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
 					{
@@ -37,7 +41,7 @@ namespace aquarius
 
 			read_handle_result to_bytes(flex_buffer_t& stream)
 			{
-				if constexpr (!std::same_as<value_type, void>)
+				if constexpr (!std::same_as<value_type, null_body>)
 				{
 					auto buf = body_ptr_->SerializeAsString();
 

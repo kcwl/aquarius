@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <aquarius/detail/type_traits.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
-#include <aquarius/impl/header.hpp>
+#include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <type_traits>
 
@@ -94,14 +94,14 @@ namespace aquarius
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
-										if (!system_call())
+										if (!system_call(bytes_transferred))
 											read_handler();
 
 										do_read();
 									});
 		}
 
-		bool system_call()
+		bool system_call(std::size_t bytes_transferred)
 		{
 			elastic::binary_iarchive ia(buffer_);
 
@@ -114,16 +114,17 @@ namespace aquarius
 				return false;
 			}
 
-			buffer_.consume(sizeof(aquarius::impl::tcp_request_header) + 1);
+			buffer_.consume(static_cast<int>(bytes_transferred));
 
-			// core::ping_response pr{};
+			null_body_response<1001> resp{};
 
 			impl::flex_buffer_t fs;
 
-			// pr.to_message(fs);
+			resp.visit(fs, aquarius::impl::visit_mode::output);
 
 			async_write(std::move(fs));
 
+			std::cout << "pong\n";
 			return true;
 		}
 

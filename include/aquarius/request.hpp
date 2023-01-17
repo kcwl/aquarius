@@ -15,5 +15,5 @@ namespace aquarius
 	};
 
 	template <uint32_t Number>
-	using null_body_request = request<void, Number>;
+	using null_body_request = request<impl::null_body, Number>;
 } // namespace aquarius

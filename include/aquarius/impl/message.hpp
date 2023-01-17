@@ -24,7 +24,7 @@ namespace aquarius
 		{
 		public:
 			using header_type = _Header;
-			using body_type = _Body;
+			using body_type = std::conditional_t<std::same_as<_Body, void>, void*, _Body>;
 
 			constexpr static uint32_t Number = N;
 

@@ -110,6 +110,13 @@ namespace aquarius
 
 			void start()
 			{
+				if (!session_ptr_)
+				{
+					auto session_ptr = std::make_shared<session>(this->shared_from_this());
+
+					session_ptr_.swap(session_ptr);
+				}
+
 				if constexpr (std::same_as<_SocketType, ssl_socket>)
 				{
 					ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
@@ -193,9 +200,8 @@ namespace aquarius
 
 				if (heart_timer_.expires_at() <= detail::deadline_timer::traits_type::now())
 				{
-					// core::ping_request resp{};
-
-					// queue_packet(std::move(resp));
+					if (session_ptr_)
+						session_ptr_->heart_deadline();
 				}
 
 				last_operator_ ? last_operator_ = false : 0;
@@ -214,13 +220,6 @@ namespace aquarius
 				read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 				!last_operator_ ? last_operator_ = true : 0;
-
-				if (!session_ptr_)
-				{
-					auto session_ptr = std::make_shared<session>(this->shared_from_this());
-
-					session_ptr_.swap(session_ptr);
-				}
 
 				auto res = session_ptr_->read();
 

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <aquarius/impl/field.hpp>
+#include <aquarius/impl/header.hpp>
 #include <aquarius/impl/message.hpp>
 
 namespace aquarius
@@ -15,5 +16,5 @@ namespace aquarius
 	};
 
 	template <uint32_t Number>
-	using null_body_response = response<void, Number>;
+	using null_body_response = response<impl::null_body, Number>;
 } // namespace aquarius
