@@ -32,8 +32,8 @@ namespace aquarius
 			virtual _Return accept(std::shared_ptr<context> ctx) = 0;
 		};
 
-		template <typename _Request>
-		static int accept_impl(_Request* req, std::shared_ptr<context> ctx)
+		template <typename _Return, typename _Request>
+		static _Return accept_impl(_Request* req, std::shared_ptr<context> ctx)
 		{
 			using visitor_t = impl::visitor<_Request, int>;
 			using visitor_msg_t = impl::visitor<xmessage, int>;
@@ -47,13 +47,19 @@ namespace aquarius
 				return visitor_ptr->visit(req);
 			}
 
-			return 0;
+			return _Return{};
 		}
 
-#define DEFINE_VISITOR()                                                                                               \
-	virtual int accept(std::shared_ptr<aquarius::impl::context> ctx)                                                   \
+#define DEFINE_VISITABLE(_Return)                                                                                             \
+	virtual _Return accept(std::shared_ptr<aquarius::impl::context> ctx)                                                   \
 	{                                                                                                                  \
-		return accept_impl(this, ctx);                                                                                 \
+		return accept_impl<_Return>(this, ctx);                                                                                 \
+	}
+
+#define DEFINE_VISITOR(_Type, _Return)                                                                                          \
+	virtual _Return visit(_Type*, visit_mode) override                                                                     \
+	{                                                                                                                  \
+		return 0;                                                                                                      \
 	}
 	} // namespace impl
 } // namespace aquarius

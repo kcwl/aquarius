@@ -10,6 +10,8 @@ namespace aquarius
 	public:
 		response() = default;
 		~response() = default;
+
+		DEFINE_VISITABLE(int)
 	};
 
 	template <uint32_t Number>

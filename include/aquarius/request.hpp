@@ -11,7 +11,7 @@ namespace aquarius
 		request() = default;
 		~request() = default;
 
-		DEFINE_VISITOR()
+		DEFINE_VISITABLE(int)
 	};
 
 	template <uint32_t Number>

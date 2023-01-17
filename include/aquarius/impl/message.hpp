@@ -11,12 +11,9 @@ namespace aquarius
 		class xmessage : public visitable<int>, public visitor<flex_buffer_t, int>
 		{
 		public:
-			DEFINE_VISITOR()
+			DEFINE_VISITABLE(int)
 
-			virtual int visit([[maybe_unused]]flex_buffer_t* stream, [[maybe_unused]]visit_mode mode) override
-			{
-				return 0;
-			}
+			DEFINE_VISITOR(flex_buffer_t, int)
 
 		public:
 			virtual uint32_t unique_key()
@@ -34,7 +31,7 @@ namespace aquarius
 
 			constexpr static uint32_t Number = N;
 
-			DEFINE_VISITOR()
+			DEFINE_VISITABLE(int)
 
 		public:
 			message()
