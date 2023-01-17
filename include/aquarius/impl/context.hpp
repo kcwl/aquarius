@@ -23,23 +23,20 @@ namespace aquarius
 
 			context& operator=(const context&) = delete;
 
+			DEFINE_VISITOR(xmessage, int)
+
 		public:
-			virtual int on_connected()
+			virtual int on_connected([[maybe_unused]] std::shared_ptr<session> session_ptr)
 			{
 				return 0;
 			}
 
-			virtual int on_closed()
+			virtual int on_closed([[maybe_unused]] std::shared_ptr<session> session_ptr)
 			{
 				return 0;
 			}
 
-			virtual int on_timeout()
-			{
-				return 0;
-			}
-
-			virtual int visit([[maybe_unused]] impl::xmessage* msg, [[maybe_unused]] visit_mode mode) override
+			virtual int on_timeout([[maybe_unused]] std::shared_ptr<session> session_ptr)
 			{
 				return 0;
 			}
@@ -70,28 +67,31 @@ namespace aquarius
 			{}
 
 		public:
-			virtual int on_connected() override
+			virtual int on_connected(std::shared_ptr<session> session_ptr) override
 			{
-				session_ptr_->close();
+				session_ptr->close();
 
 				return 0;
 			}
 
-			virtual int on_closed() override
+			virtual int on_closed(std::shared_ptr<session> session_ptr) override
 			{
-				session_ptr_->close();
+				session_ptr->close();
 
 				return 0;
 			}
 
-			virtual int on_timeout() override
+			virtual int on_timeout(std::shared_ptr<session> session_ptr) override
 			{
+				session_ptr->close();
 				return 0;
 			}
 
-			virtual int visit(_Request* req, [[maybe_unused]] visit_mode mode)
+			virtual int visit(_Request* req, std::shared_ptr<session> session_ptr, [[maybe_unused]] visit_mode mode)
 			{
 				request_ptr_ = req;
+
+				session_ptr_ = session_ptr;
 
 				return handle();
 			}

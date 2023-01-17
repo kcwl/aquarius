@@ -18,7 +18,8 @@ namespace aquarius
 			virtual ~visitor() = default;
 
 		public:
-			virtual _Return visit(_Request* visited, visit_mode mode = visit_mode::input) = 0;
+			virtual _Return visit(_Request* visited, std::shared_ptr<session> session_ptr,
+								  visit_mode mode = visit_mode::input) = 0;
 		};
 
 		template <typename _Return>
@@ -29,35 +30,36 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual _Return accept(std::shared_ptr<context> ctx) = 0;
+			virtual _Return accept(std::shared_ptr<context> ctx, std::shared_ptr<session> session_ptr) = 0;
 		};
 
 		template <typename _Return, typename _Request>
-		static _Return accept_impl(_Request* req, std::shared_ptr<context> ctx)
+		static _Return accept_impl(_Request* req, std::shared_ptr<context> ctx, std::shared_ptr<session> session_ptr)
 		{
 			using visitor_t = impl::visitor<_Request, int>;
 			using visitor_msg_t = impl::visitor<xmessage, int>;
 
 			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
 			{
-				return visit_ptr->visit(req);
+				return visit_ptr->visit(req, session_ptr);
 			}
 			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
 			{
-				return visitor_ptr->visit(req);
+				return visitor_ptr->visit(req, session_ptr);
 			}
 
 			return _Return{};
 		}
 
-#define DEFINE_VISITABLE(_Return)                                                                                             \
-	virtual _Return accept(std::shared_ptr<aquarius::impl::context> ctx)                                                   \
+#define DEFINE_VISITABLE(_Return)                                                                                      \
+	virtual _Return accept(std::shared_ptr<aquarius::impl::context> ctx,                                               \
+						   std::shared_ptr<aquarius::impl::session> session_ptr)         \
 	{                                                                                                                  \
-		return accept_impl<_Return>(this, ctx);                                                                                 \
+		return accept_impl<_Return>(this, ctx, session_ptr);                                                                        \
 	}
 
-#define DEFINE_VISITOR(_Type, _Return)                                                                                          \
-	virtual _Return visit(_Type*, visit_mode) override                                                                     \
+#define DEFINE_VISITOR(_Type, _Return)                                                                                 \
+	virtual _Return visit(_Type*, std::shared_ptr<aquarius::impl::session>, visit_mode) override                                       \
 	{                                                                                                                  \
 		return 0;                                                                                                      \
 	}

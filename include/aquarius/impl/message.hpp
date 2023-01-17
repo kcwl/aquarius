@@ -70,7 +70,7 @@ namespace aquarius
 				return Number;
 			}
 
-			virtual int visit(flex_buffer_t* stream, visit_mode mode) override
+			virtual int visit(flex_buffer_t* stream, std::shared_ptr<session> ptr, visit_mode mode) override
 			{
 				if (mode == visit_mode::input)
 				{

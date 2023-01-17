@@ -22,7 +22,7 @@ namespace aquarius
 			{
 				flex_buffer_t fs;
 
-				std::forward<_Message>(resp).visit(&fs, visit_mode::output);
+				std::forward<_Message>(resp).visit(&fs, shared_from_this(), visit_mode::output);
 
 				conn_ptr_->write(std::move(fs), timeout);
 
@@ -64,10 +64,10 @@ namespace aquarius
 					return false;
 				}
 
-				if (!req_ptr->visit(&read_buffer, visit_mode::input))
+				if (!req_ptr->visit(&read_buffer, shared_from_this(), visit_mode::input))
 					return false;
 
-				if (!req_ptr->accept(ctx))
+				if (!req_ptr->accept(ctx, shared_from_this()))
 					return false;
 
 				return true;
