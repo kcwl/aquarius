@@ -53,25 +53,13 @@ namespace aquarius
 				init_context();
 			}
 
-			virtual ~connect()
-			{
-				shut_down();
-			}
+			virtual ~connect() { shut_down(); }
 
-			auto& socket()
-			{
-				return socket_;
-			}
+			auto& socket() { return socket_; }
 
-			std::string remote_address()
-			{
-				return socket_.remote_endpoint().address().to_string();
-			}
+			std::string remote_address() { return socket_.remote_endpoint().address().to_string(); }
 
-			uint16_t remote_port()
-			{
-				return socket_.remote_endpoint().port();
-			}
+			uint16_t remote_port() { return socket_.remote_endpoint().port(); }
 
 			void set_delay(bool enable)
 			{
@@ -118,10 +106,7 @@ namespace aquarius
 				async_read();
 			}
 
-			virtual flex_buffer_t& get_read_buffer() override
-			{
-				return read_buffer_;
-			}
+			virtual flex_buffer_t& get_read_buffer() override { return read_buffer_; }
 
 			void start()
 			{
@@ -194,11 +179,9 @@ namespace aquarius
 				}
 			}
 
-			virtual void on_start()
-			{}
+			virtual void on_start() {}
 
-			virtual void on_close()
-			{}
+			virtual void on_close() {}
 
 		private:
 			void heart_deadline()

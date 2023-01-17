@@ -11,19 +11,13 @@ namespace aquarius
 			using value_type = _Ty;
 
 		public:
-			body_of()
-			{
-				this->alloc(body_ptr_);
-			}
+			body_of() { this->alloc(body_ptr_); }
 
 			body_of(const body_of&) = default;
 
 			body_of(body_of&&) = default;
 
-			~body_of()
-			{
-				this->dealloc(body_ptr_);
-			}
+			~body_of() { this->dealloc(body_ptr_); }
 
 		public:
 			read_handle_result parse_bytes(flex_buffer_t& stream)
@@ -37,7 +31,7 @@ namespace aquarius
 
 					stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
 				}
-				
+
 				return read_handle_result::ok;
 			}
 
@@ -51,19 +45,13 @@ namespace aquarius
 
 					oa.append(buf.data());
 				}
-				
+
 				return read_handle_result::ok;
 			}
 
-			value_type* get() noexcept
-			{
-				return body_ptr_;
-			}
+			value_type* get() noexcept { return body_ptr_; }
 
-			const value_type* get() const noexcept
-			{
-				return body_ptr_;
-			}
+			const value_type* get() const noexcept { return body_ptr_; }
 
 		private:
 			value_type* body_ptr_;

@@ -14,15 +14,9 @@ namespace aquarius
 			DEFINE_VISITABLE(int)
 
 		public:
-			virtual uint32_t unique_key()
-			{
-				return 0;
-			};
+			virtual uint32_t unique_key() { return 0; };
 
-			virtual read_handle_result visit(flex_buffer_t&, visit_mode)
-			{
-				return read_handle_result::error;
-			}
+			virtual read_handle_result visit(flex_buffer_t&, visit_mode) { return read_handle_result::error; }
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
@@ -37,41 +31,20 @@ namespace aquarius
 			DEFINE_VISITABLE(int)
 
 		public:
-			message()
-			{
-				this->alloc(header_ptr_);
-			}
+			message() { this->alloc(header_ptr_); }
 
-			virtual ~message()
-			{
-				this->dealloc(header_ptr_);
-			}
+			virtual ~message() { this->dealloc(header_ptr_); }
 
 		public:
-			header_type& header() noexcept
-			{
-				return *header_ptr_;
-			}
+			header_type& header() noexcept { return *header_ptr_; }
 
-			const header_type& header() const noexcept
-			{
-				return *header_ptr_;
-			}
+			const header_type& header() const noexcept { return *header_ptr_; }
 
-			body_type& body() noexcept
-			{
-				return *body_.get();
-			}
+			body_type& body() noexcept { return *body_.get(); }
 
-			const body_type& body() const noexcept
-			{
-				return *body_.get();
-			}
+			const body_type& body() const noexcept { return *body_.get(); }
 
-			virtual uint32_t unique_key() override
-			{
-				return Number;
-			}
+			virtual uint32_t unique_key() override { return Number; }
 
 			virtual read_handle_result visit(flex_buffer_t& stream, visit_mode mode) override
 			{

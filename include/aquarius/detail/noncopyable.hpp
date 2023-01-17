@@ -6,5 +6,5 @@ namespace aquarius
 	namespace detail
 	{
 		using noncopyable = boost::noncopyable;
-	} // namespace core
+	} // namespace detail
 } // namespace aquarius

@@ -10,5 +10,5 @@ namespace aquarius
 		using oarchive = elastic::binary_oarchive;
 
 		using iarchive = elastic::binary_iarchive;
-	}
+	} // namespace impl
 } // namespace aquarius

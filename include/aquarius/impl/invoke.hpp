@@ -50,5 +50,5 @@ namespace aquarius
 				return msg_router::instance().invoke(_key, args...);
 			}
 		};
-	}
-}
+	} // namespace impl
+} // namespace aquarius

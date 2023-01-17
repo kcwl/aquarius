@@ -69,10 +69,7 @@ namespace aquarius
 
 		virtual int read_handler() = 0;
 
-		void close()
-		{
-			socket_.close();
-		}
+		void close() { socket_.close(); }
 
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)

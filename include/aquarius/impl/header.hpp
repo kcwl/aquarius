@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/impl/defines.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
 #include <cstdint>
-#include <aquarius/impl/defines.hpp>
 
 namespace aquarius
 {

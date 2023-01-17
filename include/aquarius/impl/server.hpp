@@ -30,10 +30,7 @@ namespace aquarius
 			virtual ~server() = default;
 
 		public:
-			void run()
-			{
-				io_service_pool_.run();
-			}
+			void run() { io_service_pool_.run(); }
 
 		private:
 			void start_accept()
@@ -52,10 +49,7 @@ namespace aquarius
 									   });
 			}
 
-			void handle_stop()
-			{
-				io_service_pool_.stop();
-			}
+			void handle_stop() { io_service_pool_.stop(); }
 
 		private:
 			io_service_pool io_service_pool_;

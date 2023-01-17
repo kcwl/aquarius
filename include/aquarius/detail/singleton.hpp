@@ -13,10 +13,7 @@ namespace aquarius
 		class singleton
 		{
 		public:
-			static _Ty& instance()
-			{
-				return get_instance();
-			}
+			static _Ty& instance() { return get_instance(); }
 
 		private:
 			static _Ty& get_instance()
@@ -27,8 +24,7 @@ namespace aquarius
 			}
 
 		protected:
-			singleton()
-			{}
+			singleton() {}
 
 		private:
 			static _Ty* instance_;

@@ -57,8 +57,8 @@ namespace aquarius
 		return accept_impl<_Return>(this, ctx, session_ptr);                                                           \
 	}
 
-#define DEFINE_VISITOR(_Request, _Return)                                                                                        \
-	virtual _Return visit(_Request*, std::shared_ptr<aquarius::impl::session>)                         \
+#define DEFINE_VISITOR(_Request, _Return)                                                                              \
+	virtual _Return visit(_Request*, std::shared_ptr<aquarius::impl::session>)                                         \
 	{                                                                                                                  \
 		return _Return{};                                                                                              \
 	}

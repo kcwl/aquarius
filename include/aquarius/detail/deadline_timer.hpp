@@ -10,5 +10,5 @@ namespace aquarius
 																 time_traits<std::chrono::system_clock::time_point>>;
 
 		using steady_timer = boost::asio::steady_timer;
-	}
+	} // namespace detail
 } // namespace aquarius
