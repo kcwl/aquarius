@@ -102,13 +102,13 @@ namespace aquarius
 			virtual void on_error([[maybe_unused]] int result) override
 			{}
 
-			bool send_response(int result, std::chrono::steady_clock::duration timeout = 10s)
+			bool send_response(int result)
 			{
 				response_.header().clone(request_ptr_->header());
 
 				response_.header().result_ = result;
 
-				if (!session_ptr_->write(std::move(response_), timeout))
+				if (!session_ptr_->write(std::move(response_), timeout_))
 					return false;
 
 				return true;
