@@ -8,18 +8,21 @@ namespace aquarius
 {
 	namespace impl
 	{
-		class xmessage : public visitable<int>, public visitor<flex_buffer_t, int>
+		class xmessage : public visitable<int>
 		{
 		public:
 			DEFINE_VISITABLE(int)
-
-			DEFINE_VISITOR(flex_buffer_t, int)
 
 		public:
 			virtual uint32_t unique_key()
 			{
 				return 0;
 			};
+
+			virtual int visit(flex_buffer_t&, visit_mode)
+			{
+				return 0;
+			}
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
@@ -70,14 +73,14 @@ namespace aquarius
 				return Number;
 			}
 
-			virtual int visit(flex_buffer_t* stream, std::shared_ptr<session> ptr, visit_mode mode) override
+			virtual int visit(flex_buffer_t& stream, visit_mode mode) override
 			{
 				if (mode == visit_mode::input)
 				{
-					return parse_message(*stream);
+					return parse_message(stream);
 				}
 
-				return to_message(*stream);
+				return to_message(stream);
 			}
 
 		private:

@@ -41,11 +41,6 @@ namespace aquarius
 				return 0;
 			}
 
-			void attach(std::shared_ptr<session> trans_ptr)
-			{
-				session_ptr_ = trans_ptr;
-			}
-
 		protected:
 			virtual void on_error([[maybe_unused]] int result){};
 
@@ -87,7 +82,7 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int visit(_Request* req, std::shared_ptr<session> session_ptr, [[maybe_unused]] visit_mode mode)
+			virtual int visit(_Request* req, std::shared_ptr<session> session_ptr)
 			{
 				request_ptr_ = req;
 

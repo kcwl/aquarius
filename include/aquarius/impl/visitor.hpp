@@ -18,8 +18,7 @@ namespace aquarius
 			virtual ~visitor() = default;
 
 		public:
-			virtual _Return visit(_Request* visited, std::shared_ptr<session> session_ptr,
-								  visit_mode mode = visit_mode::input) = 0;
+			virtual _Return visit(_Request* visited, std::shared_ptr<session> session_ptr) = 0;
 		};
 
 		template <typename _Return>
@@ -53,15 +52,16 @@ namespace aquarius
 
 #define DEFINE_VISITABLE(_Return)                                                                                      \
 	virtual _Return accept(std::shared_ptr<aquarius::impl::context> ctx,                                               \
-						   std::shared_ptr<aquarius::impl::session> session_ptr)         \
+						   std::shared_ptr<aquarius::impl::session> session_ptr)                                       \
 	{                                                                                                                  \
-		return accept_impl<_Return>(this, ctx, session_ptr);                                                                        \
+		return accept_impl<_Return>(this, ctx, session_ptr);                                                           \
 	}
 
-#define DEFINE_VISITOR(_Type, _Return)                                                                                 \
-	virtual _Return visit(_Type*, std::shared_ptr<aquarius::impl::session>, visit_mode) override                                       \
+#define DEFINE_VISITOR(_Request, _Return)                                                                                        \
+	virtual _Return visit(_Request*, std::shared_ptr<aquarius::impl::session>)                         \
 	{                                                                                                                  \
-		return 0;                                                                                                      \
+		return _Return{};                                                                                              \
 	}
+
 	} // namespace impl
 } // namespace aquarius
