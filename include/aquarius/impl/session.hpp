@@ -104,7 +104,7 @@ namespace aquarius
 
 			void close()
 			{
-				return conn_ptr_->close();
+				return conn_ptr_->shut_down();
 			}
 
 		private:

@@ -13,20 +13,26 @@ namespace aquarius
 			context(const std::string& name, std::chrono::steady_clock::duration timeout)
 				: name_(name)
 				, timeout_(timeout)
-			{}
+			{
+				on_connected();
+			}
 
 			context(const context&) = delete;
 
 			context(context&&) = default;
 
-			virtual ~context() = default;
+			virtual ~context()
+			{
+				if (session_ptr_)
+					on_closed(session_ptr_);
+			}
 
 			context& operator=(const context&) = delete;
 
 			DEFINE_VISITOR(xmessage, int)
 
 		public:
-			virtual int on_connected([[maybe_unused]] std::shared_ptr<session> session_ptr)
+			virtual int on_connected()
 			{
 				return 0;
 			}
@@ -62,10 +68,8 @@ namespace aquarius
 			{}
 
 		public:
-			virtual int on_connected(std::shared_ptr<session> session_ptr) override
+			virtual int on_connected() override
 			{
-				session_ptr->close();
-
 				return 0;
 			}
 

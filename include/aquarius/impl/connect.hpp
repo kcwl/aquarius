@@ -27,7 +27,7 @@ namespace aquarius
 		public:
 			virtual void write(flex_buffer_t&&, std::chrono::steady_clock::duration) = 0;
 
-			virtual void close() = 0;
+			virtual void shut_down() = 0;
 
 			virtual flex_buffer_t& get_read_buffer() = 0;
 		};
@@ -142,18 +142,22 @@ namespace aquarius
 				}
 			}
 
-			virtual void close() override
+			virtual void shut_down()
 			{
-				shut_down();
+				if (socket().is_open())
+				{
+					boost::system::error_code ec;
+					socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+				}
+
+				heart_timer_.cancel();
+
+				conn_timer_.cancel();
+
+				socket().close();
 
 				on_close();
 			}
-
-			virtual void on_start()
-			{}
-
-			virtual void on_close()
-			{}
 
 		protected:
 			void async_process_queue(std::chrono::steady_clock::duration dura)
@@ -190,22 +194,13 @@ namespace aquarius
 				}
 			}
 
+			virtual void on_start()
+			{}
+
+			virtual void on_close()
+			{}
+
 		private:
-			void shut_down()
-			{
-				if (socket().is_open())
-				{
-					boost::system::error_code ec;
-					socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-				}
-
-				heart_timer_.cancel();
-
-				conn_timer_.cancel();
-
-				socket().close();
-			}
-
 			void heart_deadline()
 			{
 				if (!last_operator_)
