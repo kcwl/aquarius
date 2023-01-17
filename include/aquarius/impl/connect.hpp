@@ -113,6 +113,8 @@ namespace aquarius
 				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
 				heart_timer_.async_wait(std::bind(&connect::heart_deadline, this->shared_from_this()));
 
+				on_start();
+
 				async_read();
 			}
 
@@ -131,16 +133,12 @@ namespace aquarius
 													if (ec)
 														return;
 
-													on_start();
-
-													async_read();
+													establish_async_read();
 												});
 				}
 				else
 				{
-					on_start();
-
-					async_read();
+					establish_async_read();
 				}
 			}
 
