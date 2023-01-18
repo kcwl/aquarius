@@ -1,18 +1,20 @@
 ﻿#pragma once
-#include "message/field.hpp"
-#include "message/message.hpp"
+#include <aquarius/impl/field.hpp>
+#include <aquarius/impl/header.hpp>
+#include <aquarius/impl/message.hpp>
 
 namespace aquarius
 {
-	template<typename _Header, typename _Body, uint32_t Number>
-	class response : public message::basic_message<false, _Header, _Body, Number>
+	template <typename _Body, uint32_t Number>
+	class response : public impl::message<impl::tcp_response_header, _Body, Number>
 	{
 	public:
 		response() = default;
 		~response() = default;
+
+		DEFINE_VISITABLE(int)
 	};
 
-	template<typename _Header, uint32_t Number>
-	using null_body_response = response<_Header, message::empty_body, Number>;
-}
-
+	template <uint32_t Number>
+	using null_body_response = response<impl::null_body, Number>;
+} // namespace aquarius
