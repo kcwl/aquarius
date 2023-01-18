@@ -1,16 +1,19 @@
 ﻿#pragma once
-#include "message/message.hpp"
+#include <aquarius/impl/header.hpp>
+#include <aquarius/impl/message.hpp>
 
 namespace aquarius
 {
-	template<typename _Header, typename _Body, uint32_t Number>
-	class request : public message::basic_message<true, _Header, _Body, Number>
+	template <typename _Body, uint32_t Number>
+	class request : public impl::message<impl::tcp_request_header, _Body, Number>
 	{
 	public:
 		request() = default;
 		~request() = default;
+
+		DEFINE_VISITABLE(int)
 	};
 
-	template<typename _Header, uint32_t Number>
-	using null_body_request = request<_Header, message::empty_body, Number>;
-}
+	template <uint32_t Number>
+	using null_body_request = request<impl::null_body, Number>;
+} // namespace aquarius
