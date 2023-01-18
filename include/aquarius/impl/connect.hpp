@@ -43,7 +43,6 @@ namespace aquarius
 				, ssl_context_(ssl_context_t::sslv23)
 				, ssl_socket_(socket_, ssl_context_)
 				, read_buffer_()
-				, heart_timer_(io_service)
 				, write_queue_()
 				, heart_deadline_(heart_time)
 				, last_operator_(true)
@@ -98,9 +97,6 @@ namespace aquarius
 
 			void establish_async_read()
 			{
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
-				heart_timer_.async_wait(std::bind(&connect::heart_deadline, this->shared_from_this()));
-
 				on_start();
 
 				async_read();
@@ -141,8 +137,6 @@ namespace aquarius
 					boost::system::error_code ec;
 					socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 				}
-
-				heart_timer_.cancel();
 
 				conn_timer_.cancel();
 
@@ -191,25 +185,6 @@ namespace aquarius
 			virtual void on_close() {}
 
 		private:
-			void heart_deadline()
-			{
-				if (!last_operator_)
-				{
-					return shut_down();
-				}
-
-				if (heart_timer_.expires_at() <= detail::deadline_timer::traits_type::now())
-				{
-					if (session_ptr_)
-						session_ptr_->heart_deadline();
-				}
-
-				last_operator_ ? last_operator_ = false : 0;
-
-				heart_timer_.expires_from_now(std::chrono::seconds(heart_deadline_.load()));
-				heart_timer_.async_wait(std::bind(&connect::heart_deadline, this->shared_from_this()));
-			}
-
 			void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
 			{
 				if (ec)
@@ -272,8 +247,6 @@ namespace aquarius
 			ssl_socket_t ssl_socket_;
 
 			flex_buffer_t read_buffer_;
-
-			detail::deadline_timer heart_timer_;
 
 			std::queue<flex_buffer_t> write_queue_;
 

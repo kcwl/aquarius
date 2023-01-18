@@ -105,13 +105,6 @@ namespace aquarius
 
 			void close() { return conn_ptr_->shut_down(); }
 
-			void heart_deadline()
-			{
-				null_body_request<1000> req{};
-
-				write(std::move(req), 0s);
-			}
-
 		private:
 			std::shared_ptr<connector> conn_ptr_;
 
