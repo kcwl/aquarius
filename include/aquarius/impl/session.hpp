@@ -19,13 +19,13 @@ namespace aquarius
 
 		public:
 			template <typename _Message>
-			bool write(_Message&& resp, std::chrono::steady_clock::duration timeout)
+			bool write(_Message&& resp)
 			{
 				flex_buffer_t fs;
 
 				std::forward<_Message>(resp).visit(fs, visit_mode::output);
 
-				conn_ptr_->write(std::move(fs), timeout);
+				conn_ptr_->write(std::move(fs));
 
 				return true;
 			}
@@ -54,7 +54,7 @@ namespace aquarius
 
 					if (!ctx)
 					{
-						ctx = std::make_shared<context>("", 0s);
+						ctx = std::make_shared<context>("");
 					}
 
 					attach_context(id, ctx);
