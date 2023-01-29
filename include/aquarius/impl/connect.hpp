@@ -97,6 +97,8 @@ namespace aquarius
 
 			void establish_async_read()
 			{
+				connect_time_ = std::chrono::system_clock::now();
+
 				on_start();
 
 				async_read();
@@ -144,6 +146,14 @@ namespace aquarius
 
 				on_close();
 			}
+
+			std::chrono::milliseconds get_connect_duration()
+			{
+				return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() -
+																			 connect_time_);
+			}
+
+			auto get_connect_time() { return connect_time_; }
 
 		protected:
 			void async_process_queue(std::chrono::steady_clock::duration dura)
@@ -257,6 +267,8 @@ namespace aquarius
 			std::shared_ptr<session> session_ptr_;
 
 			detail::steady_timer conn_timer_;
+
+			std::chrono::system_clock::time_point connect_time_;
 		};
 	} // namespace impl
 } // namespace aquarius
