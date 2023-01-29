@@ -52,18 +52,24 @@ namespace aquarius
 				init_context();
 			}
 
-			virtual ~connect() { shut_down(); }
-
-			auto& socket() { return socket_; }
-
-			std::string remote_address() { return socket_.remote_endpoint().address().to_string(); }
-
-			uint16_t remote_port() { return socket_.remote_endpoint().port(); }
-
-			void set_delay(bool enable)
+			virtual ~connect()
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+				shut_down();
+			}
+
+			auto& socket()
+			{
+				return socket_;
+			}
+
+			std::string remote_address()
+			{
+				return socket_.remote_endpoint().address().to_string();
+			}
+
+			uint16_t remote_port()
+			{
+				return socket_.remote_endpoint().port();
 			}
 
 			void write(flex_buffer_t&& resp_buf, std::chrono::steady_clock::duration timeout)
@@ -104,7 +110,10 @@ namespace aquarius
 				async_read();
 			}
 
-			virtual flex_buffer_t& get_read_buffer() override { return read_buffer_; }
+			virtual flex_buffer_t& get_read_buffer() override
+			{
+				return read_buffer_;
+			}
 
 			void start()
 			{
@@ -153,7 +162,69 @@ namespace aquarius
 																			 connect_time_);
 			}
 
-			auto get_connect_time() { return connect_time_; }
+			auto get_connect_time()
+			{
+				return connect_time_;
+			}
+
+			void set_sndbuf_size(int value) noexcept
+			{
+				boost::system::error_code ec;
+				socket_.set_option(boost::asio::socket_base::send_buffer_size(value), ec);
+			}
+
+			int get_sndbuf_size() noexcept
+			{
+				boost::asio::socket_base::send_buffer_size option{};
+
+				boost::system::error_code ec;
+
+				socket_.get_option(option, ec);
+
+				return option.value();
+			}
+
+			void set_rcvbuf_size(int value) noexcept
+			{
+				boost::system::error_code ec;
+				socket_.set_option(boost::asio::socket_base::receive_buffer_size(value), ec);
+			}
+
+			int get_rcvbuf_size() noexcept
+			{
+				boost::asio::socket_base::receive_buffer_size option{};
+
+				boost::system::error_code ec;
+
+				socket_.get_option(option, ec);
+
+				return option.value();
+			}
+
+			void keep_alive(bool value) noexcept
+			{
+				boost::system::error_code ec;
+
+				socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
+			}
+
+			void set_delay(bool enable)
+			{
+				boost::system::error_code ec;
+				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+			}
+
+			void reuse_address(bool value)
+			{
+				boost::system::error_code ec;
+				socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
+			}
+
+			void set_linger(bool enable, int timeout)
+			{
+				boost::system::error_code ec;
+				socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
+			}
 
 		protected:
 			void async_process_queue(std::chrono::steady_clock::duration dura)
@@ -190,9 +261,11 @@ namespace aquarius
 				}
 			}
 
-			virtual void on_start() {}
+			virtual void on_start()
+			{}
 
-			virtual void on_close() {}
+			virtual void on_close()
+			{}
 
 		private:
 			void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
