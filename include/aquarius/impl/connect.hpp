@@ -145,15 +145,15 @@ namespace aquarius
 
 			virtual void shut_down()
 			{
-				if (socket().is_open())
+				if (socket_.is_open())
 				{
 					boost::system::error_code ec;
-					socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+					socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 				}
 
 				connect_timer_.cancel();
 
-				socket().close();
+				socket_.close();
 
 				on_close();
 			}
