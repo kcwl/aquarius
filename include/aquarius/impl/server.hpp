@@ -44,6 +44,10 @@ namespace aquarius
 										   {
 											   new_connect_ptr->start();
 										   }
+										   else
+										   {
+											   set_last_error(error);
+										   }
 
 										   start_accept();
 									   });

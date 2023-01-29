@@ -2,6 +2,7 @@
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
 #include <aquarius/impl/defines.hpp>
+#include <aquarius/impl/error.hpp>
 #include <aquarius/impl/flex_buffer.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -38,7 +39,8 @@ namespace aquarius
 						public std::enable_shared_from_this<connect<_SocketType>>
 		{
 		public:
-			explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
+			explicit connect(boost::asio::io_service& io_service,
+							 std::chrono::steady_clock::duration dura = heart_time_interval)
 				: socket_(io_service)
 				, ssl_context_(ssl_context_t::sslv23)
 				, ssl_socket_(socket_, ssl_context_)
@@ -64,7 +66,16 @@ namespace aquarius
 
 			std::string remote_address()
 			{
-				return socket_.remote_endpoint().address().to_string();
+				try
+				{
+					return socket_.remote_endpoint().address().to_string();
+				}
+				catch (boost::system::system_error& e)
+				{
+					set_last_error(e);
+				}
+
+				return {};
 			}
 
 			uint16_t remote_port()
@@ -132,7 +143,10 @@ namespace aquarius
 												[](const boost::system::error_code& ec)
 												{
 													if (ec)
+													{
+														set_last_error(ec);
 														return;
+													}
 
 													establish_async_read();
 												});
@@ -147,8 +161,7 @@ namespace aquarius
 			{
 				if (socket_.is_open())
 				{
-					boost::system::error_code ec;
-					socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+					socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, get_last_error());
 				}
 
 				connect_timer_.cancel();
@@ -171,61 +184,50 @@ namespace aquarius
 
 			void set_sndbuf_size(int value) noexcept
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::socket_base::send_buffer_size(value), ec);
+				socket_.set_option(boost::asio::socket_base::send_buffer_size(value), get_last_error());
 			}
 
 			int get_sndbuf_size() noexcept
 			{
 				boost::asio::socket_base::send_buffer_size option{};
 
-				boost::system::error_code ec;
-
-				socket_.get_option(option, ec);
+				socket_.get_option(option, get_last_error());
 
 				return option.value();
 			}
 
 			void set_rcvbuf_size(int value) noexcept
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::socket_base::receive_buffer_size(value), ec);
+				socket_.set_option(boost::asio::socket_base::receive_buffer_size(value), get_last_error());
 			}
 
 			int get_rcvbuf_size() noexcept
 			{
 				boost::asio::socket_base::receive_buffer_size option{};
 
-				boost::system::error_code ec;
-
-				socket_.get_option(option, ec);
+				socket_.get_option(option, get_last_error());
 
 				return option.value();
 			}
 
 			void keep_alive(bool value) noexcept
 			{
-				boost::system::error_code ec;
-
-				socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
+				socket_.set_option(boost::asio::socket_base::keep_alive(value), get_last_error());
 			}
 
 			void set_delay(bool enable)
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+				socket_.set_option(boost::asio::ip::tcp::no_delay(enable), get_last_error());
 			}
 
 			void reuse_address(bool value)
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
+				socket_.set_option(boost::asio::socket_base::reuse_address(value), get_last_error());
 			}
 
 			void set_linger(bool enable, int timeout)
 			{
-				boost::system::error_code ec;
-				socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
+				socket_.set_option(boost::asio::socket_base::linger(enable, timeout), get_last_error());
 			}
 
 		protected:
@@ -276,8 +278,7 @@ namespace aquarius
 				async_read();
 			}
 
-			void write_handle(const boost::system::error_code& ec,
-							  std::size_t bytes_transferred)
+			void write_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
 			{
 				if (ec)
 				{
