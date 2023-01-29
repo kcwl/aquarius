@@ -1,11 +1,14 @@
 #pragma once
 #include <cstdint>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 namespace aquarius
 {
 	namespace impl
 	{
-		constexpr static int32_t heart_time_interval = 10;
+		constexpr static auto heart_time_interval = 10s;
 
 		enum class visit_mode
 		{

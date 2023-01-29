@@ -25,7 +25,7 @@ namespace aquarius
 		class connector
 		{
 		public:
-			virtual void write(flex_buffer_t&&, std::chrono::steady_clock::duration) = 0;
+			virtual void write(flex_buffer_t&&) = 0;
 
 			virtual void shut_down() = 0;
 
@@ -38,16 +38,16 @@ namespace aquarius
 						public std::enable_shared_from_this<connect<_SocketType>>
 		{
 		public:
-			explicit connect(boost::asio::io_service& io_service, int heart_time = heart_time_interval)
+			explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
 				: socket_(io_service)
 				, ssl_context_(ssl_context_t::sslv23)
 				, ssl_socket_(socket_, ssl_context_)
 				, read_buffer_()
 				, write_queue_()
-				, heart_deadline_(heart_time)
-				, last_operator_(true)
 				, session_ptr_(nullptr)
-				, conn_timer_(io_service)
+				, connect_timer_(io_service)
+				, connect_time_()
+				, dura_(dura)
 			{
 				init_context();
 			}
@@ -72,11 +72,11 @@ namespace aquarius
 				return socket_.remote_endpoint().port();
 			}
 
-			void write(flex_buffer_t&& resp_buf, std::chrono::steady_clock::duration timeout)
+			void write(flex_buffer_t&& resp_buf)
 			{
 				write_queue_.push(std::move(resp_buf));
 
-				async_process_queue(timeout);
+				async_process_queue();
 			}
 
 			void async_read()
@@ -106,6 +106,8 @@ namespace aquarius
 				connect_time_ = std::chrono::system_clock::now();
 
 				on_start();
+
+				heart_deadline();
 
 				async_read();
 			}
@@ -149,7 +151,7 @@ namespace aquarius
 					socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 				}
 
-				conn_timer_.cancel();
+				connect_timer_.cancel();
 
 				socket().close();
 
@@ -227,36 +229,23 @@ namespace aquarius
 			}
 
 		protected:
-			void async_process_queue(std::chrono::steady_clock::duration dura)
+			void async_process_queue()
 			{
 				if (write_queue_.empty())
 					return;
-
-				if (dura > 0s)
-				{
-					conn_timer_.expires_from_now(dura);
-					conn_timer_.async_wait(
-						[this, self = this->shared_from_this()](const boost::system::error_code& ec)
-						{
-							if (ec)
-								return;
-
-							shut_down();
-						});
-				}
 
 				auto& buffer = write_queue_.front();
 
 				if constexpr (std::same_as<_SocketType, ssl_socket>)
 				{
 					ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
-												 std::bind(&connect::write_handle, this->shared_from_this(), dura,
+												 std::bind(&connect::write_handle, this->shared_from_this(),
 														   std::placeholders::_1, std::placeholders::_2));
 				}
 				else
 				{
 					socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
-											 std::bind(&connect::write_handle, this->shared_from_this(), dura,
+											 std::bind(&connect::write_handle, this->shared_from_this(),
 													   std::placeholders::_1, std::placeholders::_2));
 				}
 			}
@@ -277,8 +266,6 @@ namespace aquarius
 
 				read_buffer_.commit(static_cast<int>(bytes_transferred));
 
-				!last_operator_ ? last_operator_ = true : 0;
-
 				auto res = session_ptr_->read();
 
 				if (res == read_handle_result::error)
@@ -289,7 +276,7 @@ namespace aquarius
 				async_read();
 			}
 
-			void write_handle(std::chrono::steady_clock::duration dura, const boost::system::error_code& ec,
+			void write_handle(const boost::system::error_code& ec,
 							  std::size_t bytes_transferred)
 			{
 				if (ec)
@@ -299,11 +286,9 @@ namespace aquarius
 					return;
 				}
 
-				conn_timer_.cancel();
-
 				write_queue_.pop();
 
-				async_process_queue(dura);
+				async_process_queue();
 
 				std::cout << "complete " << bytes_transferred << " bytes\n";
 			}
@@ -322,6 +307,22 @@ namespace aquarius
 				}
 			}
 
+			void heart_deadline()
+			{
+				connect_timer_.expires_from_now(dura_);
+				connect_timer_.async_wait(
+					[this, self = this->shared_from_this()](const boost::system::error_code& ec)
+					{
+						if (ec == boost::asio::error::operation_aborted)
+							return;
+
+						if (!ec)
+							return heart_deadline();
+
+						shut_down();
+					});
+			}
+
 		private:
 			socket_t socket_;
 
@@ -333,15 +334,13 @@ namespace aquarius
 
 			std::queue<flex_buffer_t> write_queue_;
 
-			std::atomic_int heart_deadline_;
-
-			bool last_operator_;
-
 			std::shared_ptr<session> session_ptr_;
 
-			detail::steady_timer conn_timer_;
+			detail::steady_timer connect_timer_;
 
 			std::chrono::system_clock::time_point connect_time_;
+
+			std::chrono::steady_clock::duration dura_;
 		};
 	} // namespace impl
 } // namespace aquarius
