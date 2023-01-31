@@ -103,7 +103,10 @@ namespace aquarius
 				ctxs_.insert({ id, ctx_ptr });
 			}
 
-			void close() { return conn_ptr_->shut_down(); }
+			void close() 
+			{
+				ctxs_.clear();
+			}
 
 		private:
 			std::shared_ptr<connector> conn_ptr_;

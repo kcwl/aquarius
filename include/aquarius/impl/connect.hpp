@@ -155,6 +155,8 @@ namespace aquarius
 
 				socket_.close();
 
+				session_ptr_->close();
+
 				on_close();
 			}
 

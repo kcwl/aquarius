@@ -22,8 +22,7 @@ namespace aquarius
 
 			virtual ~context()
 			{
-				if (session_ptr_)
-					on_closed(session_ptr_);
+				on_closed();
 			}
 
 			context& operator=(const context&) = delete;
@@ -33,7 +32,7 @@ namespace aquarius
 		public:
 			virtual int on_connected() { return 0; }
 
-			virtual int on_closed([[maybe_unused]] std::shared_ptr<session> session_ptr) { return 0; }
+			virtual int on_closed() { return 0; }
 
 			virtual int on_timeout([[maybe_unused]] std::shared_ptr<session> session_ptr) { return 0; }
 
@@ -58,10 +57,8 @@ namespace aquarius
 		public:
 			virtual int on_connected() override { return 0; }
 
-			virtual int on_closed(std::shared_ptr<session> session_ptr) override
+			virtual int on_closed() override
 			{
-				session_ptr->close();
-
 				return 0;
 			}
 
