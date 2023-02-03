@@ -1,10 +1,9 @@
 #pragma once
-#include <aquarius/connect.hpp>
-#include <aquarius/impl/io_service_pool.hpp>
+#include <aquarius/server/io_service_pool.hpp>
 
 namespace aquarius
 {
-	namespace impl
+	namespace srv
 	{
 		template <typename _Connector>
 		class server

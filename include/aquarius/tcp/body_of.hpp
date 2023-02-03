@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/impl/defines.hpp>
-#include <aquarius/impl/field.hpp>
+#include <aquarius/core/defines.hpp>
+#include <aquarius/tcp/field.hpp>
 
 namespace aquarius
 {
-	namespace impl
+	namespace tcp
 	{
 		struct null_body
 		{};
@@ -24,22 +24,22 @@ namespace aquarius
 			~body_of() { this->dealloc(body_ptr_); }
 
 		public:
-			read_handle_result parse_bytes(flex_buffer_t& stream)
+			core::read_handle_result parse_bytes(core::flex_buffer_t& stream)
 			{
 				if constexpr (!std::same_as<value_type, null_body>)
 				{
 					if (!body_ptr_->ParseFromArray(stream.rdata(), static_cast<int>(stream.size())))
 					{
-						return read_handle_result::waiting_for_query;
+						return core::read_handle_result::waiting_for_query;
 					}
 
 					stream.commit(static_cast<int>(body_ptr_->ByteSizeLong()));
 				}
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
-			read_handle_result to_bytes(flex_buffer_t& stream)
+			core::read_handle_result to_bytes(core::flex_buffer_t& stream)
 			{
 				if constexpr (!std::same_as<value_type, null_body>)
 				{
@@ -50,7 +50,7 @@ namespace aquarius
 					oa.append(buf.data());
 				}
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
 			value_type* get() noexcept { return body_ptr_; }

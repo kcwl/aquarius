@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		template <typename _Ty>
 		struct use_empty_value_base

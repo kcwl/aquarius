@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <aquarius/detail/type_traits.hpp>
-#include <aquarius/impl/flex_buffer.hpp>
+#include <aquarius/core/type_traits.hpp>
+#include <aquarius/core/flex_buffer.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <type_traits>
@@ -32,7 +32,7 @@ namespace aquarius
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
 
-			if constexpr (!detail::is_string<decltype(host)>::value || !detail::is_string<decltype(port)>::value)
+			if constexpr (!core::is_string<decltype(host)>::value || !core::is_string<decltype(port)>::value)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
 			boost::asio::ip::tcp::resolver resolver(io_service);
@@ -55,7 +55,7 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(impl::flex_buffer_t&& buf)
+		void async_write(core::flex_buffer_t&& buf)
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
@@ -118,9 +118,9 @@ namespace aquarius
 
 			null_body_response<1001> resp{};
 
-			impl::flex_buffer_t fs;
+			core::flex_buffer_t fs;
 
-			resp.visit(fs, aquarius::impl::visit_mode::output);
+			resp.visit(fs, aquarius::core::visit_mode::output);
 
 			async_write(std::move(fs));
 
@@ -133,6 +133,6 @@ namespace aquarius
 
 		boost::asio::ip::tcp::socket socket_;
 
-		impl::flex_buffer_t buffer_;
+		core::flex_buffer_t buffer_;
 	};
 } // namespace aquarius

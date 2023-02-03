@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/singleton.hpp>
+#include <aquarius/core/singleton.hpp>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -7,7 +7,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace core
 	{
 		template <typename _R, typename... _Args>
 		class router

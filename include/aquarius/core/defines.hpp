@@ -6,7 +6,7 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	namespace impl
+	namespace core
 	{
 		constexpr static auto heart_time_interval = 10s;
 
