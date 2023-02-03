@@ -7,6 +7,8 @@
 #include <boost/asio/ssl.hpp>
 #include <memory>
 #include <queue>
+#include <aquarius/impl/basic_connector.hpp>
+#include <aquarius/impl/dispatch.hpp>
 
 using namespace std::chrono_literals;
 
@@ -14,37 +16,25 @@ namespace aquarius
 {
 	namespace impl
 	{
-		class session;
-
 		using socket_t = boost::asio::ip::tcp::socket;
 
 		using ssl_socket_t = boost::asio::ssl::stream<socket_t&>;
 
 		using ssl_context_t = boost::asio::ssl::context;
 
-		class connector
-		{
-		public:
-			virtual void write(flex_buffer_t&&) = 0;
-
-			virtual void shut_down() = 0;
-
-			virtual flex_buffer_t& get_read_buffer() = 0;
-		};
-
 		template <typename _SocketType = void>
 		class connect : private detail::noncopyable,
-						public connector,
+						public basic_connector,
 						public std::enable_shared_from_this<connect<_SocketType>>
 		{
 		public:
-			explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
+			explicit connect(boost::asio::io_service& io_service,
+							 std::chrono::steady_clock::duration dura = heart_time_interval)
 				: socket_(io_service)
 				, ssl_context_(ssl_context_t::sslv23)
 				, ssl_socket_(socket_, ssl_context_)
 				, read_buffer_()
 				, write_queue_()
-				, session_ptr_(nullptr)
 				, connect_timer_(io_service)
 				, connect_time_()
 				, dura_(dura)
@@ -74,7 +64,7 @@ namespace aquarius
 
 			void write(flex_buffer_t&& resp_buf)
 			{
-				write_queue_.push(std::move(resp_buf));
+				write_queue_.push(std::forward<flex_buffer_t>(resp_buf));
 
 				async_process_queue();
 			}
@@ -119,13 +109,6 @@ namespace aquarius
 
 			void start()
 			{
-				if (!session_ptr_)
-				{
-					auto session_ptr = std::make_shared<session>(this->shared_from_this());
-
-					session_ptr_.swap(session_ptr);
-				}
-
 				if constexpr (std::same_as<_SocketType, ssl_socket>)
 				{
 					ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
@@ -154,8 +137,6 @@ namespace aquarius
 				connect_timer_.cancel();
 
 				socket_.close();
-
-				session_ptr_->close();
 
 				on_close();
 			}
@@ -268,7 +249,7 @@ namespace aquarius
 
 				read_buffer_.commit(static_cast<int>(bytes_transferred));
 
-				auto res = session_ptr_->read();
+				auto res = dispatch::on_connected(this->shared_from_this());
 
 				if (res == read_handle_result::error)
 				{
@@ -278,8 +259,7 @@ namespace aquarius
 				async_read();
 			}
 
-			void write_handle(const boost::system::error_code& ec,
-							  std::size_t bytes_transferred)
+			void write_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
 			{
 				if (ec)
 				{
@@ -325,6 +305,9 @@ namespace aquarius
 					});
 			}
 
+		public:
+			std::map<uint32_t, std::shared_ptr<context>> ctxs_;
+
 		private:
 			socket_t socket_;
 
@@ -335,8 +318,6 @@ namespace aquarius
 			flex_buffer_t read_buffer_;
 
 			std::queue<flex_buffer_t> write_queue_;
-
-			std::shared_ptr<session> session_ptr_;
 
 			detail::steady_timer connect_timer_;
 

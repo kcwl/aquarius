@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <aquarius/impl/session.hpp>
 #include <aquarius/impl/visitor.hpp>
 #include <memory>
 
@@ -30,17 +29,26 @@ namespace aquarius
 			DEFINE_VISITOR(xmessage, int)
 
 		public:
-			virtual int on_connected() { return 0; }
+			virtual int on_connected()
+			{
+				return 0;
+			}
 
-			virtual int on_closed() { return 0; }
+			virtual int on_closed()
+			{
+				return 0;
+			}
 
-			virtual int on_timeout([[maybe_unused]] std::shared_ptr<session> session_ptr) { return 0; }
+			virtual int on_timeout([[maybe_unused]] std::shared_ptr<basic_connector> session_ptr)
+			{
+				return 0;
+			}
 
 		protected:
 			virtual void on_error([[maybe_unused]] int result){};
 
 		protected:
-			std::shared_ptr<session> session_ptr_;
+			std::shared_ptr<basic_connector> conn_ptr_;
 
 			std::string name_;
 		};
@@ -55,24 +63,26 @@ namespace aquarius
 			{}
 
 		public:
-			virtual int on_connected() override { return 0; }
+			virtual int on_connected() override
+			{
+				return 0;
+			}
 
 			virtual int on_closed() override
 			{
 				return 0;
 			}
 
-			virtual int on_timeout(std::shared_ptr<session> session_ptr) override
+			virtual int on_timeout(std::shared_ptr<basic_connector> conn_ptr) override
 			{
-				session_ptr->close();
 				return 0;
 			}
 
-			virtual int visit(_Request* req, std::shared_ptr<session> session_ptr)
+			virtual int visit(_Request* req, std::shared_ptr<basic_connector> conn_ptr)
 			{
 				request_ptr_ = req;
 
-				session_ptr_ = session_ptr;
+				conn_ptr_ = conn_ptr;
 
 				return handle();
 			}
@@ -80,7 +90,8 @@ namespace aquarius
 		protected:
 			virtual int handle() = 0;
 
-			virtual void on_error([[maybe_unused]] int result) override {}
+			virtual void on_error([[maybe_unused]] int result) override
+			{}
 
 			bool send_response(int result)
 			{
@@ -88,8 +99,11 @@ namespace aquarius
 
 				response_.header().result_ = result;
 
-				if (!session_ptr_->write(std::move(response_)))
-					return false;
+				flex_buffer_t fs;
+
+				response_.visit(fs, visit_mode::output);
+
+				conn_ptr_->write(std::move(fs));
 
 				return true;
 			}
