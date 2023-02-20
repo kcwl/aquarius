@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/impl/defines.hpp>
-#include <aquarius/impl/flex_buffer.hpp>
+#include <aquarius/core/defines.hpp>
+#include <aquarius/core/flex_buffer.hpp>
 #include <cstdint>
 
 namespace aquarius
 {
-	namespace impl
+	namespace tcp
 	{
 		struct tcp_header
 		{
@@ -34,20 +34,20 @@ namespace aquarius
 			}
 
 		public:
-			read_handle_result parse_bytes(flex_buffer_t& stream)
+			core::read_handle_result parse_bytes(core::flex_buffer_t& stream)
 			{
-				iarchive ia(stream);
+				core::iarchive ia(stream);
 				ia >> *this;
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
-			read_handle_result to_bytes(flex_buffer_t& stream)
+			core::read_handle_result to_bytes(core::flex_buffer_t& stream)
 			{
-				oarchive oa(stream);
+				core::oarchive oa(stream);
 				oa << *this;
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 		};
 
@@ -66,20 +66,20 @@ namespace aquarius
 			}
 
 		public:
-			read_handle_result parse_bytes(flex_buffer_t& stream)
+			core::read_handle_result parse_bytes(core::flex_buffer_t& stream)
 			{
-				iarchive ia(stream);
+				core::iarchive ia(stream);
 				ia >> *this;
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
-			read_handle_result to_bytes(flex_buffer_t& stream)
+			core::read_handle_result to_bytes(core::flex_buffer_t& stream)
 			{
-				oarchive oa(stream);
+				core::oarchive oa(stream);
 				oa << *this;
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 		};
 	} // namespace impl

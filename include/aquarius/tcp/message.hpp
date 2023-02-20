@@ -1,14 +1,15 @@
 #pragma once
-#include <aquarius/impl/body_of.hpp>
-#include <aquarius/impl/flex_buffer.hpp>
-#include <aquarius/impl/visitor.hpp>
+#include <aquarius/tcp/body_of.hpp>
+#include <aquarius/core/flex_buffer.hpp>
+#include <aquarius/context/visitor.hpp>
+#include <aquarius/core/defines.hpp>
 #include <cstddef>
 
 namespace aquarius
 {
-	namespace impl
+	namespace tcp
 	{
-		class xmessage : public visitable<int>
+		class xmessage : public ctx::visitable<int>
 		{
 		public:
 			DEFINE_VISITABLE(int)
@@ -16,7 +17,7 @@ namespace aquarius
 		public:
 			virtual uint32_t unique_key() { return 0; };
 
-			virtual read_handle_result visit(flex_buffer_t&, visit_mode) { return read_handle_result::error; }
+			virtual core::read_handle_result visit(core::flex_buffer_t&, core::visit_mode) { return core::read_handle_result::error; }
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
@@ -46,9 +47,9 @@ namespace aquarius
 
 			virtual uint32_t unique_key() override { return Number; }
 
-			virtual read_handle_result visit(flex_buffer_t& stream, visit_mode mode) override
+			virtual core::read_handle_result visit(core::flex_buffer_t& stream, core::visit_mode mode) override
 			{
-				if (mode == visit_mode::input)
+				if (mode == core::visit_mode::input)
 				{
 					return parse_message(stream);
 				}
@@ -57,43 +58,43 @@ namespace aquarius
 			}
 
 		private:
-			read_handle_result parse_message(flex_buffer_t& stream)
+			core::read_handle_result parse_message(core::flex_buffer_t& stream)
 			{
 				auto res = header_ptr_->parse_bytes(stream);
 
-				if (res != read_handle_result::ok)
+				if (res != core::read_handle_result::ok)
 					return res;
 
 				res = body_.parse_bytes(stream);
 
-				if (res != read_handle_result::ok)
+				if (res != core::read_handle_result::ok)
 				{
 					return res;
 				}
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
-			read_handle_result to_message(flex_buffer_t& stream)
+			core::read_handle_result to_message(core::flex_buffer_t& stream)
 			{
-				elastic::binary_oarchive oa(stream);
+				core::oarchive oa(stream);
 				oa << Number;
 
 				auto res = header_ptr_->to_bytes(stream);
 
-				if (res != read_handle_result::ok)
+				if (res != core::read_handle_result::ok)
 				{
 					return res;
 				}
 
 				res = body_.to_bytes(stream);
 
-				if (res != read_handle_result::ok)
+				if (res != core::read_handle_result::ok)
 				{
 					return res;
 				}
 
-				return read_handle_result::ok;
+				return core::read_handle_result::ok;
 			}
 
 		private:

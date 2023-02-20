@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	namespace impl
+	namespace srv
 	{
 		class io_service_pool
 		{

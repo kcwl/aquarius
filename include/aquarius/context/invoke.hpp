@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/impl/router.hpp>
+#include <aquarius/context/router.hpp>
 
 namespace aquarius
 {
-	namespace impl
+	namespace ctx
 	{
 		template <typename _Context>
 		struct ctx_regist
@@ -36,7 +36,7 @@ namespace aquarius
 				std::string _key = "aquarius_" + std::to_string(key);
 
 				msg_router::instance().regist(
-					_key, []() { return std::dynamic_pointer_cast<xmessage>(std::make_shared<_Message>()); });
+					_key, []() { return std::dynamic_pointer_cast<tcp::xmessage>(std::make_shared<_Message>()); });
 			}
 		};
 
