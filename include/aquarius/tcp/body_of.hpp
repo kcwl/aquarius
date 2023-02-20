@@ -47,7 +47,7 @@ namespace aquarius
 
 					elastic::binary_oarchive oa(stream);
 
-					oa.append(buf.data());
+					oa.save(buf);
 				}
 
 				return core::read_handle_result::ok;
