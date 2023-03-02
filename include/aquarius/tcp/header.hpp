@@ -11,17 +11,17 @@ namespace aquarius
 		{
 			uint32_t magic_;
 			int32_t size_;
+			uint32_t uid_;
 
-			void clone(const tcp_header& header)
+			void set_size(std::size_t sz)
 			{
-				magic_ = header.magic_;
-				size_ = header.size_;
+				size_ = static_cast<uint32_t>(sz);
 			}
 		};
 
 		struct tcp_request_header : tcp_header
 		{
-			uint32_t uid_;
+			uint32_t reserve_;
 
 		private:
 			friend class elastic::access;
@@ -30,7 +30,7 @@ namespace aquarius
 			void serialize(_Archive& ar)
 			{
 				ar& elastic::serialize::base_object<tcp_header>(*this);
-				ar& uid_;
+				ar& reserve_;
 			}
 
 		public:

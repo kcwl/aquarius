@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/tcp/body_of.hpp>
-#include <aquarius/core/flex_buffer.hpp>
 #include <aquarius/context/visitor.hpp>
 #include <aquarius/core/defines.hpp>
+#include <aquarius/core/flex_buffer.hpp>
+#include <aquarius/tcp/body_of.hpp>
 #include <cstddef>
 
 namespace aquarius
@@ -15,9 +15,15 @@ namespace aquarius
 			DEFINE_VISITABLE(int)
 
 		public:
-			virtual uint32_t unique_key() { return 0; };
+			virtual uint32_t unique_key()
+			{
+				return 0;
+			};
 
-			virtual core::read_handle_result visit(core::flex_buffer_t&, core::visit_mode) { return core::read_handle_result::error; }
+			virtual core::read_handle_result visit(core::flex_buffer_t&, core::visit_mode)
+			{
+				return core::read_handle_result::error;
+			}
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
@@ -32,20 +38,41 @@ namespace aquarius
 			DEFINE_VISITABLE(int)
 
 		public:
-			message() { this->alloc(header_ptr_); }
+			message()
+			{
+				this->alloc(header_ptr_);
+			}
 
-			virtual ~message() { this->dealloc(header_ptr_); }
+			virtual ~message()
+			{
+				this->dealloc(header_ptr_);
+			}
 
 		public:
-			header_type& header() noexcept { return *header_ptr_; }
+			header_type& header() noexcept
+			{
+				return *header_ptr_;
+			}
 
-			const header_type& header() const noexcept { return *header_ptr_; }
+			const header_type& header() const noexcept
+			{
+				return *header_ptr_;
+			}
 
-			body_type& body() noexcept { return *body_.get(); }
+			body_type& body() noexcept
+			{
+				return body_;
+			}
 
-			const body_type& body() const noexcept { return *body_.get(); }
+			const body_type& body() const noexcept
+			{
+				return body_;
+			}
 
-			virtual uint32_t unique_key() override { return Number; }
+			virtual uint32_t unique_key() override
+			{
+				return Number;
+			}
 
 			virtual core::read_handle_result visit(core::flex_buffer_t& stream, core::visit_mode mode) override
 			{
@@ -65,7 +92,10 @@ namespace aquarius
 				if (res != core::read_handle_result::ok)
 					return res;
 
-				res = body_.parse_bytes(stream);
+				if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
+				{
+					res = core::read_handle_result::error;
+				}
 
 				if (res != core::read_handle_result::ok)
 				{
@@ -80,6 +110,10 @@ namespace aquarius
 				core::oarchive oa(stream);
 				oa << Number;
 
+				auto buf = body_.SerializeAsString();
+
+				header_ptr_->set_size(buf.size());
+
 				auto res = header_ptr_->to_bytes(stream);
 
 				if (res != core::read_handle_result::ok)
@@ -87,12 +121,7 @@ namespace aquarius
 					return res;
 				}
 
-				res = body_.to_bytes(stream);
-
-				if (res != core::read_handle_result::ok)
-				{
-					return res;
-				}
+				oa.save(buf);
 
 				return core::read_handle_result::ok;
 			}
@@ -100,7 +129,7 @@ namespace aquarius
 		private:
 			header_type* header_ptr_;
 
-			body_of<body_type> body_;
+			body_type body_;
 		};
-	} // namespace impl
+	} // namespace tcp
 } // namespace aquarius
