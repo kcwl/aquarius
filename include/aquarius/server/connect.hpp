@@ -325,8 +325,6 @@ namespace aquarius
 		public:
 			std::map<uint32_t, std::shared_ptr<ctx::context>> ctxs_;
 
-			uuids::uuid uid_;
-
 		private:
 			socket_t socket_;
 
