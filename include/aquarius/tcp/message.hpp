@@ -2,13 +2,15 @@
 #include <aquarius/context/visitor.hpp>
 #include <aquarius/core/defines.hpp>
 #include <aquarius/core/flex_buffer.hpp>
-#include <aquarius/tcp/body_of.hpp>
 #include <cstddef>
 
 namespace aquarius
 {
 	namespace tcp
 	{
+		struct null_body
+		{};
+
 		class xmessage : public ctx::visitable<int>
 		{
 		public:
@@ -92,14 +94,17 @@ namespace aquarius
 				if (res != core::read_handle_result::ok)
 					return res;
 
-				if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
+				if constexpr (!std::is_same_v<body_type, null_body>)
 				{
-					res = core::read_handle_result::error;
-				}
+					if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
+					{
+						res = core::read_handle_result::error;
+					}
 
-				if (res != core::read_handle_result::ok)
-				{
-					return res;
+					if (res != core::read_handle_result::ok)
+					{
+						return res;
+					}
 				}
 
 				return core::read_handle_result::ok;
@@ -110,18 +115,21 @@ namespace aquarius
 				core::oarchive oa(stream);
 				oa << Number;
 
-				auto buf = body_.SerializeAsString();
-
-				header_ptr_->set_size(buf.size());
-
-				auto res = header_ptr_->to_bytes(stream);
-
-				if (res != core::read_handle_result::ok)
+				if constexpr (!std::is_same_v<body_type, null_body>)
 				{
-					return res;
-				}
+					auto buf = body_.SerializeAsString();
 
-				oa.save(buf);
+					header_ptr_->set_size(buf.size());
+
+					auto res = header_ptr_->to_bytes(stream);
+
+					if (res != core::read_handle_result::ok)
+					{
+						return res;
+					}
+
+					oa.save(buf);
+				}
 
 				return core::read_handle_result::ok;
 			}
