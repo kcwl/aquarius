@@ -151,6 +151,11 @@ namespace aquarius
 				on_close();
 			}
 
+			virtual std::string uuid()
+			{
+				return uuids::to_string(uid_);
+			}
+
 			std::chrono::milliseconds get_connect_duration()
 			{
 				return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() -
@@ -338,6 +343,8 @@ namespace aquarius
 			std::chrono::system_clock::time_point connect_time_;
 
 			std::chrono::steady_clock::duration dura_;
+
+			uuids::uuid uid_;
 		};
 	} // namespace srv
 } // namespace aquarius
