@@ -13,6 +13,8 @@ namespace aquarius
 			virtual void shut_down() = 0;
 
 			virtual core::flex_buffer_t& get_read_buffer() = 0;
+
+			virtual std::string uuid() = 0;
 		};
 	}
 }

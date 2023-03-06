@@ -12,6 +12,7 @@ namespace aquarius
 			uint32_t magic_;
 			int32_t size_;
 			uint32_t uid_;
+			uint32_t append_;
 
 			void set_size(std::size_t sz)
 			{
