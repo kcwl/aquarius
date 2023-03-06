@@ -1,9 +1,11 @@
 ﻿#pragma once
+#include "../third_part/stduuid/include/uuid.h"
+
 #include <aquarius/core/deadline_timer.hpp>
-#include <aquarius/core/noncopyable.hpp>
-#include <aquarius/server/basic_connector.hpp>
 #include <aquarius/core/defines.hpp>
 #include <aquarius/core/flex_buffer.hpp>
+#include <aquarius/core/noncopyable.hpp>
+#include <aquarius/server/basic_connector.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <memory>
@@ -36,8 +38,18 @@ namespace aquarius
 				, connect_timer_(io_service)
 				, connect_time_()
 				, dura_(dura)
+				, uid_()
 			{
 				init_context();
+
+				std::random_device rd{};
+
+				auto seed_data = std::array<int, std::mt19937::state_size>{};
+				std::generate(seed_data.begin(), seed_data.end(), std::ref(rd));
+				std::seed_seq seq(seed_data.begin(), seed_data.end());
+				std::mt19937 generator{ seq };
+				
+				uid_ = uuids::uuid_random_generator{ generator }();
 			}
 
 			virtual ~connect()
@@ -308,6 +320,8 @@ namespace aquarius
 		public:
 			std::map<uint32_t, std::shared_ptr<ctx::context>> ctxs_;
 
+			uuids::uuid uid_;
+
 		private:
 			socket_t socket_;
 
@@ -325,5 +339,5 @@ namespace aquarius
 
 			std::chrono::steady_clock::duration dura_;
 		};
-	} // namespace impl
+	} // namespace srv
 } // namespace aquarius
