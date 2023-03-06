@@ -2,6 +2,7 @@
 #include <aquarius/context/visitor.hpp>
 #include <aquarius/core/defines.hpp>
 #include <aquarius/core/flex_buffer.hpp>
+#include <aquarius/tcp/field.hpp>
 #include <cstddef>
 
 namespace aquarius
