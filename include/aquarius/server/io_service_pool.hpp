@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <functional>
 #include <thread>
 
@@ -56,7 +55,7 @@ namespace aquarius
 				boost::asio::io_service& io_service = *io_services_[next_to_service_];
 				++next_to_service_;
 
-				if (next_to_service_ == io_services_.size())
+				if (next_to_service_ == static_cast<int>(io_services_.size()))
 					next_to_service_ = 0;
 
 				return io_service;
