@@ -15,6 +15,14 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
+	namespace ctx
+	{
+		class context;
+	}
+}
+
+namespace aquarius
+{
 	namespace srv
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
