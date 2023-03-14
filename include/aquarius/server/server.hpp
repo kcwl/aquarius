@@ -47,6 +47,11 @@ namespace aquarius
 				return true;
 			}
 
+			void regist_module(std::shared_ptr<core::basic_module> module_ptr)
+			{
+				modules_.push_back(module_ptr);
+			}
+
 		private:
 			void start_accept()
 			{
@@ -116,7 +121,7 @@ namespace aquarius
 
 			boost::asio::ip::tcp::acceptor acceptor_;
 
-			std::vector<core::basic_module> modules_;
+			std::vector<std::shared_ptr<core::basic_module>> modules_;
 		};
 	} // namespace srv
 } // namespace aquarius
