@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/core/basic_module.hpp>
 #include <aquarius/server/io_service_pool.hpp>
 
 namespace aquarius
@@ -29,7 +30,22 @@ namespace aquarius
 			virtual ~server() = default;
 
 		public:
-			void run() { io_service_pool_.run(); }
+			bool run()
+			{
+				if (!load_module())
+					return false;
+
+				if (!start_module())
+					return false;
+
+				io_service_pool_.run();
+			}
+
+		protected:
+			virtual bool load_module()
+			{
+				return true;
+			}
 
 		private:
 			void start_accept()
@@ -48,7 +64,50 @@ namespace aquarius
 									   });
 			}
 
-			void handle_stop() { io_service_pool_.stop(); }
+			bool start_module()
+			{
+				for (auto& module : modules_)
+				{
+					if (!module.enable())
+						continue;
+
+					if (!module.initialize())
+						return false;
+
+					if (!module.stop())
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			bool stop_module()
+			{
+				for (auto& module : modules_)
+				{
+					if (!module.enable())
+						continue;
+
+					if (!module.initialize())
+						return false;
+
+					if (!module.stop())
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			void handle_stop()
+			{
+				stop_module();
+
+				io_service_pool_.stop();
+			}
 
 		private:
 			io_service_pool io_service_pool_;
@@ -56,6 +115,8 @@ namespace aquarius
 			boost::asio::signal_set signals_;
 
 			boost::asio::ip::tcp::acceptor acceptor_;
+
+			std::vector<core::basic_module> modules_;
 		};
-	} // namespace impl
+	} // namespace srv
 } // namespace aquarius
