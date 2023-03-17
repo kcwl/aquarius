@@ -39,6 +39,8 @@ namespace aquarius
 					return false;
 
 				io_service_pool_.run();
+
+				return true;
 			}
 
 		protected:
@@ -73,13 +75,13 @@ namespace aquarius
 			{
 				for (auto& module : modules_)
 				{
-					if (!module.enable())
+					if (!module->enable())
 						continue;
 
-					if (!module.initialize())
+					if (!module->initialize())
 						return false;
 
-					if (!module.stop())
+					if (!module->stop())
 					{
 						return false;
 					}
@@ -92,13 +94,13 @@ namespace aquarius
 			{
 				for (auto& module : modules_)
 				{
-					if (!module.enable())
+					if (!module->enable())
 						continue;
 
-					if (!module.initialize())
+					if (!module->initialize())
 						return false;
 
-					if (!module.stop())
+					if (!module->stop())
 					{
 						return false;
 					}
