@@ -80,6 +80,13 @@ namespace aquarius
 				return socket_.remote_endpoint().port();
 			}
 
+			void write(const void* data, std::size_t size)
+			{
+				core::flex_buffer_t buffer(data, size);
+
+				write(std::move(buffer));
+			}
+
 			void write(core::flex_buffer_t&& resp_buf)
 			{
 				write_queue_.push(std::forward<core::flex_buffer_t>(resp_buf));
