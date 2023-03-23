@@ -58,7 +58,7 @@ namespace aquarius
 
 		void async_write(core::flex_buffer_t&& buf)
 		{
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.active()),
+			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
@@ -94,7 +94,7 @@ namespace aquarius
 
 		void do_read()
 		{
-			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.size()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
 									[this](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
