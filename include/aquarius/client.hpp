@@ -68,6 +68,13 @@ namespace aquarius
 									 });
 		}
 
+		void async_write(const void* data, std::size_t size) const
+		{
+			aquarius::core::flex_buffer_t buffer(data, size);
+
+			async_write(std::move(buffer));
+		}
+
 		virtual int read_handler() = 0;
 
 		void close() { socket_.close(); }
