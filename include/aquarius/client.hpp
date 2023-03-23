@@ -11,19 +11,26 @@ namespace aquarius
 	class client
 	{
 	public:
-		explicit client(boost::asio::io_service& io_service,
+		explicit client()
+			: io_service_()
+			, socket_(io_service_)
+		{
+
+		}
+
+		client(/*boost::asio::io_service& io_service,*/
 						const boost::asio::ip::tcp::resolver::results_type& endpoints)
-			: io_service_(io_service)
-			, socket_(io_service)
+			: io_service_(/*io_service*/)
+			, socket_(io_service_)
 			, buffer_()
 		{
 			do_connect(endpoints);
 		}
 
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
-		client(boost::asio::io_service& io_service, _Args&&... args)
-			: io_service_(io_service)
-			, socket_(io_service)
+		client(/*boost::asio::io_service& io_service,*/ _Args&&... args)
+			: io_service_(/*io_service*/)
+			, socket_(io_service_)
 		{
 			if constexpr (sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
@@ -36,13 +43,26 @@ namespace aquarius
 			if constexpr (!core::is_string<decltype(host)>::value || !core::is_string<decltype(port)>::value)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
-			boost::asio::ip::tcp::resolver resolver(io_service);
+			boost::asio::ip::tcp::resolver resolver(io_service_);
 
 			auto endpoints = resolver.resolve(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
 			do_connect(endpoints);
 		}
 
 	public:
+		void open(boost::asio::io_service& io_service, const std::string& host, const std::string& port)
+		{
+			boost::asio::ip::tcp::resolver resolver(io_service);
+
+			auto endpoints = resolver.resolve(host, port);
+			do_connect(endpoints);
+		}
+
+		void run()
+		{
+			io_service_.run();
+		}
+
 		template <class _Ty, std::size_t N>
 		void async_write(const std::array<_Ty, N>& buf)
 		{
@@ -78,6 +98,11 @@ namespace aquarius
 		virtual int read_handler() = 0;
 
 		void close() { socket_.close(); }
+
+		core::flex_buffer_t& get_recv_buffer()
+		{
+			return buffer_;
+		}
 
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
@@ -137,7 +162,7 @@ namespace aquarius
 		}
 
 	private:
-		boost::asio::io_service& io_service_;
+		boost::asio::io_service io_service_;
 
 		boost::asio::ip::tcp::socket socket_;
 
