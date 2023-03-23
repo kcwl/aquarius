@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../third_part/stduuid/include/uuid.h"
+
 
 #include <aquarius/core/deadline_timer.hpp>
 #include <aquarius/core/defines.hpp>

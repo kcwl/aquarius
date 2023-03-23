@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/core/flex_buffer.hpp>
+#include "../third_part/stduuid/include/uuid.h"
 
 namespace aquarius
 {
