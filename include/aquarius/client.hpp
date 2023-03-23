@@ -44,10 +44,10 @@ namespace aquarius
 
 	public:
 		template <class _Ty, std::size_t N>
-		void async_write(const std::array<_Ty, N>& buf) const
+		void async_write(const std::array<_Ty, N>& buf)
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
-									 [this](boost::system::error_code ec, std::size_t)
+									 [this](const boost::system::error_code& ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -56,9 +56,9 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(core::flex_buffer_t&& buf) const
+		void async_write(core::flex_buffer_t&& buf)
 		{
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
+			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.active()),
 									 [this](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
@@ -68,7 +68,7 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(const void* data, std::size_t size) const
+		void async_write(const void* data, std::size_t size)
 		{
 			aquarius::core::flex_buffer_t buffer(data, size);
 
@@ -94,7 +94,7 @@ namespace aquarius
 
 		void do_read()
 		{
-			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.size()),
 									[this](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
@@ -130,7 +130,7 @@ namespace aquarius
 
 			resp.visit(fs, aquarius::core::visit_mode::output);
 
-			async_write(std::move(fs));
+			//async_write(std::move(fs));
 
 			std::cout << "pong\n";
 			return true;
