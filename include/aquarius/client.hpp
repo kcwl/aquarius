@@ -4,6 +4,7 @@
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <type_traits>
+#include <iostream>
 
 namespace aquarius
 {
@@ -43,7 +44,7 @@ namespace aquarius
 
 	public:
 		template <class _Ty, std::size_t N>
-		void async_write(const std::array<_Ty, N>& buf)
+		void async_write(const std::array<_Ty, N>& buf) const
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
 									 [this](boost::system::error_code ec, std::size_t)
@@ -55,7 +56,7 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(core::flex_buffer_t&& buf)
+		void async_write(core::flex_buffer_t&& buf) const
 		{
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
 									 [this](boost::system::error_code ec, std::size_t)
