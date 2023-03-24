@@ -56,11 +56,13 @@ namespace aquarius
 
 			auto endpoints = resolver.resolve(host, port);
 			do_connect(endpoints);
+
+			run();
 		}
 
 		void run()
 		{
-			io_service_.run();
+			thread_ptr_.reset(new std::thread([&] { io_service_.run(); }));
 		}
 
 		template <class _Ty, std::size_t N>
@@ -167,5 +169,7 @@ namespace aquarius
 		boost::asio::ip::tcp::socket socket_;
 
 		core::flex_buffer_t buffer_;
+
+		std::shared_ptr<std::thread> thread_ptr_;
 	};
 } // namespace aquarius
