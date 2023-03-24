@@ -121,6 +121,8 @@ namespace aquarius
 
 		void do_read()
 		{
+			buffer_.ensure();
+			buffer_.normalize();
 			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
 									[this](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
