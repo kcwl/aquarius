@@ -129,7 +129,7 @@ namespace aquarius
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
-										if (!system_call(bytes_transferred))
+										//if (!system_call(bytes_transferred))
 											read_handler();
 
 										do_read();
