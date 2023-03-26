@@ -106,6 +106,16 @@ namespace aquarius
 			return buffer_;
 		}
 
+		std::string remote_address()
+		{
+			return socket_.remote_endpoint().address().to_string();
+		}
+
+		int remote_port()
+		{
+			return socket_.remote_endpoint().port();
+		}
+
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
