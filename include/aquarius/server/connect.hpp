@@ -92,11 +92,24 @@ namespace aquarius
 				write(std::move(buffer));
 			}
 
-			void write(core::flex_buffer_t&& resp_buf)
+			void write(core::flex_buffer_t&& buffer)
 			{
-				write_queue_.push(std::forward<core::flex_buffer_t>(resp_buf));
+				//write_queue_.push(std::forward<core::flex_buffer_t>(resp_buf));
 
-				async_process_queue();
+				//async_process_queue();
+
+				if constexpr (std::same_as<_SocketType, core::ssl_socket>)
+				{
+					ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
+												 std::bind(&connect::write_handle, this->shared_from_this(),
+														   std::placeholders::_1, std::placeholders::_2));
+				}
+				else
+				{
+					socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
+											 std::bind(&connect::write_handle, this->shared_from_this(),
+													   std::placeholders::_1, std::placeholders::_2));
+				}
 			}
 
 			void async_read()
@@ -266,6 +279,8 @@ namespace aquarius
 											 std::bind(&connect::write_handle, this->shared_from_this(),
 													   std::placeholders::_1, std::placeholders::_2));
 				}
+
+				buffer.consume(buffer.size());
 			}
 
 			virtual core::read_handle_result read_handle_internal() = 0;
@@ -304,10 +319,11 @@ namespace aquarius
 					shut_down();
 					return;
 				}
+				
+				//if (!write_queue_.empty())
+				//	write_queue_.pop();
 
-				write_queue_.pop();
-
-				async_process_queue();
+				//async_process_queue();
 
 				std::cout << "complete " << bytes_transferred << " bytes\n";
 			}
