@@ -112,6 +112,19 @@ namespace aquarius
 				}
 			}
 
+			void write_length(const void* data, std::size_t size)
+			{
+				uint16_t sz = static_cast<uint16_t>(size + 2);
+
+				aquarius::core::flex_buffer_t buffer{};
+
+				elastic::binary_oarchive oa(buffer);
+				oa.save_binary(&sz, 2);
+				oa.save_binary(data, size);
+
+				write(std::move(buffer));
+			}
+
 			void async_read()
 			{
 				if (!socket_.is_open())
