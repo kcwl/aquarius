@@ -18,6 +18,12 @@ namespace aquarius
 			{
 				size_ = static_cast<uint32_t>(sz);
 			}
+
+			void clone(const tcp_header& header)
+			{
+				uid_ = header.uid_;
+				append_ = header.append_;
+			}
 		};
 
 		struct tcp_request_header : tcp_header
