@@ -65,6 +65,17 @@ namespace aquarius
 			thread_ptr_.reset(new std::thread([&] { io_service_.run(); }));
 		}
 
+		void shut_down()
+		{
+			io_service_.stop();
+
+			thread_ptr_->join();
+
+			socket_.shutdown(boost::asio::socket_base::shutdown_both);
+
+			socket_.close();
+		}
+
 		template <class _Ty, std::size_t N>
 		void async_write(const std::array<_Ty, N>& buf)
 		{
