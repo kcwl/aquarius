@@ -8,7 +8,7 @@
 
 namespace aquarius
 {
-	class client
+	class client : public std::enable_shared_from_this<client>
 	{
 	public:
 		explicit client()
@@ -50,9 +50,9 @@ namespace aquarius
 		}
 
 	public:
-		void open(boost::asio::io_service& io_service, const std::string& host, const std::string& port)
+		void open(const std::string& host, const std::string& port)
 		{
-			boost::asio::ip::tcp::resolver resolver(io_service);
+			boost::asio::ip::tcp::resolver resolver(io_service_);
 
 			auto endpoints = resolver.resolve(host, port);
 			do_connect(endpoints);
@@ -79,8 +79,10 @@ namespace aquarius
 		template <class _Ty, std::size_t N>
 		void async_write(const std::array<_Ty, N>& buf)
 		{
+			auto self = this->shared_from_this();
+
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
-									 [this](const boost::system::error_code& ec, std::size_t)
+									 [this, self](const boost::system::error_code& ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -91,8 +93,10 @@ namespace aquarius
 
 		void async_write(core::flex_buffer_t&& buf)
 		{
+			auto self = this->shared_from_this();
+
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
-									 [this](boost::system::error_code ec, std::size_t)
+									 [this, self](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -130,8 +134,10 @@ namespace aquarius
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
+			auto self = this->shared_from_this();
+
 			boost::asio::async_connect(socket_, endpoints,
-									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   [this, self](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
 											   return;
@@ -142,10 +148,12 @@ namespace aquarius
 
 		void do_read()
 		{
+			auto self = this->shared_from_this();
+
 			buffer_.ensure();
 			buffer_.normalize();
 			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
-									[this](boost::system::error_code ec, std::size_t bytes_transferred)
+									[this, self](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
 											return;
