@@ -112,6 +112,15 @@ namespace aquarius
 			async_write(std::move(buffer));
 		}
 
+		template<typename _Message>
+		void async_write(_Message&& msg)
+		{
+			aquarius::core::flex_buffer_t buffer{};
+			msg.visit(buffer, core::visit_mode::output);
+
+			async_write(buffer);
+		}
+
 		virtual int read_handler() = 0;
 
 		void close() { socket_.close(); }
