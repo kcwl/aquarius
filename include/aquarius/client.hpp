@@ -118,7 +118,7 @@ namespace aquarius
 			aquarius::core::flex_buffer_t buffer{};
 			msg.visit(buffer, core::visit_mode::output);
 
-			async_write(buffer);
+			async_write(std::move(buffer));
 		}
 
 		virtual int read_handler() = 0;
