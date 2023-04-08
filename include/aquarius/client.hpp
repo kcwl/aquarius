@@ -143,10 +143,10 @@ namespace aquarius
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
-			auto self = this->shared_from_this();
+			//auto self = this->shared_from_this();
 
 			boost::asio::async_connect(socket_, endpoints,
-									   [this, self](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   [this/*, self*/](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
 											   return;
@@ -157,12 +157,12 @@ namespace aquarius
 
 		void do_read()
 		{
-			auto self = this->shared_from_this();
+			//auto self = this->shared_from_this();
 
 			buffer_.ensure();
 			buffer_.normalize();
 			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
-									[this, self](boost::system::error_code ec, std::size_t bytes_transferred)
+									[this/*, self*/](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
 											return;
