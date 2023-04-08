@@ -129,7 +129,8 @@ namespace aquarius
 						return res;
 					}
 
-					oa.save(buf);
+					if (!buf.empty())
+						oa.save_binary(buf.data(), buf.size());
 				}
 
 				return core::read_handle_result::ok;
