@@ -71,7 +71,8 @@ namespace aquarius
 
 			thread_ptr_->join();
 
-			socket_.shutdown(boost::asio::socket_base::shutdown_both);
+			boost::system::error_code ec;
+			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
 
 			socket_.close();
 		}
@@ -79,10 +80,10 @@ namespace aquarius
 		template <class _Ty, std::size_t N>
 		void async_write(const std::array<_Ty, N>& buf)
 		{
-			auto self = this->shared_from_this();
+			//auto self = this->shared_from_this();
 
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
-									 [this, self](const boost::system::error_code& ec, std::size_t)
+									 [this/*, self*/](const boost::system::error_code& ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -93,10 +94,10 @@ namespace aquarius
 
 		void async_write(core::flex_buffer_t&& buf)
 		{
-			auto self = this->shared_from_this();
+			//auto self = this->shared_from_this();
 
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
-									 [this, self](boost::system::error_code ec, std::size_t)
+									 [this/*, self*/](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
 										 {
