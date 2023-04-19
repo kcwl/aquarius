@@ -1,10 +1,12 @@
 ﻿#pragma once
-#include <aquarius/core/type_traits.hpp>
+#include <aquarius/context/invoke.hpp>
 #include <aquarius/core/flex_buffer.hpp>
+#include <aquarius/core/type_traits.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
+#include <map>
 
 namespace aquarius
 {
@@ -14,12 +16,10 @@ namespace aquarius
 		explicit client()
 			: io_service_()
 			, socket_(io_service_)
-		{
-
-		}
+		{}
 
 		client(/*boost::asio::io_service& io_service,*/
-						const boost::asio::ip::tcp::resolver::results_type& endpoints)
+			   const boost::asio::ip::tcp::resolver::results_type& endpoints)
 			: io_service_(/*io_service*/)
 			, socket_(io_service_)
 			, buffer_()
@@ -80,10 +80,10 @@ namespace aquarius
 		template <class _Ty, std::size_t N>
 		void async_write(const std::array<_Ty, N>& buf)
 		{
-			//auto self = this->shared_from_this();
+			// auto self = this->shared_from_this();
 
 			boost::asio::async_write(socket_, boost::asio::buffer(buf),
-									 [this/*, self*/](const boost::system::error_code& ec, std::size_t)
+									 [this /*, self*/](const boost::system::error_code& ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -94,10 +94,10 @@ namespace aquarius
 
 		void async_write(core::flex_buffer_t&& buf)
 		{
-			//auto self = this->shared_from_this();
+			// auto self = this->shared_from_this();
 
 			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
-									 [this/*, self*/](boost::system::error_code ec, std::size_t)
+									 [this /*, self*/](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
 										 {
@@ -113,7 +113,7 @@ namespace aquarius
 			async_write(std::move(buffer));
 		}
 
-		template<typename _Message>
+		template <typename _Message>
 		void async_write(_Message&& msg)
 		{
 			aquarius::core::flex_buffer_t buffer{};
@@ -122,9 +122,20 @@ namespace aquarius
 			async_write(std::move(buffer));
 		}
 
+		template<typename _Message, typename _Func>
+		void async_write(_Message&& msg, _Func&& f)
+		{
+			async_funcs_.emplace(msg.header().magic_, std::forward<_Func>(f));
+
+			async_write(std::forward<_Message>(msg));
+		}
+
 		virtual int read_handler() = 0;
 
-		void close() { socket_.close(); }
+		void close()
+		{
+			socket_.close();
+		}
 
 		core::flex_buffer_t& get_recv_buffer()
 		{
@@ -144,10 +155,10 @@ namespace aquarius
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
-			//auto self = this->shared_from_this();
+			// auto self = this->shared_from_this();
 
 			boost::asio::async_connect(socket_, endpoints,
-									   [this/*, self*/](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   [this /*, self*/](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
 											   return;
@@ -158,50 +169,44 @@ namespace aquarius
 
 		void do_read()
 		{
-			//auto self = this->shared_from_this();
+			// auto self = this->shared_from_this();
 
 			buffer_.ensure();
 			buffer_.normalize();
 			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
-									[this/*, self*/](boost::system::error_code ec, std::size_t bytes_transferred)
+									[this /*, self*/](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
 											return;
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
-										//if (!system_call(bytes_transferred))
+										uint32_t proto = 0;
+
+										elastic::binary_iarchive ia(buffer_);
+
+										ia >> proto;
+
+										auto req = ctx::message_invoke_helpter::invoke(proto);
+
+										if (!req)
+											return;
+
+										auto iter = async_funcs_.find(req->unique_key());
+
+										if (iter == async_funcs_.end())
+										{
 											read_handler();
+										}
+										else
+										{
+											iter->second(buffer_);
+
+											async_funcs_.erase(iter);
+										}
 
 										do_read();
 									});
-		}
-
-		bool system_call(std::size_t bytes_transferred)
-		{
-			elastic::binary_iarchive ia(buffer_);
-
-			int proto_id = 0;
-
-			ia >> proto_id;
-
-			if (proto_id != 1000)
-			{
-				return false;
-			}
-
-			buffer_.consume(static_cast<int>(bytes_transferred));
-
-			null_body_response<1001> resp{};
-
-			core::flex_buffer_t fs;
-
-			resp.visit(fs, aquarius::core::visit_mode::output);
-
-			//async_write(std::move(fs));
-
-			std::cout << "pong\n";
-			return true;
 		}
 
 	private:
@@ -212,5 +217,7 @@ namespace aquarius
 		core::flex_buffer_t buffer_;
 
 		std::shared_ptr<std::thread> thread_ptr_;
+
+		std::map<uint32_t, std::function<void(core::flex_buffer_t&)>> async_funcs_;
 	};
 } // namespace aquarius
