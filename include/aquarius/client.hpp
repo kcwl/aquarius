@@ -5,8 +5,8 @@
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
-#include <type_traits>
 #include <map>
+#include <type_traits>
 
 namespace aquarius
 {
@@ -106,13 +106,6 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(const void* data, std::size_t size)
-		{
-			aquarius::core::flex_buffer_t buffer(data, size);
-
-			async_write(std::move(buffer));
-		}
-
 		template <typename _Message>
 		void async_write(_Message&& msg)
 		{
@@ -122,7 +115,7 @@ namespace aquarius
 			async_write(std::move(buffer));
 		}
 
-		template<typename _Message, typename _Func>
+		template <typename _Message, typename _Func>
 		void async_write(_Message&& msg, _Func&& f)
 		{
 			async_funcs_.emplace(msg.header().magic_, std::forward<_Func>(f));
@@ -179,6 +172,8 @@ namespace aquarius
 										if (ec)
 											return;
 
+										auto pos = 4096 - buffer_.active();
+
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
 										uint32_t proto = 0;
@@ -200,6 +195,8 @@ namespace aquarius
 										}
 										else
 										{
+											buffer_.commit(buffer_.active() + pos - 4096);
+
 											iter->second(buffer_);
 
 											async_funcs_.erase(iter);
