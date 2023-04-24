@@ -187,6 +187,10 @@ namespace aquarius
 										if (!req)
 											return;
 
+										req->visit(buffer_, aquarius::core::visit_mode::input);
+
+										buffer_.consume(0 - bytes_transferred);
+
 										auto iter = async_funcs_.find(req->unique_key());
 
 										if (iter == async_funcs_.end())
@@ -195,8 +199,6 @@ namespace aquarius
 										}
 										else
 										{
-											buffer_.commit(buffer_.active() + pos - 4096);
-
 											iter->second(buffer_);
 
 											async_funcs_.erase(iter);
