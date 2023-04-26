@@ -195,9 +195,7 @@ namespace aquarius
 										}
 										else
 										{
-											buffer_.commit(buffer_.active() + pos - 4096);
-
-											iter->second(buffer_);
+											iter->second(req);
 
 											async_funcs_.erase(iter);
 										}
@@ -215,6 +213,6 @@ namespace aquarius
 
 		std::shared_ptr<std::thread> thread_ptr_;
 
-		std::map<uint32_t, std::function<void(core::flex_buffer_t&)>> async_funcs_;
+		std::map<uint32_t, std::function<void(std::shared_ptr<tcp::xmessage>)>> async_funcs_;
 	};
 } // namespace aquarius
