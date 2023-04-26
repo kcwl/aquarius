@@ -27,6 +27,11 @@ namespace aquarius
 			{
 				return core::read_handle_result::error;
 			}
+
+			virtual int32_t size()
+			{
+				return 0;
+			}
 		};
 
 		template <typename _Header, typename _Body, uint32_t N>
@@ -111,10 +116,19 @@ namespace aquarius
 				return to_message(stream);
 			}
 
+			virtual int32_t size()
+			{
+				return bytes_;
+			}
+
 		private:
 			core::read_handle_result parse_message(core::flex_buffer_t& stream)
 			{
+				auto sz = stream.size();
+
 				auto res = header_ptr_->parse_bytes(stream);
+
+				bytes_ += sz - stream.size();
 
 				if (res != core::read_handle_result::ok)
 					return res;
@@ -130,6 +144,9 @@ namespace aquarius
 					{
 						return res;
 					}
+
+					bytes_ += body_.ByteSizeLong();
+					stream.consume(header_ptr_->size_);
 				}
 
 				return core::read_handle_result::ok;
@@ -164,6 +181,8 @@ namespace aquarius
 			header_type* header_ptr_;
 
 			body_type body_;
+
+			std::size_t bytes_;
 		};
 	} // namespace tcp
 } // namespace aquarius
