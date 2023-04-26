@@ -51,6 +51,30 @@ namespace aquarius
 				this->dealloc(header_ptr_);
 			}
 
+			message(const message& other)
+			{
+				header() = other.header();
+
+				body().Copy(other.body());
+			}
+
+			message(message&& other)
+			{
+				header() = std::move(other.header());
+
+				body().Move(other.body());
+			}
+
+			message& operator=(message&& other)
+			{
+				if (this == std::addressof(other))
+					return *this;
+
+				*this = std::move(other);
+
+				return *this;
+			}
+
 		public:
 			header_type& header() noexcept
 			{
