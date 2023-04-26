@@ -172,9 +172,9 @@ namespace aquarius
 										if (ec)
 											return;
 
-										auto pos = 4096 - buffer_.active();
-
 										buffer_.commit(static_cast<int>(bytes_transferred));
+
+										int pos = static_cast<int>(buffer_.size());
 
 										uint32_t proto = 0;
 
@@ -182,15 +182,21 @@ namespace aquarius
 
 										ia >> proto;
 
+										pos -= buffer_.size();
+
 										auto req = ctx::message_invoke_helpter::invoke(proto);
 
 										if (!req)
 											return;
 
+										req->visit(buffer_, aquarius::core::visit_mode::input);
+
 										auto iter = async_funcs_.find(req->unique_key());
 
 										if (iter == async_funcs_.end())
 										{
+											buffer_.consume(-req->size() - pos);
+
 											read_handler();
 										}
 										else
