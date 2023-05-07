@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 #include <aquarius/core/basic_module.hpp>
 #include <aquarius/server/io_service_pool.hpp>
 
@@ -30,28 +31,39 @@ namespace aquarius
 			virtual ~server() = default;
 
 		public:
-			bool run()
+			void run()
 			{
+				if (!load_config())
+					return;
+
 				if (!load_module())
-					return false;
+					return;
+
+				if (!config_module())
+					return;
 
 				if (!start_module())
-					return false;
+					return;
 
 				io_service_pool_.run();
-
-				return true;
 			}
 
 		protected:
+			virtual bool load_config()
+			{
+				return true;
+			}
+
 			virtual bool load_module()
 			{
 				return true;
 			}
 
-			void regist_module(std::shared_ptr<core::basic_module> module_ptr)
+			template<typename _Module>
+			requires(std::is_base_of_v<core::basic_module, _Module>)
+			void regist_module()
 			{
-				modules_.push_back(module_ptr);
+				modules_.push_back(std::make_shared<_Module>());
 			}
 
 		private:
@@ -71,42 +83,39 @@ namespace aquarius
 									   });
 			}
 
+			bool config_module()
+			{
+				for (auto& m : modules_)
+				{
+					if (!m->config())
+						return false;
+				}
+				return true;
+			}
+
 			bool start_module()
 			{
-				for (auto& module : modules_)
+				for (auto& m : modules_)
 				{
-					if (!module->enable())
+					if (!m->enable())
 						continue;
 
-					if (!module->initialize())
+					if (!m->start())
 						return false;
-
-					if (!module->stop())
-					{
-						return false;
-					}
 				}
 
 				return true;
 			}
 
-			bool stop_module()
+			void stop_module()
 			{
 				for (auto& module : modules_)
 				{
 					if (!module->enable())
 						continue;
 
-					if (!module->initialize())
-						return false;
-
-					if (!module->stop())
-					{
-						return false;
-					}
+					module->stop();
 				}
-
-				return true;
 			}
 
 			void handle_stop()
