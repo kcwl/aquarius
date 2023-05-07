@@ -66,7 +66,7 @@ namespace aquarius
 
 				if (result == 0)
 				{
-					std::cout << "warning: no ctx for req\n";
+					std::cout << std::format("warning: no ctx for req: {}\n", id) ;
 				}
 
 				return core::read_handle_result::ok;

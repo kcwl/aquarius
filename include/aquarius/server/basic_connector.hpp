@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/core/flex_buffer.hpp>
+#include "../third_part/stduuid/include/uuid.h"
 
 namespace aquarius
 {
@@ -14,7 +15,11 @@ namespace aquarius
 
 			virtual core::flex_buffer_t& get_read_buffer() = 0;
 
-			virtual std::string uuid() = 0;
+			virtual uuids::uuid uid() = 0;
+
+			virtual std::string remote_address() = 0;
+
+			virtual uint16_t remote_port() = 0;
 		};
 	}
 }
