@@ -29,7 +29,15 @@ namespace aquarius
 			virtual ~server() = default;
 
 		public:
-			void run() { io_service_pool_.run(); }
+			server(const server&) = default;
+
+			server(server&&) = default;
+
+		public:
+			void run()
+			{
+				io_service_pool_.run();
+			}
 
 		private:
 			void start_accept()
@@ -48,7 +56,10 @@ namespace aquarius
 									   });
 			}
 
-			void handle_stop() { io_service_pool_.stop(); }
+			void handle_stop()
+			{
+				io_service_pool_.stop();
+			}
 
 		private:
 			io_service_pool io_service_pool_;
@@ -57,5 +68,5 @@ namespace aquarius
 
 			boost::asio::ip::tcp::acceptor acceptor_;
 		};
-	} // namespace impl
+	} // namespace srv
 } // namespace aquarius
