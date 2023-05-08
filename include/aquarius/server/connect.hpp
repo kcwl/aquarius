@@ -159,9 +159,9 @@ namespace aquarius
 				on_close();
 			}
 
-			virtual std::string uuid()
+			virtual std::size_t uuid()
 			{
-				return uuids::to_string(uid_);
+				return std::hash<uuids::uuid>{}(uid_);
 			}
 
 			std::chrono::milliseconds get_connect_duration()
