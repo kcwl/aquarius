@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "../third_part/stduuid/include/uuid.h"
 
 #include <aquarius/core/deadline_timer.hpp>
 #include <aquarius/core/defines.hpp>
@@ -75,54 +75,16 @@ namespace aquarius
 				return socket_.remote_endpoint().address().to_string();
 			}
 
-			uint32_t remote_address_u()
-			{
-				return socket_.remote_endpoint().address().to_v4().to_uint();
-			}
-
 			uint16_t remote_port()
 			{
 				return socket_.remote_endpoint().port();
 			}
 
-			void write(const void* data, std::size_t size)
+			void write(core::flex_buffer_t&& resp_buf)
 			{
-				core::flex_buffer_t buffer(data, size);
+				write_queue_.push(std::forward<core::flex_buffer_t>(resp_buf));
 
-				write(std::move(buffer));
-			}
-
-			void write(core::flex_buffer_t&& buffer)
-			{
-				//write_queue_.push(std::forward<core::flex_buffer_t>(resp_buf));
-
-				//async_process_queue();
-
-				if constexpr (std::same_as<_SocketType, core::ssl_socket>)
-				{
-					ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
-												 std::bind(&connect::write_handle, this->shared_from_this(),
-														   std::placeholders::_1, std::placeholders::_2));
-				}
-				else
-				{
-					socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
-											 std::bind(&connect::write_handle, this->shared_from_this(),
-													   std::placeholders::_1, std::placeholders::_2));
-				}
-			}
-
-			void write_length(const void* data, std::size_t size)
-			{
-				uint16_t sz = static_cast<uint16_t>(size + 2);
-
-				aquarius::core::flex_buffer_t buffer{};
-
-				elastic::binary_oarchive oa(buffer);
-				oa.save_binary(&sz, 2);
-				oa.save_binary(data, size);
-
-				write(std::move(buffer));
+				async_process_queue();
 			}
 
 			void async_read()
@@ -197,9 +159,9 @@ namespace aquarius
 				on_close();
 			}
 
-			virtual uuids::uuid uid()
+			virtual std::size_t uuid()
 			{
-				return uid_;
+				return std::hash<uuids::uuid>{}(uid_);
 			}
 
 			std::chrono::milliseconds get_connect_duration()
@@ -292,8 +254,6 @@ namespace aquarius
 											 std::bind(&connect::write_handle, this->shared_from_this(),
 													   std::placeholders::_1, std::placeholders::_2));
 				}
-
-				buffer.consume(buffer.size());
 			}
 
 			virtual core::read_handle_result read_handle_internal() = 0;
@@ -332,11 +292,10 @@ namespace aquarius
 					shut_down();
 					return;
 				}
-				
-				//if (!write_queue_.empty())
-				//	write_queue_.pop();
 
-				//async_process_queue();
+				write_queue_.pop();
+
+				async_process_queue();
 
 				std::cout << "complete " << bytes_transferred << " bytes\n";
 			}

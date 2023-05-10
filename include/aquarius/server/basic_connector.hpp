@@ -15,7 +15,7 @@ namespace aquarius
 
 			virtual core::flex_buffer_t& get_read_buffer() = 0;
 
-			virtual uuids::uuid uid() = 0;
+			virtual std::size_t uuid() = 0;
 
 			virtual std::string remote_address() = 0;
 
