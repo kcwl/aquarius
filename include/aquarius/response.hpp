@@ -18,16 +18,16 @@ namespace aquarius
 	public:
 		response(const response& other)
 		{
-			header() = other.header();
+			this->header() = other.header();
 
-			body().Copy(other.body());
+			this->body().Copy(other.body());
 		}
 
 		response(response&& other)
 		{
-			header() = std::move(other.header());
+			this->header() = std::move(other.header());
 
-			body().Move(other.body());
+			this->body().Move(other.body());
 		}
 
 		response& operator=(response&& other)
