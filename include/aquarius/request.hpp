@@ -17,16 +17,16 @@ namespace aquarius
 	public:
 		request(const request& other)
 		{
-			header() = other.header();
+			this->header() = other.header();
 
-			body().Copy(other.body());
+			this->body().Copy(other.body());
 		}
 
 		request(request&& other)
 		{
-			header() = std::move(other.header());
+			this->header() = std::move(other.header());
 
-			body().Move(other.body());
+			this->body().Move(other.body());
 		}
 
 		request& operator=(request&& other)
