@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/core/time_traits.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio.hpp>
 
 namespace aquarius
 {
