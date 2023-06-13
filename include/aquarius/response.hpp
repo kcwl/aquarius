@@ -1,14 +1,14 @@
 ﻿#pragma once
-#include <aquarius/tcp/field.hpp>
-#include <aquarius/tcp/header.hpp>
-#include <aquarius/tcp/message.hpp>
+#include <aquarius/header.hpp>
+#include <aquarius/message.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class response : public tcp::message<tcp::tcp_response_header, _Body, Number>
+	class response : public message<tcp_response_header, _Body, Number>
 	{
-		using base_type = tcp::message<tcp::tcp_response_header, _Body, Number>;
+		using base_type = message<tcp_response_header, _Body, Number>;
+
 	public:
 		response() = default;
 		~response() = default;
@@ -39,5 +39,5 @@ namespace aquarius
 	};
 
 	template <uint32_t Number>
-	using null_body_response = response<tcp::null_body, Number>;
+	using null_body_response = response<null_body, Number>;
 } // namespace aquarius

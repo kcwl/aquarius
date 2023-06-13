@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
 		using noncopyable = boost::noncopyable;
 	} // namespace detail

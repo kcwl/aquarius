@@ -1,12 +1,12 @@
 #pragma once
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 
 using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
 		constexpr static auto heart_time_interval = 10s;
 
@@ -25,5 +25,5 @@ namespace aquarius
 			error = 2,
 			waiting_for_query = 3
 		};
-	} // namespace impl
+	} // namespace detail
 } // namespace aquarius

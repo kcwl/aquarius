@@ -140,37 +140,73 @@ namespace
 	template <typename _Ty>
 	struct logic_sig<_Ty, 256>
 	{
-		static constexpr _Ty ssig0(_Ty x) { return rotr_s<_Ty>(x, 2, 13, 22); }
+		static constexpr _Ty ssig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 2, 13, 22);
+		}
 
-		static constexpr _Ty ssig1(_Ty x) { return rotr_s<_Ty>(x, 6, 11, 25); }
+		static constexpr _Ty ssig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 6, 11, 25);
+		}
 
-		static constexpr _Ty sig0(_Ty x) { return rotr_s<_Ty>(x, 7, 18) ^ (x >> 3); }
+		static constexpr _Ty sig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 7, 18) ^ (x >> 3);
+		}
 
-		static constexpr _Ty sig1(_Ty x) { return rotr_s<_Ty>(x, 17, 19) ^ (x >> 10); }
+		static constexpr _Ty sig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 17, 19) ^ (x >> 10);
+		}
 	};
 
 	template <typename _Ty>
 	struct logic_sig<_Ty, 384>
 	{
-		static constexpr _Ty ssig0(_Ty x) { return rotr_s<_Ty>(x, 28, 34, 39); }
+		static constexpr _Ty ssig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 28, 34, 39);
+		}
 
-		static constexpr _Ty ssig1(_Ty x) { return rotr_s<_Ty>(x, 14, 18, 41); }
+		static constexpr _Ty ssig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 14, 18, 41);
+		}
 
-		static constexpr _Ty sig0(_Ty x) { return rotr_s<_Ty>(x, 1, 8) ^ (x >> 7); }
+		static constexpr _Ty sig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 1, 8) ^ (x >> 7);
+		}
 
-		static constexpr _Ty sig1(_Ty x) { return rotr_s<_Ty>(x, 19, 61) ^ (x >> 6); }
+		static constexpr _Ty sig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 19, 61) ^ (x >> 6);
+		}
 	};
 
 	template <typename _Ty>
 	struct logic_sig<_Ty, 512>
 	{
-		static constexpr _Ty ssig0(_Ty x) { return rotr_s<_Ty>(x, 28, 34, 39); }
+		static constexpr _Ty ssig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 28, 34, 39);
+		}
 
-		static constexpr _Ty ssig1(_Ty x) { return rotr_s<_Ty>(x, 14, 18, 41); }
+		static constexpr _Ty ssig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 14, 18, 41);
+		}
 
-		static constexpr _Ty sig0(_Ty x) { return rotr_s<_Ty>(x, 1, 8) ^ (x >> 7); }
+		static constexpr _Ty sig0(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 1, 8) ^ (x >> 7);
+		}
 
-		static constexpr _Ty sig1(_Ty x) { return rotr_s<_Ty>(x, 19, 61) ^ (x >> 6); }
+		static constexpr _Ty sig1(_Ty x)
+		{
+			return rotr_s<_Ty>(x, 19, 61) ^ (x >> 6);
+		}
 	};
 
 	template <std::size_t N>

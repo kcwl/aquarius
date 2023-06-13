@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/server/basic_connector.hpp>
+#include <aquarius/basic_connector.hpp>
 
 namespace aquarius
 {
-	namespace tcp
-	{
-		class xmessage;
-	} // namespace impl
+	class xmessage;
+}
 
-	namespace ctx
+namespace aquarius
+{
+	namespace detail
 	{
 		class basic_visitor
 		{
@@ -25,7 +25,7 @@ namespace aquarius
 			virtual ~visitor() = default;
 
 		public:
-			virtual _Return visit(_Request* visited, std::shared_ptr<srv::basic_connector> conn_ptr) = 0;
+			virtual _Return visit(_Request* visited, std::shared_ptr<basic_connector> conn_ptr) = 0;
 		};
 
 		template <typename _Return>
@@ -36,22 +36,21 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual _Return accept(std::shared_ptr<basic_visitor> ctx,
-								   std::shared_ptr<srv::basic_connector> conn_ptr) = 0;
+			virtual _Return accept(std::shared_ptr<basic_visitor> ctx, std::shared_ptr<basic_connector> conn_ptr) = 0;
 		};
 
 		template <typename _Return, typename _Request>
 		static _Return accept_impl(_Request* req, std::shared_ptr<basic_visitor> ctx,
-								   std::shared_ptr<srv::basic_connector> conn_ptr)
+								   std::shared_ptr<basic_connector> conn_ptr)
 		{
-			using visitor_t = ctx::visitor<_Request, int>;
-			using visitor_msg_t = ctx::visitor<tcp::xmessage, int>;
+			using visitor_t = detail::visitor<_Request, int>;
+			using visitor_msg_t = detail::visitor<xmessage, int>;
 
-			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
+			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(detail))
 			{
 				return visit_ptr->visit(req, conn_ptr);
 			}
-			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
+			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(detail))
 			{
 				return visitor_ptr->visit(req, conn_ptr);
 			}
@@ -60,17 +59,17 @@ namespace aquarius
 		}
 
 #define DEFINE_VISITABLE(_Return)                                                                                      \
-	virtual _Return accept(std::shared_ptr<aquarius::ctx::basic_visitor> ctx,                                               \
-						   std::shared_ptr<aquarius::srv::basic_connector> conn_ptr)                                  \
+	virtual _Return accept(std::shared_ptr<aquarius::detail::basic_visitor> ctx,                                       \
+						   std::shared_ptr<aquarius::basic_connector> conn_ptr)                                        \
 	{                                                                                                                  \
 		return accept_impl<_Return>(this, ctx, conn_ptr);                                                              \
 	}
 
 #define DEFINE_VISITOR(_Request, _Return)                                                                              \
-	virtual _Return visit(_Request*, std::shared_ptr<aquarius::srv::basic_connector>)                                 \
+	virtual _Return visit(_Request*, std::shared_ptr<aquarius::basic_connector>)                                       \
 	{                                                                                                                  \
 		return _Return{};                                                                                              \
 	}
 
-	} // namespace impl
+	} // namespace detail
 } // namespace aquarius

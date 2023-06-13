@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/core/type_traits.hpp>
+#include <aquarius/detail/type_traits.hpp>
 #include <boost/core/empty_value.hpp>
 #include <cstddef>
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
 		template <typename _Alloc>
 		using empty_value = boost::empty_::empty_value<_Alloc>;

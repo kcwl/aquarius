@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	namespace srv
+	namespace detail
 	{
 		class io_service_pool
 		{
@@ -70,5 +70,5 @@ namespace aquarius
 
 			std::vector<work_ptr_t> works_;
 		};
-	} // namespace impl
+	} // namespace detail
 } // namespace aquarius
