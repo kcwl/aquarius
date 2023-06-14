@@ -43,14 +43,14 @@ namespace aquarius
 		static _Return accept_impl(_Request* req, std::shared_ptr<basic_visitor> ctx,
 								   std::shared_ptr<basic_connector> conn_ptr)
 		{
-			using visitor_t = detail::visitor<_Request, int>;
-			using visitor_msg_t = detail::visitor<xmessage, int>;
+			using visitor_t = visitor<_Request, int>;
+			using visitor_msg_t = visitor<xmessage, int>;
 
-			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(detail))
+			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
 			{
 				return visit_ptr->visit(req, conn_ptr);
 			}
-			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(detail))
+			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
 			{
 				return visitor_ptr->visit(req, conn_ptr);
 			}

@@ -77,9 +77,9 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		void write(detail::flex_buffer_t&& resp_buf)
+		void write(flex_buffer_t&& resp_buf)
 		{
-			write_queue_.push(std::forward<detail::flex_buffer_t>(resp_buf));
+			write_queue_.push(std::forward<flex_buffer_t>(resp_buf));
 
 			async_process_queue();
 		}
@@ -117,7 +117,7 @@ namespace aquarius
 			async_read();
 		}
 
-		virtual detail::flex_buffer_t& get_read_buffer() override
+		virtual flex_buffer_t& get_read_buffer() override
 		{
 			return read_buffer_;
 		}
@@ -337,9 +337,9 @@ namespace aquarius
 
 		ssl_socket_t ssl_socket_;
 
-		detail::flex_buffer_t read_buffer_;
+		flex_buffer_t read_buffer_;
 
-		std::queue<detail::flex_buffer_t> write_queue_;
+		std::queue<flex_buffer_t> write_queue_;
 
 		detail::steady_timer connect_timer_;
 

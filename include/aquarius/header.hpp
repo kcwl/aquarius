@@ -22,6 +22,18 @@ namespace aquarius
 			uid_ = header.uid_;
 			append_ = header.append_;
 		}
+
+	private:
+		friend class boost::serialization::access;
+
+		template <typename _Archive>
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
+		{
+			ar& magic_;
+			ar& size_;
+			ar& uid_;
+			ar& append_;
+		}
 	};
 
 	struct tcp_request_header : tcp_header
@@ -29,10 +41,10 @@ namespace aquarius
 		uint32_t reserve_;
 
 	private:
-		friend class access;
+		friend class boost::serialization::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar)
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
 		{
 			ar& boost::serialization::base_object<tcp_header>(*this);
 			ar& reserve_;
@@ -61,10 +73,10 @@ namespace aquarius
 		int32_t result_;
 
 	private:
-		friend class access;
+		friend class boost::serialization::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar)
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
 		{
 			ar& boost::serialization::base_object<tcp_header>(*this);
 			ar& result_;

@@ -10,7 +10,7 @@ namespace aquarius
 	{
 	public:
 		explicit tcp_connect(boost::asio::io_service& io_service,
-							 std::chrono::steady_clock::duration dura = core::heart_time_interval)
+							 std::chrono::steady_clock::duration dura = detail::heart_time_interval)
 			: connect<tcp_connect<_SocketType>, _SocketType>(io_service, dura)
 		{}
 
@@ -21,7 +21,7 @@ namespace aquarius
 
 			uint32_t id = 0;
 
-			iarchive ia(read_buffer);
+			boost::archive::binary_iarchive ia(read_buffer);
 			ia >> id;
 
 			if (id == 0)
@@ -31,7 +31,7 @@ namespace aquarius
 
 			auto ctx_iter = this->ctxs_.find(id);
 
-			std::shared_ptr<ctx::context> ctx_ptr;
+			std::shared_ptr<detail::context> ctx_ptr;
 
 			if (ctx_iter == this->ctxs_.end())
 			{
