@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/defines.hpp>
+#include <aquarius/defines.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <cstdint>
 
@@ -51,20 +51,20 @@ namespace aquarius
 		}
 
 	public:
-		detail::read_handle_result parse_bytes(flex_buffer_t& stream)
+		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
 			boost::archive::binary_iarchive ia(stream);
 			ia >> *this;
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 
-		detail::read_handle_result to_bytes(flex_buffer_t& stream)
+		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
 			boost::archive::binary_oarchive oa(stream);
 			oa << *this;
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 	};
 
@@ -83,20 +83,20 @@ namespace aquarius
 		}
 
 	public:
-		detail::read_handle_result parse_bytes(flex_buffer_t& stream)
+		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
 			boost::archive::binary_iarchive ia(stream);
 			ia >> *this;
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 
-		detail::read_handle_result to_bytes(flex_buffer_t& stream)
+		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
 			boost::archive::binary_oarchive oa(stream);
 			oa << *this;
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 	};
 } // namespace aquarius

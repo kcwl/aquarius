@@ -40,7 +40,7 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int on_timeout([[maybe_unused]] std::shared_ptr<basic_connector> session_ptr)
+			virtual int on_timeout([[maybe_unused]] std::shared_ptr<transfer> session_ptr)
 			{
 				return 0;
 			}
@@ -49,7 +49,7 @@ namespace aquarius
 			virtual void on_error([[maybe_unused]] int result){};
 
 		protected:
-			std::shared_ptr<basic_connector> conn_ptr_;
+			std::shared_ptr<transfer> conn_ptr_;
 
 			std::string name_;
 		};
@@ -74,12 +74,12 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int on_timeout(std::shared_ptr<basic_connector> conn_ptr) override
+			virtual int on_timeout([[maybe_unused]] std::shared_ptr<transfer> conn_ptr) override
 			{
 				return 0;
 			}
 
-			virtual int visit(_Request* req, std::shared_ptr<basic_connector> conn_ptr)
+			virtual int visit(_Request* req, std::shared_ptr<transfer> conn_ptr)
 			{
 				request_ptr_ = req;
 
@@ -102,9 +102,9 @@ namespace aquarius
 
 				flex_buffer_t fs;
 
-				response_.visit(fs, detail::visit_mode::output);
+				response_.visit(fs, visit_mode::output);
 
-				conn_ptr_->write(std::move(fs));
+				(*conn_ptr_)(std::move(fs));
 
 				return true;
 			}

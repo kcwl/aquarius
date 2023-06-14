@@ -110,7 +110,7 @@ namespace aquarius
 		void async_write(_Message&& msg)
 		{
 			flex_buffer_t buffer{};
-			msg.visit(buffer, detail::visit_mode::output);
+			msg.visit(buffer, visit_mode::output);
 
 			async_write(std::move(buffer));
 		}
@@ -189,7 +189,7 @@ namespace aquarius
 										if (!req)
 											return;
 
-										req->visit(buffer_, aquarius::detail::visit_mode::input);
+										req->visit(buffer_, aquarius::visit_mode::input);
 
 										auto iter = async_funcs_.find(req->unique_key());
 
