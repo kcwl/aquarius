@@ -29,4 +29,11 @@ namespace aquarius
 		error = 2,
 		waiting_for_query = 3
 	};
+
+	enum class connect_event
+	{
+		start,
+		close
+	};
+
 } // namespace aquarius

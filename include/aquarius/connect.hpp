@@ -104,17 +104,6 @@ namespace aquarius
 			}
 		}
 
-		void establish_async_read()
-		{
-			connect_time_ = std::chrono::system_clock::now();
-
-			on_start();
-
-			heart_deadline();
-
-			async_read();
-		}
-
 		void start()
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
@@ -146,7 +135,8 @@ namespace aquarius
 
 			socket_.close();
 
-			on_close();
+			if (on_close_)
+				on_close_();
 		}
 
 		virtual std::size_t uuid()
@@ -224,6 +214,19 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 		}
 
+		template<connect_event e, typename _Func>
+		void regist_func(_Func&& f)
+		{
+			if constexpr (e == connect_event::start)
+			{
+				on_start_ = std::forward<_Func>(f);
+			}
+			else if constexpr (e == connect_event::close)
+			{
+				on_close_ = std::forward<_Func>(f);
+			}
+		}
+
 	protected:
 		void async_process_queue()
 		{
@@ -245,12 +248,6 @@ namespace aquarius
 												   std::placeholders::_1, std::placeholders::_2));
 			}
 		}
-
-		virtual void on_start()
-		{}
-
-		virtual void on_close()
-		{}
 
 	private:
 		void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
@@ -377,6 +374,19 @@ namespace aquarius
 			return read_handle_result::ok;
 		}
 
+		void establish_async_read()
+		{
+			connect_time_ = std::chrono::system_clock::now();
+
+			if (on_start_)
+				on_start_();
+
+			heart_deadline();
+
+			async_read();
+		}
+
+
 	public:
 		std::map<uint32_t, std::shared_ptr<detail::context>> ctxs_;
 
@@ -398,5 +408,9 @@ namespace aquarius
 		std::chrono::steady_clock::duration dura_;
 
 		boost::uuids::uuid uid_;
+
+		std::function<void()> on_start_;
+
+		std::function<void()> on_close_;
 	};
 } // namespace aquarius
