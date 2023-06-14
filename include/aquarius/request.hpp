@@ -1,13 +1,14 @@
 ﻿#pragma once
-#include <aquarius/tcp/header.hpp>
-#include <aquarius/tcp/message.hpp>
+#include <aquarius/header.hpp>
+#include <aquarius/message.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class request : public tcp::message<tcp::tcp_request_header, _Body, Number>
+	class request : public message<tcp_request_header, _Body, Number>
 	{
-		using base_type = tcp::message<tcp::tcp_request_header, _Body, Number>;
+		using base_type = message<tcp_request_header, _Body, Number>;
+
 	public:
 		request() = default;
 		~request() = default;
@@ -38,5 +39,5 @@ namespace aquarius
 	};
 
 	template <uint32_t Number>
-	using null_body_request = request<tcp::null_body, Number>;
+	using null_body_request = request<null_body, Number>;
 } // namespace aquarius

@@ -1,12 +1,13 @@
 ﻿#pragma once
-#include <aquarius/context/visitor.hpp>
+#include <aquarius/detail/visitor.hpp>
 #include <memory>
+#include <string>
 
 namespace aquarius
 {
-	namespace ctx
+	namespace detail
 	{
-		class context : public ctx::visitor<tcp::xmessage, int>
+		class context : public detail::visitor<xmessage, int>
 		{
 		public:
 			context(const std::string& name)
@@ -26,7 +27,7 @@ namespace aquarius
 
 			context& operator=(const context&) = delete;
 
-			DEFINE_VISITOR(tcp::xmessage, int)
+			DEFINE_VISITOR(xmessage, int)
 
 		public:
 			virtual int on_connected()
@@ -39,7 +40,7 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int on_timeout([[maybe_unused]] std::shared_ptr<srv::basic_connector> session_ptr)
+			virtual int on_timeout([[maybe_unused]] std::shared_ptr<basic_connector> session_ptr)
 			{
 				return 0;
 			}
@@ -48,13 +49,13 @@ namespace aquarius
 			virtual void on_error([[maybe_unused]] int result){};
 
 		protected:
-			std::shared_ptr<srv::basic_connector> conn_ptr_;
+			std::shared_ptr<basic_connector> conn_ptr_;
 
 			std::string name_;
 		};
 
 		template <typename _Request, typename _Response>
-		class context_impl : public context, public ctx::visitor<_Request, int>
+		class context_impl : public context, public detail::visitor<_Request, int>
 		{
 		public:
 			context_impl(const std::string& name)
@@ -73,12 +74,12 @@ namespace aquarius
 				return 0;
 			}
 
-			virtual int on_timeout(std::shared_ptr<srv::basic_connector> conn_ptr) override
+			virtual int on_timeout(std::shared_ptr<basic_connector> conn_ptr) override
 			{
 				return 0;
 			}
 
-			virtual int visit(_Request* req, std::shared_ptr<srv::basic_connector> conn_ptr)
+			virtual int visit(_Request* req, std::shared_ptr<basic_connector> conn_ptr)
 			{
 				request_ptr_ = req;
 
@@ -99,9 +100,9 @@ namespace aquarius
 
 				response_.header().result_ = result;
 
-				core::flex_buffer_t fs;
+				flex_buffer_t fs;
 
-				response_.visit(fs, core::visit_mode::output);
+				response_.visit(fs, detail::visit_mode::output);
 
 				conn_ptr_->write(std::move(fs));
 
@@ -113,5 +114,5 @@ namespace aquarius
 
 			_Response response_;
 		};
-	} // namespace impl
+	} // namespace detail
 } // namespace aquarius

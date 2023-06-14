@@ -1,13 +1,12 @@
 ﻿#pragma once
-#include <aquarius/context/invoke.hpp>
-#include <aquarius/core/flex_buffer.hpp>
-#include <aquarius/core/type_traits.hpp>
+#include <aquarius/detail/invoke.hpp>
+#include <aquarius/detail/type_traits.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
 #include <map>
 #include <type_traits>
-#include <iostream>
 
 namespace aquarius
 {
@@ -41,7 +40,7 @@ namespace aquarius
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
 
-			if constexpr (!core::is_string<decltype(host)>::value || !core::is_string<decltype(port)>::value)
+			if constexpr (!detail::is_string<decltype(host)>::value || !detail::is_string<decltype(port)>::value)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
 			boost::asio::ip::tcp::resolver resolver(io_service_);
@@ -93,7 +92,7 @@ namespace aquarius
 									 });
 		}
 
-		void async_write(core::flex_buffer_t&& buf)
+		void async_write(flex_buffer_t&& buf)
 		{
 			// auto self = this->shared_from_this();
 
@@ -110,8 +109,8 @@ namespace aquarius
 		template <typename _Message>
 		void async_write(_Message&& msg)
 		{
-			aquarius::core::flex_buffer_t buffer{};
-			msg.visit(buffer, core::visit_mode::output);
+			flex_buffer_t buffer{};
+			msg.visit(buffer, detail::visit_mode::output);
 
 			async_write(std::move(buffer));
 		}
@@ -131,7 +130,7 @@ namespace aquarius
 			socket_.close();
 		}
 
-		core::flex_buffer_t& get_recv_buffer()
+		flex_buffer_t& get_recv_buffer()
 		{
 			return buffer_;
 		}
@@ -179,18 +178,18 @@ namespace aquarius
 
 										uint32_t proto = 0;
 
-										elastic::binary_iarchive ia(buffer_);
+										boost::archive::binary_iarchive ia(buffer_);
 
 										ia >> proto;
 
-										pos -= buffer_.size();
+										pos -= static_cast<int>(buffer_.size());
 
-										auto req = ctx::message_invoke_helpter::invoke(proto);
+										auto req = detail::message_invoke_helpter::invoke(proto);
 
 										if (!req)
 											return;
 
-										req->visit(buffer_, aquarius::core::visit_mode::input);
+										req->visit(buffer_, aquarius::detail::visit_mode::input);
 
 										auto iter = async_funcs_.find(req->unique_key());
 
@@ -216,10 +215,10 @@ namespace aquarius
 
 		boost::asio::ip::tcp::socket socket_;
 
-		core::flex_buffer_t buffer_;
+		flex_buffer_t buffer_;
 
 		std::shared_ptr<std::thread> thread_ptr_;
 
-		std::map<uint32_t, std::function<void(std::shared_ptr<tcp::xmessage>)>> async_funcs_;
+		std::map<uint32_t, std::function<void(std::shared_ptr<xmessage>)>> async_funcs_;
 	};
 } // namespace aquarius

@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/core/time_traits.hpp>
+#include <aquarius/detail/time_traits.hpp>
 #include <boost/asio.hpp>
 
 namespace aquarius
 {
-	namespace core
+	namespace detail
 	{
 		using deadline_timer = boost::asio::basic_deadline_timer<std::chrono::system_clock::time_point,
 																 time_traits<std::chrono::system_clock::time_point>>;
