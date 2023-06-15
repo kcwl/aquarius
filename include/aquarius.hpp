@@ -5,15 +5,24 @@
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/tcp_connect.hpp>
+#include <aquarius/connect.hpp>
 
 namespace aquarius
 {
-	using nossl_tcp_connect = tcp_connect<>;
+	using no_ssl_tcp_connect = connect<connect_tcp>;
 
-	using ssl_tcp_connect = tcp_connect<detail::ssl_socket>;
+	using ssl_tcp_connect = connect<connect_tcp, ssl_socket>;
 
-	using no_ssl_server = server<nossl_tcp_connect>;
+	using no_ssl_tcp_server = server<no_ssl_tcp_connect>;
 
-	using ssl_server = server<ssl_tcp_connect>;
+	using ssl_tcp_server = server<ssl_tcp_connect>;
+
+	using no_ssl_http_connect = connect<connect_http>;
+
+	using ssl_http_connect = connect<connect_http, ssl_socket>;
+
+	using no_ssl_http_server = server<no_ssl_http_connect>;
+
+	using ssl_http_server = server<ssl_http_connect>;
+
 } // namespace aquarius

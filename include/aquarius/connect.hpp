@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include <aquarius/basic_connector.hpp>
+#include <aquarius/defines.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
-#include <aquarius/detail/defines.hpp>
 #include <aquarius/detail/noncopyable.hpp>
+#include <aquarius/detail/transfer.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -22,19 +22,17 @@ namespace aquarius
 
 namespace aquarius
 {
-	using socket_t = boost::asio::ip::tcp::socket;
-
-	using ssl_socket_t = boost::asio::ssl::stream<socket_t&>;
-
-	using ssl_context_t = boost::asio::ssl::context;
-
-	template <typename _Ty, typename _SocketType>
-	class connect : private detail::noncopyable,
-					public basic_connector,
-					public std::enable_shared_from_this<connect<_Ty, _SocketType>>
+	template <typename _ConnectType, typename _SocketType = void>
+	class connect : private detail::noncopyable, public std::enable_shared_from_this<connect<_ConnectType, _SocketType>>
 	{
+		using socket_t = boost::asio::ip::tcp::socket;
+
+		using ssl_socket_t = boost::asio::ssl::stream<socket_t&>;
+
+		using ssl_context_t = boost::asio::ssl::context;
+
 	public:
-		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura)
+		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
 			: socket_(io_service)
 			, ssl_context_(ssl_context_t::sslv23)
 			, ssl_socket_(socket_, ssl_context_)
@@ -77,7 +75,7 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		void write(flex_buffer_t&& resp_buf)
+		void async_write(flex_buffer_t&& resp_buf)
 		{
 			write_queue_.push(std::forward<flex_buffer_t>(resp_buf));
 
@@ -92,7 +90,7 @@ namespace aquarius
 			read_buffer_.normalize();
 			read_buffer_.ensure();
 
-			if constexpr (std::same_as<_SocketType, detail::ssl_socket>)
+			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
 				ssl_socket_.async_read_some(boost::asio::buffer(read_buffer_.wdata(), read_buffer_.active()),
 											std::bind(&connect::read_handle, this->shared_from_this(),
@@ -106,25 +104,9 @@ namespace aquarius
 			}
 		}
 
-		void establish_async_read()
-		{
-			connect_time_ = std::chrono::system_clock::now();
-
-			on_start();
-
-			heart_deadline();
-
-			async_read();
-		}
-
-		virtual flex_buffer_t& get_read_buffer() override
-		{
-			return read_buffer_;
-		}
-
 		void start()
 		{
-			if constexpr (std::same_as<_SocketType, detail::ssl_socket>)
+			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
 				ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
 											[](const boost::system::error_code& ec)
@@ -153,7 +135,8 @@ namespace aquarius
 
 			socket_.close();
 
-			on_close();
+			if (on_close_)
+				on_close_();
 		}
 
 		virtual std::size_t uuid()
@@ -231,6 +214,19 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 		}
 
+		template<connect_event e, typename _Func>
+		void regist_func(_Func&& f)
+		{
+			if constexpr (e == connect_event::start)
+			{
+				on_start_ = std::forward<_Func>(f);
+			}
+			else if constexpr (e == connect_event::close)
+			{
+				on_close_ = std::forward<_Func>(f);
+			}
+		}
+
 	protected:
 		void async_process_queue()
 		{
@@ -239,7 +235,7 @@ namespace aquarius
 
 			auto& buffer = write_queue_.front();
 
-			if constexpr (std::same_as<_SocketType, detail::ssl_socket>)
+			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
 				ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
 											 std::bind(&connect::write_handle, this->shared_from_this(),
@@ -253,14 +249,6 @@ namespace aquarius
 			}
 		}
 
-		virtual detail::read_handle_result read_handle_internal() = 0;
-
-		virtual void on_start()
-		{}
-
-		virtual void on_close()
-		{}
-
 	private:
 		void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
 		{
@@ -273,7 +261,7 @@ namespace aquarius
 
 			auto res = read_handle_internal();
 
-			if (res == detail::read_handle_result::error)
+			if (res == read_handle_result::error)
 			{
 				return shut_down();
 			}
@@ -299,7 +287,7 @@ namespace aquarius
 
 		void init_context()
 		{
-			if constexpr (std::same_as<_SocketType, detail::ssl_socket>)
+			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
 				ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
 										 ssl_context_t::single_dh_use);
@@ -327,6 +315,78 @@ namespace aquarius
 				});
 		}
 
+		read_handle_result read_handle_internal()
+		{
+			if constexpr (std::same_as<_ConnectType, connect_tcp>)
+			{
+				uint32_t id = 0;
+
+				boost::archive::binary_iarchive ia(read_buffer_);
+				ia >> id;
+
+				if (id == 0)
+				{
+					return read_handle_result::waiting_for_query;
+				}
+
+				auto ctx_iter = this->ctxs_.find(id);
+
+				std::shared_ptr<detail::context> ctx_ptr;
+
+				if (ctx_iter == this->ctxs_.end())
+				{
+					ctx_ptr = detail::context_invoke_helper::invoke(id);
+
+					this->ctxs_.insert({ id, ctx_ptr });
+				}
+				else
+				{
+					ctx_ptr = ctx_iter->second;
+				}
+
+				auto req_ptr = detail::message_invoke_helpter::invoke(id);
+
+				if (!req_ptr)
+				{
+					return read_handle_result::error;
+				}
+
+				auto res = req_ptr->visit(read_buffer_, visit_mode::input);
+
+				if (res != read_handle_result::ok)
+				{
+					return res;
+				}
+
+				auto result = req_ptr->accept(
+					ctx_ptr, std::make_shared<detail::transfer>(std::bind(&connect::async_write, this->shared_from_this(), std::placeholders::_1)));
+
+				if (result == 0)
+				{
+					std::cout << std::format("warning: no ctx for req: {}\n", id);
+				}
+			}
+			else if constexpr (std::same_as<_ConnectType, connect_http>)
+			{}
+			else
+			{}
+
+			return read_handle_result::ok;
+		}
+
+		void establish_async_read()
+		{
+			connect_time_ = std::chrono::system_clock::now();
+
+			if (on_start_)
+				on_start_();
+
+			heart_deadline();
+
+			async_read();
+		}
+
+
 	public:
 		std::map<uint32_t, std::shared_ptr<detail::context>> ctxs_;
 
@@ -348,5 +408,9 @@ namespace aquarius
 		std::chrono::steady_clock::duration dura_;
 
 		boost::uuids::uuid uid_;
+
+		std::function<void()> on_start_;
+
+		std::function<void()> on_close_;
 	};
 } // namespace aquarius

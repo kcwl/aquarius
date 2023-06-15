@@ -20,7 +20,7 @@ namespace aquarius
 #ifdef SIGQUIT
 			signals_.add(SIGQUIT);
 #endif
-			signals_.async_wait(std::bind(&server::handle_stop, this));
+			signals_.async_wait(std::bind(&server::stop, this));
 
 			start_accept();
 		}
@@ -31,6 +31,11 @@ namespace aquarius
 		void run()
 		{
 			io_service_pool_.run();
+		}
+
+		void stop()
+		{
+			io_service_pool_.stop();
 		}
 
 	private:
@@ -48,11 +53,6 @@ namespace aquarius
 
 									   start_accept();
 								   });
-		}
-
-		void handle_stop()
-		{
-			io_service_pool_.stop();
 		}
 
 	private:

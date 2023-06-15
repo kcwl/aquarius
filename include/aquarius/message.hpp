@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/detail/defines.hpp>
-#include <aquarius/detail/visitor.hpp>
+#include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
+#include <aquarius/detail/visitor.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <cstddef>
 
@@ -21,9 +21,9 @@ namespace aquarius
 			return 0;
 		};
 
-		virtual detail::read_handle_result visit(flex_buffer_t&, detail::visit_mode)
+		virtual read_handle_result visit(flex_buffer_t&, visit_mode)
 		{
-			return detail::read_handle_result::error;
+			return read_handle_result::error;
 		}
 
 		virtual int32_t size()
@@ -104,9 +104,9 @@ namespace aquarius
 			return Number;
 		}
 
-		virtual detail::read_handle_result visit(flex_buffer_t& stream, detail::visit_mode mode) override
+		virtual read_handle_result visit(flex_buffer_t& stream, visit_mode mode) override
 		{
-			if (mode == detail::visit_mode::input)
+			if (mode == visit_mode::input)
 			{
 				return parse_message(stream);
 			}
@@ -120,7 +120,7 @@ namespace aquarius
 		}
 
 	private:
-		detail::read_handle_result parse_message(flex_buffer_t& stream)
+		read_handle_result parse_message(flex_buffer_t& stream)
 		{
 			auto sz = stream.size();
 
@@ -128,17 +128,17 @@ namespace aquarius
 
 			bytes_ += sz - stream.size();
 
-			if (res != detail::read_handle_result::ok)
+			if (res != read_handle_result::ok)
 				return res;
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
 			{
 				if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
 				{
-					res = detail::read_handle_result::error;
+					res = read_handle_result::error;
 				}
 
-				if (res != detail::read_handle_result::ok)
+				if (res != read_handle_result::ok)
 				{
 					return res;
 				}
@@ -147,10 +147,10 @@ namespace aquarius
 				stream.consume(header_ptr_->size_);
 			}
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 
-		detail::read_handle_result to_message(flex_buffer_t& stream)
+		read_handle_result to_message(flex_buffer_t& stream)
 		{
 			boost::archive::binary_oarchive oa(stream);
 			oa << Number;
@@ -163,7 +163,7 @@ namespace aquarius
 
 				auto res = header_ptr_->to_bytes(stream);
 
-				if (res != detail::read_handle_result::ok)
+				if (res != read_handle_result::ok)
 				{
 					return res;
 				}
@@ -172,7 +172,7 @@ namespace aquarius
 					oa.save_binary(buf.data(), buf.size());
 			}
 
-			return detail::read_handle_result::ok;
+			return read_handle_result::ok;
 		}
 
 	private:
