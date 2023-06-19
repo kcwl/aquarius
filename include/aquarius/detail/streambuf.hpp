@@ -11,6 +11,8 @@ namespace aquarius
 	{
 		constexpr static std::size_t capacity = 4096;
 
+		constexpr static std::size_t water_line = 32;
+
 		template <typename _Elem, typename _Traits, typename _Alloc = std::allocator<_Elem>>
 		class basic_streambuf : public std::basic_streambuf<_Elem, _Traits>
 		{
@@ -50,12 +52,16 @@ namespace aquarius
 				buffer_.clear();
 
 				std::copy(begin, end, std::back_inserter(buffer_));
+
+				commit(static_cast<int>(buffer_.size()));
 			}
 
 			template <typename _Ty, std::size_t N, typename = std::is_convertible<_Ty, _Elem>>
 			basic_streambuf(std::span<_Ty, N> data)
-				: basic_streambuf()
-			{}
+				: basic_streambuf(data.begin(), data.end())
+			{
+				static_assert(N <= capacity, "maybe input is too large!");
+			}
 
 			basic_streambuf(basic_streambuf&& other)
 			{
@@ -65,28 +71,33 @@ namespace aquarius
 				}
 			}
 
-			basic_streambuf(const void* buffer, std::size_t sz)
+			basic_streambuf(const void* buffer, size_type sz)
 				: basic_streambuf()
 			{
 				if (sz < active())
 				{
-					std::memcpy(wdata(), buffer, sz);
-					commit(sz);
+					std::memcpy(rdata(), buffer, sz);
+					commit(static_cast<int>(sz));
 				}
 			}
 
 			basic_streambuf(const basic_streambuf&) = delete;
 			basic_streambuf& operator=(const basic_streambuf&) = delete;
 
-		public:
-			std::size_t active() noexcept
+			bool operator==(const basic_streambuf& other) const
 			{
-				return base_type::epptr() - base_type::gptr();
+				return buffer_ == other.buffer_;
 			}
 
-			std::size_t active() const noexcept
+		public:
+			size_type active() noexcept
 			{
-				return base_type::epptr() - base_type::gptr();
+				return base_type::epptr() - base_type::pptr();
+			}
+
+			size_type active() const noexcept
+			{
+				return base_type::epptr() - base_type::pptr();
 			}
 
 			pointer data() noexcept
@@ -101,22 +112,22 @@ namespace aquarius
 
 			pointer wdata() noexcept
 			{
-				return base_type::pptr();
+				return base_type::gptr();
 			}
 
 			const_pointer wdata() const noexcept
 			{
-				return base_type::pptr();
+				return base_type::gptr();
 			}
 
 			pointer rdata() noexcept
 			{
-				return base_type::gptr();
+				return base_type::pptr();
 			}
 
 			const_pointer rdata() const noexcept
 			{
-				return base_type::gptr();
+				return base_type::pptr();
 			}
 
 			void commit(int bytes)
@@ -133,6 +144,9 @@ namespace aquarius
 
 				if (base_type::gptr() + bytes > base_type::pptr())
 					bytes = static_cast<int>(base_type::pptr() - base_type::gptr());
+
+				if (base_type::gptr() + bytes < base_type::eback())
+					bytes = static_cast<int>(base_type::eback() - base_type::gptr());
 
 				base_type::gbump(bytes);
 			}
@@ -176,43 +190,14 @@ namespace aquarius
 				buffer_.swap(buf.buffer_);
 			}
 
-			auto erase(const_iterator& where)
+			size_type size() noexcept
 			{
-				this->consume(-1);
-
-				auto iter = buffer_.erase(where);
-
-				reset();
-
-				return iter;
+				return base_type::pptr() - wdata();
 			}
 
-			auto erase(const_iterator& begin, const_iterator& end)
+			size_type size() const noexcept
 			{
-				auto dis = std::distance(begin, end);
-
-				this->consume(-dis);
-
-				auto iter = buffer_.erase(begin, end);
-
-				reset();
-
-				return iter;
-			}
-
-			base_type* rdbuf()
-			{
-				return static_cast<base_type*>(this);
-			}
-
-			std::size_t size() noexcept
-			{
-				return base_type::pptr() - rdata();
-			}
-
-			std::size_t size() const noexcept
-			{
-				return base_type::pptr() - rdata();
+				return base_type::pptr() - wdata();
 			}
 
 			void normalize()
@@ -220,60 +205,46 @@ namespace aquarius
 				if (rdata() == &buffer_[0])
 					return;
 
-				std::memmove(buffer_.data(), rdata(), wdata() - rdata());
+				int seg = static_cast<int>(rdata() - wdata());
+
+				std::memmove(buffer_.data(), wdata(), rdata() - wdata());
 
 				reset();
+
+				commit(seg);
 			}
 
 			void ensure()
 			{
-				if (active() != 0)
+				if (active() > water_line)
 					return;
 
-				buffer_.resize(buffer_.size() * 2);
+				buffer_.resize(max_size() * 2);
+			}
+
+			size_type max_size()
+			{
+				return buffer_.size();
+			}
+
+			size_type max_size() const
+			{
+				return buffer_.size();
 			}
 
 		protected:
-			virtual int_type overflow(int_type meta = _Traits::eof()) override
-			{
-				if (_Traits::eq_int_type(meta, _Traits::eof()))
-					return _Traits::not_eof(meta);
-
-				const auto pptr = base_type::pptr();
-				const auto epptr = base_type::epptr();
-
-				if (epptr - pptr < meta)
-					return _Traits::eof();
-
-				base_type::setg(base_type::eback(), base_type::gptr(), base_type::pptr());
-
-				return meta;
-			}
-
 			virtual int_type underflow() override
 			{
-				const auto gptr = base_type::gptr();
-
-				if (!gptr)
-					return _Traits::eof();
-
-				if (gptr < base_type::egptr())
-					return _Traits::eof();
-
 				const auto pptr = base_type::pptr();
-
-				if (!pptr)
-					return _Traits::eof();
 
 				if (pptr == base_type::eback())
 					return _Traits::eof();
 
-				if (gptr == pptr)
-					return _Traits::eof();
+				auto result = _Traits::to_int_type(*base_type::gptr());
 
-				base_type::setg(&buffer_[0], base_type::gptr(), base_type::pptr());
+				consume(1);
 
-				return _Traits::to_int_type(*base_type::gptr());
+				return result;
 			}
 
 			virtual pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode mode) override
@@ -330,9 +301,6 @@ namespace aquarius
 
 				off += new_off;
 
-				if (off != 0 && (((mode & std::ios::in) && !gptr_old) || (mode & std::ios::out) && !pptr_old))
-					return pos_type(off_type(-1));
-
 				const auto new_ptr = seek_low + off;
 
 				if ((mode & std::ios::in) && gptr_old)
@@ -358,9 +326,6 @@ namespace aquarius
 				const auto seek_dist = pptr_old - seek_low;
 
 				if (static_cast<unsigned long long>(off) > static_cast<unsigned long long>(seek_dist))
-					return pos_type(off_type(-1));
-
-				if (off != 0 && (((mode & std::ios::in) && !gptr_old) || ((mode & std::ios::out) && !pptr_old)))
 					return pos_type(off_type(-1));
 
 				const auto new_ptr = seek_low + off;
