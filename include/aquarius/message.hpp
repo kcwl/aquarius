@@ -23,7 +23,7 @@ namespace aquarius
 
 		virtual read_handle_result visit(flex_buffer_t&, visit_mode)
 		{
-			return read_handle_result::error;
+			return read_handle_result::ok;
 		}
 
 		virtual int32_t size()

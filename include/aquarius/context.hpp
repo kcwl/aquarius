@@ -39,21 +39,6 @@ namespace aquarius
 		{}
 
 	public:
-		virtual int on_connected() override
-		{
-			return 0;
-		}
-
-		virtual int on_closed() override
-		{
-			return 0;
-		}
-
-		virtual int on_timeout([[maybe_unused]] std::shared_ptr<detail::transfer> conn_ptr) override
-		{
-			return 0;
-		}
-
 		virtual int visit(_Request* req, std::shared_ptr<detail::transfer> conn_ptr)
 		{
 			request_ptr_ = req;
@@ -65,9 +50,6 @@ namespace aquarius
 
 	protected:
 		virtual int handle() = 0;
-
-		virtual void on_error([[maybe_unused]] int result) override
-		{}
 
 		bool send_response(int result)
 		{

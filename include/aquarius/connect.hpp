@@ -32,7 +32,8 @@ namespace aquarius
 		using ssl_context_t = boost::asio::ssl::context;
 
 	public:
-		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
+		explicit connect(boost::asio::io_service& io_service,
+						 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: socket_(io_service)
 			, ssl_context_(ssl_context_t::sslv23)
 			, ssl_socket_(socket_, ssl_context_)
@@ -214,7 +215,7 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 		}
 
-		template<connect_event e, typename _Func>
+		template <connect_event e, typename _Func>
 		void regist_func(_Func&& f)
 		{
 			if constexpr (e == connect_event::start)
@@ -328,26 +329,16 @@ namespace aquarius
 					return read_handle_result::waiting_for_query;
 				}
 
-				auto ctx_iter = this->ctxs_.find(id);
+				auto ctx_ptr = detail::context_invoke_helper::invoke(id);
 
-				std::shared_ptr<detail::basic_context> ctx_ptr;
-
-				if (ctx_iter == this->ctxs_.end())
-				{
-					ctx_ptr = detail::context_invoke_helper::invoke(id);
-
-					this->ctxs_.insert({ id, ctx_ptr });
-				}
-				else
-				{
-					ctx_ptr = ctx_iter->second;
-				}
+				if (!ctx_ptr)
+					return read_handle_result::error;
 
 				auto req_ptr = detail::message_invoke_helpter::invoke(id);
 
 				if (!req_ptr)
 				{
-					return read_handle_result::error;
+					req_ptr = std::make_shared<xmessage>();
 				}
 
 				auto res = req_ptr->visit(read_buffer_, visit_mode::input);
@@ -357,13 +348,8 @@ namespace aquarius
 					return res;
 				}
 
-				auto result = req_ptr->accept(
-					ctx_ptr, std::make_shared<detail::transfer>(std::bind(&connect::async_write, this->shared_from_this(), std::placeholders::_1)));
-
-				if (result == 0)
-				{
-					std::cout << std::format("warning: no ctx for req: {}\n", id);
-				}
+				req_ptr->accept(ctx_ptr, std::make_shared<detail::transfer>(std::bind(
+											 &connect::async_write, this->shared_from_this(), std::placeholders::_1)));
 			}
 			else if constexpr (std::same_as<_ConnectType, connect_http>)
 			{}
@@ -384,7 +370,6 @@ namespace aquarius
 
 			async_read();
 		}
-
 
 	public:
 		std::map<uint32_t, std::shared_ptr<detail::basic_context>> ctxs_;
