@@ -27,7 +27,8 @@ namespace aquarius
 		{
 			this->header() = std::move(other.header());
 
-			this->body().Move(other.body());
+			//this->body().Move(other.body());
+			this->body() = std::move(other.body());
 		}
 
 		response& operator=(response&& other)

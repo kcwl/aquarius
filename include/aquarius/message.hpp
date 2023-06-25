@@ -116,35 +116,37 @@ namespace aquarius
 
 		virtual int32_t size()
 		{
-			return bytes_;
+			return static_cast<int32_t>(bytes_);
 		}
 
 	private:
 		read_handle_result parse_message(flex_buffer_t& stream)
 		{
-			auto sz = stream.size();
+			// auto sz = stream.size();
 
 			auto res = header_ptr_->parse_bytes(stream);
 
-			bytes_ += sz - stream.size();
+			// bytes_ += sz - stream.size();
 
 			if (res != read_handle_result::ok)
 				return res;
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
 			{
-				if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
-				{
-					res = read_handle_result::error;
-				}
+				// if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
+				//{
+				//	res = read_handle_result::error;
+				// }
 
-				if (res != read_handle_result::ok)
-				{
-					return res;
-				}
+				// if (res != read_handle_result::ok)
+				//{
+				//	return res;
+				// }
 
-				bytes_ += body_.ByteSizeLong();
-				stream.consume(header_ptr_->size_);
+				elastic::from_binary(body_, stream);
+
+				// bytes_ += body_.ByteSizeLong();
+				// stream.consume(header_ptr_->size_);
 			}
 
 			return read_handle_result::ok;
@@ -152,24 +154,32 @@ namespace aquarius
 
 		read_handle_result to_message(flex_buffer_t& stream)
 		{
-			boost::archive::binary_oarchive oa(stream);
-			oa << Number;
+			elastic::to_binary(Number, stream);
+
+			auto res = header_ptr_->to_bytes(stream);
+
+			if (res != read_handle_result::ok)
+			{
+				return res;
+			}
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
 			{
-				auto buf = body_.SerializeAsString();
+				// auto buf = body_.SerializeAsString();
 
-				header_ptr_->set_size(buf.size());
+				// header_ptr_->set_size(buf.size());
 
-				auto res = header_ptr_->to_bytes(stream);
+				// auto res = header_ptr_->to_bytes(stream);
 
-				if (res != read_handle_result::ok)
-				{
-					return res;
-				}
+				// if (res != read_handle_result::ok)
+				//{
+				//	return res;
+				// }
 
-				if (!buf.empty())
-					oa.save_binary(buf.data(), buf.size());
+				// if (!buf.empty())
+				//	oa.save_binary(buf.data(), buf.size());
+
+				elastic::to_binary(body_, stream);
 			}
 
 			return read_handle_result::ok;

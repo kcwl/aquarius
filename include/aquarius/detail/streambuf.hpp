@@ -233,6 +233,15 @@ namespace aquarius
 			}
 
 		protected:
+			virtual int_type overflow(int_type ch) override
+			{
+				auto result = _Traits::to_int_type(ch);
+
+				commit(1);
+
+				return result;
+			}
+
 			virtual int_type underflow() override
 			{
 				const auto pptr = base_type::pptr();

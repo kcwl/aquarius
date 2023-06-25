@@ -27,7 +27,7 @@ namespace aquarius
 		friend class elastic::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
 		{
 			ar& magic_;
 			ar& size_;
@@ -44,9 +44,9 @@ namespace aquarius
 		friend class elastic::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
 		{
-			ar& boost::serialization::base_object<tcp_header>(*this);
+			ar& elastic::base_object<tcp_header>(*this);
 			ar& reserve_;
 		}
 
@@ -74,9 +74,9 @@ namespace aquarius
 		friend class elastic::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
+		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
 		{
-			ar& boost::serialization::base_object<tcp_header>(*this);
+			ar& elastic::base_object<tcp_header>(*this);
 			ar& result_;
 		}
 

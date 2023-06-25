@@ -96,7 +96,7 @@ namespace aquarius
 		{
 			// auto self = this->shared_from_this();
 
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.rdata(), buf.size()),
+			boost::asio::async_write(socket_, boost::asio::buffer(buf.wdata(), buf.size()),
 									 [this /*, self*/](boost::system::error_code ec, std::size_t)
 									 {
 										 if (ec)
@@ -166,7 +166,7 @@ namespace aquarius
 
 			buffer_.ensure();
 			buffer_.normalize();
-			socket_.async_read_some(boost::asio::buffer(buffer_.wdata(), buffer_.active()),
+			socket_.async_read_some(boost::asio::buffer(buffer_.rdata(), buffer_.active()),
 									[this /*, self*/](boost::system::error_code ec, std::size_t bytes_transferred)
 									{
 										if (ec)
@@ -174,37 +174,35 @@ namespace aquarius
 
 										buffer_.commit(static_cast<int>(bytes_transferred));
 
-										int pos = static_cast<int>(buffer_.size());
+										//int pos = static_cast<int>(buffer_.size());
 
-										uint32_t proto = 0;
+										//uint32_t proto = 0;
 
-										boost::archive::binary_iarchive ia(buffer_);
+										//elastic::from_binary(proto, buffer_);
 
-										ia >> proto;
+										//pos -= static_cast<int>(buffer_.size());
 
-										pos -= static_cast<int>(buffer_.size());
+										//auto req = detail::message_invoke_helpter::invoke(proto);
 
-										auto req = detail::message_invoke_helpter::invoke(proto);
+										//if (!req)
+										//	return;
 
-										if (!req)
-											return;
+										//req->visit(buffer_, aquarius::visit_mode::input);
 
-										req->visit(buffer_, aquarius::visit_mode::input);
+										//auto iter = async_funcs_.find(req->unique_key());
 
-										auto iter = async_funcs_.find(req->unique_key());
-
-										if (iter == async_funcs_.end())
-										{
-											buffer_.consume(-req->size() - pos);
+										//if (iter == async_funcs_.end())
+										//{
+										//	buffer_.consume(-req->size() - pos);
 
 											read_handler();
-										}
-										else
-										{
-											iter->second(req);
+										//}
+										//else
+										//{
+										//	iter->second(req);
 
-											async_funcs_.erase(iter);
-										}
+										//	async_funcs_.erase(iter);
+										//}
 
 										do_read();
 									});

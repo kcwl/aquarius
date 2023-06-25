@@ -113,5 +113,8 @@
     <ClInclude Include="io.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="message_process.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
