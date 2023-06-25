@@ -1,8 +1,6 @@
 #pragma once
 #include <aquarius/detail/streambuf.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/serialization/access.hpp>
+#include "../3rd/elastic/include/elastic.hpp"
 
 namespace aquarius
 {

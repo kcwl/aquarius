@@ -24,7 +24,7 @@ namespace aquarius
 		}
 
 	private:
-		friend class boost::serialization::access;
+		friend class elastic::access;
 
 		template <typename _Archive>
 		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
@@ -41,7 +41,7 @@ namespace aquarius
 		uint32_t reserve_;
 
 	private:
-		friend class boost::serialization::access;
+		friend class elastic::access;
 
 		template <typename _Archive>
 		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
@@ -53,16 +53,14 @@ namespace aquarius
 	public:
 		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
-			boost::archive::binary_iarchive ia(stream);
-			ia >> *this;
+			elastic::from_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
-			boost::archive::binary_oarchive oa(stream);
-			oa << *this;
+			elastic::to_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
@@ -73,7 +71,7 @@ namespace aquarius
 		int32_t result_;
 
 	private:
-		friend class boost::serialization::access;
+		friend class elastic::access;
 
 		template <typename _Archive>
 		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version)
@@ -85,16 +83,14 @@ namespace aquarius
 	public:
 		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
-			boost::archive::binary_iarchive ia(stream);
-			ia >> *this;
+			elastic::from_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
-			boost::archive::binary_oarchive oa(stream);
-			oa << *this;
+			elastic::to_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
