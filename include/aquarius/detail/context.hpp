@@ -7,112 +7,27 @@ namespace aquarius
 {
 	namespace detail
 	{
-		class context : public detail::visitor<xmessage, int>
+		class basic_context : public detail::visitor<xmessage, int>
 		{
 		public:
-			context(const std::string& name)
+			basic_context(const std::string& name)
 				: name_(name)
-			{
-				on_connected();
-			}
+			{}
 
-			context(const context&) = delete;
+			basic_context(const basic_context&) = delete;
 
-			context(context&&) = default;
+			basic_context(basic_context&&) = default;
 
-			virtual ~context()
-			{
-				on_closed();
-			}
+			virtual ~basic_context() = default;
 
-			context& operator=(const context&) = delete;
+			basic_context& operator=(const basic_context&) = delete;
 
 			DEFINE_VISITOR(xmessage, int)
-
-		public:
-			virtual int on_connected()
-			{
-				return 0;
-			}
-
-			virtual int on_closed()
-			{
-				return 0;
-			}
-
-			virtual int on_timeout([[maybe_unused]] std::shared_ptr<transfer> session_ptr)
-			{
-				return 0;
-			}
-
-		protected:
-			virtual void on_error([[maybe_unused]] int result){};
 
 		protected:
 			std::shared_ptr<transfer> conn_ptr_;
 
 			std::string name_;
-		};
-
-		template <typename _Request, typename _Response>
-		class context_impl : public context, public detail::visitor<_Request, int>
-		{
-		public:
-			context_impl(const std::string& name)
-				: context(name)
-				, request_ptr_(nullptr)
-			{}
-
-		public:
-			virtual int on_connected() override
-			{
-				return 0;
-			}
-
-			virtual int on_closed() override
-			{
-				return 0;
-			}
-
-			virtual int on_timeout([[maybe_unused]] std::shared_ptr<transfer> conn_ptr) override
-			{
-				return 0;
-			}
-
-			virtual int visit(_Request* req, std::shared_ptr<transfer> conn_ptr)
-			{
-				request_ptr_ = req;
-
-				conn_ptr_ = conn_ptr;
-
-				return handle();
-			}
-
-		protected:
-			virtual int handle() = 0;
-
-			virtual void on_error([[maybe_unused]] int result) override
-			{}
-
-			bool send_response(int result)
-			{
-				response_.header().clone(request_ptr_->header());
-
-				response_.header().result_ = result;
-
-				flex_buffer_t fs;
-
-				response_.visit(fs, visit_mode::output);
-
-				(*conn_ptr_)(std::move(fs));
-
-				return true;
-			}
-
-		protected:
-			_Request* request_ptr_;
-
-			_Response response_;
 		};
 	} // namespace detail
 } // namespace aquarius

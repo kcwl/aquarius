@@ -26,3 +26,49 @@
 #define CONTEXT_MULTI_DEFINE(msg_name_space, msg, ctx_name_space, context)                                             \
 	MESSAGE_MULTI_DEFINE(msg_name_space, msg);                                                                         \
 	static aquarius::detail::ctx_regist<ctx_name_space::context> ctx_##context(msg_name_space::msg::Number)
+
+namespace aquarius
+{
+	template <typename _Request, typename _Response>
+	class context : public detail::basic_context, public detail::visitor<_Request, int>
+	{
+	public:
+		context(const std::string& name)
+			: basic_context(name)
+			, request_ptr_(nullptr)
+		{}
+
+	public:
+		virtual int visit(_Request* req, std::shared_ptr<detail::transfer> conn_ptr)
+		{
+			request_ptr_ = req;
+
+			conn_ptr_ = conn_ptr;
+
+			return handle();
+		}
+
+	protected:
+		virtual int handle() = 0;
+
+		bool send_response(int result)
+		{
+			response_.header().clone(request_ptr_->header());
+
+			response_.header().result_ = result;
+
+			flex_buffer_t fs;
+
+			response_.visit(fs, visit_mode::output);
+
+			(*conn_ptr_)(std::move(fs));
+
+			return true;
+		}
+
+	protected:
+		_Request* request_ptr_;
+
+		_Response response_;
+	};
+} // namespace aquarius
