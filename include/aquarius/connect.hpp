@@ -92,7 +92,7 @@ namespace aquarius
 
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
-				ssl_socket_.async_read_some(boost::asio::buffer(read_buffer_.wdata(), read_buffer_.active()),
+				ssl_socket_.async_read_some(boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
 											std::bind(&connect::read_handle, this->shared_from_this(),
 													  std::placeholders::_1, std::placeholders::_2));
 			}
@@ -237,13 +237,13 @@ namespace aquarius
 
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
-				ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
+				ssl_socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
 											 std::bind(&connect::write_handle, this->shared_from_this(),
 													   std::placeholders::_1, std::placeholders::_2));
 			}
 			else
 			{
-				socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.size()),
+				socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
 										 std::bind(&connect::write_handle, this->shared_from_this(),
 												   std::placeholders::_1, std::placeholders::_2));
 			}
@@ -321,8 +321,7 @@ namespace aquarius
 			{
 				uint32_t id = 0;
 
-				boost::archive::binary_iarchive ia(read_buffer_);
-				ia >> id;
+				elastic::from_binary(id, read_buffer_);
 
 				if (id == 0)
 				{
