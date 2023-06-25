@@ -16,7 +16,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		class context;
+		class basic_context;
 	}
 } // namespace aquarius
 
@@ -330,7 +330,7 @@ namespace aquarius
 
 				auto ctx_iter = this->ctxs_.find(id);
 
-				std::shared_ptr<detail::context> ctx_ptr;
+				std::shared_ptr<detail::basic_context> ctx_ptr;
 
 				if (ctx_iter == this->ctxs_.end())
 				{
@@ -387,7 +387,7 @@ namespace aquarius
 
 
 	public:
-		std::map<uint32_t, std::shared_ptr<detail::context>> ctxs_;
+		std::map<uint32_t, std::shared_ptr<detail::basic_context>> ctxs_;
 
 	private:
 		socket_t socket_;

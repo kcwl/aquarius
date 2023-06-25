@@ -21,11 +21,11 @@ struct test_resp_body
 using test_request = aquarius::request<test_req_body, 1001>;
 using test_response = aquarius::response<test_resp_body, 1002>;
 
-class ctx_test : public aquarius::detail::context_impl<test_request, test_response>
+class ctx_test : public aquarius::context<test_request, test_response>
 {
 public:
 	ctx_test()
-		: aquarius::detail::context_impl<test_request, test_response>("ctx_test")
+		: aquarius::context<test_request, test_response>("ctx_test")
 	{}
 
 public:
