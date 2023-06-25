@@ -1,9 +1,3 @@
-[submodule "third_part/elastic"]
-	path = third_part/elastic
-	url = https://github.com/kcwl/elastic.git
-[submodule "third_part/stduuid"]
-	path = third_part/stduuid
-	url = https://github.com/mariusbancila/stduuid.git
 [submodule "3rd/elastic"]
 	path = 3rd/elastic
 	url = https://github.com/kcwl/elastic.git
