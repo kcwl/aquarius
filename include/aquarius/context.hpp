@@ -71,4 +71,20 @@ namespace aquarius
 
 		_Response response_;
 	};
+
+	template <typename _Response>
+	class client_context : public context<_Response, int>
+	{
+	public:
+		client_context(const std::string& name)
+			: context<_Response,int>(name)
+		{}
+
+	protected:
+		virtual int handle()
+		{
+			return 0;
+		}
+	};
+
 } // namespace aquarius

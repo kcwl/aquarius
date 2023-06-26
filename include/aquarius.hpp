@@ -25,4 +25,7 @@ namespace aquarius
 
 	using ssl_http_server = server<ssl_http_connect>;
 
+	using no_ssl_tcp_client = client<no_ssl_tcp_connect>;
+
+	using ssl_tcp_client = client<ssl_tcp_connect>;
 } // namespace aquarius
