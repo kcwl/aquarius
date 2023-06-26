@@ -282,8 +282,6 @@ namespace aquarius
 			write_queue_.pop();
 
 			async_process_queue();
-
-			std::cout << "complete " << bytes_transferred << " bytes\n";
 		}
 
 		void init_context()

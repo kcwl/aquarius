@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
-#include "../aquarius/include/aquarius.hpp"
+#include "../include/aquarius.hpp"
 
 BOOST_AUTO_TEST_SUITE(message_process)
 
@@ -21,11 +21,11 @@ struct test_resp_body
 using test_request = aquarius::request<test_req_body, 1001>;
 using test_response = aquarius::response<test_resp_body, 1002>;
 
-class ctx_test : public aquarius::context<test_request, test_response>
+class ctx_test_server : public aquarius::context<test_request, test_response>
 {
 public:
-	ctx_test()
-		: aquarius::context<test_request, test_response>("ctx_test")
+	ctx_test_server()
+		: aquarius::context<test_request, test_response>("ctx_test_server")
 	{}
 
 public:
@@ -41,38 +41,29 @@ public:
 	}
 };
 
-CONTEXT_DEFINE(test_request, ctx_test);
+CONTEXT_DEFINE(test_request, ctx_test_server);
 
-class test_client : public aquarius::client
+class ctx_test_client : public aquarius::client_context<test_response>
 {
 public:
-	test_client(const std::string& ip, const std::string& port)
-		: aquarius::client(ip, port)
-	{}
+	ctx_test_client()
+		: aquarius::client_context<test_response>("ctx_test_client"){}
 
 public:
-	virtual int read_handler() override
+	virtual int handle() override
 	{
-		auto& buffer = this->get_recv_buffer();
+		std::cout << "test response recved!\n";
 
-		uint32_t proto = 0;
-
-		elastic::from_binary(proto, buffer);
-
-		resp_.visit(buffer, aquarius::visit_mode::input);
-
-		result_.set_value(true);
+		BOOST_CHECK_EQUAL(request_ptr_->body().a_, 2);
+		BOOST_CHECK_EQUAL(request_ptr_->body().b_, 3);
+		BOOST_CHECK_EQUAL(request_ptr_->body().c_, 4);
 
 		return 1;
 	}
-
-public:
-	test_response resp_;
-
-	std::promise<bool> result_;
 };
 
-MESSAGE_DEFINE(test_response);
+
+CONTEXT_DEFINE(test_response, ctx_test_client);
 
 
 BOOST_AUTO_TEST_CASE(process)
@@ -81,9 +72,9 @@ BOOST_AUTO_TEST_CASE(process)
 
 	std::thread t([&] { srv.run(); });
 
-	test_client cli("127.0.0.1", "8100");
+	aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
 
-	cli.run();
+	std::thread tc([&] { cli.run(); });
 
 	test_request req{};
 	req.body().a_ = 1;
@@ -96,13 +87,10 @@ BOOST_AUTO_TEST_CASE(process)
 
 	cli.async_write(std::move(buffer));
 
-	cli.result_.get_future().wait();
-
-	BOOST_CHECK_EQUAL(cli.resp_.body().a_, 2);
-	BOOST_CHECK_EQUAL(cli.resp_.body().b_, 3);
-	BOOST_CHECK_EQUAL(cli.resp_.body().c_, 4);
+	std::this_thread::sleep_for(30s);
 
 	cli.shut_down();
+	tc.join();
 
 	srv.stop();
 	t.join();

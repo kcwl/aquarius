@@ -10,27 +10,23 @@
 
 namespace aquarius
 {
-	class client : public std::enable_shared_from_this<client>
+	template <typename _Connector>
+	class client : public std::enable_shared_from_this<client<_Connector>>
 	{
 	public:
 		explicit client()
 			: io_service_()
-			, socket_(io_service_)
 		{}
 
-		client(/*boost::asio::io_service& io_service,*/
-			   const boost::asio::ip::tcp::resolver::results_type& endpoints)
-			: io_service_(/*io_service*/)
-			, socket_(io_service_)
-			, buffer_()
+		client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
+			: client()
 		{
 			do_connect(endpoints);
 		}
 
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
-		client(/*boost::asio::io_service& io_service,*/ _Args&&... args)
-			: io_service_(/*io_service*/)
-			, socket_(io_service_)
+		client(_Args&&... args)
+			: client()
 		{
 			if constexpr (sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
@@ -40,7 +36,7 @@ namespace aquarius
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
 
-			if constexpr (!detail::is_string<decltype(host)>::value || !detail::is_string<decltype(port)>::value)
+			if constexpr (!detail::is_string_v<decltype(host)> || !detail::is_string_v<decltype(port)>)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
 			boost::asio::ip::tcp::resolver resolver(io_service_);
@@ -50,173 +46,51 @@ namespace aquarius
 		}
 
 	public:
-		void open(const std::string& host, const std::string& port)
-		{
-			boost::asio::ip::tcp::resolver resolver(io_service_);
-
-			auto endpoints = resolver.resolve(host, port);
-			do_connect(endpoints);
-
-			run();
-		}
-
 		void run()
 		{
-			thread_ptr_.reset(new std::thread([&] { io_service_.run(); }));
+			io_service_.run();
 		}
 
 		void shut_down()
 		{
 			io_service_.stop();
 
-			thread_ptr_->join();
-
-			boost::system::error_code ec;
-			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
-
-			socket_.close();
-		}
-
-		template <class _Ty, std::size_t N>
-		void async_write(const std::array<_Ty, N>& buf)
-		{
-			// auto self = this->shared_from_this();
-
-			boost::asio::async_write(socket_, boost::asio::buffer(buf),
-									 [this /*, self*/](const boost::system::error_code& ec, std::size_t)
-									 {
-										 if (ec)
-										 {
-											 std::cout << ec.message() << std::endl;
-										 }
-									 });
+			conn_ptr_->shut_down();
 		}
 
 		void async_write(flex_buffer_t&& buf)
 		{
-			// auto self = this->shared_from_this();
-
-			boost::asio::async_write(socket_, boost::asio::buffer(buf.wdata(), buf.size()),
-									 [this /*, self*/](boost::system::error_code ec, std::size_t)
-									 {
-										 if (ec)
-										 {
-											 std::cout << ec.message() << std::endl;
-										 }
-									 });
-		}
-
-		template <typename _Message>
-		void async_write(_Message&& msg)
-		{
-			flex_buffer_t buffer{};
-			msg.visit(buffer, visit_mode::output);
-
-			async_write(std::move(buffer));
-		}
-
-		template <typename _Message, typename _Func>
-		void async_write(_Message&& msg, _Func&& f)
-		{
-			async_funcs_.emplace(msg.header().magic_, std::forward<_Func>(f));
-
-			async_write(std::forward<_Message>(msg));
-		}
-
-		virtual int read_handler() = 0;
-
-		void close()
-		{
-			socket_.close();
-		}
-
-		flex_buffer_t& get_recv_buffer()
-		{
-			return buffer_;
+			conn_ptr_->async_write(std::forward<flex_buffer_t>(buf));
 		}
 
 		std::string remote_address()
 		{
-			return socket_.remote_endpoint().address().to_string();
+			return conn_ptr_->remote_address();
 		}
 
 		int remote_port()
 		{
-			return socket_.remote_endpoint().port();
+			return conn_ptr_->remote_port();
 		}
 
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
-			// auto self = this->shared_from_this();
+			conn_ptr_ = std::make_shared<_Connector>(io_service_);
 
-			boost::asio::async_connect(socket_, endpoints,
-									   [this /*, self*/](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+			boost::asio::async_connect(conn_ptr_->socket(), endpoints,
+									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
 											   return;
 
-										   do_read();
+										   conn_ptr_->start();
 									   });
-		}
-
-		void do_read()
-		{
-			// auto self = this->shared_from_this();
-
-			buffer_.ensure();
-			buffer_.normalize();
-			socket_.async_read_some(boost::asio::buffer(buffer_.rdata(), buffer_.active()),
-									[this /*, self*/](boost::system::error_code ec, std::size_t bytes_transferred)
-									{
-										if (ec)
-											return;
-
-										buffer_.commit(static_cast<int>(bytes_transferred));
-
-										//int pos = static_cast<int>(buffer_.size());
-
-										//uint32_t proto = 0;
-
-										//elastic::from_binary(proto, buffer_);
-
-										//pos -= static_cast<int>(buffer_.size());
-
-										//auto req = detail::message_invoke_helpter::invoke(proto);
-
-										//if (!req)
-										//	return;
-
-										//req->visit(buffer_, aquarius::visit_mode::input);
-
-										//auto iter = async_funcs_.find(req->unique_key());
-
-										//if (iter == async_funcs_.end())
-										//{
-										//	buffer_.consume(-req->size() - pos);
-
-											read_handler();
-										//}
-										//else
-										//{
-										//	iter->second(req);
-
-										//	async_funcs_.erase(iter);
-										//}
-
-										do_read();
-									});
 		}
 
 	private:
 		boost::asio::io_service io_service_;
 
-		boost::asio::ip::tcp::socket socket_;
-
-		flex_buffer_t buffer_;
-
-		std::shared_ptr<std::thread> thread_ptr_;
-
-		std::map<uint32_t, std::function<void(std::shared_ptr<xmessage>)>> async_funcs_;
+		std::shared_ptr<_Connector> conn_ptr_;
 	};
 } // namespace aquarius

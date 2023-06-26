@@ -43,13 +43,11 @@ namespace aquarius
 		template <typename _Ty>
 		constexpr static bool is_container_v = is_container<_Ty>::value;
 
-		template <typename _Ty>
-		struct is_string : std::false_type
-		{};
+		template <typename _Ty, typename... _Args>
+		constexpr static bool is_any_of_v = std::disjunction_v<std::is_same<_Ty, _Args>...>;
 
-		template <>
-		struct is_string<std::string> : std::true_type
-		{};
+		template <typename _Ty>
+		constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[]>;
 
 		struct http
 		{};
