@@ -347,7 +347,7 @@ namespace aquarius
 				}
 
 				req_ptr->accept(ctx_ptr, std::make_shared<detail::transfer>(std::bind(
-											 &connect::async_write, this->shared_from_this(), std::placeholders::_1)));
+											 &connect::async_write, this->shared_from_this(), std::placeholders::_1,boost::uuids::hash_value(uid_))));
 			}
 			else if constexpr (std::same_as<_ConnectType, connect_http>)
 			{}
