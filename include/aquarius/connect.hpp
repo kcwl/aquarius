@@ -136,8 +136,13 @@ namespace aquarius
 
 			socket_.close();
 
-			if (on_close_)
-				on_close_();
+			if (close_func_)
+			{
+				auto session_ptr = detail::session_manager::instance().find(this->uuid());
+
+				close_func_(session_ptr);
+			}
+				
 		}
 
 		virtual std::size_t uuid()
@@ -215,16 +220,16 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 		}
 
-		template <connect_event e, typename _Func>
-		void regist_func(_Func&& f)
+		template <connect_event E, typename _Func>
+		void regist_callback(_Func&& f)
 		{
-			if constexpr (e == connect_event::start)
+			if constexpr (E == connect_event::start)
 			{
-				on_start_ = std::forward<_Func>(f);
+				start_func_ = std::forward<_Func>(f);
 			}
-			else if constexpr (e == connect_event::close)
+			else if constexpr (E == connect_event::close)
 			{
-				on_close_ = std::forward<_Func>(f);
+				close_func_ = std::forward<_Func>(f);
 			}
 		}
 
@@ -362,9 +367,13 @@ namespace aquarius
 		{
 			connect_time_ = std::chrono::system_clock::now();
 
-			if (on_start_)
-				on_start_();
+			if (start_func_)
+			{
+				auto session_ptr = detail::session_manager::instance().find(uuid());
 
+				start_func_(session_ptr);
+			}
+			
 			heart_deadline();
 
 			async_read();
@@ -392,8 +401,8 @@ namespace aquarius
 
 		boost::uuids::uuid uid_;
 
-		std::function<void()> on_start_;
+		std::function<void(std::shared_ptr<basic_session>)> start_func_;
 
-		std::function<void()> on_close_;
+		std::function<void(std::shared_ptr<basic_session>)> close_func_;
 	};
 } // namespace aquarius
