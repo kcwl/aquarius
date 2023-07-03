@@ -16,12 +16,14 @@ namespace aquarius
 	public:
 		explicit client()
 			: io_service_()
+			, endpoint_()
 		{}
 
 		client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
 			: client()
+			, endpoint_(endpoints)
 		{
-			do_connect(endpoints);
+			do_connect(endpoint_);
 		}
 
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
@@ -41,8 +43,8 @@ namespace aquarius
 
 			boost::asio::ip::tcp::resolver resolver(io_service_);
 
-			auto endpoints = resolver.resolve(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
-			do_connect(endpoints);
+			endpoint_ = resolver.resolve(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
+			do_connect(endpoint_);
 		}
 
 	public:
@@ -51,7 +53,7 @@ namespace aquarius
 			io_service_.run();
 		}
 
-		void shut_down()
+		void stop()
 		{
 			io_service_.stop();
 
@@ -86,6 +88,13 @@ namespace aquarius
 			}
 		}
 
+		void re_connect()
+		{
+			conn_ptr_->shut_down();
+
+			do_connect(endpoint_);
+		}
+
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
@@ -113,5 +122,7 @@ namespace aquarius
 		std::function<void(std::shared_ptr<basic_session>)> start_func_;
 
 		std::function<void(std::shared_ptr<basic_session>)> close_func_;
+
+		boost::asio::ip::tcp::resolver::results_type endpoint_;
 	};
 } // namespace aquarius
