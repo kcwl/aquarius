@@ -66,6 +66,11 @@ namespace aquarius
 			return true;
 		}
 
+		bool send_broadcast(int result)
+		{
+			return true;
+		}
+
 	protected:
 		_Request* request_ptr_;
 
