@@ -8,12 +8,12 @@ namespace aquarius
 	class server
 	{
 	public:
-		explicit server(const std::string& port, int io_service_pool_size)
+		explicit server(int32_t port, int io_service_pool_size)
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(),
 						boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
-													   static_cast<unsigned short>(std::atoi(port.data()))))
+													   static_cast<unsigned short>(port)))
 		{
 			signals_.add(SIGINT);
 			signals_.add(SIGTERM);
