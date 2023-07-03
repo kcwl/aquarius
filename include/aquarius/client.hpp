@@ -73,6 +73,19 @@ namespace aquarius
 			return conn_ptr_->remote_port();
 		}
 
+		template<connect_event E, typename _Func>
+		void regist_callback(_Func&& f)
+		{
+			if constexpr (E == connect_event::start)
+			{
+				start_func_ = std::forward<_Func>(f);
+			}
+			else if constexpr (E == connect_event::close)
+			{
+				close_func_ = std::forward<_Func>(f);
+			}
+		}
+
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
@@ -84,6 +97,10 @@ namespace aquarius
 										   if (ec)
 											   return;
 
+										   conn_ptr_->regist_callback<connect_event::start>(start_func_);
+
+										   conn_ptr_->regist_callback<connect_event::close>(close_func_);
+
 										   conn_ptr_->start();
 									   });
 		}
@@ -92,5 +109,9 @@ namespace aquarius
 		boost::asio::io_service io_service_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
+
+		std::function<void(std::shared_ptr<basic_session>)> start_func_;
+
+		std::function<void(std::shared_ptr<basic_session>)> close_func_;
 	};
 } // namespace aquarius
