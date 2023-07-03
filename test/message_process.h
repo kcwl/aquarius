@@ -81,15 +81,11 @@ BOOST_AUTO_TEST_CASE(process)
 	req.body().b_ = 2;
 	req.body().c_ = 3;
 
-	aquarius::flex_buffer_t buffer{};
-
-	req.visit(buffer, aquarius::visit_mode::output);
-
-	cli.async_write(std::move(buffer));
+	cli.async_write(std::move(req));
 
 	std::this_thread::sleep_for(30s);
 
-	cli.shut_down();
+	cli.stop();
 	tc.join();
 
 	srv.stop();
