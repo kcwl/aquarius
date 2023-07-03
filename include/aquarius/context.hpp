@@ -2,6 +2,7 @@
 #include <aquarius/detail/context.hpp>
 #include <aquarius/detail/invoke.hpp>
 #include <aquarius/router.hpp>
+#include <aquarius/detail/session_manager.hpp>
 
 #define MESSAGE_DEFINE(req) static aquarius::detail::msg_regist<req> msg_##req(req::Number)
 
@@ -53,13 +54,7 @@ namespace aquarius
 
 		bool send_response(int result)
 		{
-			response_.header().clone(request_ptr_->header());
-
-			response_.header().result_ = result;
-
-			flex_buffer_t fs;
-
-			response_.visit(fs, visit_mode::output);
+			auto fs = make_response(result);
 
 			session_ptr_->async_write(std::move(fs));
 
@@ -68,7 +63,33 @@ namespace aquarius
 
 		bool send_broadcast(int result)
 		{
+			auto fs = make_response(result);
+
+			detail::session_manager::instance().broadcast(std::move(fs));
+
 			return true;
+		}
+
+		template<typename _Func>
+		bool send_broadcast_if(int result, _Func&& f)
+		{
+			auto fs = this->make_response(result);
+
+			detail::session_manager::instance().broadcast_if(std::move(fs), std::forward<_Func>(f));
+		}
+
+	private:
+		flex_buffer_t make_response(int32_t result)
+		{
+			response_.header().clone(request_ptr_->header());
+
+			response_.header().result_ = result;
+
+			flex_buffer_t fs;
+
+			response_.visit(fs, visit_mode::output);
+
+			return fs;
 		}
 
 	protected:

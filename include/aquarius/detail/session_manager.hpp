@@ -32,6 +32,32 @@ namespace aquarius
 				return iter->second;
 			}
 
+			void broadcast(flex_buffer_t&& buffer)
+			{
+				for (auto& session : sessions_)
+				{
+					if (!session.second)
+						continue;
+
+					session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				}
+			}
+
+			template<typename _Func>
+			void broadcast(flex_buffer_t&& buffer, _Func&& f)
+			{
+				for (auto& session : sessions_)
+				{
+					if (!session.second)
+						continue;
+
+					if (!std::forward<_Func>(f)(session.second))
+						continue;
+
+					session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				}
+			}
+
 		private:
 			std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
 		};
