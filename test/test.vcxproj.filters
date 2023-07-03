@@ -101,9 +101,6 @@
     <ClInclude Include="..\include\aquarius\detail\time_traits.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\transfer.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\type_traits.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
@@ -115,6 +112,12 @@
     </ClInclude>
     <ClInclude Include="message_process.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\session_manager.hpp">
+      <Filter>aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

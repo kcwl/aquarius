@@ -39,11 +39,11 @@ namespace aquarius
 		{}
 
 	public:
-		virtual int visit(_Request* req, std::shared_ptr<detail::transfer> conn_ptr)
+		virtual int visit(_Request* req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
 
-			conn_ptr_ = conn_ptr;
+			session_ptr_ = session_ptr;
 
 			return handle();
 		}
@@ -61,7 +61,7 @@ namespace aquarius
 
 			response_.visit(fs, visit_mode::output);
 
-			(*conn_ptr_)(std::move(fs));
+			session_ptr_->async_write(std::move(fs));
 
 			return true;
 		}

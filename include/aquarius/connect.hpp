@@ -2,7 +2,7 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
-#include <aquarius/detail/transfer.hpp>
+#include <aquarius/detail/session_manager.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -270,7 +270,7 @@ namespace aquarius
 			async_read();
 		}
 
-		void write_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
+		void write_handle(const boost::system::error_code& ec, [[maybe_unused]]std::size_t bytes_transferred)
 		{
 			if (ec)
 			{
@@ -346,8 +346,9 @@ namespace aquarius
 					return res;
 				}
 
-				req_ptr->accept(ctx_ptr, std::make_shared<detail::transfer>(std::bind(
-											 &connect::async_write, this->shared_from_this(), std::placeholders::_1,boost::uuids::hash_value(uid_))));
+				auto session_ptr = detail::session_manager::instance().find(this->uuid());
+
+				req_ptr->accept(ctx_ptr, session_ptr);
 			}
 			else if constexpr (std::same_as<_ConnectType, connect_http>)
 			{}
