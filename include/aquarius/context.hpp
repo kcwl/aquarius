@@ -65,7 +65,7 @@ namespace aquarius
 		{
 			flex_buffer_t fs{};
 
-			has_request ? fs = transfer_request() : make_response(1);
+			has_request ? fs = transfer_request() : fs = make_response(1);
 
 			detail::session_manager::instance().broadcast(std::move(fs));
 
