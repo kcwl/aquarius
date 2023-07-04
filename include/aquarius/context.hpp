@@ -80,6 +80,10 @@ namespace aquarius
 
 		bool send_someone(std::size_t uid)
 		{
+			auto fs = transfer_request();
+
+			detail::session_manager::instance().send_someone(uid, std::move(fs));
+
 			return true;
 		}
 

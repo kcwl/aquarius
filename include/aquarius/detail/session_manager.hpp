@@ -58,6 +58,19 @@ namespace aquarius
 				}
 			}
 
+			void send_someone(std::size_t uid, flex_buffer_t&& buffer)
+			{
+				auto iter = sessions_.find(uid);
+
+				if (iter == sessions_.end())
+					return;
+
+				if (!iter->second)
+					return;
+
+				iter->second->async_write(std::move(buffer));
+			}
+
 		private:
 			std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
 		};
