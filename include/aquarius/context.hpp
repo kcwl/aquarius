@@ -75,7 +75,7 @@ namespace aquarius
 		{
 			auto fs = this->transfer_request();
 
-			detail::session_manager::instance().broadcast_if(std::move(fs), std::forward<_Func>(f));
+			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 		}
 
 		bool send_someone(std::size_t uid)

@@ -39,7 +39,7 @@ namespace aquarius
 					if (!session.second)
 						continue;
 
-					session.second->async_write(std::forward<flex_buffer_t>(buffer));
+					session.second->async_write(std::move(buffer));
 				}
 			}
 
