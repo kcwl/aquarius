@@ -61,9 +61,9 @@ namespace aquarius
 			return true;
 		}
 
-		bool send_broadcast(int result)
+		bool send_broadcast()
 		{
-			auto fs = make_response(result);
+			auto fs = transfer_request();
 
 			detail::session_manager::instance().broadcast(std::move(fs));
 
@@ -71,9 +71,9 @@ namespace aquarius
 		}
 
 		template<typename _Func>
-		bool send_broadcast_if(int result, _Func&& f)
+		bool send_broadcast_if(_Func&& f)
 		{
-			auto fs = this->make_response(result);
+			auto fs = this->transfer_request();
 
 			detail::session_manager::instance().broadcast_if(std::move(fs), std::forward<_Func>(f));
 		}
@@ -88,6 +88,15 @@ namespace aquarius
 			flex_buffer_t fs;
 
 			response_.visit(fs, visit_mode::output);
+
+			return fs;
+		}
+
+		flex_buffer_t transfer_request()
+		{
+			flex_buffer_t fs;
+
+			request_ptr_->visit(fs, visit_mode::output);
 
 			return fs;
 		}
