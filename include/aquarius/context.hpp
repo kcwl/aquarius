@@ -78,6 +78,11 @@ namespace aquarius
 			detail::session_manager::instance().broadcast_if(std::move(fs), std::forward<_Func>(f));
 		}
 
+		bool send_someone(std::size_t uid)
+		{
+			return true;
+		}
+
 	private:
 		flex_buffer_t make_response(int32_t result)
 		{
