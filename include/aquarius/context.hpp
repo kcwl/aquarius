@@ -63,11 +63,7 @@ namespace aquarius
 
 		bool send_broadcast(bool has_request = true)
 		{
-			flex_buffer_t fs{};
-
-			has_request ? fs = transfer_request() : fs = make_response(1);
-
-			detail::session_manager::instance().broadcast(std::move(fs));
+			detail::session_manager::instance().broadcast(std::move(has_request ? transfer_request() : make_response(1)));
 
 			return true;
 		}
