@@ -41,13 +41,19 @@ namespace aquarius
 			if constexpr (!detail::is_string_v<decltype(host)> || !detail::is_string_v<decltype(port)>)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
-			boost::asio::ip::tcp::resolver resolver(io_service_);
-
-			endpoint_ = resolver.resolve(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
-			do_connect(endpoint_);
+			connect(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
 		}
 
 	public:
+		void connect(const std::string& ip, const std::string& port)
+		{
+			boost::asio::ip::tcp::resolver resolver(io_service_);
+
+			endpoint_ = resolver.resolve(ip, port);
+
+			do_connect(endpoint_);
+		}
+
 		void run()
 		{
 			io_service_.run();
