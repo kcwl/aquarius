@@ -7,9 +7,9 @@ namespace aquarius
 	class basic_session
 	{
 	public:
-		virtual std::string remote_ip() = 0;
+		virtual std::string remote_address() = 0;
 
-		virtual std::size_t remote_ip_u() = 0;
+		virtual std::size_t remote_address_u() = 0;
 
 		virtual int32_t remote_port() = 0;
 
@@ -32,20 +32,20 @@ namespace aquarius
 			: conn_ptr_(conn_ptr) {}
 
 	public:
-		virtual std::string remote_ip() override
+		virtual std::string remote_address() override
 		{
 			if (!conn_ptr_)
 				return std::string{};
 
-			return conn_ptr_->remote_ip();
+			return conn_ptr_->remote_address();
 		}
 
-		virtual std::size_t remote_ip_u() override
+		virtual std::size_t remote_address_u() override
 		{
 			if (!conn_ptr_)
 				return std::size_t{};
 
-			return conn_ptr_->remote_ip_u();
+			return conn_ptr_->remote_address_u();
 		}
 
 		virtual int32_t remote_port() override
