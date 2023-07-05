@@ -13,7 +13,7 @@ namespace aquarius
 	class xmessage : public detail::visitable<int>
 	{
 	public:
-		DEFINE_VISITABLE(int)
+		DEFINE_VISITABLE_NULL(int)
 
 	public:
 		virtual uint32_t unique_key()
@@ -41,7 +41,7 @@ namespace aquarius
 
 		constexpr static uint32_t Number = N;
 
-		DEFINE_VISITABLE(int)
+		//DEFINE_VISITABLE(int)
 
 	public:
 		message()

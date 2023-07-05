@@ -40,7 +40,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual int visit(_Request* req, std::shared_ptr<basic_session> session_ptr)
+		virtual int visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
 
@@ -109,7 +109,7 @@ namespace aquarius
 		}
 
 	protected:
-		_Request* request_ptr_;
+		std::shared_ptr<_Request> request_ptr_;
 
 		_Response response_;
 	};

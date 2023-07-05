@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class response : public message<tcp_response_header, _Body, Number>
+	class response : public message<tcp_response_header, _Body, Number>, public std::enable_shared_from_this<response<_Body, Number>>
 	{
 		using base_type = message<tcp_response_header, _Body, Number>;
 
