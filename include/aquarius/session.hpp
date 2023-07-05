@@ -61,7 +61,7 @@ namespace aquarius
 			if (!conn_ptr_)
 				return std::size_t{};
 
-			return conn_ptr_->uid();
+			return conn_ptr_->uuid();
 		}
 
 		virtual void async_write(flex_buffer_t&& buffer) override
