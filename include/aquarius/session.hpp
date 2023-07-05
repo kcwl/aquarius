@@ -19,7 +19,7 @@ namespace aquarius
 	};
 
 	template<typename _Connector>
-	class session
+	class session : public basic_session
 	{
 	public:
 		explicit session()
