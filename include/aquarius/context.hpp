@@ -76,13 +76,13 @@ namespace aquarius
 			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 		}
 
-		bool send_someone(std::size_t uid)
+		template<typename _Message>
+		bool send_broadcast(_Message&& msg)
 		{
-			auto fs = transfer_request();
+			flex_buffer_t fs{};
+			msg.visit(fs, visit_mode::output);
 
-			detail::session_manager::instance().send_someone(uid, std::move(fs));
-
-			return true;
+			detail::session_manager::instance().broadcast(std::move(fs));
 		}
 
 	private:
