@@ -29,18 +29,18 @@ namespace aquarius
 
 	using ssl_tcp_client = client<ssl_tcp_connect>;
 
-	std::shared_ptr<basic_session> find_session(std::size_t id)
+	inline std::shared_ptr<basic_session> find_session(std::size_t id)
 	{
 		return detail::session_manager::instance().find(id);
 	}
 
-	bool erase_session(std::size_t id)
+	inline bool erase_session(std::size_t id)
 	{
 		return detail::session_manager::instance().erase(id);
 	}
 
 	template<typename _Message>
-	void broadcast(_Message&& msg)
+	inline void broadcast(_Message&& msg)
 	{
 		flex_buffer_t fs{};
 		msg.visit(fs, visit_mode::output);
@@ -49,7 +49,7 @@ namespace aquarius
 	}
 
 	template<typename _Message, typename _Func>
-	void broadcast(_Message&& msg, _Func&& f)
+	inline void broadcast(_Message&& msg, _Func&& f)
 	{
 		flex_buffer_t fs{};
 		msg.visit(fs, visit_mode::output);

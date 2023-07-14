@@ -16,6 +16,9 @@ namespace aquarius
 		virtual std::size_t uid() = 0;
 
 		virtual void async_write(flex_buffer_t&& buffer) = 0;
+
+	public:
+		int32_t session_type;
 	};
 
 	template<typename _Connector>

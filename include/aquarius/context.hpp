@@ -68,14 +68,6 @@ namespace aquarius
 			return true;
 		}
 
-		template<typename _Func>
-		bool send_broadcast_if(_Func&& f)
-		{
-			auto fs = this->transfer_request();
-
-			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
-		}
-
 		template<typename _Message>
 		bool send_broadcast(_Message&& msg)
 		{
@@ -83,6 +75,29 @@ namespace aquarius
 			msg.visit(fs, visit_mode::output);
 
 			detail::session_manager::instance().broadcast(std::move(fs));
+
+			return true;
+		}
+
+		template<typename _Func>
+		bool send_broadcast_if(_Func&& f)
+		{
+			auto fs = this->transfer_request();
+
+			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+
+			return true;
+		}
+
+		template<typename _Message,typename _Func>
+		bool send_broadcast_if(_Message&& msg, _Func&& f)
+		{
+			flex_buffer_t fs{};
+			msg.visit(fs, visit_mode::output);
+
+			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+
+			return true;
 		}
 
 	private:
