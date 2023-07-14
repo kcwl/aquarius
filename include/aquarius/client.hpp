@@ -41,17 +41,35 @@ namespace aquarius
 			if constexpr (!detail::is_string_v<decltype(host)> || !detail::is_string_v<decltype(port)>)
 				throw std::overflow_error("Usage: client <host> <port> : type - string");
 
-			connect(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
+			async_connect(std::get<0>(endpoint_list), std::get<1>(endpoint_list));
 		}
 
 	public:
-		void connect(const std::string& ip, const std::string& port)
+		void async_connect(const std::string& ip, const std::string& port)
 		{
 			boost::asio::ip::tcp::resolver resolver(io_service_);
 
 			endpoint_ = resolver.resolve(ip, port);
 
 			do_connect(endpoint_);
+		}
+
+		bool connect(const std::string& ip, int32_t port)
+		{
+			boost::asio::ip::tcp::resolver resolver(io_service_);
+
+			endpoint_ = resolver.resolve(ip, std::to_string(port));
+
+			conn_ptr_ = std::make_shared<_Connector>(io_service_);
+
+			boost::system::error_code ec;
+
+			boost::asio::connect(conn_ptr_->socket(), endpoint_, ec);
+
+			if (ec)
+				return false;
+
+			return true;
 		}
 
 		void run()
@@ -73,6 +91,31 @@ namespace aquarius
 			req.visit(fs, visit_mode::output);
 
 			conn_ptr_->async_write(std::move(fs));
+		}
+
+		template<typename _Request>
+		void write(_Request&& req)
+		{
+			flex_buffer_t fs{};
+			req.visit(fs, visit_mode::output);
+
+			conn_ptr_->write(std::move(fs));
+		}
+
+		void async_read()
+		{
+			conn_ptr_->establish_async_read();
+		}
+
+		std::size_t read()
+		{
+			return conn_ptr_->read();
+		}
+
+		template<typename _Func>
+		std::size_t read_if(_Func&& f)
+		{
+			return conn_ptr_->read(std::forward<_Func>(f));
 		}
 
 		std::string remote_address()
