@@ -7,14 +7,14 @@ namespace aquarius
 {
 	struct tcp_header
 	{
-		uint32_t magic_;
+		int32_t magic_;
 		int32_t size_;
-		uint32_t uid_;
-		uint32_t append_;
+		int32_t uid_;
+		int32_t append_;
 
 		void set_size(std::size_t sz)
 		{
-			size_ = static_cast<uint32_t>(sz);
+			size_ = static_cast<int32_t>(sz);
 		}
 
 		void clone(const tcp_header& header)
@@ -38,7 +38,7 @@ namespace aquarius
 
 	struct tcp_request_header : tcp_header
 	{
-		uint32_t reserve_;
+		int32_t reserve_;
 
 	private:
 		friend class elastic::access;

@@ -17,6 +17,8 @@ namespace aquarius
 		explicit client()
 			: io_service_()
 			, endpoint_()
+			, start_func_()
+			, close_func_()
 		{}
 
 		client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
@@ -109,7 +111,8 @@ namespace aquarius
 
 		std::size_t read()
 		{
-			return conn_ptr_->read();
+			auto [sz,_] = conn_ptr_->read();
+			return sz;
 		}
 
 		template<typename _Func>

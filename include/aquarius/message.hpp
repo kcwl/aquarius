@@ -124,12 +124,20 @@ namespace aquarius
 		{
 			// auto sz = stream.size();
 
-			auto res = header_ptr_->parse_bytes(stream);
+			//auto res = header_ptr_->parse_bytes(stream);
+			auto distance = elastic::from_binary(*header_ptr_, stream);
 
 			// bytes_ += sz - stream.size();
 
-			if (res != read_handle_result::ok)
-				return res;
+			//if (res != read_handle_result::ok)
+			//	return res;
+			if (header_ptr_->size_ > stream.size())
+			{
+				
+				stream.consume(-distance);
+
+				return read_handle_result::waiting_for_query;
+			}
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
 			{
@@ -156,12 +164,13 @@ namespace aquarius
 		{
 			elastic::to_binary(Number, stream);
 
-			auto res = header_ptr_->to_bytes(stream);
+			//auto res = header_ptr_->to_bytes(stream);
+			/*auto res = */elastic::to_binary(*header_ptr_, stream);
 
-			if (res != read_handle_result::ok)
-			{
-				return res;
-			}
+			//if (res != read_handle_result::ok)
+			//{
+			//	return res;
+			//}
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
 			{

@@ -37,6 +37,7 @@ namespace aquarius
 		context(const std::string& name)
 			: basic_context(name)
 			, request_ptr_(nullptr)
+			, response_()
 		{}
 
 	public:
@@ -108,6 +109,9 @@ namespace aquarius
 			response_.header().result_ = result;
 
 			flex_buffer_t fs;
+
+			if (response_.header().size_ != 0)
+				fs.resize(response_.header().size_+sizeof(response_.header()));
 
 			response_.visit(fs, visit_mode::output);
 
