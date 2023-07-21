@@ -28,4 +28,33 @@ namespace aquarius
 	using no_ssl_tcp_client = client<no_ssl_tcp_connect>;
 
 	using ssl_tcp_client = client<ssl_tcp_connect>;
+
+	inline std::shared_ptr<basic_session> find_session(std::size_t id)
+	{
+		return detail::session_manager::instance().find(id);
+	}
+
+	inline bool erase_session(std::size_t id)
+	{
+		return detail::session_manager::instance().erase(id);
+	}
+
+	template<typename _Message>
+	inline void broadcast(_Message&& msg)
+	{
+		flex_buffer_t fs{};
+		msg.visit(fs, visit_mode::output);
+
+		detail::session_manager::instance().broadcast(std::move(fs));
+	}
+
+	template<typename _Message, typename _Func>
+	inline void broadcast(_Message&& msg, _Func&& f)
+	{
+		flex_buffer_t fs{};
+		msg.visit(fs, visit_mode::output);
+
+		detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+	}
+
 } // namespace aquarius

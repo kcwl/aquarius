@@ -25,7 +25,7 @@ namespace aquarius
 			DEFINE_VISITOR(xmessage, int)
 
 		protected:
-			std::shared_ptr<transfer> conn_ptr_;
+			std::shared_ptr<basic_session> session_ptr_;
 
 			std::string name_;
 		};

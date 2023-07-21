@@ -180,7 +180,16 @@ namespace aquarius
 
 			void resize(size_type bytes)
 			{
+				bytes == 0 ? bytes = capacity : 0;
+
+				auto old_size = buffer_.size();
+
+				if (bytes <= old_size)
+					return;
+
 				buffer_.resize(bytes);
+
+				reset();
 			}
 
 			void swap(basic_streambuf& buf)
@@ -207,8 +216,10 @@ namespace aquarius
 
 				int seg = static_cast<int>(rdata() - wdata());
 
-				std::memmove(buffer_.data(), wdata(), rdata() - wdata());
+				seg <= 0 ? seg = 0 : 0;
 
+				std::memmove(buffer_.data(), wdata(), seg);
+					
 				reset();
 
 				commit(seg);

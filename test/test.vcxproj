@@ -150,11 +150,11 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\detail\sha2.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\streambuf.hpp" />
     <ClInclude Include="..\include\aquarius\detail\time_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\transfer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
@@ -164,6 +164,7 @@
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\router.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
+    <ClInclude Include="..\include\aquarius\session.hpp" />
     <ClInclude Include="io.h" />
     <ClInclude Include="message_process.h" />
   </ItemGroup>

@@ -2,6 +2,7 @@
 #include <aquarius/detail/context.hpp>
 #include <aquarius/detail/invoke.hpp>
 #include <aquarius/router.hpp>
+#include <aquarius/detail/session_manager.hpp>
 
 #define MESSAGE_DEFINE(req) static aquarius::detail::msg_regist<req> msg_##req(req::Number)
 
@@ -36,14 +37,15 @@ namespace aquarius
 		context(const std::string& name)
 			: basic_context(name)
 			, request_ptr_(nullptr)
+			, response_()
 		{}
 
 	public:
-		virtual int visit(_Request* req, std::shared_ptr<detail::transfer> conn_ptr)
+		virtual int visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
 
-			conn_ptr_ = conn_ptr;
+			session_ptr_ = session_ptr;
 
 			return handle();
 		}
@@ -53,21 +55,80 @@ namespace aquarius
 
 		bool send_response(int result)
 		{
+			auto fs = make_response(result);
+
+			session_ptr_->async_write(std::move(fs));
+
+			return true;
+		}
+
+		bool send_broadcast(bool has_request = true)
+		{
+			detail::session_manager::instance().broadcast(std::move(has_request ? transfer_request() : make_response(1)));
+
+			return true;
+		}
+
+		template<typename _Message>
+		bool send_broadcast(_Message&& msg)
+		{
+			flex_buffer_t fs{};
+			msg.visit(fs, visit_mode::output);
+
+			detail::session_manager::instance().broadcast(std::move(fs));
+
+			return true;
+		}
+
+		template<typename _Func>
+		bool send_broadcast_if(_Func&& f)
+		{
+			auto fs = this->transfer_request();
+
+			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+
+			return true;
+		}
+
+		template<typename _Message,typename _Func>
+		bool send_broadcast_if(_Message&& msg, _Func&& f)
+		{
+			flex_buffer_t fs{};
+			msg.visit(fs, visit_mode::output);
+
+			detail::session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+
+			return true;
+		}
+
+	private:
+		flex_buffer_t make_response(int32_t result)
+		{
 			response_.header().clone(request_ptr_->header());
 
 			response_.header().result_ = result;
 
 			flex_buffer_t fs;
 
+			if (response_.header().size_ != 0)
+				fs.resize(response_.header().size_+sizeof(response_.header()));
+
 			response_.visit(fs, visit_mode::output);
 
-			(*conn_ptr_)(std::move(fs));
+			return fs;
+		}
 
-			return true;
+		flex_buffer_t transfer_request()
+		{
+			flex_buffer_t fs;
+
+			request_ptr_->visit(fs, visit_mode::output);
+
+			return fs;
 		}
 
 	protected:
-		_Request* request_ptr_;
+		std::shared_ptr<_Request> request_ptr_;
 
 		_Response response_;
 	};
