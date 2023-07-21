@@ -476,12 +476,12 @@ namespace aquarius
 		{
 			connect_time_ = std::chrono::system_clock::now();
 
+			auto session_ptr = std::make_shared<session<connect<_ConnectType, _SocketType>>>(this->shared_from_this());
+
+			detail::session_manager::instance().push(session_ptr);
+
 			if (start_func_)
 			{
-				auto session_ptr = std::make_shared<session<connect<_ConnectType, _SocketType>>>(this->shared_from_this());
-
-				detail::session_manager::instance().push(session_ptr);
-
 				start_func_(session_ptr);
 			}
 
