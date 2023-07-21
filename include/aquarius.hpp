@@ -6,6 +6,7 @@
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/connect.hpp>
+#include <aquarius/detail/md5.hpp>
 
 namespace aquarius
 {
