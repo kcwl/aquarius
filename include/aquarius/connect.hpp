@@ -428,11 +428,11 @@ namespace aquarius
 
 			if constexpr (std::same_as<_ConnectType, connect_tcp>)
 			{
-				auto size = elastic::from_binary(id, read_buffer_);
+				auto id_size = elastic::from_binary(id, read_buffer_);
 
 				if (id == 0)
 				{
-					read_buffer_.consume(-size);
+					read_buffer_.consume(-id_size);
 					return { id, read_handle_result::waiting_for_query };
 				}
 
@@ -440,7 +440,11 @@ namespace aquarius
 
 				if (!ctx_ptr)
 				{
-					read_buffer_.consume(-size);
+					uint32_t total{};
+					auto proto_size = elastic::from_binary(total, read_buffer_);
+
+					read_buffer_.consume(total - proto_size);
+
 					return { id, read_handle_result::error };
 				}
 
@@ -455,7 +459,7 @@ namespace aquarius
 
 				if (res != read_handle_result::ok)
 				{
-					read_buffer_.consume(-size);
+					read_buffer_.consume(-id_size);
 
 					return { id, res };
 				}
@@ -463,6 +467,9 @@ namespace aquarius
 				auto session_ptr = detail::session_manager::instance().find(this->uuid());
 
 				req_ptr->accept(ctx_ptr, session_ptr);
+
+				if (read_buffer_.size() != 0)
+					return read_handle_internal();
 			}
 			else if constexpr (std::same_as<_ConnectType, connect_http>)
 			{}
