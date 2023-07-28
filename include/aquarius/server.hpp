@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <aquarius/defines.hpp>
 #include <aquarius/session.hpp>
+#include <aquarius/timer_queue.hpp>
 
 namespace aquarius
 {
@@ -32,6 +33,8 @@ namespace aquarius
 	public:
 		void run()
 		{
+			timer_queue::instance().exec(io_service_pool_.get_io_service());
+
 			io_service_pool_.run();
 		}
 
