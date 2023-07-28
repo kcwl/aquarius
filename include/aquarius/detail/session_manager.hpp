@@ -32,6 +32,11 @@ namespace aquarius
 				return iter->second;
 			}
 
+			std::size_t count()
+			{
+				return sessions_.size();
+			}
+
 			void broadcast(flex_buffer_t&& buffer)
 			{
 				for (auto& session : sessions_)
