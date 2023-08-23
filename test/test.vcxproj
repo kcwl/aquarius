@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;G:\git\boost_1_82_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\openssl\lib;G:\git\boost_1_82_0\stage\lib;F:\boost_1_81_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -160,6 +160,7 @@
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\header.hpp" />
+    <ClInclude Include="..\include\aquarius\ip_addr.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />

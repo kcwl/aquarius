@@ -119,6 +119,9 @@
     <ClInclude Include="..\include\aquarius\detail\session_manager.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip_addr.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\md5.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>

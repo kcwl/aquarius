@@ -51,5 +51,8 @@ namespace aquarius
 
 		struct http
 		{};
+
+		template<typename _Ty>
+		concept integer_t = requires { std::is_integral_v<_Ty>; };
 	} // namespace detail
 } // namespace aquarius

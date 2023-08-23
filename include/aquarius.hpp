@@ -1,13 +1,13 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/client.hpp>
-#include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
-#include <aquarius/detail/md5.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/timer_queue.hpp>
+#include <aquarius/connect.hpp>
+#include <aquarius/detail/md5.hpp>
+#include <aquarius/ip_addr.hpp>
 
 namespace aquarius
 {
