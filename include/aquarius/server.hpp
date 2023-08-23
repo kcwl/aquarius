@@ -71,9 +71,9 @@ namespace aquarius
 								   {
 									   if (!error)
 									   {
-										   new_connect_ptr->regist_callback<connect_event::start>(start_func_);
+										   new_connect_ptr->template regist_callback<connect_event::start>(start_func_);
 
-										   new_connect_ptr->regist_callback<connect_event::close>(close_func_);
+										   new_connect_ptr->template regist_callback<connect_event::close>(close_func_);
 
 										   new_connect_ptr->start();
 
