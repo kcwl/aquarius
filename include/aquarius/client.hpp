@@ -22,8 +22,10 @@ namespace aquarius
 		{}
 
 		client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
-			: client()
+			: io_service_()
 			, endpoint_(endpoints)
+			, start_func_()
+			, close_func_()
 		{
 			do_connect(endpoint_);
 		}
@@ -86,7 +88,7 @@ namespace aquarius
 			conn_ptr_->shut_down();
 		}
 
-		template<typename _Request>
+		template <typename _Request>
 		void async_write(_Request&& req)
 		{
 			flex_buffer_t fs{};
@@ -95,7 +97,7 @@ namespace aquarius
 			conn_ptr_->async_write(std::move(fs));
 		}
 
-		template<typename _Request>
+		template <typename _Request>
 		void write(_Request&& req)
 		{
 			flex_buffer_t fs{};
@@ -111,11 +113,11 @@ namespace aquarius
 
 		std::size_t read()
 		{
-			auto [sz,_] = conn_ptr_->read();
+			auto [sz, _] = conn_ptr_->read();
 			return sz;
 		}
 
-		template<typename _Func>
+		template <typename _Func>
 		std::size_t read_if(_Func&& f)
 		{
 			return conn_ptr_->read(std::forward<_Func>(f));
@@ -131,7 +133,7 @@ namespace aquarius
 			return conn_ptr_->remote_port();
 		}
 
-		template<connect_event E, typename _Func>
+		template <connect_event E, typename _Func>
 		void regist_callback(_Func&& f)
 		{
 			if constexpr (E == connect_event::start)
