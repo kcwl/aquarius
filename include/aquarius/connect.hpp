@@ -109,7 +109,7 @@ namespace aquarius
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
-				ssl_socket_.write_some(boost::asio::buffer(resp_buf.wdata().resp_buf.size()));
+				ssl_socket_.write_some(boost::asio::buffer(resp_buf.wdata(), resp_buf.size()));
 			}
 			else
 			{
@@ -347,7 +347,7 @@ namespace aquarius
 		{
 			if (ec)
 			{
-				auto str = ec.what();
+				auto str = ec.message();
 				return shut_down();
 			}
 
