@@ -81,7 +81,7 @@ namespace aquarius
 
 		auto dura = dest_time - cur_now;
 
-		dura.count() < 0 ? dura += std::chrono::days(1) : 0;
+		dura.count() < 0 ? dura += std::chrono::days(1) : dura;
 
 		return timer_queue::instance().regist(std::forward<_Func>(f), timer_queue::timer_category::clock,
 											  std::chrono::duration_cast<std::chrono::milliseconds>(dura));
