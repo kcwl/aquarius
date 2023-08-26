@@ -4,6 +4,7 @@
 #include <span>
 #include <streambuf>
 #include <vector>
+#include <cstring>
 
 namespace aquarius
 {
