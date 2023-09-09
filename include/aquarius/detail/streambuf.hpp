@@ -4,6 +4,7 @@
 #include <span>
 #include <streambuf>
 #include <vector>
+#include <cstring>
 
 namespace aquarius
 {
@@ -348,7 +349,7 @@ namespace aquarius
 
 				if ((mode & std::ios::out) && pptr_old)
 				{
-					base_type::setp(seek_low, new_ptr, base_type::epptr());
+					base_type::setp(seek_low, new_ptr);
 				}
 
 				return pos_type(off);

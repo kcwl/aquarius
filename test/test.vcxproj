@@ -106,13 +106,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;G:\git\boost_1_82_0;D:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;G:\git\boost_1_82_0;D:\openssl\include;F:\boost_1_81_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;G:\git\boost_1_82_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\openssl\lib;G:\git\boost_1_82_0\stage\lib;F:\boost_1_81_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -148,6 +148,7 @@
     <ClInclude Include="..\include\aquarius\detail\field.hpp" />
     <ClInclude Include="..\include\aquarius\detail\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\md5.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_manager.hpp" />
@@ -159,12 +160,14 @@
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\header.hpp" />
+    <ClInclude Include="..\include\aquarius\ip_addr.hpp" />
     <ClInclude Include="..\include\aquarius\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\router.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
+    <ClInclude Include="..\include\aquarius\timer_queue.hpp" />
     <ClInclude Include="io.h" />
     <ClInclude Include="message_process.h" />
   </ItemGroup>

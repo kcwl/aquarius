@@ -4,7 +4,8 @@
 
 namespace aquarius
 {
-	static std::string md5_hash(const std::string& src)
+	template <typename _Ty>
+	std::string md5_hash(const std::basic_string<_Ty, std::char_traits<_Ty>, std::allocator<_Ty>>& src)
 	{
 		std::string result{};
 		result.resize(MD5_DIGEST_LENGTH * 2);
@@ -13,4 +14,4 @@ namespace aquarius
 
 		return result;
 	}
-}
+} // namespace aquarius

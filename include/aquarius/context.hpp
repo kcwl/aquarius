@@ -115,6 +115,8 @@ namespace aquarius
 
 			response_.visit(fs, visit_mode::output);
 
+			response_.header().size_ = fs.size();
+
 			return fs;
 		}
 
