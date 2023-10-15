@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(streambuf)
 
 		buffer.resize(1024);
 
-		BOOST_CHECK_EQUAL(buffer.max_size(), 1024);
+		BOOST_CHECK_EQUAL(buffer.max_size(), 4096);
 	}
 
 	{
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(streambuf)
 	{
 		//base member pubseekoff() pubseekpos()
 		aquarius::flex_buffer_t buffer{};
-		buffer.sputn("ahello", 6);
+		buffer.sputn("ahelwo", 6);
 
 		buffer.sgetc();
 
@@ -224,19 +224,19 @@ BOOST_AUTO_TEST_CASE(streambuf)
 
 		buffer.pubseekpos(3, std::ios::out);
 
-		BOOST_CHECK_EQUAL(buffer.size(), 0);
+		BOOST_CHECK_EQUAL(*buffer.wdata(), 'l');
 
 		buffer.pubseekoff(2, std::ios::beg, std::ios::out);
 
-		BOOST_CHECK_EQUAL(buffer.size(), 1);
+		BOOST_CHECK_EQUAL(*buffer.wdata(), 'l');
 
 		buffer.pubseekoff(2, std::ios::end, std::ios::in);
 
-		BOOST_CHECK_EQUAL(buffer.size(), 1);
+		BOOST_CHECK_EQUAL(*buffer.rdata(), 'a');
 
 		buffer.pubseekoff(2, std::ios::end, std::ios::out);
 
-		BOOST_CHECK_EQUAL(buffer.size(), 1);
+		BOOST_CHECK_EQUAL(*buffer.wdata(), 'l');
 
 		BOOST_TEST(buffer.pubseekpos(4096, std::ios::in));
 
