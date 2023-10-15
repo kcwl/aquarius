@@ -110,12 +110,7 @@ namespace aquarius
 
 			flex_buffer_t fs;
 
-			if (response_.header().size_ != 0)
-				fs.resize(response_.header().size_+sizeof(response_.header()));
-
 			response_.visit(fs, visit_mode::output);
-
-			response_.header().size_ = fs.size();
 
 			return fs;
 		}

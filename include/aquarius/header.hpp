@@ -5,51 +5,28 @@
 
 namespace aquarius
 {
-	struct tcp_header
+	constexpr static int32_t unknown_req_number = 0;
+	constexpr static int32_t unknown_resp_number = 1;
+	constexpr static int32_t message_base_number = 1000;
+
+	class command_header
 	{
-		uint32_t size_;
-		uint32_t magic_;
-		uint32_t uid_;
-		uint32_t append_;
-
-		void set_size(std::size_t sz)
+	public:
+		void clone(const command_header& header)
 		{
-			size_ = static_cast<int32_t>(sz);
+			total_seq_ = header.total_seq_;
+			sequences_ = header.sequences_;
+			reserve_ = header.reserve_;
 		}
 
-		void clone(const tcp_header& header)
-		{
-			uid_ = header.uid_;
-			append_ = header.append_;
-		}
-
-	private:
-		friend class elastic::access;
-
-		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
-		{
-			ar& magic_;
-			ar& size_;
-			ar& uid_;
-			ar& append_;
-		}
+	public:
+		int32_t total_seq_;
+		int32_t sequences_;
+		uint32_t reserve_;
 	};
 
-	struct tcp_request_header : tcp_header
+	class request_header : public command_header
 	{
-		int32_t reserve_;
-
-	private:
-		friend class elastic::access;
-
-		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
-		{
-			ar& elastic::base_object<tcp_header>(*this);
-			ar& reserve_;
-		}
-
 	public:
 		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
@@ -64,35 +41,51 @@ namespace aquarius
 
 			return read_handle_result::ok;
 		}
-	};
-
-	struct tcp_response_header : tcp_header
-	{
-		int32_t result_;
 
 	private:
 		friend class elastic::access;
 
 		template <typename _Archive>
-		void serialize(_Archive& ar, [[maybe_unused]] uint32_t file_version = 0)
+		void serialize(_Archive& ar)
 		{
-			ar& elastic::base_object<tcp_header>(*this);
+			ar& elastic::base_object<command_header>(*this);
+			ar& uid_;
+			ar& session_id_;
+		}
+
+	public:
+		uint32_t uid_;
+		uint32_t session_id_;
+	};
+
+	class response_header : public command_header
+	{
+	public:
+		read_handle_result parse_bytes(flex_buffer_t& stream)
+		{
+			elastic::from_binary(*this, stream);
+
+			return read_handle_result::ok;
+		}
+
+		read_handle_result to_bytes(flex_buffer_t& stream)
+		{
+			elastic::to_binary(*this, stream);
+
+			return read_handle_result::ok;
+		}
+
+	private:
+		friend class elastic::access;
+
+		template <typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& elastic::base_object<command_header>(*this);
 			ar& result_;
 		}
 
 	public:
-		read_handle_result parse_bytes(flex_buffer_t& stream)
-		{
-			elastic::from_binary(*this, stream);
-
-			return read_handle_result::ok;
-		}
-
-		read_handle_result to_bytes(flex_buffer_t& stream)
-		{
-			elastic::to_binary(*this, stream);
-
-			return read_handle_result::ok;
-		}
+		int32_t result_;
 	};
 } // namespace aquarius
