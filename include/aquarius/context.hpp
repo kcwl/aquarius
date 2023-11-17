@@ -1,8 +1,7 @@
 #pragma once
-#include <aquarius/detail/context.hpp>
 #include <aquarius/detail/invoke.hpp>
-#include <aquarius/router.hpp>
 #include <aquarius/detail/session_manager.hpp>
+#include <aquarius/router.hpp>
 
 #define MESSAGE_DEFINE(req) static aquarius::detail::msg_regist<req> msg_##req(req::Number)
 
@@ -30,17 +29,70 @@
 
 namespace aquarius
 {
-	template <typename _Request, typename _Response>
-	class context : public detail::basic_context, public detail::visitor<_Request, int>
+	class context : public detail::visitor<xmessage, int>
 	{
 	public:
-		context(const std::string& name)
-			: basic_context(name)
+		context(const std::string& name, std::chrono::milliseconds timeout)
+			: name_(name)
+			, timeout_(timeout)
+		{}
+
+		virtual ~context() = default;
+
+		context(const context&) = delete;
+
+		context(context&&) = default;
+
+		context& operator=(const context&) = delete;
+
+	public:
+		virtual void on_create() = 0;
+
+		virtual void on_close() = 0;
+
+		virtual void on_connect() = 0;
+
+		virtual void on_timeout() = 0;
+
+		virtual int visit(xmessage* msg) = 0;
+
+	protected:
+		std::string name_;
+
+		std::chrono::milliseconds timeout_;
+	};
+
+	template <typename _Request, typename _Response>
+	class handle : public context, public detail::visitor<_Request, int>
+	{
+	public:
+		handle(const std::string& name, std::chrono::milliseconds timeout)
+			: handle(name, timeout)
 			, request_ptr_(nullptr)
 			, response_()
 		{}
 
 	public:
+		virtual void on_create()
+		{
+			//flow monitor
+		}
+
+		virtual void on_close()
+		{
+			//clear
+		}
+
+		virtual void on_connect()
+		{
+			// log record
+		}
+
+		virtual void on_timeout()
+		{
+			// timeout
+		}
+
 		virtual int visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
@@ -64,12 +116,13 @@ namespace aquarius
 
 		bool send_broadcast(bool has_request = true)
 		{
-			detail::session_manager::instance().broadcast(std::move(has_request ? transfer_request() : make_response(1)));
+			detail::session_manager::instance().broadcast(
+				std::move(has_request ? transfer_request() : make_response(1)));
 
 			return true;
 		}
 
-		template<typename _Message>
+		template <typename _Message>
 		bool send_broadcast(_Message&& msg)
 		{
 			flex_buffer_t fs{};
@@ -80,7 +133,7 @@ namespace aquarius
 			return true;
 		}
 
-		template<typename _Func>
+		template <typename _Func>
 		bool send_broadcast_if(_Func&& f)
 		{
 			auto fs = this->transfer_request();
@@ -90,7 +143,7 @@ namespace aquarius
 			return true;
 		}
 
-		template<typename _Message,typename _Func>
+		template <typename _Message, typename _Func>
 		bool send_broadcast_if(_Message&& msg, _Func&& f)
 		{
 			flex_buffer_t fs{};
@@ -131,11 +184,11 @@ namespace aquarius
 	};
 
 	template <typename _Response>
-	class client_context : public context<_Response, int>
+	class client_context : public handle<_Response, int>
 	{
 	public:
 		client_context(const std::string& name)
-			: context<_Response,int>(name)
+			: handle<_Response, int>(name)
 		{}
 
 	protected:
