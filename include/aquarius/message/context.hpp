@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/invoke.hpp>
-#include <aquarius/detail/session_manager.hpp>
+#include <aquarius/session/session_manager.hpp>
 #include <aquarius/router.hpp>
 
 #define MESSAGE_DEFINE(req) static aquarius::detail::msg_regist<req> msg_##req(req::Number)
@@ -63,11 +63,11 @@ namespace aquarius
 	};
 
 	template <typename _Request, typename _Response>
-	class handle : public context, public detail::visitor<_Request, int>
+	class xhandle : public context, public detail::visitor<_Request, int>
 	{
 	public:
-		handle(const std::string& name, std::chrono::milliseconds timeout)
-			: handle(name, timeout)
+		xhandle(const std::string& name, std::chrono::milliseconds timeout)
+			: context(name, timeout)
 			, request_ptr_(nullptr)
 			, response_()
 		{}
@@ -184,11 +184,11 @@ namespace aquarius
 	};
 
 	template <typename _Response>
-	class client_context : public handle<_Response, int>
+	class client_context : public context<_Response, int>
 	{
 	public:
 		client_context(const std::string& name)
-			: handle<_Response, int>(name)
+			: context<_Response, int>(name)
 		{}
 
 	protected:

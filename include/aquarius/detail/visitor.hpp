@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/session.hpp>
+#include <aquarius/session/session.hpp>
 
 namespace aquarius
 {

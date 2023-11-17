@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/detail/io_service_pool.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <type_traits>
 #include <aquarius/defines.hpp>
-#include <aquarius/session.hpp>
+#include <aquarius/session/session.hpp>
 #include <aquarius/timer_queue.hpp>
 
 namespace aquarius

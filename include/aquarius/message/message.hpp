@@ -125,10 +125,10 @@ namespace aquarius
 			// auto sz = stream.size();
 
 			//auto res = header_ptr_->parse_bytes(stream);
-			auto distance = elastic::from_binary(*header_ptr_, stream);
+			//auto distance = elastic::from_binary(*header_ptr_, stream);
 
-			if (distance == 0)
-				return read_handle_result::waiting_for_query;
+			//if (distance == 0)
+			//	return read_handle_result::waiting_for_query;
 
 			// bytes_ += sz - stream.size();
 
@@ -139,7 +139,7 @@ namespace aquarius
 			//	
 			//	stream.consume(-distance);
 
-			//	return read_handle_result::waiting_for_query;
+				return read_handle_result::ok;
 			//}
 
 			if constexpr (!std::is_same_v<body_type, null_body>)
@@ -154,13 +154,14 @@ namespace aquarius
 				//	return res;
 				// }
 
-				auto bytes = elastic::from_binary(body_, stream);
+				//auto bytes = elastic::from_binary(body_, stream);
 
-				if (bytes == 0)
-					return read_handle_result::waiting_for_query;
+				//if (bytes == 0)
+				//	return read_handle_result::waiting_for_query;
 
 				// bytes_ += body_.ByteSizeLong();
 				// stream.consume(header_ptr_->size_);
+				//return read_handle_result::ok;
 			}
 
 			return read_handle_result::ok;
@@ -168,34 +169,34 @@ namespace aquarius
 
 		read_handle_result to_message(flex_buffer_t& stream)
 		{
-			elastic::to_binary(Number, stream);
+			//elastic::to_binary(Number, stream);
 
-			//auto res = header_ptr_->to_bytes(stream);
-			/*auto res = */elastic::to_binary(*header_ptr_, stream);
+			////auto res = header_ptr_->to_bytes(stream);
+			///*auto res = */elastic::to_binary(*header_ptr_, stream);
 
-			//if (res != read_handle_result::ok)
+			////if (res != read_handle_result::ok)
+			////{
+			////	return res;
+			////}
+
+			//if constexpr (!std::is_same_v<body_type, null_body>)
 			//{
-			//	return res;
+			//	// auto buf = body_.SerializeAsString();
+
+			//	// header_ptr_->set_size(buf.size());
+
+			//	// auto res = header_ptr_->to_bytes(stream);
+
+			//	// if (res != read_handle_result::ok)
+			//	//{
+			//	//	return res;
+			//	// }
+
+			//	// if (!buf.empty())
+			//	//	oa.save_binary(buf.data(), buf.size());
+
+			//	elastic::to_binary(body_, stream);
 			//}
-
-			if constexpr (!std::is_same_v<body_type, null_body>)
-			{
-				// auto buf = body_.SerializeAsString();
-
-				// header_ptr_->set_size(buf.size());
-
-				// auto res = header_ptr_->to_bytes(stream);
-
-				// if (res != read_handle_result::ok)
-				//{
-				//	return res;
-				// }
-
-				// if (!buf.empty())
-				//	oa.save_binary(buf.data(), buf.size());
-
-				elastic::to_binary(body_, stream);
-			}
 
 			return read_handle_result::ok;
 		}

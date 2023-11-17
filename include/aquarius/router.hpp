@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/router.hpp>
-#include <aquarius/message.hpp>
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {

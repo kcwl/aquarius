@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <aquarius/detail/invoke.hpp>
-#include <aquarius/detail/type_traits.hpp>
+#include <aquarius/type_traits.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>

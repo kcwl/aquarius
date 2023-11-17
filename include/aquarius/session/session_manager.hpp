@@ -1,6 +1,6 @@
 #pragma once
-#include "../session.hpp"
-#include "singleton.hpp"
+#include <aquarius/session/session.hpp>
+#include <aquarius/detail/singleton.hpp>
 #include <mutex>
 
 

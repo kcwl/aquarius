@@ -30,28 +30,28 @@ namespace aquarius
 	public:
 		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
-			elastic::from_binary(*this, stream);
+			//elastic::from_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
-			elastic::to_binary(*this, stream);
+			//elastic::to_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
-	private:
-		friend class elastic::access;
+	//private:
+	//	friend class elastic::access;
 
-		template <typename _Archive>
-		void serialize(_Archive& ar)
-		{
-			ar& elastic::base_object<command_header>(*this);
-			ar& uid_;
-			ar& session_id_;
-		}
+	//	template <typename _Archive>
+	//	void serialize(_Archive& ar)
+	//	{
+	//		ar& elastic::base_object<command_header>(*this);
+	//		ar& uid_;
+	//		ar& session_id_;
+	//	}
 
 	public:
 		uint32_t uid_;
@@ -63,27 +63,27 @@ namespace aquarius
 	public:
 		read_handle_result parse_bytes(flex_buffer_t& stream)
 		{
-			elastic::from_binary(*this, stream);
+			//elastic::from_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_bytes(flex_buffer_t& stream)
 		{
-			elastic::to_binary(*this, stream);
+			//elastic::to_binary(*this, stream);
 
 			return read_handle_result::ok;
 		}
 
-	private:
-		friend class elastic::access;
+	//private:
+	//	friend class elastic::access;
 
-		template <typename _Archive>
-		void serialize(_Archive& ar)
-		{
-			ar& elastic::base_object<command_header>(*this);
-			ar& result_;
-		}
+	//	template <typename _Archive>
+	//	void serialize(_Archive& ar)
+	//	{
+	//		ar& elastic::base_object<command_header>(*this);
+	//		ar& result_;
+	//	}
 
 	public:
 		int32_t result_;

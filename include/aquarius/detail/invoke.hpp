@@ -4,6 +4,8 @@
 
 namespace aquarius
 {
+	class context;
+
 	namespace detail
 	{
 		template <typename _Context>
@@ -14,7 +16,7 @@ namespace aquarius
 				std::string _key = "aquarius_" + std::to_string(key);
 
 				ctx_router::instance().regist(
-					_key, []() { return std::dynamic_pointer_cast<basic_context>(std::make_shared<_Context>()); });
+					_key, []() { return std::dynamic_pointer_cast<context>(std::make_shared<_Context>()); });
 			}
 		};
 

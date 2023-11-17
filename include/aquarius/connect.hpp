@@ -2,7 +2,7 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
-#include <aquarius/detail/session_manager.hpp>
+#include <aquarius/session/session_manager.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -16,7 +16,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		class basic_context;
+		class context;
 	}
 } // namespace aquarius
 

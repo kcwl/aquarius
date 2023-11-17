@@ -19,6 +19,12 @@
     <Filter Include="aquarius\detail">
       <UniqueIdentifier>{edfa55b9-1d24-4db0-b0f4-48f74b5a82ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\message">
+      <UniqueIdentifier>{0d5dd5db-33d3-4f0e-8872-6db7b9f0ecb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="aquarius\session">
+      <UniqueIdentifier>{b16301ad-ce7d-4f36-a7bf-413cfdebe4a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -29,43 +35,13 @@
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\client.hpp">
-      <Filter>aquarius</Filter>
+    <ClInclude Include="io.h">
+      <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\defines.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\flex_buffer.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\header.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\message.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\request.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\response.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\router.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\server.hpp">
-      <Filter>aquarius</Filter>
+    <ClInclude Include="message_process.h">
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\config.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\context.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp">
@@ -80,52 +56,61 @@
     <ClInclude Include="..\include\aquarius\detail\invoke.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\sha2.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\streambuf.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\time_traits.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\type_traits.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="io.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\include\aquarius\message\context.hpp">
+      <Filter>aquarius\message</Filter>
     </ClInclude>
-    <ClInclude Include="message_process.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\include\aquarius\message\header.hpp">
+      <Filter>aquarius\message</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\session.hpp">
+    <ClInclude Include="..\include\aquarius\message\message.hpp">
+      <Filter>aquarius\message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session.hpp">
+      <Filter>aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session_manager.hpp">
+      <Filter>aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\client.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\session_manager.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip_addr.hpp">
+    <ClInclude Include="..\include\aquarius\connect.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\md5.hpp">
-      <Filter>aquarius\detail</Filter>
+    <ClInclude Include="..\include\aquarius\defines.hpp">
+      <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\timer_queue.hpp">
+    <ClInclude Include="..\include\aquarius\io_service_pool.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\request.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\response.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\server.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\flex_buffer.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\type_traits.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
   </ItemGroup>

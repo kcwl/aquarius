@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "flex_buffer.hpp"
+#include <aquarius/flex_buffer.hpp>
 
 namespace aquarius
 {
