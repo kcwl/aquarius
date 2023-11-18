@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/defines.hpp>
 #include <aquarius/io_service_pool.hpp>
-#include <aquarius/session/session.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/session/session.hpp>
 #include <type_traits>
 
 namespace aquarius
@@ -23,7 +23,7 @@ namespace aquarius
 #ifdef SIGQUIT
 			signals_.add(SIGQUIT);
 #endif
-			signals_.async_wait(std::bind(&server::stop, this));
+			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 
 			start_accept();
 		}
@@ -42,7 +42,7 @@ namespace aquarius
 
 		void stop()
 		{
-			io_service_pool_.stop();
+			signal_stop(0, SIGINT);
 		}
 
 		std::size_t client_count()
@@ -60,8 +60,8 @@ namespace aquarius
 								   {
 									   if (ec)
 									   {
-										   XLOG(error) << "[acceprtor] accept error at " << end_point_.address().to_string() << ":"
-													   << ec.message();
+										   XLOG(error) << "[acceprtor] accept error at "
+													   << end_point_.address().to_string() << ":" << ec.message();
 
 										   close();
 									   }
@@ -73,8 +73,9 @@ namespace aquarius
 
 										   start_accept();
 
-										   XLOG(info) << "[acceptor] accept connection at " << end_point_.address().to_string()
-													  << " : " << new_connect_ptr->remote_address(); 
+										   XLOG(info)
+											   << "[acceptor] accept connection at " << end_point_.address().to_string()
+											   << " : " << new_connect_ptr->remote_address();
 									   }
 								   });
 		}
@@ -86,6 +87,22 @@ namespace aquarius
 			acceptor_.close(ec);
 
 			XLOG(info) << "[acceptor] acceptor closed";
+		}
+
+		void signal_stop(const boost::system::error_code& ec, int signal)
+		{
+			std::string error_message = "success";
+
+			ec ? error_message = ec.message : 0;
+
+			io_service_pool_.stop();
+
+			signals_.cancel();
+
+			close();
+
+			KLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
+					   << ", signal: " << signal;
 		}
 
 	private:
