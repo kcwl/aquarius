@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../3rd/elastic/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -150,12 +150,14 @@
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\context.hpp" />
     <ClInclude Include="..\include\aquarius\message\header.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
+    <ClInclude Include="..\include\aquarius\message\router.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
+    <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
-    <ClInclude Include="..\include\aquarius\router.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />

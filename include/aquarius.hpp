@@ -19,9 +19,9 @@ namespace aquarius
 
 	using ssl_tcp_server = server<ssl_tcp_connect>;
 
-	using no_ssl_http_connect = connect<connect_http>;
+	using no_ssl_http_connect = connect<http>;
 
-	using ssl_http_connect = connect<connect_http, ssl_socket>;
+	using ssl_http_connect = connect<http, ssl_socket>;
 
 	using no_ssl_http_server = server<no_ssl_http_connect>;
 

@@ -2,7 +2,8 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
-#include <aquarius/session/session_manager.hpp>
+#include <aquarius/logger.hpp>
+#include <aquarius/session/session.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -14,22 +15,16 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	namespace detail
-	{
-		class context;
-	}
-} // namespace aquarius
-
-namespace aquarius
-{
-	template <typename _ConnectType, typename _SocketType = void>
-	class connect : private detail::noncopyable, public std::enable_shared_from_this<connect<_ConnectType, _SocketType>>
+	template <typename _ConnectType, typename _SocketType>
+	class connect : public std::enable_shared_from_this<connect<_ConnectType, _SocketType>>
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
 
 		using ssl_socket_t = boost::asio::ssl::stream<socket_t&>;
 
 		using ssl_context_t = boost::asio::ssl::context;
+
+		using this_type = connect<_ConnectType, _SocketType>;
 
 	public:
 		explicit connect(boost::asio::io_service& io_service,
@@ -43,12 +38,13 @@ namespace aquarius
 			, connect_time_()
 			, dura_(dura)
 			, uid_()
+			, session_ptr_(new session<this_type>())
 		{
 			init_context();
 
 			boost::uuids::random_generator_mt19937 generator{};
 
-			uid_ = generator();
+			uid_ = boost::uuids::hash_value(generator());
 		}
 
 		virtual ~connect()
@@ -87,10 +83,6 @@ namespace aquarius
 
 		void async_write(flex_buffer_t&& resp_buf)
 		{
-			//write_queue_.push(std::forward<flex_buffer_t>(resp_buf));
-
-			//async_process_queue();
-
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
 				ssl_socket_.async_write_some(boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
@@ -142,57 +134,6 @@ namespace aquarius
 			}
 		}
 
-		std::pair<std::size_t, bool> read()
-		{
-			if (!socket_.is_open())
-				return { 0, false };
-
-			read_buffer_.normalize();
-			read_buffer_.ensure();
-
-			std::size_t bytes_transferred{};
-
-			if constexpr (std::same_as<_SocketType, ssl_socket>)
-			{
-				bytes_transferred =
-					ssl_socket_.read_some(boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()));
-			}
-			else
-			{
-				boost::system::error_code ec;
-				bytes_transferred = socket_.read_some(boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()), ec);
-			}
-
-			if (bytes_transferred == 0)
-				return { 0, true };
-
-			read_buffer_.commit(static_cast<int>(bytes_transferred));
-
-			auto [id, res] = read_handle_internal();
-
-			if (res == read_handle_result::error)
-			{
-				shut_down();
-
-				return { id, false };
-			}
-
-			return { id, true };
-		}
-
-		template <typename _Func>
-		bool read(_Func&& f)
-		{
-			auto [proto_id, result] = read();
-
-			if (!result)
-				return false;
-
-			f(proto_id);
-
-			return true;
-		}
-
 		void start()
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
@@ -212,7 +153,7 @@ namespace aquarius
 			}
 		}
 
-		virtual void shut_down()
+		void shut_down()
 		{
 			if (socket_.is_open())
 			{
@@ -232,9 +173,9 @@ namespace aquarius
 			}
 		}
 
-		virtual std::size_t uuid()
+		std::size_t uuid()
 		{
-			return boost::uuids::hash_value(uid_);
+			return uid_;
 		}
 
 		std::chrono::milliseconds get_connect_duration()
@@ -289,7 +230,7 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
 		}
 
-		void set_delay(bool enable)
+		void set_nodelay(bool enable)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
@@ -345,51 +286,34 @@ namespace aquarius
 	private:
 		void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
 		{
+			if (!socket_.is_open())
+			{
+				return;
+			}
+
 			if (ec)
 			{
-				auto str = ec.message();
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG(error) << "on read some at " << remote_address() << " occur error : " << ec.message();
+				}
+
 				return shut_down();
 			}
 
-			auto old_size = read_buffer_.size() + bytes_transferred;
-
-			read_buffer_.commit(static_cast<int>(bytes_transferred));
-
-			auto [_, res] = read_handle_internal();
-
-			if (res == read_handle_result::error)
-			{
-				return shut_down();
-			}
-			else if (res == read_handle_result::waiting_for_query)
-			{
-				read_buffer_.resize(read_buffer_.size() + aquarius::detail::capacity);
-
-				read_buffer_.commit(static_cast<int>(old_size));
-
-				!multi_pack_mode_ ? multi_pack_mode_ = !multi_pack_mode_ : 0;
-			}
-			else
-			{
-				multi_pack_mode_ ? multi_pack_mode_ = !multi_pack_mode_ : 0;
-			}
+			session_ptr_->open_session(read_buffer_, this->shared_from_this());
 
 			async_read();
 		}
 
 		void write_handle(const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
 		{
-			if (ec)
-			{
-				std::cout << ec.message() << std::endl;
-				shut_down();
+			if (!ec)
 				return;
-			}
 
-			//if (!write_queue_.empty())
-			//	write_queue_.pop();
+			XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
 
-			//async_process_queue();
+			return shut_down();
 		}
 
 		void init_context()
@@ -422,63 +346,6 @@ namespace aquarius
 				});
 		}
 
-		std::pair<std::size_t, read_handle_result> read_handle_internal()
-		{
-			uint32_t id = 0;
-
-			if constexpr (std::same_as<_ConnectType, connect_tcp>)
-			{
-				auto id_size = elastic::from_binary(id, read_buffer_);
-
-				if (id == 0)
-				{
-					read_buffer_.consume(-id_size);
-					return { id, read_handle_result::waiting_for_query };
-				}
-
-				auto ctx_ptr = detail::context_invoke_helper::invoke(id);
-
-				if (!ctx_ptr)
-				{
-					uint32_t total{};
-					auto proto_size = elastic::from_binary(total, read_buffer_);
-
-					read_buffer_.consume(total - proto_size);
-
-					return { id, read_handle_result::error };
-				}
-
-				auto req_ptr = detail::message_invoke_helpter::invoke(id);
-
-				if (!req_ptr)
-				{
-					req_ptr = std::make_shared<xmessage>();
-				}
-
-				auto res = req_ptr->visit(read_buffer_, visit_mode::input);
-
-				if (res != read_handle_result::ok)
-				{
-					read_buffer_.consume(-id_size);
-
-					return { id, res };
-				}
-
-				auto session_ptr = detail::session_manager::instance().find(this->uuid());
-
-				req_ptr->accept(ctx_ptr, session_ptr);
-
-				if (read_buffer_.size() != 0)
-					return read_handle_internal();
-			}
-			else if constexpr (std::same_as<_ConnectType, connect_http>)
-			{}
-			else
-			{}
-
-			return { id, read_handle_result::ok };
-		}
-
 		void establish_async_read()
 		{
 			connect_time_ = std::chrono::system_clock::now();
@@ -497,9 +364,6 @@ namespace aquarius
 			async_read();
 		}
 
-	public:
-		std::map<uint32_t, std::shared_ptr<detail::basic_context>> ctxs_;
-
 	private:
 		socket_t socket_;
 
@@ -509,20 +373,14 @@ namespace aquarius
 
 		flex_buffer_t read_buffer_;
 
-		std::queue<flex_buffer_t> write_queue_;
-
 		detail::steady_timer connect_timer_;
 
 		std::chrono::system_clock::time_point connect_time_;
 
 		std::chrono::steady_clock::duration dura_;
 
-		boost::uuids::uuid uid_;
+		std::size_t uid_;
 
-		std::function<void(std::shared_ptr<basic_session>)> start_func_;
-
-		std::function<void(std::shared_ptr<basic_session>)> close_func_;
-
-		bool multi_pack_mode_;
+		std::sahred_ptr<session<this_type>> session_ptr_;
 	};
 } // namespace aquarius

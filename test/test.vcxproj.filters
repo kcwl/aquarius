@@ -101,9 +101,6 @@
     <ClInclude Include="..\include\aquarius\response.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\router.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\server.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
@@ -112,6 +109,15 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\type_traits.hpp">
       <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\logger.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resolver.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\router.hpp">
+      <Filter>aquarius\message</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

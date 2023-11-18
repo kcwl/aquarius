@@ -1,78 +1,93 @@
 #pragma once
-#include <string>
 #include <aquarius/flex_buffer.hpp>
+#include <aquarius/message/context.hpp>
+#include <aquarius/resolver.hpp>
+#include <string>
 
 namespace aquarius
 {
-	class basic_session
-	{
-	public:
-		virtual std::string remote_address() = 0;
-
-		virtual std::size_t remote_address_u() = 0;
-
-		virtual int32_t remote_port() = 0;
-
-		virtual std::size_t uid() = 0;
-
-		virtual void async_write(flex_buffer_t&& buffer) = 0;
-
-	public:
-		int32_t session_type;
-	};
-
-	template<typename _Connector>
-	class session : public basic_session
+	template <typename _Connector>
+	class session
 	{
 	public:
 		explicit session()
 			: session(nullptr)
-		{
-
-		}
+		{}
 
 		session(std::shared_ptr<_Connector> conn_ptr)
-			: conn_ptr_(conn_ptr) {}
+			: conn_ptr_(conn_ptr)
+		{}
 
 	public:
-		virtual std::string remote_address() override
+		bool open_session(flex_buffer_t& buffer, std::shared_ptr<_Connector> conn_ptr)
 		{
-			if (!conn_ptr_)
-				return std::string{};
+			if (!conn_ptr)
+				return false;
 
-			return conn_ptr_->remote_address();
+			conn_ptr_ = conn_ptr;
+
+			uint32_t proto{};
+
+			auto result = resolver<tcp>::template from_binay(buffer, proto);
+
+			auto request_ptr = message_invoke_helper::invoke(proto_number);
+
+			if (!request_ptr)
+				return false;
+
+			std::shared_ptr<context> context_ptr;
+
+			auto iter = ctx_.find(proto);
+
+			if (iter == ctx_.end())
+			{
+				context_ptr = context_invoke_helper::invoke(proto_number);
+			}
+			else
+			{
+				context_ptr = iter->second;
+			}
+
+			if (!context_ptr)
+				return false;
+
+			if (!request_ptr->accept(buffer, context_ptr))
+				return false;
+
+			erase_context(proto);
+
+			return true;
 		}
 
-		virtual std::size_t remote_address_u() override
+		void close_session()
 		{
-			if (!conn_ptr_)
-				return std::size_t{};
-
-			return conn_ptr_->remote_address_u();
+			ctxs_.clear();
 		}
 
-		virtual int32_t remote_port() override
+	private:
+		void erase_context(uint32_t proto)
 		{
-			if (!conn_ptr_)
-				return int32_t{};
+			auto iter = ctxs_.find(proto);
 
-			return conn_ptr_->remote_port();
+			if (iter == ctxs_.end())
+				return;
+
+			std::shared_ptr<context>().swap(iter->second);
 		}
 
-		virtual std::size_t uid() override
+		bool send_message(flex_buffer_t&& buffer)
 		{
 			if (!conn_ptr_)
-				return std::size_t{};
+				return false;
 
-			return conn_ptr_->uuid();
-		}
+			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
 
-		virtual void async_write(flex_buffer_t&& buffer) override
-		{
-			return conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
+			return true;
 		}
 
 	private:
 		std::shared_ptr<_Connector> conn_ptr_;
+
+		std::unordered_map<uint32_t, std::shared_ptr<context>> ctxs_;
 	};
-}
+} // namespace aquarius

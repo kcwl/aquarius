@@ -20,14 +20,19 @@ namespace aquarius
 	struct connect_tcp
 	{};
 
-	struct connect_http
+	struct http
 	{};
 
 	enum class read_handle_result
 	{
 		ok = 1,
-		error = 2,
-		waiting_for_query = 3
+		unknown_error,
+		unknown_proto,
+		header_error,
+		body_error,
+		context_error,
+		waiting_for_query,
+		null_message
 	};
 
 	enum class connect_event
