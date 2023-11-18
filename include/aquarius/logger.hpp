@@ -46,4 +46,4 @@ namespace aquarius
 	}
 } // namespace aquarius
 
-#define XLOG(level) BOOST_LOG_TRIVIAL(aquarius::logger::get(), level)
+#define XLOG(level) BOOST_LOG_TRIVIAL(aquarius::logger::get(), trivial::##level)
