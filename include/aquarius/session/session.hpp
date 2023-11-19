@@ -46,7 +46,7 @@ namespace aquarius
 	public:
 		virtual std::size_t uid()
 		{
-			return conn_ptr_ ? conn_ptr_->uid() : 0;
+			return conn_ptr_ ? conn_ptr_->uuid() : 0;
 		}
 
 		virtual read_handle_result process(flex_buffer_t& buffer) override

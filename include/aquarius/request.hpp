@@ -14,7 +14,7 @@ namespace aquarius
 		request() = default;
 		~request() = default;
 
-		DEFINE_VISITABLE(int)
+		DEFINE_VISITABLE_REQUEST(read_handle_result)
 
 	public:
 		request(const request& other)

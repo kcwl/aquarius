@@ -8,12 +8,6 @@ namespace aquarius
 {
 	constexpr static auto heart_time_interval = 10s;
 
-	enum class visit_mode
-	{
-		input,
-		output
-	};
-
 	struct ssl_socket
 	{};
 

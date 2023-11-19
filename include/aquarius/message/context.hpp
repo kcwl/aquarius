@@ -52,7 +52,13 @@ namespace aquarius
 
 		virtual void on_timeout() = 0;
 
-		virtual int visit(xmessage* msg) = 0;
+		virtual int visit(std::shared_ptr<xmessage>, std::shared_ptr<xsession>)
+		{
+			XLOG(warning) << name_ << "visit a unknown message!";
+
+			return 0;
+		}
+			
 
 	protected:
 		std::string name_;
@@ -126,7 +132,7 @@ namespace aquarius
 		bool send_broadcast(_Message&& msg)
 		{
 			flex_buffer_t fs{};
-			msg.visit(fs, visit_mode::output);
+			msg.to_binary(fs);
 
 			session_manager::instance().broadcast(std::move(fs));
 
@@ -147,7 +153,7 @@ namespace aquarius
 		bool send_broadcast_if(_Message&& msg, _Func&& f)
 		{
 			flex_buffer_t fs{};
-			msg.visit(fs, visit_mode::output);
+			msg.to_binary(fs);
 
 			session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 
@@ -163,7 +169,7 @@ namespace aquarius
 
 			flex_buffer_t fs;
 
-			response_.visit(fs, visit_mode::output);
+			response_.to_binary(fs);
 
 			return fs;
 		}
@@ -172,7 +178,7 @@ namespace aquarius
 		{
 			flex_buffer_t fs;
 
-			request_ptr_->visit(fs, visit_mode::output);
+			request_ptr_->to_binary(fs);
 
 			return fs;
 		}

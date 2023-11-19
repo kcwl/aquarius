@@ -92,7 +92,7 @@ namespace aquarius
 		void async_write(_Request&& req)
 		{
 			flex_buffer_t fs{};
-			req.visit(fs, visit_mode::output);
+			req.to_binary(fs);
 
 			conn_ptr_->async_write(std::move(fs));
 		}
@@ -101,7 +101,7 @@ namespace aquarius
 		void write(_Request&& req)
 		{
 			flex_buffer_t fs{};
-			req.visit(fs, visit_mode::output);
+			req.to_binary(fs);
 
 			conn_ptr_->write(std::move(fs));
 		}
@@ -163,10 +163,6 @@ namespace aquarius
 									   {
 										   if (ec)
 											   return;
-
-										   conn_ptr_->template regist_callback<connect_event::start>(start_func_);
-
-										   conn_ptr_->template regist_callback<connect_event::close>(close_func_);
 
 										   conn_ptr_->start();
 									   });

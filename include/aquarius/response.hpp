@@ -13,7 +13,7 @@ namespace aquarius
 		response() = default;
 		~response() = default;
 
-		DEFINE_VISITABLE(int)
+		DEFINE_VISITABLE_RESPONSE(read_handle_result)
 
 	public:
 		response(const response& other)

@@ -122,7 +122,7 @@ namespace aquarius
 
 			socket_helper().async_read_some(
 				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
-				[self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytetransferred)
+				[this, self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytetransferred)
 				{
 					if (!socket_.is_open())
 					{
@@ -139,7 +139,14 @@ namespace aquarius
 						return shut_down();
 					}
 
-					session_ptr_->open_session(read_buffer_, self);
+					auto result = session_ptr_->process(read_buffer_);
+
+					if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
+					{
+						XLOG(error) << "unknown proto at " << remote_address();
+
+						return shut_down();
+					}
 
 					async_read();
 				});
@@ -151,7 +158,7 @@ namespace aquarius
 
 			socket_helper().async_write_some(
 				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-				[self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+				[this, self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
 				{
 					if (!ec)
 						return;
@@ -297,7 +304,7 @@ namespace aquarius
 			async_read();
 		}
 
-		auto socket_helper()
+		auto& socket_helper()
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
