@@ -253,19 +253,6 @@ namespace aquarius
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 		}
 
-		template <connect_event E, typename _Func>
-		void regist_callback(_Func&& f)
-		{
-			if constexpr (E == connect_event::start)
-			{
-				start_func_ = std::forward<_Func>(f);
-			}
-			else if constexpr (E == connect_event::close)
-			{
-				close_func_ = std::forward<_Func>(f);
-			}
-		}
-
 	private:
 		void init_ssl_context()
 		{
@@ -302,9 +289,9 @@ namespace aquarius
 		{
 			connect_time_ = std::chrono::system_clock::now();
 
-			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
+			session_ptr_ = std::make_shared<session<this_type>>(this->shared_from_this());
 
-			detail::session_manager::instance().push(session_ptr);
+			detail::session_manager::instance().push(session_ptr_);
 
 			heart_deadline();
 

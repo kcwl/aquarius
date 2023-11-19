@@ -28,6 +28,7 @@ namespace aquarius
 		ok = 1,
 		unknown_error,
 		unknown_proto,
+		unknown_ctx,
 		header_error,
 		body_error,
 		context_error,

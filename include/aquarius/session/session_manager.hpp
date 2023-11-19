@@ -11,7 +11,7 @@ namespace aquarius
 		class session_manager : public singleton<session_manager>
 		{
 		public:
-			bool push(std::shared_ptr<basic_session> session_ptr)
+			bool push(std::shared_ptr<xsession> session_ptr)
 			{
 				std::lock_guard lk(mutex_);
 
@@ -27,7 +27,7 @@ namespace aquarius
 				return sessions_.erase(id) != 0;
 			}
 
-			std::shared_ptr<basic_session> find(std::size_t id)
+			std::shared_ptr<xsession> find(std::size_t id)
 			{
 				std::lock_guard lk(mutex_);
 
@@ -41,6 +41,8 @@ namespace aquarius
 
 			std::size_t count()
 			{
+				std::lock_guard lk(mutex_);
+
 				return sessions_.size();
 			}
 
@@ -90,7 +92,7 @@ namespace aquarius
 			}
 
 		private:
-			std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
+			std::unordered_map<std::size_t, std::shared_ptr<xsession>> sessions_;
 
 			std::mutex mutex_;
 		};
