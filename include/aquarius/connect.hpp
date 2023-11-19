@@ -33,7 +33,6 @@ namespace aquarius
 			, ssl_context_(ssl_context_t::sslv23)
 			, ssl_socket_(socket_, ssl_context_)
 			, read_buffer_()
-			, write_queue_()
 			, connect_timer_(io_service)
 			, connect_time_()
 			, dura_(dura)
@@ -119,7 +118,7 @@ namespace aquarius
 
 			read_buffer_.ensure();
 
-			auto self(shared_from_this());
+			auto self(this->shared_from_this());
 
 			socket_helper().async_read_some(
 				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
@@ -148,7 +147,7 @@ namespace aquarius
 
 		void async_write(flex_buffer_t&& resp_buf)
 		{
-			auto self(shared_from_this());
+			auto self(this->shared_from_this());
 
 			socket_helper().async_write_some(
 				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
@@ -291,7 +290,7 @@ namespace aquarius
 
 			session_ptr_ = std::make_shared<session<this_type>>(this->shared_from_this());
 
-			detail::session_manager::instance().push(session_ptr_);
+			session_manager::instance().push(session_ptr_);
 
 			heart_deadline();
 

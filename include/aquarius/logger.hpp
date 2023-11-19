@@ -21,9 +21,6 @@ namespace trivial = boost::log::trivial;
 
 namespace aquarius
 {
-	BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(logger, src::logger_mt)
-
-
 	inline void init_logger()
 	{
 		using file_sink = sinks::asynchronous_sink<sinks::text_multifile_backend>;
@@ -46,4 +43,4 @@ namespace aquarius
 	}
 } // namespace aquarius
 
-#define XLOG(level) BOOST_LOG_TRIVIAL(aquarius::logger::get(), trivial::##level)
+#define XLOG(level) BOOST_LOG_TRIVIAL(level)

@@ -1,10 +1,15 @@
 #pragma once
 #include <any>
 #include <aquarius/flex_buffer.hpp>
-#include <aquarius/message/context.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
+#include <aquarius/defines.hpp>
+
+namespace aquarius
+{
+	class xmessage;
+}
 
 namespace aquarius
 {
@@ -18,10 +23,14 @@ namespace aquarius
 		virtual std::size_t uid() = 0;
 
 		virtual read_handle_result process(flex_buffer_t& buffer) = 0;
+
+		virtual bool async_write(flex_buffer_t&& buffer) = 0;
+
+		virtual void close_session() = 0;
 	};
 
 	template <typename _Connector>
-	class session : public std::enable_shared_from_this<session<_Connector>>
+	class session : public xsession, public std::enable_shared_from_this<session<_Connector>>
 	{
 		friend class context;
 
@@ -63,9 +72,9 @@ namespace aquarius
 
 			std::shared_ptr<context> context_ptr;
 
-			auto iter = ctx_.find(proto);
+			auto iter = ctxs_.find(proto);
 
-			if (iter == ctx_.end())
+			if (iter == ctxs_.end())
 			{
 				context_ptr = context_invoke_helper::invoke(proto);
 			}
@@ -75,7 +84,7 @@ namespace aquarius
 			}
 
 			if (!context_ptr)
-				return read_headle_result::unknown_ctx;
+				return read_handle_result::unknown_ctx;
 
 			result = request_ptr->accept(buffer, context_ptr, this->shared_from_this());
 
@@ -91,7 +100,17 @@ namespace aquarius
 			return read_handle_result::ok;
 		}
 
-		void close_session()
+		virtual bool async_write(flex_buffer_t&& buffer) override
+		{
+			if (!conn_ptr_)
+				return false;
+
+			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
+
+			return true;
+		}
+
+		virtual void close_session() override
 		{
 			ctxs_.clear();
 		}
@@ -107,16 +126,6 @@ namespace aquarius
 				return;
 
 			std::shared_ptr<context>().swap(iter->second);
-		}
-
-		bool send_message(flex_buffer_t&& buffer)
-		{
-			if (!conn_ptr_)
-				return false;
-
-			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
-
-			return true;
 		}
 
 	private:

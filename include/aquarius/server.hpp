@@ -2,7 +2,6 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/session/session.hpp>
 #include <type_traits>
 
 namespace aquarius
@@ -42,7 +41,7 @@ namespace aquarius
 
 		void stop()
 		{
-			signal_stop(0, SIGINT);
+			signal_stop({}, SIGINT);
 		}
 
 		std::size_t client_count()
@@ -82,7 +81,7 @@ namespace aquarius
 
 		void close()
 		{
-			boost::system::error ec;
+			boost::system::error_code ec;
 			acceptor_.cancel(ec);
 			acceptor_.close(ec);
 
@@ -93,7 +92,7 @@ namespace aquarius
 		{
 			std::string error_message = "success";
 
-			ec ? error_message = ec.message : 0;
+			ec ? error_message = ec.message() : std::string{};
 
 			io_service_pool_.stop();
 
@@ -101,7 +100,7 @@ namespace aquarius
 
 			close();
 
-			KLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
+			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
 					   << ", signal: " << signal;
 		}
 

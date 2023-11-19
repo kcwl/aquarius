@@ -3,7 +3,6 @@
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/message/invoke.hpp>
 #include <elastic.hpp>
-#include <aquarius/message/message.hpp>
 
 
 namespace aquarius
@@ -11,7 +10,7 @@ namespace aquarius
 	template<typename _Type>
 	struct resolver
 	{
-		read_handle_result from_binay(flex_buffer& buffer, uint32_t proto)
+		read_handle_result from_binay(flex_buffer_t& buffer, uint32_t proto)
 		{
 			constexpr auto prev_header_size = sizeof(uint32_t) + sizeof(uint32_t);
 

@@ -21,11 +21,11 @@ struct test_resp_body
 using test_request = aquarius::request<test_req_body, 1001>;
 using test_response = aquarius::response<test_resp_body, 1002>;
 
-class ctx_test_server : public aquarius::handle<test_request, test_response>
+class ctx_test_server : public aquarius::xhandle<test_request, test_response>
 {
 public:
 	ctx_test_server()
-		: aquarius::handle<test_request, test_response>("ctx_test_server")
+		: aquarius::xhandle<test_request, test_response>("ctx_test_server")
 	{}
 
 public:

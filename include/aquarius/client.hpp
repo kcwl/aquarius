@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <aquarius/detail/invoke.hpp>
+#include <aquarius/message/invoke.hpp>
 #include <aquarius/type_traits.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/response.hpp>
@@ -177,9 +177,9 @@ namespace aquarius
 
 		std::shared_ptr<_Connector> conn_ptr_;
 
-		std::function<void(std::shared_ptr<basic_session>)> start_func_;
+		std::function<void(std::shared_ptr<xsession>)> start_func_;
 
-		std::function<void(std::shared_ptr<basic_session>)> close_func_;
+		std::function<void(std::shared_ptr<xsession>)> close_func_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
 	};

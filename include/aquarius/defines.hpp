@@ -23,6 +23,9 @@ namespace aquarius
 	struct http
 	{};
 
+	struct tcp
+	{};
+
 	enum class read_handle_result
 	{
 		ok = 1,
