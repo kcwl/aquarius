@@ -53,9 +53,6 @@
     <ClInclude Include="..\include\aquarius\detail\field.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\invoke.hpp">
-      <Filter>aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
       <Filter>aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\router.hpp">
+      <Filter>aquarius\message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\invoke.hpp">
       <Filter>aquarius\message</Filter>
     </ClInclude>
   </ItemGroup>

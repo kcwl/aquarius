@@ -15,8 +15,8 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename _ConnectType, typename _SocketType>
-	class connect : public std::enable_shared_from_this<connect<_ConnectType, _SocketType>>
+	template <typename _ProtoType, typename _SocketType>
+	class connect : public std::enable_shared_from_this<connect<_ProtoType, _SocketType>>
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
 
@@ -24,7 +24,7 @@ namespace aquarius
 
 		using ssl_context_t = boost::asio::ssl::context;
 
-		using this_type = connect<_ConnectType, _SocketType>;
+		using this_type = connect<_ProtoType, _SocketType>;
 
 	public:
 		explicit connect(boost::asio::io_service& io_service,
@@ -40,7 +40,7 @@ namespace aquarius
 			, uid_()
 			, session_ptr_(new session<this_type>())
 		{
-			init_context();
+			init_ssl_context();
 
 			boost::uuids::random_generator_mt19937 generator{};
 
@@ -81,59 +81,6 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		void async_write(flex_buffer_t&& resp_buf)
-		{
-			if constexpr (std::same_as<_SocketType, ssl_socket>)
-			{
-				ssl_socket_.async_write_some(boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-											 std::bind(&connect::write_handle, this->shared_from_this(),
-													   std::placeholders::_1, std::placeholders::_2));
-			}
-			else
-			{
-				socket_.async_write_some(boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-										 std::bind(&connect::write_handle, this->shared_from_this(),
-												   std::placeholders::_1, std::placeholders::_2));
-			}
-		}
-
-		void write(flex_buffer_t&& resp_buf)
-		{
-			if constexpr (std::same_as<_SocketType, ssl_socket>)
-			{
-				ssl_socket_.write_some(boost::asio::buffer(resp_buf.wdata(), resp_buf.size()));
-			}
-			else
-			{
-				socket_.write_some(boost::asio::buffer(read_buffer_.wdata(), read_buffer_.active()));
-			}
-		}
-
-		void async_read()
-		{
-			if (!socket_.is_open())
-				return;
-
-			if (!multi_pack_mode_)
-			{
-				read_buffer_.normalize();
-				read_buffer_.ensure();
-			}
-
-			if constexpr (std::same_as<_SocketType, ssl_socket>)
-			{
-				ssl_socket_.async_read_some(boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
-											std::bind(&connect::read_handle, this->shared_from_this(),
-													  std::placeholders::_1, std::placeholders::_2));
-			}
-			else
-			{
-				socket_.async_read_some(boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
-										std::bind(&connect::read_handle, this->shared_from_this(),
-												  std::placeholders::_1, std::placeholders::_2));
-			}
-		}
-
 		void start()
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
@@ -142,15 +89,78 @@ namespace aquarius
 											[](const boost::system::error_code& ec)
 											{
 												if (ec)
+												{
+													XLOG(error) << "handshake error at " << remote_address() << ":"
+																<< ec.message();
+
 													return;
+												}
+
+												XLOG(info) << "handshake success at " << remote_address()
+														   << ", async read establish";
 
 												establish_async_read();
 											});
 			}
 			else
 			{
+				XLOG(info) << "async read establish";
+
 				establish_async_read();
 			}
+		}
+
+		void async_read()
+		{
+			if (!socket_.is_open())
+				return;
+
+			read_buffer_.normalize();
+
+			read_buffer_.ensure();
+
+			auto self(shared_from_this());
+
+			socket_helper().async_read_some(
+				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
+				[self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytetransferred)
+				{
+					if (!socket_.is_open())
+					{
+						return;
+					}
+
+					if (ec)
+					{
+						if (ec != boost::asio::error::eof)
+						{
+							XLOG(error) << "on read some at " << remote_address() << " occur error : " << ec.message();
+						}
+
+						return shut_down();
+					}
+
+					session_ptr_->open_session(read_buffer_, self);
+
+					async_read();
+				});
+		}
+
+		void async_write(flex_buffer_t&& resp_buf)
+		{
+			auto self(shared_from_this());
+
+			socket_helper().async_write_some(
+				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
+				[self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+				{
+					if (!ec)
+						return;
+
+					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
+
+					return shut_down();
+				});
 		}
 
 		void shut_down()
@@ -163,17 +173,12 @@ namespace aquarius
 
 			connect_timer_.cancel();
 
+			ssl_socket_.shutdown();
+
 			socket_.close();
-
-			if (close_func_)
-			{
-				auto session_ptr = detail::session_manager::instance().find(this->uuid());
-
-				close_func_(session_ptr);
-			}
 		}
 
-		std::size_t uuid()
+		std::size_t uuid() const
 		{
 			return uid_;
 		}
@@ -261,62 +266,8 @@ namespace aquarius
 			}
 		}
 
-	protected:
-		void async_process_queue()
-		{
-			if (write_queue_.empty())
-				return;
-
-			auto& buffer = write_queue_.front();
-
-			if constexpr (std::same_as<_SocketType, ssl_socket>)
-			{
-				ssl_socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
-											 std::bind(&connect::write_handle, this->shared_from_this(),
-													   std::placeholders::_1, std::placeholders::_2));
-			}
-			else
-			{
-				socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
-										 std::bind(&connect::write_handle, this->shared_from_this(),
-												   std::placeholders::_1, std::placeholders::_2));
-			}
-		}
-
 	private:
-		void read_handle(const boost::system::error_code& ec, std::size_t bytes_transferred)
-		{
-			if (!socket_.is_open())
-			{
-				return;
-			}
-
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG(error) << "on read some at " << remote_address() << " occur error : " << ec.message();
-				}
-
-				return shut_down();
-			}
-
-			session_ptr_->open_session(read_buffer_, this->shared_from_this());
-
-			async_read();
-		}
-
-		void write_handle(const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
-		{
-			if (!ec)
-				return;
-
-			XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
-
-			return shut_down();
-		}
-
-		void init_context()
+		void init_ssl_context()
 		{
 			if constexpr (std::same_as<_SocketType, ssl_socket>)
 			{
@@ -333,6 +284,7 @@ namespace aquarius
 		void heart_deadline()
 		{
 			connect_timer_.expires_from_now(dura_);
+
 			connect_timer_.async_wait(
 				[this, self = this->shared_from_this()](const boost::system::error_code& ec)
 				{
@@ -350,18 +302,25 @@ namespace aquarius
 		{
 			connect_time_ = std::chrono::system_clock::now();
 
-			auto session_ptr = std::make_shared<session<connect<_ConnectType, _SocketType>>>(this->shared_from_this());
+			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
 			detail::session_manager::instance().push(session_ptr);
-
-			if (start_func_)
-			{
-				start_func_(session_ptr);
-			}
 
 			heart_deadline();
 
 			async_read();
+		}
+
+		auto socket_helper()
+		{
+			if constexpr (std::same_as<_SocketType, ssl_socket>)
+			{
+				return ssl_socket_;
+			}
+			else
+			{
+				return socket_;
+			}
 		}
 
 	private:
@@ -381,6 +340,6 @@ namespace aquarius
 
 		std::size_t uid_;
 
-		std::sahred_ptr<session<this_type>> session_ptr_;
+		std::shared_ptr<session<this_type>> session_ptr_;
 	};
 } // namespace aquarius

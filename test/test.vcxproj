@@ -144,7 +144,6 @@
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
     <ClInclude Include="..\include\aquarius\detail\field.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
@@ -153,6 +152,7 @@
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\context.hpp" />
     <ClInclude Include="..\include\aquarius\message\header.hpp" />
+    <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\router.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
