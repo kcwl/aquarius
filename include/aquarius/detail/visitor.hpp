@@ -82,8 +82,9 @@ namespace aquarius
 	}
 
 #define DEFINE_VISITABLE_NULL(_Return)                                                                                 \
-	virtual _Return accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::context> ctx,                    \
-						   std::shared_ptr<aquarius::xsession> session_ptr)                                            \
+	virtual _Return accept([[maybe_unused]] aquarius::flex_buffer_t& buffer,                                           \
+						   [[maybe_unused]] std::shared_ptr<aquarius::context> ctx,                                    \
+						   [[maybe_unused]] std::shared_ptr<aquarius::xsession> session_ptr)                           \
 	{                                                                                                                  \
 		return _Return{};                                                                                              \
 	}

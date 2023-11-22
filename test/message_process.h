@@ -1,25 +1,12 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 #include "../include/aquarius.hpp"
+#include "test_proto.mpr.h"
 
 BOOST_AUTO_TEST_SUITE(message_process)
 
-struct test_req_body
-{
-	int a_;
-	int b_;
-	int c_;
-};
-
-struct test_resp_body
-{
-	int a_;
-	int b_;
-	int c_;
-};
-
-using test_request = aquarius::request<test_req_body, 1001>;
-using test_response = aquarius::response<test_resp_body, 1002>;
+using test_request = aquarius::request<xxx::person, 1001>;
+using test_response = aquarius::response<xxx::person, 1002>;
 
 class ctx_test_server : public aquarius::xhandle<test_request, test_response>
 {
@@ -31,9 +18,8 @@ public:
 public:
 	virtual int handle() override
 	{
-		response_.body().a_ = request_ptr_->body().a_ + 1;
-		response_.body().b_ = request_ptr_->body().b_ + 1;
-		response_.body().c_ = request_ptr_->body().c_ + 1;
+		response_.body().age = 1;
+		response_.body().back_money = 2;
 
 		send_response(1);
 
@@ -54,9 +40,8 @@ public:
 	{
 		std::cout << "test response recved!\n";
 
-		BOOST_CHECK_EQUAL(request_ptr_->body().a_, 2);
-		BOOST_CHECK_EQUAL(request_ptr_->body().b_, 3);
-		BOOST_CHECK_EQUAL(request_ptr_->body().c_, 4);
+		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
+		BOOST_CHECK_EQUAL(request_ptr_->body().back_money, 2u);
 
 		return 1;
 	}
@@ -77,9 +62,8 @@ BOOST_AUTO_TEST_CASE(process)
 	std::thread tc([&] { cli.run(); });
 
 	test_request req{};
-	req.body().a_ = 1;
-	req.body().b_ = 2;
-	req.body().c_ = 3;
+	req.body().age = 1;
+	req.body().back_money = 2;
 
 	cli.async_write(std::move(req));
 

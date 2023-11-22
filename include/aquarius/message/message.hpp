@@ -104,81 +104,22 @@ namespace aquarius
 
 		read_handle_result from_binary(flex_buffer_t& stream)
 		{
-			// auto sz = stream.size();
+			if (!elastic::from_binary(*header_ptr_, stream))
+				return read_handle_result::header_error;
 
-			// auto res = header_ptr_->parse_bytes(stream);
-			// auto distance = elastic::from_binary(*header_ptr_, stream);
-
-			// if (distance == 0)
-			//	return read_handle_result::waiting_for_query;
-
-			// bytes_ += sz - stream.size();
-
-			// if (res != read_handle_result::ok)
-			//	return res;
-			// if (header_ptr_->size_ > stream.size())
-			//{
-			//
-			//	stream.consume(-distance);
-
-			return read_handle_result::ok;
-			//}
-
-			if constexpr (!std::is_same_v<body_type, null_body>)
-			{
-				// if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
-				//{
-				//	res = read_handle_result::error;
-				// }
-
-				// if (res != read_handle_result::ok)
-				//{
-				//	return res;
-				// }
-
-				// auto bytes = elastic::from_binary(body_, stream);
-
-				// if (bytes == 0)
-				//	return read_handle_result::waiting_for_query;
-
-				// bytes_ += body_.ByteSizeLong();
-				// stream.consume(header_ptr_->size_);
-				// return read_handle_result::ok;
-			}
+			if (!body_.from_binary(stream))
+				return read_handle_result::body_error;
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_binary(flex_buffer_t& stream)
 		{
-			// elastic::to_binary(Number, stream);
+			if (!elastic::to_binary(*header_ptr_, stream))
+				return read_handle_result::header_error;
 
-			////auto res = header_ptr_->to_bytes(stream);
-			///*auto res = */elastic::to_binary(*header_ptr_, stream);
-
-			////if (res != read_handle_result::ok)
-			////{
-			////	return res;
-			////}
-
-			// if constexpr (!std::is_same_v<body_type, null_body>)
-			//{
-			//	// auto buf = body_.SerializeAsString();
-
-			//	// header_ptr_->set_size(buf.size());
-
-			//	// auto res = header_ptr_->to_bytes(stream);
-
-			//	// if (res != read_handle_result::ok)
-			//	//{
-			//	//	return res;
-			//	// }
-
-			//	// if (!buf.empty())
-			//	//	oa.save_binary(buf.data(), buf.size());
-
-			//	elastic::to_binary(body_, stream);
-			//}
+			if (!body_.to_binary(stream))
+				return read_handle_result::body_error;
 
 			return read_handle_result::ok;
 		}
