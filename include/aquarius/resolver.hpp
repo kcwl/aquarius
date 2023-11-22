@@ -11,13 +11,8 @@ namespace aquarius
 	template<typename _Type>
 	struct resolver
 	{
-		static read_handle_result from_binay(flex_buffer_t& buffer, uint32_t proto)
+		static read_handle_result from_binay(flex_buffer_t& buffer, uint32_t& proto)
 		{
-			constexpr auto prev_header_size = sizeof(uint32_t) + sizeof(uint32_t);
-
-			if (buffer.size() < prev_header_size)
-				return read_handle_result::unknown_error;
-
 			if (!elastic::from_binary(proto, buffer))
 				return read_handle_result::unknown_proto;
 

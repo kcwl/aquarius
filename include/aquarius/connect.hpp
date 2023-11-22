@@ -122,7 +122,7 @@ namespace aquarius
 
 			socket_helper().async_read_some(
 				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
-				[this, self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytetransferred)
+				[this, self](const boost::system::error_code& ec, std::size_t bytes_transferred)
 				{
 					if (!socket_.is_open())
 					{
@@ -138,6 +138,8 @@ namespace aquarius
 
 						return shut_down();
 					}
+
+					read_buffer_.commit(bytes_transferred);
 
 					auto result = session_ptr_->process(read_buffer_);
 
@@ -179,7 +181,8 @@ namespace aquarius
 
 			connect_timer_.cancel();
 
-			ssl_socket_.shutdown();
+			boost::system::error_code ec;
+			ssl_socket_.shutdown(ec);
 
 			socket_.close();
 		}

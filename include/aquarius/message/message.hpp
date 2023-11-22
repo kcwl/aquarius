@@ -121,6 +121,8 @@ namespace aquarius
 			if (!body_.to_binary(stream))
 				return read_handle_result::body_error;
 
+			bytes_ += stream.size();
+
 			return read_handle_result::ok;
 		}
 

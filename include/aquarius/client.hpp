@@ -92,6 +92,10 @@ namespace aquarius
 		void async_write(_Request&& req)
 		{
 			flex_buffer_t fs{};
+			elastic::to_binary(_Request::Number, fs);
+
+			elastic::to_binary(req.size(), fs);
+
 			req.to_binary(fs);
 
 			conn_ptr_->async_write(std::move(fs));
