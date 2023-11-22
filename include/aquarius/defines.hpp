@@ -8,26 +8,29 @@ namespace aquarius
 {
 	constexpr static auto heart_time_interval = 10s;
 
-	enum class visit_mode
-	{
-		input,
-		output
-	};
-
 	struct ssl_socket
 	{};
 
 	struct connect_tcp
 	{};
 
-	struct connect_http
+	struct http
+	{};
+
+	struct tcp
 	{};
 
 	enum class read_handle_result
 	{
 		ok = 1,
-		error = 2,
-		waiting_for_query = 3
+		unknown_error,
+		unknown_proto,
+		unknown_ctx,
+		header_error,
+		body_error,
+		context_error,
+		waiting_for_query,
+		null_message
 	};
 
 	enum class connect_event

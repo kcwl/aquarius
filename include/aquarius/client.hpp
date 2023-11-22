@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <aquarius/detail/invoke.hpp>
-#include <aquarius/detail/type_traits.hpp>
+#include <aquarius/message/invoke.hpp>
+#include <aquarius/type_traits.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
@@ -92,7 +92,11 @@ namespace aquarius
 		void async_write(_Request&& req)
 		{
 			flex_buffer_t fs{};
-			req.visit(fs, visit_mode::output);
+			elastic::to_binary(_Request::Number, fs);
+
+			elastic::to_binary(req.size(), fs);
+
+			req.to_binary(fs);
 
 			conn_ptr_->async_write(std::move(fs));
 		}
@@ -101,7 +105,7 @@ namespace aquarius
 		void write(_Request&& req)
 		{
 			flex_buffer_t fs{};
-			req.visit(fs, visit_mode::output);
+			req.to_binary(fs);
 
 			conn_ptr_->write(std::move(fs));
 		}
@@ -164,10 +168,6 @@ namespace aquarius
 										   if (ec)
 											   return;
 
-										   conn_ptr_->template regist_callback<connect_event::start>(start_func_);
-
-										   conn_ptr_->template regist_callback<connect_event::close>(close_func_);
-
 										   conn_ptr_->start();
 									   });
 		}
@@ -177,9 +177,9 @@ namespace aquarius
 
 		std::shared_ptr<_Connector> conn_ptr_;
 
-		std::function<void(std::shared_ptr<basic_session>)> start_func_;
+		std::function<void(std::shared_ptr<xsession>)> start_func_;
 
-		std::function<void(std::shared_ptr<basic_session>)> close_func_;
+		std::function<void(std::shared_ptr<xsession>)> close_func_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
 	};

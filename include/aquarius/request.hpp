@@ -1,20 +1,20 @@
 ﻿#pragma once
-#include <aquarius/header.hpp>
-#include <aquarius/message.hpp>
+#include <aquarius/message/header.hpp>
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class request : public message<tcp_request_header, _Body, Number>,
+	class request : public message<request_header, _Body, Number>,
 					public std::enable_shared_from_this<request<_Body, Number>>
 	{
-		using base_type = message<tcp_request_header, _Body, Number>;
+		using base_type = message<request_header, _Body, Number>;
 
 	public:
 		request() = default;
 		~request() = default;
 
-		DEFINE_VISITABLE(int)
+		DEFINE_VISITABLE_REQUEST(read_handle_result)
 
 	public:
 		request(const request& other)

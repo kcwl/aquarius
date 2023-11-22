@@ -1,19 +1,19 @@
 ﻿#pragma once
-#include <aquarius/header.hpp>
-#include <aquarius/message.hpp>
+#include <aquarius/message/header.hpp>
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class response : public message<tcp_response_header, _Body, Number>, public std::enable_shared_from_this<response<_Body, Number>>
+	class response : public message<response_header, _Body, Number>, public std::enable_shared_from_this<response<_Body, Number>>
 	{
-		using base_type = message<tcp_response_header, _Body, Number>;
+		using base_type = message<response_header, _Body, Number>;
 
 	public:
 		response() = default;
 		~response() = default;
 
-		DEFINE_VISITABLE(int)
+		DEFINE_VISITABLE_RESPONSE(read_handle_result)
 
 	public:
 		response(const response& other)
