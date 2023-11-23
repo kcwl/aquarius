@@ -26,7 +26,7 @@ namespace aquarius
 
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
-		virtual void close_session() = 0;
+		virtual void close() = 0;
 	};
 
 	template <typename _Connector>
@@ -110,9 +110,12 @@ namespace aquarius
 			return true;
 		}
 
-		virtual void close_session() override
+		virtual void close() override
 		{
 			ctxs_.clear();
+
+			if (conn_ptr_)
+				conn_ptr_->shut_down();
 		}
 
 	private:
