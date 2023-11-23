@@ -5,6 +5,7 @@
 #include <deque>
 #include <string>
 #include <aquarius/defines.hpp>
+#include <aquarius/event_callback.hpp>
 
 namespace aquarius
 {
@@ -13,7 +14,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class xsession
+	class xsession : public event_callback
 	{
 	public:
 		xsession() = default;
@@ -117,6 +118,19 @@ namespace aquarius
 			if (conn_ptr_)
 				conn_ptr_->shut_down();
 		}
+
+		public:
+		virtual void on_accept() final
+		{}
+
+		virtual void on_close() final
+		{}
+
+		virtual void on_connect() final
+		{}
+
+		virtual void on_timeout() final
+		{}
 
 	private:
 		void erase_context(uint32_t proto)

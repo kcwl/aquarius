@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/session/session_manager.hpp>
+#include <aquarius/event_callback.hpp>
 
 #define MESSAGE_DEFINE(req) static aquarius::msg_regist<req> msg_##req(req::Number)
 
@@ -27,7 +28,7 @@
 
 namespace aquarius
 {
-	class context : public detail::visitor<xmessage, int>
+	class context : public detail::visitor<xmessage, int>, public event_callback
 	{
 	public:
 		context(const std::string& name, std::chrono::milliseconds timeout)
@@ -44,14 +45,6 @@ namespace aquarius
 		context& operator=(const context&) = delete;
 
 	public:
-		virtual void on_create() = 0;
-
-		virtual void on_close() = 0;
-
-		virtual void on_connect() = 0;
-
-		virtual void on_timeout() = 0;
-
 		virtual int visit(std::shared_ptr<xmessage>, std::shared_ptr<xsession>)
 		{
 			XLOG(warning) << name_ << "visit a unknown message!";
@@ -79,22 +72,22 @@ namespace aquarius
 		{}
 
 	public:
-		virtual void on_create()
+		virtual void on_accept() override
 		{
 			//flow monitor
 		}
 
-		virtual void on_close()
+		virtual void on_close() override
 		{
 			//clear
 		}
 
-		virtual void on_connect()
+		virtual void on_connect() override
 		{
 			// log record
 		}
 
-		virtual void on_timeout()
+		virtual void on_timeout() override
 		{
 			// timeout
 		}

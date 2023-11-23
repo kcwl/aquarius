@@ -153,6 +153,7 @@
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
+    <ClInclude Include="..\include\aquarius\event_callback.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\context.hpp" />

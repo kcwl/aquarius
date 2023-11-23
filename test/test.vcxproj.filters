@@ -30,12 +30,12 @@
     <ClCompile Include="Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="test_proto.mpr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="io.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="message_process.h">
@@ -118,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\invoke.hpp">
       <Filter>aquarius\message</Filter>
+    </ClInclude>
+    <ClInclude Include="test_proto.mpr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\event_callback.hpp">
+      <Filter>aquarius</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
