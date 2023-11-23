@@ -144,6 +144,9 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
+    <ClInclude Include="..\include\aquarius\context.hpp" />
+    <ClInclude Include="..\include\aquarius\context\system_context.hpp" />
+    <ClInclude Include="..\include\aquarius\context\user_context.hpp" />
     <ClInclude Include="..\include\aquarius\defines.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
@@ -156,7 +159,7 @@
     <ClInclude Include="..\include\aquarius\event_callback.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\message\context.hpp" />
+    <ClInclude Include="..\include\aquarius\context\context.hpp" />
     <ClInclude Include="..\include\aquarius\message\header.hpp" />
     <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />

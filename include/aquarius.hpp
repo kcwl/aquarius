@@ -1,7 +1,7 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/client.hpp>
-#include <aquarius/message/context.hpp>
+#include <aquarius/context.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>

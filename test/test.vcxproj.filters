@@ -25,6 +25,9 @@
     <Filter Include="aquarius\session">
       <UniqueIdentifier>{b16301ad-ce7d-4f36-a7bf-413cfdebe4a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\context">
+      <UniqueIdentifier>{efd9f61a-6b90-4f5f-9a90-c0a08ab49742}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -64,9 +67,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
       <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\context.hpp">
-      <Filter>aquarius\message</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\header.hpp">
       <Filter>aquarius\message</Filter>
@@ -124,6 +124,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\event_callback.hpp">
       <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\context.hpp">
+      <Filter>aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\system_context.hpp">
+      <Filter>aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\user_context.hpp">
+      <Filter>aquarius\context</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
