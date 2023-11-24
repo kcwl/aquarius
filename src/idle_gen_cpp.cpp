@@ -251,7 +251,10 @@ namespace elastic
 
 			void generate_cpp::write_internal_func_def(const reflactor_structure& rs, const std::string& func_name)
 			{
-				lines.push_back("bool " + rs.name_ + "::internal_" + func_name + "(aquarius::flex_buffer_t& buffer)");
+				!rs.structs_.empty() ? lines.push_back("bool " + rs.name_ + "::internal_" + func_name +
+													   "(aquarius::flex_buffer_t& buffer)")
+									 : lines.push_back("bool " + rs.name_ + "::internal_" + func_name +
+													   "(aquarius::flex_buffer_t&)");
 				lines.push_back("{");
 
 				for (auto& mem : rs.structs_)
