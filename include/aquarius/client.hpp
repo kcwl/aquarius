@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <aquarius/message/invoke.hpp>
 #include <aquarius/type_traits.hpp>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic.hpp>
 #include <aquarius/response.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
@@ -92,9 +92,9 @@ namespace aquarius
 		void async_write(_Request&& req)
 		{
 			flex_buffer_t fs{};
-			elastic::to_binary(_Request::Number, fs);
+			aquarius::to_binary(_Request::Number, fs);
 
-			elastic::to_binary(req.size(), fs);
+			aquarius::to_binary(req.size(), fs);
 
 			req.to_binary(fs);
 
