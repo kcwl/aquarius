@@ -93,12 +93,12 @@ namespace aquarius
 	public:
 		size_type active() noexcept
 		{
-			return buffer_.size() - pptr_;
+			return buffer_.size() - static_cast<std::size_t>(pptr_);
 		}
 
 		size_type active() const noexcept
 		{
-			return buffer_.size() - pptr_;
+			return buffer_.size() - static_cast<std::size_t>(pptr_);
 		}
 
 		pointer data() noexcept
@@ -133,7 +133,7 @@ namespace aquarius
 
 		void commit(off_type bytes)
 		{
-			bytes = static_cast<off_type>(std::min<std::size_t>(bytes, buffer_.size() - pptr_));
+			bytes = std::min<off_type>(bytes, static_cast<off_type>(buffer_.size()) - pptr_);
 
 			pptr_ += bytes;
 
@@ -196,12 +196,12 @@ namespace aquarius
 
 		size_type size() noexcept
 		{
-			return pptr_ - gptr_;
+			return static_cast<size_type>(pptr_ - gptr_);
 		}
 
 		size_type size() const noexcept
 		{
-			return pptr_ - gptr_;
+			return static_cast<size_type>(pptr_ - gptr_);
 		}
 
 		void normalize()

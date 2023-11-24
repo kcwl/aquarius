@@ -100,7 +100,7 @@ namespace aquarius
 		{
 			std::streamsize s = static_cast<std::streamsize>(size / sizeof(_Elem));
 
-			std::streamsize scount = this->streambuf_.sgetn(static_cast<_Elem*>(address), s);
+			std::streamsize scount = this->streambuf_.sgetn(static_cast<_Elem*>(address), static_cast<std::size_t>(s));
 
 			if (scount != 0)
 			{
