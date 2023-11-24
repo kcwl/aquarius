@@ -54,7 +54,7 @@ namespace elastic
 
 				void pragma(const std::string& name);
 
-				void include_file(const std::string& file_name);
+				void include_file(const std::string& file_name, bool has_libary = true);
 
 				void line_feed();
 

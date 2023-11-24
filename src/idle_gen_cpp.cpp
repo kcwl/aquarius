@@ -125,7 +125,7 @@ namespace elastic
 			{
 				lines.clear();
 
-				include_file(input_file_ptr_->file_name() + ".mpr.h");
+				include_file(input_file_ptr_->file_name() + ".mpr.h", false);
 				line_feed();
 
 				bool has_namespace = false;
@@ -280,9 +280,10 @@ namespace elastic
 				lines.push_back("#pragma " + name);
 			}
 
-			void generate_cpp::include_file(const std::string& file_name)
+			void generate_cpp::include_file(const std::string& file_name, bool has_libary)
 			{
-				lines.push_back("#include <" + file_name + ">");
+				has_libary ? lines.push_back("#include <" + file_name + ">")
+						   : lines.push_back("#include \"" + file_name + "\"");
 				line_feed();
 			}
 
