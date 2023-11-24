@@ -2,7 +2,7 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/message/invoke.hpp>
-#include <elastic.hpp>
+#include "../3rd/elastic/include/elastic.hpp"
 #include <aquarius/logger.hpp>
 
 
