@@ -53,7 +53,9 @@ namespace elastic
 		auto pos = keywords.find_first_of(sp);
 
 		if (pos == std::string::npos)
-			return false;
+		{
+			first = keywords;
+		}
 
 		first = keywords.substr(0, pos);
 

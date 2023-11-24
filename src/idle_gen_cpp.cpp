@@ -117,7 +117,7 @@ namespace elastic
 			void generate_cpp::write_struct_declare_header()
 			{
 				pragma("once");
-				include_file("elastic.hpp");
+				include_file("aquarius/elastic.hpp");
 				line_feed();
 			}
 
@@ -165,7 +165,7 @@ namespace elastic
 
 			void generate_cpp::begin_write_class(const reflactor_structure& rs)
 			{
-				auto base_type = std::format("elastic::message_lite");
+				auto base_type = std::format("aquarius::message_lite");
 
 				lines.push_back("class " + rs.name_ + " final : public " + base_type + rs.note_.content_);
 
@@ -189,7 +189,7 @@ namespace elastic
 
 			void generate_cpp::write_parse_func(const std::string& func_name)
 			{
-				lines.push_back("virtual bool internal_" + func_name + "(elastic::flex_buffer_t& buffer) final;");
+				lines.push_back("virtual bool internal_" + func_name + "(aquarius::flex_buffer_t& buffer) final;");
 				line_feed();
 			}
 
@@ -251,7 +251,7 @@ namespace elastic
 
 			void generate_cpp::write_internal_func_def(const reflactor_structure& rs, const std::string& func_name)
 			{
-				lines.push_back("bool " + rs.name_ + "::internal_" + func_name + "(elastic::flex_buffer_t& buffer)");
+				lines.push_back("bool " + rs.name_ + "::internal_" + func_name + "(aquarius::flex_buffer_t& buffer)");
 				lines.push_back("{");
 
 				for (auto& mem : rs.structs_)
@@ -264,7 +264,7 @@ namespace elastic
 					if (type.empty())
 						continue;
 
-					lines.push_back("if (!elastic::" + func_name + "(" + mem.name_ + ", buffer))");
+					lines.push_back("if (!aquarius::" + func_name + "(" + mem.name_ + ", buffer))");
 					lines.push_back("{");
 					lines.push_back("return false;");
 					lines.push_back("}");

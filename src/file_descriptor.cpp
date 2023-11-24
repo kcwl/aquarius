@@ -35,6 +35,10 @@ namespace elastic
 				{
 					impl.note_ = read_note();
 				}
+				else if (cur == -1)
+				{
+					break;
+				}
 				else
 				{
 					if (!read_keyword(impl.type_))
@@ -281,6 +285,8 @@ namespace elastic
 
 				if (impl.type_[0] == '}')
 				{
+					read_file_stream_.seekg(0 - impl.type_.size(), std::ios::cur);
+
 					rs.structs_.pop_back();
 					break;
 				}

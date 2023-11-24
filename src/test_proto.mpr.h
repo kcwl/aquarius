@@ -1,5 +1,5 @@
 #pragma once
-#include <elastic.hpp>
+#include <aquarius/elastic.hpp>
 
 
 /****************
@@ -8,21 +8,21 @@
 namespace xxx
 {
 	//message person that number is 10001
-	class person final : public elastic::message_lite
+	class person final : public aquarius::message_lite
 	{
 	public:
 		person() = default;
 		virtual ~person() = default;
 		
 	private:
-		virtual bool internal_from_binary(elastic::flex_buffer_t& buffer) final;
+		virtual bool internal_from_binary(aquarius::flex_buffer_t& buffer) final;
 		
-		virtual bool internal_to_binary(elastic::flex_buffer_t& buffer) final;
+		virtual bool internal_to_binary(aquarius::flex_buffer_t& buffer) final;
 		
 	public:
 		int32_t age;		//年龄
 		std::string name;	//姓名
-		bool sex;
+		std::vector<bool> sex;
 		int64_t money;	//钱
 		uint32_t back_money; //仓库里的钱
 		uint64_t crc; //crc验证码
