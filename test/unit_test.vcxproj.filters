@@ -161,9 +161,6 @@
     <ClInclude Include="..\include\aquarius\elastic\archive.hpp">
       <Filter>aquarius\elastic</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\basic_primitive.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\elastic\fixed.hpp">
       <Filter>aquarius\elastic</Filter>
     </ClInclude>
