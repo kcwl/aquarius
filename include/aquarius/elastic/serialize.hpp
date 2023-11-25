@@ -222,7 +222,7 @@ namespace aquarius
 				}
 				else
 				{
-					serialize(ar, mem);
+					binary::serialize(ar, mem);
 				}
 			}
 
