@@ -210,13 +210,15 @@ namespace aquarius
 		template <typename _Archive, sequence_t _Ty>
 		void serialize(_Archive& ar, _Ty&& value)
 		{
+			using type = std::remove_cvref_t<_Ty>;
+
 			auto bytes = value.size();
 
 			serialize(ar, bytes);
 
 			for (auto& mem : value)
 			{
-				if constexpr (std::same_as<std::string, _Ty>)
+				if constexpr (std::same_as<std::string, type>)
 				{
 					ar.put(mem);
 				}
