@@ -24,13 +24,9 @@ namespace elastic
 				virtual bool generate(file_descriptor* input_file, const std::string& output_dir) override;
 
 			private:
-				bool write_file();
-
 				void write_struct_declare();
 
 				void write_struct_declare_header();
-
-				void write_struct_define();
 
 				void begin_write_package(const std::string& name);
 
@@ -38,11 +34,7 @@ namespace elastic
 
 				void begin_write_class(const reflactor_structure& rs);
 
-				void write_construct(const std::string& class_name);
-
-				void write_internal_func_declare();
-
-				void write_parse_func(const std::string& func_name);
+				void write_access_func(const reflactor_structure& rs);
 
 				void write_members(const std::vector<reflactor_structure>& rss);
 
@@ -63,7 +55,7 @@ namespace elastic
 
 				std::string output_file_name_;
 
-				std::ofstream write_h_stream_;
+				std::ofstream write_hpp_stream_;
 
 				std::ofstream write_cpp_stream_;
 
