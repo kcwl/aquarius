@@ -274,13 +274,13 @@ namespace elastic
 
 					if (suffix == "body_request")
 					{
-						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 4) +
+						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 5) +
 										" = aquarius::request<" + mem.name_ + ", " + mem.number_ + ">;");
 					}
 						
 					if (suffix == "body_response")
 					{
-						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 4) +
+						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 5) +
 										" = aquarius::response<" + mem.name_ + ", " + mem.number_ + ">;");
 					}
 				}
