@@ -6,6 +6,8 @@ namespace aquarius
 	class xsession;
 
 	class xmessage;
+
+	class context;
 } // namespace aquarius
 
 namespace aquarius
