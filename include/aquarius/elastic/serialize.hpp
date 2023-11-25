@@ -224,7 +224,7 @@ namespace aquarius
 				}
 				else
 				{
-					ar >> mem;
+					ar << mem;
 				}
 			}
 
