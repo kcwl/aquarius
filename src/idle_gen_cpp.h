@@ -42,13 +42,13 @@ namespace elastic
 
 				void real_write_file(std::ofstream& ofs);
 
-				void write_internal_func_def(const reflactor_structure& rs, const std::string& func_name);
-
 				void pragma(const std::string& name);
 
 				void include_file(const std::string& file_name, bool has_libary = true);
 
 				void line_feed();
+
+				void write_message_register(const std::vector<reflactor_structure>& rs);
 
 			private:
 				file_descriptor* input_file_ptr_;

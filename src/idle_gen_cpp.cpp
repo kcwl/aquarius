@@ -5,6 +5,7 @@
 
 #include <array>
 #include <filesystem>
+#include <iostream>
 #include <string_view>
 
 namespace
@@ -93,6 +94,8 @@ namespace elastic
 					}
 				}
 
+				write_message_register(input_file_ptr_->structs());
+
 				auto& back = lines.back();
 
 				if (back.empty())
@@ -108,6 +111,10 @@ namespace elastic
 			{
 				pragma("once");
 				include_file("aquarius/elastic.hpp");
+				include_file("aquarius/request.hpp");
+				include_file("aquarius/response.hpp");
+
+				line_feed();
 			}
 
 			void generate_cpp::begin_write_package(const std::string& name)
@@ -238,12 +245,45 @@ namespace elastic
 			{
 				has_libary ? lines.push_back("#include <" + file_name + ">")
 						   : lines.push_back("#include \"" + file_name + "\"");
-				line_feed();
 			}
 
 			void generate_cpp::line_feed()
 			{
 				lines.push_back({});
+			}
+
+			void generate_cpp::write_message_register(const std::vector<reflactor_structure>& rs)
+			{
+				for (auto& mem : rs)
+				{
+					auto pos = mem.name_.find_last_of('_');
+
+					if (pos == std::string::npos)
+					{
+						continue;
+					}
+
+					auto suffix = mem.name_.substr(pos);
+
+					pos = mem.name_.rfind('_', pos - 1);
+
+					if (pos == std::string::npos)
+						continue;
+
+					suffix = mem.name_.substr(pos + 1);
+
+					if (suffix == "body_request")
+					{
+						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 4) +
+										" = aquarius::request<" + mem.name_ + ", " + mem.number_ + ">;");
+					}
+						
+					if (suffix == "body_response")
+					{
+						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 4) +
+										" = aquarius::response<" + mem.name_ + ", " + mem.number_ + ">;");
+					}
+				}
 			}
 
 		} // namespace cpp
