@@ -107,7 +107,7 @@ namespace aquarius
 			if (!aquarius::from_binary(*header_ptr_, stream))
 				return read_handle_result::header_error;
 
-			if (!body_.from_binary(stream))
+			if (!aquarius::from_binary(body_, stream))
 				return read_handle_result::body_error;
 
 			return read_handle_result::ok;
@@ -118,7 +118,7 @@ namespace aquarius
 			if (!aquarius::to_binary(*header_ptr_, stream))
 				return read_handle_result::header_error;
 
-			if (!body_.to_binary(stream))
+			if (!aquarius::to_binary(body_, stream))
 				return read_handle_result::body_error;
 
 			bytes_ += stream.size();
