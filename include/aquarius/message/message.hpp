@@ -2,7 +2,7 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
-#include <aquarius/elastic/flex_buffer.hpp>
+#include <aquarius/elastic.hpp>
 #include <cstddef>
 
 namespace aquarius
