@@ -1,10 +1,11 @@
 #pragma once
 #include <any>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic/flex_buffer.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
 #include <aquarius/defines.hpp>
+#include <aquarius/event_callback.hpp>
 
 namespace aquarius
 {
@@ -13,7 +14,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class xsession
+	class xsession : public event_callback
 	{
 	public:
 		xsession() = default;
@@ -26,7 +27,7 @@ namespace aquarius
 
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
-		virtual void close_session() = 0;
+		virtual void close() = 0;
 	};
 
 	template <typename _Connector>
@@ -110,10 +111,26 @@ namespace aquarius
 			return true;
 		}
 
-		virtual void close_session() override
+		virtual void close() override
 		{
 			ctxs_.clear();
+
+			if (conn_ptr_)
+				conn_ptr_->shut_down();
 		}
+
+		public:
+		virtual void on_accept() final
+		{}
+
+		virtual void on_close() final
+		{}
+
+		virtual void on_connect() final
+		{}
+
+		virtual void on_timeout() final
+		{}
 
 	private:
 		void erase_context(uint32_t proto)

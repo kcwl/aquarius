@@ -46,7 +46,7 @@ namespace aquarius
 
 		std::size_t client_count()
 		{
-			return connect_count_.load(std::memory_order_acq_rel);
+			return connect_count_.load(std::memory_order_acquire);
 		}
 
 	private:
@@ -105,7 +105,7 @@ namespace aquarius
 		}
 
 	private:
-		detail::io_service_pool io_service_pool_;
+		io_service_pool io_service_pool_;
 
 		boost::asio::ip::tcp::endpoint end_point_;
 

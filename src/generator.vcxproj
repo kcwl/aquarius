@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1e1d42eb-5a2a-44b7-a3ee-5f762fa42591}</ProjectGuid>
-    <RootNamespace>test</RootNamespace>
+    <ProjectGuid>{c4419a49-ee6d-4862-9c40-c218bc74d96b}</ProjectGuid>
+    <RootNamespace>generator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -74,16 +74,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../3rd/elastic/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;F:\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,18 +102,15 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../3rd/elastic/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;F:\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,6 +121,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,39 +132,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp" />
-    <ClCompile Include="test_proto.mpr.cpp" />
+    <ClCompile Include="command_line.cpp" />
+    <ClCompile Include="file_descriptor.cpp" />
+    <ClCompile Include="generator.cpp" />
+    <ClCompile Include="idle_gen_cpp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\client.hpp" />
-    <ClInclude Include="..\include\aquarius\connect.hpp" />
-    <ClInclude Include="..\include\aquarius\defines.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\config.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\field.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\router.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
-    <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\message\context.hpp" />
-    <ClInclude Include="..\include\aquarius\message\header.hpp" />
-    <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
-    <ClInclude Include="..\include\aquarius\message\message.hpp" />
-    <ClInclude Include="..\include\aquarius\message\router.hpp" />
-    <ClInclude Include="..\include\aquarius\request.hpp" />
-    <ClInclude Include="..\include\aquarius\resolver.hpp" />
-    <ClInclude Include="..\include\aquarius\response.hpp" />
-    <ClInclude Include="..\include\aquarius\server.hpp" />
-    <ClInclude Include="..\include\aquarius\session\session.hpp" />
-    <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
-    <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\type_traits.hpp" />
-    <ClInclude Include="message_process.h" />
-    <ClInclude Include="test_proto.mpr.h" />
+    <ClInclude Include="command_line.h" />
+    <ClInclude Include="common.hpp" />
+    <ClInclude Include="file_descriptor.h" />
+    <ClInclude Include="idle_gen_cpp.h" />
+    <ClInclude Include="defines.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,7 @@
 #pragma once
-#include <elastic.hpp>
-
+#include <aquarius/elastic.hpp>
+#include <aquarius/request.hpp>
+#include <aquarius/response.hpp>
 
 /****************
 *test_proto
@@ -8,16 +9,25 @@
 namespace xxx
 {
 	//message person that number is 10001
-	class person final : public elastic::message_lite
+	class person
 	{
-	public:
-		person() = default;
-		virtual ~person() = default;
+		friend class aquarius::access;
 		
-	private:
-		virtual bool internal_from_binary(elastic::flex_buffer_t& buffer) final;
-		
-		virtual bool internal_to_binary(elastic::flex_buffer_t& buffer) final;
+		template<typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& age;
+			ar& name;
+			ar& sex;
+			ar& money;
+			ar& back_money;
+			ar& crc;
+			ar& role_data;
+			ar& hp;
+			ar& mana;
+			ar& input_stream;
+			ar& output_stream;
+		}
 		
 	public:
 		int32_t age;		//ƒÍ¡‰

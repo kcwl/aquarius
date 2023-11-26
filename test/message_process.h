@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 #include "../include/aquarius.hpp"
-#include "test_proto.mpr.h"
+#include "test_proto.mpr.hpp"
 
 BOOST_AUTO_TEST_SUITE(message_process)
 
@@ -53,7 +53,7 @@ CONTEXT_DEFINE(test_response, ctx_test_client);
 
 BOOST_AUTO_TEST_CASE(process)
 {
-	aquarius::no_ssl_tcp_server srv(8100, 10);
+	aquarius::no_ssl_tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(process)
 
 	cli.async_write(std::move(req));
 
-	std::this_thread::sleep_for(30s);
+	std::this_thread::sleep_for(5s);
 
 	cli.stop();
 	tc.join();

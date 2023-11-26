@@ -21,6 +21,13 @@ namespace aquarius
 		{
 			std::lock_guard lk(mutex_);
 
+			auto iter = sessions_.find(id);
+
+			if (iter == sessions_.end())
+				return true;
+
+			iter->second->close();
+
 			return sessions_.erase(id) != 0;
 		}
 
@@ -34,6 +41,18 @@ namespace aquarius
 				return nullptr;
 
 			return iter->second;
+		}
+
+		void clear()
+		{
+			std::lock_guard lk(mutex_);
+
+			for (auto& session : sessions_)
+			{
+				session.second->close();
+			}
+			
+			sessions_.clear();
 		}
 
 		std::size_t count()

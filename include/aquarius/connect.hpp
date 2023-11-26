@@ -177,14 +177,14 @@ namespace aquarius
 			{
 				boost::system::error_code ec;
 				socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+				socket_.close();
 			}
 
 			connect_timer_.cancel();
 
 			boost::system::error_code ec;
 			ssl_socket_.shutdown(ec);
-
-			socket_.close();
 		}
 
 		std::size_t uuid() const

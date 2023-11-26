@@ -1,11 +1,13 @@
 #pragma once
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic/flex_buffer.hpp>
 
 namespace aquarius
 {
 	class xsession;
 
 	class xmessage;
+
+	class context;
 } // namespace aquarius
 
 namespace aquarius

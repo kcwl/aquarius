@@ -1,8 +1,7 @@
 #pragma once
 #include <aquarius/defines.hpp>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic/flex_buffer.hpp>
 #include <aquarius/message/invoke.hpp>
-#include <elastic.hpp>
 #include <aquarius/logger.hpp>
 
 
@@ -13,12 +12,12 @@ namespace aquarius
 	{
 		static read_handle_result from_binay(flex_buffer_t& buffer, uint32_t& proto)
 		{
-			if (!elastic::from_binary(proto, buffer))
+			if (!aquarius::from_binary(proto, buffer))
 				return read_handle_result::unknown_proto;
 
 			uint32_t proto_size{};
 
-			if (!elastic::from_binary(proto_size, buffer))
+			if (!aquarius::from_binary(proto_size, buffer))
 				return read_handle_result::null_message;
 
 			if (buffer.size() < proto_size)

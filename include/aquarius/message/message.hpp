@@ -2,7 +2,7 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic.hpp>
 #include <cstddef>
 
 namespace aquarius
@@ -104,10 +104,10 @@ namespace aquarius
 
 		read_handle_result from_binary(flex_buffer_t& stream)
 		{
-			if (!elastic::from_binary(*header_ptr_, stream))
+			if (!aquarius::from_binary(*header_ptr_, stream))
 				return read_handle_result::header_error;
 
-			if (!body_.from_binary(stream))
+			if (!aquarius::from_binary(body_, stream))
 				return read_handle_result::body_error;
 
 			return read_handle_result::ok;
@@ -115,10 +115,10 @@ namespace aquarius
 
 		read_handle_result to_binary(flex_buffer_t& stream)
 		{
-			if (!elastic::to_binary(*header_ptr_, stream))
+			if (!aquarius::to_binary(*header_ptr_, stream))
 				return read_handle_result::header_error;
 
-			if (!body_.to_binary(stream))
+			if (!aquarius::to_binary(body_, stream))
 				return read_handle_result::body_error;
 
 			bytes_ += stream.size();

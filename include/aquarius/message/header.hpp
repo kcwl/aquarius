@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/defines.hpp>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/elastic/flex_buffer.hpp>
 #include <cstdint>
 
 namespace aquarius
@@ -29,12 +29,12 @@ namespace aquarius
 		uint32_t session_id_;
 
 	private:
-		friend class elastic::access;
+		friend class aquarius::access;
 
 		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
-			ar& elastic::base_object<command_header>(*this);
+			ar& aquarius::base_object<command_header>(*this);
 			ar& uid_;
 			ar& session_id_;
 		}
@@ -45,12 +45,12 @@ namespace aquarius
 		int32_t result_;
 
 	private:
-		friend class elastic::access;
+		friend class aquarius::access;
 
 		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
-			ar& elastic::base_object<command_header>(*this);
+			ar& aquarius::base_object<command_header>(*this);
 			ar& result_;
 		}
 	};

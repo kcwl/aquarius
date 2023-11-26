@@ -1,11 +1,12 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/client.hpp>
-#include <aquarius/message/context.hpp>
+#include <aquarius/context.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/connect.hpp>
+#include <aquarius/elastic.hpp>
 
 namespace aquarius
 {
@@ -42,6 +43,11 @@ namespace aquarius
 	inline std::size_t count_session()
 	{
 		return session_manager::instance().count();
+	}
+
+	inline void clear_session()
+	{
+		return session_manager::instance().clear();
 	}
 
 	template <typename _Message>
