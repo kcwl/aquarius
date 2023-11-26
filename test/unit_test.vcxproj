@@ -198,6 +198,7 @@
     <ClInclude Include="els.h" />
     <ClInclude Include="generate.h" />
     <ClInclude Include="inherit.h" />
+    <ClInclude Include="io_service_pool_test.h" />
     <ClInclude Include="message_process.h" />
     <ClInclude Include="test_proto.mpr.h" />
     <ClInclude Include="tuple_size.h" />

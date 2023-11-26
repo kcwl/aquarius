@@ -188,5 +188,8 @@
     <ClInclude Include="..\src\test_proto.mpr.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="io_service_pool_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

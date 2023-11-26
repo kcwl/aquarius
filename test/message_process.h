@@ -53,7 +53,7 @@ CONTEXT_DEFINE(test_response, ctx_test_client);
 
 BOOST_AUTO_TEST_CASE(process)
 {
-	aquarius::no_ssl_tcp_server srv(8100, 10);
+	aquarius::no_ssl_tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 

@@ -8,3 +8,4 @@
 #include "type.h"
 #include "tuple_size.h"
 #include "els.h"
+#include "io_service_pool_test.h"

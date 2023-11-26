@@ -105,7 +105,7 @@ namespace aquarius
 		}
 
 	private:
-		detail::io_service_pool io_service_pool_;
+		io_service_pool io_service_pool_;
 
 		boost::asio::ip::tcp::endpoint end_point_;
 
