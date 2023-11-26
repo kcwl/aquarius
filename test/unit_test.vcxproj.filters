@@ -36,9 +36,6 @@
     <ClCompile Include="Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="test_proto.mpr.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -187,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\elastic.hpp">
       <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\test_proto.mpr.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

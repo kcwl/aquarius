@@ -3,8 +3,6 @@
 
 #include <boost/test/unit_test_suite.hpp>
 
-#include "test_proto.mpr.h"
-
 BOOST_AUTO_TEST_SUITE(els_tst)
 
 BOOST_AUTO_TEST_CASE(els)
@@ -35,11 +33,11 @@ BOOST_AUTO_TEST_CASE(els)
 
 	persons.output_stream = (aquarius::fixed<uint64_t>(10));
 
-	persons.to_binary(buffer);
+	aquarius::to_binary(persons, buffer);
 
 	xxx::person per{};
 
-	per.from_binary(buffer);
+	aquarius::from_binary(per, buffer);
 
 	BOOST_CHECK(per.age == persons.age);
 	BOOST_CHECK(per.name == persons.name);

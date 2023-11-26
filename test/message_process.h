@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 #include "../include/aquarius.hpp"
-#include "test_proto.mpr.h"
+#include "test_proto.mpr.hpp"
 
 BOOST_AUTO_TEST_SUITE(message_process)
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(process)
 
 	cli.async_write(std::move(req));
 
-	std::this_thread::sleep_for(30s);
+	std::this_thread::sleep_for(5s);
 
 	cli.stop();
 	tc.join();

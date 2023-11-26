@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -150,7 +150,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp" />
-    <ClCompile Include="test_proto.mpr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
@@ -194,6 +193,7 @@
     <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
+    <ClInclude Include="..\src\test_proto.mpr.hpp" />
     <ClInclude Include="attr.h" />
     <ClInclude Include="els.h" />
     <ClInclude Include="generate.h" />
