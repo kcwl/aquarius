@@ -38,11 +38,6 @@ namespace aquarius
 
 			void complete()
 			{
-				if (good())
-					return;
-
-				my_state_ = std::ios::iostate{};
-
 				my_state_ |= std::ios::goodbit;
 			}
 
@@ -146,7 +141,7 @@ namespace aquarius
 
 			auto* elastic_fixed_ptr = reinterpret_cast<element_type*>(&t);
 
-			this->streambuf_.sputn(elastic_fixed_ptr, array_size);
+			this->save(elastic_fixed_ptr, array_size);
 		}
 
 		template <typename _Ty>
@@ -157,21 +152,13 @@ namespace aquarius
 
 		std::size_t put(const element_type& c)
 		{
-			return this->streambuf_.sputc(c);
+			return this->streambuf_.sputn(&c, sizeof(element_type));
 		}
 
 	protected:
 		_Archive* _this()
 		{
 			return static_cast<_Archive*>(this);
-		}
-
-	private:
-		void save_binary(const element_type* address, std::size_t count)
-		{
-			count = (count + sizeof(element_type) - 1) / sizeof(element_type);
-
-			this->streambuf_.sputn(address, count);
 		}
 	};
 } // namespace elastic

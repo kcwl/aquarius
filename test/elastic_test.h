@@ -450,4 +450,52 @@ BOOST_AUTO_TEST_CASE(property)
 	}
 }
 
+BOOST_AUTO_TEST_CASE(flexbuffer)
+{
+	{
+		aquarius::flex_buffer_t buffer(0);
+
+		aquarius::binary_oarchive oa(buffer);
+		oa << 1;
+
+		BOOST_CHECK(buffer.size() == 0);
+	}
+
+	{
+		aquarius::flex_buffer_t buffer(0);
+		aquarius::binary_iarchive ia(buffer);
+
+		int a{};
+		ia >> a;
+
+		BOOST_CHECK(a == 0);
+	}
+
+	{
+		aquarius::flex_buffer_t buffer{};
+		aquarius::binary_oarchive oa(buffer);
+		oa << 1;
+		oa << 2;
+
+		buffer.pubseekoff(-1, std::ios::cur, std::ios::in);
+
+		BOOST_CHECK(buffer.active() == 4095);
+
+		buffer.pubseekoff(1, std::ios::cur, std::ios::out);
+		BOOST_CHECK(buffer.size() == 0);
+
+		buffer.pubseekpos(2, std::ios::in);
+		BOOST_CHECK(buffer.active() == 4094);
+
+		buffer.pubseekpos(0, std::ios::out);
+		BOOST_CHECK(buffer.size() == 2);
+
+		BOOST_CHECK(buffer.pubseekoff(-1, std::ios::beg, std::ios::in) == 0);
+		BOOST_CHECK(buffer.pubseekoff(1, std::ios::end, std::ios::in) == buffer.rdata()-buffer.data());
+
+		BOOST_CHECK(buffer.pubseekoff(-1, std::ios::beg, std::ios::out) == 0);
+		BOOST_CHECK(buffer.pubseekoff(1, std::ios::end, std::ios::out) == buffer.wdata() - buffer.data());
+	}
+}
+
 BOOST_AUTO_TEST_SUITE_END()

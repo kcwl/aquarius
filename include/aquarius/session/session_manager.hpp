@@ -43,6 +43,18 @@ namespace aquarius
 			return iter->second;
 		}
 
+		void clear()
+		{
+			std::lock_guard lk(mutex_);
+
+			for (auto& session : sessions_)
+			{
+				session.second->close();
+			}
+			
+			sessions_.clear();
+		}
+
 		std::size_t count()
 		{
 			std::lock_guard lk(mutex_);

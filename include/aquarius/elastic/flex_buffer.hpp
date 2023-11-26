@@ -262,7 +262,14 @@ namespace aquarius
 				break;
 			case std::ios::end:
 				{
-					new_off = buffer_.size();
+					if (mode & std::ios::in)
+					{
+						new_off = pptr_;
+					}
+					else if (mode & std::ios::out)
+					{
+						new_off = gptr_;
+					}
 				}
 				break;
 			default:
@@ -275,11 +282,11 @@ namespace aquarius
 
 			if (mode & std::ios::in)
 			{
-				off > buffer_.size() ? pptr_ = buffer_.size() : pptr_ = off;
+				off > pptr_ ? pptr_ = off = pptr_ : pptr_ = off;
 			}
 			else if (mode & std::ios::out)
 			{
-				off > pptr_ ? gptr_ = pptr_ : gptr_ = off;
+				off > pptr_ ? gptr_ = off = pptr_ : gptr_ = off;
 			}
 
 			return static_cast<pos_type>(off);
@@ -302,7 +309,7 @@ namespace aquarius
 			{
 				pos > pptr_ ? gptr_ = pptr_ : 0;
 
-				pos < 0 ?  pos = 0 : (pos_type)0;
+				pos < 0 ? pos = 0 : (pos_type)0;
 
 				gptr_ = static_cast<off_type>(pos);
 			}
@@ -325,11 +332,6 @@ namespace aquarius
 			return size;
 		}
 
-		size_type sputc(const value_type& c)
-		{
-			return sputn(&c, 1);
-		}
-
 		size_type sgetn(value_type* begin, size_type size)
 		{
 			if (size > this->size())
@@ -345,11 +347,6 @@ namespace aquarius
 			return size;
 		}
 
-		size_type sgetc(value_type* c)
-		{
-			return sgetn(c, 1);
-		}
-
 	private:
 		std::vector<value_type, allocator_type> buffer_;
 
@@ -359,4 +356,4 @@ namespace aquarius
 	};
 
 	using flex_buffer_t = flex_buffer<uint8_t, std::char_traits<uint8_t>>;
-} // namespace elastic
+} // namespace aquarius

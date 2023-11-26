@@ -45,6 +45,11 @@ namespace aquarius
 		return session_manager::instance().count();
 	}
 
+	inline void clear_session()
+	{
+		return session_manager::instance().clear();
+	}
+
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)
 	{
