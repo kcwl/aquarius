@@ -194,15 +194,11 @@
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
     <ClInclude Include="..\src\test_proto.mpr.hpp" />
-    <ClInclude Include="attr.h" />
-    <ClInclude Include="els.h" />
+    <ClInclude Include="elastic_test.h" />
     <ClInclude Include="generate.h" />
-    <ClInclude Include="inherit.h" />
-    <ClInclude Include="io_service_pool_test.h" />
     <ClInclude Include="message_process.h" />
-    <ClInclude Include="test_proto.mpr.h" />
-    <ClInclude Include="tuple_size.h" />
-    <ClInclude Include="type.h" />
+    <ClInclude Include="message_test.h" />
+    <ClInclude Include="server_test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

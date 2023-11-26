@@ -24,14 +24,14 @@ namespace aquarius
 				if (start_pos_ != 0)
 					return false;
 
-				start_pos_ = static_cast<int32_t>(this->streambuf_.pubseekoff(0, std::ios::cur, std::ios::in));
+				start_pos_ = static_cast<int32_t>(this->streambuf_.pubseekoff(0, std::ios::cur, std::ios::out));
 
 				return true;
 			}
 
 			void roll_back()
 			{
-				this->streambuf_.pubseekpos(start_pos_, std::ios::in);
+				this->streambuf_.pubseekpos(start_pos_, std::ios::out);
 
 				start_pos_ = 0;
 			}
@@ -114,9 +114,9 @@ namespace aquarius
 			throw std::exception("input stream error!");
 		}
 
-		std::size_t get(element_type* c)
+		void get(element_type* c)
 		{
-			return this->streambuf_.sgetc(c);
+			return this->load(c, 1);
 		}
 
 	protected:

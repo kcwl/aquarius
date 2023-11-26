@@ -46,7 +46,7 @@ namespace aquarius
 
 		std::size_t client_count()
 		{
-			return connect_count_.load(std::memory_order_acq_rel);
+			return connect_count_.load(std::memory_order_acquire);
 		}
 
 	private:

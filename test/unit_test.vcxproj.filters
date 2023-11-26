@@ -116,9 +116,6 @@
     <ClInclude Include="..\include\aquarius\message\invoke.hpp">
       <Filter>aquarius\message</Filter>
     </ClInclude>
-    <ClInclude Include="test_proto.mpr.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\event_callback.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
@@ -134,22 +131,7 @@
     <ClInclude Include="..\include\aquarius\context\user_context.hpp">
       <Filter>aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="attr.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="els.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="generate.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="inherit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="tuple_size.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="type.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\elastic\access.hpp">
@@ -188,7 +170,13 @@
     <ClInclude Include="..\src\test_proto.mpr.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="io_service_pool_test.h">
+    <ClInclude Include="server_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="elastic_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="message_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
