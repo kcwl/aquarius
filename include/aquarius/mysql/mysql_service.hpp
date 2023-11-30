@@ -4,17 +4,16 @@
 #include <boost/mysql.hpp>
 #include <string>
 #include <vector>
+#include <aquarius/mysql/algorithm.hpp>
 
 namespace aquarius
 {
 	class mysql_connect final
 	{
 	public:
-		template <typename... Args>
-		explicit mysql_connect(boost::asio::io_service& ios, Args&&... args)
+		template <typename... _Args>
+		explicit mysql_connect(boost::asio::io_service& ios, _Args&&... args)
 			: io_service_(ios)
-			, auto_reconnect_(true)
-			, lock_(false)
 			, ssl_ctx_(boost::asio::ssl::context::tls_client)
 			, mysql_ptr_(new boost::mysql::tcp_ssl_connection(io_service_, ssl_ctx_))
 		{
@@ -26,7 +25,7 @@ namespace aquarius
 	public:
 		void run()
 		{
-			mysql_ptr_->async_connect(endpoint_, *params_,
+			mysql_ptr_->async_connect(*endpoint_.begin(), *params_,
 									  [this](const boost::mysql::error_code& ec)
 									  {
 										  if (!ec)
@@ -39,8 +38,15 @@ namespace aquarius
 									  });
 		}
 
+		void close()
+		{
+			mysql_ptr_->close();
+		}
+
 		void set_charset(const std::string& charset = "utf8mb4")
 		{
+			mutex_.lock();
+
 			boost::mysql::results result;
 
 			mysql_ptr_->async_execute("SET NAMES " + charset, result,
@@ -54,11 +60,15 @@ namespace aquarius
 										  {
 											  XLOG(info) << "set charset " << charset << "successful";
 										  }
+
+										  mutex_.unlock();
 									  });
 		}
 
 		bool execute(const std::string& sql, boost::mysql::error_code& ec)
 		{
+			std::lock_guard lk(mutex_);
+
 			boost::mysql::results result{};
 			boost::mysql::diagnostics diag{};
 
@@ -68,23 +78,33 @@ namespace aquarius
 		}
 
 		template <typename _Func>
-		void async_excute(std::string_view sql)
+		auto async_excute(std::string_view sql, bool& result)
 		{
+			result = false;
+
+			mutex_.lock();
+
 			boost::mysql::results result{};
-			mysql_ptr_->async_execute(sql, result,
-									  [&](const boost::mysql::error_code& ec)
-									  {
-										  if (ec)
-										  {
-											  XLOG(error) << "failed at excute sql:" << sql;
-											  return;
-										  }
-									  })
+			return mysql_ptr_->async_execute(sql, result,
+											 [&](const boost::mysql::error_code& ec)
+											 {
+												 if (ec)
+												 {
+													 XLOG(error) << "failed at excute sql:" << sql;
+													 return;
+												 }
+
+												 result = true;
+
+												 mutex_.unlock();
+											 });
 		}
 
 		template <typename T>
 		T query(const std::string& sql, boost::mysql::error_code& ec)
 		{
+			std::lock_guard	lk(mutex_);
+
 			T results{};
 
 			boost::mysql::results result{};
@@ -95,11 +115,11 @@ namespace aquarius
 			if (!result.has_value())
 				return results;
 
-			if constexpr (is_container_v<T>)
+			if constexpr (detail::is_container_v<T>)
 			{
-				while (auto& column : result)
+				for (auto& column : result)
 				{
-					results.push_back(sqlpro::detail::template to_struct<T>(column));
+					results.push_back(to_struct<T>(column));
 				}
 			}
 			else
@@ -107,28 +127,37 @@ namespace aquarius
 				static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "T error!");
 
 				auto& column = result.back();
-				results = detail::template to_struct<T>(column);
+				results = to_struct<T>(column);
 			}
 
 			return results;
 		}
 
-		template <typename _Ty>
-		auto query(const std::string& sql, _Ty& t)
+		template <typename _Ty, typename _Func>
+		auto async_query(const std::string& sql, _Func&& f)
 		{
+			mutex_.lock();
+
 			boost::mysql::results result{};
 
 			return mysql_ptr_->async_query(sql, result,
-									[&](const boost::mysql::error_code& ec)
-									{
-										if (ec)
-										{
-											XLOG(error) << "failed at excute sql:" << sql;
-											return;
-										}
+										   [&](const boost::mysql::error_code& ec)
+										   {
+											   if (ec)
+											   {
+												   XLOG(error) << "failed at excute sql:" << sql;
+												   return;
+											   }
 
-										t = make_result<_Ty>(result);
-									});
+											   f(make_result<_Ty>(result));
+
+											   mutex_.unlock();
+										   });
+		}
+
+		bool try_lock()
+		{
+			return mutex_.try_lock();
 		}
 
 	private:
@@ -150,19 +179,19 @@ namespace aquarius
 			if (!result.has_value())
 				return results;
 
-			if constexpr (is_container_v<T>)
+			if constexpr (detail::is_container_v<_Ty>)
 			{
-				while (auto& column : result)
+				for (auto& column : result)
 				{
-					results.push_back(sqlpro::detail::template to_struct<T>(column));
+					results.push_back(to_struct<_Ty>(column));
 				}
 			}
 			else
 			{
-				static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>, "T error!");
+				static_assert(std::is_trivial_v<_Ty> && std::is_standard_layout_v<_Ty>, "T error!");
 
 				auto& column = result.back();
-				results = detail::template to_struct<T>(column);
+				results = to_struct<_Ty>(column);
 			}
 
 			return results;
@@ -171,12 +200,14 @@ namespace aquarius
 	private:
 		boost::asio::io_service& io_service_;
 
-		boost::asio::ip::tcp::endpoint endpoint_;
+		boost::asio::ip::tcp::resolver::results_type endpoint_;
 
 		std::unique_ptr<boost::mysql::handshake_params> params_;
 
 		boost::asio::ssl::context ssl_ctx_;
 
 		std::unique_ptr<boost::mysql::tcp_ssl_connection> mysql_ptr_;
+
+		std::mutex mutex_;
 	};
 } // namespace aquarius

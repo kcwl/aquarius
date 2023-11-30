@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <type_traits>
+#include <variant>
 
 namespace aquarius
 {
@@ -47,12 +48,54 @@ namespace aquarius
 		constexpr static bool is_any_of_v = std::disjunction_v<std::is_same<_Ty, _Args>...>;
 
 		template <typename _Ty>
-		constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[]>;
+		constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[], char*>;
 
 		struct http
 		{};
 
 		template<typename _Ty>
 		concept integer_t = requires { std::is_integral_v<_Ty>; };
+
+		struct replace_mode
+		{};
+
+		struct delete_mode
+		{};
+
+		struct select_mode
+		{};
+
+		struct create_mode
+		{};
+
+		struct remove_mode
+		{};
+
+		template <class T>
+		struct is_string : std::false_type
+		{};
+
+		template <class T>
+		struct is_byte : std::false_type
+		{};
+
+		template <>
+		struct is_byte<std::byte> : std::true_type
+		{};
+
+		template <class T>
+		static constexpr bool is_byte_v = is_byte<T>::value;
+
+		template <class T>
+		struct is_variant : std::false_type
+		{};
+
+		template <class... Args>
+		struct is_variant<std::variant<Args...>> : std::true_type
+		{};
+
+		template <class T>
+		static constexpr bool is_variant_v = is_variant<T>::value;
+
 	} // namespace detail
 } // namespace aquarius

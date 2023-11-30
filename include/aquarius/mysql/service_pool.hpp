@@ -16,12 +16,7 @@ namespace aquarius
 
 	public:
 		template <typename... _Args>
-		service_pool(std::size_t number, _Args&&... args)
-			: service_pool(std::move(io_service_pool{ number }))
-		{}
-
-		template <typename... Args>
-		explicit service_pool(std::size_t connects, io_service_pool& pool, Args&&... args)
+		explicit service_pool(io_service_pool& pool, std::size_t connects, _Args&&... args)
 			: pools_(pool)
 			, has_stop_(false)
 			, conn_num_(connects)
@@ -31,27 +26,42 @@ namespace aquarius
 
 		~service_pool() = default;
 
+		void start()
+		{
+			for (auto& s : services_)
+			{
+				s->run();
+			}
+		}
+
+		void stop()
+		{
+			for (auto& s : services_)
+			{
+				s->close();
+			}
+		}
+
 		std::future<bool> async_execute(const std::string& sql)
 		{
+			std::promise<bool> promise{};
+			auto future = promise.get_future();
+
 			auto conn_ptr = get_service();
 
-			if (conn_ptr == nullptr)
-				return std::future<bool>();
+			if (conn_ptr != nullptr)
+			{
+				conn_ptr->template async_excute(sql, [&](bool value) { promise.set_value(value); });
+			}
+			else
+			{
+				auto f = [&](service_ptr conn_ptr)
+				{ conn_ptr->template async_excute(sql, [&](bool value) { promise.set_value(value); }); };
 
-			auto task = std::make_shared<std::packaged_task<bool()>>(
-				[&]
-				{
-					error_code ec;
-					auto res = conn_ptr->execute(sql, ec);
+				push_queue(std::move(f));
+			}
 
-					conn_ptr->unlock();
-
-					return res;
-				});
-
-			push_queue(task);
-
-			return task->get_future();
+			return future;
 		}
 
 		template <typename T, typename F, typename... Args>
@@ -61,22 +71,22 @@ namespace aquarius
 		}
 
 		template <typename _Ty>
-		auto async_query(const std::string& sql, _Ty& t) -> decltype(std::declval<decltype(get_service())>().async_query())
+		auto async_query(const std::string& sql)
 		{
 			std::promise<_Ty> promise{};
 
-			auto future = promise->get_future();
+			auto future = promise.get_future();
 
 			auto conn_ptr = get_service();
 
 			if (conn_ptr != nullptr)
 			{
-				return conn_ptr->template async_query(sql, [&](_Ty&& value) { t = value; });
+				return conn_ptr->template async_query(sql, [&](_Ty&& value) { promise.set_value(std::move(value)); });
 			}
 			else
 			{
 				auto f = [&](service_ptr conn_ptr)
-				{ conn_ptr->template async_query(sql, [&](_Ty&& value) { t = value; }; }
+				{ conn_ptr->template async_query(sql, [&](_Ty&& value) { promise.set_value(std::move(value)); }); };
 
 				push_queue(std::move(f));
 			}
@@ -90,10 +100,10 @@ namespace aquarius
 		{
 			for (std::size_t i = 0; i < conn_num_; i++)
 			{
-				service_pool_.push_back(std::make_shared<_Service>(pool.get_io_service(), std::forward<Args>(args)...));
+				services_.push_back(std::make_shared<_Service>(pool.get_io_service(), std::forward<_Args>(args)...));
 			}
 
-			thread_ptr_.reset(
+			thread_ptr_.reset(new std::thread(
 				[&]
 				{
 					while (!has_stop_.load())
@@ -103,21 +113,21 @@ namespace aquarius
 						if (queue_.empty())
 							continue;
 
-						auto& task = queue_.top();
+						auto& task = queue_.front();
 
 						task();
 
 						queue_.pop_front();
 					}
-				});
+				}));
 		}
 
 		service_ptr get_service()
 		{
 			auto iter =
-				std::find_if(service_pool_.begin(), service_pool_.end(), [](auto srv) { return srv->try_lock(); });
+				std::find_if(services_.begin(), services_.end(), [](auto srv) { return srv->try_lock(); });
 
-			if (iter == service_pool_.end())
+			if (iter == services_.end())
 				return nullptr;
 
 			return *iter;
@@ -128,7 +138,7 @@ namespace aquarius
 		{
 			std::lock_guard lk(mutex_);
 
-			cq_.push([task = std::move(task)] { task(); });
+			queue_.push([task = std::move(task)] { task(); });
 		}
 
 	private:

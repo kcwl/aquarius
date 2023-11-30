@@ -31,6 +31,9 @@
     <Filter Include="aquarius\elastic">
       <UniqueIdentifier>{71b89279-e1a8-4995-81f6-90578421d12e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\mysql">
+      <UniqueIdentifier>{a0518608-c803-4290-9f2b-dab5207810c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -177,6 +180,27 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="message_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\sql_type.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="mysql_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
