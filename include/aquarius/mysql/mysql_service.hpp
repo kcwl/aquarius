@@ -87,7 +87,7 @@ namespace aquarius
 		}
 
 		template <typename _Ty>
-		bool query(const std::string& sql, _Ty& t,boost::mysql::error_code& ec)
+		bool query(const std::string& sql, std::vector<_Ty>& t, boost::mysql::error_code& ec)
 		{
 			boost::mysql::results result{};
 			boost::mysql::diagnostics diag{};
@@ -97,19 +97,9 @@ namespace aquarius
 			if (!result.has_value())
 				return false;
 
-			if constexpr (detail::is_container_v<_Ty>)
+			for (auto& column : result)
 			{
-				for (auto& column : result)
-				{
-					t.push_back(to_struct<_Ty>(column));
-				}
-			}
-			else
-			{
-				static_assert(std::is_trivial_v<_Ty> && std::is_standard_layout_v<_Ty>, "T error!");
-
-				auto& column = result.back();
-				t = to_struct<_Ty>(column);
+				t.push_back(to_struct<_Ty>(column));
 			}
 
 			return true;
@@ -147,7 +137,7 @@ namespace aquarius
 
 										  XLOG(info) << "msyql async connect success!";
 
-										  //set_charset();
+										  // set_charset();
 									  });
 		}
 

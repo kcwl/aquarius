@@ -24,4 +24,17 @@ BOOST_AUTO_TEST_CASE(connect)
 	t.join();
 }
 
+struct person
+{
+	int age;
+	std::string name;
+};
+
+BOOST_AUTO_TEST_CASE(sql)
+{ 
+	aquarius::io_service_pool io_pool{ 5 };
+
+	std::vector<person> result = chain_sql(io_pool).select<person>().where(AQUARIUS_ATTRIBUTE(person, age) != 1).async_query();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

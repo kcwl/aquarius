@@ -58,7 +58,8 @@ namespace aquarius
 			this->template recycle_service(std::move(conn_ptr));
 		}
 
-		std::future<bool> async_execute(const std::string& sql)
+		template<typename _Func>
+		std::future<bool> async_execute(const std::string& sql, _Func&& f)
 		{
 			std::promise<bool> promise{};
 			auto future = promise.get_future();
@@ -69,9 +70,11 @@ namespace aquarius
 				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
 
 			conn_ptr->template async_excute(sql,
-											[&, ptr = std::move(conn_ptr)](bool value)
+											[&, ptr = std::move(conn_ptr), func = std::move(f)](bool value)
 											{
 												promise.set_value(value);
+
+												func();
 
 												this->template recycle_service(ptr);
 											});
@@ -80,7 +83,7 @@ namespace aquarius
 		}
 
 		template <typename _Ty>
-		_Ty query(const std::string& sql)
+		std::vector<_Ty> query(const std::string& sql)
 		{
 			auto conn_ptr = get_service();
 
@@ -89,7 +92,7 @@ namespace aquarius
 
 			boost::mysql::error_code ec;
 
-			_Ty result{};
+			std::vector<_Ty> result{};
 			if (!conn_ptr->query(sql, result, ec))
 			{
 				XLOG(error) << "sql: " << sql << " query failed! " << ec.what();
@@ -106,8 +109,8 @@ namespace aquarius
 			return async_query<_Ty>(std::format(std::forward<_Fmt>(f), std::forward<_Args>(args)...));
 		}
 
-		template <typename _Ty>
-		auto async_query(const std::string& sql)
+		template <typename _Ty, typename _Func>
+		auto async_query(const std::string& sql, _Func&& f)
 		{
 			std::promise<_Ty> promise{};
 
@@ -119,9 +122,11 @@ namespace aquarius
 				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
 
 			conn_ptr->template async_query(sql,
-										   [&, ptr = std::move(conn_ptr)](_Ty&& value)
+										   [&, ptr = std::move(conn_ptr), func = std::move(f)](_Ty&& value)
 										   {
 											   promise.set_value(std::move(value));
+
+											   func();
 
 											   this->recycle_service(ptr);
 										   });

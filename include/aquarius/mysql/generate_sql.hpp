@@ -1,36 +1,90 @@
 ﻿#pragma once
+#include <aquarius/mysql/sql_keyword.hpp>
+#include <aquarius/type_traits.hpp>
 #include <array>
-#include <typeinfo>
 #include <functional>
-#include "sql_type.hpp"
-#include <sqlpro/type_traits.hpp>
-#include <sqlpro/algorithm.hpp>
+#include <typeinfo>
 
-#pragma warning(disable:4100)
+#pragma warning(disable : 4100)
 
-namespace sqlpro
+namespace aquarius
 {
+	template <typename _Ty>
+	void make_select_sql(std::string& sql)
+	{
+		constexpr auto temp_sql = concat_v<SELECT, SPACE, ASTERISK, SPACE, FROM, SPACE, name<_Ty>(), SEPARATOR>;
+
+		sql.swap(std::string(temp_sql.data(), temp_sql.size()));
+	}
+
+	template <typename _Ty>
+	void make_insert_sql(std::string& sql, _Ty&& t)
+	{
+		constexpr auto temp_sql_prev = concat_v<INSERT, SPACE.INTO, SPACE, name<_Ty>(), SPACE, VALUES, LEFT_BRACKET>;
+
+		sql.append(temp_sql_prev.data());
+
+		for_each(std::forward<_Ty>(t),
+				 [&](auto&& value)
+				 {
+					 using type = std::remove_cvref_t<decltype(value)>;
+					 if constexpr (std::same_as<type, std::string>)
+					 {
+						 sql += "'" + std::to_string(value) + "'";
+					 }
+					 else
+					 {
+						 sql += std::to_string(value);
+					 }
+
+					 sql += ",";
+				 });
+
+		if (sql.back() == ',')
+			sql.pop_back();
+
+		sql += RIGHT_BRACKET;
+		sql += SEPARATOR;
+	}
+
+	template<typename _Ty>
+	void make_remove_sql(std::string& sql)
+	{
+		
+		sql += SEPARATOR;
+	}
+
+	template <typename _Ty>
+	void make_remove_sql(std::string& sql)
+	{
+		constexpr auto temp_sql_prev = concat_v<REMOVE.SPACE, FROM, SPACE, name<_Ty>()>;
+
+		sql += SEPARATOR;
+	}
+
 	namespace detail
 	{
-		template<typename T>
+		template <typename T>
 		std::string create()
 		{
 			constexpr std::string_view table_name = reflect::rf_name<T>();
 
 			std::string sql = "create table " + std::string(table_name) + " (";
 
-			detail::for_each(T{}, [&sql](auto name, auto value, std::size_t&& I)
+			detail::for_each(T{},
+							 [&sql](auto name, auto value, std::size_t&& I)
 							 {
-								 sql.append("" + std::string(name) + " " + detail::mysql_type(detail::indentify<decltype(value)>{}));
+								 sql.append("" + std::string(name) + " " +
+											detail::mysql_type(detail::indentify<decltype(value)>{}));
 
-								 if (I != reflect::rf_size_v<T> -1)
+								 if (I != reflect::rf_size_v<T> - 1)
 									 sql.append(",");
 							 });
 
 			return sql;
 		}
 
-		template<typename T>
+		template <typename T>
 		std::string remove()
 		{
 			std::string sql = "delete table if exists ";
@@ -44,7 +98,7 @@ namespace sqlpro
 			return sql;
 		}
 
-		template<typename Mode, typename T>
+		template <typename Mode, typename T>
 		struct generate
 		{
 			static std::string sql(T&& val, std::string condition)
@@ -53,7 +107,7 @@ namespace sqlpro
 			}
 		};
 
-		template<typename T>
+		template <typename T>
 		struct generate<replace_mode, T>
 		{
 			static std::string sql(T const& val, std::string condition)
@@ -62,11 +116,12 @@ namespace sqlpro
 
 				std::string sql = "replace into " + std::string(table_name) + " values(";
 
-				detail::for_each(val, [&sql](auto&& value, std::size_t I)
+				detail::for_each(val,
+								 [&sql](auto&& value, std::size_t I)
 								 {
 									 sql += detail::to_string(std::move(value));
 
-									 if (I != reflect::rf_size_v<T> -1)
+									 if (I != reflect::rf_size_v<T> - 1)
 										 sql.append(",");
 								 });
 
@@ -76,7 +131,7 @@ namespace sqlpro
 			}
 		};
 
-		template<typename T>
+		template <typename T>
 		struct generate<remove_mode, T>
 		{
 			static std::string sql(const std::string& condition)
@@ -94,7 +149,7 @@ namespace sqlpro
 			}
 		};
 
-		template<typename T>
+		template <typename T>
 		struct generate<select_mode, T>
 		{
 			static std::string sql(const std::string& condition)
@@ -111,5 +166,5 @@ namespace sqlpro
 				return sql;
 			}
 		};
-	}
-}
+	} // namespace detail
+} // namespace aquarius

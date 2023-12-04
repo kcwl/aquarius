@@ -188,10 +188,13 @@
     <ClInclude Include="..\include\aquarius\message\router.hpp" />
     <ClInclude Include="..\include\aquarius\mysql.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\operator.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\sql_type.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\sql_keyword.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />

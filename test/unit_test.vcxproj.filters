@@ -197,11 +197,20 @@
     <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\sql_type.hpp">
+    <ClInclude Include="..\include\aquarius\mysql\sql_keyword.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
     <ClInclude Include="mysql_test.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\operator.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\sql.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp">
+      <Filter>aquarius\mysql</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
