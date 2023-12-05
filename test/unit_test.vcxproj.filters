@@ -197,7 +197,7 @@
     <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\sql_keyword.hpp">
+    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
     <ClInclude Include="mysql_test.h">

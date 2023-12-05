@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <string_view>
-#include <aquarius/mysql/sql_keyword.hpp>
+#include <aquarius/mysql/keyword.hpp>
 #include <aquarius/mysql/algorithm.hpp>
 
 namespace aquarius
@@ -52,15 +52,6 @@ namespace aquarius
 			return *this;
 		}
 
-		attributes& operator!<(_Ty&& t)
-		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, NOT, LESS, SPACE>;
-
-			attr_str_ = sql + std::to_string(t);
-
-			return *this;
-		}
-
 		attributes& operator>(_Ty&& t)
 		{
 			constexpr auto sql = concat_v<sql_begin, SPACE , GREATER , SPACE>;
@@ -79,17 +70,7 @@ namespace aquarius
 			return *this;
 		}
 
-		
-		attributes& operator!>(_Ty&& t)
-		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, NOT, GREATER, SPACE>;
-
-			attr_str_ = sql + std::to_string(t);
-
-			return *this;
-		}
-
-		atrributes& operator|(const attributes& other)
+		attributes& operator|(const attributes& other)
 		{
 			attr_str_ += OR + other.attr_str_;
 

@@ -48,6 +48,12 @@ namespace aquarius
 
 	inline constexpr std::string_view BETWEEN = "between";
 
+	inline constexpr std::string_view SET = "set"sv;
+
+	inline constexpr std::string_view UPDATE = "update"sv;
+
+	inline constexpr std::string_view REPLACE = "replace"sv;
+
 	template <class T>
 	struct indentify
 	{};

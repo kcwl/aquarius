@@ -55,31 +55,24 @@ namespace aquarius
 				XLOG(error) << "sql: " << sql << " execute failed! " << ec.what();
 			}
 
-			this->template recycle_service(std::move(conn_ptr));
+			this->recycle_service(std::move(conn_ptr));
 		}
 
-		template<typename _Func>
-		std::future<bool> async_execute(const std::string& sql, _Func&& f)
+		template <typename _Func>
+		auto async_execute(const std::string& sql, _Func&& f)
 		{
-			std::promise<bool> promise{};
-			auto future = promise.get_future();
-
 			auto conn_ptr = get_service();
 
 			if (conn_ptr == nullptr)
-				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
+				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
-			conn_ptr->template async_excute(sql,
-											[&, ptr = std::move(conn_ptr), func = std::move(f)](bool value)
-											{
-												promise.set_value(value);
+			conn_ptr->async_excute(sql,
+								   [&, ptr = std::move(conn_ptr), func = std::move(f)](bool value) mutable
+								   {
+									   func(value);
 
-												func();
-
-												this->template recycle_service(ptr);
-											});
-
-			return future;
+									   this->recycle_service(std::move(ptr));
+								   });
 		}
 
 		template <typename _Ty>
@@ -88,7 +81,7 @@ namespace aquarius
 			auto conn_ptr = get_service();
 
 			if (conn_ptr == nullptr)
-				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
+				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
 			boost::mysql::error_code ec;
 
@@ -112,26 +105,18 @@ namespace aquarius
 		template <typename _Ty, typename _Func>
 		auto async_query(const std::string& sql, _Func&& f)
 		{
-			std::promise<_Ty> promise{};
-
-			auto future = promise.get_future();
-
 			auto conn_ptr = get_service();
 
 			if (conn_ptr == nullptr)
-				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
+				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
-			conn_ptr->template async_query(sql,
-										   [&, ptr = std::move(conn_ptr), func = std::move(f)](_Ty&& value)
-										   {
-											   promise.set_value(std::move(value));
+			return conn_ptr->template async_query(sql,
+												  [&, ptr = std::move(conn_ptr), func = std::move(f)](_Ty&& value)
+												  {
+													  func(std::move(value));
 
-											   func();
-
-											   this->recycle_service(ptr);
-										   });
-
-			return future;
+													  this->recycle_service(std::move(ptr));
+												  });
 		}
 
 	private:
@@ -146,7 +131,7 @@ namespace aquarius
 			}
 		}
 
-		service_ptr&& get_service()
+		service_ptr get_service()
 		{
 			std::lock_guard lk(free_mutex_);
 
@@ -166,7 +151,7 @@ namespace aquarius
 		{
 			std::lock_guard lk(free_mutex_);
 
-			free_queue_.push(std::move(conn_ptr));
+			free_queue_.push_back(std::move(conn_ptr));
 		}
 
 		template <typename _Host, typename _Passwd, typename... _Args>

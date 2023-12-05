@@ -7,38 +7,7 @@
 
 namespace
 {
-	static constexpr int32_t hold_bit = 7;
 
-	template <typename _Ty, typename _Func, std::size_t... I>
-	constexpr void for_each(_Ty&& val, _Func&& func, std::index_sequence<I...>)
-	{
-		return (std::forward<_Func>(func)(aquarius::get<I>(std::forward<_Ty>(val))), ...);
-	}
-
-	template <typename _Ty, typename _Func, std::size_t N = aquarius::tuple_size_v<_Ty>,
-			  typename Indices = std::make_index_sequence<N>>
-	constexpr void for_each(_Ty&& val, _Func&& func)
-	{
-		return for_each(std::forward<_Ty>(val), std::forward<_Func>(func), Indices{});
-	}
-
-	template <aquarius::signed_numric_t _Ty>
-	aquarius::zig_zag_t<_Ty> zigzag_encode(_Ty value)
-	{
-		using type = aquarius::zig_zag_t<_Ty>;
-
-		constexpr auto size = sizeof(_Ty) * 8 - 1;
-
-		return static_cast<type>(value) << 1 ^ static_cast<type>(value) >> size;
-	}
-
-	template <aquarius::unsigned_numric_t _Ty>
-	aquarius::zig_zag_t<_Ty> zigzag_decode(_Ty value)
-	{
-		using type = aquarius::zig_zag_t<_Ty>;
-
-		return static_cast<type>((value >> 1) ^ (~(value & 1) + 1));
-	}
 
 } // namespace
 
@@ -46,6 +15,39 @@ namespace aquarius
 {
 	namespace impl
 	{
+		static constexpr int32_t hold_bit = 7;
+
+		template <typename _Ty, typename _Func, std::size_t... I>
+		constexpr void for_each(_Ty&& val, _Func&& func, std::index_sequence<I...>)
+		{
+			return (std::forward<_Func>(func)(aquarius::get<I>(std::forward<_Ty>(val))), ...);
+		}
+
+		template <typename _Ty, typename _Func, std::size_t N = aquarius::tuple_size_v<_Ty>,
+				  typename Indices = std::make_index_sequence<N>>
+		constexpr void for_each(_Ty&& val, _Func&& func)
+		{
+			return impl::for_each(std::forward<_Ty>(val), std::forward<_Func>(func), Indices{});
+		}
+
+		template <aquarius::signed_numric_t _Ty>
+		aquarius::zig_zag_t<_Ty> zigzag_encode(_Ty value)
+		{
+			using type = aquarius::zig_zag_t<_Ty>;
+
+			constexpr auto size = sizeof(_Ty) * 8 - 1;
+
+			return static_cast<type>(value) << 1 ^ static_cast<type>(value) >> size;
+		}
+
+		template <aquarius::unsigned_numric_t _Ty>
+		aquarius::zig_zag_t<_Ty> zigzag_decode(_Ty value)
+		{
+			using type = aquarius::zig_zag_t<_Ty>;
+
+			return static_cast<type>((value >> 1) ^ (~(value & 1) + 1));
+		}
+
 		template <typename _Archive, signed_numric_t _Ty>
 		void deserialize(_Archive& ar, _Ty& t)
 		{
@@ -127,7 +129,7 @@ namespace aquarius
 
 				using Indices = std::make_index_sequence<N>;
 
-				for_each(t, [&](auto&& v) { deserialize(ar, v); });
+				impl::for_each(t, [&](auto&& v) { deserialize(ar, v); });
 			}
 		}
 
@@ -203,7 +205,7 @@ namespace aquarius
 			}
 			else
 			{
-				for_each(std::forward<_Ty>(value), [&](auto&& v) { serialize(ar, v); });
+				impl::for_each(std::forward<_Ty>(value), [&](auto&& v) { serialize(ar, v); });
 			}
 		}
 

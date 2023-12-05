@@ -18,29 +18,15 @@ namespace aquarius
 		~basic_sql() = default;
 
 	public:
-		template <typename _Ty>
-		bool insert(_Ty&& t)
-		{
-			make_insert_sql(sql_str_, std::forward<_Ty>(t));
-
-			return execute(sql_str_);
-		}
-
-		template <typename _Ty>
-		bool replace(_Ty&& t)
-		{
-			return true;
-		}
-
 		bool execute()
 		{
 			return pool_.execute(sql_str_);
 		}
 
 		template <typename _Func>
-		auto async_excute(_Func&& f)
+		auto async_execute(_Func&& f)
 		{
-			return pool_.async_execute(basic_sql, std::forward<_Func>(f));
+			return pool_.async_execute(sql_str_, std::forward<_Func>(f));
 		}
 
 		template <typename _Ty>
@@ -55,14 +41,9 @@ namespace aquarius
 			return pool_.async_query(sql_str_, std::forward<_Func>(f));
 		}
 
-	private:
-		template <typename>
-		friend basic_sql& basic_sql::select();
-
-		template <typename _Func>
-		basic_sql& where(_Func&& f)
+		std::string sql()
 		{
-			return *this;
+			return sql_str_;
 		}
 
 	protected:
@@ -84,24 +65,47 @@ namespace aquarius
 		template <typename _Ty>
 		chain_sql& select()
 		{
-			make_select_sql<_Ty>(sql_str_);
+			make_select_sql<_Ty>(this->sql_str_);
 
 			return *this;
 		}
 
 		template <typename _Ty>
-		bool remove()
+		chain_sql& remove()
 		{
-			make_remove_sql(sql_str_);
+			make_remove_sql<_Ty>(this->sql_str_);
 
-			return execute();
+			return *this;
 		}
 
+		template <typename _Ty>
+		chain_sql& insert(_Ty&& t)
+		{
+			make_input_sql<INSERT>(this->sql_str_, std::forward<_Ty>(t));
+
+			return *this;
+		}
+
+		template<typename _Ty>
+		chain_sql& update(_Ty&& t)
+		{
+			make_update_sql(this->sql_str_, std::forward<_Ty>(t));
+
+			return *this;
+		}
+
+		template <typename _Ty>
+		chain_sql& replace(_Ty&& t)
+		{
+			make_input_sql<REPLACE>(this->sql_str_, std::forward<_Ty>(t));
+
+			return *this;
+		}
 
 		template <typename _Ty>
 		chain_sql& where(_Ty&& f)
 		{
-			sql_str_ += f.sql();
+			this->sql_str_ += f.sql();
 
 			return *this;
 		}

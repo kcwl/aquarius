@@ -9,18 +9,19 @@
 
 #pragma warning(disable : 4996)
 
-namespace
+namespace aquarius
 {
 	template <typename Tuple, typename Func, std::size_t... I>
 	constexpr auto for_each(Tuple&& tuple, Func&& f, std::index_sequence<I...>)
 	{
-		return (std::forward<Func>(f)(aquarius::get<I>(std::forward<Tuple>(tuple)), I), ...);
+		return (std::forward<Func>(f)(aquarius::get<I>(std::forward<Tuple>(tuple))), ...);
 	}
 
 	template <typename T, typename Func>
 	constexpr auto for_each(T&& tp, Func&& f)
 	{
-		return for_each(std::forward<T>(tp), std::forward<Func>(f), std::make_index_sequence<aquarius::tuple_size_v<T>>{});
+		return for_each(std::forward<T>(tp), std::forward<Func>(f),
+						std::make_index_sequence<aquarius::tuple_size_v<T>>{});
 	}
 
 	template <typename Tuple, typename Func, std::size_t... I>
@@ -36,10 +37,7 @@ namespace
 		return for_each_elem(std::forward<T>(tp), std::forward<Func>(f),
 							 std::make_index_sequence<aquarius::tuple_size_v<T>>{});
 	}
-} // namespace
 
-namespace aquarius
-{
 	template <typename T>
 	std::string to_string(T&& val)
 	{
@@ -124,12 +122,12 @@ namespace aquarius
 		return to_struct_impl<T>(row, std::make_index_sequence<tuple_size_v<T>>{});
 	}
 
-	template <const std::string_view&... strs>
+	template <const std::string_view&... args>
 	struct concat
 	{
 		constexpr static auto impl() noexcept
 		{
-			constexpr auto len = (strs.size() + ... + 0);
+			constexpr auto len = (args.size() + ... + 0);
 			std::array<char, len + 1> arr{};
 
 			auto f = [i = 0, &arr](auto const& str) mutable
@@ -140,7 +138,7 @@ namespace aquarius
 				return arr;
 			};
 
-			(f(strs), ...);
+			(f(args), ...);
 
 			arr[len] = '\0';
 
@@ -152,8 +150,8 @@ namespace aquarius
 		static constexpr std::string_view value{ arr.data(), arr.size() - 1 };
 	};
 
-	template <std::string_view const&... strs>
-	constexpr static auto concat_v = concat<strs...>::value;
+	template <std::string_view const&... args>
+	constexpr static auto concat_v = concat<args...>::value;
 
 	std::string to_uft8(const std::string& str)
 	{

@@ -194,7 +194,7 @@
     <ClInclude Include="..\include\aquarius\mysql\operator.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\sql_keyword.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
