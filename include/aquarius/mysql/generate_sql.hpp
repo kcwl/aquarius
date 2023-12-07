@@ -7,6 +7,8 @@
 
 #pragma warning(disable : 4100)
 
+using namespace std::string_view_literals;
+
 namespace aquarius
 {
 	template <std::string_view const& Keyword, typename _Ty>
@@ -43,14 +45,44 @@ namespace aquarius
 		sql += SEPARATOR;
 	}
 
+	template <typename _Ty, std::size_t... I>
+	constexpr auto get_tuple(_Ty&& tp, std::index_sequence<I...>)
+	{
+		return { (std::get<I>(tp), ...) };
+	}
+
 	template <typename _Ty>
+	constexpr auto get_tuple(_Ty&& tp)
+	{
+		return get_tuple(std::forward<_Ty>(tp), std::make_index_sequence<std::tuple_size_v<_Ty>()>{});
+	}
+
+	template <typename _From, std::string_view const&... args>
 	void make_select_sql(std::string& sql)
 	{
-		constexpr static auto table_name = name<_Ty>();
+		constexpr static auto table_name = name<_From>();
 
-		constexpr auto temp_sql = concat_v<SELECT, SPACE, ASTERISK, SPACE, FROM, SPACE, table_name, SEPARATOR>;
+		if constexpr (sizeof...(args) != 0)
+		{
+			constexpr std::string_view temp_sql =
+				concat_v<SELECT, SPACE, (concat_v<args, SPACE, COMMA>, ...), FROM, SPACE, table_name, SEPARATOR>;
 
-		sql = std::string(temp_sql.data(), temp_sql.size());
+			constexpr auto pos = temp_sql.find(FROM);
+
+			constexpr static std::string_view left = temp_sql.substr(0, pos - 1);
+
+			constexpr static std::string_view right = temp_sql.substr(pos);
+
+			constexpr auto temp_sql_s = concat_v<left, right>;
+
+			sql = std::string(temp_sql_s.data(), temp_sql_s.size());
+		}
+		else
+		{
+			constexpr auto temp_sql = concat_v<SELECT, SPACE, ASTERISK, SPACE, FROM, SPACE, table_name, SEPARATOR>;
+
+			sql = std::string(temp_sql.data(), temp_sql.size());
+		}
 	}
 
 	template <typename _Ty>

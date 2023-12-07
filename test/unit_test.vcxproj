@@ -119,6 +119,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -191,7 +192,6 @@
     <ClInclude Include="..\include\aquarius\mysql\attributes.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\operator.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\keyword.hpp" />

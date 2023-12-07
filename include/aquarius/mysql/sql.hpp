@@ -5,6 +5,8 @@
 #include <aquarius/mysql/service_pool.hpp>
 #include <vector>
 
+using namespace std::string_view_literals;
+
 namespace aquarius
 {
 	template <typename _Service>
@@ -62,10 +64,10 @@ namespace aquarius
 		{}
 
 	public:
-		template <typename _Ty>
+		template <typename _From, std::string_view const&... args>
 		chain_sql& select()
 		{
-			make_select_sql<_Ty>(this->sql_str_);
+			make_select_sql<_From, args...>(this->sql_str_);
 
 			return *this;
 		}

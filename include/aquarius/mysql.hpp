@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	template <typename _Ty, typename _Service>
+	template <typename _Ty, typename _Service, typename... _Args>
 	std::vector<_Ty> select(service_pool<_Service>& pool)
 	{
 		return chain_sql<_Service>(pool).select<_Ty>().query();

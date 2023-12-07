@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <string_view>
 #include <aquarius/mysql/keyword.hpp>
 #include <aquarius/mysql/algorithm.hpp>
 

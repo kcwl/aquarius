@@ -203,9 +203,6 @@
     <ClInclude Include="mysql_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\operator.hpp">
-      <Filter>aquarius\mysql</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\mysql\sql.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
