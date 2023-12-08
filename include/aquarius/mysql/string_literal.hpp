@@ -1,7 +1,6 @@
 #pragma once
 #include <string_view>
 
-
 namespace aquarius
 {
 	template <std::size_t N>
@@ -24,7 +23,9 @@ namespace aquarius
 	{
 		static constexpr std::string_view value = param.value;
 	};
-}
+} // namespace aquarius
+
+#define AQUARIUS_EXPAND(...) __VA_ARGS__
 
 #define AQUARIUS_CAT1(a, b) a##_##b
 #define AQUARIUS_CAT(a, b) AQUARIUS_CAT1(a, b)
@@ -36,70 +37,41 @@ namespace aquarius
 					   _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, N, ...)                                       \
 	N
 
-#define AQUARIUS_NARG_(...) AQUARIUS_ARG_N(##__VA_ARGS__)
-#define AQUARIUS_NARG(...) AQUARIUS_NARG_(__VA_ARGS__, AQUARIUS_RSEQ_N())
+#define AQUARIUS_NARG_(...) AQUARIUS_EXPAND(AQUARIUS_ARG_N(__VA_ARGS__))
+#define AQUARIUS_NARG(...) AQUARIUS_EXPAND(AQUARIUS_NARG_(__VA_ARGS__, AQUARIUS_RSEQ_N()))
 
-#define AQUARIUS_SQL_BIND_IMPL_1(element) aquarius::bind_param<#element>::value
-#define AQUARIUS_SQL_BIND_IMPL_2(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_1(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_3(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_2(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_4(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_3(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_5(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_4(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_6(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_5(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_7(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_6(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_8(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_7(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_9(element, ...)                                                                         \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_8(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_10(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_9(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_11(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_10(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_12(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_11(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_13(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_12(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_14(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_13(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_15(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_14(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_16(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_15(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_17(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_16(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_18(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_17(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_19(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_18(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_20(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_19(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_21(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_20(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_22(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_21(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_23(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_22(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_24(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_23(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_25(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_24(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_26(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_25(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_27(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_26(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_28(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_27(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_29(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_28(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_30(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_29(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_31(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_30(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND_IMPL_32(element, ...)                                                                        \
-	aquarius::bind_param<#element>::value, AQUARIUS_SQL_BIND_IMPL_31(##__VA_ARGS__)
-#define AQUARIUS_SQL_BIND(...) AQUARIUS_CAT(AQUARIUS_SQL_BIND_IMPL, AQUARIUS_NARG(##__VA_ARGS__))(##__VA_ARGS__)
+#define AQUARIUS_SQL_BIND_IMPL_1(element) #element
+#define AQUARIUS_SQL_BIND_IMPL_2(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_1(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_3(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_2(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_4(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_3(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_5(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_4(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_6(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_5(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_7(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_6(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_8(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_7(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_9(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_8(__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_10(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_9(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_11(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_10(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_12(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_11(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_13(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_12(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_14(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_13(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_15(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_14(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_16(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_15(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_17(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_16(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_18(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_17(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_19(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_18(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_20(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_19(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_21(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_20(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_22(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_21(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_23(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_22(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_24(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_23(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_25(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_24(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_26(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_25(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_27(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_26(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_28(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_27(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_29(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_28(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_30(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_29(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_31(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_30(##__VA_ARGS__))
+#define AQUARIUS_SQL_BIND_IMPL_32(element, ...) #element, AQUARIUS_EXPAND(AQUARIUS_SQL_BIND_IMPL_31(##__VA_ARGS__))
+
+#define AQUARIUS_SQL_BIND(...)                                                                                         \
+	AQUARIUS_EXPAND(AQUARIUS_CAT(AQUARIUS_SQL_BIND_IMPL, AQUARIUS_NARG(__VA_ARGS__))(__VA_ARGS__))

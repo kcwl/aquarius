@@ -64,7 +64,7 @@ namespace aquarius
 		{}
 
 	public:
-		template <typename _From, std::string_view const&... args>
+		template <typename _From, string_literal... args>
 		chain_sql& select()
 		{
 			make_select_sql<_From, args...>(this->sql_str_);
