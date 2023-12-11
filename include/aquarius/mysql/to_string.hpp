@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <string_view>
+#include <aquarius/mysql/string_literal.hpp>
 
 namespace aquarius
 {
@@ -53,9 +54,9 @@ namespace aquarius
 		template <typename _Ty, _Ty value>
 		constexpr auto to_string_view()
 		{
-			constexpr auto ste_view = std::string_view(value.data(), value.size());
+			constexpr auto str_view = std::string_view(value.data(), value.size());
 
-			return ste_view;
+			return str_view;
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include <aquarius/mysql/generate_sql.hpp>
 #include <aquarius/mysql/service_pool.hpp>
 #include <vector>
+#include <aquarius/mysql/to_string.hpp>
 
 using namespace std::string_view_literals;
 
@@ -64,14 +65,6 @@ namespace aquarius
 		{}
 
 	public:
-		template <typename _From, string_literal... args>
-		chain_sql& select()
-		{
-			make_select_sql<_From, args...>(this->sql_str_);
-
-			return *this;
-		}
-
 		template <typename _Ty>
 		chain_sql& remove()
 		{
@@ -88,7 +81,7 @@ namespace aquarius
 			return *this;
 		}
 
-		template<typename _Ty>
+		template <typename _Ty>
 		chain_sql& update(_Ty&& t)
 		{
 			make_update_sql(this->sql_str_, std::forward<_Ty>(t));
@@ -142,6 +135,86 @@ namespace aquarius
 
 			this->sql_str_ += sql;
 
+			return *this;
+		}
+	};
+
+	template <typename _Service>
+	class select_chain : public chain_sql<_Service>
+	{
+	public:
+		explicit select_chain(service_pool<_Service>& pool)
+			: chain_sql<_Service>(pool)
+		{}
+
+	public:
+		template <typename _From, string_literal... args>
+		select_chain& select()
+		{
+			make_select_sql<_From, bind_param<"">::value, bind_param<args>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template <typename _From, string_literal... args>
+		select_chain& select_distinct()
+		{
+			make_select_sql<_From, concat_v<DISTINCT,SPACE>, bind_param<args>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template <typename _From, std::size_t N, string_literal... args>
+		select_chain& select_top()
+		{
+			make_select_sql<_From, concat_v<TOP, SPACE, to_string<N>::value,SPACE>, bind_param<args>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template<std::size_t N>
+		select_chain& limit()
+		{
+			make_cat<concat_v<SPACE, LIMIT, SPACE, to_string<N>::value>>(this->sql_str_);
+
+			return *this;
+		}
+
+		template<std::size_t N>
+		select_chain& offset()
+		{
+			make_cat<concat_v<SPACE, OFFSET, SPACE, to_string<N>::value>>(this->sql_str_);
+
+			return *this;
+		}
+
+		template<string_literal... args>
+		select_chain& order_by()
+		{
+			make_cat<concat_v<SPACE, ORDER, SPACE, BY, SPACE>, bind_param<args>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template <std::size_t ... I>
+		select_chain& order_by_index()
+		{
+			make_cat<concat_v<SPACE, ORDER, SPACE, BY, SPACE>, to_string<I>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template<string_literal... args>
+		select_chain& group_by()
+		{
+			make_cat<concat_v<SPACE, GROUP, SPACE, BY,SPACE>, bind_param<args>::value...>(this->sql_str_);
+
+			return *this;
+		}
+
+		template<typename _Attr>
+		select_chain& having(_Attr&& attr)
+		{
 			return *this;
 		}
 	};

@@ -38,63 +38,63 @@ namespace aquarius
 							 std::make_index_sequence<aquarius::tuple_size_v<T>>{});
 	}
 
-	template <typename T>
-	std::string to_string(T&& val)
-	{
-		std::stringstream ss;
-		if constexpr (detail::is_string_v<std::remove_cvref_t<T>>)
-		{
-			ss << "'" << val << "'";
-		}
-		else if constexpr (detail::is_container_v<std::remove_cvref_t<T>>)
-		{
-			ss << "{";
-			std::for_each(val.begin(), val.end(),
-						  [&](auto iter)
-						  {
-							  if constexpr (detail::is_byte_v<decltype(iter)>)
-								  ss << static_cast<char>(iter) << ",";
-							  else
-							  {
-								  ss << "{";
+	//template <typename T>
+	//std::string to_string(T&& val)
+	//{
+	//	std::stringstream ss;
+	//	if constexpr (detail::is_string_v<std::remove_cvref_t<T>>)
+	//	{
+	//		ss << "'" << val << "'";
+	//	}
+	//	else if constexpr (detail::is_container_v<std::remove_cvref_t<T>>)
+	//	{
+	//		ss << "{";
+	//		std::for_each(val.begin(), val.end(),
+	//					  [&](auto iter)
+	//					  {
+	//						  if constexpr (detail::is_byte_v<decltype(iter)>)
+	//							  ss << static_cast<char>(iter) << ",";
+	//						  else
+	//						  {
+	//							  ss << "{";
 
-								  for_each(val, [&ss](const std::string& name, auto value) { ss << value << ","; });
+	//							  for_each(val, [&ss](const std::string& name, auto value) { ss << value << ","; });
 
-								  auto result = ss.str();
-								  result.erase(result.size() - 1);
-								  result.append("},");
-							  }
-						  });
+	//							  auto result = ss.str();
+	//							  result.erase(result.size() - 1);
+	//							  result.append("},");
+	//						  }
+	//					  });
 
-			auto result = ss.str();
-			result.erase(result.size() - 1);
-			result.append("}");
+	//		auto result = ss.str();
+	//		result.erase(result.size() - 1);
+	//		result.append("}");
 
-			return result;
-		}
-		else if constexpr (detail::is_byte_v<std::remove_cvref_t<T>>)
-		{
-			ss << static_cast<char>(std::forward<T>(val));
-		}
-		else if constexpr (std::is_trivial_v<std::remove_reference_t<T>>)
-		{
-			ss << val;
-		}
-		else if constexpr (detail::is_variant_v<std::remove_cvref_t<T>>)
-		{
-			// constexpr std::size_t index = std::forward<T>(val).index();
-			// ss << detail::to_string(std::get<index>(std::forward<T>(val)));
-			/*auto result = */ // for_each_variant(std::forward<T>(val),ss);
+	//		return result;
+	//	}
+	//	else if constexpr (detail::is_byte_v<std::remove_cvref_t<T>>)
+	//	{
+	//		ss << static_cast<char>(std::forward<T>(val));
+	//	}
+	//	else if constexpr (std::is_trivial_v<std::remove_reference_t<T>>)
+	//	{
+	//		ss << val;
+	//	}
+	//	else if constexpr (detail::is_variant_v<std::remove_cvref_t<T>>)
+	//	{
+	//		// constexpr std::size_t index = std::forward<T>(val).index();
+	//		// ss << detail::to_string(std::get<index>(std::forward<T>(val)));
+	//		/*auto result = */ // for_each_variant(std::forward<T>(val),ss);
 
-			/*ss << detail::to_string(std::get<decltype(result)>(std::forward<T>(val)));*/
-		}
-		else
-		{
-			ss << val;
-		}
+	//		/*ss << detail::to_string(std::get<decltype(result)>(std::forward<T>(val)));*/
+	//	}
+	//	else
+	//	{
+	//		ss << val;
+	//	}
 
-		return ss.str();
-	}
+	//	return ss.str();
+	//}
 
 	template <typename T>
 	auto cast(const char* val)
@@ -152,6 +152,12 @@ namespace aquarius
 
 	template <std::string_view const&... args>
 	constexpr static auto concat_v = concat<args...>::value;
+
+	template<bool flag, std::size_t N>
+	struct int_to_string2
+	{
+
+	};
 
 	std::string to_uft8(const std::string& str)
 	{

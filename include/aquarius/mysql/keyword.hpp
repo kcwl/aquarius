@@ -56,6 +56,22 @@ namespace aquarius
 
 	inline constexpr std::string_view COMMA = ","sv;
 
+	inline constexpr std::string_view DISTINCT = "distinct"sv;
+
+	inline constexpr std::string_view TOP = "top"sv;
+
+	inline constexpr std::string_view LIMIT = "limit"sv;
+
+	inline constexpr std::string_view OFFSET = "offset"sv;
+
+	inline constexpr std::string_view ORDER= "order"sv;
+
+	inline constexpr std::string_view BY = "by"sv;
+
+	inline constexpr std::string_view GROUP = "group"sv;
+
+	inline constexpr std::string_view HAVING = "having"sv;
+
 	template <class T>
 	struct indentify
 	{};

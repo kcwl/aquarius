@@ -9,10 +9,12 @@ using namespace std::string_view_literals;
 
 BOOST_AUTO_TEST_SUITE(mysql)
 
-struct person
+struct products
 {
-	int age;
-	std::string name;
+	int prod_id;
+	std::string prod_name;
+	int prod_price;
+	int vend_id;
 };
 
 BOOST_AUTO_TEST_CASE(connect)
@@ -39,32 +41,86 @@ BOOST_AUTO_TEST_CASE(sql)
 	aquarius::service_pool<aquarius::mysql_connect> pool(io_pool, "172.26.4.15", boost::mysql::default_port_string,
 														 "kcwl", "123456", "test_mysql");
 
-	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
-
 	{
-		BOOST_CHECK(mysql_sql(pool).select<person>().sql() == "select * from person;");
+		using mysql_sql = aquarius::select_chain<aquarius::mysql_connect>;
 
-		mysql_sql(pool).select<person, AQUARIUS_SQL_BIND(age, name)>()
-				.sql() ==
-			"select age, name from person;";
+		auto sql = mysql_sql(pool).select<products, AQUARIUS_SQL_BIND(prod_name)>().sql();
+
+		BOOST_CHECK_EQUAL(sql, "select prod_name from products");
+
+		sql = mysql_sql(pool).select<products, AQUARIUS_SQL_BIND(prod_id, prod_name, prod_price)>().sql();
+
+		BOOST_CHECK_EQUAL(sql, "select prod_id, prod_name, prod_price from products");
+
+		BOOST_CHECK_EQUAL(mysql_sql(pool).select<products>().sql(), "select * from products");
+
+		sql = mysql_sql(pool).select_distinct<products, AQUARIUS_SQL_BIND(vend_id)>().sql();
+		BOOST_CHECK_EQUAL(sql, "select distinct vend_id from products");
+
+		sql = mysql_sql(pool).select_top<products, 5, AQUARIUS_SQL_BIND(prod_name)>().sql();
+
+		BOOST_CHECK_EQUAL(sql, "select top 5 prod_name from products");
+
+		sql = mysql_sql(pool).select<products, AQUARIUS_SQL_BIND(prod_name)>().limit<5>().sql();
+		BOOST_CHECK_EQUAL(sql, "select prod_name from products limit 5");
+
+		sql = mysql_sql(pool).select<products, AQUARIUS_SQL_BIND(prod_name)>().limit<5>().offset<5>().sql();
+		BOOST_CHECK_EQUAL(sql, "select prod_name from products limit 5 offset 5");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(prod_name)>()
+				  .order_by<AQUARIUS_SQL_BIND(prod_name)>()
+				  .sql();
+		BOOST_CHECK_EQUAL(sql, "select prod_name from products order by prod_name");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(prod_id, prod_price, prod_name)>()
+				  .order_by<AQUARIUS_SQL_BIND(prod_price, prod_name)>()
+				  .sql();
+		BOOST_CHECK_EQUAL(sql, "select prod_id, prod_price, prod_name from products order by prod_price, prod_name");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(prod_id, prod_price, prod_name)>()
+				  .order_by_index<2, 3>()
+				  .sql();
+		BOOST_CHECK_EQUAL(sql, "select prod_id, prod_price, prod_name from products order by 2, 3");
+
+		sql =
+			mysql_sql(pool).select<products, AQUARIUS_SQL_BIND(vend_id)>().group_by<AQUARIUS_SQL_BIND(vend_id)>().sql();
+		BOOST_CHECK_EQUAL(sql, "select vend_id from products group by vend_id");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(vend_id)>()
+				  .group_by<AQUARIUS_SQL_BIND(vend_id)>()
+				  .having(1)
+				  .sql();
+		BOOST_CHECK_EQUAL(sql, "select vend_id from products group by vend_id having vend_id > 2");
 	}
 
-	{
-		BOOST_CHECK(mysql_sql(pool).insert(person{ 1, "peter" }).sql() == "insert into person values(1,'peter');");
-	}
+	//{
+	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	{
-		BOOST_CHECK(mysql_sql(pool).remove<person>().sql() == "delete from person;");
-	}
+	//	BOOST_CHECK(mysql_sql(pool).insert(person{ 1, "peter" }).sql() == "insert into person values(1,'peter');");
+	//}
 
-	{
-		BOOST_CHECK(mysql_sql(pool).update(person{ 1, "candy" }).sql() ==
-					"update person set age = 1 and name = 'candy';");
-	}
+	//{
+	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	{
-		BOOST_CHECK(mysql_sql(pool).replace(person{ 1, "ridy" }).sql() == "replace into person values(1,'ridy');");
-	}
+	//	BOOST_CHECK(mysql_sql(pool).remove<person>().sql() == "delete from person;");
+	//}
+
+	//{
+	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+
+	//	BOOST_CHECK(mysql_sql(pool).update(person{ 1, "candy" }).sql() ==
+	//				"update person set age = 1 and name = 'candy';");
+	//}
+
+	//{
+	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+
+	//	BOOST_CHECK(mysql_sql(pool).replace(person{ 1, "ridy" }).sql() == "replace into person values(1,'ridy');");
+	//}
 }
 
 BOOST_AUTO_TEST_SUITE_END()

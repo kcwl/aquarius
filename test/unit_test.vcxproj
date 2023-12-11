@@ -196,6 +196,7 @@
     <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\keyword.hpp" />
     <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />

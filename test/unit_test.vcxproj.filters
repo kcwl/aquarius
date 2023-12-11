@@ -212,5 +212,8 @@
     <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
