@@ -119,6 +119,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,6 +187,16 @@
     <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\router.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
@@ -198,6 +209,7 @@
     <ClInclude Include="generate.h" />
     <ClInclude Include="message_process.h" />
     <ClInclude Include="message_test.h" />
+    <ClInclude Include="mysql_test.h" />
     <ClInclude Include="server_test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
