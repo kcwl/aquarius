@@ -43,7 +43,6 @@ namespace aquarius
 			sql.pop_back();
 
 		sql += RIGHT_BRACKET;
-		sql += SEPARATOR;
 	}
 
 	template <typename _Ty, std::size_t... I>
@@ -94,8 +93,6 @@ namespace aquarius
 		constexpr auto temp_sql_prev = concat_v<REMOVE, SPACE, FROM, SPACE, table_name>;
 
 		sql += temp_sql_prev;
-
-		sql += SEPARATOR;
 	}
 
 	template <typename _Ty>
@@ -131,7 +128,6 @@ namespace aquarius
 			sql.pop_back();
 
 		sql += RIGHT_BRACKET;
-		sql += SEPARATOR;
 	}
 
 	template <const std::string_view& Keyword, std::string_view const&... args>

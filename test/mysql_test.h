@@ -115,28 +115,28 @@ BOOST_AUTO_TEST_CASE(sql)
 	{
 		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-		BOOST_CHECK(mysql_sql(pool).insert(products{ 1, "peter", 2, 3 }).sql() ==
-					"insert into products values(1,'peter',2,3)");
+		BOOST_CHECK_EQUAL(mysql_sql(pool).insert(products{ 1, "peter", 2, 3 }).sql(),
+						  "insert into products values(1,'peter',2,3)");
 	}
 
 	{
 		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-		BOOST_CHECK(mysql_sql(pool).remove<products>().sql() == "delete from products");
+		BOOST_CHECK_EQUAL(mysql_sql(pool).remove<products>().sql(), "delete from products");
 	}
 
 	{
 		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-		BOOST_CHECK(mysql_sql(pool).update(products{ 1, "candy", 3, 5 }).sql() ==
-					"update person set age = 1 and name = 'candy'");
+		BOOST_CHECK_EQUAL(mysql_sql(pool).update(products{ 1, "candy", 3, 5 }).sql(),
+						  "update person set age = 1 and name = 'candy'");
 	}
 
 	{
 		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-		BOOST_CHECK(mysql_sql(pool).replace(products{ 1, "ridy", 6, 7 }).sql() ==
-					"replace into person values(1,'ridy')");
+		BOOST_CHECK_EQUAL(mysql_sql(pool).replace(products{ 1, "ridy", 6, 7 }).sql(),
+						  "replace into products values(1,'ridy',6,7)");
 	}
 }
 
