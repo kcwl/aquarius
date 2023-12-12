@@ -47,8 +47,32 @@ namespace aquarius
 		template <typename _Ty, typename... _Args>
 		constexpr static bool is_any_of_v = std::disjunction_v<std::is_same<_Ty, _Args>...>;
 
+		//template <typename _Ty>
+		//constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[], char*>;
+
+		template<typename _Ty>
+		struct is_string : std::false_type
+		{};
+
+		template<>
+		struct is_string<std::string> : std::true_type
+		{};
+
+		template <>
+		struct is_string<const char*> : std::true_type
+		{};
+
+		template <std::size_t N>
+		struct is_string<const char(&)[N]> : std::true_type
+		{};
+
+		template <>
+		struct is_string<char*> : std::true_type
+		{};
+
 		template <typename _Ty>
-		constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[], char*>;
+		constexpr static bool is_string_v = is_string<_Ty>::value;
+
 
 		struct http
 		{};
@@ -69,10 +93,6 @@ namespace aquarius
 		{};
 
 		struct remove_mode
-		{};
-
-		template <class T>
-		struct is_string : std::false_type
 		{};
 
 		template <class T>

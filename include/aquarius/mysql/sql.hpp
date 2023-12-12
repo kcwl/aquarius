@@ -100,7 +100,7 @@ namespace aquarius
 		template <typename _Ty>
 		chain_sql& where(_Ty&& f)
 		{
-			this->sql_str_ += f.sql();
+			this->sql_str_ += " where" + f.sql();
 
 			return *this;
 		}
@@ -215,6 +215,8 @@ namespace aquarius
 		template<typename _Attr>
 		select_chain& having(_Attr&& attr)
 		{
+			this->sql_str_ += " having";
+			this->sql_str_ += attr.sql();
 			return *this;
 		}
 	};

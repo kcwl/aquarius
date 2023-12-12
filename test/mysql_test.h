@@ -92,35 +92,52 @@ BOOST_AUTO_TEST_CASE(sql)
 		sql = mysql_sql(pool)
 				  .select<products, AQUARIUS_SQL_BIND(vend_id)>()
 				  .group_by<AQUARIUS_SQL_BIND(vend_id)>()
-				  .having(1)
+				  .having(AQUARIUS_EXPR(vend_id) > 2)
 				  .sql();
 		BOOST_CHECK_EQUAL(sql, "select vend_id from products group by vend_id having vend_id > 2");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(prod_name, prod_price)>()
+				  .where(AQUARIUS_EXPR(prod_price) == 3.49)
+				  .sql();
+
+		BOOST_CHECK_EQUAL(sql, "select prod_name, prod_price from Products where prod_price = 3.49");
+
+		sql = mysql_sql(pool)
+				  .select<products, AQUARIUS_SQL_BIND(prod_name, prod_price)>()
+				  .where(AQUARIUS_EXPR(prod_name) != "3.49" | AQUARIUS_EXPR(prod_name) <= "3.91")
+				  .sql();
+
+		BOOST_CHECK_EQUAL(
+			sql, "select prod_name, prod_price from products where prod_name != '3.49' or prod_name <= '3.91'");
 	}
 
-	//{
-	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+	{
+		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	//	BOOST_CHECK(mysql_sql(pool).insert(person{ 1, "peter" }).sql() == "insert into person values(1,'peter');");
-	//}
+		BOOST_CHECK(mysql_sql(pool).insert(products{ 1, "peter", 2, 3 }).sql() ==
+					"insert into products values(1,'peter',2,3)");
+	}
 
-	//{
-	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+	{
+		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	//	BOOST_CHECK(mysql_sql(pool).remove<person>().sql() == "delete from person;");
-	//}
+		BOOST_CHECK(mysql_sql(pool).remove<products>().sql() == "delete from products");
+	}
 
-	//{
-	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+	{
+		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	//	BOOST_CHECK(mysql_sql(pool).update(person{ 1, "candy" }).sql() ==
-	//				"update person set age = 1 and name = 'candy';");
-	//}
+		BOOST_CHECK(mysql_sql(pool).update(products{ 1, "candy", 3, 5 }).sql() ==
+					"update person set age = 1 and name = 'candy'");
+	}
 
-	//{
-	//	using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
+	{
+		using mysql_sql = aquarius::chain_sql<aquarius::mysql_connect>;
 
-	//	BOOST_CHECK(mysql_sql(pool).replace(person{ 1, "ridy" }).sql() == "replace into person values(1,'ridy');");
-	//}
+		BOOST_CHECK(mysql_sql(pool).replace(products{ 1, "ridy", 6, 7 }).sql() ==
+					"replace into person values(1,'ridy')");
+	}
 }
 
 BOOST_AUTO_TEST_SUITE_END()
