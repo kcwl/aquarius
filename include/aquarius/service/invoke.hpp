@@ -13,4 +13,4 @@ namespace aquarius
 	};
 }
 
-#define AQUARIUS_SERVICE_REGIST(name, service) static service_regist<service> #service(name)
+#define AQUARIUS_SERVICE_REGIST(name, service) static aquarius::service_regist<service> srv_##service(name)
