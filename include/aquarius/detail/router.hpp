@@ -35,18 +35,19 @@ namespace aquarius
 				return iter->second(args...);
 			}
 
+		protected:
+			std::unordered_map<std::string, std::function<_R(_Args...)>> map_invokes_;
+
+			std::mutex mutex_;
+
 		private:
 			router(const router&) = delete;
 
 			router(router&&) = delete;
-
-			std::unordered_map<std::string, std::function<_R(_Args...)>> map_invokes_;
-
-			std::mutex mutex_;
 		};
 
-		template <typename _R, typename... _Args>
-		class single_router : public router<_R, _Args...>, public singleton<router<_R, _Args...>>
+		template <typename _Single, typename _R, typename... _Args>
+		class single_router : public router<_R, _Args...>, public singleton<_Single>
 		{};
 	} // namespace detail
 } // namespace aquarius
