@@ -3,6 +3,7 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <type_traits>
+#include <aquarius/service.hpp>
 
 namespace aquarius
 {
@@ -34,9 +35,11 @@ namespace aquarius
 		{
 			init_logger();
 
-			io_service_pool_.run();
-
 			XLOG(info) << "[server] " << server_name_ << " server is started!";
+
+			service_router::instance().run();
+
+			io_service_pool_.run();
 		}
 
 		void stop()
@@ -99,6 +102,8 @@ namespace aquarius
 			signals_.cancel();
 
 			close();
+
+			service_router::instance().stop();
 
 			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
 					   << ", signal: " << signal;

@@ -25,8 +25,10 @@ namespace aquarius
 				if (!service.second->enable())
 					continue;
 
-				return start_one(service.second);
+				start_one(service.second);
 			}
+
+			return true;
 		}
 
 		void stop()
