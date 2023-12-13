@@ -7,6 +7,7 @@
 #include <aquarius/server.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/elastic.hpp>
+#include <aquarius/service.hpp>
 
 namespace aquarius
 {

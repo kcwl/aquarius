@@ -190,6 +190,10 @@
     <ClInclude Include="..\include\aquarius\resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
+    <ClInclude Include="..\include\aquarius\service.hpp" />
+    <ClInclude Include="..\include\aquarius\service\invoke.hpp" />
+    <ClInclude Include="..\include\aquarius\service\service.hpp" />
+    <ClInclude Include="..\include\aquarius\service\service_router.hpp" />
     <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />

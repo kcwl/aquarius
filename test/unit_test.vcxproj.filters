@@ -31,6 +31,9 @@
     <Filter Include="aquarius\elastic">
       <UniqueIdentifier>{71b89279-e1a8-4995-81f6-90578421d12e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\service">
+      <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -178,6 +181,18 @@
     </ClInclude>
     <ClInclude Include="message_test.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\service.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\service\service.hpp">
+      <Filter>aquarius\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\service\service_router.hpp">
+      <Filter>aquarius\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\service\invoke.hpp">
+      <Filter>aquarius\service</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
