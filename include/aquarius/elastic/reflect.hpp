@@ -377,7 +377,7 @@ namespace aquarius
 	constexpr std::size_t tuple_size_v = tuple_size<std::remove_cvref_t<_Ty>>::value;
 
 	template <typename _Ty>
-	static constexpr std::string_view name()
+	constexpr auto name() -> std::string_view
 	{
 		using namespace std::string_view_literals;
 

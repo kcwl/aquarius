@@ -12,7 +12,7 @@ namespace aquarius
 		using work_ptr_t = std::shared_ptr<boost::asio::io_service::work>;
 
 	public:
-		explicit io_service_pool(std::size_t pool_size)
+		explicit io_service_pool(int pool_size)
 			: io_services_()
 			, pool_size_(pool_size)
 			, next_to_service_(0)
@@ -61,9 +61,9 @@ namespace aquarius
 	private:
 		std::vector<io_service_ptr_t> io_services_;
 
-		std::size_t pool_size_;
+		int pool_size_;
 
-		std::size_t next_to_service_;
+		int next_to_service_;
 
 		std::vector<work_ptr_t> works_;
 	};
