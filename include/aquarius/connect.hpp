@@ -173,18 +173,17 @@ namespace aquarius
 
 		void shut_down()
 		{
-			boost::system::error_code ec;
-
 			if (socket_.is_open())
 			{
+				boost::system::error_code ec;
 				socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
-				socket_.close(ec);
+				socket_.close();
 			}
 
-			connect_timer_.cancel(ec);
+			connect_timer_.cancel();
 
-			
+			boost::system::error_code ec;
 			ssl_socket_.shutdown(ec);
 		}
 

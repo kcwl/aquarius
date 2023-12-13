@@ -3,4 +3,3 @@
 #include "server_test.h"
 #include "elastic_test.h"
 #include "message_test.h"
-#include "mysql_test.h"
