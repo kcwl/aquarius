@@ -34,6 +34,9 @@
     <Filter Include="aquarius\service">
       <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\mysql">
+      <UniqueIdentifier>{a0518608-c803-4290-9f2b-dab5207810c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -182,6 +185,27 @@
     <ClInclude Include="message_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="mysql_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\aquarius\service.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
@@ -193,6 +217,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\service\invoke.hpp">
       <Filter>aquarius\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\sql.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp">
+      <Filter>aquarius\mysql</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
