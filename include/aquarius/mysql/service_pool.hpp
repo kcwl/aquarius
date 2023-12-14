@@ -46,16 +46,18 @@ namespace aquarius
 			auto conn_ptr = get_service();
 
 			if (conn_ptr == nullptr)
-				conn_ptr = std::make_shared<_Service>(pool_.get_io_service(), endpoint_, params_);
+				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
 			boost::mysql::error_code ec;
 
-			if (!conn_ptr->execute(sql))
+			if (!conn_ptr->execute(sql, ec))
 			{
 				XLOG(error) << "sql: " << sql << " execute failed! " << ec.what();
 			}
 
 			this->recycle_service(std::move(conn_ptr));
+
+			return true;
 		}
 
 		template <typename _Func>
@@ -66,10 +68,10 @@ namespace aquarius
 			if (conn_ptr == nullptr)
 				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
-			conn_ptr->async_excute(sql,
+			return conn_ptr->async_excute(sql,
 								   [&, ptr = std::move(conn_ptr), func = std::move(f)](bool value) mutable
 								   {
-									   func(value);
+									   func(std::move(value));
 
 									   this->recycle_service(std::move(ptr));
 								   });
@@ -86,12 +88,12 @@ namespace aquarius
 			boost::mysql::error_code ec;
 
 			std::vector<_Ty> result{};
-			if (!conn_ptr->query(sql, result, ec))
+			if (!conn_ptr->query<_Ty>(sql, result, ec))
 			{
 				XLOG(error) << "sql: " << sql << " query failed! " << ec.what();
 			}
 
-			this->template recycle_service(std::move(conn_ptr));
+			this->recycle_service(std::move(conn_ptr));
 
 			return result;
 		}
@@ -110,10 +112,10 @@ namespace aquarius
 			if (conn_ptr == nullptr)
 				conn_ptr = std::make_unique<_Service>(pool_.get_io_service(), endpoint_, params_);
 
-			return conn_ptr->template async_query(sql,
-												  [&, ptr = std::move(conn_ptr), func = std::move(f)](_Ty&& value)
+			return conn_ptr->template async_query<_Ty>(sql,
+												  [&, ptr = std::move(conn_ptr), func = std::move(f)](const std::vector<_Ty>& value) mutable
 												  {
-													  func(std::move(value));
+													  func(value);
 
 													  this->recycle_service(std::move(ptr));
 												  });

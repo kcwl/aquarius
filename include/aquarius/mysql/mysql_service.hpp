@@ -72,6 +72,7 @@ namespace aquarius
 		auto async_excute(std::string_view sql, _Func&& f)
 		{
 			boost::mysql::results result{};
+
 			return mysql_ptr_->async_execute(sql, result,
 											 [&](const boost::mysql::error_code& ec)
 											 {
@@ -97,10 +98,7 @@ namespace aquarius
 			if (!result.has_value())
 				return false;
 
-			for (auto& column : result)
-			{
-				t.push_back(to_struct<_Ty>(column));
-			}
+			t = make_result<_Ty>(result);
 
 			return true;
 		}
@@ -111,7 +109,7 @@ namespace aquarius
 			boost::mysql::results result{};
 
 			return mysql_ptr_->async_query(sql, result,
-										   [&](const boost::mysql::error_code& ec)
+										   [&, func = std::move(f)](const boost::mysql::error_code& ec) mutable
 										   {
 											   if (ec)
 											   {
@@ -119,7 +117,7 @@ namespace aquarius
 												   return;
 											   }
 
-											   f(make_result<_Ty>(result));
+											   func(make_result<_Ty>(result));
 										   });
 		}
 
@@ -142,26 +140,16 @@ namespace aquarius
 		}
 
 		template <typename _Ty>
-		_Ty make_result(const boost::mysql::results& result)
+		std::vector<_Ty> make_result(const boost::mysql::results& result)
 		{
-			_Ty results{};
+			std::vector<_Ty> results{};
 
 			if (!result.has_value())
 				return results;
 
-			if constexpr (detail::is_container_v<_Ty>)
+			for (auto column : result.rows())
 			{
-				for (auto& column : result)
-				{
-					results.push_back(to_struct<_Ty>(column));
-				}
-			}
-			else
-			{
-				static_assert(std::is_trivial_v<_Ty> && std::is_standard_layout_v<_Ty>, "T error!");
-
-				auto& column = result.back();
-				results = to_struct<_Ty>(column);
+				results.push_back(to_struct<_Ty>(column));
 			}
 
 			return results;

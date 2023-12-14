@@ -19,19 +19,52 @@ struct products
 
 BOOST_AUTO_TEST_CASE(connect)
 {
-	// aquarius::io_service_pool io_pool{ 5 };
+	aquarius::io_service_pool io_pool{ 5 };
 
-	// aquarius::service_pool<aquarius::mysql_connect> pool(io_pool, "172.26.4.15", boost::mysql::default_port_string,
-	//													 "kcwl", "123456", "test_mysql");
+	aquarius::service_pool<aquarius::mysql_connect> pool(io_pool, "172.26.4.15", boost::mysql::default_port_string,
+														 "kcwl", "123456", "test_mysql");
 
-	// std::thread t([&] { io_pool.run(); });
-	//
-	// std::this_thread::sleep_for(3s);
+	std::thread t([&] { io_pool.run(); });
 
-	// pool.stop();
+	std::this_thread::sleep_for(3s);
 
-	// io_pool.stop();
-	// t.join();
+	BOOST_CHECK_EQUAL(aquarius::insert(pool, products{ 1, "pro", 2, 3 }), true);
+
+	auto select_result = aquarius::select_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1);
+
+	auto& last_one = select_result.back();
+
+	BOOST_CHECK_EQUAL(last_one.prod_id, 1);
+	BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
+	BOOST_CHECK_EQUAL(last_one.prod_price, 2);
+	BOOST_CHECK_EQUAL(last_one.vend_id, 3);
+
+	BOOST_CHECK_EQUAL(aquarius::remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1), true);
+
+	std::this_thread::sleep_for(3s);
+
+	aquarius::async_insert(pool, products{ 1, "pro", 2, 3 }, [](auto&& result) { BOOST_CHECK_EQUAL(result, true); });
+
+	aquarius::async_select_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
+														[](const auto& result)
+														{
+															auto& last_one = result.back();
+
+															BOOST_CHECK_EQUAL(last_one.prod_id, 1);
+															BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
+															BOOST_CHECK_EQUAL(last_one.prod_price, 2);
+															BOOST_CHECK_EQUAL(last_one.vend_id, 3);
+														});
+
+	aquarius::async_remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
+										[](auto result) { BOOST_CHECK_EQUAL(result, true); });
+
+	std::this_thread::sleep_for(3s);
+
+	pool.stop();
+
+	io_pool.stop();
+	t.join();
 }
 
 BOOST_AUTO_TEST_CASE(sql)

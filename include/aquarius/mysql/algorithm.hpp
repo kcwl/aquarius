@@ -96,18 +96,19 @@ namespace aquarius
 	//	return ss.str();
 	//}
 
-	template <typename T>
-	auto cast(const char* val)
+	template<typename _Ty>
+	auto cast(const boost::mysql::field_view& field)
 	{
-		using type = std::remove_cvref_t<T>;
+		std::stringstream ss{};
+		ss << field;
 
-		std::stringstream ss;
-		ss << val;
+		using type = std::remove_cvref_t<_Ty>;
 
-		type t{};
-		ss >> t;
+		type result{};
 
-		return t;
+		ss >> result;
+
+		return result;
 	}
 
 	template <typename T, std::size_t... I>
@@ -159,7 +160,7 @@ namespace aquarius
 
 	};
 
-	std::string to_uft8(const std::string& str)
+	inline std::string to_uft8(const std::string& str)
 	{
 		std::vector<wchar_t> buff(str.size());
 
@@ -183,7 +184,7 @@ namespace aquarius
 		return cuft8.to_bytes(std::wstring(buff.data(), wnext));
 	}
 
-	std::string to_gbk(const std::string& str)
+	inline std::string to_gbk(const std::string& str)
 	{
 		std::vector<char> buff(str.size() * 2);
 

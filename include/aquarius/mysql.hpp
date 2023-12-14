@@ -25,7 +25,7 @@ namespace aquarius
 	template <typename _Ty, typename _Attr>
 	std::vector<_Ty> select_if(mysql_pool& pool, _Attr&& attr)
 	{
-		return select_chain(pool).select<_Ty>().where(std::forward<_Attr>(attr)).query();
+		return select_chain(pool).select<_Ty>().where(std::forward<_Attr>(attr)).query<_Ty>();
 	}
 
 	template <typename _Ty, typename _Attr, typename _Func>
@@ -34,7 +34,7 @@ namespace aquarius
 		return select_chain(pool)
 			.select<_Ty>()
 			.where(std::forward<_Attr>(attr))
-			.async_query(std::forward<_Func>(f));
+			.async_query<_Ty>(std::forward<_Func>(f));
 	}
 
 	template <typename _Ty>
