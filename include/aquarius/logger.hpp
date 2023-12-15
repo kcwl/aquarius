@@ -8,6 +8,7 @@
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/common.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace logging = boost::log;
 namespace attrs = boost::log::attributes;
