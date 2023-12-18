@@ -2,7 +2,6 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
-#include <aquarius/elastic.hpp>
 #include <cstddef>
 
 namespace aquarius
@@ -104,24 +103,30 @@ namespace aquarius
 
 		read_handle_result from_binary(flex_buffer_t& stream)
 		{
-			if (!aquarius::from_binary(*header_ptr_, stream))
-				return read_handle_result::header_error;
+			constexpr auto sz = sizeof(header_type);
 
-			if (!aquarius::from_binary(body_, stream))
-				return read_handle_result::body_error;
+			header_ptr_ = (header_type*)stream.rdata();
+
+			stream.commit(sz);
+
+			if (!body_.ParseFromArray(stream.rdata(), header_ptr_->size_))
+				return read_handle_result::unknown_error;
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_binary(flex_buffer_t& stream)
 		{
-			if (!aquarius::to_binary(*header_ptr_, stream))
+			constexpr auto size = sizeof(header_type);
+
+			if (stream.sputn((flex_buffer_t::value_type*)header_ptr_, size) != size)
 				return read_handle_result::header_error;
 
-			if (!aquarius::to_binary(body_, stream))
+			if (stream.active() < body_.ByteSizeLong())
 				return read_handle_result::body_error;
 
-			bytes_ += stream.size();
+			if (!body_.SerializeToArray(stream.wdata(), static_cast<int>(body_.ByteSizeLong())))
+				return read_handle_result::unknown_error;
 
 			return read_handle_result::ok;
 		}

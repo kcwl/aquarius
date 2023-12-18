@@ -28,9 +28,6 @@
     <Filter Include="aquarius\context">
       <UniqueIdentifier>{efd9f61a-6b90-4f5f-9a90-c0a08ab49742}</UniqueIdentifier>
     </Filter>
-    <Filter Include="aquarius\elastic">
-      <UniqueIdentifier>{71b89279-e1a8-4995-81f6-90578421d12e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="aquarius\service">
       <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
     </Filter>
@@ -40,6 +37,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -137,49 +137,7 @@
     <ClInclude Include="..\include\aquarius\context\user_context.hpp">
       <Filter>aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="generate.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\access.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\archive.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\fixed.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\flex_buffer.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\interface.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\message_lite.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\primitive.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\reflect.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\serialize.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic\type_traits.hpp">
-      <Filter>aquarius\elastic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\elastic.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\test_proto.mpr.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="server_test.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="elastic_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="message_test.h">
@@ -228,6 +186,12 @@
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\mysql\to_string.hpp">
+      <Filter>aquarius\mysql</Filter>
+    </ClInclude>
+    <ClInclude Include="test.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\mysql\reflect.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
   </ItemGroup>

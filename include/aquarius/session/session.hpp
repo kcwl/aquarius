@@ -1,6 +1,6 @@
 #pragma once
 #include <any>
-#include <aquarius/elastic/flex_buffer.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
