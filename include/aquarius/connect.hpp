@@ -154,7 +154,7 @@ namespace aquarius
 				});
 		}
 
-		template<typename _Func,>
+		template<typename _Func>
 		void async_write(flex_buffer_t&& resp_buf, _Func&& f)
 		{
 			auto self(this->shared_from_this());
