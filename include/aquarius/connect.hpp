@@ -154,7 +154,8 @@ namespace aquarius
 				});
 		}
 
-		void async_write(flex_buffer_t&& resp_buf)
+		template<typename _Func,>
+		void async_write(flex_buffer_t&& resp_buf, _Func&& f)
 		{
 			auto self(this->shared_from_this());
 
@@ -166,6 +167,8 @@ namespace aquarius
 						return;
 
 					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
+
+					std::forward<_Func>(f)();
 
 					return shut_down();
 				});

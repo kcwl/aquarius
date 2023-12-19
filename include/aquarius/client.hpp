@@ -52,14 +52,14 @@ namespace aquarius
 			conn_ptr_->shut_down();
 		}
 
-		template <typename _Request>
-		void async_write(_Request&& req)
+		template <typename _Request, typename _Func>
+		void async_write(_Request&& req, _Func&& f)
 		{
 			flex_buffer_t fs{};
 
 			req.to_binary(fs);
 
-			conn_ptr_->async_write(std::move(fs));
+			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
 		}
 
 		std::string remote_address()
