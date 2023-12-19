@@ -6,11 +6,7 @@
 #include <string>
 #include <aquarius/defines.hpp>
 #include <aquarius/event_callback.hpp>
-
-namespace aquarius
-{
-	class xmessage;
-}
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
