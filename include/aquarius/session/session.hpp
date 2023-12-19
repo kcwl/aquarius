@@ -102,7 +102,7 @@ namespace aquarius
 			if (!conn_ptr_)
 				return false;
 
-			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
+			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer), [] {});
 
 			return true;
 		}

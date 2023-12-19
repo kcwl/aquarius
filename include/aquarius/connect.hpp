@@ -161,14 +161,15 @@ namespace aquarius
 
 			socket_helper().async_write_some(
 				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-				[this, self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+											 [this, self, func = std::move(f)](const boost::system::error_code& ec,
+																	   [[maybe_unused]] std::size_t bytes_transferred)
 				{
 					if (!ec)
 						return;
 
 					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
 
-					std::forward<_Func>(f)();
+					func();
 
 					return shut_down();
 				});
