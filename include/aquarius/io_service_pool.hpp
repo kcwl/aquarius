@@ -21,7 +21,7 @@ namespace aquarius
 			if (pool_size == 0)
 				throw std::runtime_error("io_service_pool size is 0");
 
-			for (auto i = 0; i < pool_size_; ++i)
+			for (std::size_t i = 0; i < pool_size_; ++i)
 			{
 				io_service_ptr_t io_service_ptr(new boost::asio::io_service{});
 				work_ptr_t work_ptr(new boost::asio::io_service::work(*io_service_ptr));
