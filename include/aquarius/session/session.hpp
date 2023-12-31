@@ -1,12 +1,13 @@
 #pragma once
 #include <any>
+#include <aquarius/defines.hpp>
+#include <aquarius/event_callback.hpp>
 #include <aquarius/flex_buffer.hpp>
+#include <aquarius/message/message.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
-#include <aquarius/defines.hpp>
-#include <aquarius/event_callback.hpp>
-#include <aquarius/message/message.hpp>
+#include <memory>
 
 namespace aquarius
 {
@@ -24,6 +25,30 @@ namespace aquarius
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
 		virtual void close() = 0;
+
+		virtual void update_identify(std::size_t id) = 0;
+
+		virtual std::size_t identify() = 0;
+
+		virtual std::size_t conn_number() = 0;
+
+		virtual void update_conn() = 0;
+
+	public:
+		template<typename _Ty>
+		struct less;
+
+		template <>
+		struct less<std::shared_ptr<xsession>>
+		{
+			bool operator()(std::shared_ptr<xsession> left_ptr, std::shared_ptr<xsession> right_ptr)
+			{
+				if (!left_ptr || !right_ptr)
+					return false;
+
+				return left_ptr->conn_number() < right_ptr->conn_number();
+			}
+		};
 	};
 
 	template <typename _Connector>
@@ -38,6 +63,8 @@ namespace aquarius
 
 		session(std::shared_ptr<_Connector> conn_ptr)
 			: conn_ptr_(conn_ptr)
+			, identify_(-1)
+			, conn_number_()
 		{}
 
 	public:
@@ -115,7 +142,27 @@ namespace aquarius
 				conn_ptr_->shut_down();
 		}
 
-		public:
+		virtual void update_identify(std::size_t id) override
+		{
+			identify_ = id;
+		}
+
+		virtual std::size_t identify() override
+		{
+			return identify_;
+		}
+
+		virtual std::size_t conn_number() override
+		{
+			return conn_number_;
+		}
+
+		virtual void update_conn() override
+		{
+			conn_number_++;
+		}
+
+	public:
 		virtual void on_accept() final
 		{}
 
@@ -147,5 +194,9 @@ namespace aquarius
 		std::unordered_map<uint32_t, std::shared_ptr<context>> ctxs_;
 
 		std::deque<std::pair<std::shared_ptr<xmessage>, std::shared_ptr<context>>> ctx_queue_;
+
+		std::size_t identify_;
+
+		std::size_t conn_number_;
 	};
 } // namespace aquarius

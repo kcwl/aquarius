@@ -2,8 +2,8 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
-#include <type_traits>
 #include <aquarius/service.hpp>
+#include <type_traits>
 
 namespace aquarius
 {
@@ -11,12 +11,16 @@ namespace aquarius
 	class server
 	{
 	public:
+		constexpr static std::size_t IDENTIFY = _Connector::IDENTIFY;
+
+	public:
 		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, end_point_(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), end_point_)
 			, server_name_(name)
+			, is_master_(false)
 		{
 			signals_.add(SIGINT);
 			signals_.add(SIGTERM);
@@ -52,10 +56,15 @@ namespace aquarius
 			return connect_count_.load(std::memory_order_acquire);
 		}
 
+		void set_master(bool master = true)
+		{
+			is_master_ = master;
+		}
+
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
+			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), is_master_);
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& ec)
@@ -121,5 +130,7 @@ namespace aquarius
 		std::atomic_uint32_t connect_count_;
 
 		std::string server_name_;
+
+		bool is_master_;
 	};
 } // namespace aquarius

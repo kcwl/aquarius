@@ -2,6 +2,7 @@
 #include <aquarius/detail/singleton.hpp>
 #include <aquarius/session/session.hpp>
 #include <mutex>
+#include <set>
 
 namespace aquarius
 {
@@ -43,6 +44,22 @@ namespace aquarius
 			return iter->second;
 		}
 
+		template <typename _Func>
+		auto find_if(_Func&& f) -> std::vector<std::shared_ptr<xsession>>
+		{
+			std::vector<std::shared_ptr<xsession>> results{};
+
+			for (auto& ptr : sessions_)
+			{
+				if (!std::forward<_Func>(f)(ptr.second))
+					continue;
+
+				results.push_back(ptr.second);
+			}
+
+			return results;
+		}
+
 		void clear()
 		{
 			std::lock_guard lk(mutex_);
@@ -51,7 +68,7 @@ namespace aquarius
 			{
 				session.second->close();
 			}
-			
+
 			sessions_.clear();
 		}
 

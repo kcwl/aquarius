@@ -2,21 +2,23 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
+#include <aquarius/detail/random.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/session/session.hpp>
+#include <aquarius/session/session_manager.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <memory>
 #include <queue>
+#include <set>
 
 using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename _ProtoType, typename _SocketType>
-	class connect : public std::enable_shared_from_this<connect<_ProtoType, _SocketType>>
+	template <typename _ProtoType, typename _SocketType, std::size_t Identify>
+	class connect : public std::enable_shared_from_this<connect<_ProtoType, _SocketType, Identify>>
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
 
@@ -24,10 +26,13 @@ namespace aquarius
 
 		using ssl_context_t = boost::asio::ssl::context;
 
-		using this_type = connect<_ProtoType, _SocketType>;
+		using this_type = connect<_ProtoType, _SocketType, Identify>;
 
 	public:
-		explicit connect(boost::asio::io_service& io_service,
+		constexpr static std::size_t IDENTIFY = Identify;
+
+	public:
+		explicit connect(boost::asio::io_service& io_service, bool is_master,
 						 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: socket_(io_service)
 			, ssl_context_(ssl_context_t::sslv23)
@@ -38,6 +43,7 @@ namespace aquarius
 			, dura_(dura)
 			, uid_()
 			, session_ptr_(new session<this_type>())
+			, is_master_(is_master)
 		{
 			init_ssl_context();
 
@@ -141,6 +147,34 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
+					if (is_master_)
+					{
+						auto sessions =
+							find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
+
+						if (sessions.empty())
+							return;
+
+						std::sort(sessions.begin(), sessions.end(), xsession::less<std::shared_ptr<xsession>>());
+
+						auto end_pos = ((sessions.size() % 10) >> 1);
+
+						end_pos == 0 ? end_pos = sessions.size() / 10 : 0;
+
+						auto index = aquarius::random(0, end_pos);
+
+						if (index >= sessions.size())
+							index = 0;
+
+						auto session_ptr = sessions[index];
+
+						session_ptr->update_conn();
+
+						session_ptr->async_write(std::move(read_buffer_));
+
+						return;
+					}
+
 					auto result = session_ptr_->process(read_buffer_);
 
 					if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
@@ -154,15 +188,15 @@ namespace aquarius
 				});
 		}
 
-		template<typename _Func>
+		template <typename _Func>
 		void async_write(flex_buffer_t&& resp_buf, _Func&& f)
 		{
 			auto self(this->shared_from_this());
 
 			socket_helper().async_write_some(
 				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-											 [this, self, func = std::move(f)](const boost::system::error_code& ec,
-																	   [[maybe_unused]] std::size_t bytes_transferred)
+				[this, self, func = std::move(f)](const boost::system::error_code& ec,
+												  [[maybe_unused]] std::size_t bytes_transferred)
 				{
 					if (!ec)
 						return;
@@ -188,7 +222,6 @@ namespace aquarius
 
 			connect_timer_.cancel(ec);
 
-			
 			ssl_socket_.shutdown(ec);
 		}
 
@@ -342,5 +375,7 @@ namespace aquarius
 		std::size_t uid_;
 
 		std::shared_ptr<session<this_type>> session_ptr_;
+
+		bool is_master_;
 	};
 } // namespace aquarius
