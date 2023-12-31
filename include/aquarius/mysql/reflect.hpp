@@ -1,5 +1,5 @@
 #pragma once
-#include "type_traits.hpp"
+#include <aquarius/type_traits.hpp>
 
 #include <string_view>
 
@@ -68,7 +68,7 @@ namespace aquarius
 		{
 			static_assert(Start == End, "It is not a correct way with binary search!");
 
-			if constexpr (aggregate_inialize_t<_Ty, Start>)
+			if constexpr (aggregate_inialize_v<_Ty, Start>)
 			{
 				return Start;
 			}
@@ -82,7 +82,7 @@ namespace aquarius
 		constexpr std::size_t detect_fields_greey(multi_range);
 
 		template <typename _Ty, std::size_t Begin, std::size_t End>
-		requires(aggregate_inialize_t<_Ty, End>)
+		requires(aggregate_inialize_v<_Ty, End>)
 		constexpr auto detect_fields_greey(multi_range)
 		{
 			constexpr std::size_t next = End + (End - Begin + 1) / 2;

@@ -1,16 +1,12 @@
 #pragma once
 #include <any>
-#include <aquarius/elastic/flex_buffer.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
 #include <aquarius/defines.hpp>
 #include <aquarius/event_callback.hpp>
-
-namespace aquarius
-{
-	class xmessage;
-}
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
@@ -106,7 +102,7 @@ namespace aquarius
 			if (!conn_ptr_)
 				return false;
 
-			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer));
+			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer), [] {});
 
 			return true;
 		}

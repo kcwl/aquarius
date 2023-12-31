@@ -1,12 +1,13 @@
 #pragma once
 #include "../include/aquarius.hpp"
-#include "test_proto.mpr.hpp"
 
 #include <boost/test/unit_test_suite.hpp>
 
+#include "test.pb.h"
+
 BOOST_AUTO_TEST_SUITE(message_process)
-using test_request = aquarius::request<xxx::person, 1001>;
-using test_response = aquarius::response<xxx::person, 1002>;
+using test_request = aquarius::request<Person, 1001>;
+using test_response = aquarius::response<Person, 1002>;
 
 class ctx_test_server : public aquarius::xhandle<test_request, test_response>
 {
@@ -18,8 +19,8 @@ public:
 public:
 	virtual int handle() override
 	{
-		response_.body().age = 1;
-		response_.body().back_money = 2;
+		response_.body().set_age(1);
+		response_.body().set_name("hello");
 
 		send_response(1);
 
@@ -41,8 +42,8 @@ public:
 	{
 		std::cout << "test response recved!\n";
 
-		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
-		BOOST_CHECK_EQUAL(request_ptr_->body().back_money, 2u);
+		BOOST_CHECK_EQUAL(request_ptr_->body().age(), 1);
+		BOOST_CHECK_EQUAL(request_ptr_->body().name(), "hello");
 
 		return 1;
 	}
@@ -61,8 +62,8 @@ BOOST_AUTO_TEST_CASE(process)
 	std::thread tc([&] { cli.run(); });
 
 	test_request req{};
-	req.body().age = 1;
-	req.body().back_money = 2;
+	req.body().set_age(1);
+	req.body().set_name("world");
 
 	cli.async_write(std::move(req));
 

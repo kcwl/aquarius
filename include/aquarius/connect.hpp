@@ -154,18 +154,22 @@ namespace aquarius
 				});
 		}
 
-		void async_write(flex_buffer_t&& resp_buf)
+		template<typename _Func>
+		void async_write(flex_buffer_t&& resp_buf, _Func&& f)
 		{
 			auto self(this->shared_from_this());
 
 			socket_helper().async_write_some(
 				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
-				[this, self](const boost::system::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+											 [this, self, func = std::move(f)](const boost::system::error_code& ec,
+																	   [[maybe_unused]] std::size_t bytes_transferred)
 				{
 					if (!ec)
 						return;
 
 					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
+
+					func();
 
 					return shut_down();
 				});

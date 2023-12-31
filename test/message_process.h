@@ -1,12 +1,12 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 #include "../include/aquarius.hpp"
-#include "test_proto.mpr.hpp"
+#include "test.pb.h"
 
 BOOST_AUTO_TEST_SUITE(message_process)
 
-using test_request = aquarius::request<xxx::person, 1001>;
-using test_response = aquarius::response<xxx::person, 1002>;
+using test_request = aquarius::request<Personn, 1001>;
+using test_response = aquarius::response<Person, 1002>;
 
 class ctx_test_server : public aquarius::xhandle<test_request, test_response>
 {

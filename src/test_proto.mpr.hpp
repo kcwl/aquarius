@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/elastic.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 

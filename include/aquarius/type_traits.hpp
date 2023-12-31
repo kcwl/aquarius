@@ -47,14 +47,14 @@ namespace aquarius
 		template <typename _Ty, typename... _Args>
 		constexpr static bool is_any_of_v = std::disjunction_v<std::is_same<_Ty, _Args>...>;
 
-		//template <typename _Ty>
-		//constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[], char*>;
+		// template <typename _Ty>
+		// constexpr static bool is_string_v = is_any_of_v<_Ty, std::string, const char*, const char[], char*>;
 
-		template<typename _Ty>
+		template <typename _Ty>
 		struct is_string : std::false_type
 		{};
 
-		template<>
+		template <>
 		struct is_string<std::string> : std::true_type
 		{};
 
@@ -63,7 +63,7 @@ namespace aquarius
 		{};
 
 		template <std::size_t N>
-		struct is_string<const char(&)[N]> : std::true_type
+		struct is_string<const char (&)[N]> : std::true_type
 		{};
 
 		template <>
@@ -73,11 +73,10 @@ namespace aquarius
 		template <typename _Ty>
 		constexpr static bool is_string_v = is_string<_Ty>::value;
 
-
 		struct http
 		{};
 
-		template<typename _Ty>
+		template <typename _Ty>
 		concept integer_t = requires { std::is_integral_v<_Ty>; };
 
 		struct replace_mode
@@ -117,5 +116,42 @@ namespace aquarius
 		template <class T>
 		static constexpr bool is_variant_v = is_variant<T>::value;
 
+		namespace impl
+		{
+			struct any_type
+			{
+				std::size_t ignore_;
+
+				template <typename _Ty>
+				constexpr operator _Ty() const noexcept
+				{
+					return _Ty{};
+				};
+			};
+		} // namespace impl
+
+		template <typename _Ty, typename Indices, typename = void>
+		struct is_aggregate_initalize_impl : std::false_type
+		{};
+
+		template <typename _Ty, size_t... I>
+		struct is_aggregate_initalize_impl<_Ty, std::index_sequence<I...>,
+										   std::void_t<decltype(_Ty{ impl::any_type{ I }... })>> : std::true_type
+		{};
+
+		template <typename _Ty, std::size_t N>
+		struct is_aggregate_initialize : is_aggregate_initalize_impl<_Ty, std::make_index_sequence<N>>
+		{};
+
+		template<typename _Ty, std::size_t N>
+		concept aggregate_inialize_v = is_aggregate_initialize<_Ty,N>::value;
+
+		template <typename _Ty>
+		concept tuple_t = requires() { std::tuple_size<_Ty>(); };
+
+		template <typename _Ty>
+		concept class_t = std::is_class_v<std::remove_reference_t<_Ty>>;
+
 	} // namespace detail
+
 } // namespace aquarius

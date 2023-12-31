@@ -4,8 +4,8 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <aquarius/elastic.hpp>
 #include <boost/mysql.hpp>
+#include <aquarius/mysql/reflect.hpp>
 
 #pragma warning(disable : 4996)
 
