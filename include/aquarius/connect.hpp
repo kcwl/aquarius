@@ -32,7 +32,7 @@ namespace aquarius
 		constexpr static std::size_t IDENTIFY = Identify;
 
 	public:
-		explicit connect(boost::asio::io_service& io_service, bool is_master,
+		explicit connect(boost::asio::io_service& io_service, bool is_master, bool is_master_router_,
 						 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: socket_(io_service)
 			, ssl_context_(ssl_context_t::sslv23)
@@ -361,7 +361,7 @@ namespace aquarius
 
 			auto session_ptr = sessions[index];
 
-			if (session_ptr->conn_number() > count_session())
+			if (is_master_router_ && session_ptr->conn_number() > count_session())
 				return false;
 
 			return transfer_session(session_ptr->uid(), std::move(read_buffer_));
@@ -387,5 +387,7 @@ namespace aquarius
 		std::shared_ptr<session<this_type>> session_ptr_;
 
 		bool is_master_;
+
+		bool is_master_router_;
 	};
 } // namespace aquarius

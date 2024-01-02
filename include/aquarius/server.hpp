@@ -61,10 +61,15 @@ namespace aquarius
 			is_master_ = master;
 		}
 
+		void set_master_router(bool router = true)
+		{
+			is_master_router_ = router;
+		}
+
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), is_master_);
+			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), is_master_, is_master_router_);
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& ec)
@@ -132,5 +137,7 @@ namespace aquarius
 		std::string server_name_;
 
 		bool is_master_;
+
+		bool is_master_router_;
 	};
 } // namespace aquarius
