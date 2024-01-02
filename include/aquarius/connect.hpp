@@ -147,31 +147,8 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					if (is_master_)
+					if (is_master_ && transfer_slave())
 					{
-						auto sessions =
-							find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
-
-						if (sessions.empty())
-							return;
-
-						std::sort(sessions.begin(), sessions.end(), xsession::less<std::shared_ptr<xsession>>());
-
-						auto end_pos = ((sessions.size() % 10) >> 1);
-
-						end_pos == 0 ? end_pos = sessions.size() / 10 : 0;
-
-						auto index = aquarius::random(0, end_pos);
-
-						if (index >= sessions.size())
-							index = 0;
-
-						auto session_ptr = sessions[index];
-
-						session_ptr->update_conn();
-
-						session_ptr->async_write(std::move(read_buffer_));
-
 						return;
 					}
 
@@ -355,6 +332,43 @@ namespace aquarius
 			{
 				return socket_;
 			}
+		}
+
+		bool tranfer_slave()
+		{
+			auto sessions = find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
+
+			if (sessions.empty())
+				return false;
+
+			std::sort(sessions.begin(), sessions.end(),
+					  [](auto left_ptr, auto right_ptr)
+					  {
+						  if (!left_ptr || !right_ptr)
+							  return false;
+
+						  return left_ptr->conn_number() < right_ptr->conn_number();
+					  });
+
+			auto end_pos = ((sessions.size() % 10) >> 1);
+
+			end_pos == 0 ? end_pos = sessions.size() / 10 : 0;
+
+			auto index = aquarius::random(0, end_pos);
+
+			if (index >= sessions.size())
+				index = 0;
+
+			auto session_ptr = sessions[index];
+
+			if (session_ptr->conn_number() > count_session())
+				return false;
+
+			session_ptr->update_conn();
+
+			session_ptr->async_write(std::move(read_buffer_));
+
+			return true;
 		}
 
 	private:

@@ -33,22 +33,6 @@ namespace aquarius
 		virtual std::size_t conn_number() = 0;
 
 		virtual void update_conn() = 0;
-
-	public:
-		template<typename _Ty>
-		struct less;
-
-		template <>
-		struct less<std::shared_ptr<xsession>>
-		{
-			bool operator()(std::shared_ptr<xsession> left_ptr, std::shared_ptr<xsession> right_ptr)
-			{
-				if (!left_ptr || !right_ptr)
-					return false;
-
-				return left_ptr->conn_number() < right_ptr->conn_number();
-			}
-		};
 	};
 
 	template <typename _Connector>
