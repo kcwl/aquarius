@@ -334,7 +334,7 @@ namespace aquarius
 			}
 		}
 
-		bool tranfer_slave()
+		bool transfer_slave()
 		{
 			auto sessions = find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
 
@@ -364,11 +364,7 @@ namespace aquarius
 			if (session_ptr->conn_number() > count_session())
 				return false;
 
-			session_ptr->update_conn();
-
-			session_ptr->async_write(std::move(read_buffer_));
-
-			return true;
+			return transfer_session(session_ptr->uid(), std::move(read_buffer_));
 		}
 
 	private:

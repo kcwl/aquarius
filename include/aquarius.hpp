@@ -40,32 +40,6 @@ namespace aquarius
 	template <std::size_t Identify>
 	using ssl_tcp_client = client<ssl_tcp_connect<Identify>>;
 
-	inline std::shared_ptr<xsession> find_session(std::size_t id)
-	{
-		return session_manager::instance().find(id);
-	}
-
-	template <typename _Func>
-	inline auto find_session_if(_Func&& f)
-	{
-		return session_manager::instance().find_if(std::forward<_Func>(f));
-	}
-
-	inline bool erase_session(std::size_t id)
-	{
-		return session_manager::instance().erase(id);
-	}
-
-	inline std::size_t count_session()
-	{
-		return session_manager::instance().count();
-	}
-
-	inline void clear_session()
-	{
-		return session_manager::instance().clear();
-	}
-
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)
 	{

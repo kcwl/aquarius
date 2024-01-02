@@ -44,6 +44,25 @@ namespace aquarius
 			return iter->second;
 		}
 
+		bool transfer(std::size_t id, flex_buffer_t&& buffer)
+		{
+			std::lock_guard lk(mutex_);
+
+			auto iter = sessions_.find(id);
+
+			if (iter == sessions_.end())
+				return false;
+
+			if (!iter->second)
+				return false;
+			
+			iter->second->update_conn();
+
+			iter->second->async_write(std::move(buffer));
+
+			return true;
+		}
+
 		template <typename _Func>
 		auto find_if(_Func&& f) -> std::vector<std::shared_ptr<xsession>>
 		{
@@ -129,4 +148,36 @@ namespace aquarius
 
 		std::mutex mutex_;
 	};
+
+	inline std::shared_ptr<xsession> find_session(std::size_t id)
+	{
+		return session_manager::instance().find(id);
+	}
+
+	template <typename _Func>
+	inline auto find_session_if(_Func&& f)
+	{
+		return session_manager::instance().find_if(std::forward<_Func>(f));
+	}
+
+	inline bool erase_session(std::size_t id)
+	{
+		return session_manager::instance().erase(id);
+	}
+
+	inline std::size_t count_session()
+	{
+		return session_manager::instance().count();
+	}
+
+	inline void clear_session()
+	{
+		return session_manager::instance().clear();
+	}
+
+	inline bool transfer_session(std::size_t uid, flex_buffer_t&& buffer)
+	{
+		return session_manager::instance().transfer(uid, std::move(buffer));
+	}
 } // namespace aquarius
+
