@@ -166,6 +166,7 @@
     <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
     <ClInclude Include="..\include\aquarius\detail\field.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\random.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />

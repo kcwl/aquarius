@@ -194,5 +194,8 @@
     <ClInclude Include="..\include\aquarius\mysql\reflect.hpp">
       <Filter>aquarius\mysql</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\random.hpp">
+      <Filter>aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
