@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <aquarius/detail/config.hpp>
 #include <aquarius/message/invoke.hpp>
 #include <aquarius/type_traits.hpp>
 #include <aquarius/response.hpp>
@@ -16,6 +17,8 @@ namespace aquarius
 		explicit client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
 			: io_service_()
 			, endpoint_(endpoints)
+			, is_report_(false)
+			, server_port_(0)
 		{
 			do_connect(endpoint_);
 		}
@@ -79,6 +82,16 @@ namespace aquarius
 			do_connect(endpoint_);
 		}
 
+		void set_report(bool report = true)
+		{
+			is_report_ = report;
+		}
+
+		void set_server_port(int32_t port)
+		{
+			server_port_ = port;
+		}
+
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
@@ -90,6 +103,22 @@ namespace aquarius
 										   if (ec)
 											   return;
 
+										   if (!conn_ptr_)
+											   return;
+
+										   if (is_report_)
+										   {
+											   flex_buffer_t buffer{};
+											   buffer.sputn(ip_report_proto, sizeof(ip_report_proto));
+
+											   request_header header{};
+											   header.session_id_ = server_port_;
+
+											   buffer.sputn((char*)&header, sizeof(header));
+
+											   conn_ptr_->async_write(std::move(buffer), []{});
+										   }
+
 										   conn_ptr_->start();
 									   });
 		}
@@ -100,5 +129,9 @@ namespace aquarius
 		std::shared_ptr<_Connector> conn_ptr_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
+
+		bool is_report_;
+
+		int32_t server_port_;
 	};
 } // namespace aquarius

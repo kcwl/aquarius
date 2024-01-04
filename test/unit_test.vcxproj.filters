@@ -34,6 +34,9 @@
     <Filter Include="aquarius\mysql">
       <UniqueIdentifier>{a0518608-c803-4290-9f2b-dab5207810c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\config">
+      <UniqueIdentifier>{1c3b604c-085a-4af5-a289-0b5abdd2a950}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -196,6 +199,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\random.hpp">
       <Filter>aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp">
+      <Filter>aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\config\distribute_config.hpp">
+      <Filter>aquarius\config</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

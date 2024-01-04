@@ -44,23 +44,19 @@ namespace aquarius
 			return iter->second;
 		}
 
-		bool transfer(std::size_t id, flex_buffer_t&& buffer)
+		void report(std::size_t uid, int32_t port)
 		{
 			std::lock_guard lk(mutex_);
 
-			auto iter = sessions_.find(id);
+			auto iter = sessions_.find(uid);
 
 			if (iter == sessions_.end())
-				return false;
+				return;
 
 			if (!iter->second)
-				return false;
-			
-			iter->second->update_conn();
+				return;
 
-			iter->second->async_write(std::move(buffer));
-
-			return true;
+			//iter->second->set_server_port(port);
 		}
 
 		template <typename _Func>
@@ -175,9 +171,10 @@ namespace aquarius
 		return session_manager::instance().clear();
 	}
 
-	inline bool transfer_session(std::size_t uid, flex_buffer_t&& buffer)
+	inline void report_session(std::size_t uid, int32_t port)
 	{
-		return session_manager::instance().transfer(uid, std::move(buffer));
+		return session_manager::instance().report(uid, port);
 	}
+
 } // namespace aquarius
 

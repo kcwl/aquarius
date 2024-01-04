@@ -7,6 +7,7 @@
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/service.hpp>
+#include <aquarius/config/distribute_config.hpp>
 
 namespace aquarius
 {

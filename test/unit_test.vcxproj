@@ -162,7 +162,9 @@
     <ClInclude Include="..\include\aquarius\context\user_context.hpp" />
     <ClInclude Include="..\include\aquarius\defines.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp" />
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
+    <ClInclude Include="..\include\aquarius\config\distribute_config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
     <ClInclude Include="..\include\aquarius\detail\field.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />

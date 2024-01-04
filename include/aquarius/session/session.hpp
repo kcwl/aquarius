@@ -30,9 +30,7 @@ namespace aquarius
 
 		virtual std::size_t identify() = 0;
 
-		virtual std::size_t conn_number() = 0;
-
-		virtual void update_conn() = 0;
+		virtual std::string remote_address() = 0;
 	};
 
 	template <typename _Connector>
@@ -48,7 +46,6 @@ namespace aquarius
 		session(std::shared_ptr<_Connector> conn_ptr)
 			: conn_ptr_(conn_ptr)
 			, identify_(-1)
-			, conn_number_()
 		{}
 
 	public:
@@ -72,6 +69,16 @@ namespace aquarius
 
 			if (result != read_handle_result::ok)
 				return result;
+
+			if (proto == ip_back_proto)
+			{
+				return read_handle_result::reset_peer;
+			}
+
+			if (proto == ip_report_proto)
+			{
+				return read_handle_result::report;
+			}
 
 			auto request_ptr = message_invoke_helper::invoke(proto);
 
@@ -136,14 +143,12 @@ namespace aquarius
 			return identify_;
 		}
 
-		virtual std::size_t conn_number() override
+		virtual std::string remote_address() override
 		{
-			return conn_number_;
-		}
+			if (!conn_ptr_)
+				return {};
 
-		virtual void update_conn() override
-		{
-			conn_number_++;
+			return conn_ptr_->remote_address();
 		}
 
 	public:
@@ -180,7 +185,5 @@ namespace aquarius
 		std::deque<std::pair<std::shared_ptr<xmessage>, std::shared_ptr<context>>> ctx_queue_;
 
 		std::size_t identify_;
-
-		std::size_t conn_number_;
 	};
 } // namespace aquarius

@@ -4,6 +4,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/service.hpp>
 #include <type_traits>
+#include <aquarius/config/distribute_config.hpp>
 
 namespace aquarius
 {

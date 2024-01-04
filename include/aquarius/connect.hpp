@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <aquarius/defines.hpp>
+#include <aquarius/detail/config.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
 #include <aquarius/detail/random.hpp>
@@ -12,6 +13,8 @@
 #include <memory>
 #include <queue>
 #include <set>
+#include <aquarius/detail/consistent_hash.hpp>
+#include <aquarius/config/distribute_config.hpp>
 
 using namespace std::chrono_literals;
 
@@ -34,11 +37,12 @@ namespace aquarius
 	public:
 		explicit connect(boost::asio::io_service& io_service, bool is_master, bool is_master_router_,
 						 std::chrono::steady_clock::duration dura = heart_time_interval)
-			: socket_(io_service)
+			: io_service_(io_service)
+			, socket_(io_service_)
 			, ssl_context_(ssl_context_t::sslv23)
 			, ssl_socket_(socket_, ssl_context_)
 			, read_buffer_()
-			, connect_timer_(io_service)
+			, connect_timer_(io_service_)
 			, connect_time_()
 			, dura_(dura)
 			, uid_()
@@ -147,8 +151,22 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					if (is_master_ && transfer_slave())
+					std::string ip_addr{};
+					int32_t port{};
+
+					if (is_master_ && transfer_slave(ip_addr, port))
 					{
+						flex_buffer_t buffer{};
+
+						buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
+						response_header header{};
+						header.result_ = boost::asio::ip::address_v4().from_string(ip_addr).to_uint();
+						header.reserve_ = port;
+
+						buffer.sputn((uint8_t*)&header, sizeof(header));
+
+						async_write(std::move(buffer), [] {});
+
 						return;
 					}
 
@@ -159,6 +177,39 @@ namespace aquarius
 						XLOG(error) << "unknown proto at " << remote_address();
 
 						return shut_down();
+					}
+
+					if (result == read_handle_result::reset_peer)
+					{
+						response_header header{};
+						read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
+
+						boost::system::error_code ec;
+						socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+
+						boost::asio::ip::tcp::resolver resolve(io_service_);
+
+						auto endpoints = resolve.resolve(boost::asio::ip::address_v4(header.result_).to_string(), std::to_string(header.reserve_));
+
+						boost::asio::async_connect(socket_, endpoints,
+												   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+												   {
+													   if (ec)
+														   return;
+
+													   start();
+												   });
+
+						return;
+					}
+
+					if (result == read_handle_result::report)
+					{
+						request_header header{};
+
+						read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
+
+						report_session(uid_, header.session_id_);
 					}
 
 					async_read();
@@ -334,40 +385,29 @@ namespace aquarius
 			}
 		}
 
-		bool transfer_slave()
+		bool transfer_slave(std::string& ip_addr, int32_t& port)
 		{
 			auto sessions = find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
 
 			if (sessions.empty())
 				return false;
 
-			std::sort(sessions.begin(), sessions.end(),
-					  [](auto left_ptr, auto right_ptr)
-					  {
-						  if (!left_ptr || !right_ptr)
-							  return false;
+			for (auto& s : sessions)
+			{
+				hash_.add(s->remote_address());
+			}
+			
+			auto gate_ip = hash_.get(this->remote_address());
 
-						  return left_ptr->conn_number() < right_ptr->conn_number();
-					  });
+			ip_addr = gate_ip;
+			port = 12345;
 
-			auto end_pos = ((sessions.size() % 10) >> 1);
-
-			end_pos == 0 ? end_pos = sessions.size() / 10 : 0;
-
-			auto index = aquarius::random(0, end_pos);
-
-			if (index >= sessions.size())
-				index = 0;
-
-			auto session_ptr = sessions[index];
-
-			if (is_master_router_ && session_ptr->conn_number() > count_session())
-				return false;
-
-			return transfer_session(session_ptr->uid(), std::move(read_buffer_));
+			return true;
 		}
 
 	private:
+		boost::asio::io_service& io_service_;
+
 		socket_t socket_;
 
 		ssl_context_t ssl_context_;
@@ -389,5 +429,7 @@ namespace aquarius
 		bool is_master_;
 
 		bool is_master_router_;
+
+		consistent_hash hash_;
 	};
 } // namespace aquarius
