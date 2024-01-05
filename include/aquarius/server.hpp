@@ -1,10 +1,11 @@
 #pragma once
+#include <aquarius/client.hpp>
+#include <aquarius/config/distribute_config.hpp>
 #include <aquarius/defines.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/service.hpp>
 #include <type_traits>
-#include <aquarius/config/distribute_config.hpp>
 
 namespace aquarius
 {
@@ -67,54 +68,66 @@ namespace aquarius
 			is_master_router_ = router;
 		}
 
+		void set_master_address(const std::string& ip_addr, int32_t port)
+		{
+			if (is_master_)
+				return;
+
+			slave_client_ptr_.reset(
+				new client<_Connector>(io_service_pool_.get_io_service(), ip_addr, std::to_string(port)));
+
+			slave_client_ptr_->set_report();
+
+			slave_client_ptr_->set_server_port(end_point_.port());
+		}
+
 	private:
 		void start_accept()
 		{
 			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
 
-			acceptor_.async_accept(new_connect_ptr->socket(),
-								   [this, new_connect_ptr](const boost::system::error_code& ec)
-								   {
-									   if (ec)
-									   {
-										   XLOG(error) << "[acceprtor] accept error at "
-													   << end_point_.address().to_string() << ":" << ec.message();
+			acceptor_.async_accept(
+				new_connect_ptr->socket(),
+				[this, new_connect_ptr](const boost::system::error_code& ec)
+				{
+					if (ec)
+					{
+						XLOG(error) << "[acceprtor] accept error at " << end_point_.address().to_string() << ":"
+									<< ec.message();
 
-										   close();
-									   }
-									   else
-									   {
-										   std::string ip_addrs{};
-										   int32_t port{};
+						close();
+					}
+					else
+					{
+						std::string ip_addrs{};
+						int32_t port{};
 
-										   if (is_master_ && transfer_slave(new_connect_ptr->remote_address(), ip_addrs, port))
-										   {
-											   flex_buffer_t buffer{};
+						if (is_master_ && transfer_slave(new_connect_ptr->remote_address(), ip_addrs, port))
+						{
+							flex_buffer_t buffer{};
 
-											   buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
-											   response_header header{};
-											   header.result_ =
-												   boost::asio::ip::address_v4().from_string(ip_addrs).to_uint();
-											   header.reserve_ = port;
+							buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
+							response_header header{};
+							header.result_ = boost::asio::ip::address_v4().from_string(ip_addrs).to_uint();
+							header.reserve_ = port;
 
-											   buffer.sputn((uint8_t*)&header, sizeof(header));
+							buffer.sputn((uint8_t*)&header, sizeof(header));
 
-											   new_connect_ptr->async_write(std::move(buffer), [] {});
-										   }
-										   else
-										   {
-											   new_connect_ptr->start();
+							new_connect_ptr->async_write(std::move(buffer), [] {});
+						}
+						else
+						{
+							new_connect_ptr->start();
 
-											   connect_count_.exchange(connect_count_ + 1);
-										   }
+							connect_count_.exchange(connect_count_ + 1);
+						}
 
-										   start_accept();
+						start_accept();
 
-										   XLOG(info)
-											   << "[acceptor] accept connection at " << end_point_.address().to_string()
-											   << " : " << new_connect_ptr->remote_address();
-									   }
-								   });
+						XLOG(info) << "[acceptor] accept connection at " << end_point_.address().to_string() << " : "
+								   << new_connect_ptr->remote_address();
+					}
+				});
 		}
 
 		void close()
@@ -153,15 +166,27 @@ namespace aquarius
 
 			for (auto& s : sessions)
 			{
-				hash_.add(s->remote_address());
+				hash_.add(s->remote_address(), s->server_port());
 			}
 
 			auto gate_ip = hash_.get(remote_ip);
 
-			ip_addr = gate_ip;
-			port = 12345;
+			auto [ _ip_addr, _port ] = spilt_ipaddr(gate_ip);
+
+			ip_addr = _ip_addr;
+			port = _port;
 
 			return true;
+		}
+
+		auto spilt_ipaddr(const std::string& addr) ->std::pair<std::string, int32_t>
+		{
+			auto pos = addr.find_first_of(":");
+
+			if (pos == std::string::npos)
+				return { {}, {} };
+
+			return { addr.substr(0, pos), std::atoi(addr.substr(pos + 1).c_str()) };
 		}
 
 	private:
@@ -182,5 +207,7 @@ namespace aquarius
 		bool is_master_router_;
 
 		consistent_hash hash_;
+
+		std::shared_ptr<client<_Connector>> slave_client_ptr_;
 	};
 } // namespace aquarius

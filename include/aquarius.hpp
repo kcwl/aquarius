@@ -35,10 +35,9 @@ namespace aquarius
 	template <std::size_t Identify>
 	using ssl_http_server = server<ssl_http_connect<Identify>>;
 
-	using no_ssl_tcp_client = client<no_ssl_tcp_connect<0>>;
+	using no_ssl_tcp_client = alone_client<no_ssl_tcp_connect<0>>;
 
-	template <std::size_t Identify>
-	using ssl_tcp_client = client<ssl_tcp_connect<Identify>>;
+	using ssl_tcp_client = alone_client<ssl_tcp_connect<0>>;
 
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)

@@ -31,6 +31,10 @@ namespace aquarius
 		virtual std::size_t identify() = 0;
 
 		virtual std::string remote_address() = 0;
+
+		virtual void server_port(int32_t port) = 0;
+
+		virtual int32_t server_port() = 0;
 	};
 
 	template <typename _Connector>
@@ -45,7 +49,7 @@ namespace aquarius
 
 		session(std::shared_ptr<_Connector> conn_ptr)
 			: conn_ptr_(conn_ptr)
-			, identify_(-1)
+			, identify_(0)
 		{}
 
 	public:
@@ -151,6 +155,16 @@ namespace aquarius
 			return conn_ptr_->remote_address();
 		}
 
+		virtual void server_port(int32_t port) override
+		{
+			server_port_ = port;
+		}
+
+		virtual int32_t server_port() override
+		{
+			return server_port_;
+		}
+
 	public:
 		virtual void on_accept() final
 		{}
@@ -185,5 +199,7 @@ namespace aquarius
 		std::deque<std::pair<std::shared_ptr<xmessage>, std::shared_ptr<context>>> ctx_queue_;
 
 		std::size_t identify_;
+
+		int32_t server_port_;
 	};
 } // namespace aquarius

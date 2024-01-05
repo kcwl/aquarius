@@ -56,7 +56,7 @@ namespace aquarius
 			if (!iter->second)
 				return;
 
-			//iter->second->set_server_port(port);
+			iter->second->server_port(port);
 		}
 
 		template <typename _Func>

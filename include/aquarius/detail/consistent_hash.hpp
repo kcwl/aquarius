@@ -15,11 +15,13 @@ namespace aquarius
 		~consistent_hash() = default;
 
 	public:
-		void add(const std::string& ip)
+		void add(const std::string& ip,int32_t port)
 		{
-			physic_nodes_.insert(ip);
+			auto addr = std::format("{}:{}", ip, port);
 
-			virtual_impl(ip);
+			physic_nodes_.insert(addr);
+
+			virtual_impl(addr);
 		}
 
 		void erase(const std::string& ip)
