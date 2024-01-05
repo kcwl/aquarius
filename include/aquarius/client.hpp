@@ -109,12 +109,12 @@ namespace aquarius
 										   if (is_report_)
 										   {
 											   flex_buffer_t buffer{};
-											   buffer.sputn(ip_report_proto, sizeof(ip_report_proto));
+											   buffer.sputn((uint8_t*)&ip_report_proto, sizeof(ip_report_proto));
 
 											   request_header header{};
 											   header.session_id_ = server_port_;
 
-											   buffer.sputn((char*)&header, sizeof(header));
+											   buffer.sputn((uint8_t*)&header, sizeof(header));
 
 											   conn_ptr_->async_write(std::move(buffer), []{});
 										   }

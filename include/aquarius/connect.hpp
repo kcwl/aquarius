@@ -35,7 +35,7 @@ namespace aquarius
 		constexpr static std::size_t IDENTIFY = Identify;
 
 	public:
-		explicit connect(boost::asio::io_service& io_service, bool is_master, bool is_master_router_,
+		explicit connect(boost::asio::io_service& io_service, bool is_master = false, bool is_master_router_ = false,
 						 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: io_service_(io_service)
 			, socket_(io_service_)
@@ -184,8 +184,8 @@ namespace aquarius
 						response_header header{};
 						read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
 
-						boost::system::error_code ec;
-						socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+						boost::system::error_code ecc;
+						socket_.shutdown(boost::asio::socket_base::shutdown_both, ecc);
 
 						boost::asio::ip::tcp::resolver resolve(io_service_);
 

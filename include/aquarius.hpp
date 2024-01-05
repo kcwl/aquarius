@@ -35,8 +35,7 @@ namespace aquarius
 	template <std::size_t Identify>
 	using ssl_http_server = server<ssl_http_connect<Identify>>;
 
-	template <std::size_t Identify>
-	using no_ssl_tcp_client = client<no_ssl_tcp_connect<Identify>>;
+	using no_ssl_tcp_client = client<no_ssl_tcp_connect<0>>;
 
 	template <std::size_t Identify>
 	using ssl_tcp_client = client<ssl_tcp_connect<Identify>>;

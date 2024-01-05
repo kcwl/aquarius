@@ -1,9 +1,8 @@
 #pragma once
 #include <aquarius/detail/singleton.hpp>
 #include <boost/json.hpp>
-#include <fstream>
 #include <filesystem>
-
+#include <fstream>
 
 namespace aquarius
 {
@@ -57,7 +56,7 @@ namespace aquarius
 			if (!object)
 				return false;
 
-			auto& setting = object->at("Setting");
+			auto& setting = object->at("setting");
 
 			server_port_ = static_cast<int>(setting.as_object().at("port").as_int64());
 			pool_size_ = static_cast<int>(setting.as_object().at("threads").as_int64());
@@ -66,13 +65,13 @@ namespace aquarius
 
 			auto& master = object->at("master");
 			balance_ = master.as_object().at("balance").as_bool();
-			
+
 			auto& slave = object->at("slave");
 			master_addr_.ip_addr = slave.at("master").as_object().at("ip").as_string();
 			master_addr_.port = static_cast<int32_t>(slave.at("master").as_object().at("port").as_int64());
 
 			auto& router = object->at("router");
-			
+
 			for (auto& addr : router.as_array())
 			{
 				routers_.push_back({});
@@ -103,6 +102,6 @@ namespace aquarius
 	private:
 		std::string file_name_;
 	};
-}
+} // namespace aquarius
 
 #define APP_CONFIG aquarius::distribute_config::instance()
