@@ -35,8 +35,7 @@ namespace aquarius
 		constexpr static std::size_t IDENTIFY = Identify;
 
 	public:
-		explicit connect(boost::asio::io_service& io_service, bool is_master = false, bool is_master_router_ = false,
-						 std::chrono::steady_clock::duration dura = heart_time_interval)
+		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
 			: io_service_(io_service)
 			, socket_(io_service_)
 			, ssl_context_(ssl_context_t::sslv23)
@@ -47,7 +46,6 @@ namespace aquarius
 			, dura_(dura)
 			, uid_()
 			, session_ptr_(new session<this_type>())
-			, is_master_(is_master)
 		{
 			init_ssl_context();
 
@@ -151,25 +149,7 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					std::string ip_addr{};
-					int32_t port{};
-
-					if (is_master_ && transfer_slave(ip_addr, port))
-					{
-						flex_buffer_t buffer{};
-
-						buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
-						response_header header{};
-						header.result_ = boost::asio::ip::address_v4().from_string(ip_addr).to_uint();
-						header.reserve_ = port;
-
-						buffer.sputn((uint8_t*)&header, sizeof(header));
-
-						async_write(std::move(buffer), [] {});
-
-						return;
-					}
-
+					
 					auto result = session_ptr_->process(read_buffer_);
 
 					if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
@@ -385,26 +365,6 @@ namespace aquarius
 			}
 		}
 
-		bool transfer_slave(std::string& ip_addr, int32_t& port)
-		{
-			auto sessions = find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
-
-			if (sessions.empty())
-				return false;
-
-			for (auto& s : sessions)
-			{
-				hash_.add(s->remote_address());
-			}
-			
-			auto gate_ip = hash_.get(this->remote_address());
-
-			ip_addr = gate_ip;
-			port = 12345;
-
-			return true;
-		}
-
 	private:
 		boost::asio::io_service& io_service_;
 
@@ -425,11 +385,5 @@ namespace aquarius
 		std::size_t uid_;
 
 		std::shared_ptr<session<this_type>> session_ptr_;
-
-		bool is_master_;
-
-		bool is_master_router_;
-
-		consistent_hash hash_;
 	};
 } // namespace aquarius

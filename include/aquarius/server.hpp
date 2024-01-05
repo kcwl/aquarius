@@ -70,7 +70,7 @@ namespace aquarius
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), is_master_, is_master_router_);
+			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& ec)
@@ -84,9 +84,29 @@ namespace aquarius
 									   }
 									   else
 									   {
-										   new_connect_ptr->start();
+										   std::string ip_addrs{};
+										   int32_t port{};
 
-										   connect_count_.exchange(connect_count_ + 1);
+										   if (is_master_ && transfer_slave(new_connect_ptr->remote_address(), ip_addrs, port))
+										   {
+											   flex_buffer_t buffer{};
+
+											   buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
+											   response_header header{};
+											   header.result_ =
+												   boost::asio::ip::address_v4().from_string(ip_addrs).to_uint();
+											   header.reserve_ = port;
+
+											   buffer.sputn((uint8_t*)&header, sizeof(header));
+
+											   new_connect_ptr->async_write(std::move(buffer), [] {});
+										   }
+										   else
+										   {
+											   new_connect_ptr->start();
+
+											   connect_count_.exchange(connect_count_ + 1);
+										   }
 
 										   start_accept();
 
@@ -124,6 +144,26 @@ namespace aquarius
 					   << ", signal: " << signal;
 		}
 
+		bool transfer_slave(const std::string& remote_ip, std::string& ip_addr, int32_t& port)
+		{
+			auto sessions = find_session_if([](std::shared_ptr<xsession> ptr) { return ptr->identify() == IDENTIFY; });
+
+			if (sessions.empty())
+				return false;
+
+			for (auto& s : sessions)
+			{
+				hash_.add(s->remote_address());
+			}
+
+			auto gate_ip = hash_.get(remote_ip);
+
+			ip_addr = gate_ip;
+			port = 12345;
+
+			return true;
+		}
+
 	private:
 		io_service_pool io_service_pool_;
 
@@ -140,5 +180,7 @@ namespace aquarius
 		bool is_master_;
 
 		bool is_master_router_;
+
+		consistent_hash hash_;
 	};
 } // namespace aquarius
