@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include <aquarius/config/distribute_config.hpp>
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/config.hpp>
+#include <aquarius/detail/consistent_hash.hpp>
 #include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/detail/noncopyable.hpp>
 #include <aquarius/detail/random.hpp>
@@ -13,15 +15,13 @@
 #include <memory>
 #include <queue>
 #include <set>
-#include <aquarius/detail/consistent_hash.hpp>
-#include <aquarius/config/distribute_config.hpp>
 
 using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename _ProtoType, typename _SocketType, std::size_t Identify>
-	class connect : public std::enable_shared_from_this<connect<_ProtoType, _SocketType, Identify>>
+	template <typename _ProtoType, typename _SocketType>
+	class connect : public std::enable_shared_from_this<connect<_ProtoType, _SocketType>>
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
 
@@ -29,18 +29,15 @@ namespace aquarius
 
 		using ssl_context_t = boost::asio::ssl::context;
 
-		using this_type = connect<_ProtoType, _SocketType, Identify>;
+		using this_type = connect<_ProtoType, _SocketType>;
 
 	public:
-		constexpr static std::size_t IDENTIFY = Identify;
-
-	public:
-		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura = heart_time_interval)
-			: io_service_(io_service)
+		explicit connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura)
+			: read_buffer_()
+			, io_service_(io_service)
 			, socket_(io_service_)
 			, ssl_context_(ssl_context_t::sslv23)
 			, ssl_socket_(socket_, ssl_context_)
-			, read_buffer_()
 			, connect_timer_(io_service_)
 			, connect_time_()
 			, dura_(dura)
@@ -149,7 +146,6 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					
 					auto result = session_ptr_->process(read_buffer_);
 
 					if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
@@ -159,38 +155,8 @@ namespace aquarius
 						return shut_down();
 					}
 
-					if (result == read_handle_result::reset_peer)
-					{
-						response_header header{};
-						read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
-
-						boost::system::error_code ecc;
-						socket_.shutdown(boost::asio::socket_base::shutdown_both, ecc);
-
-						boost::asio::ip::tcp::resolver resolve(io_service_);
-
-						auto endpoints = resolve.resolve(boost::asio::ip::address_v4(header.result_).to_string(), std::to_string(header.reserve_));
-
-						boost::asio::async_connect(socket_, endpoints,
-												   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
-												   {
-													   if (ec)
-														   return;
-
-													   start();
-												   });
-
+					if (!on_read(result))
 						return;
-					}
-
-					if (result == read_handle_result::report)
-					{
-						request_header header{};
-
-						read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
-
-						report_session(uid_, header.session_id_);
-					}
 
 					async_read();
 				});
@@ -207,11 +173,13 @@ namespace aquarius
 												  [[maybe_unused]] std::size_t bytes_transferred)
 				{
 					if (!ec)
+					{
+						func();
+
 						return;
+					}
 
 					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
-
-					func();
 
 					return shut_down();
 				});
@@ -253,6 +221,8 @@ namespace aquarius
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::send_buffer_size(value), ec);
+
+			XLOG(info) << "set sndbuf size :" << value;
 		}
 
 		int get_sndbuf_size() noexcept
@@ -270,6 +240,8 @@ namespace aquarius
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::receive_buffer_size(value), ec);
+
+			XLOG(info) << "set rcvbuf size :" << value;
 		}
 
 		int get_rcvbuf_size() noexcept
@@ -288,25 +260,36 @@ namespace aquarius
 			boost::system::error_code ec;
 
 			socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
+
+			XLOG(info) << "set keep alive :" << value;
 		}
 
 		void set_nodelay(bool enable)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+
+			XLOG(info) << "set nodelay :" << enable;
 		}
 
 		void reuse_address(bool value)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
+
+			XLOG(info) << "reuse address :" << value;
 		}
 
 		void set_linger(bool enable, int timeout)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
+
+			XLOG(info) << "set linger :" << enable << ",timeout:" << timeout;
 		}
+
+	public:
+		virtual bool on_read(read_handle_result) = 0;
 
 	private:
 		void init_ssl_context()
@@ -365,6 +348,9 @@ namespace aquarius
 			}
 		}
 
+	protected:
+		flex_buffer_t read_buffer_;
+
 	private:
 		boost::asio::io_service& io_service_;
 
@@ -373,8 +359,6 @@ namespace aquarius
 		ssl_context_t ssl_context_;
 
 		ssl_socket_t ssl_socket_;
-
-		flex_buffer_t read_buffer_;
 
 		detail::steady_timer connect_timer_;
 
@@ -386,4 +370,72 @@ namespace aquarius
 
 		std::shared_ptr<session<this_type>> session_ptr_;
 	};
+
+	template <typename _ProtoType, typename _SocketType, std::size_t Identify>
+	class server_connect : public connect<_ProtoType, _SocketType>
+	{
+	public:
+		constexpr static std::size_t IDENTIFY = Identify;
+
+	public:
+		server_connect(boost::asio::io_service& io_service,
+					   std::chrono::steady_clock::duration dura = heart_time_interval)
+			: connect<_ProtoType, _SocketType>(io_service, dura)
+		{}
+
+	public:
+		virtual bool on_read(read_handle_result result) override
+		{
+			if (result != read_handle_result::report)
+				return true;
+
+			request_header header{};
+
+			this->read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
+
+			report_session(this->uuid(), header.session_id_);
+
+			return true;
+		}
+	};
+
+	template <typename _ProtoType, typename _SocketType>
+	class client_connect : public connect<_ProtoType, _SocketType>
+	{
+	public:
+		client_connect(boost::asio::io_service& io_service,
+					   std::chrono::steady_clock::duration dura = heart_time_interval)
+			: connect<_ProtoType, _SocketType>(io_service, dura)
+		{}
+
+	public:
+		virtual bool on_read(read_handle_result result) override
+		{
+			if (result != read_handle_result::reset_peer)
+				return true;
+
+			response_header header{};
+			this->read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
+
+			boost::system::error_code ec;
+			this->socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+
+			boost::asio::ip::tcp::resolver resolve(this->io_service_);
+
+			auto endpoints = resolve.resolve(boost::asio::ip::address_v4(header.result_).to_string(),
+											 std::to_string(header.reserve_));
+
+			boost::asio::async_connect(this->socket_, endpoints,
+									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   {
+										   if (ec)
+											   return;
+
+										   this->start();
+									   });
+
+			return false;
+		}
+	};
+
 } // namespace aquarius
