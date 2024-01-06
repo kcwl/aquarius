@@ -3,6 +3,7 @@
 #include <aquarius/session/session.hpp>
 #include <mutex>
 #include <set>
+#include <aquarius/detail/consistent_hash.hpp>
 
 namespace aquarius
 {
@@ -57,6 +58,25 @@ namespace aquarius
 				return;
 
 			iter->second->server_port(port);
+
+			slave_sessions_.push_back(iter->second);
+		}
+
+		bool slave(const std::string& remote_ip, std::string& slave)
+		{
+			std::lock_guard lk(mutex_);
+
+			for (auto& s : slave_sessions_)
+			{
+				if (!s)
+					continue;
+
+				hash_.add(s->remote_address(), s->server_port());
+			}
+
+			slave = hash_.get(remote_ip);
+
+			return !slave.empty();
 		}
 
 		template <typename _Func>
@@ -143,6 +163,12 @@ namespace aquarius
 		std::unordered_map<std::size_t, std::shared_ptr<xsession>> sessions_;
 
 		std::mutex mutex_;
+
+		std::vector<std::shared_ptr<xsession>> slave_sessions_;
+
+		std::mutex slave_mutex_;
+
+		consistent_hash hash_;
 	};
 
 	inline std::shared_ptr<xsession> find_session(std::size_t id)
@@ -173,8 +199,12 @@ namespace aquarius
 
 	inline void report_session(std::size_t uid, int32_t port)
 	{
-		return session_manager::instance().report(uid, port);
+		session_manager::instance().report(uid, port);
+	}
+
+	inline bool slave_session(const std::string& condition, std::string& slave)
+	{
+		return session_manager::instance().slave(condition, slave);
 	}
 
 } // namespace aquarius
-
