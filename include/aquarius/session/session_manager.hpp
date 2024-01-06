@@ -202,9 +202,14 @@ namespace aquarius
 		session_manager::instance().report(uid, port);
 	}
 
-	inline bool slave_session(const std::string& condition, std::string& slave)
+	inline bool slave_session(const std::string& condition, const std::string& cur_ip, int32_t cur_port, std::string& slave)
 	{
-		return session_manager::instance().slave(condition, slave);
+		if(!session_manager::instance().slave(condition, slave))
+			return false;
+
+		auto cur_addrs = std::format("{}:{}", cur_ip, cur_port);
+
+		return cur_addrs != slave;
 	}
 
 } // namespace aquarius

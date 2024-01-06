@@ -90,10 +90,14 @@ namespace aquarius
 					{
 						std::string ip_addrs{};
 
-						if (slave_session(new_connect_ptr->remote_address(), ip_addrs))
+						if (slave_session(new_connect_ptr->remote_address(),
+										  acceptor_.local_endpoint().address().to_string(),
+										  acceptor_.local_endpoint().port(),
+										  ip_addrs))
 						{
 							auto [_ip_addr, _port] = spilt_ipaddr(ip_addrs);
 
+							;
 							
 							flex_buffer_t buffer{};
 
