@@ -45,7 +45,7 @@ namespace aquarius
 			}
 		}
 
-		bool restart_one(const std::string& key)
+		bool restart_one(std::size_t key)
 		{
 			auto iter = services_.find(key);
 
@@ -55,7 +55,7 @@ namespace aquarius
 			return start_one(iter->second);
 		}
 
-		bool stop_one(const std::string& key)
+		bool stop_one(std::size_t key)
 		{
 			auto iter = services_.find(key);
 
@@ -89,6 +89,6 @@ namespace aquarius
 		}
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<service>> services_;
+		std::unordered_map<std::size_t, std::shared_ptr<service>> services_;
 	};
 } // namespace aquarius

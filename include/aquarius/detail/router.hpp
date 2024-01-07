@@ -16,14 +16,14 @@ namespace aquarius
 			router() = default;
 
 		public:
-			void regist(const std::string& key, std::function<_R(_Args...)>&& func)
+			void regist(std::size_t key, std::function<_R(_Args...)>&& func)
 			{
 				std::lock_guard lk(mutex_);
 
 				map_invokes_.insert({ key, std::forward<std::function<_R(_Args...)>>(func) });
 			}
 
-			_R invoke(const std::string& key, _Args&... args)
+			_R invoke(std::size_t key, _Args&... args)
 			{
 				std::lock_guard lk(mutex_);
 

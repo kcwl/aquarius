@@ -11,9 +11,7 @@ namespace aquarius
 	{
 		ctx_regist(const std::size_t& key)
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
-
-			ctx_router::instance().regist(_key, []()
+			ctx_router::instance().regist(key, []()
 										  { return std::dynamic_pointer_cast<context>(std::make_shared<_Context>()); });
 		}
 	};
@@ -23,9 +21,7 @@ namespace aquarius
 		template <typename... _Args>
 		static auto invoke(uint32_t key, _Args&... args)
 		{
-			std::string _key = "aquarius_" + std::to_string(key);
-
-			return ctx_router::instance().invoke(_key, args...);
+			return ctx_router::instance().invoke(key, args...);
 		}
 	};
 
