@@ -212,4 +212,14 @@ namespace aquarius
 		return cur_addrs != slave;
 	}
 
+	inline void send_session(std::size_t uid, flex_buffer_t& buffer)
+	{
+		auto session_ptr = find_session(uid);
+
+		if (!session_ptr)
+			return;
+
+		session_ptr->async_write(std::move(buffer));
+	}
+
 } // namespace aquarius
