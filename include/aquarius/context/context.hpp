@@ -27,7 +27,11 @@ namespace aquarius
 
 			return 0;
 		}
-			
+		
+		virtual int visit(flex_buffer_t& buffer)
+		{
+			return 0;
+		}
 
 	protected:
 		std::string name_;

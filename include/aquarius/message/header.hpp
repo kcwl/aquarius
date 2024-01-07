@@ -18,6 +18,7 @@ namespace aquarius
 			size_ = header.size_;
 		}
 
+		uint32_t proxy_proto_;
 		int32_t total_seq_;
 		int32_t sequences_;
 		uint32_t reserve_;

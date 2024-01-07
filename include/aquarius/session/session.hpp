@@ -8,6 +8,7 @@
 #include <deque>
 #include <string>
 #include <memory>
+#include <aquarius/context/context.hpp>
 
 namespace aquarius
 {
@@ -87,7 +88,10 @@ namespace aquarius
 			auto request_ptr = message_invoke_helper::invoke(proto);
 
 			if (!request_ptr)
-				return read_handle_result::unknown_proto;
+			{
+				if(resolver<tcp>::template from_binay(buffer, proto) != read_handle_result::ok)
+					return read_handle_result::unknown_proto;
+			}
 
 			std::shared_ptr<context> context_ptr;
 
@@ -104,6 +108,13 @@ namespace aquarius
 
 			if (!context_ptr)
 				return read_handle_result::unknown_ctx;
+
+			if (!request_ptr)
+			{
+				buffer.consume(-(int)(sizeof(uint32_t) * 3));
+
+				return static_cast<read_handle_result>(context_ptr->visit(buffer));
+			}
 
 			result = request_ptr->accept(buffer, context_ptr, this->shared_from_this());
 
