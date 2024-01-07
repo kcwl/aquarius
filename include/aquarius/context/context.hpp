@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/session/session_manager.hpp>
 #include <aquarius/event_callback.hpp>
+#include <aquarius/session/session_manager.hpp>
 
 namespace aquarius
 {
@@ -27,11 +27,24 @@ namespace aquarius
 
 			return 0;
 		}
-		
+
 		virtual int visit(flex_buffer_t& buffer)
 		{
 			return 0;
 		}
+
+	public:
+		virtual void on_accept() override
+		{}
+
+		virtual void on_close() override
+		{}
+
+		virtual void on_connect() override
+		{}
+
+		virtual void on_timeout() override
+		{}
 
 	protected:
 		std::string name_;
