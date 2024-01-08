@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/context/context.hpp>
+#include <aquarius/session/session_manager.hpp>
 
 namespace aquarius
 {

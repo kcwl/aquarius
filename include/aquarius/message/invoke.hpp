@@ -49,6 +49,8 @@ namespace aquarius
 		std::vector<std::size_t> result{};
 
 		msg_router::instance().count_ids(result);
+
+		return result;
 	}
 
 } // namespace aquarius

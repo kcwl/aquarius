@@ -8,6 +8,7 @@
 #include <deque>
 #include <string>
 #include <memory>
+#include <aquarius/detail/config.hpp>
 #include <aquarius/context/context.hpp>
 
 namespace aquarius

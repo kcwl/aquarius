@@ -185,6 +185,26 @@ namespace aquarius
 				});
 		}
 
+		void change_connect(const std::string& ip_addr, int32_t port)
+		{
+			boost::system::error_code ec;
+			this->socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+
+			boost::asio::ip::tcp::resolver resolve(this->io_service_);
+
+			auto endpoints = resolve.resolve(ip_addr,
+											 std::to_string(port));
+
+			boost::asio::async_connect(this->socket_, endpoints,
+									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   {
+										   if (ec)
+											   return;
+
+										   this->start();
+									   });
+		}
+
 		void shut_down()
 		{
 			boost::system::error_code ec;
@@ -417,22 +437,7 @@ namespace aquarius
 			response_header header{};
 			this->read_buffer_.sgetn((uint8_t*)&header, sizeof(header));
 
-			boost::system::error_code ec;
-			this->socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
-
-			boost::asio::ip::tcp::resolver resolve(this->io_service_);
-
-			auto endpoints = resolve.resolve(boost::asio::ip::address_v4(header.result_).to_string(),
-											 std::to_string(header.reserve_));
-
-			boost::asio::async_connect(this->socket_, endpoints,
-									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
-									   {
-										   if (ec)
-											   return;
-
-										   this->start();
-									   });
+			this->change_connect(boost::asio::ip::address_v4(header.result_).to_string(), header.reserve_);
 
 			return false;
 		}

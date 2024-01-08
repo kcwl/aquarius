@@ -1,6 +1,8 @@
 #pragma once
 #include <aquarius/event_callback.hpp>
-#include <aquarius/session/session_manager.hpp>
+#include <aquarius/detail/visitor.hpp>
+#include <chrono>
+#include <aquarius/logger.hpp>
 
 namespace aquarius
 {
@@ -28,7 +30,7 @@ namespace aquarius
 			return 0;
 		}
 
-		virtual int visit(flex_buffer_t& buffer)
+		virtual int visit(flex_buffer_t&)
 		{
 			return 0;
 		}
