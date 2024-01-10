@@ -15,13 +15,14 @@ namespace aquarius
 		constexpr static std::size_t IDENTIFY = _Connector::IDENTIFY;
 
 	public:
-		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
+		explicit server(int32_t port, int io_service_pool_size, int32_t slave_port = 0, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, endpoint_(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, server_name_(name)
 			, is_master_(false)
+			, slave_port_(slave_port)
 		{
 			signals_.add(SIGINT);
 			signals_.add(SIGTERM);
@@ -92,13 +93,12 @@ namespace aquarius
 
 						if (slave_session(new_connect_ptr->remote_address(),
 										  acceptor_.local_endpoint().address().to_string(),
-										  acceptor_.local_endpoint().port(),
-										  ip_addrs))
+										  acceptor_.local_endpoint().port(), ip_addrs))
 						{
 							auto [_ip_addr, _port] = spilt_ipaddr(ip_addrs);
 
 							;
-							
+
 							flex_buffer_t buffer{};
 
 							buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
@@ -118,13 +118,40 @@ namespace aquarius
 						{
 							new_connect_ptr->start();
 
-							XLOG(info) << "[acceptor] accept connection at " << endpoint_.address().to_string()
-									   << " : " << new_connect_ptr->remote_address();
+							XLOG(info) << "[acceptor] accept connection at " << endpoint_.address().to_string() << " : "
+									   << new_connect_ptr->remote_address();
 						}
 
 						start_accept();
 					}
 				});
+
+			if (slave_port_ == 0)
+				return;
+
+			slave_acceptor_ptr_.reset(new boost::asio::ip::tcp::acceptor(
+				io_service_pool_.get_io_service(),
+				boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(slave_port_))));
+
+			auto slave_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
+
+			slave_acceptor_ptr_->async_accept(slave_connect_ptr->socket(),
+										 [this, slave_connect_ptr](const boost::system::error_code& ec)
+										 {
+											 if (ec)
+											 {
+												 XLOG(error) << "[acceprtor] accept error at "
+															 << endpoint_.address().to_string() << ":" << ec.message();
+
+												 close();
+
+												 return;
+											 }
+
+											 slave_connect_ptr->start();
+
+											 start_accept();
+										 });
 		}
 
 		void close()
@@ -173,10 +200,14 @@ namespace aquarius
 
 		boost::asio::ip::tcp::acceptor acceptor_;
 
+		std::shared_ptr<boost::asio::ip::tcp::acceptor> slave_acceptor_ptr_;
+
 		std::string server_name_;
 
 		bool is_master_;
 
 		std::shared_ptr<client<_Connector>> slave_client_ptr_;
+
+		int32_t slave_port_;
 	};
 } // namespace aquarius
