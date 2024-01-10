@@ -76,10 +76,10 @@ namespace aquarius
 			if (!ptr)
 				return false;
 
-			if (!ptr->init())
+			if (!ptr->config())
 				return false;
 
-			if (!ptr->config())
+			if (!ptr->init())
 				return false;
 
 			if (!ptr->run())
