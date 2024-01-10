@@ -90,7 +90,7 @@ namespace aquarius
 
 			if (!request_ptr)
 			{
-				if(resolver<tcp>::template from_binay(buffer, proto) != read_handle_result::ok)
+				if (buffer.sgetn((uint8_t*)&proto, sizeof(proto)) != sizeof(proto))
 					return read_handle_result::unknown_proto;
 			}
 
