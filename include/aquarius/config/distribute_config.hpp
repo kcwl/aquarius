@@ -59,6 +59,7 @@ namespace aquarius
 			auto& setting = object->at("setting");
 
 			server_port_ = static_cast<int>(setting.as_object().at("port").as_int64());
+			slave_port_ = static_cast<int>(setting.as_object().at("slave_port").as_int64());
 			pool_size_ = static_cast<int>(setting.as_object().at("threads").as_int64());
 			master_ = setting.as_object().at("master").as_bool();
 			router_ = setting.as_object().at("router").as_bool();
@@ -86,6 +87,8 @@ namespace aquarius
 
 	public:
 		int server_port_;
+
+		int slave_port_;
 
 		int pool_size_;
 
