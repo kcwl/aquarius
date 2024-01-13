@@ -146,17 +146,20 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					auto result = session_ptr_->process(read_buffer_);
-
-					if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
+					if (!on_resolve(read_buffer_))
 					{
-						XLOG(error) << "unknown proto at " << remote_address();
+						auto result = session_ptr_->process(read_buffer_);
 
-						return shut_down();
+						if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
+						{
+							XLOG(error) << "unknown proto at " << remote_address();
+
+							return shut_down();
+						}
+
+						if (!on_read(result))
+							return;
 					}
-
-					if (!on_read(result))
-						return;
 
 					async_read();
 				});
@@ -183,6 +186,14 @@ namespace aquarius
 
 					return shut_down();
 				});
+		}
+
+		template<typename _Func>
+		void async_write(std::size_t uid, flex_buffer_t&& resp_buf, _Func&& f)
+		{
+			funcs_.insert({ uid,std::forward<_Func>(f) });
+
+			async_write(std::move(resp_buf), [] {});
 		}
 
 		void change_connect(const std::string& ip_addr, int32_t port)
@@ -235,6 +246,18 @@ namespace aquarius
 		auto get_connect_time()
 		{
 			return connect_time_;
+		}
+
+		bool func_invoke(std::size_t uid, flex_buffer_t& buffer)
+		{
+			auto iter = funcs_.find(uid);
+
+			if (iter == funcs_.end())
+				return false;
+
+			iter->second(buffer);
+
+			return true;
 		}
 
 		void set_sndbuf_size(int value) noexcept
@@ -310,6 +333,8 @@ namespace aquarius
 
 	public:
 		virtual bool on_read(read_handle_result) = 0;
+
+		virtual bool on_resolve(flex_buffer_t& buffer) = 0;
 
 	private:
 		void init_ssl_context()
@@ -389,6 +414,8 @@ namespace aquarius
 		std::size_t uid_;
 
 		std::shared_ptr<session<this_type>> session_ptr_;
+
+		std::map<std::size_t, std::function<void(aquarius::flex_buffer_t&)>> funcs_;
 	};
 
 	template <typename _ProtoType, typename _SocketType, std::size_t Identify>
@@ -417,6 +444,11 @@ namespace aquarius
 
 			return true;
 		}
+
+		virtual bool on_resolve(flex_buffer_t&) override
+		{
+			return false;
+		}
 	};
 
 	template <typename _ProtoType, typename _SocketType>
@@ -440,6 +472,19 @@ namespace aquarius
 			this->change_connect(boost::asio::ip::address_v4(header.result_).to_string(), header.reserve_);
 
 			return false;
+		}
+
+		virtual bool on_resolve(flex_buffer_t& buffer) override
+		{
+			buffer.consume(sizeof(uint32_t) * 3);
+
+			uint32_t uid{};
+
+			buffer.sgetn((uint8_t*)&uid, sizeof(uint32_t));
+
+			buffer.consume(-((int)sizeof(uint32_t) * 4));
+
+			return this->func_invoke(uid, buffer);
 		}
 	};
 

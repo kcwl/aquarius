@@ -19,6 +19,7 @@ namespace aquarius
 		}
 
 		uint32_t proxy_proto_;
+		uint32_t uid_;
 		int32_t total_seq_;
 		int32_t sequences_;
 		uint32_t reserve_;
@@ -27,7 +28,6 @@ namespace aquarius
 
 	struct request_header : command_header
 	{
-		uint32_t uid_;
 		uint32_t session_id_;
 	};
 

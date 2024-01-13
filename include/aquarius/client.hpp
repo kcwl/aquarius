@@ -42,7 +42,23 @@ namespace aquarius
 
 			req.to_binary(fs);
 
-			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
+			async_write(std::move(fs), [] {});
+		}
+
+		template<typename _Func>
+		void async_write(flex_buffer_t&& buffer, _Func&& f)
+		{
+			conn_ptr_->async_write(std::move(buffer), std::forward<_Func>(f));
+		}
+
+		template<typename _Request, typename _Func>
+		void async_write(std::size_t uid, _Request&& req, _Func&& f)
+		{
+			flex_buffer_t fs{};
+
+			req.to_binary(fs);
+
+			conn_ptr_->async_write(uid, std::move(fs), std::forward<_Func>(f));
 		}
 
 		std::string remote_address()
@@ -62,16 +78,6 @@ namespace aquarius
 			do_connect(endpoint_);
 		}
 
-		void set_report(bool report = true)
-		{
-			is_report_ = report;
-		}
-
-		void set_server_port(int32_t port)
-		{
-			server_port_ = port;
-		}
-
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
@@ -86,19 +92,6 @@ namespace aquarius
 										   if (!conn_ptr_)
 											   return;
 
-										   if (is_report_)
-										   {
-											   flex_buffer_t buffer{};
-											   buffer.sputn((uint8_t*)&ip_report_proto, sizeof(ip_report_proto));
-
-											   request_header header{};
-											   header.session_id_ = server_port_;
-
-											   buffer.sputn((uint8_t*)&header, sizeof(header));
-
-											   conn_ptr_->async_write(std::move(buffer), [] {});
-										   }
-
 										   conn_ptr_->start();
 									   });
 		}
@@ -109,10 +102,6 @@ namespace aquarius
 		std::shared_ptr<_Connector> conn_ptr_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
-
-		bool is_report_;
-
-		int32_t server_port_;
 	};
 
 	template <typename _Connector>
@@ -142,6 +131,15 @@ namespace aquarius
 				return;
 
 			client_ptr_->async_write(std::forward<_Ty>(request), std::forward<_Func>(f));
+		}
+
+		template<typename _Ty, typename _Func>
+		void async_write(std::size_t uid, _Ty&& request, _Func&& f)
+		{
+			if (!client_ptr_)
+				return;
+
+			client_ptr_->async_write(uid, std::forward<_Ty>(request), std::forward<_Func>(f));
 		}
 
 	private:
