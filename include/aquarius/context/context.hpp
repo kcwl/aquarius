@@ -30,7 +30,7 @@ namespace aquarius
 			return 0;
 		}
 
-		virtual int visit(flex_buffer_t&)
+		virtual int visit(flex_buffer_t&, std::shared_ptr<xsession>)
 		{
 			return 0;
 		}

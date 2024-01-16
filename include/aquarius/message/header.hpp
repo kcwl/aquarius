@@ -12,6 +12,7 @@ namespace aquarius
 	{
 		void clone(const command_header& header)
 		{
+			uid_ = header.uid_;
 			total_seq_ = header.total_seq_;
 			sequences_ = header.sequences_;
 			reserve_ = header.reserve_;

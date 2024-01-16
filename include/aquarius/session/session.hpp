@@ -114,7 +114,7 @@ namespace aquarius
 			{
 				buffer.consume(-(int)(sizeof(uint32_t) * 3));
 
-				return static_cast<read_handle_result>(context_ptr->visit(buffer));
+				return static_cast<read_handle_result>(context_ptr->visit(buffer,this->shared_from_this()));
 			}
 
 			result = request_ptr->accept(buffer, context_ptr, this->shared_from_this());

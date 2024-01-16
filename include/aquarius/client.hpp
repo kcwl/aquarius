@@ -61,6 +61,15 @@ namespace aquarius
 			conn_ptr_->async_write(uid, std::move(fs), std::forward<_Func>(f));
 		}
 
+		template<typename _Func>
+		void async_write(std::size_t uid, flex_buffer_t&& buffer, _Func&& f)
+		{
+			if (!conn_ptr_)
+				return;
+
+			conn_ptr_->async_write(uid, std::move(buffer), std::forward<_Func>(f));
+		}
+
 		std::string remote_address()
 		{
 			return conn_ptr_->remote_address();
