@@ -40,6 +40,9 @@
     <Filter Include="aquarius\channel">
       <UniqueIdentifier>{2434a1fe-9af2-40a8-b717-3bc3ee057069}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\connect">
+      <UniqueIdentifier>{b70ee681-84a7-4703-9b23-9a182dfb1a8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -93,9 +96,6 @@
       <Filter>aquarius\session</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\client.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\defines.hpp">
@@ -214,6 +214,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\channel\group.hpp">
       <Filter>aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\ssl_connect.hpp">
+      <Filter>aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\server_connect.hpp">
+      <Filter>aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\client_connect.hpp">
+      <Filter>aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect.hpp">
+      <Filter>aquarius</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

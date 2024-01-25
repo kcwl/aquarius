@@ -159,6 +159,9 @@
     <ClInclude Include="..\include\aquarius\channel\group.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\client_connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\server_connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\ssl_connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\system_context.hpp" />
     <ClInclude Include="..\include\aquarius\context\user_context.hpp" />

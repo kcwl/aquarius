@@ -15,8 +15,8 @@ namespace aquarius
 	{
 	public:
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
-		explicit client(boost::asio::io_service& ios, _Args&&... args)
-			: io_service_(ios)
+		explicit client(_Args&&... args)
+			: io_service_()
 		{
 			if constexpr (sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
@@ -35,25 +35,41 @@ namespace aquarius
 		}
 
 	public:
+		void run()
+		{
+			io_service_.run();
+		}
+
+		void stop()
+		{
+			io_service_.stop();
+		}
+
 		template <typename _Request, typename _Func>
 		void async_write(_Request&& req, _Func&& f)
 		{
+			if (!conn_ptr_)
+				return;
+
 			flex_buffer_t fs{};
 
 			req.to_binary(fs);
 
-			async_write(std::move(fs), [] {});
+			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
 		}
 
-		template<typename _Func>
-		void async_write(flex_buffer_t&& buffer, _Func&& f)
+		template <typename _Request>
+		void async_write(_Request&& req)
 		{
-			conn_ptr_->async_write(std::move(buffer), std::forward<_Func>(f));
+			async_write(std::forward<_Request>(req), [] {});
 		}
 
-		template<typename _Request, typename _Func>
+		template <typename _Request, typename _Func>
 		void async_write(std::size_t uid, _Request&& req, _Func&& f)
 		{
+			if (!conn_ptr_)
+				return;
+
 			flex_buffer_t fs{};
 
 			req.to_binary(fs);
@@ -61,7 +77,7 @@ namespace aquarius
 			conn_ptr_->async_write(uid, std::move(fs), std::forward<_Func>(f));
 		}
 
-		template<typename _Func>
+		template <typename _Func>
 		void async_write(std::size_t uid, flex_buffer_t&& buffer, _Func&& f)
 		{
 			if (!conn_ptr_)
@@ -106,55 +122,10 @@ namespace aquarius
 		}
 
 	private:
-		boost::asio::io_service& io_service_;
+		boost::asio::io_service io_service_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
 	};
-
-	template <typename _Connector>
-	class alone_client
-	{
-	public:
-		explicit alone_client(const std::string& ip_addr, int32_t port)
-			: io_service_()
-			, client_ptr_(new client<_Connector>(io_service_, ip_addr, std::to_string(port)))
-		{}
-
-	public:
-		void run()
-		{
-			io_service_.run();
-		}
-
-		void stop()
-		{
-			io_service_.stop();
-		}
-
-		template<typename _Ty, typename _Func>
-		void async_write(_Ty&& request, _Func&& f)
-		{
-			if (!client_ptr_)
-				return;
-
-			client_ptr_->async_write(std::forward<_Ty>(request), std::forward<_Func>(f));
-		}
-
-		template<typename _Ty, typename _Func>
-		void async_write(std::size_t uid, _Ty&& request, _Func&& f)
-		{
-			if (!client_ptr_)
-				return;
-
-			client_ptr_->async_write(uid, std::forward<_Ty>(request), std::forward<_Func>(f));
-		}
-
-	private:
-		boost::asio::io_service io_service_;
-
-		std::shared_ptr<client<_Connector>> client_ptr_;
-	};
-
 } // namespace aquarius
