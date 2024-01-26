@@ -100,7 +100,7 @@ namespace aquarius
 		{
 			response_.header().clone(request_ptr_->header());
 
-			response_.header().result_ = result;
+			response_.header().result = result;
 
 			flex_buffer_t fs;
 

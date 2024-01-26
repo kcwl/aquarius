@@ -181,7 +181,7 @@
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />
-    <ClInclude Include="..\include\aquarius\message\header.hpp" />
+    <ClInclude Include="..\include\aquarius\message\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\router.hpp" />

@@ -83,7 +83,7 @@
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
       <Filter>aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\header.hpp">
+    <ClInclude Include="..\include\aquarius\message\tcp_header.hpp">
       <Filter>aquarius\message</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\message.hpp">

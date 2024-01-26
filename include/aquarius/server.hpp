@@ -102,9 +102,9 @@ namespace aquarius
 							flex_buffer_t buffer{};
 
 							buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
-							response_header header{};
-							header.result_ = boost::asio::ip::address_v4().from_string(_ip_addr).to_uint();
-							header.reserve_ = _port;
+							tcp_response_header header{};
+							header.result = boost::asio::ip::address_v4().from_string(_ip_addr).to_uint();
+							header.reserve = _port;
 
 							buffer.sputn((uint8_t*)&header, sizeof(header));
 

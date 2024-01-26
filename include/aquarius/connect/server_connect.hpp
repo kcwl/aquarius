@@ -21,11 +21,11 @@ namespace aquarius
 			if (result != read_handle_result::report)
 				return true;
 
-			request_header header{};
+			tcp_request_header header{};
 
 			this->buffer().sgetn((uint8_t*)&header, sizeof(header));
 
-			report_session(this->uuid(), header.session_id_);
+			report_session(this->uuid(), header.session_id);
 
 			return true;
 		}

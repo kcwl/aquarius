@@ -107,7 +107,7 @@ namespace aquarius
 
 			stream.sgetn((uint8_t*)header_ptr_, sz);
 
-			if (!body_.ParseFromArray(stream.wdata(), header_ptr_->size_))
+			if (!body_.ParseFromArray(stream.wdata(), static_cast<int>(header_ptr_->size)))
 				return read_handle_result::unknown_error;
 
 			return read_handle_result::ok;
@@ -119,9 +119,9 @@ namespace aquarius
 
 			stream.sputn((uint8_t*)&Number, sizeof(Number));
 
-			header_ptr_->size_ = static_cast<uint32_t>(body_.ByteSizeLong());
+			header_ptr_->size = body_.ByteSizeLong();
 
-			uint32_t total_size = static_cast<uint32_t>(size + header_ptr_->size_);
+			uint64_t total_size = size + header_ptr_->size;
 
 			stream.sputn((uint8_t*)&total_size, sizeof(total_size));
 

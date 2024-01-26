@@ -18,11 +18,11 @@ namespace aquarius
 			if (result != read_handle_result::reset_peer)
 				return true;
 
-			response_header header{};
+			tcp_response_header header{};
 
 			this->buffer().sgetn((uint8_t*)&header, sizeof(header));
 
-			change_connect(boost::asio::ip::address_v4(header.result_).to_string(), header.reserve_);
+			change_connect(boost::asio::ip::address_v4(header.result).to_string(), static_cast<int32_t>(header.reserve));
 
 			return false;
 		}
