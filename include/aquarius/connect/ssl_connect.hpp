@@ -273,18 +273,18 @@ namespace aquarius
 			return read_buffer_;
 		}
 
-	private:
 		void init_ssl_context()
 		{
-			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
-									 ssl_context_t::single_dh_use);
+			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv3 |
+				ssl_context_t::single_dh_use);
 
 			ssl_context_.set_password_callback(std::bind(&ssl_connect::get_passwd, this));
-			ssl_context_.use_certificate_chain_file("server.pem");
-			ssl_context_.use_private_key_file("server.pem", boost::asio::ssl::context::pem);
-			ssl_context_.use_tmp_dh_file("dh4096.pem");
+			ssl_context_.use_certificate_chain_file("crt/server.crt");
+			ssl_context_.use_private_key_file("crt/server.pem", ssl_context_t::pem);
+			ssl_context_.use_tmp_dh_file("crt/dh4096.pem");
 		}
 
+	private:
 		std::string get_passwd()
 		{
 			return {};

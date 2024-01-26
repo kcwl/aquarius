@@ -13,7 +13,9 @@ namespace aquarius
 		server_connect(boost::asio::io_service& io_service,
 			std::chrono::steady_clock::duration dura = heart_time_interval)
 			: ssl_connect<_Protocol>(io_service, dura)
-		{}
+		{
+			
+		}
 
 	public:
 		virtual bool on_read(read_handle_result result) override
