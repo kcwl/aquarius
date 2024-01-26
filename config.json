@@ -1,0 +1,22 @@
+{
+  "setting": {
+    "port": 12345,
+    "slave_port": 12346,
+    "threads": 10,
+    "master": 1,
+    "router": 0
+  },
+  "master": {
+    "balance": 1
+  },
+  "router": [
+    {
+      "ip": "127.0.0.1",
+      "port": 12341
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 12342
+    }
+  ]
+}

@@ -1,12 +1,15 @@
 #pragma once
 #include <any>
+#include <aquarius/defines.hpp>
+#include <aquarius/event_callback.hpp>
 #include <aquarius/flex_buffer.hpp>
+#include <aquarius/message/message.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
 #include <string>
-#include <aquarius/defines.hpp>
-#include <aquarius/event_callback.hpp>
-#include <aquarius/message/message.hpp>
+#include <memory>
+#include <aquarius/detail/config.hpp>
+#include <aquarius/context/context.hpp>
 
 namespace aquarius
 {
@@ -24,6 +27,16 @@ namespace aquarius
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
 		virtual void close() = 0;
+
+		virtual void update_identify(std::size_t id) = 0;
+
+		virtual std::size_t identify() = 0;
+
+		virtual std::string remote_address() = 0;
+
+		virtual void server_port(int32_t port) = 0;
+
+		virtual int32_t server_port() = 0;
 	};
 
 	template <typename _Connector>
@@ -38,6 +51,7 @@ namespace aquarius
 
 		session(std::shared_ptr<_Connector> conn_ptr)
 			: conn_ptr_(conn_ptr)
+			, identify_(0)
 		{}
 
 	public:
@@ -62,10 +76,23 @@ namespace aquarius
 			if (result != read_handle_result::ok)
 				return result;
 
+			if (proto == ip_back_proto)
+			{
+				return read_handle_result::reset_peer;
+			}
+
+			if (proto == ip_report_proto)
+			{
+				return read_handle_result::report;
+			}
+
 			auto request_ptr = message_invoke_helper::invoke(proto);
 
 			if (!request_ptr)
-				return read_handle_result::unknown_proto;
+			{
+				if (buffer.sgetn((uint8_t*)&proto, sizeof(proto)) != sizeof(proto))
+					return read_handle_result::unknown_proto;
+			}
 
 			std::shared_ptr<context> context_ptr;
 
@@ -82,6 +109,13 @@ namespace aquarius
 
 			if (!context_ptr)
 				return read_handle_result::unknown_ctx;
+
+			if (!request_ptr)
+			{
+				buffer.consume(-(int)(sizeof(uint32_t) * 3));
+
+				return static_cast<read_handle_result>(context_ptr->visit(buffer,this->shared_from_this()));
+			}
 
 			result = request_ptr->accept(buffer, context_ptr, this->shared_from_this());
 
@@ -115,7 +149,35 @@ namespace aquarius
 				conn_ptr_->shut_down();
 		}
 
-		public:
+		virtual void update_identify(std::size_t id) override
+		{
+			identify_ = id;
+		}
+
+		virtual std::size_t identify() override
+		{
+			return identify_;
+		}
+
+		virtual std::string remote_address() override
+		{
+			if (!conn_ptr_)
+				return {};
+
+			return conn_ptr_->remote_address();
+		}
+
+		virtual void server_port(int32_t port) override
+		{
+			server_port_ = port;
+		}
+
+		virtual int32_t server_port() override
+		{
+			return server_port_;
+		}
+
+	public:
 		virtual void on_accept() final
 		{}
 
@@ -147,5 +209,9 @@ namespace aquarius
 		std::unordered_map<uint32_t, std::shared_ptr<context>> ctxs_;
 
 		std::deque<std::pair<std::shared_ptr<xmessage>, std::shared_ptr<context>>> ctx_queue_;
+
+		std::size_t identify_;
+
+		int32_t server_port_;
 	};
 } // namespace aquarius

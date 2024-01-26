@@ -6,7 +6,7 @@ namespace aquarius
 	template<typename _Service>
 	struct service_regist
 	{
-		service_regist(const std::string& service_name)
+		service_regist(std::size_t service_name)
 		{
 			service_router::instance().regist(service_name, []() { return std::make_shared<_Service>(); });
 		}

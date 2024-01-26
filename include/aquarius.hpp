@@ -1,54 +1,30 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/client.hpp>
+#include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/connect.hpp>
 #include <aquarius/service.hpp>
 
 namespace aquarius
 {
-	using no_ssl_tcp_connect = connect<connect_tcp, void>;
+	template <std::size_t Identify>
+	using tcp_server_connect = server_connect<tcp, Identify>;
 
-	using ssl_tcp_connect = connect<connect_tcp, ssl_socket>;
+	template <std::size_t Identify>
+	using tcp_server = server<tcp_server_connect<Identify>>;
 
-	using no_ssl_tcp_server = server<no_ssl_tcp_connect>;
+	template <std::size_t Identify>
+	using http_server_connect = server_connect<http, Identify>;
 
-	using ssl_tcp_server = server<ssl_tcp_connect>;
+	template <std::size_t Identify>
+	using http_server = server<http_server_connect<Identify>>;
 
-	using no_ssl_http_connect = connect<http, void>;
+	using tcp_client_connect = client_connect<tcp>;
 
-	using ssl_http_connect = connect<http, ssl_socket>;
-
-	using no_ssl_http_server = server<no_ssl_http_connect>;
-
-	using ssl_http_server = server<ssl_http_connect>;
-
-	using no_ssl_tcp_client = client<no_ssl_tcp_connect>;
-
-	using ssl_tcp_client = client<ssl_tcp_connect>;
-
-	inline std::shared_ptr<xsession> find_session(std::size_t id)
-	{
-		return session_manager::instance().find(id);
-	}
-
-	inline bool erase_session(std::size_t id)
-	{
-		return session_manager::instance().erase(id);
-	}
-
-	inline std::size_t count_session()
-	{
-		return session_manager::instance().count();
-	}
-
-	inline void clear_session()
-	{
-		return session_manager::instance().clear();
-	}
+	using tcp_client = client<tcp_client_connect>;
 
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)

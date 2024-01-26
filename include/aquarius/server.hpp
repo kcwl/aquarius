@@ -1,9 +1,10 @@
 #pragma once
+#include <aquarius/client.hpp>
 #include <aquarius/defines.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
-#include <type_traits>
 #include <aquarius/service.hpp>
+#include <type_traits>
 
 namespace aquarius
 {
@@ -11,12 +12,17 @@ namespace aquarius
 	class server
 	{
 	public:
-		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
+		constexpr static std::size_t IDENTIFY = _Connector::IDENTIFY;
+
+	public:
+		explicit server(int32_t port, int io_service_pool_size, int32_t slave_port = 0, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
-			, end_point_(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(port))
+			, endpoint_(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(port))
 			, signals_(io_service_pool_.get_io_service())
-			, acceptor_(io_service_pool_.get_io_service(), end_point_)
+			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, server_name_(name)
+			, is_master_(false)
+			, slave_port_(slave_port)
 		{
 			signals_.add(SIGINT);
 			signals_.add(SIGTERM);
@@ -47,9 +53,22 @@ namespace aquarius
 			signal_stop({}, SIGINT);
 		}
 
-		std::size_t client_count()
+		void set_master(bool master = true)
 		{
-			return connect_count_.load(std::memory_order_acquire);
+			is_master_ = master;
+		}
+
+		void set_master_address(const std::string& ip_addr, int32_t port)
+		{
+			if (is_master_)
+				return;
+
+			slave_client_ptr_.reset(
+				new client<_Connector>(io_service_pool_.get_io_service(), ip_addr, std::to_string(port)));
+
+			slave_client_ptr_->set_report();
+
+			slave_client_ptr_->set_server_port(endpoint_.port());
 		}
 
 	private:
@@ -57,29 +76,82 @@ namespace aquarius
 		{
 			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
 
-			acceptor_.async_accept(new_connect_ptr->socket(),
-								   [this, new_connect_ptr](const boost::system::error_code& ec)
-								   {
-									   if (ec)
-									   {
-										   XLOG(error) << "[acceprtor] accept error at "
-													   << end_point_.address().to_string() << ":" << ec.message();
+			acceptor_.async_accept(
+				new_connect_ptr->socket(),
+				[this, new_connect_ptr](const boost::system::error_code& ec)
+				{
+					if (ec)
+					{
+						XLOG(error) << "[acceprtor] accept error at " << endpoint_.address().to_string() << ":"
+									<< ec.message();
 
-										   close();
-									   }
-									   else
-									   {
-										   new_connect_ptr->start();
+						close();
+					}
+					else
+					{
+						std::string ip_addrs{};
 
-										   connect_count_.exchange(connect_count_ + 1);
+						if (slave_session(new_connect_ptr->remote_address(),
+										  acceptor_.local_endpoint().address().to_string(),
+										  acceptor_.local_endpoint().port(), ip_addrs))
+						{
+							auto [_ip_addr, _port] = spilt_ipaddr(ip_addrs);
 
-										   start_accept();
+							;
 
-										   XLOG(info)
-											   << "[acceptor] accept connection at " << end_point_.address().to_string()
-											   << " : " << new_connect_ptr->remote_address();
-									   }
-								   });
+							flex_buffer_t buffer{};
+
+							buffer.sputn((uint8_t*)&ip_back_proto, sizeof(ip_back_proto));
+							tcp_response_header header{};
+							header.result = boost::asio::ip::address_v4().from_string(_ip_addr).to_uint();
+							header.reserve = _port;
+
+							buffer.sputn((uint8_t*)&header, sizeof(header));
+
+							new_connect_ptr->async_write(std::move(buffer), [] {});
+
+							XLOG(info) << "[acceptor] transfer connection at " << endpoint_.address().to_string()
+									   << " : " << new_connect_ptr->remote_address() << " to " << _ip_addr << ":"
+									   << _port << "\n";
+						}
+						else
+						{
+							new_connect_ptr->start();
+
+							XLOG(info) << "[acceptor] accept connection at " << endpoint_.address().to_string() << " : "
+									   << new_connect_ptr->remote_address();
+						}
+
+						start_accept();
+					}
+				});
+
+			if (slave_port_ == 0)
+				return;
+
+			slave_acceptor_ptr_.reset(new boost::asio::ip::tcp::acceptor(
+				io_service_pool_.get_io_service(),
+				boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(slave_port_))));
+
+			auto slave_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
+
+			slave_acceptor_ptr_->async_accept(slave_connect_ptr->socket(),
+										 [this, slave_connect_ptr](const boost::system::error_code& ec)
+										 {
+											 if (ec)
+											 {
+												 XLOG(error) << "[acceprtor] accept error at "
+															 << endpoint_.address().to_string() << ":" << ec.message();
+
+												 close();
+
+												 return;
+											 }
+
+											 slave_connect_ptr->start();
+
+											 start_accept();
+										 });
 		}
 
 		void close()
@@ -109,17 +181,33 @@ namespace aquarius
 					   << ", signal: " << signal;
 		}
 
+		auto spilt_ipaddr(const std::string& addr) -> std::pair<std::string, int32_t>
+		{
+			auto pos = addr.find_first_of(":");
+
+			if (pos == std::string::npos)
+				return { {}, {} };
+
+			return { addr.substr(0, pos), std::atoi(addr.substr(pos + 1).c_str()) };
+		}
+
 	private:
 		io_service_pool io_service_pool_;
 
-		boost::asio::ip::tcp::endpoint end_point_;
+		boost::asio::ip::tcp::endpoint endpoint_;
 
 		boost::asio::signal_set signals_;
 
 		boost::asio::ip::tcp::acceptor acceptor_;
 
-		std::atomic_uint32_t connect_count_;
+		std::shared_ptr<boost::asio::ip::tcp::acceptor> slave_acceptor_ptr_;
 
 		std::string server_name_;
+
+		bool is_master_;
+
+		std::shared_ptr<client<_Connector>> slave_client_ptr_;
+
+		int32_t slave_port_;
 	};
 } // namespace aquarius

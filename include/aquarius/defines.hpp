@@ -8,12 +8,6 @@ namespace aquarius
 {
 	constexpr static auto heart_time_interval = 10s;
 
-	struct ssl_socket
-	{};
-
-	struct connect_tcp
-	{};
-
 	struct http
 	{};
 
@@ -30,13 +24,8 @@ namespace aquarius
 		body_error,
 		context_error,
 		waiting_for_query,
-		null_message
+		null_message,
+		reset_peer,
+		report
 	};
-
-	enum class connect_event
-	{
-		start,
-		close
-	};
-
 } // namespace aquarius

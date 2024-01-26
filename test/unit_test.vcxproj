@@ -155,17 +155,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\channel.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\group.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\client_connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\server_connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\ssl_connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\system_context.hpp" />
     <ClInclude Include="..\include\aquarius\context\user_context.hpp" />
     <ClInclude Include="..\include\aquarius\defines.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp" />
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
+    <ClInclude Include="..\include\aquarius\config\distribute_config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
     <ClInclude Include="..\include\aquarius\detail\field.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\random.hpp" />
     <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
@@ -173,7 +181,7 @@
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />
-    <ClInclude Include="..\include\aquarius\message\header.hpp" />
+    <ClInclude Include="..\include\aquarius\message\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\router.hpp" />

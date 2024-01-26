@@ -1,7 +1,8 @@
 ﻿#pragma once
+#include <aquarius/detail/config.hpp>
 #include <aquarius/message/invoke.hpp>
-#include <aquarius/type_traits.hpp>
 #include <aquarius/response.hpp>
+#include <aquarius/type_traits.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
 #include <map>
@@ -13,15 +14,9 @@ namespace aquarius
 	class client : public std::enable_shared_from_this<client<_Connector>>
 	{
 	public:
-		explicit client(const boost::asio::ip::tcp::resolver::results_type& endpoints)
-			: io_service_()
-			, endpoint_(endpoints)
-		{
-			do_connect(endpoint_);
-		}
-
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
-		client(_Args&&... args)
+		explicit client(_Args&&... args)
+			: io_service_()
 		{
 			if constexpr (sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
@@ -48,18 +43,47 @@ namespace aquarius
 		void stop()
 		{
 			io_service_.stop();
-
-			conn_ptr_->shut_down();
 		}
 
 		template <typename _Request, typename _Func>
 		void async_write(_Request&& req, _Func&& f)
 		{
+			if (!conn_ptr_)
+				return;
+
 			flex_buffer_t fs{};
 
 			req.to_binary(fs);
 
 			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
+		}
+
+		template <typename _Request>
+		void async_write(_Request&& req)
+		{
+			async_write(std::forward<_Request>(req), [] {});
+		}
+
+		template <typename _Request, typename _Func>
+		void async_write(std::size_t uid, _Request&& req, _Func&& f)
+		{
+			if (!conn_ptr_)
+				return;
+
+			flex_buffer_t fs{};
+
+			req.to_binary(fs);
+
+			conn_ptr_->async_write(uid, std::move(fs), std::forward<_Func>(f));
+		}
+
+		template <typename _Func>
+		void async_write(std::size_t uid, flex_buffer_t&& buffer, _Func&& f)
+		{
+			if (!conn_ptr_)
+				return;
+
+			conn_ptr_->async_write(uid, std::move(buffer), std::forward<_Func>(f));
 		}
 
 		std::string remote_address()
@@ -88,6 +112,9 @@ namespace aquarius
 									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
+											   return;
+
+										   if (!conn_ptr_)
 											   return;
 
 										   conn_ptr_->start();
