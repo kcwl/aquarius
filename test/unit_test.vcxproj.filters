@@ -34,9 +34,6 @@
     <Filter Include="aquarius\mysql">
       <UniqueIdentifier>{a0518608-c803-4290-9f2b-dab5207810c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="aquarius\config">
-      <UniqueIdentifier>{1c3b604c-085a-4af5-a289-0b5abdd2a950}</UniqueIdentifier>
-    </Filter>
     <Filter Include="aquarius\channel">
       <UniqueIdentifier>{2434a1fe-9af2-40a8-b717-3bc3ee057069}</UniqueIdentifier>
     </Filter>
@@ -205,9 +202,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp">
       <Filter>aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\config\distribute_config.hpp">
-      <Filter>aquarius\config</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\channel\channel.hpp">
       <Filter>aquarius\channel</Filter>
