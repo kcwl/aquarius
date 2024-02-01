@@ -61,11 +61,13 @@ BOOST_AUTO_TEST_CASE(process)
 
 	std::thread tc([&] { cli.run(); });
 
+	std::this_thread::sleep_for(3s);
+
 	test_request req{};
 	req.body().set_age(1);
 	req.body().set_name("world");
 
-	//cli.async_write(std::move(req));
+	cli.async_write(std::move(req));
 
 	std::this_thread::sleep_for(5s);
 
