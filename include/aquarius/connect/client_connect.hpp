@@ -4,12 +4,12 @@
 namespace aquarius
 {
 	template <typename _Protocol>
-	class client_connect : public ssl_connect<_Protocol>
+	class client_connect : public ssl_connect<_Protocol, false>
 	{
 	public:
 		client_connect(boost::asio::io_service& io_service,
 					   std::chrono::steady_clock::duration dura = heart_time_interval)
-			: ssl_connect<_Protocol>(io_service, dura)
+			: ssl_connect<_Protocol, false>(io_service, dura)
 		{}
 
 	public:
@@ -22,7 +22,8 @@ namespace aquarius
 
 			this->buffer().sgetn((uint8_t*)&header, sizeof(header));
 
-			change_connect(boost::asio::ip::address_v4(header.result).to_string(), static_cast<int32_t>(header.reserve));
+			change_connect(boost::asio::ip::address_v4(header.result).to_string(),
+						   static_cast<int32_t>(header.reserve));
 
 			return false;
 		}

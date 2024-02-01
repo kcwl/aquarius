@@ -12,8 +12,8 @@
 
 namespace aquarius
 {
-	template <typename _Protocol>
-	class ssl_connect : public std::enable_shared_from_this<ssl_connect<_Protocol>>
+	template <typename _Protocol, bool HasServer>
+	class ssl_connect : public std::enable_shared_from_this<ssl_connect<_Protocol, HasServer>>
 	{
 		using socket_t = boost::asio::ip::tcp::socket;
 
@@ -21,7 +21,9 @@ namespace aquarius
 
 		using ssl_context_t = boost::asio::ssl::context;
 
-		using this_type = ssl_connect<_Protocol>;
+		constexpr static bool has_server = HasServer;
+
+		using this_type = ssl_connect<_Protocol, has_server>;
 
 	public:
 		explicit ssl_connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura)
@@ -275,13 +277,21 @@ namespace aquarius
 
 		void init_ssl_context()
 		{
-			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv3 |
-				ssl_context_t::single_dh_use);
+			if constexpr (has_server)
+			{
+				ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv3 |
+					ssl_context_t::single_dh_use);
 
-			ssl_context_.set_password_callback(std::bind(&ssl_connect::get_passwd, this));
-			ssl_context_.use_certificate_chain_file("crt/server.crt");
-			ssl_context_.use_private_key_file("crt/server.pem", ssl_context_t::pem);
-			ssl_context_.use_tmp_dh_file("crt/dh4096.pem");
+				ssl_context_.set_password_callback(std::bind(&ssl_connect::get_passwd, this));
+				ssl_context_.use_certificate_chain_file("crt/server.crt");
+				ssl_context_.use_private_key_file("crt/server.key", ssl_context_t::pem);
+				ssl_context_.use_tmp_dh_file("crt/dh512.pem");
+			}
+			else
+			{
+				ssl_context_.load_verify_file("crt/server.crt");
+			}
+			
 		}
 
 	private:

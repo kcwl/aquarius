@@ -4,18 +4,16 @@
 namespace aquarius
 {
 	template <typename _Protocol, std::size_t Identify>
-	class server_connect : public ssl_connect<_Protocol>
+	class server_connect : public ssl_connect<_Protocol, true>
 	{
 	public:
 		constexpr static std::size_t IDENTIFY = Identify;
 
 	public:
 		server_connect(boost::asio::io_service& io_service,
-			std::chrono::steady_clock::duration dura = heart_time_interval)
-			: ssl_connect<_Protocol>(io_service, dura)
-		{
-			
-		}
+					   std::chrono::steady_clock::duration dura = heart_time_interval)
+			: ssl_connect<_Protocol, true>(io_service, dura)
+		{}
 
 	public:
 		virtual bool on_read(read_handle_result result) override
@@ -37,4 +35,4 @@ namespace aquarius
 			return false;
 		}
 	};
-}
+} // namespace aquarius
