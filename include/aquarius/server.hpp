@@ -11,6 +11,7 @@ namespace aquarius
 	template <typename _Connector>
 	class server
 	{
+		using ssl_context_t = boost::asio::ssl::context;
 	public:
 		constexpr static std::size_t IDENTIFY = _Connector::IDENTIFY;
 
@@ -20,6 +21,7 @@ namespace aquarius
 			, endpoint_(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
+			, ssl_context_(boost::asio::ssl::context::sslv23)
 			, server_name_(name)
 			, is_master_(false)
 			, slave_port_(slave_port)
@@ -29,6 +31,8 @@ namespace aquarius
 #ifdef SIGQUIT
 			signals_.add(SIGQUIT);
 #endif
+			init_ssl_context();
+
 			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 
 			start_accept();
@@ -74,7 +78,7 @@ namespace aquarius
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
+			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), ssl_context_);
 
 			acceptor_.async_accept(
 				new_connect_ptr->socket(),
@@ -133,25 +137,26 @@ namespace aquarius
 				io_service_pool_.get_io_service(),
 				boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), static_cast<unsigned short>(slave_port_))));
 
-			auto slave_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service());
+			auto slave_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), ssl_context_);
 
 			slave_acceptor_ptr_->async_accept(slave_connect_ptr->socket(),
-										 [this, slave_connect_ptr](const boost::system::error_code& ec)
-										 {
-											 if (ec)
-											 {
-												 XLOG(error) << "[acceprtor] accept error at "
-															 << endpoint_.address().to_string() << ":" << ec.message();
+											  [this, slave_connect_ptr](const boost::system::error_code& ec)
+											  {
+												  if (ec)
+												  {
+													  XLOG(error)
+														  << "[acceprtor] accept error at "
+														  << endpoint_.address().to_string() << ":" << ec.message();
 
-												 close();
+													  close();
 
-												 return;
-											 }
+													  return;
+												  }
 
-											 slave_connect_ptr->start();
+												  slave_connect_ptr->start();
 
-											 start_accept();
-										 });
+												  start_accept();
+											  });
 		}
 
 		void close()
@@ -191,6 +196,22 @@ namespace aquarius
 			return { addr.substr(0, pos), std::atoi(addr.substr(pos + 1).c_str()) };
 		}
 
+		void init_ssl_context()
+		{
+			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
+									 ssl_context_t::single_dh_use);
+
+			ssl_context_.set_password_callback(std::bind(&server::get_passwd, this));
+			ssl_context_.use_certificate_chain_file("crt/server.crt");
+			ssl_context_.use_private_key_file("crt/server.key", ssl_context_t::pem);
+			ssl_context_.use_tmp_dh_file("crt/dh512.pem");
+		}
+
+		std::string get_passwd()
+		{
+			return {};
+		}
+
 	private:
 		io_service_pool io_service_pool_;
 
@@ -199,6 +220,8 @@ namespace aquarius
 		boost::asio::signal_set signals_;
 
 		boost::asio::ip::tcp::acceptor acceptor_;
+
+		ssl_context_t ssl_context_;
 
 		std::shared_ptr<boost::asio::ip::tcp::acceptor> slave_acceptor_ptr_;
 

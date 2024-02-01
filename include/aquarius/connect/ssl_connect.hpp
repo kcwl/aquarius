@@ -26,19 +26,16 @@ namespace aquarius
 		using this_type = ssl_connect<_Protocol, has_server>;
 
 	public:
-		explicit ssl_connect(boost::asio::io_service& io_service, std::chrono::steady_clock::duration dura)
+		explicit ssl_connect(boost::asio::io_service& io_service, ssl_context_t& context, std::chrono::steady_clock::duration dura)
 			: io_service_(io_service)
 			, socket_(io_service_)
-			, ssl_context_(ssl_context_t::sslv3)
-			, ssl_socket_(socket_, ssl_context_)
+			, ssl_socket_(socket_, context)
 			, read_buffer_()
 			, heart_timer_(io_service_)
 			, dura_(dura)
 			, uid_()
 			, session_ptr_(new session<this_type>())
 		{
-			init_ssl_context();
-
 			boost::uuids::random_generator_mt19937 generator{};
 
 			uid_ = boost::uuids::hash_value(generator());
@@ -80,13 +77,24 @@ namespace aquarius
 
 		void start()
 		{
-			ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
+			boost::asio::ssl::stream_base::handshake_type htype{};
+
+			if constexpr (has_server)
+			{
+				htype = boost::asio::ssl::stream_base::server;
+			}
+			else
+			{
+				htype = boost::asio::ssl::stream_base::client;
+			}
+
+			ssl_socket_.async_handshake(htype,
 										[this, self = this->shared_from_this()](const boost::system::error_code& ec)
 										{
 											if (ec)
 											{
-												XLOG(error)
-													<< "handshake error at " << remote_address() << ":" << ec.message();
+												XLOG(error) << has_server<<"-" << "handshake error at " << remote_address() << ":"
+															<< ec.message();
 
 												return;
 											}
@@ -166,7 +174,7 @@ namespace aquarius
 						return;
 					}
 
-					XLOG(error) << "write error at " << remote_address() << ": " << ec.message();
+					XLOG(error) << has_server<< "-write error at " << remote_address() << ": " << ec.message();
 
 					return shut_down();
 				});
@@ -275,31 +283,12 @@ namespace aquarius
 			return read_buffer_;
 		}
 
-		void init_ssl_context()
+		[[nodiscard]] ssl_socket_t& ssl_socket()
 		{
-			if constexpr (has_server)
-			{
-				ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv3 |
-					ssl_context_t::single_dh_use);
-
-				ssl_context_.set_password_callback(std::bind(&ssl_connect::get_passwd, this));
-				ssl_context_.use_certificate_chain_file("crt/server.crt");
-				ssl_context_.use_private_key_file("crt/server.key", ssl_context_t::pem);
-				ssl_context_.use_tmp_dh_file("crt/dh512.pem");
-			}
-			else
-			{
-				ssl_context_.load_verify_file("crt/server.crt");
-			}
-			
+			return ssl_socket_;
 		}
 
 	private:
-		std::string get_passwd()
-		{
-			return {};
-		}
-
 		void heart_deadline()
 		{
 			heart_timer_.expires_from_now(dura_);
@@ -332,8 +321,6 @@ namespace aquarius
 		boost::asio::io_service& io_service_;
 
 		socket_t socket_;
-
-		ssl_context_t ssl_context_;
 
 		ssl_socket_t ssl_socket_;
 

@@ -7,9 +7,9 @@ namespace aquarius
 	class client_connect : public ssl_connect<_Protocol, false>
 	{
 	public:
-		client_connect(boost::asio::io_service& io_service,
+		client_connect(boost::asio::io_service& io_service, boost::asio::ssl::context& context,
 					   std::chrono::steady_clock::duration dura = heart_time_interval)
-			: ssl_connect<_Protocol, false>(io_service, dura)
+			: ssl_connect<_Protocol, false>(io_service, context, dura)
 		{}
 
 	public:
@@ -49,6 +49,11 @@ namespace aquarius
 			funcs_.insert({ uid, std::forward<_Func>(f) });
 
 			async_write(std::move(resp_buf), [] {});
+		}
+
+		void set_verify_mode(boost::asio::ssl::verify_mode v)
+		{
+			this->ssl_socket().set_verify_mode(v);
 		}
 
 	private:

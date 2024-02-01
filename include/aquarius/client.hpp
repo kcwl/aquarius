@@ -4,6 +4,7 @@
 #include <aquarius/response.hpp>
 #include <aquarius/type_traits.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 #include <iostream>
 #include <map>
 #include <type_traits>
@@ -17,7 +18,10 @@ namespace aquarius
 		template <class... _Args, class = std::enable_if_t<(sizeof...(_Args) > 1)>>
 		explicit client(_Args&&... args)
 			: io_service_()
+			, ssl_context_(boost::asio::ssl::context::sslv23)
 		{
+			init_ssl_context();
+
 			if constexpr (sizeof...(args) < 2)
 				std::throw_with_nested(std::overflow_error("Usage: client <host> <port>"));
 
@@ -106,7 +110,7 @@ namespace aquarius
 	private:
 		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
 		{
-			conn_ptr_ = std::make_shared<_Connector>(io_service_);
+			conn_ptr_ = std::make_shared<_Connector>(io_service_, ssl_context_);
 
 			boost::asio::async_connect(conn_ptr_->socket(), endpoints,
 									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
@@ -117,12 +121,21 @@ namespace aquarius
 										   if (!conn_ptr_)
 											   return;
 
+										   conn_ptr_->set_verify_mode(boost::asio::ssl::verify_peer);
+
 										   conn_ptr_->start();
 									   });
 		}
 
+		void init_ssl_context()
+		{
+			ssl_context_.load_verify_file("crt/server.crt");
+		}
+
 	private:
 		boost::asio::io_service io_service_;
+
+		boost::asio::ssl::context ssl_context_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
 

@@ -10,9 +10,9 @@ namespace aquarius
 		constexpr static std::size_t IDENTIFY = Identify;
 
 	public:
-		server_connect(boost::asio::io_service& io_service,
+		server_connect(boost::asio::io_service& io_service, boost::asio::ssl::context& context,
 					   std::chrono::steady_clock::duration dura = heart_time_interval)
-			: ssl_connect<_Protocol, true>(io_service, dura)
+			: ssl_connect<_Protocol, true>(io_service, context, dura)
 		{}
 
 	public:
