@@ -17,11 +17,11 @@ namespace aquarius
 			if (buffer.size() < size)
 				return read_handle_result::waiting_for_query;
 
-			uint32_t proto_size{};
+			uint64_t proto_size{};
 
 			buffer.sgetn((uint8_t*)&proto, sizeof(uint32_t));
 
-			buffer.sgetn((uint8_t*)&proto_size, sizeof(uint32_t));
+			buffer.sgetn((uint8_t*)&proto_size, sizeof(uint64_t));
 
 			if (buffer.size() < proto_size)
 				return read_handle_result::waiting_for_query;

@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(process)
 
 	cli.async_write(std::move(req));
 
-	std::this_thread::sleep_for(5s);
+	std::this_thread::sleep_for(15s); 
 
 	cli.stop();
 	tc.join();

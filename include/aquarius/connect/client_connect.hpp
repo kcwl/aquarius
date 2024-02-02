@@ -32,13 +32,13 @@ namespace aquarius
 		{
 			auto& buff = this->buffer();
 
-			buff.consume(sizeof(uint32_t) * 3);
+			buff.consume(sizeof(uint32_t) + sizeof(uint64_t) * 2);
 
-			uint32_t uid{};
+			uint64_t uid{};
 
-			buff.sgetn((uint8_t*)&uid, sizeof(uint32_t));
+			buff.sgetn((uint8_t*)&uid, sizeof(uint64_t));
 
-			buff.consume(-((int)sizeof(uint32_t) * 4));
+			buff.consume(-static_cast<int>(sizeof(uint32_t) + sizeof(uint64_t) * 3));
 
 			return func_invoke(uid, buff);
 		}
