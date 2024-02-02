@@ -166,6 +166,7 @@
     <ClInclude Include="..\include\aquarius\context\system_context.hpp" />
     <ClInclude Include="..\include\aquarius\context\user_context.hpp" />
     <ClInclude Include="..\include\aquarius\defines.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp" />
     <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
+    <ClInclude Include="io_service_pool.h" />
     <ClInclude Include="message_process.h" />
     <ClInclude Include="message_test.h" />
     <ClInclude Include="mysql_test.h" />
