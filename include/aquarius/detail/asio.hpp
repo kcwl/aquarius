@@ -5,5 +5,4 @@
 namespace aquarius
 {
 	namespace asio = boost::asio;
-
 }

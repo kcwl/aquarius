@@ -140,10 +140,7 @@
     <ClInclude Include="..\include\aquarius\context\user_context.hpp">
       <Filter>aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="server_test.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="message_test.h">
+    <ClInclude Include="server.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\mysql.hpp">
