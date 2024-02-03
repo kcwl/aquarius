@@ -1,9 +1,8 @@
 #pragma once
-#include <aquarius/client.hpp>
 #include <aquarius/defines.hpp>
+#include <aquarius/invoke.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/service.hpp>
 #include <type_traits>
 
 namespace aquarius
@@ -38,7 +37,7 @@ namespace aquarius
 
 			XLOG(info) << "[server] " << server_name_ << " server is started!";
 
-			service_router::instance().run();
+			service_invoke_helper::run();
 
 			io_service_pool_.run();
 		}
@@ -102,7 +101,7 @@ namespace aquarius
 
 			close();
 
-			// service_router::instance().stop();
+			service_invoke_helper::stop();
 
 			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
 					   << ", signal: " << signal;

@@ -2,8 +2,6 @@
 #include <aquarius/detail/router.hpp>
 #include <aquarius/service/service.hpp>
 #include <memory>
-#include <string>
-#include <unordered_map>
 
 namespace aquarius
 {
@@ -14,30 +12,33 @@ namespace aquarius
 		{
 			for (auto& invoke : this->map_invokes_)
 			{
-				services_.insert({ invoke.first, invoke.second() });
+				auto ptr = invoke.second();
+
+				if (ptr == nullptr)
+					continue;
+
+				services_.insert({ invoke.first, ptr });
 			}
+
+			int result = 1;
 
 			for (auto& service : services_)
 			{
-				if (!service.second)
-					continue;
-
 				if (!service.second->enable())
 					continue;
 
-				start_one(service.second);
+				auto res = start_one(service.second);
+
+				result &= static_cast<int>(res);
 			}
 
-			return true;
+			return result != 0;
 		}
 
 		void stop()
 		{
 			for (auto& service : services_)
 			{
-				if (!service.second)
-					continue;
-
 				if (!service.second->enable())
 					continue;
 
@@ -62,9 +63,6 @@ namespace aquarius
 			if (iter == services_.end())
 				return false;
 
-			if (!iter->second)
-				return false;
-
 			iter->second->stop();
 
 			return true;
@@ -73,17 +71,27 @@ namespace aquarius
 	private:
 		bool start_one(std::shared_ptr<service> ptr)
 		{
-			if (!ptr)
-				return false;
-
 			if (!ptr->config())
-				return false;
+			{
+				XLOG(error) << "[servie] " << ptr->name() << " config error!";
 
-			if (!ptr->init())
 				return false;
+			}
+				
+			if (!ptr->init())
+			{
+				XLOG(error) << "[servie] " << ptr->name() << " init error!";
+
+				return false;
+			}
+				
 
 			if (!ptr->run())
+			{
+				XLOG(error) << "[servie] " << ptr->name() << " run error!";
+
 				return false;
+			}
 
 			return true;
 		}

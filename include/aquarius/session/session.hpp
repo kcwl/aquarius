@@ -10,6 +10,7 @@
 #include <memory>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/context/context.hpp>
+#include <aquarius/invoke.hpp>
 
 namespace aquarius
 {

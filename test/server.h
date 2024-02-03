@@ -28,7 +28,7 @@ public:
 	}
 };
 
-CONTEXT_DEFINE(test_request, ctx_test_server);
+AQUARIUS_CONTEXT_REGIST(test_request, ctx_test_server);
 
 class ctx_test_client : public aquarius::client_context<test_response>
 {
@@ -49,7 +49,7 @@ public:
 	}
 };
 
-CONTEXT_DEFINE(test_response, ctx_test_client);
+AQUARIUS_CONTEXT_REGIST(test_response, ctx_test_client);
 
 BOOST_AUTO_TEST_CASE(process_message)
 {

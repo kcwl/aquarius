@@ -6,7 +6,7 @@
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/service.hpp>
+#include <aquarius/invoke.hpp>
 
 namespace aquarius
 {

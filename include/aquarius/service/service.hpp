@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace aquarius
 {
@@ -14,5 +15,7 @@ namespace aquarius
 		virtual void stop() = 0;
 
 		virtual bool enable() = 0;
+
+		virtual std::string name() = 0;
 	};
 } // namespace aquarius

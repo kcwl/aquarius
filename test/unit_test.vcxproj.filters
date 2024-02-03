@@ -40,6 +40,9 @@
     <Filter Include="aquarius\connect">
       <UniqueIdentifier>{b70ee681-84a7-4703-9b23-9a182dfb1a8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="aquarius\invoke">
+      <UniqueIdentifier>{7c74b2f0-31ab-45f4-83b9-ef5fc900642a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -119,12 +122,6 @@
     <ClInclude Include="..\include\aquarius\resolver.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\router.hpp">
-      <Filter>aquarius\message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\invoke.hpp">
-      <Filter>aquarius\message</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\event_callback.hpp">
       <Filter>aquarius</Filter>
     </ClInclude>
@@ -164,16 +161,7 @@
     <ClInclude Include="mysql_test.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\service.hpp">
-      <Filter>aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\service\service.hpp">
-      <Filter>aquarius\service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\service\service_router.hpp">
-      <Filter>aquarius\service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\service\invoke.hpp">
       <Filter>aquarius\service</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\mysql\sql.hpp">
@@ -223,6 +211,30 @@
     </ClInclude>
     <ClInclude Include="io_service_pool.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="router.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke.hpp">
+      <Filter>aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp">
+      <Filter>aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp">
+      <Filter>aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp">
+      <Filter>aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\router_context.hpp">
+      <Filter>aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\router_message.hpp">
+      <Filter>aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\router_service.hpp">
+      <Filter>aquarius\invoke</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

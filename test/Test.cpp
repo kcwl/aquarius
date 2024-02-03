@@ -2,3 +2,4 @@
 #include <boost/test/included/unit_test.hpp>
 #include "io_service_pool.h"
 #include "server.h"
+#include "router.h"

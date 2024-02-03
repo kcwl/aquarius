@@ -35,14 +35,6 @@ namespace aquarius
 				return iter->second(args...);
 			}
 
-			void count_ids(std::vector<std::size_t>& ids)
-			{
-				for (auto& m : map_invokes_)
-				{
-					ids.push_back(m.first);
-				}
-			}
-
 		protected:
 			std::unordered_map<std::size_t, std::function<_R(_Args...)>> map_invokes_;
 

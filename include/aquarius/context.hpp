@@ -2,7 +2,7 @@
 #include <aquarius/context/system_context.hpp>
 #include <aquarius/context/user_context.hpp>
 
-#define MESSAGE_DEFINE(req) static aquarius::msg_regist<req> msg_##req(req::Number)
+#define AQUARIUS_MESSAGE_REGIST(req) static aquarius::msg_regist<req> msg_##req(req::Number)
 
 #define MESSAGE_MULTI_DEFINE(name_space, req)                                                                          \
 	static aquarius::ctx::msg_regist<name_space::req> msg_##req(name_space::req::Number)
@@ -12,8 +12,8 @@
 #define CONTEXT_IMPL_MULTI_DEFINE(msg, name_space, context)                                                            \
 	static aquarius::ctx_regist<name_space::context> ctx##context(msg::Number)
 
-#define CONTEXT_DEFINE(msg, context)                                                                                   \
-	MESSAGE_DEFINE(msg);                                                                                               \
+#define AQUARIUS_CONTEXT_REGIST(msg, context)                                                                                   \
+	AQUARIUS_MESSAGE_REGIST(msg);                                                                                               \
 	CONTEXT_DEFINE_IMPL(msg, context)
 
 #define CONTEXT_DEFINE_MULTI_MESSAGE(name_space, req, context)                                                         \
