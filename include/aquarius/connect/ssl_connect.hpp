@@ -26,12 +26,12 @@ namespace aquarius
 		using this_type = ssl_connect<_Protocol, has_server>;
 
 	public:
-		explicit ssl_connect(boost::asio::io_service& io_service, ssl_context_t& context, std::chrono::steady_clock::duration dura)
+		explicit ssl_connect(boost::asio::io_service& io_service, ssl_context_t& context,
+							 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: io_service_(io_service)
 			, socket_(io_service_)
 			, ssl_socket_(socket_, context)
 			, read_buffer_()
-			, heart_timer_(io_service_)
 			, dura_(dura)
 			, uid_()
 			, session_ptr_(new session<this_type>())
@@ -93,14 +93,15 @@ namespace aquarius
 										{
 											if (ec)
 											{
-												XLOG(error) << has_server<<"-" << "handshake error at " << remote_address() << ":"
-															<< ec.message();
+												XLOG(error) << has_server << "-"
+															<< "handshake error at " << remote_address() << ":"
+															<< remote_port() << "\t" << ec.message();
 
 												return;
 											}
 
-											XLOG(info) << "handshake success at " << remote_address()
-													   << ", async read establish";
+											XLOG(info) << "handshake success at " << remote_address() << ":"
+													   << remote_port() << ", async read establish";
 
 											establish_async_read();
 										});
@@ -130,7 +131,10 @@ namespace aquarius
 					{
 						if (ec != boost::asio::error::eof)
 						{
-							XLOG(error) << "on read some at " << remote_address() << " occur error : " << ec.message();
+							XLOG(error) << "on read some at " << remote_address() << ":" << remote_port()
+										<< "\t"
+										   " occur error : "
+										<< ec.message();
 						}
 
 						return shut_down();
@@ -144,7 +148,7 @@ namespace aquarius
 
 						if (result == read_handle_result::unknown_error || result == read_handle_result::unknown_proto)
 						{
-							XLOG(error) << "unknown proto at " << remote_address();
+							XLOG(error) << "unknown proto at " << remote_address() << ":" << remote_port();
 
 							return shut_down();
 						}
@@ -174,7 +178,8 @@ namespace aquarius
 						return;
 					}
 
-					XLOG(error) << has_server<< "-write error at " << remote_address() << ": " << ec.message();
+					XLOG(error) << has_server << "-write error at " << remote_address() << ":" <<
+						":" << remote_port() << "\t" << ec.message();
 
 					return shut_down();
 				});
@@ -191,8 +196,6 @@ namespace aquarius
 				socket_.close(ec);
 			}
 
-			heart_timer_.cancel(ec);
-
 			ssl_socket_.shutdown(ec);
 		}
 
@@ -203,6 +206,9 @@ namespace aquarius
 
 		void set_sndbuf_size(int value) noexcept
 		{
+			if (get_sndbuf_size() == value)
+				return;
+
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::send_buffer_size(value), ec);
 
@@ -222,6 +228,9 @@ namespace aquarius
 
 		void set_rcvbuf_size(int value) noexcept
 		{
+			if (get_rcvbuf_size() == value)
+				return;
+
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::receive_buffer_size(value), ec);
 
@@ -239,43 +248,62 @@ namespace aquarius
 			return option.value();
 		}
 
-		void keep_alive(bool value) noexcept
+		bool keep_alive(bool value) noexcept
 		{
 			boost::system::error_code ec;
 
 			socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
 
 			XLOG(info) << "set keep alive :" << value;
+
+			return !ec;
 		}
 
-		void set_nodelay(bool enable)
+		bool set_nodelay(bool enable)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 
 			XLOG(info) << "set nodelay :" << enable;
+
+			return !ec;
 		}
 
-		void reuse_address(bool value)
+		bool reuse_address(bool value)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
 
 			XLOG(info) << "reuse address :" << value;
+
+			return !ec;
 		}
 
-		void set_linger(bool enable, int timeout)
+		bool set_linger(bool enable, int timeout)
 		{
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::linger(enable, timeout), ec);
 
 			XLOG(info) << "set linger :" << enable << ",timeout:" << timeout;
+
+			return !ec;
+		}
+
+		void set_verify_mode(boost::asio::ssl::verify_mode v)
+		{
+			ssl_socket_.set_verify_mode(v);
 		}
 
 	public:
-		virtual bool on_read(read_handle_result) = 0;
+		virtual bool on_read(read_handle_result)
+		{
+			return false;
+		}
 
-		virtual bool on_resolve() = 0;
+		virtual bool on_resolve()
+		{
+			return false;
+		}
 
 	protected:
 		[[nodiscard]] flex_buffer_t& buffer()
@@ -289,30 +317,20 @@ namespace aquarius
 		}
 
 	private:
-		void heart_deadline()
-		{
-			heart_timer_.expires_from_now(dura_);
-
-			heart_timer_.async_wait(
-				[this, self = this->shared_from_this()](const boost::system::error_code& ec)
-				{
-					if (ec == boost::asio::error::operation_aborted)
-						return;
-
-					if (!ec)
-						return heart_deadline();
-
-					shut_down();
-				});
-		}
-
 		void establish_async_read()
 		{
 			session_ptr_ = std::make_shared<session<this_type>>(this->shared_from_this());
 
 			session_manager::instance().push(session_ptr_);
 
-			heart_deadline();
+			keep_alive(true);
+
+			if constexpr (has_server)
+			{
+				reuse_address(true);
+
+				set_nodelay(true);
+			}
 
 			async_read();
 		}
@@ -325,8 +343,6 @@ namespace aquarius
 		ssl_socket_t ssl_socket_;
 
 		flex_buffer_t read_buffer_;
-
-		detail::steady_timer heart_timer_;
 
 		std::chrono::steady_clock::duration dura_;
 

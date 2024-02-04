@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <type_traits>
+#include <filesystem>
 
 namespace aquarius
 {
@@ -18,6 +19,7 @@ namespace aquarius
 		explicit client(_Args&&... args)
 			: io_service_()
 			, ssl_context_(boost::asio::ssl::context::sslv23)
+			, resolve_(io_service_)
 		{
 			init_ssl_context();
 
@@ -29,12 +31,9 @@ namespace aquarius
 			auto host = std::get<0>(endpoint_list);
 			auto port = std::get<1>(endpoint_list);
 
-			if constexpr (!detail::is_string_v<decltype(host)> || !detail::is_string_v<decltype(port)>)
-				throw std::overflow_error("Usage: client <host> <port> : type - string");
+			static_assert(detail::is_string_v<decltype(host)> && detail::is_string_v<decltype(port)>, "Usage: client <host> <port> : type - string");
 
-			boost::asio::ip::tcp::resolver resolve(io_service_);
-
-			do_connect(resolve.resolve(host, port));
+			do_connect(resolve_.resolve(host, port));
 		}
 
 	public:
@@ -111,6 +110,9 @@ namespace aquarius
 		{
 			conn_ptr_ = std::make_shared<_Connector>(io_service_, ssl_context_);
 
+			if (!conn_ptr_)
+				return;
+
 			boost::asio::async_connect(conn_ptr_->socket(), endpoints,
 									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
@@ -128,7 +130,12 @@ namespace aquarius
 
 		void init_ssl_context()
 		{
-			ssl_context_.load_verify_file("crt/server.crt");
+			auto path = std::filesystem::current_path();
+
+			path.append("crt");
+			path.append("server.crt");
+
+			ssl_context_.load_verify_file(path.string());
 		}
 
 	private:
@@ -139,5 +146,7 @@ namespace aquarius
 		std::shared_ptr<_Connector> conn_ptr_;
 
 		boost::asio::ip::tcp::resolver::results_type endpoint_;
+
+		boost::asio::ip::tcp::resolver resolve_;
 	};
 } // namespace aquarius

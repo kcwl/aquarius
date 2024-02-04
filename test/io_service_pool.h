@@ -1,6 +1,6 @@
 #pragma once
-#include <boost/test/unit_test_suite.hpp>
 #include <aquarius/io_service_pool.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 BOOST_AUTO_TEST_SUITE(io_service_pool)
 
@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(io_service)
 
 	aquarius::io_service_pool pool(3);
 
-	std::thread t([&] {pool.run(); });
+	std::thread t([&] { pool.run(); });
 
 	for (int i = 0; i < 4; ++i)
 	{

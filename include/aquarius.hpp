@@ -3,10 +3,10 @@
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
+#include <aquarius/invoke.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/invoke.hpp>
 
 namespace aquarius
 {
@@ -22,7 +22,7 @@ namespace aquarius
 	template <std::size_t Identify>
 	using http_server = server<http_server_connect<Identify>>;
 
-	using tcp_client_connect = client_connect<tcp>;
+	using tcp_client_connect = ssl_connect<tcp, false>;
 
 	using tcp_client = client<tcp_client_connect>;
 

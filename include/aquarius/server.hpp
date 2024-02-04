@@ -12,6 +12,8 @@ namespace aquarius
 	{
 		using ssl_context_t = asio::ssl::context;
 
+		using connect_t = _Connector;
+
 	public:
 		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
@@ -47,19 +49,17 @@ namespace aquarius
 			signal_stop({}, -1);
 		}
 
-		void close()
-		{
-			boost::system::error_code ec;
-			acceptor_.cancel(ec);
-			acceptor_.close(ec);
-
-			XLOG(info) << "[acceptor] acceptor closed! " << ec.message();
-		}
+		
 
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<_Connector>(io_service_pool_.get_io_service(), ssl_context_);
+			auto new_connect_ptr = std::make_shared<connect_t>(io_service_pool_.get_io_service(), ssl_context_);
+
+			if (!new_connect_ptr)
+				return;
+
+			conns_.push_back(new_connect_ptr);
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& ec)
@@ -95,12 +95,6 @@ namespace aquarius
 
 			io_service_pool_.stop();
 
-			boost::system::error_code _ec;
-
-			signals_.cancel(_ec);
-
-			close();
-
 			service_invoke_helper::stop();
 
 			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
@@ -133,6 +127,9 @@ namespace aquarius
 
 			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 		}
+
+	public:
+		std::vector<std::shared_ptr<connect_t>> conns_;
 
 	private:
 		io_service_pool io_service_pool_;
