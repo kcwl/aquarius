@@ -44,5 +44,11 @@
     <ClInclude Include="file_descriptor.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="key_word.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="file_struct.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,14 +1,15 @@
 #include "command_line.h"
 
-#include <vector>
 #include "file_descriptor.h"
 
-namespace elastic
+#include <vector>
+
+namespace aquarius
 {
 	namespace compiler
 	{
 		void command_line::register_generator(const std::string& flag_name, code_generator* generator,
-											  const std::string& help_text)
+											  const std::string& help_text = {})
 		{
 			generator_info info{};
 			info.flag_name_ = flag_name;
@@ -19,7 +20,7 @@ namespace elastic
 		}
 
 		void command_line::register_generator(const std::string& flag_name, const std::string& option_flag_name,
-											  code_generator* generator, const std::string& help_text)
+											  code_generator* generator, const std::string& help_text = {})
 		{
 			generator_info info{};
 			info.flag_name_ = flag_name;

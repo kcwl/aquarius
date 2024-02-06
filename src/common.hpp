@@ -1,9 +1,9 @@
 #pragma once
 #include "defines.h"
-
+#include "key_word.hpp"
 #include <string>
 
-namespace elastic
+namespace aquarius
 {
 	template <typename T, std::size_t... I>
 	bool spilt(const char elem, T&& t, std::index_sequence<I...>)
@@ -45,7 +45,22 @@ namespace elastic
 			stream.get();
 		}
 
-		return stream.good();
+		return !stream.fail();
+	}
+
+	inline std::string substr_num(const std::string& word)
+	{
+		int pos = 0;
+
+		for (auto& s : word)
+		{
+			if (!std::isalnum(s))
+				break;
+
+			pos++;
+		}
+
+		return word.substr(0, pos);
 	}
 
 	inline bool spilt_by(const std::string& keywords, const char sp, std::string& first, std::string& second)
@@ -54,21 +69,35 @@ namespace elastic
 
 		if (pos == std::string::npos)
 		{
-			first = keywords;
+			return false;
 		}
 
 		first = keywords.substr(0, pos);
 
 		second = keywords.substr(pos + 1);
 
-		pos = second.find_first_of('/');
-
-		if (pos != std::string::npos)
-		{
-			second = second.substr(0, pos);
-		}
+		second = substr_num(second);
 
 		return true;
+	}
+
+	inline bool check_key_word(const std::string& key)
+	{
+		auto iter = key_word.find(key);
+
+		return iter != key_word.end();
+	}
+
+	inline bool check_key_type(const std::string& key)
+	{
+		auto iter = key_type.find(key);
+
+		return iter != key_type.end();
+	}
+
+	inline bool check_key_info(const std::string& key)
+	{
+		return check_key_type(key) || check_key_word(key);
 	}
 
 } // namespace elastic

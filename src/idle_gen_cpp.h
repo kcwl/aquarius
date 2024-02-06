@@ -7,7 +7,7 @@
 
 using namespace std::string_view_literals;
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{
@@ -36,7 +36,7 @@ namespace elastic
 
 				void write_access_func(const reflactor_structure& rs);
 
-				void write_members(const std::vector<reflactor_structure>& rss);
+				void write_members(const reflactor_structure& srs);
 
 				void end_write_class();
 

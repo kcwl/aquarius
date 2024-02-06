@@ -3,8 +3,11 @@
 #include "common.hpp"
 
 #include <iostream>
+#include <vector>
+#include <deque>
+#include <filesystem>
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{
@@ -12,7 +15,7 @@ namespace elastic
 		{
 			if (!check_file_suffix(file_name))
 			{
-				std::cout << "file format error, maybe suffix is not \".mpr\"!";
+				std::cout << "file format error, maybe suffix is not \"."<< file_suffix <<"\"!";
 
 				return false;
 			}
@@ -29,26 +32,20 @@ namespace elastic
 			{
 				reflactor_structure impl{};
 
-				auto cur = read_file_stream_.peek();
+				if (!read_keyword(impl.type_))
+					continue;
 
-				if (cur == '/')
-				{
-					impl.note_ = read_note();
-				}
-				else if (cur == -1)
-				{
-					break;
-				}
-				else
-				{
-					if (!read_keyword(impl.type_))
-						return false;
+				if (!check_key_info(impl.type_))
+					continue;
 
-					if (impl.type_ == "message")
-						read_message(impl);
-					else if (impl.type_ == "package")
-						read_package(impl);
-					else
+				if (impl.type_ == "message")
+				{
+					if (!read_message(impl))
+						continue;
+				}
+				else if (impl.type_ == "package")
+				{
+					if (!read_package(impl))
 						continue;
 				}
 
@@ -68,98 +65,39 @@ namespace elastic
 			return multi_key_words_;
 		}
 
-		bool file_descriptor::read_to_spilt(std::string& value, char sp)
+		bool file_descriptor::read_to_spilt(std::string& value, int sp)
 		{
+			auto cur = read_file_stream_.peek();
+
+			if (cur == sp)
+			{
+				read_file_stream_.get();
+
+				return true;
+			}
+
 			std::array<char, 1024> temp_line{};
 
-			read_file_stream_.get(&temp_line[0], 1024, sp);
-
-			read_file_stream_.get();
+			read_file_stream_.get(&temp_line[0], 1024, (char)sp);
 
 			value = temp_line.data();
 
-			return true;
+			if (!read_file_stream_.eof())
+			{
+				read_file_stream_.get();
+			}
+
+			return !read_file_stream_.fail();
 		}
 
-		bool file_descriptor::read_command(reflactor_structure& rs)
+		bool file_descriptor::read_command(std::string& name)
 		{
-			if (!read_to_spilt(rs.name_, ';'))
+			if (!read_to_spilt(name, ';'))
 				return false;
 
-			rs.note_ = read_note();
-
-			skip_if(read_file_stream_, '\r', '\n','\t');
+			skip_if(read_file_stream_, '\r', '\n','\t',' ');
 
 			return true;
-		}
-
-		bool file_descriptor::choose_state(int current, reflactor_structure& rs)
-		{
-			bool result = true;
-			switch (current)
-			{
-			case '/':
-				{
-					rs.note_ = read_note();
-				}
-				break;
-			default:
-				{
-					result = read_command(rs);
-				}
-				break;
-			}
-
-			return result;
-		}
-
-		note file_descriptor::read_note()
-		{
-			note n{};
-
-			std::string space{};
-
-			while (!read_file_stream_.eof())
-			{
-				auto cur = read_file_stream_.peek();
-
-				if (cur == '\r')
-					break;
-
-				read_file_stream_.get();
-
-				if (cur != '/')
-				{
-					space += static_cast<char>(cur);
-
-					continue;
-				}
-
-				cur = read_file_stream_.get();
-
-				if (cur == '*')
-				{
-					read_to_spilt(n.content_, '/');
-
-					n.content_ = space + std::string("/") + n.content_ + std::string("/");
-
-					n.type_ = note_type::slash;
-				}
-				else if (cur == '/')
-				{
-					read_to_spilt(n.content_, '\r');
-
-					n.content_ = space + std::string("//") + n.content_;
-
-					read_file_stream_.get();
-
-					n.type_ = note_type::double_slash;
-				}
-
-				break;
-			}
-
-			return n;
 		}
 
 		bool file_descriptor::check_file_suffix(const std::string& file_name)
@@ -174,71 +112,41 @@ namespace elastic
 
 			input_file_name_ = file_name.substr(slash_pos, pos - slash_pos);
 
+			auto suffix = file_name.substr(pos + 1);
+
+			if (suffix.compare(file_suffix) != 0)
+				return false;
+
 			return true;
 		}
 
-		bool file_descriptor::read_keyword(std::string& keyword, bool ignore_note)
+		bool file_descriptor::read_keyword(std::string& keyword)
 		{
 			if (!read_to_spilt(keyword, ' '))
 				return false;
 
-			auto size = keyword.size();
-			std::size_t i = 0;
-			while (i < size - 1)
-			{
-				if (keyword[i] == '/')
-				{
-					std::size_t pos{};
+			keyword = spilt_keyword_from_line(keyword);
 
-					if (keyword[i + 1] == '/')
-					{
-						pos = keyword.find_first_of('\r');
+			if (keyword.empty())
+				return false;
 
-						if (pos == std::string::npos)
-							return false;
-					}
-					else if (keyword[i + 1] == '*')
-					{
-						while (pos < keyword.size())
-						{
-							pos = keyword.find('*', pos);
+			return true;
+		}
 
-							if (pos == std::string::npos)
-								return false;
+		bool file_descriptor::read_keytype(std::string& keytype)
+		{
+			if (!read_to_spilt(keytype, ' ') && !read_file_stream_.eof())
+				return false;
 
-							pos++;
+			auto pos = keytype.find("}");
 
-							if (pos < keyword.size() - 1 && keyword[pos + 1] == '/')
-								break;
-						}
+			if (pos != std::string::npos)
+				return true;
 
-						pos += 2;
-					}
+			keytype = spilt_keytype_from_line(keytype);
 
-					if (!ignore_note)
-					{
-						multi_key_words_.push_back({});
-
-						auto& back = multi_key_words_.back();
-
-						back.note_.content_ = keyword.substr(0, pos);
-					}
-
-					keyword = keyword.substr(pos + 1);
-
-					i = 0;
-
-					trip(keyword, '\r', '\n', '\t', ' ');
-
-					size = keyword.size();
-
-					continue;
-				}
-
-				trip(keyword, '\r', '\n', '\t', ' ');
-
-				break;
-			}
+			if (keytype.empty())
+				return false;
 
 			return true;
 		}
@@ -251,50 +159,34 @@ namespace elastic
 
 			trip(name_and_number, '\r', '\n', '\t', ' ');
 
-			//auto pos = name_and_number.find('=');
-
-			//if (pos == std::string::npos)
-			//{
-			//	return false;
-			//}
-
-			//rs.name_ = name_and_number.substr(0, pos);
-
-			//auto note_pos = name_and_number.find('/');
-
-			//if (note_pos == std::string::npos)
-			//	rs.number_ = name_and_number.substr(pos + 1);
-			//else
-			//{
-			//	rs.number_ = name_and_number.substr(pos + 1, note_pos - pos - 1);
-			//}
-
 			if (!spilt_by(name_and_number, '=', rs.name_, rs.number_))
 				return false;
 
 			read_file_stream_.get();
 
-			while (true)
+			while (!read_file_stream_.eof())
 			{
-				rs.structs_.push_back({});
+				std::string type{};
+				std::string name{};
 
-				auto& impl = rs.structs_.back();
-
-				if (!read_keyword(impl.type_, true))
+				if (!read_keytype(type))
 					return false;
 
-				if (impl.type_[0] == '}')
-				{
-					read_file_stream_.seekg(0 - impl.type_.size(), std::ios::cur);
+				auto pos = type.find("}");
 
-					rs.structs_.pop_back();
+				if (pos != std::string::npos)
+				{
+					int off = static_cast<int>(type.size() - pos - 1);
+
+					read_file_stream_.seekg(-off, std::ios::cur);
+
 					break;
 				}
 
-				if (impl.type_ == "repeated")
-					read_keyword(impl.sub_type_);
+				if (!read_command(name))
+					return false;
 
-				read_command(impl);
+				rs.keywords_.insert({type,name});
 			}
 
 			return true;
@@ -302,7 +194,80 @@ namespace elastic
 
 		bool file_descriptor::read_package(reflactor_structure& rs)
 		{
-			return read_command(rs);
+			auto pos = read_file_stream_.tellg();
+
+			if (!read_command(rs.name_))
+				return false;
+
+			if (check_space(rs.name_))
+			{
+				read_file_stream_.seekg(pos);
+
+				std::string str{};
+
+				read_to_spilt(str, ' ');
+
+				return false;
+			}
+				
+			return true;
+		}
+
+		std::string file_descriptor::spilt_keyword_from_line(const std::string& keyword)
+		{
+			for (auto& key : key_word)
+			{
+				auto pos = keyword.find(key.first);
+
+				if (pos == std::string::npos)
+					continue;
+
+				if (pos > 0)
+				{
+					auto& cur = keyword[pos - 1];
+					if ((cur != '\r') && (cur != '\n') && (cur != ' ') && (cur != '\t'))
+						return {};
+				}
+
+				return key.first;
+			}
+
+			return {};
+		}
+
+		std::string file_descriptor::spilt_keytype_from_line(const std::string& keytype)
+		{
+			for (auto& key : key_type)
+			{
+				auto pos = keytype.find(key.first);
+
+				if (pos == std::string::npos)
+					continue;
+
+				if (pos > 0)
+				{
+					auto& cur = keytype[pos - 1];
+					if ((cur != '\r') && (cur != '\n') && (cur != ' ') && (cur != '\t'))
+						continue;
+				}
+
+				return key.first;
+			}
+
+			return {};
+		}
+
+		bool file_descriptor::check_space(const std::string& word)
+		{
+			for (auto& s : word)
+			{
+				if (!std::isspace(s))
+					continue;
+
+				return true;
+			}
+
+			return false;
 		}
 	} // namespace compiler
 } // namespace elastic

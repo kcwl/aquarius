@@ -3,7 +3,7 @@
 
 #include "file_descriptor.h"
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{

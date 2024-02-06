@@ -10,13 +10,7 @@
 
 namespace
 {
-	const std::map<std::string, std::string> type_pair = {
-		{ "int32", "int32_t" },	  { "int64", "int64_t" },	  { "string", "std::string" }, { "bool", "bool" },
-		{ "uint32", "uint32_t" }, { "uint64", "uint64_t" },	  { "bytes", "bytes" },		   { "float", "float" },
-		{ "double", "double" },	  { "fixed32", "fixed32_t" }, { "fixed64", "fixed64_t" },
-	};
-
-	const std::string file_suffix = ".mpr.hpp";
+	const std::string generate_file_suffix = ".proto.hpp";
 
 	std::string get_type_name(const std::string& type, const std::string& sub_type = {})
 	{
@@ -24,9 +18,9 @@ namespace
 
 		temp_type == "repeated" ? temp_type = sub_type : std::string{};
 
-		auto iter = type_pair.find(temp_type);
+		auto iter = aquarius::key_type.find(temp_type);
 
-		if (iter != type_pair.end())
+		if (iter != aquarius::key_type.end())
 		{
 			return iter->second;
 		}
@@ -38,9 +32,19 @@ namespace
 		return result;
 	}
 
+	std::string get_keyword_name(const std::string& keyword)
+	{
+		auto iter = aquarius::key_word.find(keyword);
+
+		if (iter == aquarius::key_word.end())
+			return {};
+
+		return iter->second;
+	}
+
 } // namespace
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{
@@ -52,7 +56,8 @@ namespace elastic
 
 				output_file_name_ = output_dir;
 
-				write_hpp_stream_.open(input_file_ptr_->file_name() + file_suffix, std::ios::binary | std::ios::out);
+				write_hpp_stream_.open(input_file_ptr_->file_name() + generate_file_suffix,
+									   std::ios::binary | std::ios::out);
 
 				if (!write_hpp_stream_.is_open())
 					return false;
@@ -82,15 +87,15 @@ namespace elastic
 					{
 						begin_write_class(s);
 
-						write_access_func(s);
+						write_members(s);
 
-						write_members(s.structs_);
+						write_access_func(s);
 
 						end_write_class();
 					}
 					else
 					{
-						lines.push_back(s.note_.content_);
+						// lines.push_back(s.note_.content_);
 					}
 				}
 
@@ -101,6 +106,7 @@ namespace elastic
 				if (back.empty())
 					lines.pop_back();
 
+
 				if (has_namespace)
 				{
 					end_write_package();
@@ -110,9 +116,7 @@ namespace elastic
 			void generate_cpp::write_struct_declare_header()
 			{
 				pragma("once");
-				include_file("aquarius/elastic.hpp");
-				include_file("aquarius/request.hpp");
-				include_file("aquarius/response.hpp");
+				include_file("aquarius.hpp");
 
 				line_feed();
 			}
@@ -130,19 +134,19 @@ namespace elastic
 
 			void generate_cpp::begin_write_class(const reflactor_structure& rs)
 			{
-				lines.push_back("class " + rs.name_);
+				lines.push_back(get_keyword_name(rs.type_) + " " + rs.name_);
 
 				lines.push_back("{");
 			}
 			void generate_cpp::write_access_func(const reflactor_structure& rs)
 			{
-				if (rs.structs_.empty())
+				if (rs.keywords_.empty())
 					return;
 
 				int count = 0;
-				for (auto& mem : rs.structs_)
+				for (auto& mem : rs.keywords_)
 				{
-					if (mem.type_ == "string" || mem.type_ == "bytes" || !mem.sub_type_.empty())
+					if (mem.first == "string" || mem.first == "bytes")
 					{
 						count++;
 
@@ -153,6 +157,7 @@ namespace elastic
 				if (count == 0)
 					return;
 
+				lines.push_back("private:");
 				lines.push_back("friend class aquarius::access;");
 				line_feed();
 
@@ -160,31 +165,30 @@ namespace elastic
 				lines.push_back("void serialize(_Archive& ar)");
 				lines.push_back("{");
 
-				for (auto& mem : rs.structs_)
+				for (auto& mem : rs.keywords_)
 				{
-					lines.push_back("ar& " + mem.name_ + ";");
+					lines.push_back("ar& " + mem.second + ";");
 				}
 
 				lines.push_back("}");
-				line_feed();
 			}
 
-			void generate_cpp::write_members(const std::vector<reflactor_structure>& rss)
+			void generate_cpp::write_members(const reflactor_structure& srs)
 			{
-				if (rss.empty())
+				if (srs.keywords_.empty())
 					return;
 
-				lines.push_back("public:");
-
-				for (auto& rs : rss)
+				for (auto& rs : srs.keywords_)
 				{
-					auto type = get_type_name(rs.type_, rs.sub_type_);
+					auto type = get_type_name(rs.first);
 
 					if (type.empty())
 						continue;
 
-					lines.push_back(type + " " + rs.name_ + ";" + rs.note_.content_);
+					lines.push_back(type + " " + rs.second + ";");
 				}
+
+				line_feed();
 			}
 
 			void generate_cpp::end_write_class()
@@ -207,11 +211,11 @@ namespace elastic
 							space.pop_back();
 					}
 
-					if (line.size() > 5)
+					if (line.size() > 6)
 					{
-						auto temp = line.substr(0, 5);
+						auto temp = line.substr(0, 6);
 
-						if (temp == "class")
+						if (temp == "struct")
 							last_space = space;
 					}
 
@@ -254,6 +258,11 @@ namespace elastic
 
 			void generate_cpp::write_message_register(const std::vector<reflactor_structure>& rs)
 			{
+				line_feed();
+				line_feed();
+				line_feed();
+				line_feed();
+
 				for (auto& mem : rs)
 				{
 					auto pos = mem.name_.find_last_of('_');
@@ -277,7 +286,7 @@ namespace elastic
 						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 5) +
 										" = aquarius::request<" + mem.name_ + ", " + mem.number_ + ">;");
 					}
-						
+
 					if (suffix == "body_response")
 					{
 						lines.push_back("using " + mem.name_.substr(0, pos) + mem.name_.substr(pos + 5) +
@@ -285,7 +294,6 @@ namespace elastic
 					}
 				}
 			}
-
 		} // namespace cpp
-	}	  // namespace compiler
-} // namespace elastic
+	} // namespace compiler
+} // namespace aquarius

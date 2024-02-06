@@ -7,9 +7,9 @@
 
 int main(int argc, char** argv)
 {
-	elastic::compiler::cpp::generate_cpp cpp{};
+	aquarius::compiler::cpp::generate_cpp cpp{};
 
-	elastic::compiler::command_line cl;
+	aquarius::compiler::command_line cl;
 	cl.register_generator("--cpp_out", &cpp, "heiheihei");
 
 	cl.run(argc, argv);

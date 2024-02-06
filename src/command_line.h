@@ -3,7 +3,7 @@
 
 #include <map>
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{

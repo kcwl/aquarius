@@ -141,8 +141,10 @@
     <ClInclude Include="command_line.h" />
     <ClInclude Include="common.hpp" />
     <ClInclude Include="file_descriptor.h" />
+    <ClInclude Include="file_struct.hpp" />
     <ClInclude Include="idle_gen_cpp.h" />
     <ClInclude Include="defines.h" />
+    <ClInclude Include="key_word.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
