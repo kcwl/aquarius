@@ -1,6 +1,4 @@
 #pragma once
-#include "test.pb.h"
-
 #include <aquarius/context.hpp>
 #include <aquarius/invoke.hpp>
 #include <aquarius/request.hpp>
@@ -10,9 +8,14 @@
 
 BOOST_AUTO_TEST_SUITE(router)
 
-using test_request = aquarius::request<Person, 1001>;
-using test_response = aquarius::response<Person, 1002>;
-using test_request_1 = aquarius::request<Person, 1003>;
+struct Person
+{
+	int age;
+};
+
+using test_request = aquarius::request<Person, 1000>;
+using test_response = aquarius::response<Person, 1001>;
+using test_request_1 = aquarius::request<Person, 1002>;
 
 class ctx_test_server : public aquarius::xhandle<test_request, test_response>
 {
@@ -24,8 +27,7 @@ public:
 public:
 	virtual int handle() override
 	{
-		response_.body().set_age(1);
-		response_.body().set_name("hello");
+		response_.body().age = 1;
 
 		send_response(1);
 

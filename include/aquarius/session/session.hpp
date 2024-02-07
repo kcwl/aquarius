@@ -2,7 +2,6 @@
 #include <any>
 #include <aquarius/defines.hpp>
 #include <aquarius/event_callback.hpp>
-#include <aquarius/flex_buffer.hpp>
 #include <aquarius/message/message.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>

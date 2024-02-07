@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/defines.hpp>
 #include <cstdint>
+#include <aquarius/elastic.hpp>
 
 namespace aquarius
 {
@@ -28,10 +29,32 @@ namespace aquarius
 	struct tcp_request_header : tcp_header
 	{
 		uint32_t session_id;
+
+	private:
+		friend class elastic::access;
+
+		template<typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& elastic::base_object<tcp_header>(*this);
+
+			ar& session_id;
+		}
 	};
 
 	struct tcp_response_header : tcp_header
 	{
 		int32_t result;
+
+	private:
+		friend class elastic::access;
+
+		template<typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& elastic::base_object<tcp_header>(*this);
+
+			ar& result;
+		}
 	};
 } // namespace aquarius

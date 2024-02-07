@@ -1,26 +1,85 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 #include <aquarius.hpp>
-//#include "test.pb.h"
 
 BOOST_AUTO_TEST_SUITE(server)
 
-using test_request = aquarius::request<Person, 10001>;
-using test_response = aquarius::response<Person, 10002>;
+struct person_body_request
+{
+	bool sex;
+	std::vector<uint8_t> role_data;
+	double mana;
+	float hp;
+	int32_t age;
+	int64_t money;
+	std::string name;
+	uint32_t back_money;
+	uint64_t crc;
 
-class ctx_test_server : public aquarius::xhandle<test_request, test_response>
+private:
+	friend class elastic::access;
+
+	template<typename _Archive>
+	void serialize(_Archive& ar)
+	{
+		ar& sex;
+		ar& role_data;
+		ar& mana;
+		ar& hp;
+		ar& age;
+		ar& money;
+		ar& name;
+		ar& back_money;
+		ar& crc;
+	}
+};
+
+struct person_body_response
+{
+	bool sex;
+	std::vector<uint8_t> role_data;
+	double mana;
+	float hp;
+	int32_t age;
+	int64_t money;
+	std::string name;
+	uint32_t back_money;
+	uint64_t crc;
+
+private:
+	friend class elastic::access;
+
+	template<typename _Archive>
+	void serialize(_Archive& ar)
+	{
+		ar& sex;
+		ar& role_data;
+		ar& mana;
+		ar& hp;
+		ar& age;
+		ar& money;
+		ar& name;
+		ar& back_money;
+		ar& crc;
+	}
+};
+
+using person_request = aquarius::request<person_body_request, 10000>;
+using person_response = aquarius::response<person_body_response, 10001>;
+
+class ctx_test_server : public aquarius::xhandle<person_request, person_response>
 {
 public:
 	ctx_test_server()
-		: aquarius::xhandle<test_request, test_response>("ctx_test_server")
+		: aquarius::xhandle<person_request, person_response>("ctx_test_server")
 	{}
 
 public:
 	virtual int handle() override
 	{
 		std::cout << "server ctx\n";
-		response_.body().set_age(1);
-		response_.body().set_name("hello");
+		response_.body().age = 1;
+		response_.body().name = "hello";
 
 		send_response(1);
 
@@ -28,13 +87,13 @@ public:
 	}
 };
 
-AQUARIUS_CONTEXT_REGIST(test_request, ctx_test_server);
+AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
 
-class ctx_test_client : public aquarius::client_context<test_response>
+class ctx_test_client : public aquarius::client_context<person_response>
 {
 public:
 	ctx_test_client()
-		: aquarius::client_context<test_response>("ctx_test_client")
+		: aquarius::client_context<person_response>("ctx_test_client")
 	{}
 
 public:
@@ -42,14 +101,14 @@ public:
 	{
 		std::cout << "test response recved!\n";
 
-		BOOST_CHECK_EQUAL(request_ptr_->body().age(), 1);
-		BOOST_CHECK_EQUAL(request_ptr_->body().name(), "hello");
+		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
+		BOOST_CHECK_EQUAL(request_ptr_->body().name, "hello");
 
 		return 1;
 	}
 };
 
-AQUARIUS_CONTEXT_REGIST(test_response, ctx_test_client);
+AQUARIUS_CONTEXT_REGIST(person_response, ctx_test_client);
 
 BOOST_AUTO_TEST_CASE(process_message)
 {
@@ -63,9 +122,9 @@ BOOST_AUTO_TEST_CASE(process_message)
 
 	std::this_thread::sleep_for(2s);
 
-	test_request req{};
-	req.body().set_age(1);
-	req.body().set_name("world");
+	person_request req{};
+	req.body().age = 1;
+	req.body().name = "world";
 
 	cli.async_write(std::move(req));
 
@@ -76,8 +135,8 @@ BOOST_AUTO_TEST_CASE(process_message)
 	
 	std::this_thread::sleep_for(2s);
 
-	//t.join();
-	//tc.join();
+	t.join();
+	tc.join();
 }
 
 BOOST_AUTO_TEST_CASE(acceptor_error)
@@ -94,8 +153,8 @@ BOOST_AUTO_TEST_CASE(acceptor_error)
 
 	cli.stop();
 	srv.stop();
-	//t.join();
-	//tc.join();
+	t.join();
+	tc.join();
 }
 
 BOOST_AUTO_TEST_CASE(connect_param)
@@ -144,9 +203,9 @@ BOOST_AUTO_TEST_CASE(connect_param)
 
 	std::this_thread::sleep_for(1s);
 
-	test_request req{};
-	req.body().set_age(1);
-	req.body().set_name("world");
+	person_request req{};
+	req.body().age = 1;
+	req.body().name = "world";
 
 	cli.async_write(std::move(req));
 
@@ -155,8 +214,8 @@ BOOST_AUTO_TEST_CASE(connect_param)
 	srv.stop();
 	cli.stop();
 
-	//tc.join();
-	//t.join();
+	tc.join();
+	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

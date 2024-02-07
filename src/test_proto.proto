@@ -1,19 +1,17 @@
-/*****************
-*test_proto
-*****************/
-
-package xxx; // package named namespace
-
-//message person that number is 10001
-message person_body_request = 10001  //注释
-{ //begin
-	int32 age;		//年龄
-	string name;	//姓名
+message person_body_request = 10000
+{
+	int32 age;
+	string name;
 	bool sex;
-	int64 money;	//钱
-	uint32 back_money; //仓库里的钱
-	uint64 crc; //crc验证码
-	bytes role_data; //人物数据
-	float hp; //人物血量
-	double mana; //人物蓝量
-}//end
+	int64 money;
+	uint32 back_money;
+	uint64 crc;
+	bytes role_data;
+	float hp;
+	double mana;
+}
+
+message person_body_response = 10001
+{
+
+}

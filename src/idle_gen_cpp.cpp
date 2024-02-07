@@ -158,7 +158,7 @@ namespace aquarius
 					return;
 
 				lines.push_back("private:");
-				lines.push_back("friend class aquarius::access;");
+				lines.push_back("friend class elastic::access;");
 				line_feed();
 
 				lines.push_back("template<typename _Archive>");

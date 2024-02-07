@@ -3,6 +3,7 @@
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
 #include <cstddef>
+#include <aquarius/elastic.hpp>
 
 namespace aquarius
 {
@@ -103,38 +104,40 @@ namespace aquarius
 
 		read_handle_result from_binary(flex_buffer_t& stream)
 		{
-			constexpr auto sz = sizeof(header_type);
+			if (!elastic::from_binary(*header_ptr_, stream))
+				return read_handle_result::header_error;
 
-			stream.sgetn((uint8_t*)header_ptr_, sz);
-
-			if (!body_.ParseFromArray(stream.wdata(), static_cast<int>(header_ptr_->size)))
-				return read_handle_result::unknown_error;
+			if (!elastic::from_binary(body_, stream))
+				return read_handle_result::body_error;
 
 			return read_handle_result::ok;
 		}
 
 		read_handle_result to_binary(flex_buffer_t& stream)
 		{
-			constexpr auto size = sizeof(header_type);
-
-			stream.sputn((uint8_t*)&Number, sizeof(Number));
-
-			header_ptr_->size = body_.ByteSizeLong();
-
-			uint64_t total_size = size + header_ptr_->size;
-
-			stream.sputn((uint8_t*)&total_size, sizeof(total_size));
-
-			if (stream.sputn((flex_buffer_t::value_type*)header_ptr_, size) != size)
-				return read_handle_result::header_error;
-
-			if (stream.active() < body_.ByteSizeLong())
-				return read_handle_result::body_error;
-
-			if (!body_.SerializeToArray(stream.rdata(), static_cast<int>(body_.ByteSizeLong())))
+			if (!elastic::to_binary(Number, stream))
 				return read_handle_result::unknown_error;
 
-			stream.commit(body_.ByteSizeLong());
+			flex_buffer_t body_buffer{};
+
+			if (!elastic::to_binary(body_, body_buffer))
+				return read_handle_result::body_error;
+
+			header_ptr_->size = body_buffer.size();
+
+			flex_buffer_t header_buffer{};
+
+			if (!elastic::to_binary(*header_ptr_, header_buffer))
+				return read_handle_result::header_error;
+
+			std::size_t total_size = header_buffer.size() + header_ptr_->size;
+
+			if (!elastic::to_binary(total_size, stream))
+				return read_handle_result::unknown_error;
+
+			stream.append(std::move(header_buffer));
+
+			stream.append(std::move(body_buffer));
 
 			return read_handle_result::ok;
 		}
