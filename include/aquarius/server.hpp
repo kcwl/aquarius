@@ -30,7 +30,7 @@ namespace aquarius
 			start_accept();
 		}
 
-		virtual ~server() = default;
+		~server() = default;
 
 	public:
 		void run()
@@ -49,8 +49,6 @@ namespace aquarius
 			signal_stop({}, -1);
 		}
 
-		
-
 	private:
 		void start_accept()
 		{
@@ -62,7 +60,7 @@ namespace aquarius
 			//conns_.push_back(new_connect_ptr);
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
-								   [this, new_connect_ptr](const boost::system::error_code& ec)
+								   [this, &new_connect_ptr](const boost::system::error_code& ec)
 								   {
 									   if (!acceptor_.is_open())
 									   {
@@ -95,6 +93,8 @@ namespace aquarius
 
 			io_service_pool_.stop();
 
+			close();
+
 			service_invoke_helper::stop();
 
 			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
@@ -126,6 +126,18 @@ namespace aquarius
 #endif
 
 			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
+		}
+
+		void close()
+		{
+			if (!acceptor_.is_open())
+				return;
+
+			boost::system::error_code ec;
+			acceptor_.cancel(ec);
+			acceptor_.close(ec);
+
+			XLOG(info) << "[acceptor] acceptor closed";
 		}
 
 	public:

@@ -34,7 +34,7 @@ namespace aquarius
 			, read_buffer_()
 			, dura_(dura)
 			, uid_()
-			, session_ptr_(new session<this_type>())
+			, session_ptr_(nullptr)
 		{
 			boost::uuids::random_generator_mt19937 generator{};
 
