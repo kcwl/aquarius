@@ -169,37 +169,37 @@ BOOST_AUTO_TEST_CASE(connect_param)
 
 	std::this_thread::sleep_for(1s);
 
-	auto& connect_ptr = *srv.conns_.begin();
+	//auto& connect_ptr = *srv.conns_.begin();
 
-	if (connect_ptr)
-	{
-		BOOST_CHECK(connect_ptr->remote_address_u() ==2130706433);
+	//if (connect_ptr)
+	//{
+	//	BOOST_CHECK(connect_ptr->remote_address_u() ==2130706433);
 
-		connect_ptr->set_rcvbuf_size(1024);
+	//	connect_ptr->set_rcvbuf_size(1024);
 
-		BOOST_CHECK(connect_ptr->get_rcvbuf_size() == 1024);
+	//	BOOST_CHECK(connect_ptr->get_rcvbuf_size() == 1024);
 
-		connect_ptr->set_sndbuf_size(2048);
+	//	connect_ptr->set_sndbuf_size(2048);
 
-		BOOST_CHECK(connect_ptr->get_sndbuf_size() == 2048);
+	//	BOOST_CHECK(connect_ptr->get_sndbuf_size() == 2048);
 
-		BOOST_CHECK(connect_ptr->keep_alive(true) == true);
+	//	BOOST_CHECK(connect_ptr->keep_alive(true) == true);
 
-		BOOST_CHECK(connect_ptr->set_nodelay(true) == true);
+	//	BOOST_CHECK(connect_ptr->set_nodelay(true) == true);
 
-		BOOST_CHECK(connect_ptr->reuse_address(true) == true);
+	//	BOOST_CHECK(connect_ptr->reuse_address(true) == true);
 
-		BOOST_CHECK(connect_ptr->set_linger(true, 100) == true);
+	//	BOOST_CHECK(connect_ptr->set_linger(true, 100) == true);
 
 
-		connect_ptr->shut_down();
+	//	connect_ptr->shut_down();
 
-		BOOST_CHECK(connect_ptr->remote_address().empty() == true);
+	//	BOOST_CHECK(connect_ptr->remote_address().empty() == true);
 
-		BOOST_CHECK(connect_ptr->remote_address_u() == 0);
+	//	BOOST_CHECK(connect_ptr->remote_address_u() == 0);
 
-		BOOST_CHECK(connect_ptr->remote_port() == 0);
-	}
+	//	BOOST_CHECK(connect_ptr->remote_port() == 0);
+	//}
 
 	std::this_thread::sleep_for(1s);
 

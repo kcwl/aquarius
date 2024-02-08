@@ -59,7 +59,7 @@ namespace aquarius
 			if (!new_connect_ptr)
 				return;
 
-			conns_.push_back(new_connect_ptr);
+			//conns_.push_back(new_connect_ptr);
 
 			acceptor_.async_accept(new_connect_ptr->socket(),
 								   [this, new_connect_ptr](const boost::system::error_code& ec)
@@ -129,7 +129,7 @@ namespace aquarius
 		}
 
 	public:
-		std::vector<std::shared_ptr<connect_t>> conns_;
+		//std::vector<std::shared_ptr<connect_t>> conns_;
 
 	private:
 		io_service_pool io_service_pool_;
