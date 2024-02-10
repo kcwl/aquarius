@@ -49,18 +49,23 @@ namespace aquarius
 			signal_stop({}, -1);
 		}
 
+		void close()
+		{
+			if (!acceptor_.is_open())
+				return;
+
+			boost::system::error_code ec;
+			acceptor_.cancel(ec);
+			acceptor_.close(ec);
+
+			XLOG(info) << "[acceptor] acceptor closed";
+		}
+
 	private:
 		void start_accept()
 		{
-			auto new_connect_ptr = std::make_shared<connect_t>(io_service_pool_.get_io_service(), ssl_context_);
-
-			if (!new_connect_ptr)
-				return;
-
-			//conns_.push_back(new_connect_ptr);
-
-			acceptor_.async_accept(new_connect_ptr->socket(),
-								   [this, &new_connect_ptr](const boost::system::error_code& ec)
+			acceptor_.async_accept(io_service_pool_.get_io_service(),
+								   [this](const boost::system::error_code& ec, asio::ip::tcp::socket sock)
 								   {
 									   if (!acceptor_.is_open())
 									   {
@@ -74,11 +79,22 @@ namespace aquarius
 									   {
 										   std::string ip_addrs{};
 
-										   new_connect_ptr->start();
+										   auto conn_ptr = std::make_shared<connect_t>(std::move(sock), ssl_context_);
+
+										   if (!conn_ptr)
+											   return;
+
+										   conn_ptr->start();
 
 										   XLOG(info)
 											   << "[acceptor] accept connection at " << endpoint_.address().to_string()
-											   << " : " << new_connect_ptr->remote_address();
+											   << " : " << conn_ptr->remote_address();
+									   }
+									   else
+									   {
+										   XLOG(error)
+											   << "[acceprtor] occur error at " << endpoint_.address().to_string()
+											   << ":" << endpoint_.port() << '\t' << ec.message();
 									   }
 
 									   start_accept();
@@ -127,21 +143,6 @@ namespace aquarius
 
 			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 		}
-
-		void close()
-		{
-			if (!acceptor_.is_open())
-				return;
-
-			boost::system::error_code ec;
-			acceptor_.cancel(ec);
-			acceptor_.close(ec);
-
-			XLOG(info) << "[acceptor] acceptor closed";
-		}
-
-	public:
-		//std::vector<std::shared_ptr<connect_t>> conns_;
 
 	private:
 		io_service_pool io_service_pool_;

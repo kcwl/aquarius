@@ -19,6 +19,8 @@ namespace aquarius
 		explicit client(_Args&&... args)
 			: io_service_()
 			, ssl_context_(boost::asio::ssl::context::sslv23)
+			, conn_ptr_(nullptr)
+			, endpoint_()
 			, resolve_(io_service_)
 		{
 			init_ssl_context();
@@ -45,6 +47,14 @@ namespace aquarius
 		void stop()
 		{
 			io_service_.stop();
+		}
+
+		void close()
+		{
+			if (!conn_ptr_)
+				return;
+
+			conn_ptr_->close();
 		}
 
 		template <typename _Request, typename _Func>
@@ -117,9 +127,6 @@ namespace aquarius
 									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
 									   {
 										   if (ec)
-											   return;
-
-										   if (!conn_ptr_)
 											   return;
 
 										   conn_ptr_->set_verify_mode(boost::asio::ssl::verify_peer);

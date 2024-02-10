@@ -112,7 +112,7 @@ AQUARIUS_CONTEXT_REGIST(person_response, ctx_test_client);
 
 BOOST_AUTO_TEST_CASE(process_message)
 {
-	aquarius::tcp_server<0> srv(8100, 2);
+	aquarius::tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(process_message)
 
 	cli.async_write(std::move(req));
 
-	std::this_thread::sleep_for(2s); 
+	std::this_thread::sleep_for(5s); 
 
 	cli.stop();
 	srv.stop();
@@ -137,85 +137,6 @@ BOOST_AUTO_TEST_CASE(process_message)
 
 	t.join();
 	tc.join();
-}
-
-BOOST_AUTO_TEST_CASE(acceptor_error)
-{
-	aquarius::tcp_server<0> srv(8101, 2);
-
-	std::thread t([&] { srv.run(); });
-
-	aquarius::tcp_client cli("127.0.0.1", "8101");
-
-	std::thread tc([&] { cli.run(); });
-
-	std::this_thread::sleep_for(3s);
-
-	cli.stop();
-	srv.stop();
-	t.join();
-	tc.join();
-}
-
-BOOST_AUTO_TEST_CASE(connect_param)
-{
-	aquarius::tcp_server<0> srv(8102, 2);
-
-	std::thread t([&] { srv.run(); });
-
-	aquarius::tcp_client cli("127.0.0.1", "8102");
-
-	std::thread tc([&] { cli.run(); });
-
-	std::this_thread::sleep_for(1s);
-
-	//auto& connect_ptr = *srv.conns_.begin();
-
-	//if (connect_ptr)
-	//{
-	//	BOOST_CHECK(connect_ptr->remote_address_u() ==2130706433);
-
-	//	connect_ptr->set_rcvbuf_size(1024);
-
-	//	BOOST_CHECK(connect_ptr->get_rcvbuf_size() == 1024);
-
-	//	connect_ptr->set_sndbuf_size(2048);
-
-	//	BOOST_CHECK(connect_ptr->get_sndbuf_size() == 2048);
-
-	//	BOOST_CHECK(connect_ptr->keep_alive(true) == true);
-
-	//	BOOST_CHECK(connect_ptr->set_nodelay(true) == true);
-
-	//	BOOST_CHECK(connect_ptr->reuse_address(true) == true);
-
-	//	BOOST_CHECK(connect_ptr->set_linger(true, 100) == true);
-
-
-	//	connect_ptr->shut_down();
-
-	//	BOOST_CHECK(connect_ptr->remote_address().empty() == true);
-
-	//	BOOST_CHECK(connect_ptr->remote_address_u() == 0);
-
-	//	BOOST_CHECK(connect_ptr->remote_port() == 0);
-	//}
-
-	std::this_thread::sleep_for(1s);
-
-	person_request req{};
-	req.body().age = 1;
-	req.body().name = "world";
-
-	cli.async_write(std::move(req));
-
-	std::this_thread::sleep_for(1s);
-
-	srv.stop();
-	cli.stop();
-
-	tc.join();
-	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

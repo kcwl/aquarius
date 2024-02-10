@@ -28,4 +28,17 @@ namespace aquarius
 		reset_peer,
 		report
 	};
+
+	enum class conn_mode
+	{
+		client,
+		server
+	};
+
+	enum class ssl_mode
+	{
+		nossl,
+		ssl
+	};
+
 } // namespace aquarius

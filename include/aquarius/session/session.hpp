@@ -9,7 +9,6 @@
 #include <memory>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/context/context.hpp>
-#include <aquarius/invoke.hpp>
 
 namespace aquarius
 {
@@ -21,8 +20,6 @@ namespace aquarius
 
 	public:
 		virtual std::size_t uid() = 0;
-
-		virtual read_handle_result process(flex_buffer_t& buffer) = 0;
 
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
@@ -37,98 +34,29 @@ namespace aquarius
 		virtual void server_port(int32_t port) = 0;
 
 		virtual int32_t server_port() = 0;
+
+		virtual void attach(std::size_t proto, std::shared_ptr<context> context_ptr) = 0;
+
+		virtual void detach(std::size_t proto) = 0;
 	};
 
 	template <typename _Connector>
-	class session : public xsession, public std::enable_shared_from_this<session<_Connector>>
+	class session : public xsession
 	{
 		friend class context;
 
 	public:
-		explicit session()
-			: session(nullptr)
-		{}
-
-		session(std::shared_ptr<_Connector> conn_ptr)
+		explicit session(std::shared_ptr<_Connector> conn_ptr)
 			: conn_ptr_(conn_ptr)
 			, identify_(0)
 		{}
+
+		virtual ~session() = default;
 
 	public:
 		virtual std::size_t uid()
 		{
 			return conn_ptr_ ? conn_ptr_->uuid() : 0;
-		}
-
-		virtual read_handle_result process(flex_buffer_t& buffer) override
-		{
-			if (!ctx_queue_.empty())
-			{
-				auto& pair = ctx_queue_.front();
-
-				return pair.first->accept(buffer, pair.second, this->shared_from_this());
-			}
-
-			uint32_t proto{};
-
-			auto result = resolver<tcp>::template from_binay(buffer, proto);
-
-			if (result != read_handle_result::ok)
-				return result;
-
-			if (proto == ip_back_proto)
-			{
-				return read_handle_result::reset_peer;
-			}
-
-			if (proto == ip_report_proto)
-			{
-				return read_handle_result::report;
-			}
-
-			auto request_ptr = message_invoke_helper::invoke(proto);
-
-			if (!request_ptr)
-			{
-				if (buffer.sgetn((uint8_t*)&proto, sizeof(proto)) != sizeof(proto))
-					return read_handle_result::unknown_proto;
-			}
-
-			std::shared_ptr<context> context_ptr;
-
-			auto iter = ctxs_.find(proto);
-
-			if (iter == ctxs_.end())
-			{
-				context_ptr = context_invoke_helper::invoke(proto);
-			}
-			else
-			{
-				context_ptr = iter->second;
-			}
-
-			if (!context_ptr)
-				return read_handle_result::unknown_ctx;
-
-			if (!request_ptr)
-			{
-				buffer.consume(-(int)(sizeof(uint32_t) * 3));
-
-				return static_cast<read_handle_result>(context_ptr->visit(buffer,this->shared_from_this()));
-			}
-
-			result = request_ptr->accept(buffer, context_ptr, this->shared_from_this());
-
-			if (result != read_handle_result::unknown_error)
-			{
-				ctx_queue_.push_back({ request_ptr, context_ptr });
-
-				return result;
-			}
-
-			erase_context(proto);
-
-			return read_handle_result::ok;
 		}
 
 		virtual bool async_write(flex_buffer_t&& buffer) override
@@ -177,6 +105,25 @@ namespace aquarius
 			return server_port_;
 		}
 
+		virtual void attach(std::size_t proto, std::shared_ptr<context> context_ptr) override
+		{
+			std::lock_guard lk(mutex_);
+
+			auto iter = ctxs_.find(proto);
+
+			if (iter != ctxs_.end())
+				return;
+
+			ctxs_.insert({ proto,context_ptr });
+		}
+
+		virtual void detach(std::size_t proto) override
+		{
+			std::lock_guard lk(mutex_);
+
+			ctxs_.erase(proto);
+		}
+
 	public:
 		virtual void on_accept() final
 		{}
@@ -206,7 +153,9 @@ namespace aquarius
 	private:
 		std::shared_ptr<_Connector> conn_ptr_;
 
-		std::unordered_map<uint32_t, std::shared_ptr<context>> ctxs_;
+		std::mutex mutex_;
+
+		std::unordered_map<std::size_t, std::shared_ptr<context>> ctxs_;
 
 		std::deque<std::pair<std::shared_ptr<xmessage>, std::shared_ptr<context>>> ctx_queue_;
 

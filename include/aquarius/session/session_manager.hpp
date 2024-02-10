@@ -10,6 +10,12 @@ namespace aquarius
 	class session_manager : public detail::singleton<session_manager>
 	{
 	public:
+		~session_manager()
+		{
+			sessions_.clear();
+		}
+
+	public:
 		bool push(std::shared_ptr<xsession> session_ptr)
 		{
 			std::lock_guard lk(mutex_);

@@ -3,29 +3,25 @@
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
+#include <aquarius/elastic.hpp>
 #include <aquarius/invoke.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/elastic.hpp>
 
 namespace aquarius
 {
-	template <std::size_t Identify>
-	using tcp_server_connect = server_connect<tcp, Identify>;
+	using tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::ssl>>;
 
-	template <std::size_t Identify>
-	using tcp_server = server<tcp_server_connect<Identify>>;
+	using no_ssl_tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::nossl>>;
 
-	template <std::size_t Identify>
-	using http_server_connect = server_connect<http, Identify>;
+	using http_server = server<connect<http, conn_mode::server, ssl_mode::nossl>>;
 
-	template <std::size_t Identify>
-	using http_server = server<http_server_connect<Identify>>;
+	using https_server = server<connect<http, conn_mode::server, ssl_mode::ssl>>;
 
-	using tcp_client_connect = ssl_connect<tcp, false>;
+	using tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::ssl>>;
 
-	using tcp_client = client<tcp_client_connect>;
+	using no_ssl_tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::nossl>>;
 
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)

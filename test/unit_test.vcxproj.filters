@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\channel">
       <UniqueIdentifier>{2434a1fe-9af2-40a8-b717-3bc3ee057069}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\connect">
-      <UniqueIdentifier>{b70ee681-84a7-4703-9b23-9a182dfb1a8a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\context">
       <UniqueIdentifier>{efd9f61a-6b90-4f5f-9a90-c0a08ab49742}</UniqueIdentifier>
     </Filter>
@@ -152,15 +149,6 @@
     <ClInclude Include="..\include\aquarius\channel\group.hpp">
       <Filter>include\aquarius\channel</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect\ssl_connect.hpp">
-      <Filter>include\aquarius\connect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect\server_connect.hpp">
-      <Filter>include\aquarius\connect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect\client_connect.hpp">
-      <Filter>include\aquarius\connect</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -189,9 +177,6 @@
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\client.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context.hpp">
@@ -235,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
