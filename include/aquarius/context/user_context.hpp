@@ -25,11 +25,6 @@ namespace aquarius
 			// clear
 		}
 
-		virtual void on_connect() override
-		{
-			// log record
-		}
-
 		virtual void on_timeout() override
 		{
 			// timeout

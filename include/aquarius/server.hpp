@@ -4,6 +4,8 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <type_traits>
+#include <aquarius/detail/deadline_timer.hpp>
+#include <aquarius/invoke/invoke_session.hpp>
 
 namespace aquarius
 {
@@ -22,12 +24,15 @@ namespace aquarius
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, ssl_context_(asio::ssl::context::sslv23)
 			, server_name_(name)
+			, timer_(io_service_pool_.get_io_service())
 		{
 			init_ssl_context();
 
 			init_signal();
 
 			start_accept();
+
+			dead_line();
 		}
 
 		~server() = default;
@@ -101,17 +106,21 @@ namespace aquarius
 								   });
 		}
 
-		void signal_stop(const boost::system::error_code& ec, int signal)
+		void signal_stop(boost::system::error_code ec, int signal)
 		{
 			std::string error_message = "success";
 
 			ec ? error_message = ec.message() : std::string{};
 
-			io_service_pool_.stop();
+			timer_.cancel(ec);
 
 			close();
 
+			io_service_pool_.stop();
+
 			service_invoke_helper::stop();
+
+			
 
 			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
 					   << ", signal: " << signal;
@@ -144,6 +153,25 @@ namespace aquarius
 			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 		}
 
+		void dead_line()
+		{
+			timer_.expires_from_now(30ms);
+
+			timer_.async_wait([this](boost::system::error_code ec)
+				{
+					if (ec)
+					{
+						XLOG(error) << "global timer is occur error!";
+
+						return;
+					}
+
+					timer_invoke_helper::invoke();
+
+					this->dead_line();
+				});
+		}
+
 	private:
 		io_service_pool io_service_pool_;
 
@@ -156,5 +184,7 @@ namespace aquarius
 		ssl_context_t ssl_context_;
 
 		std::string server_name_;
+
+		detail::deadline_timer timer_;
 	};
 } // namespace aquarius

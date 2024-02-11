@@ -117,14 +117,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_83_0;../src;E:\常用软件\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;F:\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\openssl\lib;F:\boost_1_83_0\stage\lib;E:\常用软件\Visual Leak Detector\lib\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -176,9 +176,11 @@
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\event_callback.hpp" />
     <ClInclude Include="..\include\aquarius\invoke.hpp" />
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp" />
+    <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\router_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\router_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\router_service.hpp" />
@@ -211,6 +213,7 @@
     <ClInclude Include="router.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="mysql_test.h" />
+    <ClInclude Include="session.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

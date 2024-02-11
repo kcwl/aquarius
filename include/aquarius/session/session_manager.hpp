@@ -10,17 +10,11 @@ namespace aquarius
 	class session_manager : public detail::singleton<session_manager>
 	{
 	public:
-		~session_manager()
-		{
-			sessions_.clear();
-		}
-
-	public:
 		bool push(std::shared_ptr<xsession> session_ptr)
 		{
 			std::lock_guard lk(mutex_);
 
-			sessions_.emplace(session_ptr->uid(), session_ptr);
+			sessions_.emplace(session_ptr->uuid(), session_ptr);
 
 			return true;
 		}
@@ -33,8 +27,6 @@ namespace aquarius
 
 			if (iter == sessions_.end())
 				return true;
-
-			iter->second->close();
 
 			return sessions_.erase(id) != 0;
 		}
@@ -49,75 +41,6 @@ namespace aquarius
 				return nullptr;
 
 			return iter->second;
-		}
-
-		void report(std::size_t uid, int32_t port)
-		{
-			std::lock_guard lk(mutex_);
-
-			auto iter = sessions_.find(uid);
-
-			if (iter == sessions_.end())
-				return;
-
-			if (!iter->second)
-				return;
-
-			iter->second->server_port(port);
-
-			slave_sessions_.push_back(iter->second);
-		}
-
-		bool slave(const std::string& remote_ip, std::string& slave)
-		{
-			std::lock_guard lk(mutex_);
-
-			for (auto& s : slave_sessions_)
-			{
-				if (!s)
-					continue;
-
-				hash_.add(s->remote_address(), s->server_port());
-			}
-
-			slave = hash_.get(remote_ip);
-
-			return !slave.empty();
-		}
-
-		template <typename _Func>
-		auto find_if(_Func&& f) -> std::vector<std::shared_ptr<xsession>>
-		{
-			std::vector<std::shared_ptr<xsession>> results{};
-
-			for (auto& ptr : sessions_)
-			{
-				if (!std::forward<_Func>(f)(ptr.second))
-					continue;
-
-				results.push_back(ptr.second);
-			}
-
-			return results;
-		}
-
-		void clear()
-		{
-			std::lock_guard lk(mutex_);
-
-			for (auto& session : sessions_)
-			{
-				session.second->close();
-			}
-
-			sessions_.clear();
-		}
-
-		std::size_t count()
-		{
-			std::lock_guard lk(mutex_);
-
-			return sessions_.size();
 		}
 
 		void broadcast(flex_buffer_t&& buffer)
@@ -150,19 +73,31 @@ namespace aquarius
 			}
 		}
 
-		void send_someone(std::size_t uid, flex_buffer_t&& buffer)
+		bool send(std::size_t uid, flex_buffer_t&& buffer)
 		{
 			std::lock_guard lk(mutex_);
 
 			auto iter = sessions_.find(uid);
 
 			if (iter == sessions_.end())
-				return;
+				return false;
 
 			if (!iter->second)
-				return;
+				return false;
 
 			iter->second->async_write(std::move(buffer));
+
+			return true;
+		}
+
+		void timeout()
+		{
+			std::lock_guard lk(mutex_);
+
+			for (auto& session : sessions_)
+			{
+				session.second->on_timeout();
+			}
 		}
 
 	private:
@@ -182,50 +117,13 @@ namespace aquarius
 		return session_manager::instance().find(id);
 	}
 
-	template <typename _Func>
-	inline auto find_session_if(_Func&& f)
-	{
-		return session_manager::instance().find_if(std::forward<_Func>(f));
-	}
-
 	inline bool erase_session(std::size_t id)
 	{
 		return session_manager::instance().erase(id);
 	}
 
-	inline std::size_t count_session()
+	inline bool send_session(std::size_t uid, flex_buffer_t&& buffer)
 	{
-		return session_manager::instance().count();
+		return session_manager::instance().send(uid, std::move(buffer));
 	}
-
-	inline void clear_session()
-	{
-		return session_manager::instance().clear();
-	}
-
-	inline void report_session(std::size_t uid, int32_t port)
-	{
-		session_manager::instance().report(uid, port);
-	}
-
-	inline bool slave_session(const std::string& condition, const std::string& cur_ip, int32_t cur_port, std::string& slave)
-	{
-		if(!session_manager::instance().slave(condition, slave))
-			return false;
-
-		auto cur_addrs = std::format("{}:{}", cur_ip, cur_port);
-
-		return cur_addrs != slave;
-	}
-
-	inline void send_session(std::size_t uid, flex_buffer_t& buffer)
-	{
-		auto session_ptr = find_session(uid);
-
-		if (!session_ptr)
-			return;
-
-		session_ptr->async_write(std::move(buffer));
-	}
-
 } // namespace aquarius

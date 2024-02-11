@@ -224,5 +224,14 @@
     <ClInclude Include="..\include\aquarius\connect.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp">
+      <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp">
+      <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

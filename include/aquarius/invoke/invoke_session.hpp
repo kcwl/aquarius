@@ -39,12 +39,32 @@ namespace aquarius
 
 			session_ptr->attach(proto, context_ptr);
 
+			session_ptr->on_accept();
+
 			result = request_ptr->accept(buffer, context_ptr, session_ptr);
 
 			if (result == read_handle_result::ok)
 				session_ptr->detach(proto);
 
 			return result;
+		}
+	};
+
+	struct callback_invoke_helper
+	{
+		static void invoke(std::size_t uuid)
+		{
+			auto session_ptr = find_session(uuid);
+
+			session_ptr->on_close();
+		}
+	};
+
+	struct timer_invoke_helper
+	{
+		static void invoke()
+		{
+			session_manager::instance().timeout();
 		}
 	};
 }

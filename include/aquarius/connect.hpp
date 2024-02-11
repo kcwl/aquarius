@@ -91,13 +91,13 @@ namespace aquarius
 											{
 												if (ec)
 												{
-													XLOG(error) << "handshake error at " << remote_address() << ":"
+													XLOG(error) << "handshake error at " << remote_address() <<"("<<remote_address_u() << "):"
 																<< remote_port() << "\t" << ec.message();
 
 													return;
 												}
 
-												XLOG(info) << "handshake success at " << remote_address() << ":"
+												XLOG(info) << "handshake success at " << remote_address() << "(" << remote_address_u() << "):"
 														   << remote_port() << ", async read establish";
 
 												establish_async_read();
@@ -167,7 +167,7 @@ namespace aquarius
 						return;
 					}
 
-					XLOG(error) << "write error at " << remote_address() << ":"
+					XLOG(error) << "write error at " << remote_address() << "(" << remote_address_u() << "):"
 								<< ":" << remote_port() << "\t" << ec.message();
 
 					return shut_down();
@@ -176,6 +176,8 @@ namespace aquarius
 
 		void shut_down()
 		{
+			callback_invoke_helper::invoke(uuid());
+
 			boost::system::error_code ec;
 
 			if (socket_.is_open())

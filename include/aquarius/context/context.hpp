@@ -42,9 +42,6 @@ namespace aquarius
 		virtual void on_close() override
 		{}
 
-		virtual void on_connect() override
-		{}
-
 		virtual void on_timeout() override
 		{}
 

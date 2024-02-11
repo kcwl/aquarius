@@ -9,8 +9,6 @@ namespace aquarius
 
 		virtual void on_close() = 0;
 
-		virtual void on_connect() = 0;
-
 		virtual void on_timeout() = 0;
 	};
 }
