@@ -5,31 +5,41 @@ namespace aquarius
 {
 	class xsession;
 
-	class xmessage;
+	class basic_message;
 
-	class context;
+	class basic_context;
 } // namespace aquarius
 
 namespace aquarius
 {
 	namespace detail
 	{
+		template <typename _Request, typename _Return>
 		class basic_visitor
 		{
 		public:
 			basic_visitor() = default;
 			virtual ~basic_visitor() = default;
+
+		public:
+			virtual _Return visit(_Request visited, std::shared_ptr<xsession> session_ptr) = 0;
 		};
 
 		template <typename _Request, typename _Return>
-		class visitor : public basic_visitor
+		class shared_visitor : public virtual basic_visitor<std::shared_ptr<_Request>, _Return>
 		{
 		public:
-			visitor() = default;
-			virtual ~visitor() = default;
+			shared_visitor() = default;
+			virtual ~shared_visitor() = default;
+		};
 
+		template <typename _Request, typename _Return>
+		class bare_visitor : public virtual basic_visitor<_Request*, _Return>
+		{
 		public:
-			virtual _Return visit(std::shared_ptr<_Request> visited, std::shared_ptr<xsession> session_ptr) = 0;
+			bare_visitor() = default;
+
+			virtual ~bare_visitor() = default;
 		};
 
 		template <typename _Return>
@@ -40,16 +50,35 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual _Return accept(flex_buffer_t& buffer, std::shared_ptr<context> ctx,
+			virtual _Return accept(flex_buffer_t& buffer, std::shared_ptr<basic_context> ctx,
 								   std::shared_ptr<xsession> session_ptr) = 0;
 		};
 
 		template <typename _Return, typename _Request>
-		static _Return accept_impl(std::shared_ptr<_Request> req, std::shared_ptr<context> ctx,
-								   std::shared_ptr<xsession> session_ptr)
+		static _Return accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<basic_context> ctx,
+			std::shared_ptr<xsession> session_ptr)
 		{
-			using visitor_t = visitor<_Request, int>;
-			using visitor_msg_t = visitor<xmessage, int>;
+			using visitor_t = shared_visitor<_Request, int>;
+			using visitor_msg_t = shared_visitor<basic_message, int>;
+
+			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
+			{
+				return static_cast<_Return>(visit_ptr->visit(req, session_ptr));
+			}
+			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
+			{
+				return static_cast<_Return>(visitor_ptr->visit(req, session_ptr));
+			}
+
+			return _Return{};
+		}
+
+		template <typename _Return, typename _Request>
+		static _Return accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
+			std::shared_ptr<xsession> session_ptr)
+		{
+			using visitor_t = bare_visitor<_Request, int>;
+			using visitor_msg_t = bare_visitor<basic_message, int>;
 
 			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
 			{
@@ -64,31 +93,31 @@ namespace aquarius
 		}
 
 #define DEFINE_VISITABLE_REQUEST(_Return)                                                                              \
-	virtual _Return accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::context> ctx,                    \
+	virtual _Return accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,              \
 						   std::shared_ptr<aquarius::xsession> session_ptr)                                            \
 	{                                                                                                                  \
 		auto result = this->from_binary(buffer);                                                                       \
 		if (result != aquarius::read_handle_result::ok)                                                                \
 			return static_cast<_Return>(result);                                                                       \
-		return accept_impl<_Return>(this->shared_from_this(), ctx, session_ptr);                                       \
+		return accept_shared_impl<_Return>(this->shared_from_this(), ctx, session_ptr);                                       \
 	}
 
 #define DEFINE_VISITABLE_RESPONSE(_Return)                                                                             \
-	virtual _Return accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::context> ctx,                    \
+	virtual _Return accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,              \
 						   std::shared_ptr<aquarius::xsession> session_ptr)                                            \
 	{                                                                                                                  \
 		auto result = this->from_binary(buffer);                                                                       \
 		if (result != aquarius::read_handle_result::ok)                                                                \
 			return static_cast<_Return>(result);                                                                       \
-		return accept_impl<_Return>(this->shared_from_this(), ctx, session_ptr);                                       \
+		return accept_shared_impl<_Return>(this->shared_from_this(), ctx, session_ptr);                                       \
 	}
 
-#define DEFINE_VISITABLE_NULL(_Return)                                                                                 \
+#define DEFINE_VISITABLE(_Return)                                                                                      \
 	virtual _Return accept([[maybe_unused]] aquarius::flex_buffer_t& buffer,                                           \
-						   [[maybe_unused]] std::shared_ptr<aquarius::context> ctx,                                    \
+						   std::shared_ptr<aquarius::basic_context> ctx,                                               \
 						   [[maybe_unused]] std::shared_ptr<aquarius::xsession> session_ptr)                           \
 	{                                                                                                                  \
-		return _Return{};                                                                                              \
+		return accept_bare_impl<_Return>(this, ctx, session_ptr);  \
 	}
 
 #define DEFINE_VISITOR(_Request, _Return)                                                                              \

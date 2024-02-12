@@ -3,11 +3,11 @@
 
 namespace aquarius
 {
-	class xmessage;
+	class basic_message;
 } // namespace aquarius
 
 namespace aquarius
 {
-	class msg_router : public detail::single_router<msg_router, std::shared_ptr<xmessage>>
+	class msg_router : public detail::single_router<msg_router, std::shared_ptr<basic_message>>
 	{};
 } // namespace aquarius

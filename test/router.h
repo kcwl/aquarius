@@ -17,11 +17,11 @@ using test_request = aquarius::request<Person, 1000>;
 using test_response = aquarius::response<Person, 1001>;
 using test_request_1 = aquarius::request<Person, 1002>;
 
-class ctx_test_server : public aquarius::xhandle<test_request, test_response>
+class ctx_test_server : public aquarius::context<test_request, test_response>
 {
 public:
 	ctx_test_server()
-		: aquarius::xhandle<test_request, test_response>("ctx_test_server")
+		: aquarius::context<test_request, test_response>("ctx_test_server")
 	{}
 
 public:

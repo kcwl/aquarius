@@ -7,28 +7,22 @@
 
 namespace aquarius
 {
+	class basic_context;
+}
+
+namespace aquarius
+{
 	struct null_body
 	{};
 
-	class xmessage : public detail::visitable<read_handle_result>
+	class basic_message : public detail::visitable<read_handle_result>
 	{
 	public:
-		DEFINE_VISITABLE_NULL(read_handle_result)
-
-	public:
-		virtual uint32_t unique_key()
-		{
-			return 0;
-		};
-
-		virtual int32_t size()
-		{
-			return 0;
-		}
+		DEFINE_VISITABLE(read_handle_result)
 	};
 
 	template <typename _Header, typename _Body, uint32_t N>
-	class message : public xmessage, public fields<_Header>
+	class message : public basic_message, public fields<_Header>
 	{
 	public:
 		using header_type = _Header;
@@ -90,11 +84,6 @@ namespace aquarius
 		const body_type& body() const noexcept
 		{
 			return body_;
-		}
-
-		virtual uint32_t unique_key() override
-		{
-			return Number;
 		}
 
 		virtual int32_t size()

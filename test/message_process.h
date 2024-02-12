@@ -8,11 +8,11 @@ BOOST_AUTO_TEST_SUITE(message_process)
 using test_request = aquarius::request<Personn, 1001>;
 using test_response = aquarius::response<Person, 1002>;
 
-class ctx_test_server : public aquarius::xhandle<test_request, test_response>
+class ctx_test_server : public aquarius::context<test_request, test_response>
 {
 public:
 	ctx_test_server()
-		: aquarius::xhandle<test_request, test_response>("ctx_test_server")
+		: aquarius::context<test_request, test_response>("ctx_test_server")
 	{}
 
 public:

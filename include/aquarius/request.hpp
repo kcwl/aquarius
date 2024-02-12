@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <aquarius/message/tcp_header.hpp>
 #include <aquarius/message/message.hpp>
+#include <aquarius/message/tcp_header.hpp>
 
 namespace aquarius
 {

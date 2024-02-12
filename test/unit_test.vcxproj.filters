@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\channel">
       <UniqueIdentifier>{2434a1fe-9af2-40a8-b717-3bc3ee057069}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\context">
-      <UniqueIdentifier>{efd9f61a-6b90-4f5f-9a90-c0a08ab49742}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\detail">
       <UniqueIdentifier>{edfa55b9-1d24-4db0-b0f4-48f74b5a82ed}</UniqueIdentifier>
     </Filter>
@@ -88,15 +85,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp">
       <Filter>include\aquarius\session</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\system_context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\user_context.hpp">
-      <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="server.h">
       <Filter>头文件</Filter>
@@ -188,9 +176,6 @@
     <ClInclude Include="..\include\aquarius\elastic.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\event_callback.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\invoke.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -232,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="session.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="context.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\event.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	class xmessage;
+	class basic_message;
 }
 
 namespace aquarius
@@ -14,7 +14,7 @@ namespace aquarius
 		msg_regist(std::size_t key)
 		{
 			msg_router::instance().regist(
-				key, []() { return std::dynamic_pointer_cast<xmessage>(std::make_shared<_Message>()); });
+				key, []() { return std::dynamic_pointer_cast<basic_message>(std::make_shared<_Message>()); });
 		}
 	};
 

@@ -7,9 +7,9 @@ namespace aquarius
 	class client_connect : public connect<_Protocol, false>
 	{
 	public:
-		client_connect(boost::asio::io_service& io_service, boost::asio::ssl::context& context,
+		client_connect(boost::asio::io_service& io_service, boost::asio::ssl::basic_context& basic_context,
 					   std::chrono::steady_clock::duration dura = heart_time_interval)
-			: connect<_Protocol, false>(io_service, context, dura)
+			: connect<_Protocol, false>(io_service, basic_context, dura)
 		{}
 
 	public:

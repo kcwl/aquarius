@@ -159,8 +159,6 @@
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
-    <ClInclude Include="..\include\aquarius\context\system_context.hpp" />
-    <ClInclude Include="..\include\aquarius\context\user_context.hpp" />
     <ClInclude Include="..\include\aquarius\defines.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
@@ -174,7 +172,7 @@
     <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
-    <ClInclude Include="..\include\aquarius\event_callback.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\event.hpp" />
     <ClInclude Include="..\include\aquarius\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
@@ -186,7 +184,6 @@
     <ClInclude Include="..\include\aquarius\invoke\router_service.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\context\context.hpp" />
     <ClInclude Include="..\include\aquarius\message\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\mysql.hpp" />
@@ -208,6 +205,7 @@
     <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
+    <ClInclude Include="context.h" />
     <ClInclude Include="io_service_pool.h" />
     <ClInclude Include="message_process.h" />
     <ClInclude Include="router.h" />

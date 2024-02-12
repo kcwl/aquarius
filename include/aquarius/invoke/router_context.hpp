@@ -3,11 +3,11 @@
 
 namespace aquarius
 {
-	class context;
+	class basic_context;
 } // namespace aquarius
 
 namespace aquarius
 {
-	class ctx_router : public detail::single_router<ctx_router, std::shared_ptr<context>>
+	class ctx_router : public detail::single_router<ctx_router, std::shared_ptr<basic_context>>
 	{};
 } // namespace aquarius

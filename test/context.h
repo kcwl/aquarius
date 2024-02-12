@@ -2,7 +2,27 @@
 #include <boost/test/unit_test_suite.hpp>
 #include <aquarius.hpp>
 
-BOOST_AUTO_TEST_SUITE(server)
+BOOST_AUTO_TEST_SUITE(basic_context)
+
+
+BOOST_AUTO_TEST_CASE(error_message)
+{
+	auto ctx = std::make_shared<aquarius::basic_context>();
+
+	auto req = std::make_shared<aquarius::basic_message>();
+
+	aquarius::flex_buffer_t buffer{};
+
+	auto result = req->accept(buffer, ctx, nullptr);
+
+	ctx->on_accept();
+
+	ctx->on_close();
+
+	ctx->on_timeout();
+
+	BOOST_CHECK(result == aquarius::read_handle_result::failed);
+}
 
 struct person_body_request
 {
@@ -87,56 +107,17 @@ public:
 	}
 };
 
-AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
-
-class ctx_test_client : public aquarius::client_context<person_response>
+BOOST_AUTO_TEST_CASE(function)
 {
-public:
-	ctx_test_client()
-		: aquarius::client_context<person_response>("ctx_test_client")
-	{}
+	auto request_ptr = std::make_shared<person_request>();
 
-public:
-	virtual int handle() override
-	{
-		std::cout << "test response recved!\n";
+	aquarius::flex_buffer_t buffer{};
 
-		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
-		BOOST_CHECK_EQUAL(request_ptr_->body().name, "hello");
+	request_ptr->to_binary(buffer);
 
-		return 1;
-	}
-};
+	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
-AQUARIUS_CONTEXT_REGIST(person_response, ctx_test_client);
-
-BOOST_AUTO_TEST_CASE(process_message)
-{
-	aquarius::tcp_server srv(8100, 2);
-
-	std::thread t([&] { srv.run(); });
-
-	aquarius::tcp_client cli("127.0.0.1", "8100");
-
-	std::thread tc([&] { cli.run(); });
-
-	std::this_thread::sleep_for(2s);
-
-	person_request req{};
-	req.body().age = 1;
-	req.body().name = "world";
-
-	cli.async_write(std::move(req));
-
-	std::this_thread::sleep_for(5s); 
-
-	cli.stop();
-	srv.stop();
-	
-	std::this_thread::sleep_for(2s);
-
-	t.join();
-	tc.join();
+	BOOST_CHECK(request_ptr->accept(buffer, context_ptr, nullptr) == aquarius::read_handle_result::ok);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

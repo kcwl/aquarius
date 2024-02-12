@@ -10,13 +10,6 @@ BOOST_AUTO_TEST_CASE(session_null)
 
 	BOOST_CHECK(session_ptr == nullptr);
 
-	auto sessions = aquarius::find_session_if([](auto session_ptr)
-		{
-			return session_ptr->uuid() == 1001;
-		});
-
-	BOOST_CHECK(sessions.empty());
-
 	BOOST_CHECK(aquarius::erase_session(1001));
 }
 

@@ -16,7 +16,8 @@ namespace aquarius
 
 	enum class read_handle_result
 	{
-		ok = 1,
+		failed,
+		ok,
 		unknown_error,
 		unknown_proto,
 		unknown_ctx,

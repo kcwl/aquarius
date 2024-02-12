@@ -1,11 +1,12 @@
 ﻿#pragma once
-#include <aquarius/message/tcp_header.hpp>
 #include <aquarius/message/message.hpp>
+#include <aquarius/message/tcp_header.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class response : public message<tcp_response_header, _Body, Number>, public std::enable_shared_from_this<response<_Body, Number>>
+	class response : public message<tcp_response_header, _Body, Number>,
+					 public std::enable_shared_from_this<response<_Body, Number>>
 	{
 		using base_type = message<tcp_response_header, _Body, Number>;
 
@@ -27,7 +28,7 @@ namespace aquarius
 		{
 			this->header() = std::move(other.header());
 
-			//this->body().Move(other.body());
+			// this->body().Move(other.body());
 			this->body() = std::move(other.body());
 		}
 

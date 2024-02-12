@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	class context;
+	class basic_context;
 }
 
 namespace aquarius
@@ -14,7 +14,7 @@ namespace aquarius
 		ctx_regist(const std::size_t& key)
 		{
 			ctx_router::instance().regist(key, []()
-										  { return std::dynamic_pointer_cast<context>(std::make_shared<_Context>()); });
+										  { return std::dynamic_pointer_cast<basic_context>(std::make_shared<_Context>()); });
 		}
 	};
 

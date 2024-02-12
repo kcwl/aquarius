@@ -28,10 +28,10 @@ namespace aquarius
 		using this_type = connect<_Protocol, ConnMode, SSLMode>;
 
 	public:
-		explicit connect(socket_t socket, ssl_context_t& context,
+		explicit connect(socket_t socket, ssl_context_t& basic_context,
 						 std::chrono::steady_clock::duration dura = heart_time_interval)
 			: socket_(std::move(socket))
-			, ssl_socket_(socket_, context)
+			, ssl_socket_(socket_, basic_context)
 			, read_buffer_()
 			, dura_(dura)
 			, uid_()
@@ -41,9 +41,9 @@ namespace aquarius
 			uid_ = boost::uuids::hash_value(generator());
 		}
 
-		connect(asio::io_service& io_service, ssl_context_t& context,
+		connect(asio::io_service& io_service, ssl_context_t& basic_context,
 				std::chrono::steady_clock::duration dura = heart_time_interval)
-			: connect(std::move(asio::ip::tcp::socket(io_service)), context, dura)
+			: connect(std::move(asio::ip::tcp::socket(io_service)), basic_context, dura)
 		{}
 
 		virtual ~connect()

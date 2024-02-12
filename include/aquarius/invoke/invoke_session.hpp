@@ -30,12 +30,15 @@ namespace aquarius
 
 			auto context_ptr = context_invoke_helper::invoke(proto);
 
-			if (!request_ptr || !context_ptr)
+			if (!request_ptr)
 			{
 				buffer.consume(total);
 
-				return read_handle_result::unknown_proto;
+				request_ptr = std::make_shared<basic_message>();
 			}
+
+			if (!context_ptr)
+				context_ptr = std::make_shared<basic_context>();
 
 			session_ptr->attach(proto, context_ptr);
 
@@ -65,6 +68,18 @@ namespace aquarius
 		static void invoke()
 		{
 			session_manager::instance().timeout();
+		}
+	};
+
+	struct broadcast_invoke_helper
+	{
+		template<typename _Response>
+		static void invoke(_Response&& resp)
+		{
+			flex_buffer_t fs{};
+			resp.to_binary(fs);
+
+			session_manager::instance().broadcast(std::move(fs));
 		}
 	};
 }

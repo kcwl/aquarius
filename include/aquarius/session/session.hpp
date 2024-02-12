@@ -1,9 +1,8 @@
 #pragma once
 #include <any>
-#include <aquarius/context/context.hpp>
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/config.hpp>
-#include <aquarius/event_callback.hpp>
+#include <aquarius/detail/event.hpp>
 #include <aquarius/message/message.hpp>
 #include <aquarius/resolver.hpp>
 #include <deque>
@@ -12,7 +11,7 @@
 
 namespace aquarius
 {
-	class xsession : public event_callback
+	class xsession : public detail::event_call
 	{
 	public:
 		xsession() = default;
@@ -23,7 +22,7 @@ namespace aquarius
 
 		virtual bool async_write(flex_buffer_t&& buffer) = 0;
 
-		virtual void attach(std::size_t proto, std::shared_ptr<context> context_ptr) = 0;
+		virtual void attach(std::size_t proto, std::shared_ptr<basic_context> context_ptr) = 0;
 
 		virtual void detach(std::size_t proto) = 0;
 	};
@@ -31,7 +30,7 @@ namespace aquarius
 	template <typename _Connector>
 	class session : public xsession
 	{
-		friend class context;
+		friend class basic_context;
 
 	public:
 		explicit session(std::shared_ptr<_Connector> conn_ptr)
@@ -58,7 +57,7 @@ namespace aquarius
 			return true;
 		}
 
-		virtual void attach(std::size_t proto, std::shared_ptr<context> context_ptr) override
+		virtual void attach(std::size_t proto, std::shared_ptr<basic_context> context_ptr) override
 		{
 			std::lock_guard lk(mutex_);
 
@@ -116,6 +115,6 @@ namespace aquarius
 
 		std::mutex mutex_;
 
-		std::unordered_map<std::size_t, std::shared_ptr<context>> ctxs_;
+		std::unordered_map<std::size_t, std::shared_ptr<basic_context>> ctxs_;
 	};
 } // namespace aquarius

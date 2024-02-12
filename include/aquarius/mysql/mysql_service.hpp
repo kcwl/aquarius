@@ -14,7 +14,7 @@ namespace aquarius
 		template <typename _Endpoint, typename _Param>
 		explicit mysql_connect(boost::asio::io_service& ios, _Endpoint&& host, _Param&& param)
 			: io_service_(ios)
-			, ssl_ctx_(boost::asio::ssl::context::tls_client)
+			, ssl_ctx_(boost::asio::ssl::basic_context::tls_client)
 			, mysql_ptr_(new boost::mysql::tcp_ssl_connection(io_service_, ssl_ctx_))
 			, endpoint_(host)
 			, params_(param)
@@ -158,7 +158,7 @@ namespace aquarius
 	private:
 		boost::asio::io_service& io_service_;
 
-		boost::asio::ssl::context ssl_ctx_;
+		boost::asio::ssl::basic_context ssl_ctx_;
 
 		std::unique_ptr<boost::mysql::tcp_ssl_connection> mysql_ptr_;
 
