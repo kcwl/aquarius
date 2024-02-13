@@ -2,8 +2,8 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
-#include <cstddef>
 #include <aquarius/elastic.hpp>
+#include <cstddef>
 
 namespace aquarius
 {
@@ -41,54 +41,41 @@ namespace aquarius
 			this->dealloc(header_ptr_);
 		}
 
-		message(const message& other)
-		{
-			header() = other.header();
-
-			body().Copy(other.body());
-		}
-
 		message(message&& other)
+			: header_ptr_(std::move(other.header_ptr_))
+			, body_(std::move(other.body_))
 		{
-			header() = std::move(other.header());
+			other.header_ptr_ = nullptr;
 
-			body().Move(other.body());
+			body_type{}.swap(other.body_);
 		}
 
 		message& operator=(message&& other)
 		{
-			if (this == std::addressof(other))
-				return *this;
+			this->header_ptr_ = other.header_ptr_;
 
-			*this = std::move(other);
+			this->body_ = std::move(other.body_);
+
+			other.header_ptr_ = nullptr;
+
+			body_type().swap(other.body_);
 
 			return *this;
 		}
 
-	public:
-		header_type& header() noexcept
-		{
-			return *header_ptr_;
-		}
+	private:
+		message(const message& other) = delete;
+		message& operator=(const message&) = delete;
 
-		const header_type& header() const noexcept
+	public:
+		header_type* header() noexcept
 		{
-			return *header_ptr_;
+			return header_ptr_;
 		}
 
 		body_type& body() noexcept
 		{
 			return body_;
-		}
-
-		const body_type& body() const noexcept
-		{
-			return body_;
-		}
-
-		virtual int32_t size()
-		{
-			return static_cast<int32_t>(bytes_);
 		}
 
 		read_handle_result from_binary(flex_buffer_t& stream)
@@ -135,7 +122,5 @@ namespace aquarius
 		header_type* header_ptr_;
 
 		body_type body_;
-
-		std::size_t bytes_;
 	};
 } // namespace aquarius

@@ -6,3 +6,4 @@
 #include "server.h"
 #include "session.h"
 #include "context.h"
+#include "message.h"

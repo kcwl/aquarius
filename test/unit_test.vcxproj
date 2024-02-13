@@ -207,6 +207,7 @@
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
     <ClInclude Include="context.h" />
     <ClInclude Include="io_service_pool.h" />
+    <ClInclude Include="message.h" />
     <ClInclude Include="message_process.h" />
     <ClInclude Include="router.h" />
     <ClInclude Include="server.h" />

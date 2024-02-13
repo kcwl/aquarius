@@ -17,19 +17,10 @@ namespace aquarius
 		DEFINE_VISITABLE_RESPONSE(read_handle_result)
 
 	public:
-		response(const response& other)
+		response(response&& req)
+			: base_type(std::move(req))
 		{
-			this->header() = other.header();
-
-			this->body().Copy(other.body());
-		}
-
-		response(response&& other)
-		{
-			this->header() = std::move(other.header());
-
-			// this->body().Move(other.body());
-			this->body() = std::move(other.body());
+			
 		}
 
 		response& operator=(response&& other)
@@ -38,8 +29,9 @@ namespace aquarius
 
 			return *this;
 		}
-	};
 
-	template <uint32_t Number>
-	using null_body_response = response<null_body, Number>;
+	private:
+		response(const response&) = delete;
+		response& operator=(const response& other) = delete;
+	};
 } // namespace aquarius

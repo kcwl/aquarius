@@ -17,19 +17,9 @@ namespace aquarius
 		DEFINE_VISITABLE_REQUEST(read_handle_result)
 
 	public:
-		request(const request& other)
-		{
-			this->header() = other.header();
-
-			this->body().Copy(other.body());
-		}
-
 		request(request&& other)
-		{
-			this->header() = std::move(other.header());
-
-			this->body().Move(other.body());
-		}
+			: base_type(std::move(other))
+		{}
 
 		request& operator=(request&& other)
 		{
@@ -37,8 +27,9 @@ namespace aquarius
 
 			return *this;
 		}
-	};
 
-	template <uint32_t Number>
-	using null_body_request = request<null_body, Number>;
+	private:
+		request(const request&) = delete;
+		request& operator=(const request& other) = delete;
+	};
 } // namespace aquarius
