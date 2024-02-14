@@ -33,9 +33,6 @@ namespace aquarius
 
 			void dealloc(value_type*& ptr)
 			{
-				if (ptr == nullptr)
-					return;
-
 				_Traits::deallocate(this->get(), ptr, 1);
 
 				ptr = nullptr;

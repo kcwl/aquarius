@@ -39,7 +39,10 @@ namespace aquarius
 			, ctxs_()
 		{}
 
-		virtual ~session() = default;
+		virtual ~session()
+		{
+			on_close();
+		}
 
 	public:
 		virtual std::size_t uuid() override

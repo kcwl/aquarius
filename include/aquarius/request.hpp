@@ -12,7 +12,7 @@ namespace aquarius
 
 	public:
 		request() = default;
-		~request() = default;
+		virtual ~request() = default;
 
 		DEFINE_VISITABLE_REQUEST(read_handle_result)
 

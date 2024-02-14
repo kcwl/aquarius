@@ -77,8 +77,6 @@ BOOST_AUTO_TEST_CASE(session)
 	}
 
 	{
-		aquarius::callback_invoke_helper::invoke(0);
-
 		aquarius::session_manager::instance().erase(0);
 	}
 }

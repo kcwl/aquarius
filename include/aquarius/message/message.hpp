@@ -18,6 +18,10 @@ namespace aquarius
 	class basic_message : public detail::visitable<read_handle_result>
 	{
 	public:
+		basic_message() = default;
+		virtual ~basic_message() = default;
+
+	public:
 		DEFINE_VISITABLE(read_handle_result)
 	};
 
@@ -42,8 +46,8 @@ namespace aquarius
 		}
 
 		message(message&& other)
-			: header_ptr_(std::move(other.header_ptr_))
-			, body_(std::move(other.body_))
+			: header_ptr_(other.header_ptr_)
+			, body_(other.body_)
 		{
 			other.header_ptr_ = nullptr;
 
@@ -52,13 +56,10 @@ namespace aquarius
 
 		message& operator=(message&& other)
 		{
-			this->header_ptr_ = other.header_ptr_;
+			if (&other == this)
+				return *this;
 
-			this->body_ = std::move(other.body_);
-
-			other.header_ptr_ = nullptr;
-
-			body_type().swap(other.body_);
+			message(std::move(other)).swap(*this);
 
 			return *this;
 		}
@@ -116,6 +117,16 @@ namespace aquarius
 			stream.append(std::move(body_buffer));
 
 			return read_handle_result::ok;
+		}
+
+	private:
+		void swap(message& other)
+		{
+			auto tmp_ptr = this->header_ptr_;
+			this->header_ptr_ = other.header_ptr_;
+			other.header_ptr_ = tmp_ptr;
+
+			other.body().swap(this->body_);
 		}
 
 	private:

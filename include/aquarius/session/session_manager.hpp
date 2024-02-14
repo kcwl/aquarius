@@ -104,12 +104,6 @@ namespace aquarius
 		std::unordered_map<std::size_t, std::shared_ptr<xsession>> sessions_;
 
 		std::mutex mutex_;
-
-		std::vector<std::shared_ptr<xsession>> slave_sessions_;
-
-		std::mutex slave_mutex_;
-
-		consistent_hash hash_;
 	};
 
 	inline std::shared_ptr<xsession> find_session(std::size_t id)
