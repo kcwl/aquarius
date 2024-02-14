@@ -206,6 +206,7 @@
     <ClInclude Include="..\include\aquarius\session\session_manager.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
     <ClInclude Include="context.h" />
+    <ClInclude Include="invoke.h" />
     <ClInclude Include="io_service_pool.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="message_process.h" />

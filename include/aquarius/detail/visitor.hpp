@@ -59,37 +59,27 @@ namespace aquarius
 			std::shared_ptr<xsession> session_ptr)
 		{
 			using visitor_t = shared_visitor<_Request, int>;
-			using visitor_msg_t = shared_visitor<basic_message, int>;
 
-			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
-			{
-				return static_cast<_Return>(visit_ptr->visit(req, session_ptr));
-			}
-			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
-			{
-				return static_cast<_Return>(visitor_ptr->visit(req, session_ptr));
-			}
+			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
-			return _Return{};
+			if (!visit_ptr)
+				return _Return{};
+
+			return static_cast<_Return>(visit_ptr->visit(req, session_ptr));
 		}
 
 		template <typename _Return, typename _Request>
 		static _Return accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
 			std::shared_ptr<xsession> session_ptr)
 		{
-			using visitor_t = bare_visitor<_Request, int>;
-			using visitor_msg_t = bare_visitor<basic_message, int>;
+			using visitor_t = bare_visitor<basic_message, int>;
 
-			if (auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx))
-			{
-				return static_cast<_Return>(visit_ptr->visit(req, session_ptr));
-			}
-			else if (auto visitor_ptr = std::dynamic_pointer_cast<visitor_msg_t>(ctx))
-			{
-				return static_cast<_Return>(visitor_ptr->visit(req, session_ptr));
-			}
+			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
-			return _Return{};
+			if (!visit_ptr)
+				return _Return{};
+
+			return static_cast<_Return>(visit_ptr->visit(req, session_ptr));
 		}
 
 #define DEFINE_VISITABLE_REQUEST(_Return)                                                                              \

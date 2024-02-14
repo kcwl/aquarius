@@ -227,5 +227,8 @@
     <ClInclude Include="message.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="invoke.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
