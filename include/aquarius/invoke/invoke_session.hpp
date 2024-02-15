@@ -53,6 +53,16 @@ namespace aquarius
 		}
 	};
 
+	struct callback_invoke_helper
+	{
+		static void invoke(std::size_t uuid)
+		{
+			auto session_ptr = find_session(uuid);
+
+			session_ptr->on_close();
+		}
+	};
+
 	struct timer_invoke_helper
 	{
 		static void invoke()

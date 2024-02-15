@@ -178,6 +178,8 @@ namespace aquarius
 
 		void shut_down()
 		{
+			callback_invoke_helper::invoke(uuid());
+
 			if (!socket_.is_open())
 				return;
 

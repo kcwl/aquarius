@@ -39,23 +39,27 @@ namespace aquarius
 			, ctxs_()
 		{}
 
-		virtual ~session()
-		{
-			on_close();
-		}
+		virtual ~session() = default;
 
 	public:
 		virtual std::size_t uuid() override
 		{
-			return conn_ptr_ ? conn_ptr_->uuid() : 0;
+			auto ptr = conn_ptr_.lock();
+
+			if (!ptr)
+				return 0;
+
+			return ptr->uuid();
 		}
 
 		virtual bool async_write(flex_buffer_t&& buffer) override
 		{
-			if (!conn_ptr_)
+			auto ptr = conn_ptr_.lock();
+
+			if (!ptr)
 				return false;
 
-			conn_ptr_->async_write(std::forward<flex_buffer_t>(buffer), [] {});
+			ptr->async_write(std::forward<flex_buffer_t>(buffer), [] {});
 
 			return true;
 		}
@@ -114,7 +118,7 @@ namespace aquarius
 		}
 
 	private:
-		std::shared_ptr<_Connector> conn_ptr_;
+		std::weak_ptr<_Connector> conn_ptr_;
 
 		std::mutex mutex_;
 
