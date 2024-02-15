@@ -29,7 +29,7 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		session_manager::instance().broadcast(std::move(fs));
+		router_session::instance().broadcast(std::move(fs));
 	}
 
 	template <typename _Message, typename _Func>
@@ -38,6 +38,6 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+		router_session::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 	}
 } // namespace aquarius

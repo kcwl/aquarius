@@ -98,9 +98,6 @@ namespace aquarius
 		{
 			std::lock_guard lk(mutex_);
 
-			if (ctxs_.empty())
-				return;
-
 			for (auto& ctx : ctxs_)
 			{
 				ctx.second->on_close();

@@ -5,19 +5,14 @@
 
 namespace aquarius
 {
-	class service_router : public detail::single_router<service_router, std::shared_ptr<service>>
+	class router_service : public detail::single_router<router_service, std::shared_ptr<service>>
 	{
 	public:
 		bool run()
 		{
 			for (auto& invoke : this->map_invokes_)
 			{
-				auto ptr = invoke.second();
-
-				if (ptr == nullptr)
-					continue;
-
-				services_.insert({ invoke.first, ptr });
+				services_.insert({ invoke.first, invoke.second() });
 			}
 
 			int result = 1;

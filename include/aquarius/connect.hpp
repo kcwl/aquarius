@@ -126,11 +126,6 @@ namespace aquarius
 				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
 				[this, self](const boost::system::error_code& ec, std::size_t bytes_transferred)
 				{
-					if (!socket_.is_open())
-					{
-						return;
-					}
-
 					if (ec)
 					{
 						if (ec != boost::asio::error::eof)
@@ -146,7 +141,7 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					session_iovoke_helper::invoke(read_buffer_, uuid());
+					invoke_session_helper::process(read_buffer_, uuid());
 
 					async_read();
 				});
@@ -178,7 +173,7 @@ namespace aquarius
 
 		void shut_down()
 		{
-			callback_invoke_helper::invoke(uuid());
+			invoke_session_helper::close(uuid());
 
 			if (!socket_.is_open())
 				return;
@@ -192,14 +187,14 @@ namespace aquarius
 			ssl_socket_.shutdown(ec);
 		}
 
-		void close()
+		void close(bool shutdown)
 		{
 			boost::system::error_code ec;
 
-			if (socket_.is_open())
-			{
-				socket_.close(ec);
-			}
+			if (!socket_.is_open())
+				return;
+
+			shutdown ? socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec) : socket_.close(ec);
 		}
 
 		std::size_t uuid() const
@@ -217,14 +212,7 @@ namespace aquarius
 		{
 			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
-			if (!session_ptr)
-			{
-				XLOG(error) << "session create failed!";
-
-				return;
-			}
-
-			session_manager::instance().push(session_ptr);
+			router_session::instance().push(session_ptr);
 
 			keep_alive(true);
 

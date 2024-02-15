@@ -8,30 +8,30 @@ namespace aquarius
 	{
 		service_regist(std::size_t service_name)
 		{
-			service_router::instance().regist(service_name, []() { return std::make_shared<_Service>(); });
+			router_service::instance().regist(service_name, []() { return std::make_shared<_Service>(); });
 		}
 	};
 
-	struct service_invoke_helper
+	struct invoke_service_helper
 	{
 		static bool run()
 		{
-			return service_router::instance().run();
+			return router_service::instance().run();
 		}
 
 		static void stop()
 		{
-			return service_router::instance().stop();
+			return router_service::instance().stop();
 		}
 
 		static bool restart_one(std::size_t key)
 		{
-			return service_router::instance().restart_one(key);
+			return router_service::instance().restart_one(key);
 		}
 
 		static bool stop_one(std::size_t key)
 		{
-			return service_router::instance().stop_one(key);
+			return router_service::instance().stop_one(key);
 		}
 	};
 }

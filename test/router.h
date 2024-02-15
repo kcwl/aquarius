@@ -39,13 +39,13 @@ AQUARIUS_CONTEXT_REGIST(test_request, ctx_test_server);
 
 BOOST_AUTO_TEST_CASE(invoke_message)
 {
-	auto msg_ptr = aquarius::message_invoke_helper::invoke(1000);
+	auto msg_ptr = aquarius::invoke_message_helper::invoke(1000);
 
 	auto req_ptr = std::dynamic_pointer_cast<test_request>(msg_ptr);
 
 	BOOST_CHECK(req_ptr != nullptr);
 
-	auto msg_ptr_1 = aquarius::message_invoke_helper::invoke(1001);
+	auto msg_ptr_1 = aquarius::invoke_message_helper::invoke(1001);
 
 	auto req_ptr_1 = std::dynamic_pointer_cast<test_request_1>(msg_ptr_1);
 
@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_CASE(invoke_message)
 
 BOOST_AUTO_TEST_CASE(invoke_context)
 {
-	auto ctx_ptr = aquarius::context_invoke_helper::invoke(1000);
+	auto ctx_ptr = aquarius::invoke_context_helper::invoke(1000);
 
 	auto handle_ptr = std::dynamic_pointer_cast<ctx_test_server>(ctx_ptr);
 
 	BOOST_CHECK(handle_ptr != nullptr);
 
-	auto ctx_ptr_1 = aquarius::context_invoke_helper::invoke(1001);
+	auto ctx_ptr_1 = aquarius::invoke_context_helper::invoke(1001);
 
 	auto handle_ptr_1 = std::dynamic_pointer_cast<ctx_test_server>(ctx_ptr_1);
 
@@ -260,23 +260,23 @@ AQUARIUS_SERVICE_REGIST(10004, test_service_4);
 
 BOOST_AUTO_TEST_CASE(invoke_service)
 {
-	auto res = aquarius::service_invoke_helper::run();
+	auto res = aquarius::invoke_service_helper::run();
 
 	BOOST_CHECK_EQUAL(res, false);
 
-	res = aquarius::service_invoke_helper::stop_one(11010);
+	res = aquarius::invoke_service_helper::stop_one(11010);
 
 	BOOST_CHECK_EQUAL(res, false);
 
-	res = aquarius::service_invoke_helper::restart_one(11010);
+	res = aquarius::invoke_service_helper::restart_one(11010);
 
 	BOOST_CHECK_EQUAL(res, false);
 
-	res = aquarius::service_invoke_helper::stop_one(10000);
+	res = aquarius::invoke_service_helper::stop_one(10000);
 
 	BOOST_CHECK_EQUAL(res, true);
 
-	res = aquarius::service_invoke_helper::restart_one(10000);
+	res = aquarius::invoke_service_helper::restart_one(10000);
 
 	BOOST_CHECK_EQUAL(res, true);
 }

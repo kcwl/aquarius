@@ -8,6 +8,6 @@ namespace aquarius
 
 namespace aquarius
 {
-	class ctx_router : public detail::single_router<ctx_router, std::shared_ptr<basic_context>>
+	class router_context : public detail::single_router<router_context, std::shared_ptr<basic_context>>
 	{};
 } // namespace aquarius

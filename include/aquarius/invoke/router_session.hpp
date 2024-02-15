@@ -1,13 +1,13 @@
 #pragma once
 #include <aquarius/detail/singleton.hpp>
-#include <aquarius/session/session.hpp>
+#include <aquarius/session.hpp>
 #include <mutex>
 #include <set>
 #include <aquarius/detail/consistent_hash.hpp>
 
 namespace aquarius
 {
-	class session_manager : public detail::singleton<session_manager>
+	class router_session : public detail::singleton<router_session>
 	{
 	public:
 		bool push(std::shared_ptr<xsession> session_ptr)
@@ -57,7 +57,7 @@ namespace aquarius
 		}
 
 		template <typename _Func>
-		void broadcast(flex_buffer_t&& buffer, _Func&& f)
+		void broadcast_if(flex_buffer_t&& buffer, _Func&& f)
 		{
 			std::lock_guard lk(mutex_);
 
@@ -105,19 +105,4 @@ namespace aquarius
 
 		std::mutex mutex_;
 	};
-
-	inline std::shared_ptr<xsession> find_session(std::size_t id)
-	{
-		return session_manager::instance().find(id);
-	}
-
-	inline bool erase_session(std::size_t id)
-	{
-		return session_manager::instance().erase(id);
-	}
-
-	inline bool send_session(std::size_t uid, flex_buffer_t&& buffer)
-	{
-		return session_manager::instance().send(uid, std::move(buffer));
-	}
 } // namespace aquarius

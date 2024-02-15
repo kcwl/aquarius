@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/event.hpp>
 #include <aquarius/detail/visitor.hpp>
-#include <aquarius/session/session.hpp>
+#include <aquarius/session.hpp>
 #include <chrono>
 #include <aquarius/logger.hpp>
 

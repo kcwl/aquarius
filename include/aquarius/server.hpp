@@ -44,7 +44,7 @@ namespace aquarius
 
 			XLOG(info) << "[server] " << server_name_ << " server is started!";
 
-			service_invoke_helper::run();
+			invoke_service_helper::run();
 
 			io_service_pool_.run();
 		}
@@ -118,7 +118,7 @@ namespace aquarius
 
 			io_service_pool_.stop();
 
-			service_invoke_helper::stop();
+			invoke_service_helper::stop();
 
 			
 
@@ -166,7 +166,7 @@ namespace aquarius
 						return;
 					}
 
-					timer_invoke_helper::invoke();
+					invoke_session_helper::timeout();
 
 					this->dead_line();
 				});

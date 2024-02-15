@@ -37,9 +37,6 @@
     <Filter Include="include\aquarius\service">
       <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\session">
-      <UniqueIdentifier>{b16301ad-ce7d-4f36-a7bf-413cfdebe4a5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -79,12 +76,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\message.hpp">
       <Filter>include\aquarius\message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\session.hpp">
-      <Filter>include\aquarius\session</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\session_manager.hpp">
-      <Filter>include\aquarius\session</Filter>
     </ClInclude>
     <ClInclude Include="server.h">
       <Filter>头文件</Filter>
@@ -212,9 +203,6 @@
     <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
     <ClInclude Include="session.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -229,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="invoke.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\router_session.hpp">
+      <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

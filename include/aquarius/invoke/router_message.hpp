@@ -8,6 +8,6 @@ namespace aquarius
 
 namespace aquarius
 {
-	class msg_router : public detail::single_router<msg_router, std::shared_ptr<basic_message>>
+	class router_message : public detail::single_router<router_message, std::shared_ptr<basic_message>>
 	{};
 } // namespace aquarius

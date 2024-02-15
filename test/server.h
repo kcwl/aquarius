@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(process_message)
 
 	std::thread tc([&] { cli.run(); });
 
-	std::this_thread::sleep_for(2s);
+	std::this_thread::sleep_for(1s);
 
 	person_request req{};
 	req.body().age = 1;
@@ -128,12 +128,109 @@ BOOST_AUTO_TEST_CASE(process_message)
 
 	cli.async_write(std::move(req));
 
-	std::this_thread::sleep_for(5s); 
+	std::this_thread::sleep_for(1s);
 
 	cli.stop();
 	srv.stop();
 	
-	std::this_thread::sleep_for(2s);
+	std::this_thread::sleep_for(1s);
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(handshake)
+{
+	aquarius::tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	cli.close();
+
+	std::this_thread::sleep_for(1s);
+
+	srv.stop();
+	cli.stop();
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(read)
+{
+	aquarius::tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	std::this_thread::sleep_for(1s);
+
+	person_request req{};
+	req.body().age = 1;
+	req.body().name = "world";
+	cli.close();
+	cli.async_write(std::move(req));
+
+	std::this_thread::sleep_for(1s);
+
+	cli.stop();
+	srv.stop();
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(write)
+{
+	aquarius::tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	std::this_thread::sleep_for(1s);
+
+	cli.close();
+
+	cli.stop();
+	srv.stop();
+
+	std::this_thread::sleep_for(1s);
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(no_ssl)
+{
+	aquarius::no_ssl_tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	std::this_thread::sleep_for(1s);
+
+	person_request req{};
+	req.body().age = 1;
+	req.body().name = "world";
+	cli.close(true);
+	cli.async_write(std::move(req));
+
+	std::this_thread::sleep_for(1s);
+	cli.close();
+	srv.stop();
 
 	t.join();
 	tc.join();

@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(session)
 	{
 		aquarius::flex_buffer_t buffer{};
 
-		auto result = aquarius::session_iovoke_helper::invoke(buffer, 10001);
+		auto result = aquarius::invoke_session_helper::process(buffer, 10001);
 
 		BOOST_CHECK(result == aquarius::read_handle_result::unknown_error);
 
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(session)
 
 		auto session = std::make_shared<aquarius::session<aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>>>(nullptr);
 
-		aquarius::session_manager::instance().push(session);
+		aquarius::router_session::instance().push(session);
 
-		result = aquarius::session_iovoke_helper::invoke(buffer, session->uuid());
+		result = aquarius::invoke_session_helper::process(buffer, session->uuid());
 
 		BOOST_CHECK(result != aquarius::read_handle_result::ok);
 
@@ -71,13 +71,13 @@ BOOST_AUTO_TEST_CASE(session)
 		elastic::to_binary(45u, buffer);
 		buffer.commit(45);
 
-		result = aquarius::session_iovoke_helper::invoke(buffer, session->uuid());
+		result = aquarius::invoke_session_helper::process(buffer, session->uuid());
 
 		BOOST_CHECK(result != aquarius::read_handle_result::ok);
 	}
 
 	{
-		aquarius::session_manager::instance().erase(0);
+		aquarius::router_session::instance().erase(0);
 	}
 }
 

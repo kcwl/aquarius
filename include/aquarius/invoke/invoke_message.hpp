@@ -13,17 +13,17 @@ namespace aquarius
 	{
 		msg_regist(std::size_t key)
 		{
-			msg_router::instance().regist(
+			router_message::instance().regist(
 				key, []() { return std::dynamic_pointer_cast<basic_message>(std::make_shared<_Message>()); });
 		}
 	};
 
-	struct message_invoke_helper
+	struct invoke_message_helper
 	{
 		template <typename... _Args>
 		static auto invoke(uint32_t key, _Args&... args)
 		{
-			return msg_router::instance().invoke(key, args...);
+			return router_message::instance().invoke(key, args...);
 		}
 	};
 } // namespace aquarius
