@@ -1,11 +1,11 @@
 #pragma once
 #include <aquarius/defines.hpp>
+#include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/invoke.hpp>
+#include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <type_traits>
-#include <aquarius/detail/deadline_timer.hpp>
-#include <aquarius/invoke/invoke_session.hpp>
 
 namespace aquarius
 {
@@ -56,9 +56,6 @@ namespace aquarius
 
 		void close()
 		{
-			if (!acceptor_.is_open())
-				return;
-
 			boost::system::error_code ec;
 			acceptor_.cancel(ec);
 			acceptor_.close(ec);
@@ -75,31 +72,20 @@ namespace aquarius
 									   if (!acceptor_.is_open())
 									   {
 										   XLOG_ERROR() << "[acceprtor] accept error at "
-													   << endpoint_.address().to_string() << ": acceptor is closed!";
+														<< endpoint_.address().to_string() << ": acceptor is closed!";
 
 										   return;
 									   }
 
 									   if (!ec)
 									   {
-										   std::string ip_addrs{};
-
 										   auto conn_ptr = std::make_shared<connect_t>(std::move(sock), ssl_context_);
-
-										   if (!conn_ptr)
-											   return;
 
 										   conn_ptr->start();
 
 										   XLOG_INFO()
 											   << "[acceptor] accept connection at " << endpoint_.address().to_string()
 											   << " : " << conn_ptr->remote_address();
-									   }
-									   else
-									   {
-										   XLOG_ERROR()
-											   << "[acceprtor] occur error at " << endpoint_.address().to_string()
-											   << ":" << endpoint_.port() << '\t' << ec.message();
 									   }
 
 									   start_accept();
@@ -116,14 +102,12 @@ namespace aquarius
 
 			close();
 
-			io_service_pool_.stop();
-
 			invoke_service_helper::stop();
 
-			
+			io_service_pool_.stop();
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is stop! result: " << error_message
-					   << ", signal: " << signal;
+						<< ", signal: " << signal;
 		}
 
 		void init_ssl_context()
@@ -131,15 +115,9 @@ namespace aquarius
 			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
 									 ssl_context_t::single_dh_use);
 
-			ssl_context_.set_password_callback(std::bind(&server::get_passwd, this));
 			ssl_context_.use_certificate_chain_file("crt/server.crt");
 			ssl_context_.use_private_key_file("crt/server.key", ssl_context_t::pem);
 			ssl_context_.use_tmp_dh_file("crt/dh512.pem");
-		}
-
-		std::string get_passwd()
-		{
-			return {};
 		}
 
 		void init_signal()
@@ -157,7 +135,8 @@ namespace aquarius
 		{
 			timer_.expires_from_now(30ms);
 
-			timer_.async_wait([this](boost::system::error_code ec)
+			timer_.async_wait(
+				[this](boost::system::error_code ec)
 				{
 					if (ec)
 					{
