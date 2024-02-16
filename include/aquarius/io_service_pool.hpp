@@ -4,6 +4,7 @@
 #include <list>
 #include <thread>
 #include <vector>
+#include <aquarius/logger.hpp>
 
 namespace aquarius
 {
@@ -41,7 +42,13 @@ namespace aquarius
 
 			for (auto& io_service : io_services_)
 			{
-				threads.push_back(std::make_shared<std::thread>([&] { io_service->run(); }));
+				threads.push_back(std::make_shared<std::thread>(
+					[&]
+					{
+						BOOST_LOG_SCOPED_THREAD_TAG("ThreadID", boost::this_thread::get_id());
+
+						io_service->run();
+					}));
 			}
 
 			for (auto& thread : threads)

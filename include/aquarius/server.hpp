@@ -42,7 +42,7 @@ namespace aquarius
 		{
 			init_logger();
 
-			XLOG(info) << "[server] " << server_name_ << " server is started!";
+			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
 			invoke_service_helper::run();
 
@@ -63,7 +63,7 @@ namespace aquarius
 			acceptor_.cancel(ec);
 			acceptor_.close(ec);
 
-			XLOG(info) << "[acceptor] acceptor closed";
+			XLOG_INFO() << "[acceptor] acceptor closed";
 		}
 
 	private:
@@ -74,7 +74,7 @@ namespace aquarius
 								   {
 									   if (!acceptor_.is_open())
 									   {
-										   XLOG(error) << "[acceprtor] accept error at "
+										   XLOG_ERROR() << "[acceprtor] accept error at "
 													   << endpoint_.address().to_string() << ": acceptor is closed!";
 
 										   return;
@@ -91,13 +91,13 @@ namespace aquarius
 
 										   conn_ptr->start();
 
-										   XLOG(info)
+										   XLOG_INFO()
 											   << "[acceptor] accept connection at " << endpoint_.address().to_string()
 											   << " : " << conn_ptr->remote_address();
 									   }
 									   else
 									   {
-										   XLOG(error)
+										   XLOG_ERROR()
 											   << "[acceprtor] occur error at " << endpoint_.address().to_string()
 											   << ":" << endpoint_.port() << '\t' << ec.message();
 									   }
@@ -122,7 +122,7 @@ namespace aquarius
 
 			
 
-			XLOG(info) << "[server] " << server_name_ << " server is stop! result: " << error_message
+			XLOG_INFO() << "[server] " << server_name_ << " server is stop! result: " << error_message
 					   << ", signal: " << signal;
 		}
 
@@ -161,7 +161,7 @@ namespace aquarius
 				{
 					if (ec)
 					{
-						XLOG(error) << "global timer is occur error!";
+						XLOG_ERROR() << "global timer is occur error!";
 
 						return;
 					}

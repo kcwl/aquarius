@@ -79,7 +79,7 @@ namespace aquarius
 									   {
 										   if (ec)
 										   {
-											   XLOG(error) << remote_address() << ":" << remote_port()
+											   XLOG_ERROR() << remote_address() << ":" << remote_port()
 														   << " maybe occur error - " << ec.message();
 
 											   return;

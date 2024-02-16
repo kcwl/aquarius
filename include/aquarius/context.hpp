@@ -37,7 +37,7 @@ namespace aquarius
 	public:
 		virtual int visit(basic_message*, std::shared_ptr<xsession> session_ptr) override
 		{
-			XLOG(warning) << name_ << " maybe visit an unknown message!";
+			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 
 			return int{};
 		}

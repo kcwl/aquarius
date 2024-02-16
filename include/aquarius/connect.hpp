@@ -91,14 +91,14 @@ namespace aquarius
 											{
 												if (ec)
 												{
-													XLOG(error) << "handshake error at " << remote_address() << "("
+													XLOG_ERROR() << "handshake error at " << remote_address() << "("
 																<< remote_address_u() << "):" << remote_port() << "\t"
 																<< ec.message();
 
 													return;
 												}
 
-												XLOG(info) << "handshake success at " << remote_address() << "("
+												XLOG_INFO() << "handshake success at " << remote_address() << "("
 														   << remote_address_u() << "):" << remote_port()
 														   << ", async read establish";
 
@@ -107,7 +107,7 @@ namespace aquarius
 			}
 			else
 			{
-				XLOG(info) << "handshake success at " << remote_address() << ":" << remote_port()
+				XLOG_INFO() << "handshake success at " << remote_address() << ":" << remote_port()
 						   << ", async read establish";
 
 				establish_async_read();
@@ -130,7 +130,7 @@ namespace aquarius
 					{
 						if (ec != boost::asio::error::eof)
 						{
-							XLOG(error) << "on read some at " << remote_address() << ":" << remote_port()
+							XLOG_ERROR() << "on read some at " << remote_address() << ":" << remote_port()
 										<< "\t"
 										   " occur error : "
 										<< ec.message();
@@ -164,7 +164,7 @@ namespace aquarius
 						return;
 					}
 
-					XLOG(error) << "write error at " << remote_address() << "(" << remote_address_u() << "):"
+					XLOG_ERROR() << "write error at " << remote_address() << "(" << remote_address_u() << "):"
 								<< ":" << remote_port() << "\t" << ec.message();
 
 					return shut_down();
@@ -232,7 +232,7 @@ namespace aquarius
 
 			socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
 
-			XLOG(info) << "set keep alive :" << value;
+			XLOG_INFO() << "set keep alive :" << value;
 
 			return !ec;
 		}
@@ -242,7 +242,7 @@ namespace aquarius
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 
-			XLOG(info) << "set nodelay :" << enable;
+			XLOG_INFO() << "set nodelay :" << enable;
 
 			return !ec;
 		}
@@ -252,7 +252,7 @@ namespace aquarius
 			boost::system::error_code ec;
 			socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
 
-			XLOG(info) << "reuse address :" << value;
+			XLOG_INFO() << "reuse address :" << value;
 
 			return !ec;
 		}

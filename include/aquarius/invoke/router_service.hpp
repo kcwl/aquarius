@@ -68,14 +68,14 @@ namespace aquarius
 		{
 			if (!ptr->config())
 			{
-				XLOG(error) << "[servie] " << ptr->name() << " config error!";
+				XLOG_ERROR() << "[servie] " << ptr->name() << " config error!";
 
 				return false;
 			}
 				
 			if (!ptr->init())
 			{
-				XLOG(error) << "[servie] " << ptr->name() << " init error!";
+				XLOG_ERROR() << "[servie] " << ptr->name() << " init error!";
 
 				return false;
 			}
@@ -83,7 +83,7 @@ namespace aquarius
 
 			if (!ptr->run())
 			{
-				XLOG(error) << "[servie] " << ptr->name() << " run error!";
+				XLOG_ERROR() << "[servie] " << ptr->name() << " run error!";
 
 				return false;
 			}
