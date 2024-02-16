@@ -44,20 +44,20 @@ namespace aquarius
 	public:
 		virtual std::size_t uuid() override
 		{
-			auto ptr = conn_ptr_.lock();
+			if (conn_ptr_.expired())
+				return false;
 
-			if (!ptr)
-				return 0;
+			auto ptr = conn_ptr_.lock();
 
 			return ptr->uuid();
 		}
 
 		virtual bool async_write(flex_buffer_t&& buffer) override
 		{
-			auto ptr = conn_ptr_.lock();
-
-			if (!ptr)
+			if (conn_ptr_.expired())
 				return false;
+
+			auto ptr = conn_ptr_.lock();
 
 			ptr->async_write(std::forward<flex_buffer_t>(buffer), [] {});
 
