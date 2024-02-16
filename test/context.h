@@ -5,25 +5,6 @@
 BOOST_AUTO_TEST_SUITE(basic_context)
 
 
-BOOST_AUTO_TEST_CASE(error_message)
-{
-	auto ctx = std::make_shared<aquarius::basic_context>();
-
-	auto req = std::make_shared<aquarius::basic_message>();
-
-	aquarius::flex_buffer_t buffer{};
-
-	auto result = req->accept(buffer, ctx, nullptr);
-
-	ctx->on_accept();
-
-	ctx->on_close();
-
-	ctx->on_timeout();
-
-	BOOST_CHECK(result == aquarius::read_handle_result::failed);
-}
-
 struct person_body_request
 {
 	bool sex;
@@ -106,6 +87,52 @@ public:
 		return 1;
 	}
 };
+
+BOOST_AUTO_TEST_CASE(basic_message_context)
+{
+	auto ctx = std::make_shared<aquarius::basic_context>();
+
+	auto req = std::make_shared<aquarius::basic_message>();
+
+	aquarius::flex_buffer_t buffer{};
+
+	auto result = req->accept(buffer, ctx, nullptr);
+
+	BOOST_CHECK(result == aquarius::read_handle_result::failed);
+}
+
+BOOST_AUTO_TEST_CASE(call_back)
+{
+	{
+		using connect_t = aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>;
+
+		aquarius::asio::io_service io_service;
+
+		aquarius::asio::ip::tcp::socket socket(io_service);
+
+		using ssl_context_t = aquarius::asio::ssl::context;
+
+		ssl_context_t ssl_context(aquarius::asio::ssl::context::sslv23);
+
+		ssl_context.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
+			ssl_context_t::single_dh_use);
+
+		ssl_context.use_certificate_chain_file("crt/server.crt");
+		ssl_context.use_private_key_file("crt/server.key", ssl_context_t::pem);
+		ssl_context.use_tmp_dh_file("crt/dh512.pem");
+
+		
+
+		auto conn = std::make_shared<connect_t>(std::move(socket), ssl_context);
+
+		auto session_ptr = std::make_shared<aquarius::session<connect_t>>(conn);
+
+		aquarius::invoke_session_helper::push(session_ptr);
+
+		session_ptr->attach(1300, std::make_shared<aquarius::basic_context>());
+		session_ptr->attach(1301, std::make_shared<ctx_test_server>());
+	}
+}
 
 BOOST_AUTO_TEST_CASE(function)
 {

@@ -145,25 +145,11 @@ namespace aquarius
 	};
 
 	template <typename _Response>
-	class client_context : public context<_Response, int>
+	class handle : public context<_Response, int>
 	{
 	public:
-		client_context(const std::string& name)
+		handle(const std::string& name)
 			: context<_Response, int>(name)
-		{}
-	};
-
-	template <std::size_t Number>
-	class system_context : public basic_context
-	{
-		static_assert(Number >= 500 && Number < 1000, "system context number must be 500 ~ 999");
-
-	public:
-		constexpr static std::size_t Number = Number;
-
-	public:
-		system_context(const std::string& name)
-			: basic_context(name, 1s)
 		{}
 	};
 } // namespace aquarius

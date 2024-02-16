@@ -89,11 +89,11 @@ public:
 
 AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
 
-class ctx_test_client : public aquarius::client_context<person_response>
+class ctx_test_client : public aquarius::handle<person_response>
 {
 public:
 	ctx_test_client()
-		: aquarius::client_context<person_response>("ctx_test_client")
+		: aquarius::handle<person_response>("ctx_test_client")
 	{}
 
 public:
