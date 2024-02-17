@@ -185,16 +185,66 @@ BOOST_AUTO_TEST_CASE(construction)
 
 BOOST_AUTO_TEST_CASE(parse)
 {
-	aquarius::flex_buffer_t buffer(2);
+	{
+		aquarius::flex_buffer_t buffer(1);
 
-	person_request req{};
-	req.header()->uid = 1;
-	req.header()->src = 2;
-	req.body().age = 3;
+		person_request req{};
+		req.header()->uid = 1;
+		req.header()->src = 2;
+		req.body().age = 3;
 
-	aquarius::error_code ec{};
+		aquarius::error_code ec{};
 
-	BOOST_CHECK(req.to_binary(buffer, ec));
+		req.to_binary(buffer, ec);
+
+		BOOST_CHECK(ec);
+	}
+
+	{
+		aquarius::error_code ec{};
+
+		aquarius::flex_buffer_t buffer(2);
+
+		person_request req{};
+
+		req.from_binary(buffer, ec);
+
+		BOOST_CHECK(ec);
+	}
+
+	{
+		aquarius::flex_buffer_t buffer{};
+
+		person_request req{};
+		req.header()->uid = 1;
+		req.header()->src = 2;
+		req.header()->size = 45;
+
+		aquarius::error_code ec{};
+
+		req.to_binary(buffer, ec);
+
+		person_request req1;
+
+		uint32_t proto{};
+
+		std::size_t total_size{};
+
+		elastic::from_binary(proto, buffer);
+
+		elastic::from_binary(total_size, buffer);
+
+		req1.from_binary(buffer, ec);
+
+		BOOST_CHECK(!ec);
+	}
+
+	{
+		person_request req{};
+		req.header()->uid = 1;
+		req.header()->src = 2;
+		req.header()->size = 45;
+	}
 }
 
 BOOST_AUTO_TEST_SUITE_END()

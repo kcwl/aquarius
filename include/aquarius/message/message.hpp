@@ -82,8 +82,7 @@ namespace aquarius
 			if (!elastic::from_binary(*header_ptr_, stream))
 				return ec = system::system_errc::invalid_stream;
 
-			if (!elastic::from_binary(body_, stream))
-				return ec = system::system_errc::invalid_stream;
+			elastic::from_binary(body_, stream);
 
 			ec = error_code{};
 
@@ -92,7 +91,8 @@ namespace aquarius
 
 		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			elastic::to_binary(Number, stream);
+			if(!elastic::to_binary(Number, stream))
+				return ec = system::system_errc::invalid_stream;
 
 			flex_buffer_t body_buffer{};
 
@@ -111,9 +111,6 @@ namespace aquarius
 			stream.append(std::move(header_buffer));
 
 			stream.append(std::move(body_buffer));
-
-			if (stream.size() != total_size)
-				return ec = system::system_errc::invalid_stream;
 
 			ec = error_code{};
 
