@@ -12,6 +12,9 @@ namespace aquarius
 	public:
 		bool push(std::shared_ptr<xsession> session_ptr)
 		{
+			if (!session_ptr)
+				return false;
+
 			std::lock_guard lk(mutex_);
 
 			sessions_.emplace(session_ptr->uuid(), session_ptr);
@@ -49,9 +52,6 @@ namespace aquarius
 
 			for (auto& session : sessions_)
 			{
-				if (!session.second)
-					continue;
-
 				session.second->async_write(std::move(buffer));
 			}
 		}
@@ -63,9 +63,6 @@ namespace aquarius
 
 			for (auto& session : sessions_)
 			{
-				if (!session.second)
-					continue;
-
 				if (!std::forward<_Func>(f)(session.second))
 					continue;
 
@@ -80,9 +77,6 @@ namespace aquarius
 			auto iter = sessions_.find(uid);
 
 			if (iter == sessions_.end())
-				return false;
-
-			if (!iter->second)
 				return false;
 
 			iter->second->async_write(std::move(buffer));

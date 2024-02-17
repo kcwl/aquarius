@@ -4,7 +4,7 @@
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/event.hpp>
 #include <aquarius/message/message.hpp>
-#include <aquarius/resolver.hpp>
+#include <aquarius/invoke/invoke_resolver.hpp>
 #include <deque>
 #include <memory>
 #include <string>

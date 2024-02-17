@@ -130,6 +130,7 @@ BOOST_AUTO_TEST_CASE(call_back)
 		aquarius::invoke_session_helper::push(session_ptr);
 
 		session_ptr->attach(1300, std::make_shared<aquarius::basic_context>());
+		session_ptr->attach(1300, std::make_shared<aquarius::basic_context>());
 		session_ptr->attach(1301, std::make_shared<ctx_test_server>());
 	}
 }

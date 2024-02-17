@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/elastic.hpp>
 #include <aquarius/defines.hpp>
-#include <aquarius/resolver.hpp>
+#include <aquarius/invoke/invoke_resolver.hpp>
 #include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/invoke/invoke_context.hpp>
 #include <aquarius/invoke/router_session.hpp>
@@ -21,7 +21,7 @@ namespace aquarius
 
 			std::size_t total{};
 
-			auto result = resolver<tcp>::template from_binay(buffer, proto, total);
+			auto result = invoke_resolver_helper<tcp>::template from_binay(buffer, proto, total);
 
 			if (result != read_handle_result::ok)
 				return result;
@@ -54,9 +54,6 @@ namespace aquarius
 
 		static bool push(std::shared_ptr<xsession> session_ptr)
 		{
-			if (!session_ptr)
-				return false;
-
 			return router_session::instance().push(session_ptr);
 		}
 

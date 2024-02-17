@@ -179,9 +179,6 @@
     <ClInclude Include="..\include\aquarius\request.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\resolver.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\response.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -220,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\session.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_resolver.hpp">
+      <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

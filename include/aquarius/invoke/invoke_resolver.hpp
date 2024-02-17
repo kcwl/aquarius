@@ -7,7 +7,7 @@
 namespace aquarius
 {
 	template<typename _Type>
-	struct resolver
+	struct invoke_resolver_helper
 	{
 		static read_handle_result from_binay(flex_buffer_t& buffer, uint32_t& proto, std::size_t& total)
 		{
@@ -25,7 +25,7 @@ namespace aquarius
 	};
 
 	template<>
-	struct resolver<http>
+	struct invoke_resolver_helper<http>
 	{
 
 	};
