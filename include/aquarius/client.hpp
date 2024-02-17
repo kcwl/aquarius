@@ -46,9 +46,11 @@ namespace aquarius
 		template <typename _Request, typename _Func>
 		void async_write(_Request&& req, _Func&& f)
 		{
+			error_code ec{};
+
 			flex_buffer_t fs{};
 
-			req.to_binary(fs);
+			req.to_binary(fs, ec);
 
 			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
 		}

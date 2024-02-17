@@ -75,7 +75,7 @@ public:
 	{}
 
 public:
-	virtual int handle() override
+	virtual aquarius::error_code handle() override
 	{
 		std::cout << "server ctx\n";
 		response_.body().age = 1;
@@ -83,7 +83,7 @@ public:
 
 		send_response(1);
 
-		return 1;
+		return aquarius::error_code{};
 	}
 };
 
@@ -97,14 +97,14 @@ public:
 	{}
 
 public:
-	virtual int handle() override
+	virtual aquarius::error_code handle() override
 	{
 		std::cout << "test response recved!\n";
 
 		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
 		BOOST_CHECK_EQUAL(request_ptr_->body().name, "hello");
 
-		return 1;
+		return aquarius::error_code{};
 	}
 };
 

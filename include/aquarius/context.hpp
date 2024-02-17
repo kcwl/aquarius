@@ -14,7 +14,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public detail::bare_visitor<basic_message, int>, public detail::event_call
+	class basic_context : public detail::bare_visitor<basic_message>, public detail::event_call
 	{
 	public:
 		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
@@ -35,11 +35,11 @@ namespace aquarius
 		basic_context& operator=(const basic_context&) = delete;
 
 	public:
-		virtual int visit(basic_message*, std::shared_ptr<xsession> session_ptr) override
+		virtual error_code visit(basic_message*, std::shared_ptr<xsession> session_ptr, error_code& ec) override
 		{
 			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 
-			return int{};
+			return ec = system::system_errc::invalid_message;
 		}
 
 	public:
@@ -78,7 +78,7 @@ namespace aquarius
 	};
 
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public detail::shared_visitor<_Request, int>
+	class context : public basic_context, public detail::shared_visitor<_Request>
 	{
 	public:
 		context(const std::string& name)
@@ -103,17 +103,17 @@ namespace aquarius
 			// timeout
 		}
 
-		virtual int visit(std::shared_ptr<_Request> req, std::shared_ptr<xsession> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<xsession> session_ptr, error_code& ec)
 		{
 			request_ptr_ = req;
 
 			session_ptr_ = session_ptr;
 
-			return handle();
+			return ec = handle();
 		}
 
 	protected:
-		virtual int handle() = 0;
+		virtual error_code handle() = 0;
 
 		bool send_response(int result)
 		{
@@ -133,7 +133,9 @@ namespace aquarius
 
 			flex_buffer_t fs;
 
-			response_.to_binary(fs);
+			error_code ec{};
+
+			response_.to_binary(fs, ec);
 
 			return fs;
 		}

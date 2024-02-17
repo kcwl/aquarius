@@ -103,17 +103,19 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	std::size_t total{};
 
-	auto result = aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total);
+	aquarius::error_code ec{};
 
-	BOOST_CHECK(result == aquarius::read_handle_result::unknown_error);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
+
+	BOOST_CHECK(ec);
 
 	buffer.pubseekpos(0, std::ios::out);
 
 	elastic::to_binary(10001u, buffer);
 
-	result = aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
 
-	BOOST_CHECK(result == aquarius::read_handle_result::unknown_error);
+	BOOST_CHECK(ec);
 
 	BOOST_CHECK(proto == 10001 && total == std::size_t{});
 
@@ -121,9 +123,9 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	elastic::to_binary(45u, buffer);
 
-	result = aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
 
-	BOOST_CHECK(result == aquarius::read_handle_result::waiting_for_query);
+	BOOST_CHECK(ec);
 
 	BOOST_CHECK(proto == 10001 && total == 45);
 
@@ -131,9 +133,9 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	buffer.commit(45);
 
-	result = aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
 
-	BOOST_CHECK(result == aquarius::read_handle_result::ok);
+	BOOST_CHECK(!ec);
 
 	BOOST_CHECK(proto == 10001 && total == 45);
 }
@@ -143,9 +145,11 @@ BOOST_AUTO_TEST_CASE(session)
 	{
 		aquarius::flex_buffer_t buffer{};
 
-		auto result = aquarius::invoke_session_helper::process(buffer, 10001);
+		aquarius::error_code ec;
 
-		BOOST_CHECK(result == aquarius::read_handle_result::unknown_error);
+		aquarius::invoke_session_helper::process(buffer, 10001, ec);
+
+		BOOST_CHECK(!ec);
 
 		elastic::to_binary(12001u, buffer);
 
@@ -153,18 +157,18 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::invoke_session_helper::push(session);
 
-		result = aquarius::invoke_session_helper::process(buffer, session->uuid());
+		aquarius::invoke_session_helper::process(buffer, session->uuid(), ec);
 
-		BOOST_CHECK(result != aquarius::read_handle_result::ok);
+		BOOST_CHECK(!ec);
 
 		buffer.pubseekpos(0, std::ios::out);
 
 		elastic::to_binary(45u, buffer);
 		buffer.commit(45);
 
-		result = aquarius::invoke_session_helper::process(buffer, session->uuid());
+		aquarius::invoke_session_helper::process(buffer, session->uuid(),ec);
 
-		BOOST_CHECK(result != aquarius::read_handle_result::ok);
+		BOOST_CHECK(!ec);
 
 		aquarius::invoke_session_helper::send(session->uuid(), person_response{});
 
@@ -190,15 +194,21 @@ BOOST_AUTO_TEST_CASE(visitor)
 {
 	auto req = std::make_shared<person_request>();
 
+	aquarius::error_code ec{};
+
 	aquarius::flex_buffer_t buffer{};
 
-	req->to_binary(buffer);
+	req->to_binary(buffer, ec);
 
-	BOOST_CHECK(req->accept(buffer, nullptr, nullptr) == aquarius::read_handle_result::failed);
+	req->accept(buffer, nullptr, nullptr, ec);
+
+	BOOST_CHECK(!ec);
 
 	auto msg = std::make_shared<aquarius::basic_message>();
 
-	BOOST_CHECK(msg->accept(buffer, nullptr, nullptr) == aquarius::read_handle_result::failed);
+	msg->accept(buffer, nullptr, nullptr, ec);
+
+	BOOST_CHECK(!ec);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

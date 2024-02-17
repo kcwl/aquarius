@@ -5,26 +5,24 @@
 #include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/invoke/invoke_context.hpp>
 #include <aquarius/invoke/router_session.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
 	struct invoke_session_helper
 	{
-		static read_handle_result process(flex_buffer_t& buffer, std::size_t uid)
+		static error_code process(flex_buffer_t& buffer, std::size_t uid, error_code& ec)
 		{
 			auto session_ptr = find(uid);
-
-			if (!session_ptr)
-				return read_handle_result::unknown_error;
 
 			uint32_t proto{};
 
 			std::size_t total{};
 
-			auto result = invoke_resolver_helper<tcp>::template from_binay(buffer, proto, total);
+			invoke_resolver_helper<tcp>::template from_binay(buffer, proto, total, ec);
 
-			if (result != read_handle_result::ok)
-				return result;
+			if (ec)
+				return ec;
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
@@ -44,12 +42,12 @@ namespace aquarius
 
 			session_ptr->on_accept();
 
-			result = request_ptr->accept(buffer, context_ptr, session_ptr);
+			request_ptr->accept(buffer, context_ptr, session_ptr, ec);
 
-			if (result == read_handle_result::ok)
+			if (!ec)
 				session_ptr->detach(proto);
 
-			return result;
+			return ec;
 		}
 
 		static bool push(std::shared_ptr<xsession> session_ptr)
@@ -80,8 +78,10 @@ namespace aquarius
 		template<typename _Response>
 		static void send(std::size_t uid, _Response&& resp)
 		{
+			error_code ec{};
+
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+			resp.to_binary(fs, ec);
 
 			router_session::instance().send(uid, std::move(fs));
 		}
@@ -94,8 +94,10 @@ namespace aquarius
 		template<typename _Response>
 		static void broadcast(_Response&& resp)
 		{
+			error_code ec{};
+
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+			resp.to_binary(fs, ec);
 
 			router_session::instance().broadcast(std::move(fs));
 		}
@@ -103,8 +105,10 @@ namespace aquarius
 		template<typename _Response,typename _Pre>
 		static void broadcast_if(_Response&& resp, _Pre&& func)
 		{
+			error_code ec{};
+
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+			resp.to_binary(fs, ec);
 
 			router_session::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
 		}

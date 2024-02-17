@@ -25,13 +25,13 @@ public:
 	{}
 
 public:
-	virtual int handle() override
+	virtual aquarius::error_code handle() override
 	{
 		response_.body().age = 1;
 
 		send_response(1);
 
-		return 1;
+		return aquarius::error_code{};
 	}
 };
 

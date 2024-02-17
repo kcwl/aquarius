@@ -14,22 +14,6 @@ namespace aquarius
 	struct tcp
 	{};
 
-	enum class read_handle_result
-	{
-		failed,
-		ok,
-		unknown_error,
-		unknown_proto,
-		unknown_ctx,
-		header_error,
-		body_error,
-		context_error,
-		waiting_for_query,
-		null_message,
-		reset_peer,
-		report
-	};
-
 	enum class conn_mode
 	{
 		client,

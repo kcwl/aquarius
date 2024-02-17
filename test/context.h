@@ -76,7 +76,7 @@ public:
 	{}
 
 public:
-	virtual int handle() override
+	virtual aquarius::error_code handle() override
 	{
 		std::cout << "server ctx\n";
 		response_.body().age = 1;
@@ -84,7 +84,7 @@ public:
 
 		send_response(1);
 
-		return 1;
+		return aquarius::error_code{};
 	}
 };
 
@@ -96,9 +96,11 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 
 	aquarius::flex_buffer_t buffer{};
 
-	auto result = req->accept(buffer, ctx, nullptr);
+	aquarius::error_code ec;
 
-	BOOST_CHECK(result == aquarius::read_handle_result::failed);
+	req->accept(buffer, ctx, nullptr, ec);
+
+	BOOST_CHECK(ec);
 }
 
 BOOST_AUTO_TEST_CASE(call_back)
@@ -139,13 +141,15 @@ BOOST_AUTO_TEST_CASE(function)
 {
 	auto request_ptr = std::make_shared<person_request>();
 
+	aquarius::error_code ec{};
+
 	aquarius::flex_buffer_t buffer{};
 
-	request_ptr->to_binary(buffer);
+	request_ptr->to_binary(buffer, ec);
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
-	BOOST_CHECK(request_ptr->accept(buffer, context_ptr, nullptr) == aquarius::read_handle_result::ok);
+	BOOST_CHECK(!request_ptr->accept(buffer, context_ptr, nullptr,ec));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

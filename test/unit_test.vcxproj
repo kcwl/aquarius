@@ -173,6 +173,7 @@
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\detail\event.hpp" />
+    <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
@@ -203,6 +204,9 @@
     <ClInclude Include="..\include\aquarius\service\service.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\router_session.hpp" />
+    <ClInclude Include="..\include\aquarius\system\error_code\error_category.hpp" />
+    <ClInclude Include="..\include\aquarius\system\error_code\system_errc.hpp" />
+    <ClInclude Include="..\include\aquarius\system\error_code\system_error_message.hpp" />
     <ClInclude Include="..\include\aquarius\type_traits.hpp" />
     <ClInclude Include="context.h" />
     <ClInclude Include="invoke.h" />

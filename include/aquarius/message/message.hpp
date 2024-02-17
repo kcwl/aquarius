@@ -4,6 +4,7 @@
 #include <aquarius/detail/visitor.hpp>
 #include <aquarius/elastic.hpp>
 #include <cstddef>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
@@ -15,14 +16,14 @@ namespace aquarius
 	struct null_body
 	{};
 
-	class basic_message : public detail::visitable<read_handle_result>
+	class basic_message : public detail::visitable
 	{
 	public:
 		basic_message() = default;
 		virtual ~basic_message() = default;
 
 	public:
-		DEFINE_VISITABLE(read_handle_result)
+		DEFINE_VISITABLE()
 	};
 
 	template <typename _Header, typename _Body, uint32_t N>
@@ -56,9 +57,6 @@ namespace aquarius
 
 		message& operator=(message&& other)
 		{
-			if (&other == this)
-				return *this;
-
 			message(std::move(other)).swap(*this);
 
 			return *this;
@@ -79,44 +77,47 @@ namespace aquarius
 			return body_;
 		}
 
-		read_handle_result from_binary(flex_buffer_t& stream)
+		error_code from_binary(flex_buffer_t& stream, error_code& ec)
 		{
 			if (!elastic::from_binary(*header_ptr_, stream))
-				return read_handle_result::header_error;
+				return ec = system::system_errc::invalid_stream;
 
 			if (!elastic::from_binary(body_, stream))
-				return read_handle_result::body_error;
+				return ec = system::system_errc::invalid_stream;
 
-			return read_handle_result::ok;
+			ec = error_code{};
+
+			return ec;
 		}
 
-		read_handle_result to_binary(flex_buffer_t& stream)
+		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			if (!elastic::to_binary(Number, stream))
-				return read_handle_result::unknown_error;
+			elastic::to_binary(Number, stream);
 
 			flex_buffer_t body_buffer{};
 
-			if (!elastic::to_binary(body_, body_buffer))
-				return read_handle_result::body_error;
+			elastic::to_binary(body_, body_buffer);
 
 			header_ptr_->size = body_buffer.size();
 
 			flex_buffer_t header_buffer{};
 
-			if (!elastic::to_binary(*header_ptr_, header_buffer))
-				return read_handle_result::header_error;
+			elastic::to_binary(*header_ptr_, header_buffer);
 
 			std::size_t total_size = header_buffer.size() + header_ptr_->size;
 
-			if (!elastic::to_binary(total_size, stream))
-				return read_handle_result::unknown_error;
+			elastic::to_binary(total_size, stream);
 
 			stream.append(std::move(header_buffer));
 
 			stream.append(std::move(body_buffer));
 
-			return read_handle_result::ok;
+			if (stream.size() != total_size)
+				return ec = system::system_errc::invalid_stream;
+
+			ec = error_code{};
+
+			return ec;
 		}
 
 	private:

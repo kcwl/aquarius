@@ -192,7 +192,9 @@ BOOST_AUTO_TEST_CASE(parse)
 	req.header()->src = 2;
 	req.body().age = 3;
 
-	BOOST_CHECK(req.to_binary(buffer) != aquarius::read_handle_result::ok);
+	aquarius::error_code ec{};
+
+	BOOST_CHECK(req.to_binary(buffer, ec));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -141,7 +141,9 @@ namespace aquarius
 
 					read_buffer_.commit(bytes_transferred);
 
-					invoke_session_helper::process(read_buffer_, uuid());
+					error_code ecr{};
+
+					invoke_session_helper::process(read_buffer_, uuid(), ecr);
 
 					async_read();
 				});

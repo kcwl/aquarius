@@ -9,18 +9,20 @@ namespace aquarius
 	template<typename _Type>
 	struct invoke_resolver_helper
 	{
-		static read_handle_result from_binay(flex_buffer_t& buffer, uint32_t& proto, std::size_t& total)
+		static error_code from_binay(flex_buffer_t& buffer, uint32_t& proto, std::size_t& total, error_code& ec)
 		{
 			if (!elastic::from_binary(proto, buffer))
-				return read_handle_result::unknown_error;
+				return ec = system::system_errc::invalid_stream;
 
 			if (!elastic::from_binary(total, buffer))
-				return read_handle_result::unknown_error;
+				return ec = system::system_errc::invalid_stream;
 
 			if (buffer.size() < total)
-				return read_handle_result::waiting_for_query;
+				return ec = system::system_errc::wait_for_query;
 
-			return read_handle_result::ok;
+			ec = error_code{};
+
+			return ec;
 		}
 	};
 

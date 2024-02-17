@@ -37,6 +37,12 @@
     <Filter Include="include\aquarius\service">
       <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\system">
+      <UniqueIdentifier>{77e47d6a-d4e0-4016-b765-e7e5d8f33e56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\system\error_code">
+      <UniqueIdentifier>{cbb83a22-ae46-4acc-973e-de9a23b6f96d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -220,6 +226,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\invoke\invoke_resolver.hpp">
       <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error_code.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\error_code\error_category.hpp">
+      <Filter>include\aquarius\system\error_code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\error_code\system_error_message.hpp">
+      <Filter>include\aquarius\system\error_code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\error_code\system_errc.hpp">
+      <Filter>include\aquarius\system\error_code</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
