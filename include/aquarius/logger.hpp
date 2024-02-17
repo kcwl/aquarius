@@ -25,8 +25,6 @@ namespace aquarius
 {
 	inline void init_logger()
 	{
-		logging::add_console_log(std::clog, keywords::format = "%TimeStamp%: %Message%");
-
 		using file_sink = sinks::synchronous_sink<sinks::text_file_backend>;
 
 		auto sink_ptr = boost::make_shared<file_sink>(keywords::file_name = "file.log",
