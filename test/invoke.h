@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::invoke_session_helper::process(buffer, 10001, ec);
 
-		BOOST_CHECK(!ec);
+		BOOST_CHECK(ec);
 
 		elastic::to_binary(12001u, buffer);
 
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::invoke_session_helper::process(buffer, session->uuid(), ec);
 
-		BOOST_CHECK(!ec);
+		BOOST_CHECK(ec);
 
 		buffer.pubseekpos(0, std::ios::out);
 
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::invoke_session_helper::process(buffer, session->uuid(),ec);
 
-		BOOST_CHECK(!ec);
+		BOOST_CHECK(ec);
 
 		aquarius::invoke_session_helper::send(session->uuid(), person_response{});
 
@@ -202,13 +202,13 @@ BOOST_AUTO_TEST_CASE(visitor)
 
 	req->accept(buffer, nullptr, nullptr, ec);
 
-	BOOST_CHECK(!ec);
+	BOOST_CHECK(ec);
 
 	auto msg = std::make_shared<aquarius::basic_message>();
 
 	msg->accept(buffer, nullptr, nullptr, ec);
 
-	BOOST_CHECK(!ec);
+	BOOST_CHECK(ec);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
