@@ -15,7 +15,7 @@ namespace aquarius
 
 	namespace system
 	{
-		std::string system_errc_map(int error)
+		inline std::string system_errc_map(int error)
 		{
 			auto errc = static_cast<system_errc>(error);
 
