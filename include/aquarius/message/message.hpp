@@ -2,32 +2,32 @@
 #include <aquarius/defines.hpp>
 #include <aquarius/detail/field.hpp>
 #include <aquarius/detail/visitor.hpp>
+#include <aquarius/elastic.hpp>
 #include <cstddef>
+#include <aquarius/error_code.hpp>
+
+namespace aquarius
+{
+	class basic_context;
+}
 
 namespace aquarius
 {
 	struct null_body
 	{};
 
-	class xmessage : public detail::visitable<read_handle_result>
+	class basic_message : public detail::visitable
 	{
 	public:
-		DEFINE_VISITABLE_NULL(read_handle_result)
+		basic_message() = default;
+		virtual ~basic_message() = default;
 
 	public:
-		virtual uint32_t unique_key()
-		{
-			return 0;
-		};
-
-		virtual int32_t size()
-		{
-			return 0;
-		}
+		DEFINE_VISITABLE()
 	};
 
 	template <typename _Header, typename _Body, uint32_t N>
-	class message : public xmessage, public fields<_Header>
+	class message : public basic_message, public fields<_Header>
 	{
 	public:
 		using header_type = _Header;
@@ -46,39 +46,30 @@ namespace aquarius
 			this->dealloc(header_ptr_);
 		}
 
-		message(const message& other)
-		{
-			header() = other.header();
-
-			body().Copy(other.body());
-		}
-
 		message(message&& other)
+			: header_ptr_(other.header_ptr_)
+			, body_(other.body_)
 		{
-			header() = std::move(other.header());
+			other.header_ptr_ = nullptr;
 
-			body().Move(other.body());
+			body_type{}.swap(other.body_);
 		}
 
 		message& operator=(message&& other)
 		{
-			if (this == std::addressof(other))
-				return *this;
-
-			*this = std::move(other);
+			message(std::move(other)).swap(*this);
 
 			return *this;
 		}
 
-	public:
-		header_type& header() noexcept
-		{
-			return *header_ptr_;
-		}
+	private:
+		message(const message& other) = delete;
+		message& operator=(const message&) = delete;
 
-		const header_type& header() const noexcept
+	public:
+		header_type* header() noexcept
 		{
-			return *header_ptr_;
+			return header_ptr_;
 		}
 
 		body_type& body() noexcept
@@ -86,64 +77,59 @@ namespace aquarius
 			return body_;
 		}
 
-		const body_type& body() const noexcept
+		error_code from_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			return body_;
+			if (!elastic::from_binary(*header_ptr_, stream))
+				return ec = system::system_errc::invalid_stream;
+
+			elastic::from_binary(body_, stream);
+
+			ec = error_code{};
+
+			return ec;
 		}
 
-		virtual uint32_t unique_key() override
+		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			return Number;
+			if(!elastic::to_binary(Number, stream))
+				return ec = system::system_errc::invalid_stream;
+
+			flex_buffer_t body_buffer{};
+
+			elastic::to_binary(body_, body_buffer);
+
+			header_ptr_->size = body_buffer.size();
+
+			flex_buffer_t header_buffer{};
+
+			elastic::to_binary(*header_ptr_, header_buffer);
+
+			std::size_t total_size = header_buffer.size() + header_ptr_->size;
+
+			elastic::to_binary(total_size, stream);
+
+			stream.append(std::move(header_buffer));
+
+			stream.append(std::move(body_buffer));
+
+			ec = error_code{};
+
+			return ec;
 		}
 
-		virtual int32_t size()
+	private:
+		void swap(message& other)
 		{
-			return static_cast<int32_t>(bytes_);
-		}
+			auto tmp_ptr = this->header_ptr_;
+			this->header_ptr_ = other.header_ptr_;
+			other.header_ptr_ = tmp_ptr;
 
-		read_handle_result from_binary(flex_buffer_t& stream)
-		{
-			constexpr auto sz = sizeof(header_type);
-
-			stream.sgetn((uint8_t*)header_ptr_, sz);
-
-			if (!body_.ParseFromArray(stream.wdata(), static_cast<int>(header_ptr_->size)))
-				return read_handle_result::unknown_error;
-
-			return read_handle_result::ok;
-		}
-
-		read_handle_result to_binary(flex_buffer_t& stream)
-		{
-			constexpr auto size = sizeof(header_type);
-
-			stream.sputn((uint8_t*)&Number, sizeof(Number));
-
-			header_ptr_->size = body_.ByteSizeLong();
-
-			uint64_t total_size = size + header_ptr_->size;
-
-			stream.sputn((uint8_t*)&total_size, sizeof(total_size));
-
-			if (stream.sputn((flex_buffer_t::value_type*)header_ptr_, size) != size)
-				return read_handle_result::header_error;
-
-			if (stream.active() < body_.ByteSizeLong())
-				return read_handle_result::body_error;
-
-			if (!body_.SerializeToArray(stream.rdata(), static_cast<int>(body_.ByteSizeLong())))
-				return read_handle_result::unknown_error;
-
-			stream.commit(body_.ByteSizeLong());
-
-			return read_handle_result::ok;
+			other.body().swap(this->body_);
 		}
 
 	private:
 		header_type* header_ptr_;
 
 		body_type body_;
-
-		std::size_t bytes_;
 	};
 } // namespace aquarius

@@ -1,15 +1,19 @@
 ﻿#pragma once
-#include <boost/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <functional>
+#include <list>
 #include <thread>
+#include <vector>
+#include <aquarius/logger.hpp>
 
 namespace aquarius
 {
 	class io_service_pool
 	{
 	private:
-		using io_service_ptr_t = std::shared_ptr<boost::asio::io_service>;
-		using work_ptr_t = std::shared_ptr<boost::asio::io_service::work>;
+		using io_service_ptr_t = std::shared_ptr<asio::io_service>;
+
+		using work_guard = asio::executor_work_guard<asio::io_context::executor_type>;
 
 	public:
 		explicit io_service_pool(std::size_t pool_size)
@@ -23,11 +27,11 @@ namespace aquarius
 
 			for (std::size_t i = 0; i < pool_size_; ++i)
 			{
-				io_service_ptr_t io_service_ptr(new boost::asio::io_service{});
-				work_ptr_t work_ptr(new boost::asio::io_service::work(*io_service_ptr));
+				io_service_ptr_t io_service_ptr(new asio::io_service{});
 
 				io_services_.push_back(io_service_ptr);
-				works_.push_back(work_ptr);
+
+				works_.push_back(asio::make_work_guard(*io_service_ptr));
 			}
 		}
 
@@ -35,28 +39,47 @@ namespace aquarius
 		void run()
 		{
 			std::vector<std::shared_ptr<std::thread>> threads;
-			std::for_each(io_services_.begin(), io_services_.end(),
-						  [&threads](auto iter)
-						  { threads.push_back(std::make_shared<std::thread>([it = std::move(iter)] { it->run(); })); });
 
-			std::for_each(threads.begin(), threads.end(), [](auto iter) { iter->join(); });
+			for (auto& io_service : io_services_)
+			{
+				threads.push_back(std::make_shared<std::thread>(
+					[&]
+					{
+						BOOST_LOG_SCOPED_THREAD_TAG("ThreadID", boost::this_thread::get_id());
+
+						io_service->run();
+					}));
+			}
+
+			for (auto& thread : threads)
+			{
+				thread->join();
+			}
 		}
 
 		void stop()
 		{
-			std::for_each(io_services_.begin(), io_services_.end(), [](auto iter) { iter->stop(); });
+			for (auto& io_service : io_services_)
+			{
+				io_service->stop();
+			}
 		}
 
-		boost::asio::io_service& get_io_service()
+		asio::io_service& get_io_service()
 		{
-			boost::asio::io_service& io_service = *io_services_[next_to_service_];
+			asio::io_service& io_service = *io_services_[next_to_service_];
 			++next_to_service_;
 
-			if (next_to_service_ == static_cast<int>(io_services_.size()))
+			if (next_to_service_ == io_services_.size())
 				next_to_service_ = 0;
 
 			return io_service;
 		}
+
+	private:
+		io_service_pool(const io_service_pool&) = delete;
+
+		io_service_pool& operator=(const io_service_pool&) = delete;
 
 	private:
 		std::vector<io_service_ptr_t> io_services_;
@@ -65,6 +88,6 @@ namespace aquarius
 
 		std::size_t next_to_service_;
 
-		std::vector<work_ptr_t> works_;
+		std::list<work_guard> works_;
 	};
 } // namespace aquarius

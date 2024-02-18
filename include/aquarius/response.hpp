@@ -1,11 +1,12 @@
 ﻿#pragma once
-#include <aquarius/message/tcp_header.hpp>
 #include <aquarius/message/message.hpp>
+#include <aquarius/message/tcp_header.hpp>
 
 namespace aquarius
 {
 	template <typename _Body, uint32_t Number>
-	class response : public message<tcp_response_header, _Body, Number>, public std::enable_shared_from_this<response<_Body, Number>>
+	class response : public message<tcp_response_header, _Body, Number>,
+					 public std::enable_shared_from_this<response<_Body, Number>>
 	{
 		using base_type = message<tcp_response_header, _Body, Number>;
 
@@ -13,22 +14,13 @@ namespace aquarius
 		response() = default;
 		~response() = default;
 
-		DEFINE_VISITABLE_RESPONSE(read_handle_result)
+		DEFINE_VISITABLE_RESPONSE()
 
 	public:
-		response(const response& other)
+		response(response&& req)
+			: base_type(std::move(req))
 		{
-			this->header() = other.header();
-
-			this->body().Copy(other.body());
-		}
-
-		response(response&& other)
-		{
-			this->header() = std::move(other.header());
-
-			//this->body().Move(other.body());
-			this->body() = std::move(other.body());
+			
 		}
 
 		response& operator=(response&& other)
@@ -37,8 +29,9 @@ namespace aquarius
 
 			return *this;
 		}
-	};
 
-	template <uint32_t Number>
-	using null_body_response = response<null_body, Number>;
+	private:
+		response(const response&) = delete;
+		response& operator=(const response& other) = delete;
+	};
 } // namespace aquarius

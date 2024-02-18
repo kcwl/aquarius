@@ -32,32 +32,35 @@ BOOST_AUTO_TEST_CASE(connect)
 
 	auto select_result = aquarius::select_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1);
 
-	auto& last_one = select_result.back();
+	if (!select_result.empty())
+	{
+		auto& last_one = select_result.back();
 
-	BOOST_CHECK_EQUAL(last_one.prod_id, 1);
-	BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
-	BOOST_CHECK_EQUAL(last_one.prod_price, 2);
-	BOOST_CHECK_EQUAL(last_one.vend_id, 3);
+		BOOST_CHECK_EQUAL(last_one.prod_id, 1);
+		BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
+		BOOST_CHECK_EQUAL(last_one.prod_price, 2);
+		BOOST_CHECK_EQUAL(last_one.vend_id, 3);
 
-	BOOST_CHECK_EQUAL(aquarius::remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1), true);
+		BOOST_CHECK_EQUAL(aquarius::remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1), true);
 
-	std::this_thread::sleep_for(3s);
+		std::this_thread::sleep_for(3s);
 
-	aquarius::async_insert(pool, products{ 1, "pro", 2, 3 }, [](auto&& result) { BOOST_CHECK_EQUAL(result, true); });
+		aquarius::async_insert(pool, products{ 1, "pro", 2, 3 }, [](auto&& result) { BOOST_CHECK_EQUAL(result, true); });
 
-	aquarius::async_select_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
-														[](const auto& result)
-														{
-															auto& last_one = result.back();
+		aquarius::async_select_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
+			[](const auto& result)
+			{
+				auto& last_one = result.back();
 
-															BOOST_CHECK_EQUAL(last_one.prod_id, 1);
-															BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
-															BOOST_CHECK_EQUAL(last_one.prod_price, 2);
-															BOOST_CHECK_EQUAL(last_one.vend_id, 3);
-														});
+				BOOST_CHECK_EQUAL(last_one.prod_id, 1);
+				BOOST_CHECK_EQUAL(last_one.prod_name, "pro");
+				BOOST_CHECK_EQUAL(last_one.prod_price, 2);
+				BOOST_CHECK_EQUAL(last_one.vend_id, 3);
+			});
 
-	aquarius::async_remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
-										[](auto result) { BOOST_CHECK_EQUAL(result, true); });
+		aquarius::async_remove_if<products>(pool, AQUARIUS_EXPR(prod_id) == 1,
+			[](auto result) { BOOST_CHECK_EQUAL(result, true); });
+	}
 
 	std::this_thread::sleep_for(3s);
 

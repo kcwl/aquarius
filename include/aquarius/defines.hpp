@@ -14,18 +14,16 @@ namespace aquarius
 	struct tcp
 	{};
 
-	enum class read_handle_result
+	enum class conn_mode
 	{
-		ok = 1,
-		unknown_error,
-		unknown_proto,
-		unknown_ctx,
-		header_error,
-		body_error,
-		context_error,
-		waiting_for_query,
-		null_message,
-		reset_peer,
-		report
+		client,
+		server
 	};
+
+	enum class ssl_mode
+	{
+		nossl,
+		ssl
+	};
+
 } // namespace aquarius

@@ -1,5 +1,11 @@
 #define BOOST_TEST_MODULE UnitTest
 #include <boost/test/included/unit_test.hpp>
-#include "server_test.h"
-#include "message_test.h"
-#include "mysql_test.h"
+#include <vld.h>
+#include "io_service_pool.h"
+#include "context.h"
+#include "router.h"
+#include "server.h"
+#include "session.h"
+#include "message.h"
+#include "invoke.h"
+#include "error_code.h"

@@ -1,10 +1,10 @@
 #pragma once
-#include "defines.h"
-
 #include <fstream>
 #include <string>
+#include <vector>
+#include "file_struct.hpp"
 
-namespace elastic
+namespace aquarius
 {
 	namespace compiler
 	{
@@ -25,21 +25,25 @@ namespace elastic
 			std::vector<reflactor_structure> structs() const;
 
 		private:
-			bool read_to_spilt(std::string& value, char sp);
+			bool read_to_spilt(std::string& value, int sp);
 
-			bool read_command(reflactor_structure& rs);
-
-			bool choose_state(int current, reflactor_structure& rs);
-
-			note read_note();
+			bool read_command(std::string& name);
 
 			bool check_file_suffix(const std::string& file_name);
 
-			bool read_keyword(std::string& keyword, bool ignore_note = false);
+			bool read_keyword(std::string& keyword);
+
+			bool read_keytype(std::string& keytype);
 
 			bool read_message(reflactor_structure& rs);
 
 			bool read_package(reflactor_structure& rs);
+
+			std::string spilt_keyword_from_line(const std::string& keyword);
+
+			std::string spilt_keytype_from_line(const std::string& keytype);
+
+			bool check_space(const std::string& word);
 
 		private:
 			std::ifstream read_file_stream_;

@@ -1,0 +1,17 @@
+message person_body_request = 10000
+{
+	int32 age;
+	string name;
+	bool sex;
+	int64 money;
+	uint32 back_money;
+	uint64 crc;
+	bytes role_data;
+	float hp;
+	double mana;
+}
+
+message person_body_response = 10001
+{
+
+}

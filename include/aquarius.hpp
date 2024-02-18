@@ -3,28 +3,26 @@
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
+#include <aquarius/elastic.hpp>
+#include <aquarius/invoke.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/service.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
-	template <std::size_t Identify>
-	using tcp_server_connect = server_connect<tcp, Identify>;
+	using tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::ssl>>;
 
-	template <std::size_t Identify>
-	using tcp_server = server<tcp_server_connect<Identify>>;
+	using no_ssl_tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::nossl>>;
 
-	template <std::size_t Identify>
-	using http_server_connect = server_connect<http, Identify>;
+	using http_server = server<connect<http, conn_mode::server, ssl_mode::nossl>>;
 
-	template <std::size_t Identify>
-	using http_server = server<http_server_connect<Identify>>;
+	using https_server = server<connect<http, conn_mode::server, ssl_mode::ssl>>;
 
-	using tcp_client_connect = client_connect<tcp>;
+	using tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::ssl>>;
 
-	using tcp_client = client<tcp_client_connect>;
+	using no_ssl_tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::nossl>>;
 
 	template <typename _Message>
 	inline void broadcast(_Message&& msg)
@@ -32,7 +30,7 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		session_manager::instance().broadcast(std::move(fs));
+		router_session::instance().broadcast(std::move(fs));
 	}
 
 	template <typename _Message, typename _Func>
@@ -41,6 +39,6 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+		router_session::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 	}
 } // namespace aquarius

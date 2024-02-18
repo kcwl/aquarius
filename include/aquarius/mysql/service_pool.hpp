@@ -52,7 +52,7 @@ namespace aquarius
 
 			if (!conn_ptr->execute(sql, ec))
 			{
-				XLOG(error) << "sql: " << sql << " execute failed! " << ec.what();
+				XLOG_ERROR() << "sql: " << sql << " execute failed! " << ec.what();
 			}
 
 			this->recycle_service(std::move(conn_ptr));
@@ -90,7 +90,7 @@ namespace aquarius
 			std::vector<_Ty> result{};
 			if (!conn_ptr->query<_Ty>(sql, result, ec))
 			{
-				XLOG(error) << "sql: " << sql << " query failed! " << ec.what();
+				XLOG_ERROR() << "sql: " << sql << " query failed! " << ec.what();
 			}
 
 			this->recycle_service(std::move(conn_ptr));

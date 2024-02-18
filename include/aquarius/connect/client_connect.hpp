@@ -4,40 +4,26 @@
 namespace aquarius
 {
 	template <typename _Protocol>
-	class client_connect : public ssl_connect<_Protocol>
+	class client_connect : public connect<_Protocol, false>
 	{
 	public:
-		client_connect(boost::asio::io_service& io_service,
+		client_connect(boost::asio::io_service& io_service, boost::asio::ssl::basic_context& basic_context,
 					   std::chrono::steady_clock::duration dura = heart_time_interval)
-			: ssl_connect<_Protocol>(io_service, dura)
+			: connect<_Protocol, false>(io_service, basic_context, dura)
 		{}
 
 	public:
-		virtual bool on_read(read_handle_result result) override
-		{
-			if (result != read_handle_result::reset_peer)
-				return true;
-
-			tcp_response_header header{};
-
-			this->buffer().sgetn((uint8_t*)&header, sizeof(header));
-
-			change_connect(boost::asio::ip::address_v4(header.result).to_string(), static_cast<int32_t>(header.reserve));
-
-			return false;
-		}
-
 		virtual bool on_resolve() override
 		{
 			auto& buff = this->buffer();
 
-			buff.consume(sizeof(uint32_t) * 3);
+			buff.consume(sizeof(uint32_t) + sizeof(uint64_t) * 2);
 
-			uint32_t uid{};
+			uint64_t uid{};
 
-			buff.sgetn((uint8_t*)&uid, sizeof(uint32_t));
+			buff.sgetn((uint8_t*)&uid, sizeof(uint64_t));
 
-			buff.consume(-((int)sizeof(uint32_t) * 4));
+			buff.consume(-static_cast<int>(sizeof(uint32_t) + sizeof(uint64_t) * 3));
 
 			return func_invoke(uid, buff);
 		}
@@ -50,26 +36,12 @@ namespace aquarius
 			async_write(std::move(resp_buf), [] {});
 		}
 
-	private:
-		void change_connect(const std::string& ip_addr, int32_t port)
+		void set_verify_mode(boost::asio::ssl::verify_mode v)
 		{
-			boost::system::error_code ec;
-			this->socket().shutdown(boost::asio::socket_base::shutdown_both, ec);
-
-			boost::asio::ip::tcp::resolver resolve(this->socket().get_executor());
-
-			auto endpoints = resolve.resolve(ip_addr, std::to_string(port));
-
-			boost::asio::async_connect(this->socket(), endpoints,
-									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
-									   {
-										   if (ec)
-											   return;
-
-										   this->start();
-									   });
+			this->ssl_socket().set_verify_mode(v);
 		}
 
+	private:
 		bool func_invoke(std::size_t uid, flex_buffer_t& buffer)
 		{
 			auto iter = funcs_.find(uid);

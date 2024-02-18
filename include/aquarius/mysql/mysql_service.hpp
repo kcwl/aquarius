@@ -14,7 +14,7 @@ namespace aquarius
 		template <typename _Endpoint, typename _Param>
 		explicit mysql_connect(boost::asio::io_service& ios, _Endpoint&& host, _Param&& param)
 			: io_service_(ios)
-			, ssl_ctx_(boost::asio::ssl::context::tls_client)
+			, ssl_ctx_(boost::asio::ssl::basic_context::tls_client)
 			, mysql_ptr_(new boost::mysql::tcp_ssl_connection(io_service_, ssl_ctx_))
 			, endpoint_(host)
 			, params_(param)
@@ -32,11 +32,11 @@ namespace aquarius
 				{
 					if (ec)
 					{
-						XLOG(error) << "mysql async quit error! " << ec.what();
+						XLOG_ERROR() << "mysql async quit error! " << ec.what();
 						return;
 					}
 
-					XLOG(info) << "mysql connect async quit successful!";
+					XLOG_INFO() << "mysql connect async quit successful!";
 				});
 		}
 
@@ -49,11 +49,11 @@ namespace aquarius
 									  {
 										  if (ec)
 										  {
-											  XLOG(error) << "set charset failed! charset=" << charset;
+											  XLOG_ERROR() << "set charset failed! charset=" << charset;
 										  }
 										  else
 										  {
-											  XLOG(info) << "set charset " << charset << "successful";
+											  XLOG_INFO() << "set charset " << charset << "successful";
 										  }
 									  });
 		}
@@ -78,7 +78,7 @@ namespace aquarius
 											 {
 												 if (ec)
 												 {
-													 XLOG(error) << "failed at excute sql:" << sql;
+													 XLOG_ERROR() << "failed at excute sql:" << sql;
 													 f(false);
 													 return;
 												 }
@@ -113,7 +113,7 @@ namespace aquarius
 										   {
 											   if (ec)
 											   {
-												   XLOG(error) << "failed at excute sql:" << sql;
+												   XLOG_ERROR() << "failed at excute sql:" << sql;
 												   return;
 											   }
 
@@ -129,11 +129,11 @@ namespace aquarius
 									  {
 										  if (ec)
 										  {
-											  XLOG(error) << "mysql connect error! " << ec.what();
+											  XLOG_ERROR() << "mysql connect error! " << ec.what();
 											  return;
 										  }
 
-										  XLOG(info) << "msyql async connect success!";
+										  XLOG_INFO() << "msyql async connect success!";
 
 										  // set_charset();
 									  });
@@ -158,7 +158,7 @@ namespace aquarius
 	private:
 		boost::asio::io_service& io_service_;
 
-		boost::asio::ssl::context ssl_ctx_;
+		boost::asio::ssl::basic_context ssl_ctx_;
 
 		std::unique_ptr<boost::mysql::tcp_ssl_connection> mysql_ptr_;
 

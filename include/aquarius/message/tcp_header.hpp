@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/defines.hpp>
 #include <cstdint>
+#include <aquarius/elastic.hpp>
 
 namespace aquarius
 {
@@ -10,12 +11,21 @@ namespace aquarius
 
 	struct tcp_header
 	{
-		void clone(const tcp_header& header)
+		void clone(const tcp_header* header)
 		{
-			uid = header.uid;
-			proxy = header.proxy;
-			src = header.src;
-			reserve = header.reserve;
+			uid = header->uid;
+			proxy = header->proxy;
+			src = header->src;
+			reserve = header->reserve;
+		}
+
+		void swap(tcp_header& other)
+		{
+			std::swap(proxy, other.proxy);
+			std::swap(uid, other.uid);
+			std::swap(src, other.src);
+			std::swap(size, other.size);
+			std::swap(reserve, other.reserve);
 		}
 
 		uint64_t proxy;
@@ -28,10 +38,46 @@ namespace aquarius
 	struct tcp_request_header : tcp_header
 	{
 		uint32_t session_id;
+
+		void swap(tcp_request_header& other)
+		{
+			tcp_header::swap(other);
+
+			std::swap(session_id, other.session_id);
+		}
+
+	private:
+		friend class elastic::access;
+
+		template<typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& elastic::base_object<tcp_header>(*this);
+
+			ar& session_id;
+		}
 	};
 
 	struct tcp_response_header : tcp_header
 	{
 		int32_t result;
+
+		void swap(tcp_response_header& other)
+		{
+			tcp_header::swap(other);
+
+			std::swap(result, other.result);
+		}
+
+	private:
+		friend class elastic::access;
+
+		template<typename _Archive>
+		void serialize(_Archive& ar)
+		{
+			ar& elastic::base_object<tcp_header>(*this);
+
+			ar& result;
+		}
 	};
 } // namespace aquarius
