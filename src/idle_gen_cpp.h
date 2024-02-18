@@ -38,6 +38,8 @@ namespace aquarius
 
 				void write_members(const reflactor_structure& srs);
 
+				void write_swap_function(const reflactor_structure& rs);
+
 				void end_write_class();
 
 				void real_write_file(std::ofstream& ofs);

@@ -13,8 +13,21 @@ struct person_body_request
 	uint32_t back_money;
 	uint64_t crc;
 	
+	void swap(person_body_request& other)
+	{
+		std::swap(sex, other.sex);
+		std::swap(role_data, other.role_data);
+		std::swap(mana, other.mana);
+		std::swap(hp, other.hp);
+		std::swap(age, other.age);
+		std::swap(money, other.money);
+		std::swap(name, other.name);
+		std::swap(back_money, other.back_money);
+		std::swap(crc, other.crc);
+	}
+	
 private:
-	friend class aquarius::access;
+	friend class elastic::access;
 	
 	template<typename _Archive>
 	void serialize(_Archive& ar)
@@ -33,6 +46,10 @@ private:
 
 struct person_body_response
 {
+	void swap(person_body_response& other)
+	{
+	}
+	
 };
 
 

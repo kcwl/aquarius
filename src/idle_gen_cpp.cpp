@@ -89,6 +89,8 @@ namespace aquarius
 
 						write_members(s);
 
+						write_swap_function(s);
+
 						write_access_func(s);
 
 						end_write_class();
@@ -187,6 +189,21 @@ namespace aquarius
 
 					lines.push_back(type + " " + rs.second + ";");
 				}
+
+				line_feed();
+			}
+
+			void generate_cpp::write_swap_function(const reflactor_structure& rs)
+			{
+				lines.push_back("void swap(" + rs.name_ + "& other)");
+				lines.push_back("{");
+				
+				for (auto& m : rs.keywords_)
+				{
+					lines.push_back("std::swap(" + m.second + ", other." + m.second + ");");
+				}
+				
+				lines.push_back("}");
 
 				line_feed();
 			}
