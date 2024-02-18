@@ -164,6 +164,6 @@ namespace aquarius
 
 		std::string server_name_;
 
-		detail::deadline_timer timer_;
+		system::deadline_timer timer_;
 	};
 } // namespace aquarius

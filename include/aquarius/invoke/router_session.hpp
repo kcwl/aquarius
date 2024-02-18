@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	class router_session : public detail::singleton<router_session>
+	class router_session : public system::singleton<router_session>
 	{
 	public:
 		bool push(std::shared_ptr<xsession> session_ptr)

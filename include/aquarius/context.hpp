@@ -14,7 +14,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public detail::bare_visitor<basic_message>, public detail::event_call
+	class basic_context : public system::bare_visitor<basic_message>, public system::event_call
 	{
 	public:
 		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
@@ -78,7 +78,7 @@ namespace aquarius
 	};
 
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public detail::shared_visitor<_Request>
+	class context : public basic_context, public system::shared_visitor<_Request>
 	{
 	public:
 		context(const std::string& name)

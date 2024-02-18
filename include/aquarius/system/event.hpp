@@ -2,7 +2,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace system
 	{
 		class event_call
 		{
@@ -13,5 +13,5 @@ namespace aquarius
 
 			virtual void on_timeout() = 0;
 		};
-	} // namespace detail
+	} // namespace system
 } // namespace aquarius

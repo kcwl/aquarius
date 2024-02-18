@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace system
 	{
 		template <typename _Ty>
 		struct is_pod : std::false_type
@@ -143,6 +143,6 @@ namespace aquarius
 		template <typename _Ty>
 		concept class_t = std::is_class_v<std::remove_reference_t<_Ty>>;
 
-	} // namespace detail
+	} // namespace system
 
 } // namespace aquarius

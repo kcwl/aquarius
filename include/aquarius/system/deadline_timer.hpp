@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace system
 	{
 		template <typename _Time>
 		struct time_traits;
@@ -51,5 +51,5 @@ namespace aquarius
 														  time_traits<std::chrono::system_clock::time_point>>;
 
 		using steady_timer = asio::steady_timer;
-	} // namespace detail
+	} // namespace system
 } // namespace aquarius

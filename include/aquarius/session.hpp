@@ -10,7 +10,7 @@
 
 namespace aquarius
 {
-	class xsession : public detail::event_call
+	class xsession : public system::event_call
 	{
 	public:
 		xsession() = default;

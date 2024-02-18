@@ -16,7 +16,7 @@ namespace aquarius
 	struct null_body
 	{};
 
-	class basic_message : public detail::visitable
+	class basic_message : public system::visitable
 	{
 	public:
 		basic_message() = default;

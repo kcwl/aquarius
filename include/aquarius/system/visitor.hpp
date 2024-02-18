@@ -13,7 +13,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	namespace detail
+	namespace system
 	{
 		template <typename _Request>
 		class basic_visitor
@@ -117,5 +117,5 @@ namespace aquarius
 		return _Return{};                                                                                              \
 	}
 
-	} // namespace detail
+	} // namespace system
 } // namespace aquarius
