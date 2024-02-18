@@ -8,15 +8,6 @@ namespace aquarius
 	namespace detail
 	{
 		template <typename _Ty>
-		struct use_empty_value_base
-		{
-			static constexpr bool value = std::is_empty_v<_Ty> && !std::is_final_v<_Ty>;
-		};
-
-		template <typename _Ty>
-		static constexpr bool use_empty_value_base_v = use_empty_value_base<_Ty>::value;
-
-		template <typename _Ty>
 		struct is_pod : std::false_type
 		{};
 

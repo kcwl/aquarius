@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/defines.hpp>
-#include <aquarius/detail/deadline_timer.hpp>
 #include <aquarius/invoke.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/system/deadline_timer.hpp>
+#include <aquarius/system/defines.hpp>
 #include <type_traits>
 
 namespace aquarius
@@ -12,7 +12,7 @@ namespace aquarius
 	template <typename _Connector>
 	class server
 	{
-		using ssl_context_t = asio::ssl::context;
+		using ssl_context_t = ssl::context;
 
 		using connect_t = _Connector;
 
@@ -22,7 +22,7 @@ namespace aquarius
 			, endpoint_(asio::ip::tcp::v4(), static_cast<asio::ip::port_type>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
-			, ssl_context_(asio::ssl::context::sslv23)
+			, ssl_context_(ssl::context::sslv23)
 			, server_name_(name)
 			, timer_(io_service_pool_.get_io_service())
 		{

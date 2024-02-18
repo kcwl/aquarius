@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/type_traits.hpp>
 #include <boost/core/empty_value.hpp>
 #include <cstddef>
 

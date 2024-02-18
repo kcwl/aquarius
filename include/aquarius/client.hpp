@@ -1,9 +1,7 @@
 ﻿#pragma once
-#include <aquarius/detail/config.hpp>
 #include <aquarius/response.hpp>
-#include <aquarius/type_traits.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
+#include <aquarius/system/asio.hpp>
+#include <aquarius/system/type_traits.hpp>
 #include <filesystem>
 #include <iostream>
 #include <map>
@@ -17,12 +15,12 @@ namespace aquarius
 	public:
 		explicit client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
-			, ssl_context_(boost::asio::ssl::context::sslv23)
+			, ssl_context_(ssl::context::sslv23)
 			, conn_ptr_(nullptr)
 		{
 			init_ssl_context();
 
-			boost::asio::ip::tcp::resolver resolve_(io_service_);
+			asio::ip::tcp::resolver resolve_(io_service_);
 
 			do_connect(resolve_.resolve(ip_addr, port));
 		}
@@ -72,25 +70,25 @@ namespace aquarius
 		}
 
 	private:
-		void do_connect(boost::asio::ip::tcp::resolver::results_type endpoints)
+		void do_connect(asio::ip::tcp::resolver::results_type endpoints)
 		{
 			conn_ptr_ = std::make_shared<_Connector>(io_service_, ssl_context_);
 
-			boost::asio::async_connect(conn_ptr_->socket(), endpoints,
-									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
-									   {
-										   if (ec)
-										   {
-											   XLOG_ERROR() << remote_address() << ":" << remote_port()
-														   << " maybe occur error - " << ec.message();
+			asio::async_connect(conn_ptr_->socket(), endpoints,
+								[this](boost::system::error_code ec, asio::ip::tcp::endpoint)
+								{
+									if (ec)
+									{
+										XLOG_ERROR() << remote_address() << ":" << remote_port()
+													 << " maybe occur error - " << ec.message();
 
-											   return;
-										   }
+										return;
+									}
 
-										   conn_ptr_->set_verify_mode(boost::asio::ssl::verify_peer);
+									conn_ptr_->set_verify_mode(ssl::verify_peer);
 
-										   conn_ptr_->start();
-									   });
+									conn_ptr_->start();
+								});
 		}
 
 		void init_ssl_context()
@@ -104,9 +102,9 @@ namespace aquarius
 		}
 
 	private:
-		boost::asio::io_service io_service_;
+		asio::io_service io_service_;
 
-		boost::asio::ssl::context ssl_context_;
+		ssl::context ssl_context_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
 	};

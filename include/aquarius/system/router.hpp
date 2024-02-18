@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/singleton.hpp>
+#include <aquarius/system/singleton.hpp>
 #include <functional>
 #include <mutex>
 #include <string>

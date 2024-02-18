@@ -1,6 +1,5 @@
 #pragma once
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <chrono>
+#include <aquarius/system/asio.hpp>
 
 namespace aquarius
 {
@@ -47,5 +46,10 @@ namespace aquarius
 				return boost::posix_time::time_duration(hour.count(), min.count(), min.count());
 			}
 		};
+
+		using deadline_timer = asio::basic_deadline_timer<std::chrono::system_clock::time_point,
+														  time_traits<std::chrono::system_clock::time_point>>;
+
+		using steady_timer = asio::steady_timer;
 	} // namespace detail
 } // namespace aquarius

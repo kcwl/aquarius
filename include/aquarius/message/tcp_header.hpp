@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/defines.hpp>
-#include <cstdint>
 #include <aquarius/elastic.hpp>
+#include <aquarius/system/defines.hpp>
+#include <cstdint>
 
 namespace aquarius
 {
@@ -49,7 +49,7 @@ namespace aquarius
 	private:
 		friend class elastic::access;
 
-		template<typename _Archive>
+		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
 			ar& elastic::base_object<tcp_header>(*this);
@@ -72,7 +72,7 @@ namespace aquarius
 	private:
 		friend class elastic::access;
 
-		template<typename _Archive>
+		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
 			ar& elastic::base_object<tcp_header>(*this);

@@ -1,11 +1,11 @@
 #pragma once
 #include <aquarius/elastic.hpp>
-#include <aquarius/defines.hpp>
-#include <aquarius/invoke/invoke_resolver.hpp>
-#include <aquarius/invoke/invoke_message.hpp>
-#include <aquarius/invoke/invoke_context.hpp>
-#include <aquarius/invoke/router_session.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/invoke/invoke_context.hpp>
+#include <aquarius/invoke/invoke_message.hpp>
+#include <aquarius/invoke/invoke_resolver.hpp>
+#include <aquarius/invoke/router_session.hpp>
+#include <aquarius/system/defines.hpp>
 
 namespace aquarius
 {
@@ -75,7 +75,7 @@ namespace aquarius
 			return router_session::instance().erase(uid);
 		}
 
-		template<typename _Response>
+		template <typename _Response>
 		static void send(std::size_t uid, _Response&& resp)
 		{
 			error_code ec{};
@@ -91,7 +91,7 @@ namespace aquarius
 			router_session::instance().timeout();
 		}
 
-		template<typename _Response>
+		template <typename _Response>
 		static void broadcast(_Response&& resp)
 		{
 			error_code ec{};
@@ -102,7 +102,7 @@ namespace aquarius
 			router_session::instance().broadcast(std::move(fs));
 		}
 
-		template<typename _Response,typename _Pre>
+		template <typename _Response, typename _Pre>
 		static void broadcast_if(_Response&& resp, _Pre&& func)
 		{
 			error_code ec{};
@@ -113,4 +113,4 @@ namespace aquarius
 			router_session::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
 		}
 	};
-}
+} // namespace aquarius

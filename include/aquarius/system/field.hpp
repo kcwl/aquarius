@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/empty_value.hpp>
+#include <aquarius/system/empty_value.hpp>
 #include <memory>
 
 namespace aquarius
@@ -7,7 +7,7 @@ namespace aquarius
 	namespace detail
 	{
 		template <typename _Alloc, typename _Traits>
-		class basic_fields : private detail::empty_value<_Alloc>
+		class basic_fields : private empty_value<_Alloc>
 		{
 		public:
 			using allocate_type = _Alloc;
@@ -18,7 +18,7 @@ namespace aquarius
 			basic_fields() = default;
 
 			basic_fields(const allocate_type& alloc) noexcept
-				: detail::empty_value<_Alloc>(detail::empty_init, alloc)
+				: detail::empty_value<_Alloc>(empty_init, alloc)
 			{}
 
 			virtual ~basic_fields() = default;

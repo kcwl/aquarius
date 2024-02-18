@@ -1,10 +1,9 @@
 #pragma once
 #include <any>
-#include <aquarius/defines.hpp>
-#include <aquarius/detail/config.hpp>
-#include <aquarius/detail/event.hpp>
-#include <aquarius/message/message.hpp>
 #include <aquarius/invoke/invoke_resolver.hpp>
+#include <aquarius/message/message.hpp>
+#include <aquarius/system/defines.hpp>
+#include <aquarius/system/event.hpp>
 #include <deque>
 #include <memory>
 #include <string>

@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include <aquarius/detail/asio.hpp>
+#include <aquarius/logger.hpp>
+#include <aquarius/system/asio.hpp>
 #include <functional>
 #include <list>
 #include <thread>
 #include <vector>
-#include <aquarius/logger.hpp>
 
 namespace aquarius
 {

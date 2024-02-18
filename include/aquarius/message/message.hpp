@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/defines.hpp>
-#include <aquarius/detail/field.hpp>
-#include <aquarius/detail/visitor.hpp>
 #include <aquarius/elastic.hpp>
-#include <cstddef>
 #include <aquarius/error_code.hpp>
+#include <aquarius/system/defines.hpp>
+#include <aquarius/system/field.hpp>
+#include <aquarius/system/visitor.hpp>
+#include <cstddef>
 
 namespace aquarius
 {
@@ -80,7 +80,7 @@ namespace aquarius
 		error_code from_binary(flex_buffer_t& stream, error_code& ec)
 		{
 			if (!elastic::from_binary(*header_ptr_, stream))
-				return ec = system::system_errc::invalid_stream;
+				return ec = system_errc::invalid_stream;
 
 			elastic::from_binary(body_, stream);
 
@@ -91,8 +91,8 @@ namespace aquarius
 
 		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			if(!elastic::to_binary(Number, stream))
-				return ec = system::system_errc::invalid_stream;
+			if (!elastic::to_binary(Number, stream))
+				return ec = system_errc::invalid_stream;
 
 			flex_buffer_t body_buffer{};
 

@@ -1,9 +1,8 @@
 #pragma once
-#include <aquarius/detail/singleton.hpp>
 #include <aquarius/session.hpp>
+#include <aquarius/system/singleton.hpp>
 #include <mutex>
 #include <set>
-#include <aquarius/detail/consistent_hash.hpp>
 
 namespace aquarius
 {

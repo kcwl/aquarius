@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/detail/event.hpp>
-#include <aquarius/detail/visitor.hpp>
+#include <aquarius/system/event.hpp>
+#include <aquarius/system/visitor.hpp>
 #include <aquarius/session.hpp>
 #include <chrono>
 #include <aquarius/logger.hpp>
@@ -39,7 +39,7 @@ namespace aquarius
 		{
 			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 
-			return ec = system::system_errc::invalid_message;
+			return ec = system_errc::invalid_message;
 		}
 
 	public:

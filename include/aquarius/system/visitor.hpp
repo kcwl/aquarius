@@ -63,7 +63,7 @@ namespace aquarius
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
 			if (!visit_ptr)
-				return ec = system::system_errc::invalid_context;
+				return ec = system_errc::invalid_context;
 
 			return visit_ptr->visit(req, session_ptr, ec);
 		}
@@ -77,7 +77,7 @@ namespace aquarius
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
 			if (!visit_ptr)
-				return ec = system::system_errc::invalid_context;
+				return ec = system_errc::invalid_context;
 
 			return visit_ptr->visit(req, session_ptr, ec);
 		}

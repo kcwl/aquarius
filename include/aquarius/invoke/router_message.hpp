@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/router.hpp>
+#include <aquarius/system/router.hpp>
 
 namespace aquarius
 {

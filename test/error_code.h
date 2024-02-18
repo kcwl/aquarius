@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(msg)
 
 	BOOST_CHECK(ec.category() == "aquarius system");
 
-	ec = aquarius::system::system_errc::invalid_proto;
+	ec = aquarius::system_errc::invalid_proto;
 
 	BOOST_CHECK(ec.message() == "maybe the protocal is not registed");
 	
