@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <aquarius/logger.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/system/asio.hpp>
 #include <aquarius/system/type_traits.hpp>
