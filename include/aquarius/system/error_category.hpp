@@ -8,17 +8,17 @@ namespace aquarius
 	{
 		inline const std::error_category& system_category() noexcept;
 
-		class system_error_ccategory : public std::error_category
+		class system_error_category : public std::error_category
 		{
 		public:
-			system_error_ccategory() noexcept
+			system_error_category() noexcept
 				: std::error_category(std::error_category::_System_addr)
 			{}
 
 		public:
 			const char* name() const noexcept override
 			{
-				return "aquaruis system";
+				return "aquarius system";
 			}
 
 			std::string message(int err_code) const override
@@ -52,7 +52,7 @@ namespace aquarius
 
 		inline const std::error_category& system_category() noexcept
 		{
-			return immortalize_memcpy_image<system_error_ccategory>();
+			return immortalize_memcpy_image<system_error_category>();
 		}
 	}
 } // namespace aquarius

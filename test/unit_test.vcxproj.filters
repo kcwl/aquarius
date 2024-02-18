@@ -239,5 +239,8 @@
     <ClInclude Include="..\include\aquarius\system\error_code\system_errc.hpp">
       <Filter>include\aquarius\system\error_code</Filter>
     </ClInclude>
+    <ClInclude Include="error_code.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

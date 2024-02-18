@@ -8,6 +8,7 @@
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {

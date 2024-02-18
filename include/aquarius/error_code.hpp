@@ -14,6 +14,20 @@ namespace aquarius
 
 		}
 
+		error_code(int value)
+			: value_(value)
+			, cat_(&system::system_category())
+		{
+
+		}
+
+		error_code(system::system_errc value)
+			: value_(static_cast<int>(value))
+			, cat_(&system::system_category())
+		{
+
+		}
+
 		error_code(const error_code& ec)
 			: value_(ec.value_)
 			, cat_(ec.cat_)
@@ -32,6 +46,11 @@ namespace aquarius
 			value_ = static_cast<int>(value);
 
 			return *this;
+		}
+
+		std::string category() const
+		{
+			return cat_->name();
 		}
 
 	public:
