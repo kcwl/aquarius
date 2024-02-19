@@ -195,6 +195,9 @@ namespace aquarius
 
 			void generate_cpp::write_swap_function(const reflactor_structure& rs)
 			{
+				if (rs.keywords_.empty())
+					return;
+
 				lines.push_back("void swap(" + rs.name_ + "& other)");
 				lines.push_back("{");
 				
