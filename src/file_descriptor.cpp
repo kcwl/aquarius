@@ -254,7 +254,11 @@ namespace aquarius
 				return key.first;
 			}
 
-			return {};
+			std::string result = keytype;
+
+			trip(result, '\r', '\n', '\t', ' ');
+
+			return result;
 		}
 
 		bool file_descriptor::check_space(const std::string& word)

@@ -20,16 +20,16 @@ namespace
 
 		auto iter = aquarius::key_type.find(temp_type);
 
-		if (iter != aquarius::key_type.end())
+		if (iter == aquarius::key_type.end())
 		{
-			return iter->second;
+			std::string result{};
+
+			type == "repeated" ? result = std::string("std::vector<") + sub_type + ">" : result = temp_type;
+
+			return result;
 		}
 
-		std::string result{};
-
-		type == "repeated" ? result = std::string("std::vector<") + sub_type + ">" : result = iter->second;
-
-		return result;
+		return iter->second;
 	}
 
 	std::string get_keyword_name(const std::string& keyword)
@@ -285,6 +285,9 @@ namespace aquarius
 
 				for (auto& mem : rs)
 				{
+					if (mem.number_.empty())
+						continue;
+
 					auto pos = mem.name_.find_last_of('_');
 
 					if (pos == std::string::npos)
