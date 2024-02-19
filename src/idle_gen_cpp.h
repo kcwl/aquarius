@@ -36,7 +36,7 @@ namespace aquarius
 
 				void write_access_func(const reflactor_structure& rs);
 
-				void write_members(const reflactor_structure& srs);
+				void write_members(reflactor_structure& srs);
 
 				void write_swap_function(const reflactor_structure& rs);
 

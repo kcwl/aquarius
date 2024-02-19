@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--input=$(ProjectDir)test_proto.proto --cpp_out=.</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--input=F:\git\fs-normal-centos\share\proto\db\msg_db.proto --cpp_out=.</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

@@ -12,24 +12,28 @@ namespace
 {
 	const std::string generate_file_suffix = ".proto.hpp";
 
-	std::string get_type_name(const std::string& type, const std::string& sub_type = {})
+	std::string get_type_name(const std::string& type, const std::string& sub_type)
 	{
 		std::string temp_type = type;
 
-		temp_type == "repeated" ? temp_type = sub_type : std::string{};
+		if (temp_type == "repeated")
+		{
+			temp_type = sub_type.substr(0, sub_type.find_first_of(' '));
+
+			auto iter = aquarius::key_type.find(temp_type);
+
+			if (iter != aquarius::key_type.end())
+				temp_type = iter->second;
+
+			return "std::vector<" + temp_type + ">";
+		}
 
 		auto iter = aquarius::key_type.find(temp_type);
 
-		if (iter == aquarius::key_type.end())
-		{
-			std::string result{};
+		if (iter != aquarius::key_type.end())
+			temp_type = iter->second;
 
-			type == "repeated" ? result = std::string("std::vector<") + sub_type + ">" : result = temp_type;
-
-			return result;
-		}
-
-		return iter->second;
+		return temp_type;
 	}
 
 	std::string get_keyword_name(const std::string& keyword)
@@ -175,17 +179,20 @@ namespace aquarius
 				lines.push_back("}");
 			}
 
-			void generate_cpp::write_members(const reflactor_structure& srs)
+			void generate_cpp::write_members(reflactor_structure& srs)
 			{
 				if (srs.keywords_.empty())
 					return;
 
 				for (auto& rs : srs.keywords_)
 				{
-					auto type = get_type_name(rs.first);
+					auto type = get_type_name(rs.first, rs.second);
 
 					if (type.empty())
 						continue;
+
+					if (rs.first == "repeated")
+						rs.second = rs.second.substr(rs.second.find_first_of(' ') + 1);
 
 					lines.push_back(type + " " + rs.second + ";");
 				}
