@@ -19,6 +19,6 @@ namespace aquarius
 
 		std::string name_;
 
-		std::map<std::string, std::string> keywords_;
+		std::multimap<std::string, std::string> keywords_;
 	};
 }

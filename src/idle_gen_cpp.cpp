@@ -36,6 +36,20 @@ namespace
 		return temp_type;
 	}
 
+	bool pod_type(const std::string& type)
+	{
+		if (type == "double" || type == "float" || type == "bool")
+			return true;
+
+		if (type == "int8" || type == "int16" || type == "int32" || type == "int64")
+			return true;
+
+		if (type == "uint8" || type == "uint16" || type == "uint32" || type == "uint64")
+			return true;
+
+		return false;
+	}
+
 	std::string get_keyword_name(const std::string& keyword)
 	{
 		auto iter = aquarius::key_word.find(keyword);
@@ -152,7 +166,7 @@ namespace aquarius
 				int count = 0;
 				for (auto& mem : rs.keywords_)
 				{
-					if (mem.first == "string" || mem.first == "bytes")
+					if (!pod_type(mem.first))
 					{
 						count++;
 
