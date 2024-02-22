@@ -173,7 +173,11 @@ namespace aquarius
 
 		void shut_down()
 		{
-			invoke_session_helper::close(uuid());
+			if constexpr (SSLMode == ssl_mode::ssl)
+			{
+				invoke_session_helper::close(uuid());
+			}
+			
 
 			if (!socket_.is_open())
 				return;
