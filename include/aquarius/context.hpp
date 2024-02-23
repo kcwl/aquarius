@@ -127,8 +127,6 @@ namespace aquarius
 	private:
 		flex_buffer_t make_response(int32_t result)
 		{
-			response_.header()->clone(request_ptr_->header());
-
 			response_.header()->result = result;
 
 			flex_buffer_t fs;
