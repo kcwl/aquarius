@@ -37,7 +37,7 @@ namespace aquarius
 
 	struct tcp_request_header : tcp_header
 	{
-		uint32_t session_id;
+		uint64_t session_id;
 
 		void swap(tcp_request_header& other)
 		{
