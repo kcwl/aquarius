@@ -1,25 +1,22 @@
 ﻿#pragma once
-#include <aquarius/defines.hpp>
-#include <aquarius/detail/config.hpp>
-#include <aquarius/detail/deadline_timer.hpp>
-#include <aquarius/detail/noncopyable.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/system/deadline_timer.hpp>
+#include <aquarius/system/defines.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid.hpp>
+#include <aquarius/system/uuid.hpp>
 
 namespace aquarius
 {
 	template <typename _Protocol, conn_mode Conn, ssl_mode SSL>
 	class connect : public std::enable_shared_from_this<connect<_Protocol, Conn, SSL>>
 	{
-		using socket_t = boost::asio::ip::tcp::socket;
+		using socket_t = asio::ip::tcp::socket;
 
-		using ssl_socket_t = boost::asio::ssl::stream<socket_t&>;
+		using ssl_socket_t = ssl::stream<socket_t&>;
 
-		using ssl_context_t = boost::asio::ssl::context;
+		using ssl_context_t = ssl::context;
 
 		constexpr static conn_mode ConnMode = Conn;
 
@@ -34,11 +31,9 @@ namespace aquarius
 			, ssl_socket_(socket_, basic_context)
 			, read_buffer_()
 			, dura_(dura)
-			, uid_()
+			, uid_(uuid::invoke())
 		{
-			boost::uuids::random_generator_mt19937 generator{};
-
-			uid_ = boost::uuids::hash_value(generator());
+			
 		}
 
 		connect(asio::io_service& io_service, ssl_context_t& basic_context,
@@ -86,21 +81,21 @@ namespace aquarius
 			{
 				auto self = this->shared_from_this();
 
-				ssl_socket_.async_handshake(static_cast<boost::asio::ssl::stream_base::handshake_type>(ConnMode),
+				ssl_socket_.async_handshake(static_cast<ssl::stream_base::handshake_type>(ConnMode),
 											[this, self](const boost::system::error_code& ec)
 											{
 												if (ec)
 												{
 													XLOG_ERROR() << "handshake error at " << remote_address() << "("
-																<< remote_address_u() << "):" << remote_port() << "\t"
-																<< ec.message();
+																 << remote_address_u() << "):" << remote_port() << "\t"
+																 << ec.message();
 
 													return;
 												}
 
 												XLOG_INFO() << "handshake success at " << remote_address() << "("
-														   << remote_address_u() << "):" << remote_port()
-														   << ", async read establish";
+															<< remote_address_u() << "):" << remote_port()
+															<< ", async read establish";
 
 												establish_async_read();
 											});
@@ -108,7 +103,7 @@ namespace aquarius
 			else
 			{
 				XLOG_INFO() << "handshake success at " << remote_address() << ":" << remote_port()
-						   << ", async read establish";
+							<< ", async read establish";
 
 				establish_async_read();
 			}
@@ -123,17 +118,17 @@ namespace aquarius
 			auto self(this->shared_from_this());
 
 			sokcet_helper().async_read_some(
-				boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
+				asio::buffer(read_buffer_.rdata(), read_buffer_.active()),
 				[this, self](const boost::system::error_code& ec, std::size_t bytes_transferred)
 				{
 					if (ec)
 					{
-						if (ec != boost::asio::error::eof)
+						if (ec != asio::error::eof)
 						{
 							XLOG_ERROR() << "on read some at " << remote_address() << ":" << remote_port()
-										<< "\t"
-										   " occur error : "
-										<< ec.message();
+										 << "\t"
+											" occur error : "
+										 << ec.message();
 						}
 
 						return shut_down();
@@ -155,7 +150,7 @@ namespace aquarius
 			auto self(this->shared_from_this());
 
 			sokcet_helper().async_write_some(
-				boost::asio::buffer(resp_buf.wdata(), resp_buf.size()),
+				asio::buffer(resp_buf.wdata(), resp_buf.size()),
 				[this, self, func = std::move(f)](const boost::system::error_code& ec,
 												  [[maybe_unused]] std::size_t bytes_transferred)
 				{
@@ -167,7 +162,7 @@ namespace aquarius
 					}
 
 					XLOG_ERROR() << "write error at " << remote_address() << "(" << remote_address_u() << "):"
-								<< ":" << remote_port() << "\t" << ec.message();
+								 << ":" << remote_port() << "\t" << ec.message();
 
 					return shut_down();
 				});
@@ -176,13 +171,13 @@ namespace aquarius
 		void shut_down()
 		{
 			invoke_session_helper::close(uuid());
-
+			
 			if (!socket_.is_open())
 				return;
 
 			boost::system::error_code ec;
 
-			socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
 
 			socket_.close(ec);
 
@@ -196,7 +191,7 @@ namespace aquarius
 			if (!socket_.is_open())
 				return;
 
-			shutdown ? socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec) : socket_.close(ec);
+			shutdown ? socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec) : socket_.close(ec);
 		}
 
 		std::size_t uuid() const
@@ -204,7 +199,7 @@ namespace aquarius
 			return uid_;
 		}
 
-		void set_verify_mode(boost::asio::ssl::verify_mode v)
+		void set_verify_mode(ssl::verify_mode v)
 		{
 			ssl_socket_.set_verify_mode(v);
 		}
@@ -214,7 +209,9 @@ namespace aquarius
 		{
 			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
-			router_session::instance().push(session_ptr);
+			invoke_session_helper::push(session_ptr);
+
+			session_ptr->on_accept();
 
 			keep_alive(true);
 
@@ -232,7 +229,7 @@ namespace aquarius
 		{
 			boost::system::error_code ec;
 
-			socket_.set_option(boost::asio::socket_base::keep_alive(value), ec);
+			socket_.set_option(asio::socket_base::keep_alive(value), ec);
 
 			XLOG_INFO() << "set keep alive :" << value;
 
@@ -242,7 +239,7 @@ namespace aquarius
 		bool set_nodelay(bool enable)
 		{
 			boost::system::error_code ec;
-			socket_.set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+			socket_.set_option(asio::ip::tcp::no_delay(enable), ec);
 
 			XLOG_INFO() << "set nodelay :" << enable;
 
@@ -252,7 +249,7 @@ namespace aquarius
 		bool reuse_address(bool value)
 		{
 			boost::system::error_code ec;
-			socket_.set_option(boost::asio::socket_base::reuse_address(value), ec);
+			socket_.set_option(asio::socket_base::reuse_address(value), ec);
 
 			XLOG_INFO() << "reuse address :" << value;
 

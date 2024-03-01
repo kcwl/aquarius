@@ -2,10 +2,10 @@
 
 #include "common.hpp"
 
-#include <iostream>
-#include <vector>
 #include <deque>
 #include <filesystem>
+#include <iostream>
+#include <vector>
 
 namespace aquarius
 {
@@ -15,7 +15,7 @@ namespace aquarius
 		{
 			if (!check_file_suffix(file_name))
 			{
-				std::cout << "file format error, maybe suffix is not \"."<< file_suffix <<"\"!";
+				std::cout << "file format error, maybe suffix is not \"." << file_suffix << "\"!";
 
 				return false;
 			}
@@ -95,7 +95,7 @@ namespace aquarius
 			if (!read_to_spilt(name, ';'))
 				return false;
 
-			skip_if(read_file_stream_, '\r', '\n','\t',' ');
+			skip_if(read_file_stream_, '\r', '\n', '\t', ' ');
 
 			return true;
 		}
@@ -186,7 +186,7 @@ namespace aquarius
 				if (!read_command(name))
 					return false;
 
-				rs.keywords_.insert({type,name});
+				rs.keywords_.insert({ type, name });
 			}
 
 			return true;
@@ -209,7 +209,7 @@ namespace aquarius
 
 				return false;
 			}
-				
+
 			return true;
 		}
 
@@ -254,7 +254,11 @@ namespace aquarius
 				return key.first;
 			}
 
-			return {};
+			std::string result = keytype;
+
+			trip(result, '\r', '\n', '\t', ' ');
+
+			return result;
 		}
 
 		bool file_descriptor::check_space(const std::string& word)
@@ -270,4 +274,4 @@ namespace aquarius
 			return false;
 		}
 	} // namespace compiler
-} // namespace elastic
+} // namespace aquarius

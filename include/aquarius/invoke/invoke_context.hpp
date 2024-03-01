@@ -21,7 +21,7 @@ namespace aquarius
 	struct invoke_context_helper
 	{
 		template <typename... _Args>
-		static auto invoke(uint32_t key, _Args&... args)
+		static auto invoke(std::size_t key, _Args&... args)
 		{
 			return router_context::instance().invoke(key, args...);
 		}

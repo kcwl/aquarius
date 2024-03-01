@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -154,25 +154,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\channel\channel.hpp" />
-    <ClInclude Include="..\include\aquarius\channel\group.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
-    <ClInclude Include="..\include\aquarius\defines.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\config.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\empty_value.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\field.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\random.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\router.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
+    <ClInclude Include="..\include\aquarius\system\defines.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\event.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
@@ -186,28 +173,26 @@
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\reflect.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\sql.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp" />
-    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
-    <ClInclude Include="..\include\aquarius\service\service.hpp" />
+    <ClInclude Include="..\include\aquarius\service.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\router_session.hpp" />
+    <ClInclude Include="..\include\aquarius\system\asio.hpp" />
+    <ClInclude Include="..\include\aquarius\system\deadline_timer.hpp" />
+    <ClInclude Include="..\include\aquarius\system\empty_value.hpp" />
     <ClInclude Include="..\include\aquarius\system\error_code\error_category.hpp" />
     <ClInclude Include="..\include\aquarius\system\error_code\system_errc.hpp" />
     <ClInclude Include="..\include\aquarius\system\error_code\system_error_message.hpp" />
-    <ClInclude Include="..\include\aquarius\type_traits.hpp" />
+    <ClInclude Include="..\include\aquarius\system\event.hpp" />
+    <ClInclude Include="..\include\aquarius\system\field.hpp" />
+    <ClInclude Include="..\include\aquarius\system\router.hpp" />
+    <ClInclude Include="..\include\aquarius\system\singleton.hpp" />
+    <ClInclude Include="..\include\aquarius\system\uuid.hpp" />
+    <ClInclude Include="..\include\aquarius\system\visitor.hpp" />
+    <ClInclude Include="..\include\aquarius\system\type_traits.hpp" />
     <ClInclude Include="context.h" />
     <ClInclude Include="error_code.h" />
     <ClInclude Include="invoke.h" />
@@ -215,7 +200,6 @@
     <ClInclude Include="message.h" />
     <ClInclude Include="router.h" />
     <ClInclude Include="server.h" />
-    <ClInclude Include="mysql_test.h" />
     <ClInclude Include="session.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

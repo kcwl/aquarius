@@ -19,23 +19,11 @@
     <Filter Include="include\aquarius">
       <UniqueIdentifier>{cac2360d-aeee-4d35-ba2e-37a84050c7e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\channel">
-      <UniqueIdentifier>{2434a1fe-9af2-40a8-b717-3bc3ee057069}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\detail">
-      <UniqueIdentifier>{edfa55b9-1d24-4db0-b0f4-48f74b5a82ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\invoke">
       <UniqueIdentifier>{7c74b2f0-31ab-45f4-83b9-ef5fc900642a}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\aquarius\message">
       <UniqueIdentifier>{0d5dd5db-33d3-4f0e-8872-6db7b9f0ecb3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\mysql">
-      <UniqueIdentifier>{a0518608-c803-4290-9f2b-dab5207810c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\service">
-      <UniqueIdentifier>{93ce574a-0bbd-477e-a284-d88da6932270}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\aquarius\system">
       <UniqueIdentifier>{77e47d6a-d4e0-4016-b765-e7e5d8f33e56}</UniqueIdentifier>
@@ -50,30 +38,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\aquarius\detail\config.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\deadline_timer.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\empty_value.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\field.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\router.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\singleton.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\message\tcp_header.hpp">
       <Filter>include\aquarius\message</Filter>
     </ClInclude>
@@ -82,57 +46,6 @@
     </ClInclude>
     <ClInclude Include="server.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\algorithm.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\generate_sql.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\mysql_service.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\service_pool.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\keyword.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="mysql_test.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\service\service.hpp">
-      <Filter>include\aquarius\service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\sql.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\attributes.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\string_literal.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\to_string.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql\reflect.hpp">
-      <Filter>include\aquarius\mysql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\random.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\consistent_hash.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\channel.hpp">
-      <Filter>include\aquarius\channel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\group.hpp">
-      <Filter>include\aquarius\channel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\asio.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="io_service_pool.h">
       <Filter>头文件</Filter>
@@ -164,9 +77,6 @@
     <ClInclude Include="..\include\aquarius\context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\defines.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\elastic.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -179,9 +89,6 @@
     <ClInclude Include="..\include\aquarius\logger.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\mysql.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\request.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -189,9 +96,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\server.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\type_traits.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -208,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="context.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\event.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="message.h">
       <Filter>头文件</Filter>
@@ -241,6 +142,45 @@
     </ClInclude>
     <ClInclude Include="error_code.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\asio.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\deadline_timer.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\empty_value.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\event.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\field.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\router.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\singleton.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\visitor.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\service.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\defines.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\type_traits.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp">
+      <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\uuid.hpp">
+      <Filter>include\aquarius\system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

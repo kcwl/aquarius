@@ -69,7 +69,9 @@ namespace aquarius
 
 		if (pos == std::string::npos)
 		{
-			return false;
+			first = keywords;
+
+			return true;
 		}
 
 		first = keywords.substr(0, pos);

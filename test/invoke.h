@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	aquarius::error_code ec{};
 
-	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binary(buffer, proto, total, ec);
 
 	BOOST_CHECK(ec);
 
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	elastic::to_binary(10001u, buffer);
 
-	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binary(buffer, proto, total, ec);
 
 	BOOST_CHECK(ec);
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	elastic::to_binary(45u, buffer);
 
-	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binary(buffer, proto, total, ec);
 
 	BOOST_CHECK(ec);
 
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(invoke_resolver_helper)
 
 	buffer.commit(45);
 
-	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binay(buffer, proto, total, ec);
+	aquarius::invoke_resolver_helper<aquarius::tcp>::from_binary(buffer, proto, total, ec);
 
 	BOOST_CHECK(!ec);
 
@@ -209,6 +209,25 @@ BOOST_AUTO_TEST_CASE(visitor)
 	msg->accept(buffer, nullptr, nullptr, ec);
 
 	BOOST_CHECK(ec);
+}
+
+BOOST_AUTO_TEST_CASE(callback)
+{
+	{
+		aquarius::invoke_callback_helper::regist(1, [](std::shared_ptr<person_request> ptr) {});
+
+		std::shared_ptr<person_request> req;
+
+		BOOST_CHECK(aquarius::invoke_callback_helper::apply(2, req) == false);
+	}
+	
+	{
+		aquarius::invoke_callback_helper::regist(1, [](std::shared_ptr<person_request> ptr) {});
+
+		std::shared_ptr<person_response> resp;
+
+		BOOST_CHECK(aquarius::invoke_callback_helper::apply(1, resp) == false);
+	}
 }
 
 BOOST_AUTO_TEST_SUITE_END()

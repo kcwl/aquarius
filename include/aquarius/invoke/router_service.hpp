@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/detail/router.hpp>
-#include <aquarius/service/service.hpp>
+#include <aquarius/system/router.hpp>
+#include <aquarius/service.hpp>
 #include <memory>
 
 namespace aquarius
 {
-	class router_service : public detail::single_router<router_service, std::shared_ptr<service>>
+	class router_service : public system::single_router<router_service, std::shared_ptr<service>>
 	{
 	public:
 		bool run()

@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/defines.hpp>
-#include <cstdint>
 #include <aquarius/elastic.hpp>
+#include <aquarius/system/defines.hpp>
+#include <cstdint>
 
 namespace aquarius
 {
@@ -11,25 +11,15 @@ namespace aquarius
 
 	struct tcp_header
 	{
-		void clone(const tcp_header* header)
-		{
-			uid = header->uid;
-			proxy = header->proxy;
-			src = header->src;
-			reserve = header->reserve;
-		}
-
 		void swap(tcp_header& other)
 		{
 			std::swap(proxy, other.proxy);
-			std::swap(uid, other.uid);
 			std::swap(src, other.src);
 			std::swap(size, other.size);
 			std::swap(reserve, other.reserve);
 		}
 
 		uint64_t proxy;
-		uint64_t uid;
 		uint64_t src;
 		uint64_t size;
 		uint64_t reserve;
@@ -37,7 +27,7 @@ namespace aquarius
 
 	struct tcp_request_header : tcp_header
 	{
-		uint32_t session_id;
+		uint64_t session_id;
 
 		void swap(tcp_request_header& other)
 		{
@@ -49,7 +39,7 @@ namespace aquarius
 	private:
 		friend class elastic::access;
 
-		template<typename _Archive>
+		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
 			ar& elastic::base_object<tcp_header>(*this);
@@ -72,7 +62,7 @@ namespace aquarius
 	private:
 		friend class elastic::access;
 
-		template<typename _Archive>
+		template <typename _Archive>
 		void serialize(_Archive& ar)
 		{
 			ar& elastic::base_object<tcp_header>(*this);

@@ -12,24 +12,42 @@ namespace
 {
 	const std::string generate_file_suffix = ".proto.hpp";
 
-	std::string get_type_name(const std::string& type, const std::string& sub_type = {})
+	std::string get_type_name(const std::string& type, const std::string& sub_type)
 	{
 		std::string temp_type = type;
 
-		temp_type == "repeated" ? temp_type = sub_type : std::string{};
+		if (temp_type == "repeated")
+		{
+			temp_type = sub_type.substr(0, sub_type.find_first_of(' '));
+
+			auto iter = aquarius::key_type.find(temp_type);
+
+			if (iter != aquarius::key_type.end())
+				temp_type = iter->second;
+
+			return "std::vector<" + temp_type + ">";
+		}
 
 		auto iter = aquarius::key_type.find(temp_type);
 
 		if (iter != aquarius::key_type.end())
-		{
-			return iter->second;
-		}
+			temp_type = iter->second;
 
-		std::string result{};
+		return temp_type;
+	}
 
-		type == "repeated" ? result = std::string("std::vector<") + sub_type + ">" : result = iter->second;
+	bool pod_type(const std::string& type)
+	{
+		if (type == "double" || type == "float" || type == "bool")
+			return true;
 
-		return result;
+		if (type == "int8" || type == "int16" || type == "int32" || type == "int64")
+			return true;
+
+		if (type == "uint8" || type == "uint16" || type == "uint32" || type == "uint64")
+			return true;
+
+		return false;
 	}
 
 	std::string get_keyword_name(const std::string& keyword)
@@ -148,7 +166,7 @@ namespace aquarius
 				int count = 0;
 				for (auto& mem : rs.keywords_)
 				{
-					if (mem.first == "string" || mem.first == "bytes")
+					if (!pod_type(mem.first))
 					{
 						count++;
 
@@ -175,17 +193,20 @@ namespace aquarius
 				lines.push_back("}");
 			}
 
-			void generate_cpp::write_members(const reflactor_structure& srs)
+			void generate_cpp::write_members(reflactor_structure& srs)
 			{
 				if (srs.keywords_.empty())
 					return;
 
 				for (auto& rs : srs.keywords_)
 				{
-					auto type = get_type_name(rs.first);
+					auto type = get_type_name(rs.first, rs.second);
 
 					if (type.empty())
 						continue;
+
+					if (rs.first == "repeated")
+						rs.second = rs.second.substr(rs.second.find_first_of(' ') + 1);
 
 					lines.push_back(type + " " + rs.second + ";");
 				}
@@ -195,6 +216,9 @@ namespace aquarius
 
 			void generate_cpp::write_swap_function(const reflactor_structure& rs)
 			{
+				if (rs.keywords_.empty())
+					return;
+
 				lines.push_back("void swap(" + rs.name_ + "& other)");
 				lines.push_back("{");
 				
@@ -282,6 +306,9 @@ namespace aquarius
 
 				for (auto& mem : rs)
 				{
+					if (mem.number_.empty())
+						continue;
+
 					auto pos = mem.name_.find_last_of('_');
 
 					if (pos == std::string::npos)

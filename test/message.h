@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(construction)
 	{
 		person_request req{};
 
-		req.header()->uid = 1;
+		req.set_uuid(1);
 		req.header()->src = 2;
 		req.body().age = 3;
 		req.body().back_money = 4;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(req.header() == nullptr);
 
-		BOOST_CHECK(req1.header()->uid == 1);
+		BOOST_CHECK(req1.uuid() == 1);
 
 		BOOST_CHECK(req1.header()->src == 2);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(construction)
 	{
 		person_request req{};
 
-		req.header()->uid = 1;
+		req.set_uuid(1);
 		req.header()->src = 2;
 		req.body().age = 3;
 		req.body().back_money = 4;
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(req.header() == nullptr);
 
-		BOOST_CHECK(req1.header()->uid == 1);
+		BOOST_CHECK(req1.uuid() == 1);
 
 		BOOST_CHECK(req1.header()->src == 2);
 
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(construction)
 	{
 		person_response resp{};
 
-		resp.header()->uid = 1;
+		resp.set_uuid(1);
 		resp.header()->src = 2;
 		resp.body().age = 3;
 		resp.body().back_money = 4;
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(resp.header() == nullptr);
 
-		BOOST_CHECK(resp1.header()->uid == 1);
+		BOOST_CHECK(resp1.uuid() == 1);
 
 		BOOST_CHECK(resp1.header()->src == 2);
 
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(construction)
 	{
 		person_response resp{};
 
-		resp.header()->uid = 1;
+		resp.set_uuid(1);
 		resp.header()->src = 2;
 		resp.body().age = 3;
 		resp.body().back_money = 4;
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(resp.header() == nullptr);
 
-		BOOST_CHECK(resp1.header()->uid == 1);
+		BOOST_CHECK(resp1.uuid() == 1);
 
 		BOOST_CHECK(resp1.header()->src == 2);
 
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(parse)
 		aquarius::flex_buffer_t buffer(1);
 
 		person_request req{};
-		req.header()->uid = 1;
+		req.set_uuid(1);
 		req.header()->src = 2;
 		req.body().age = 3;
 
@@ -213,10 +213,25 @@ BOOST_AUTO_TEST_CASE(parse)
 	}
 
 	{
+		aquarius::error_code ec{};
+
+		aquarius::flex_buffer_t buffer{};
+		elastic::to_binary(10001u, buffer);
+		elastic::to_binary(3u, buffer);
+		elastic::to_binary(1u, buffer);
+
+		person_request req{};
+
+		req.from_binary(buffer, ec);
+
+		BOOST_CHECK(ec);
+	}
+
+	{
 		aquarius::flex_buffer_t buffer{};
 
 		person_request req{};
-		req.header()->uid = 1;
+		req.set_uuid(1);
 		req.header()->src = 2;
 		req.header()->size = 45;
 
@@ -238,13 +253,14 @@ BOOST_AUTO_TEST_CASE(parse)
 
 		BOOST_CHECK(!ec);
 	}
+}
 
-	{
-		person_request req{};
-		req.header()->uid = 1;
-		req.header()->src = 2;
-		req.header()->size = 45;
-	}
+BOOST_AUTO_TEST_CASE(message)
+{
+	aquarius::basic_message message{};
+	message.set_uuid(1);
+
+	BOOST_CHECK(message.uuid() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

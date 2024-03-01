@@ -82,7 +82,7 @@ public:
 		response_.body().age = 1;
 		response_.body().name = "hello";
 
-		send_response(1);
+		send_response(0);
 
 		return aquarius::error_code{};
 	}
@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE(call_back)
 
 		aquarius::asio::ip::tcp::socket socket(io_service);
 
-		using ssl_context_t = aquarius::asio::ssl::context;
+		using ssl_context_t = aquarius::ssl::context;
 
-		ssl_context_t ssl_context(aquarius::asio::ssl::context::sslv23);
+		ssl_context_t ssl_context(aquarius::ssl::context::sslv23);
 
 		ssl_context.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
 			ssl_context_t::single_dh_use);

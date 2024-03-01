@@ -1,6 +1,6 @@
 #pragma once
 #include <system_error>
-#include <aquarius/system/error_category.hpp>
+#include <aquarius/system/error_code/error_category.hpp>
 
 namespace aquarius
 {
@@ -21,7 +21,7 @@ namespace aquarius
 
 		}
 
-		error_code(system::system_errc value)
+		error_code(system_errc value)
 			: value_(static_cast<int>(value))
 			, cat_(&system::system_category())
 		{
@@ -41,11 +41,16 @@ namespace aquarius
 			return value_ != 0;
 		}
 
-		error_code& operator=(system::system_errc value) noexcept
+		error_code& operator=(system_errc value) noexcept
 		{
 			value_ = static_cast<int>(value);
 
 			return *this;
+		}
+
+		bool operator==(const system_errc& errc)
+		{
+			return value_ == static_cast<int>(errc);
 		}
 
 		std::string category() const
