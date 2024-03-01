@@ -7,6 +7,8 @@
 #include <iostream>
 #include <map>
 #include <type_traits>
+#include <aquarius/invoke/invoke_callback.hpp>
+
 
 namespace aquarius
 {
@@ -43,7 +45,15 @@ namespace aquarius
 		}
 
 		template <typename _Request, typename _Func>
-		void async_write(_Request&& req, _Func&& f)
+		void async_write(_Request&& req, _Func f)
+		{
+			invoke_callback_helper::regist(req.uuid(), std::forward<_Func>(f));
+
+			this->async_write(std::forward<_Request>(req));
+		}
+
+		template <typename _Request>
+		void async_write(_Request&& req)
 		{
 			error_code ec{};
 
@@ -51,13 +61,7 @@ namespace aquarius
 
 			req.to_binary(fs, ec);
 
-			conn_ptr_->async_write(std::move(fs), std::forward<_Func>(f));
-		}
-
-		template <typename _Request>
-		void async_write(_Request&& req)
-		{
-			async_write(std::forward<_Request>(req), [] {});
+			conn_ptr_->async_write(std::move(fs), [] {});
 		}
 
 		std::string remote_address()

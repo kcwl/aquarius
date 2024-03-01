@@ -48,6 +48,11 @@ namespace aquarius
 			return *this;
 		}
 
+		bool operator==(const system_errc& errc)
+		{
+			return value_ == static_cast<int>(errc);
+		}
+
 		std::string category() const
 		{
 			return cat_->name();

@@ -24,6 +24,8 @@ namespace aquarius
 		virtual void attach(std::size_t proto, std::shared_ptr<basic_context> context_ptr) = 0;
 
 		virtual void detach(std::size_t proto) = 0;
+
+		virtual std::shared_ptr<basic_context> get(std::size_t id) = 0;
 	};
 
 	template <typename _Connector>
@@ -82,15 +84,22 @@ namespace aquarius
 			ctxs_.erase(proto);
 		}
 
-	public:
-		virtual void on_accept() final
+		virtual std::shared_ptr<basic_context> get(std::size_t id) override
 		{
 			std::lock_guard lk(mutex_);
 
-			for (auto& ctx : ctxs_)
-			{
-				ctx.second->on_accept();
-			}
+			auto iter = ctxs_.find(id);
+
+			if (iter == ctxs_.end())
+				return nullptr;
+
+			return iter->second;
+		}
+
+	public:
+		virtual void on_accept() final
+		{
+			return;
 		}
 
 		virtual void on_close() final

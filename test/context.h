@@ -82,7 +82,7 @@ public:
 		response_.body().age = 1;
 		response_.body().name = "hello";
 
-		send_response(1);
+		send_response(0);
 
 		return aquarius::error_code{};
 	}

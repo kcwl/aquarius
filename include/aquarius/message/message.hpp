@@ -5,6 +5,8 @@
 #include <aquarius/system/field.hpp>
 #include <aquarius/system/visitor.hpp>
 #include <cstddef>
+#include <aquarius/system/uuid.hpp>
+#include <aquarius/system/type_traits.hpp>
 
 namespace aquarius
 {
@@ -24,6 +26,16 @@ namespace aquarius
 
 	public:
 		DEFINE_VISITABLE()
+
+		virtual std::size_t uuid()
+		{
+			return {};
+		}
+
+		virtual void set_uuid(std::size_t)
+		{
+			return;
+		}
 	};
 
 	template <typename _Header, typename _Body, uint32_t N>
@@ -31,12 +43,14 @@ namespace aquarius
 	{
 	public:
 		using header_type = _Header;
-		using body_type = std::conditional_t<std::same_as<_Body, void>, void*, _Body>;
+		using body_type =  _Body;
 
 		constexpr static uint32_t Number = N;
 
 	public:
 		message()
+			: body_()
+			, uid_(uuid::invoke())
 		{
 			this->alloc(header_ptr_);
 		}
@@ -49,10 +63,14 @@ namespace aquarius
 		message(message&& other)
 			: header_ptr_(other.header_ptr_)
 			, body_(other.body_)
+			, uid_(other.uid_)
 		{
 			other.header_ptr_ = nullptr;
 
-			body_type{}.swap(other.body_);
+			if constexpr (system::swap_t<body_type>)
+			{
+				body_type{}.swap(other.body_);
+			}
 		}
 
 		message& operator=(message&& other)
@@ -79,6 +97,9 @@ namespace aquarius
 
 		error_code from_binary(flex_buffer_t& stream, error_code& ec)
 		{
+			if (!elastic::from_binary(uid_, stream))
+				return ec = system_errc::invalid_stream;
+
 			if (!elastic::from_binary(*header_ptr_, stream))
 				return ec = system_errc::invalid_stream;
 
@@ -94,6 +115,10 @@ namespace aquarius
 			if (!elastic::to_binary(Number, stream))
 				return ec = system_errc::invalid_stream;
 
+			flex_buffer_t uid_buffer{};
+
+			elastic::to_binary(uid_, uid_buffer);
+
 			flex_buffer_t body_buffer{};
 
 			elastic::to_binary(body_, body_buffer);
@@ -104,9 +129,11 @@ namespace aquarius
 
 			elastic::to_binary(*header_ptr_, header_buffer);
 
-			std::size_t total_size = header_buffer.size() + header_ptr_->size;
+			std::size_t total_size = uid_buffer.size() + header_buffer.size() + header_ptr_->size;
 
 			elastic::to_binary(total_size, stream);
+
+			stream.append(std::move(uid_buffer));
 
 			stream.append(std::move(header_buffer));
 
@@ -117,19 +144,36 @@ namespace aquarius
 			return ec;
 		}
 
+		virtual void set_uuid(std::size_t uid) override
+		{
+			uid_ = uid;
+		}
+
+		virtual std::size_t uuid() override
+		{
+			return uid_;
+		}
+
 	private:
 		void swap(message& other)
 		{
+			std::swap(uid_, other.uid_);
+
 			auto tmp_ptr = this->header_ptr_;
 			this->header_ptr_ = other.header_ptr_;
 			other.header_ptr_ = tmp_ptr;
 
-			other.body().swap(this->body_);
+			if constexpr (system::swap_t<body_type>)
+			{
+				other.body().swap(this->body_);
+			}
 		}
 
 	private:
 		header_type* header_ptr_;
 
 		body_type body_;
+
+		std::size_t uid_;
 	};
 } // namespace aquarius

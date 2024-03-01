@@ -81,7 +81,7 @@ public:
 		response_.body().age = 1;
 		response_.body().name = "hello";
 
-		send_response(1);
+		send_response(0);
 
 		return aquarius::error_code{};
 	}
@@ -89,11 +89,11 @@ public:
 
 AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
 
-class ctx_test_client : public aquarius::handle<person_response>
+class ctx_test_client : public aquarius::content<person_response>
 {
 public:
 	ctx_test_client()
-		: aquarius::handle<person_response>("ctx_test_client")
+		: aquarius::content<person_response>("ctx_test_client")
 	{}
 
 public:
@@ -101,10 +101,10 @@ public:
 	{
 		std::cout << "test response recved!\n";
 
-		BOOST_CHECK_EQUAL(request_ptr_->body().age, 1);
-		BOOST_CHECK_EQUAL(request_ptr_->body().name, "hello");
+		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
+		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return aquarius::error_code{};
+		return {};
 	}
 };
 
@@ -126,7 +126,11 @@ BOOST_AUTO_TEST_CASE(process_message)
 	req.body().age = 1;
 	req.body().name = "world";
 
-	cli.async_write(std::move(req));
+	cli.async_write(std::move(req), 
+		[&](std::shared_ptr<person_response> resp)
+		{
+			BOOST_CHECK(true);
+		});
 
 	std::this_thread::sleep_for(1s);
 

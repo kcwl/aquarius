@@ -176,5 +176,11 @@
     <ClInclude Include="..\include\aquarius\system\type_traits.hpp">
       <Filter>include\aquarius\system</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp">
+      <Filter>include\aquarius\invoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\system\uuid.hpp">
+      <Filter>include\aquarius\system</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

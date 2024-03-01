@@ -6,6 +6,8 @@
 #include <aquarius/invoke/invoke_resolver.hpp>
 #include <aquarius/invoke/router_session.hpp>
 #include <aquarius/system/defines.hpp>
+#include <aquarius/system/uuid.hpp>
+#include <aquarius/context.hpp>
 
 namespace aquarius
 {
@@ -19,14 +21,24 @@ namespace aquarius
 
 			std::size_t total{};
 
-			invoke_resolver_helper<tcp>::template from_binay(buffer, proto, total, ec);
+			invoke_resolver_helper<tcp>::template from_binary(buffer, proto, total, ec);
 
 			if (ec)
 				return ec;
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
-			auto context_ptr = invoke_context_helper::invoke(proto);
+			std::shared_ptr<basic_context> context_ptr = session_ptr->get(proto);
+
+			if(!context_ptr)
+				context_ptr = invoke_context_helper::invoke(proto);
+
+			if(!context_ptr)
+				context_ptr = std::make_shared<basic_context>();
+
+			session_ptr->attach(proto, context_ptr);
+
+			context_ptr->on_accept();
 
 			if (!request_ptr)
 			{
@@ -34,13 +46,6 @@ namespace aquarius
 
 				request_ptr = std::make_shared<basic_message>();
 			}
-
-			if (!context_ptr)
-				context_ptr = std::make_shared<basic_context>();
-
-			session_ptr->attach(proto, context_ptr);
-
-			session_ptr->on_accept();
 
 			request_ptr->accept(buffer, context_ptr, session_ptr, ec);
 

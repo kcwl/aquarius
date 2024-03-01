@@ -5,8 +5,7 @@
 #include <aquarius/system/defines.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid.hpp>
+#include <aquarius/system/uuid.hpp>
 
 namespace aquarius
 {
@@ -32,11 +31,9 @@ namespace aquarius
 			, ssl_socket_(socket_, basic_context)
 			, read_buffer_()
 			, dura_(dura)
-			, uid_()
+			, uid_(uuid::invoke())
 		{
-			boost::uuids::random_generator_mt19937 generator{};
-
-			uid_ = boost::uuids::hash_value(generator());
+			
 		}
 
 		connect(asio::io_service& io_service, ssl_context_t& basic_context,
@@ -173,12 +170,8 @@ namespace aquarius
 
 		void shut_down()
 		{
-			if constexpr (SSLMode == ssl_mode::ssl)
-			{
-				invoke_session_helper::close(uuid());
-			}
+			invoke_session_helper::close(uuid());
 			
-
 			if (!socket_.is_open())
 				return;
 
@@ -216,7 +209,9 @@ namespace aquarius
 		{
 			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
-			router_session::instance().push(session_ptr);
+			invoke_session_helper::push(session_ptr);
+
+			session_ptr->on_accept();
 
 			keep_alive(true);
 

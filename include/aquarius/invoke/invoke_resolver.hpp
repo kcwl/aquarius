@@ -2,13 +2,14 @@
 #include <aquarius/elastic.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/system/defines.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
 	template <typename _Type>
 	struct invoke_resolver_helper
 	{
-		static error_code from_binay(flex_buffer_t& buffer, uint32_t& proto, std::size_t& total, error_code& ec)
+		static error_code from_binary(flex_buffer_t& buffer, uint32_t& proto, std::size_t& total, error_code& ec)
 		{
 			if (!elastic::from_binary(proto, buffer))
 				return ec = system_errc::invalid_stream;

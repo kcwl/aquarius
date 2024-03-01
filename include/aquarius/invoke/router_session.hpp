@@ -3,11 +3,33 @@
 #include <aquarius/system/singleton.hpp>
 #include <mutex>
 #include <set>
+#include <functional>
+#include <aquarius/system/type_traits.hpp>
 
 namespace aquarius
 {
 	class router_session : public system::singleton<router_session>
 	{
+		template<typename _Func>
+		struct invoker
+		{
+			static bool apply(const _Func& f, std::shared_ptr<aquarius::basic_message> msg)
+			{
+				using type = system::function_traits<_Func>::type;
+
+				using element_t = typename type::element_type;
+
+				auto ptr = std::dynamic_pointer_cast<element_t>(msg);
+
+				if (!ptr)
+					return false;
+
+				f(ptr);
+
+				return true;
+			}
+		};
+
 	public:
 		bool push(std::shared_ptr<xsession> session_ptr)
 		{
@@ -93,9 +115,33 @@ namespace aquarius
 			}
 		}
 
+		template<typename _Func>
+		void regist(std::size_t id, _Func f)
+		{
+			std::lock_guard lk(callback_mutex_);
+
+			callbacks_[id]= std::bind(&invoker<_Func>::apply, std::move(f), std::placeholders::_1);
+		}
+
+		bool apply(std::size_t id, std::shared_ptr<basic_message> message)
+		{
+			std::lock_guard lk(callback_mutex_);
+
+			auto iter = callbacks_.find(id);
+
+			if (iter == callbacks_.end())
+				return false;
+
+			return iter->second(message);
+		}
+
 	private:
 		std::unordered_map<std::size_t, std::shared_ptr<xsession>> sessions_;
 
 		std::mutex mutex_;
+
+		std::map<std::size_t, std::function<bool(std::shared_ptr<basic_message>)>> callbacks_;
+
+		std::mutex callback_mutex_;
 	};
 } // namespace aquarius

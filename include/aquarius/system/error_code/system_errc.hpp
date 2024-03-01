@@ -10,7 +10,10 @@ namespace aquarius
 		wait_for_query,
 		invalid_stream,
 		invalid_context,
-		invalid_message
+		invalid_message,
+		context_proxy,
+		context_pending,
+		process_error
 	};
 
 	namespace system

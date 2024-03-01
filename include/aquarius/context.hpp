@@ -1,16 +1,12 @@
 #pragma once
+#include <aquarius/invoke/invoke_callback.hpp>
+#include <aquarius/logger.hpp>
+#include <aquarius/session.hpp>
 #include <aquarius/system/event.hpp>
 #include <aquarius/system/visitor.hpp>
-#include <aquarius/session.hpp>
 #include <chrono>
-#include <aquarius/logger.hpp>
 
 using namespace std::chrono_literals;
-
-namespace aquarius
-{
-	class xsession;
-}
 
 namespace aquarius
 {
@@ -40,6 +36,11 @@ namespace aquarius
 			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 
 			return ec = system_errc::invalid_message;
+		}
+
+		std::string content()
+		{
+			return name_;
 		}
 
 	public:
@@ -115,7 +116,7 @@ namespace aquarius
 	protected:
 		virtual error_code handle() = 0;
 
-		bool send_response(int result)
+		bool send_response(error_code result)
 		{
 			auto fs = make_response(result);
 
@@ -124,10 +125,20 @@ namespace aquarius
 			return true;
 		}
 
-	private:
-		flex_buffer_t make_response(int32_t result)
+		void make_transfer()
 		{
-			response_.header()->result = result;
+			if (request_ptr_->header()->session_id != 0)
+				return;
+
+			request_ptr_->header()->session_id = this->session_ptr_->uuid();
+		}
+
+	private:
+		flex_buffer_t make_response(error_code result)
+		{
+			response_.set_uuid(request_ptr_->uuid());
+
+			response_.header()->result = static_cast<int>(result);
 
 			flex_buffer_t fs;
 
@@ -145,12 +156,41 @@ namespace aquarius
 	};
 
 	template <typename _Response>
-	class handle : public context<_Response, int>
+	class content : public basic_context, public system::shared_visitor<_Response>
 	{
 	public:
-		handle(const std::string& name)
-			: context<_Response, int>(name)
+		content(const std::string& name)
+			: basic_context(name, 1s)
+			, response_ptr_()
 		{}
+
+	public:
+		virtual void on_accept() override
+		{
+			// flow monitor
+		}
+
+		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<xsession> session_ptr, error_code& ec)
+		{
+			response_ptr_ = resp;
+
+			session_ptr_ = session_ptr;
+
+			ec = handle();
+
+			if (!ec)
+			{
+				invoke_callback_helper::apply(response_ptr_->uuid(), response_ptr_);
+			}
+
+			return ec;
+		}
+
+	protected:
+		virtual error_code handle() = 0;
+
+	protected:
+		std::shared_ptr<_Response> response_ptr_;
 	};
 } // namespace aquarius
 

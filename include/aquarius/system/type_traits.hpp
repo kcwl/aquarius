@@ -134,14 +134,34 @@ namespace aquarius
 		struct is_aggregate_initialize : is_aggregate_initalize_impl<_Ty, std::make_index_sequence<N>>
 		{};
 
-		template<typename _Ty, std::size_t N>
-		concept aggregate_inialize_v = is_aggregate_initialize<_Ty,N>::value;
+		template <typename _Ty, std::size_t N>
+		concept aggregate_inialize_v = is_aggregate_initialize<_Ty, N>::value;
 
 		template <typename _Ty>
 		concept tuple_t = requires() { std::tuple_size<_Ty>(); };
 
 		template <typename _Ty>
 		concept class_t = std::is_class_v<std::remove_reference_t<_Ty>>;
+
+		template <typename _Ty>
+		struct function_traits;
+
+		template <typename _Return, typename _Args>
+		struct function_traits<_Return(_Args)>
+		{
+			using type = _Args;
+		};
+
+		template <typename _Return, typename _Func, typename _Args>
+		struct function_traits<_Return (_Func::*)(_Args) const> : function_traits<_Return(_Args)>
+		{};
+
+		template <typename _Func>
+		struct function_traits : function_traits<decltype(&_Func::operator())>
+		{};
+
+		template <typename _Ty>
+		concept swap_t = requires(_Ty value) { value.swap(value); };
 
 	} // namespace system
 

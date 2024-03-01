@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -157,6 +157,7 @@
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
+    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
     <ClInclude Include="..\include\aquarius\system\defines.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="..\include\aquarius\system\field.hpp" />
     <ClInclude Include="..\include\aquarius\system\router.hpp" />
     <ClInclude Include="..\include\aquarius\system\singleton.hpp" />
+    <ClInclude Include="..\include\aquarius\system\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\system\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\system\type_traits.hpp" />
     <ClInclude Include="context.h" />
