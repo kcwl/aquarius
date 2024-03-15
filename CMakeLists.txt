@@ -11,7 +11,7 @@ set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(CMAKE_COVERAGE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CodeCoverage.cmake)
-ADD_COVERAGE_COMPILE_FLAGS()
+APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 add_subdirectory(deps)
