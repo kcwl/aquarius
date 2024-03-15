@@ -12,6 +12,6 @@ target_compile_definitions(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 find_package(Python3 3.8)
 
 if(Python3_FOUND)
-target_include_directories(boost INTERFACE "/usr/lib64")
-target_link_libraries(boost INTERFACE python3)
+target_include_directories(boost INTERFACE ${Python3_INCLUDE_DIRS})
+target_link_libraries(boost INTERFACE ${Python3_LIBRARIES})
 endif()
