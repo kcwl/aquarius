@@ -9,8 +9,9 @@ target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIR})
 target_compile_definitions(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
 
-find_package(Python3 3.8)
+find_package(Python3 3.8 COMPONENTS python3)
 
 if(Python3_FOUND)
+target_include_directories("/usr/lib64")
 target_link_libraries(boost INTERFACE python3)
 endif()
