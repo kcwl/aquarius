@@ -6,7 +6,7 @@ target_link_libraries(boost INTERFACE ${Boost_LIBRARIES})
 
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIR})
 
-target_compile_definitions(boost INTERFACE -DBOOST_ALL_DYN_LINK)
+target_compile_definitions(boost INTERFACE -DBOOST_ALL_DYN_LINK -DBOOST_LOG_DYN_LINK)
 
 
 find_package(Python3 3.8)
