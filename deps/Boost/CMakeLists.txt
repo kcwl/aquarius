@@ -13,7 +13,6 @@ target_compile_options(boost INTERFACE -DBOOST_LOG_DYN_LINK)
 find_package(Python3 3.8)
 
 if(Python3_FOUND)
-target_include_directories(boost INTERFACE ${Python3_INCLUDE_DIRS})
 
 if(NOT Python3_LIBRARIES)
 set(Python3_LIBRARIES "python3")
