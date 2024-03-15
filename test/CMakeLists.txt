@@ -12,6 +12,8 @@ add_executable(unittest ${TEST_SRCS} ${TEST_MAIN})
 
 target_link_libraries(unittest PRIVATE boost openssl)
 
+target_compile_definitions(unittest PRIVATE -DBOOST_LOG_DYN_LINK)
+
 add_test(
 	NAME unittest COMMAND unittest
 )
