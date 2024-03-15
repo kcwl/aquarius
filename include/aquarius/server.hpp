@@ -19,7 +19,7 @@ namespace aquarius
 	public:
 		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
-			, endpoint_(asio::ip::tcp::v4(), static_cast<asio::ip::port_type>(port))
+			, endpoint_(asio::ip::tcp::v4(), static_cast<uint16_t>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, ssl_context_(ssl::context::sslv23)

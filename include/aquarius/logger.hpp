@@ -4,8 +4,8 @@
 #include <boost/log/common.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
+#include <boost/log/keywords/registration.hpp>
 #include <boost/log/sinks.hpp>
-#include <boost/log/sinks/async_frontend.hpp>
 #include <boost/log/sinks/text_multifile_backend.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/trivial.hpp>

@@ -21,7 +21,7 @@ namespace aquarius
 
 			std::size_t total{};
 
-			invoke_resolver_helper<tcp>::template from_binary(buffer, proto, total, ec);
+			invoke_resolver_helper<tcp>::from_binary(buffer, proto, total, ec);
 
 			if (ec)
 				return ec;

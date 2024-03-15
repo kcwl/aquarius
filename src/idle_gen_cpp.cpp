@@ -260,7 +260,7 @@ namespace aquarius
 							last_space = space;
 					}
 
-					if (line.contains("public:") || line.contains("private:") || line.contains("protected:"))
+					if (line.find("public:")!=std::string::npos || line.find("private:") != std::string::npos || line.find("protected:") != std::string::npos)
 					{
 						ofs << last_space;
 					}
