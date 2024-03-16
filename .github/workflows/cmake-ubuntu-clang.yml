@@ -46,7 +46,7 @@ jobs:
     - name: install boost
       shell: bash
       run: |
-        sudo apt-get install -y libboost-test-dev libboost-json-dev libboost-log-dev libboost-thread-dev libboost-system-dev
+        sudo apt-get install -y libboost-test libboost-json libboost-log libboost-thread libboost-system
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
