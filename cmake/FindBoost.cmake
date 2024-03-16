@@ -22,9 +22,20 @@ find_path(INCLUDE_DIR
 
 if(NOT INCLUDE_DIR)
 message(STATUS FATAL_ERROR "Boost ${BOOST_VERSION} not found.")
+return()
 endif()
 
 list(APPEND Boost_INCLUDE_DIRS ${INCLUDE_DIR})
+
+file(READ ${Boost_INCLUDE_DIRS}/boost/version.hpp BOOST_VERSION_HPP)
+
+if(BOOST_VERSION_HPP)
+string(REGEX MATCH "\"[0-9]_[0-9]+\"" BOOST_VERSION_INT ${BOOST_VERSION_HPP})
+endif()
+
+
+string(REPLACE "\"" "" BOOST_VERSION_INT ${BOOST_VERSION_INT})
+string(REPLACE "_" "." BOOST_VERSION_INT ${BOOST_VERSION_INT})
 
 foreach(lib ${AQUARIUS_NEED_BOOST})
 	unset(LIBS CACHE)
@@ -39,8 +50,8 @@ endforeach()
 
 if(Boost_INCLUDE_DIRS AND Boost_LIBRARIES)
 set(Boost_FOUND true)
-set(Boost_FOUND_VERSION ${BOOST_VERSION})
-message(STATUS "Find Boost(${BOOST_VERSION})")
+set(Boost_FOUND_VERSION ${BOOST_VERSION_INT})
+message(STATUS "Find Boost(${Boost_FOUND_VERSION})")
 endif()
 
 
