@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <aquarius/invoke/invoke_callback.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/system/asio.hpp>
@@ -7,7 +8,6 @@
 #include <iostream>
 #include <map>
 #include <type_traits>
-#include <aquarius/invoke/invoke_callback.hpp>
 
 
 namespace aquarius

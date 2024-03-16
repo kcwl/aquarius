@@ -1,33 +1,12 @@
 #pragma once
 #include <any>
-#include <aquarius/invoke/invoke_resolver.hpp>
-#include <aquarius/message/message.hpp>
-#include <aquarius/system/defines.hpp>
-#include <aquarius/system/event.hpp>
+#include <aquarius/context/basic_context.hpp>
 #include <deque>
 #include <memory>
 #include <string>
 
 namespace aquarius
 {
-	class xsession : public system::event_call
-	{
-	public:
-		xsession() = default;
-		virtual ~xsession() = default;
-
-	public:
-		virtual std::size_t uuid() = 0;
-
-		virtual bool async_write(flex_buffer_t&& buffer) = 0;
-
-		virtual void attach(std::size_t proto, std::shared_ptr<basic_context> context_ptr) = 0;
-
-		virtual void detach(std::size_t proto) = 0;
-
-		virtual std::shared_ptr<basic_context> get(std::size_t id) = 0;
-	};
-
 	template <typename _Connector>
 	class session : public xsession
 	{

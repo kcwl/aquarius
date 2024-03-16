@@ -1,10 +1,7 @@
 #pragma once
-#include <aquarius/invoke.hpp>
+#include <aquarius/invoke/invoke_service.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
-#include <aquarius/io_service_pool.hpp>
-#include <aquarius/logger.hpp>
 #include <aquarius/system/deadline_timer.hpp>
-#include <aquarius/system/defines.hpp>
 #include <type_traits>
 
 namespace aquarius

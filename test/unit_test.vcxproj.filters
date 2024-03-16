@@ -31,6 +31,12 @@
     <Filter Include="include\aquarius\system\error_code">
       <UniqueIdentifier>{cbb83a22-ae46-4acc-973e-de9a23b6f96d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\session">
+      <UniqueIdentifier>{7db6ff92-099d-452e-be84-d69c36512274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\context">
+      <UniqueIdentifier>{9924ba07-6896-417b-ac11-dfb77ea483f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -78,9 +84,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\elastic.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp">
@@ -181,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\system\uuid.hpp">
       <Filter>include\aquarius\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\xsession.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\basic_context.hpp">
+      <Filter>include\aquarius\context</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
