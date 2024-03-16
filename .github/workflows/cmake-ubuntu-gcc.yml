@@ -66,7 +66,8 @@ jobs:
     - name: install boost
       shell: bash
       run: |
-        sudo add-apt-repository ppa:boost-latest/ppa
+        sudo add-apt-repository ppa:mhier/libboost-latest
+        sudo apt update
         sudo apt-get install -y libboost-all-dev
 
     - name: Configure CMake
