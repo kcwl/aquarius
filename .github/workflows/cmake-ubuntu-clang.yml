@@ -43,14 +43,10 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install boost 1.84
+    - name: install boost
       shell: bash
       run: |
-        wget https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.gz
-        tar -zxvf boost_1_84_0.tar.gz
-        cd boost_1_84_0
-        ./bootstrap.sh
-        ./b2
+       sudo apt-get install -y libboost-all-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
