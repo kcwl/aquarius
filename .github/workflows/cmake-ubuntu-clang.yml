@@ -42,6 +42,7 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        clang --version
 
     - name: install boost
       shell: bash
