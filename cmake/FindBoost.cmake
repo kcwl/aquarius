@@ -37,6 +37,8 @@ endif()
 string(REPLACE "\"" "" BOOST_VERSION_INT ${BOOST_VERSION_INT})
 string(REPLACE "_" "." BOOST_VERSION_INT ${BOOST_VERSION_INT})
 
+
+
 foreach(lib ${AQUARIUS_NEED_BOOST})
 	unset(LIBS CACHE)
 	find_library(LIBS boost_${lib})
@@ -46,12 +48,15 @@ foreach(lib ${AQUARIUS_NEED_BOOST})
 	endif()
 
 	list(APPEND Boost_LIBRARIES ${LIBS})
+
+	string(APPEND BOOST_COMPONENTS ${lib})
+	string(APPEND BOOST_COMPONENTS " ")
 endforeach()
 
 if(Boost_INCLUDE_DIRS AND Boost_LIBRARIES)
 set(Boost_FOUND true)
 set(Boost_FOUND_VERSION ${BOOST_VERSION_INT})
-message(STATUS "Find Boost(${Boost_FOUND_VERSION})")
+message(STATUS "Find Boost(${Boost_FOUND_VERSION}) Components ${BOOST_COMPONENTS}")
 endif()
 
 
