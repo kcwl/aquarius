@@ -18,10 +18,11 @@ endif()
 unset(INCLUDE_DIR CACHE)
 find_path(INCLUDE_DIR
 	NAMES boost/version.hpp
+	HINTS ./
 )
 
 if(NOT INCLUDE_DIR)
-message(STATUS FATAL_ERROR "Boost ${BOOST_VERSION} not found.")
+message(STATUS "Boost not found.")
 return()
 endif()
 
