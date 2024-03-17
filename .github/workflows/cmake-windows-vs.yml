@@ -50,7 +50,11 @@ jobs:
         cd windows-temp-package/boost_1_83/stage/lib
         cat libboost.tar.gz* > libboost.tar.gz
         tar zxvf libboost.tar.gz
-        echo BOOST_ROOT=${{ github.workspace}}/windows-temp-package/boost_1_83
+
+    - name: set BOOST_ROOT
+      shell: powershell
+      run: |
+         echo BOOST_ROOT=${{ github.workspace}}/windows-temp-package/boost_1_83
 
 
     - name: Configure CMake
