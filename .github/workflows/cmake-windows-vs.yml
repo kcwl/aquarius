@@ -43,7 +43,7 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install boost
+    - name: install 3rd libraries
       shell: bash
       run: |
         git clone https://github.com/kcwl/windows-temp-package.git
@@ -55,11 +55,13 @@ jobs:
       shell: powershell
       run: |
         echo "BOOST_ROOT=${{ github.workspace}}\windows-temp-package\boost_1_83" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "OPENSSL_ROOT=${{ github.workspace}}\windows-temp-package\openssl" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     - name: show BOOST_ROOT
       shell: powershell
       run: |
         echo ${{env.BOOST_ROOT}}
+        echo ${{env.OPENSSL_ROOT}}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
