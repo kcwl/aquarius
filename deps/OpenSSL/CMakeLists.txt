@@ -1,3 +1,7 @@
+if(WIN32)
+cmake_policy(SET CMP0074 NEW)
+endif()
+
 find_package(OpenSSL)
 
 if(NOT OpenSSL_FOUND)
@@ -8,6 +12,6 @@ add_library(openssl INTERFACE)
 
 target_link_libraries(openssl INTERFACE ${OpenSSL_LIBRARIES})
 
-target_include_directories(openssl INTERFACE ${OpenSSL_INCLUDE_DIR})
+target_include_directories(openssl INTERFACE ${OpenSSL_INCLUDE_DIRS})
 
 message(STATUS "Found ${OpenSSL_FOUND_VERSION}")
