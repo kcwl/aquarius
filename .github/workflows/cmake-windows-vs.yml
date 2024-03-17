@@ -54,7 +54,7 @@ jobs:
     - name: set BOOST_ROOT
       shell: powershell
       run: |
-         $ENV:BOOST_ROOT="${{ github.workspace}}\windows-temp-package\boost_1_83"
+         [Environment]::SetEnvironmentVariable("BOOST_ROOT", "${{ github.workspace}}\windows-temp-package\boost_1_83", "Machine")
 
 
     - name: Configure CMake
