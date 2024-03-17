@@ -46,11 +46,12 @@ jobs:
     - name: install boost
       shell: powershell
       run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.bat
-        cd ../
-        vcpkg/vcpkg.exe install Boost:x64-windows
+        git clone https://github.com/kcwl/windows-temp-package.git
+        cd windows-temp-package/boost_1_83/stage/lib
+        cat libboost.tar.gz* > libboost.tar.gz
+        tar zxvf libboost.tar.gz
+        echo BOOST_ROOT=${{ github.workspace}}/windows-temp-package/boost_1_83
+
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
