@@ -1,12 +1,8 @@
 #pragma once
-#include <aquarius/elastic.hpp>
-#include <aquarius/error_code.hpp>
-#include <aquarius/system/defines.hpp>
 #include <aquarius/system/field.hpp>
 #include <aquarius/system/visitor.hpp>
-#include <cstddef>
 #include <aquarius/system/uuid.hpp>
-#include <aquarius/system/type_traits.hpp>
+#include <cstddef>
 
 namespace aquarius
 {

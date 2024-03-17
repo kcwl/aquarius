@@ -11,7 +11,6 @@ namespace aquarius
 		{
 		public:
 			constexpr system_error_category() noexcept
-				: std::error_category(std::error_category::_System_addr)
 			{}
 
 		public:
@@ -44,7 +43,7 @@ namespace aquarius
 		template <typename _Category>
 		const _Category& immortalize_memcpy_image() noexcept
 		{
-			static constexpr _Category _static;
+			static const _Category _static;
 
 			return _static;
 		}

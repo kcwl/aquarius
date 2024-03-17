@@ -157,11 +157,12 @@
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
+    <ClInclude Include="..\include\aquarius\context\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
+    <ClInclude Include="..\include\aquarius\session\xsession.hpp" />
     <ClInclude Include="..\include\aquarius\system\defines.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp" />

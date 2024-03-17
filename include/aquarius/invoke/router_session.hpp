@@ -1,10 +1,15 @@
 #pragma once
 #include <aquarius/session.hpp>
 #include <aquarius/system/singleton.hpp>
+#include <aquarius/system/type_traits.hpp>
+#include <functional>
 #include <mutex>
 #include <set>
-#include <functional>
-#include <aquarius/system/type_traits.hpp>
+
+namespace aquarius
+{
+	class basic_message;
+}
 
 namespace aquarius
 {

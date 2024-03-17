@@ -1,6 +1,6 @@
 #pragma once
-#include <system_error>
 #include <aquarius/system/error_code/error_category.hpp>
+#include <system_error>
 
 namespace aquarius
 {

@@ -36,6 +36,7 @@
 .vs/
 Debug/
 Release/
+build/
 
 # log
 logs/*
