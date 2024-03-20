@@ -209,8 +209,6 @@ namespace aquarius
 
 			invoke_session_helper::push(session_ptr);
 
-			session_ptr->on_accept();
-
 			keep_alive(true);
 
 			if constexpr (ConnMode == conn_mode::server)

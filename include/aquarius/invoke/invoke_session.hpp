@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/context.hpp>
 #include <aquarius/core/core.hpp>
+#include <aquarius/core/elastic.hpp>
 #include <aquarius/core/error_code.hpp>
-#include <aquarius/elastic.hpp>
 #include <aquarius/invoke/invoke_context.hpp>
 #include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/message/message.hpp>

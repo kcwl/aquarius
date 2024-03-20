@@ -76,11 +76,6 @@ namespace aquarius
 		}
 
 	public:
-		virtual void on_accept() final
-		{
-			return;
-		}
-
 		virtual void on_close() final
 		{
 			std::lock_guard lk(mutex_);

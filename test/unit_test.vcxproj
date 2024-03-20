@@ -158,6 +158,7 @@
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\basic_context.hpp" />
+    <ClInclude Include="..\include\aquarius\context\impl\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\core\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\core\impl\error_category.hpp" />
     <ClInclude Include="..\include\aquarius\core\impl\system_errc.hpp" />
@@ -183,7 +184,7 @@
     <ClInclude Include="..\include\aquarius\router\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\xsession.hpp" />
     <ClInclude Include="..\include\aquarius\core\core.hpp" />
-    <ClInclude Include="..\include\aquarius\elastic.hpp" />
+    <ClInclude Include="..\include\aquarius\core\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp" />
@@ -199,11 +200,10 @@
     <ClInclude Include="..\include\aquarius\core\asio.hpp" />
     <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\core\empty_value.hpp" />
-    <ClInclude Include="..\include\aquarius\system\event.hpp" />
     <ClInclude Include="..\include\aquarius\message\field.hpp" />
     <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
-    <ClInclude Include="..\include\aquarius\system\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\visitable.hpp" />
     <ClInclude Include="context.h" />
     <ClInclude Include="error_code.h" />
     <ClInclude Include="invoke.h" />

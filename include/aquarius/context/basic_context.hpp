@@ -1,8 +1,7 @@
 #pragma once
+#include <aquarius/context/impl/visitor.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/session/xsession.hpp>
-#include <aquarius/system/event.hpp>
-#include <aquarius/system/visitor.hpp>
 #include <chrono>
 
 using namespace std::chrono_literals;
@@ -13,11 +12,11 @@ namespace aquarius
 	{
 		class basic_message;
 	}
-}
+} // namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public system::bare_visitor<impl::basic_message>, public system::event_call
+	class basic_context : public impl::bare_visitor<impl::basic_message>
 	{
 	public:
 		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
@@ -51,17 +50,17 @@ namespace aquarius
 		}
 
 	public:
-		virtual void on_accept() override
+		virtual void on_accept()
 		{
 			return;
 		}
 
-		virtual void on_close() override
+		virtual void on_close()
 		{
 			return;
 		}
 
-		virtual void on_timeout() override
+		virtual void on_timeout()
 		{
 			return;
 		}

@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public system::shared_visitor<_Request>
+	class context : public basic_context, public impl::shared_visitor<_Request>
 	{
 	public:
 		context(const std::string& name)
@@ -82,7 +82,7 @@ namespace aquarius
 	};
 
 	template <typename _Response>
-	class content : public basic_context, public system::shared_visitor<_Response>
+	class content : public basic_context, public impl::shared_visitor<_Response>
 	{
 	public:
 		content(const std::string& name)

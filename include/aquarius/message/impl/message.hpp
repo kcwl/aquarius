@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/system/visitor.hpp>
+#include <aquarius/message/impl/visitable.hpp>
 
 namespace aquarius
 {
 	namespace impl
 	{
-		class basic_message : public system::visitable
+		class basic_message : public visitable
 		{
 		public:
 			basic_message() = default;

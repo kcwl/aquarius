@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/elastic.hpp>
+#include <aquarius/core/elastic.hpp>
 #include <aquarius/core/error_code.hpp>
 
 namespace aquarius

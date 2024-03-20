@@ -1,6 +1,5 @@
 #pragma once
-#include <aquarius/elastic.hpp>
-#include <aquarius/system/event.hpp>
+#include <aquarius/core/elastic.hpp>
 
 namespace aquarius
 {
@@ -9,7 +8,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class xsession : public system::event_call
+	class xsession
 	{
 	public:
 		xsession() = default;
@@ -25,5 +24,9 @@ namespace aquarius
 		virtual void detach(std::size_t proto) = 0;
 
 		virtual std::shared_ptr<basic_context> get(std::size_t id) = 0;
+
+		virtual void on_close() = 0;
+
+		virtual void on_timeout() = 0;
 	};
 } // namespace aquarius
