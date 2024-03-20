@@ -37,6 +37,9 @@
     <Filter Include="include\aquarius\context">
       <UniqueIdentifier>{9924ba07-6896-417b-ac11-dfb77ea483f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\message\impl">
+      <UniqueIdentifier>{62c9fe60-8548-4fee-bd39-705bfca0c909}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -44,9 +47,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\aquarius\message\tcp_header.hpp">
-      <Filter>include\aquarius\message</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\message\message.hpp">
       <Filter>include\aquarius\message</Filter>
     </ClInclude>
@@ -128,9 +128,6 @@
     <ClInclude Include="..\include\aquarius\session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_resolver.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\error_code.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -156,9 +153,6 @@
       <Filter>include\aquarius\system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\system\event.hpp">
-      <Filter>include\aquarius\system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\system\field.hpp">
       <Filter>include\aquarius\system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\system\router.hpp">
@@ -190,6 +184,27 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\basic_context.hpp">
       <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\field.hpp">
+      <Filter>include\aquarius\message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\impl\field.hpp">
+      <Filter>include\aquarius\message\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\header.hpp">
+      <Filter>include\aquarius\message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\impl\header.hpp">
+      <Filter>include\aquarius\message\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp">
+      <Filter>include\aquarius\message\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\impl\custom.hpp">
+      <Filter>include\aquarius\message\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\message\impl\message.hpp">
+      <Filter>include\aquarius\message\impl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

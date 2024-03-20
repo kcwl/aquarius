@@ -2,13 +2,11 @@
 #include <aquarius/elastic.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/system/defines.hpp>
-#include <aquarius/system/uuid.hpp>
-#include <aquarius/invoke/invoke_resolver.hpp>
 #include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/invoke/invoke_context.hpp>
 #include <aquarius/invoke/router_session.hpp>
 #include <aquarius/context.hpp>
-#include <aquarius/request.hpp>
+#include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
@@ -22,10 +20,8 @@ namespace aquarius
 
 			std::size_t total{};
 
-			invoke_resolver_helper<tcp>::from_binary(buffer, proto, total, ec);
-
-			if (ec)
-				return ec;
+			if (!elastic::from_binary(proto, buffer))
+				return ec = system_errc::process_error;
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
@@ -45,7 +41,7 @@ namespace aquarius
 			{
 				buffer.consume(total);
 
-				request_ptr = std::make_shared<basic_message>();
+				request_ptr = std::make_shared<impl::basic_message>();
 			}
 
 			request_ptr->accept(buffer, context_ptr, session_ptr, ec);

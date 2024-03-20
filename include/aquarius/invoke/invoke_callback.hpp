@@ -12,7 +12,7 @@ namespace aquarius
 			router_session::instance().regist(id, std::forward<_Func>(f));
 		}
 
-		static bool apply(std::size_t id, std::shared_ptr<basic_message> message)
+		static bool apply(std::size_t id, std::shared_ptr<impl::basic_message> message)
 		{
 			return router_session::instance().apply(id, message);
 		}

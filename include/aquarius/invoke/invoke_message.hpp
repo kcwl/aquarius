@@ -3,18 +3,13 @@
 
 namespace aquarius
 {
-	class basic_message;
-}
-
-namespace aquarius
-{
 	template <typename _Message>
 	struct msg_regist
 	{
 		msg_regist(std::size_t key)
 		{
 			router_message::instance().regist(
-				key, []() { return std::dynamic_pointer_cast<basic_message>(std::make_shared<_Message>()); });
+				key, []() { return std::dynamic_pointer_cast<impl::basic_message>(std::make_shared<_Message>()); });
 		}
 	};
 

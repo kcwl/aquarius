@@ -159,6 +159,12 @@
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp" />
+    <ClInclude Include="..\include\aquarius\message\header.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\custom.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\header.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\field.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\message.hpp" />
+    <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\session\xsession.hpp" />
     <ClInclude Include="..\include\aquarius\system\defines.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
@@ -172,10 +178,8 @@
     <ClInclude Include="..\include\aquarius\invoke\router_service.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\message\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke\invoke_resolver.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\service.hpp" />
@@ -188,7 +192,7 @@
     <ClInclude Include="..\include\aquarius\system\error_code\system_errc.hpp" />
     <ClInclude Include="..\include\aquarius\system\error_code\system_error_message.hpp" />
     <ClInclude Include="..\include\aquarius\system\event.hpp" />
-    <ClInclude Include="..\include\aquarius\system\field.hpp" />
+    <ClInclude Include="..\include\aquarius\message\field.hpp" />
     <ClInclude Include="..\include\aquarius\system\router.hpp" />
     <ClInclude Include="..\include\aquarius\system\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\system\uuid.hpp" />

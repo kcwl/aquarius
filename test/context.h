@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 {
 	auto ctx = std::make_shared<aquarius::basic_context>();
 
-	auto req = std::make_shared<aquarius::basic_message>();
+	auto req = std::make_shared<aquarius::impl::basic_message>();
 
 	aquarius::flex_buffer_t buffer{};
 

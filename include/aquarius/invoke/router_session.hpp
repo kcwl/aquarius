@@ -8,7 +8,10 @@
 
 namespace aquarius
 {
-	class basic_message;
+	namespace impl
+	{
+		class basic_message;
+	}
 }
 
 namespace aquarius
@@ -18,7 +21,7 @@ namespace aquarius
 		template<typename _Func>
 		struct invoker
 		{
-			static bool apply(const _Func& f, std::shared_ptr<aquarius::basic_message> msg)
+			static bool apply(const _Func& f, std::shared_ptr<impl::basic_message> msg)
 			{
 				using type = system::function_traits<_Func>::type;
 
@@ -128,7 +131,7 @@ namespace aquarius
 			callbacks_[id]= std::bind(&invoker<_Func>::apply, std::move(f), std::placeholders::_1);
 		}
 
-		bool apply(std::size_t id, std::shared_ptr<basic_message> message)
+		bool apply(std::size_t id, std::shared_ptr<impl::basic_message> message)
 		{
 			std::lock_guard lk(callback_mutex_);
 
@@ -145,7 +148,7 @@ namespace aquarius
 
 		std::mutex mutex_;
 
-		std::map<std::size_t, std::function<bool(std::shared_ptr<basic_message>)>> callbacks_;
+		std::map<std::size_t, std::function<bool(std::shared_ptr<impl::basic_message>)>> callbacks_;
 
 		std::mutex callback_mutex_;
 	};

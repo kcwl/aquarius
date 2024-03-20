@@ -4,9 +4,12 @@
 
 namespace aquarius
 {
-	class xsession;
+	namespace impl
+	{
+		class basic_message;
+	}
 
-	class basic_message;
+	class xsession;
 
 	class basic_context;
 } // namespace aquarius
@@ -72,7 +75,7 @@ namespace aquarius
 		static error_code accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
 										   std::shared_ptr<xsession> session_ptr, error_code& ec)
 		{
-			using visitor_t = bare_visitor<basic_message>;
+			using visitor_t = bare_visitor<impl::basic_message>;
 
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
