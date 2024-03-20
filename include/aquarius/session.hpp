@@ -1,6 +1,6 @@
 #pragma once
 #include <any>
-#include <aquarius/context/basic_context.hpp>
+#include <aquarius/context/context.hpp>
 #include <deque>
 #include <memory>
 #include <string>
@@ -8,7 +8,7 @@
 namespace aquarius
 {
 	template <typename _Connector>
-	class session : public xsession
+	class session : public basic_session
 	{
 		friend class basic_context;
 

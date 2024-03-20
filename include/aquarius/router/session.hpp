@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/router/impl/manager.hpp>
-#include <aquarius/session/xsession.hpp>
+#include <aquarius/session/session.hpp>
 #include <functional>
 #include <mutex>
 #include <set>
@@ -15,10 +15,10 @@ namespace aquarius
 
 namespace aquarius
 {
-	class router_session : public impl::single_manager<router_session, std::shared_ptr<xsession>>
+	class router_session : public impl::single_manager<router_session, std::shared_ptr<basic_session>>
 	{
 	public:
-		bool push(std::shared_ptr<xsession> session_ptr)
+		bool push(std::shared_ptr<basic_session> session_ptr)
 		{
 			if (!session_ptr)
 				return false;
@@ -63,7 +63,7 @@ namespace aquarius
 		}
 
 	private:
-		std::unordered_map<std::size_t, std::shared_ptr<xsession>> sessions_;
+		std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
 
 		std::mutex mutex_;
 	};

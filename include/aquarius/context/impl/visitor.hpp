@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	class xsession;
+	class basic_session;
 }
 
 namespace aquarius
@@ -18,7 +18,7 @@ namespace aquarius
 			virtual ~basic_visitor() = default;
 
 		public:
-			virtual error_code visit(_Request visited, std::shared_ptr<xsession> session_ptr, error_code& ec) = 0;
+			virtual error_code visit(_Request visited, std::shared_ptr<basic_session> session_ptr, error_code& ec) = 0;
 		};
 
 		template <typename _Request>
@@ -42,7 +42,7 @@ namespace aquarius
 
 #define DEFINE_VISITOR(_Request, _Return)                                                                              \
 	virtual _Return visit([[maybe_unused]] std::shared_ptr<_Request>,                                                  \
-						  [[maybe_unused]] std::shared_ptr<aquarius::xsession>)                                        \
+						  [[maybe_unused]] std::shared_ptr<aquarius::basic_session>)                                        \
 	{                                                                                                                  \
 		return _Return{};                                                                                              \
 	}

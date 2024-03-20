@@ -4,7 +4,7 @@
 #include <aquarius/core/deadline_timer.hpp>
 #include <aquarius/core/logger.hpp>
 #include <aquarius/core/uuid.hpp>
-#include <aquarius/invoke/invoke_session.hpp>
+#include <aquarius/invoke/session.hpp>
 #include <aquarius/session.hpp>
 
 namespace aquarius

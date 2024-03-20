@@ -8,11 +8,11 @@ namespace aquarius
 
 namespace aquarius
 {
-	class xsession
+	class basic_session
 	{
 	public:
-		xsession() = default;
-		virtual ~xsession() = default;
+		basic_session() = default;
+		virtual ~basic_session() = default;
 
 	public:
 		virtual std::size_t uuid() = 0;

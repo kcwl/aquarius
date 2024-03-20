@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/invoke/invoke_service.hpp>
-#include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/core/deadline_timer.hpp>
+#include <aquarius/invoke/service.hpp>
+#include <aquarius/invoke/session.hpp>
 
 namespace aquarius
 {

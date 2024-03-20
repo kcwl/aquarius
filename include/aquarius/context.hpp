@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/context/basic_context.hpp>
-#include <aquarius/invoke/invoke_callback.hpp>
+#include <aquarius/context/context.hpp>
+#include <aquarius/invoke/callback.hpp>
 
 namespace aquarius
 {
@@ -30,7 +30,7 @@ namespace aquarius
 			// timeout
 		}
 
-		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<xsession> session_ptr, error_code& ec)
+		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr, error_code& ec)
 		{
 			request_ptr_ = req;
 
@@ -96,7 +96,7 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<xsession> session_ptr, error_code& ec)
+		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr, error_code& ec)
 		{
 			response_ptr_ = resp;
 

@@ -3,8 +3,8 @@
 #include <aquarius/core/core.hpp>
 #include <aquarius/core/elastic.hpp>
 #include <aquarius/core/error_code.hpp>
-#include <aquarius/invoke/invoke_context.hpp>
-#include <aquarius/invoke/invoke_message.hpp>
+#include <aquarius/invoke/context.hpp>
+#include <aquarius/invoke/message.hpp>
 #include <aquarius/message/message.hpp>
 #include <aquarius/router/session.hpp>
 
@@ -52,12 +52,12 @@ namespace aquarius
 			return ec;
 		}
 
-		static bool push(std::shared_ptr<xsession> session_ptr)
+		static bool push(std::shared_ptr<basic_session> session_ptr)
 		{
 			return router_session::instance().push(session_ptr);
 		}
 
-		static std::shared_ptr<xsession> find(std::size_t uid)
+		static std::shared_ptr<basic_session> find(std::size_t uid)
 		{
 			return router_session::instance().invoke(uid);
 		}

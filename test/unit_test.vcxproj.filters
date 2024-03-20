@@ -68,13 +68,13 @@
     <ClInclude Include="router.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_context.hpp">
+    <ClInclude Include="..\include\aquarius\invoke\context.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp">
+    <ClInclude Include="..\include\aquarius\invoke\message.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp">
+    <ClInclude Include="..\include\aquarius\invoke\service.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\client.hpp">
@@ -98,7 +98,7 @@
     <ClInclude Include="..\include\aquarius\connect.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp">
+    <ClInclude Include="..\include\aquarius\invoke\session.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
     <ClInclude Include="session.h">
@@ -122,13 +122,13 @@
     <ClInclude Include="..\include\aquarius\service.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\invoke_callback.hpp">
+    <ClInclude Include="..\include\aquarius\invoke\callback.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\xsession.hpp">
+    <ClInclude Include="..\include\aquarius\session\session.hpp">
       <Filter>include\aquarius\session</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\basic_context.hpp">
+    <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\field.hpp">
