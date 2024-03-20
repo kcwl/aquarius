@@ -2,7 +2,7 @@
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/concepts.hpp>
 #include <aquarius/invoke/invoke_callback.hpp>
-#include <aquarius/logger.hpp>
+#include <aquarius/core/logger.hpp>
 #include <aquarius/response.hpp>
 #include <filesystem>
 #include <iostream>

@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/core/logger.hpp>
 #include <aquarius/router/impl/manager.hpp>
 #include <aquarius/service.hpp>
-#include <aquarius/logger.hpp>
 #include <memory>
 
 namespace aquarius
@@ -68,14 +68,13 @@ namespace aquarius
 
 				return false;
 			}
-				
+
 			if (!ptr->init())
 			{
 				XLOG_ERROR() << "[servie] " << ptr->name() << " init error!";
 
 				return false;
 			}
-				
 
 			if (!ptr->run())
 			{

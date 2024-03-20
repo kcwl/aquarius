@@ -189,8 +189,8 @@
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp" />
-    <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\logger.hpp" />
+    <ClInclude Include="..\include\aquarius\core\io_service_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\core\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />
     <ClInclude Include="..\include\aquarius\response.hpp" />

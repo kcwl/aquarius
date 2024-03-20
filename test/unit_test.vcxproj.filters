@@ -83,12 +83,6 @@
     <ClInclude Include="..\include\aquarius\context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\io_service_pool.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\logger.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\request.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -231,6 +225,12 @@
       <Filter>include\aquarius\context\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\elastic.hpp">
+      <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\io_service_pool.hpp">
+      <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\logger.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
   </ItemGroup>

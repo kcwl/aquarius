@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include <aquarius/logger.hpp>
 #include <aquarius/core/asio.hpp>
-#include <aquarius/core/deadline_timer.hpp>
 #include <aquarius/core/core.hpp>
+#include <aquarius/core/deadline_timer.hpp>
+#include <aquarius/core/logger.hpp>
 #include <aquarius/core/uuid.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/session.hpp>
@@ -32,9 +32,7 @@ namespace aquarius
 			, read_buffer_()
 			, dura_(dura)
 			, uid_(uuid::invoke())
-		{
-			
-		}
+		{}
 
 		connect(asio::io_service& io_service, ssl_context_t& basic_context,
 				std::chrono::steady_clock::duration dura = heart_time_interval)
@@ -169,7 +167,7 @@ namespace aquarius
 		}
 
 		void shut_down()
-		{	
+		{
 			if (!socket_.is_open())
 				return;
 

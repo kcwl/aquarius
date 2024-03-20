@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/context/impl/visitor.hpp>
-#include <aquarius/logger.hpp>
+#include <aquarius/core/logger.hpp>
 #include <aquarius/session/xsession.hpp>
 #include <chrono>
 
