@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <aquarius/logger.hpp>
-#include <aquarius/system/asio.hpp>
-#include <aquarius/system/deadline_timer.hpp>
-#include <aquarius/system/defines.hpp>
-#include <aquarius/system/uuid.hpp>
+#include <aquarius/core/asio.hpp>
+#include <aquarius/core/deadline_timer.hpp>
+#include <aquarius/core/core.hpp>
+#include <aquarius/core/uuid.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
 #include <aquarius/session.hpp>
 

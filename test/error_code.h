@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(msg)
 
 BOOST_AUTO_TEST_CASE(category)
 {
-	aquarius::system::system_error_category sec{};
+	aquarius::impl::system_error_category sec{};
 
 	auto condition = sec.default_error_condition(0);
 

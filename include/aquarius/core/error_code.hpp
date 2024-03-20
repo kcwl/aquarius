@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/system/error_code/error_category.hpp>
+#include <aquarius/core/impl/error_category.hpp>
 #include <system_error>
 
 namespace aquarius
@@ -9,21 +9,21 @@ namespace aquarius
 	public:
 		error_code() noexcept
 			: value_(0)
-			, cat_(&system::system_category())
+			, cat_(&impl::system_category())
 		{
 
 		}
 
 		error_code(int value)
 			: value_(value)
-			, cat_(&system::system_category())
+			, cat_(&impl::system_category())
 		{
 
 		}
 
 		error_code(system_errc value)
 			: value_(static_cast<int>(value))
-			, cat_(&system::system_category())
+			, cat_(&impl::system_category())
 		{
 
 		}

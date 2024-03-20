@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/system/error_code/system_error_message.hpp>
+#include <aquarius/core/impl/system_error_message.hpp>
 
 namespace aquarius
 {
-	namespace system
+	namespace impl
 	{
 		inline const std::error_category& system_category() noexcept;
 

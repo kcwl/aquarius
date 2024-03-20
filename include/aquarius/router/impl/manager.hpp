@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/router/impl/router.hpp>
-#include <aquarius/router/impl/singleton.hpp>
+#include <aquarius/core/singleton.hpp>
 
 namespace aquarius
 {
@@ -37,7 +37,7 @@ namespace aquarius
 		};
 
 		template <typename _Single, typename _Ty>
-		class single_manager : public manager<_Ty>, public impl::singleton<_Single>
+		class single_manager : public manager<_Ty>, public singleton<_Single>
 		{};
 	} // namespace impl
 } // namespace aquarius

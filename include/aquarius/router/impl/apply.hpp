@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <aquarius/system/type_traits.hpp>
+#include <aquarius/core/concepts.hpp>
 
 namespace aquarius
 {
@@ -17,7 +17,7 @@ namespace aquarius
 	{
 		static bool apply(const _Func& f, std::shared_ptr<impl::basic_message> msg)
 		{
-			using type = system::function_traits<_Func>::type;
+			using type = function_traits<_Func>::type;
 
 			using element_t = typename type::element_type;
 

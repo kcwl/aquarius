@@ -1,6 +1,6 @@
 #pragma once
+#include <aquarius/core/singleton.hpp>
 #include <aquarius/router/impl/router.hpp>
-#include <aquarius/router/impl/singleton.hpp>
 #include <functional>
 
 namespace aquarius

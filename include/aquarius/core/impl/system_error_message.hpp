@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include <aquarius/system/error_code/system_errc.hpp>
+#include <aquarius/core/impl/system_errc.hpp>
 
 namespace aquarius
 {
-	namespace system
+	namespace impl
 	{
 		class system_error_message
 		{

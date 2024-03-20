@@ -16,7 +16,7 @@ namespace aquarius
 		process_error
 	};
 
-	namespace system
+	namespace impl
 	{
 		inline std::string system_errc_map(int error)
 		{

@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/router/impl/manager.hpp>
 #include <aquarius/session/xsession.hpp>
-#include <aquarius/system/type_traits.hpp>
 #include <functional>
 #include <mutex>
 #include <set>

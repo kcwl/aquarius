@@ -2,7 +2,7 @@
 #include <aquarius/message/field.hpp>
 #include <aquarius/message/impl/header.hpp>
 #include <aquarius/message/impl/protocol.hpp>
-#include <aquarius/system/uuid.hpp>
+#include <aquarius/core/uuid.hpp>
 
 namespace aquarius
 {
