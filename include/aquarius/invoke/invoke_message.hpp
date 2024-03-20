@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/invoke/router_message.hpp>
+#include <aquarius/router/message.hpp>
 
 namespace aquarius
 {
@@ -8,7 +8,7 @@ namespace aquarius
 	{
 		msg_regist(std::size_t key)
 		{
-			router_message::instance().regist(
+			message_generator::instance().regist(
 				key, []() { return std::dynamic_pointer_cast<impl::basic_message>(std::make_shared<_Message>()); });
 		}
 	};
@@ -18,7 +18,7 @@ namespace aquarius
 		template <typename... _Args>
 		static auto invoke(std::size_t key, _Args&... args)
 		{
-			return router_message::instance().invoke(key, args...);
+			return message_generator::instance().invoke(key, args...);
 		}
 	};
 } // namespace aquarius

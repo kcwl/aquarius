@@ -40,6 +40,12 @@
     <Filter Include="include\aquarius\message\impl">
       <UniqueIdentifier>{62c9fe60-8548-4fee-bd39-705bfca0c909}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\router">
+      <UniqueIdentifier>{594a623a-e05d-422b-8bae-79cc42668757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\router\impl">
+      <UniqueIdentifier>{e73a9760-236e-4b21-8fc9-2fa8a7fc5876}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -66,15 +72,6 @@
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\router_context.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\router_message.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\router_service.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\client.hpp">
@@ -122,9 +119,6 @@
     <ClInclude Include="invoke.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\invoke\router_session.hpp">
-      <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -153,12 +147,6 @@
       <Filter>include\aquarius\system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\system\event.hpp">
-      <Filter>include\aquarius\system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\system\router.hpp">
-      <Filter>include\aquarius\system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\system\singleton.hpp">
       <Filter>include\aquarius\system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\system\visitor.hpp">
@@ -205,6 +193,36 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\message\impl\message.hpp">
       <Filter>include\aquarius\message\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\context.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\message.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\service.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\session.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\router.hpp">
+      <Filter>include\aquarius\router\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\singleton.hpp">
+      <Filter>include\aquarius\router\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\generator.hpp">
+      <Filter>include\aquarius\router\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\manager.hpp">
+      <Filter>include\aquarius\router\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\async.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\impl\apply.hpp">
+      <Filter>include\aquarius\router\impl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

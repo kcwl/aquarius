@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/invoke/router_context.hpp>
+#include <aquarius/router/context.hpp>
 
 namespace aquarius
 {
@@ -11,9 +11,9 @@ namespace aquarius
 	template <typename _Context>
 	struct ctx_regist
 	{
-		ctx_regist(const std::size_t& key)
+		ctx_regist(std::size_t key)
 		{
-			router_context::instance().regist(key, []()
+			context_generator::instance().regist(key, []()
 										  { return std::dynamic_pointer_cast<basic_context>(std::make_shared<_Context>()); });
 		}
 	};
@@ -23,7 +23,7 @@ namespace aquarius
 		template <typename... _Args>
 		static auto invoke(std::size_t key, _Args&... args)
 		{
-			return router_context::instance().invoke(key, args...);
+			return context_generator::instance().invoke(key, args...);
 		}
 	};
 } // namespace aquarius

@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/invoke/router_service.hpp>
+#include <aquarius/router/service.hpp>
 
 namespace aquarius
 {
-	template<typename _Service>
+	template <typename _Service>
 	struct service_regist
 	{
 		service_regist(std::size_t service_name)
 		{
-			router_service::instance().regist(service_name, []() { return std::make_shared<_Service>(); });
+			service_manager::instance().regist(service_name, std::make_shared<_Service>());
 		}
 	};
 
@@ -16,24 +16,24 @@ namespace aquarius
 	{
 		static bool run()
 		{
-			return router_service::instance().run();
+			return service_manager::instance().run();
 		}
 
 		static void stop()
 		{
-			return router_service::instance().stop();
+			return service_manager::instance().stop();
 		}
 
 		static bool restart_one(std::size_t key)
 		{
-			return router_service::instance().restart_one(key);
+			return service_manager::instance().restart_one(key);
 		}
 
 		static bool stop_one(std::size_t key)
 		{
-			return router_service::instance().stop_one(key);
+			return service_manager::instance().stop_one(key);
 		}
 	};
-}
+} // namespace aquarius
 
 #define AQUARIUS_SERVICE_REGIST(name, service) static aquarius::service_regist<service> srv_##service(name)

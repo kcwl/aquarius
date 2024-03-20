@@ -5,6 +5,7 @@
 #include <aquarius/system/defines.hpp>
 #include <aquarius/system/uuid.hpp>
 #include <aquarius/invoke/invoke_session.hpp>
+#include <aquarius/session.hpp>
 
 namespace aquarius
 {
@@ -168,9 +169,7 @@ namespace aquarius
 		}
 
 		void shut_down()
-		{
-			invoke_session_helper::close(uuid());
-			
+		{	
 			if (!socket_.is_open())
 				return;
 

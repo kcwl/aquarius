@@ -165,6 +165,16 @@
     <ClInclude Include="..\include\aquarius\message\impl\field.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp" />
+    <ClInclude Include="..\include\aquarius\router\context.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\async.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\apply.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\generator.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\manager.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\router.hpp" />
+    <ClInclude Include="..\include\aquarius\router\impl\singleton.hpp" />
+    <ClInclude Include="..\include\aquarius\router\message.hpp" />
+    <ClInclude Include="..\include\aquarius\router\service.hpp" />
+    <ClInclude Include="..\include\aquarius\router\session.hpp" />
     <ClInclude Include="..\include\aquarius\session\xsession.hpp" />
     <ClInclude Include="..\include\aquarius\system\defines.hpp" />
     <ClInclude Include="..\include\aquarius\elastic.hpp" />
@@ -173,9 +183,6 @@
     <ClInclude Include="..\include\aquarius\invoke\invoke_message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_service.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\invoke_session.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke\router_context.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke\router_message.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke\router_service.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
@@ -184,7 +191,6 @@
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\service.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
-    <ClInclude Include="..\include\aquarius\invoke\router_session.hpp" />
     <ClInclude Include="..\include\aquarius\system\asio.hpp" />
     <ClInclude Include="..\include\aquarius\system\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\system\empty_value.hpp" />
@@ -193,8 +199,6 @@
     <ClInclude Include="..\include\aquarius\system\error_code\system_error_message.hpp" />
     <ClInclude Include="..\include\aquarius\system\event.hpp" />
     <ClInclude Include="..\include\aquarius\message\field.hpp" />
-    <ClInclude Include="..\include\aquarius\system\router.hpp" />
-    <ClInclude Include="..\include\aquarius\system\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\system\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\system\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\system\type_traits.hpp" />

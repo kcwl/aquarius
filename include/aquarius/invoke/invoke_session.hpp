@@ -1,12 +1,12 @@
 #pragma once
+#include <aquarius/context.hpp>
 #include <aquarius/elastic.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/system/defines.hpp>
-#include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/invoke/invoke_context.hpp>
-#include <aquarius/invoke/router_session.hpp>
-#include <aquarius/context.hpp>
+#include <aquarius/invoke/invoke_message.hpp>
 #include <aquarius/message/message.hpp>
+#include <aquarius/router/session.hpp>
+#include <aquarius/system/defines.hpp>
 
 namespace aquarius
 {
@@ -27,10 +27,10 @@ namespace aquarius
 
 			std::shared_ptr<basic_context> context_ptr = session_ptr->get(proto);
 
-			if(!context_ptr)
+			if (!context_ptr)
 				context_ptr = invoke_context_helper::invoke(proto);
 
-			if(!context_ptr)
+			if (!context_ptr)
 				context_ptr = std::make_shared<basic_context>();
 
 			session_ptr->attach(proto, context_ptr);
@@ -59,33 +59,12 @@ namespace aquarius
 
 		static std::shared_ptr<xsession> find(std::size_t uid)
 		{
-			return router_session::instance().find(uid);
+			return router_session::instance().invoke(uid);
 		}
 
-		static void close(std::size_t uid)
-		{
-			auto session_ptr = router_session::instance().find(uid);
-
-			if (!session_ptr)
-				return;
-
-			session_ptr->on_close();
-		}
-
-		static bool erase(std::size_t uid)
+		static void erase(std::size_t uid)
 		{
 			return router_session::instance().erase(uid);
-		}
-
-		template <typename _Response>
-		static void send(std::size_t uid, _Response&& resp)
-		{
-			error_code ec{};
-
-			flex_buffer_t fs{};
-			resp.to_binary(fs, ec);
-
-			router_session::instance().send(uid, std::move(fs));
 		}
 
 		static void timeout()

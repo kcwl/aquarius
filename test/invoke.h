@@ -170,10 +170,6 @@ BOOST_AUTO_TEST_CASE(session)
 
 		BOOST_CHECK(ec);
 
-		aquarius::invoke_session_helper::send(session->uuid(), person_response{});
-
-		aquarius::invoke_session_helper::send(123, person_response{});
-
 		aquarius::invoke_session_helper::broadcast(person_response{});
 
 		aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) {return true; });

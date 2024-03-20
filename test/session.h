@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(session_null)
 
 	BOOST_CHECK(session_ptr == nullptr);
 
-	BOOST_CHECK(aquarius::invoke_session_helper::erase(1001));
+	//BOOST_CHECK(aquarius::invoke_session_helper::erase(1001));
 }
 
 BOOST_AUTO_TEST_CASE(session_full)

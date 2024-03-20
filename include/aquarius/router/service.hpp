@@ -1,23 +1,19 @@
 #pragma once
-#include <aquarius/system/router.hpp>
+#include <aquarius/router/impl/manager.hpp>
 #include <aquarius/service.hpp>
+#include <aquarius/logger.hpp>
 #include <memory>
 
 namespace aquarius
 {
-	class router_service : public system::single_router<router_service, std::shared_ptr<service>>
+	class service_manager : public impl::single_manager<service_manager, std::shared_ptr<service>>
 	{
 	public:
 		bool run()
 		{
-			for (auto& invoke : this->map_invokes_)
-			{
-				services_.insert({ invoke.first, invoke.second() });
-			}
-
 			int result = 1;
 
-			for (auto& service : services_)
+			for (auto& service : this->map_invokes_)
 			{
 				if (!service.second->enable())
 					continue;
@@ -32,7 +28,7 @@ namespace aquarius
 
 		void stop()
 		{
-			for (auto& service : services_)
+			for (auto& service : this->map_invokes_)
 			{
 				if (!service.second->enable())
 					continue;
@@ -43,22 +39,22 @@ namespace aquarius
 
 		bool restart_one(std::size_t key)
 		{
-			auto iter = services_.find(key);
+			auto service = this->invoke(key);
 
-			if (iter == services_.end())
+			if (!service)
 				return false;
 
-			return start_one(iter->second);
+			return start_one(service);
 		}
 
 		bool stop_one(std::size_t key)
 		{
-			auto iter = services_.find(key);
+			auto service = this->invoke(key);
 
-			if (iter == services_.end())
+			if (!service)
 				return false;
 
-			iter->second->stop();
+			service->stop();
 
 			return true;
 		}
@@ -90,8 +86,5 @@ namespace aquarius
 
 			return true;
 		}
-
-	private:
-		std::unordered_map<std::size_t, std::shared_ptr<service>> services_;
 	};
 } // namespace aquarius

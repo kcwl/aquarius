@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/invoke/router_session.hpp>
+#include <aquarius/router/async.hpp>
 
 
 namespace aquarius
@@ -9,12 +9,12 @@ namespace aquarius
 		template<typename _Func>
 		static void regist(std::size_t id, _Func&& f)
 		{
-			router_session::instance().regist(id, std::forward<_Func>(f));
+			async_generator::instance().regist(id, std::bind(&invoker<_Func>::apply, std::move(f), std::placeholders::_1));
 		}
 
 		static bool apply(std::size_t id, std::shared_ptr<impl::basic_message> message)
 		{
-			return router_session::instance().apply(id, message);
+			return async_generator::instance().invoke(id, message);
 		}
 	};
 }

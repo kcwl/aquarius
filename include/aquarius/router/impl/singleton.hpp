@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include <type_traits>
 
 namespace aquarius
 {
-	namespace system
+	namespace impl
 	{
 		template <typename _Ty>
 		class singleton_wrapper : public _Ty
@@ -37,4 +36,4 @@ namespace aquarius
 } // namespace aquarius
 
 template <typename _Ty>
-_Ty* aquarius::system::singleton<_Ty>::instance_ = &singleton<_Ty>::instance();
+_Ty* aquarius::impl::singleton<_Ty>::instance_ = &singleton<_Ty>::instance();
