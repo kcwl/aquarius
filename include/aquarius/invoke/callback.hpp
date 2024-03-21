@@ -12,7 +12,7 @@ namespace aquarius
 			async_generator::instance().regist(id, std::bind(&invoker<_Func>::apply, std::move(f), std::placeholders::_1));
 		}
 
-		static bool apply(std::size_t id, std::shared_ptr<impl::basic_message> message)
+		static bool apply(std::size_t id, std::shared_ptr<basic_message> message)
 		{
 			return async_generator::instance().invoke(id, message);
 		}

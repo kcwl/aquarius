@@ -1,13 +1,10 @@
 #pragma once
-#include <memory>
 #include <aquarius/core/concepts.hpp>
+#include <memory>
 
 namespace aquarius
 {
-	namespace impl
-	{
-		class basic_message;
-	}
+	class basic_message;
 }
 
 namespace aquarius
@@ -15,7 +12,7 @@ namespace aquarius
 	template <typename _Func>
 	struct invoker
 	{
-		static bool apply(const _Func& f, std::shared_ptr<impl::basic_message> msg)
+		static bool apply(const _Func& f, std::shared_ptr<basic_message> msg)
 		{
 			using type = function_traits<_Func>::type;
 
@@ -31,4 +28,4 @@ namespace aquarius
 			return true;
 		}
 	};
-}
+} // namespace aquarius

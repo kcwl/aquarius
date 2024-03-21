@@ -7,10 +7,7 @@
 
 namespace aquarius
 {
-	namespace impl
-	{
-		class basic_message;
-	}
+	class basic_message;
 } // namespace aquarius
 
 namespace aquarius

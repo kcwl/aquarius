@@ -41,7 +41,7 @@ namespace aquarius
 			{
 				buffer.consume(total);
 
-				request_ptr = std::make_shared<impl::basic_message>();
+				request_ptr = std::make_shared<basic_message>();
 			}
 
 			request_ptr->accept(buffer, context_ptr, session_ptr, ec);

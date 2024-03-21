@@ -152,9 +152,6 @@
     <ClInclude Include="..\include\aquarius\message\impl\custom.hpp">
       <Filter>include\aquarius\message\impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\impl\message.hpp">
-      <Filter>include\aquarius\message\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\router\context.hpp">
       <Filter>include\aquarius\router</Filter>
     </ClInclude>

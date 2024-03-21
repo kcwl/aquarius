@@ -8,15 +8,12 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	namespace impl
-	{
-		class basic_message;
-	}
+	class basic_message;
 } // namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public impl::bare_visitor<impl::basic_message>
+	class basic_context : public impl::bare_visitor<basic_message>
 	{
 	public:
 		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
@@ -37,7 +34,8 @@ namespace aquarius
 		basic_context& operator=(const basic_context&) = delete;
 
 	public:
-		virtual error_code visit(impl::basic_message*, std::shared_ptr<basic_session> session_ptr, error_code& ec) override
+		virtual error_code visit(basic_message*, std::shared_ptr<basic_session> session_ptr,
+								 error_code& ec) override
 		{
 			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 

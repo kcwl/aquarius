@@ -171,7 +171,6 @@
     <ClInclude Include="..\include\aquarius\message\impl\custom.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\header.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\field.hpp" />
-    <ClInclude Include="..\include\aquarius\message\impl\message.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\router\context.hpp" />
     <ClInclude Include="..\include\aquarius\router\impl\async.hpp" />

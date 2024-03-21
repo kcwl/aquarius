@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(visitor)
 
 	BOOST_CHECK(ec);
 
-	auto msg = std::make_shared<aquarius::impl::basic_message>();
+	auto msg = std::make_shared<aquarius::basic_message>();
 
 	msg->accept(buffer, nullptr, nullptr, ec);
 
