@@ -156,6 +156,7 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\socket_adapter.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\impl\visitor.hpp" />

@@ -16,7 +16,7 @@ namespace aquarius
 	public:
 		explicit client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
-			, ssl_context_(ssl::context::sslv23)
+			, ssl_context_(asio::ssl::context::sslv23)
 			, conn_ptr_(nullptr)
 		{
 			init_ssl_context();
@@ -87,7 +87,7 @@ namespace aquarius
 										return;
 									}
 
-									conn_ptr_->set_verify_mode(ssl::verify_peer);
+									conn_ptr_->set_verify_mode(asio::ssl::verify_peer);
 
 									conn_ptr_->start();
 								});
@@ -106,7 +106,7 @@ namespace aquarius
 	private:
 		asio::io_service io_service_;
 
-		ssl::context ssl_context_;
+		asio::ssl::context ssl_context_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
 	};
