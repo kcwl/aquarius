@@ -8,6 +8,8 @@ namespace aquarius
 {
 	constexpr static auto heart_time_interval = 10s;
 
+	constexpr static auto timeout_dura = 30ms;
+
 	struct http
 	{};
 

@@ -116,9 +116,6 @@
     <ClInclude Include="invoke.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\session.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="error_code.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -128,7 +125,7 @@
     <ClInclude Include="..\include\aquarius\invoke\callback.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\session.hpp">
+    <ClInclude Include="..\include\aquarius\session\basic_session.hpp">
       <Filter>include\aquarius\session</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
@@ -235,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\connect\socket_adapter.hpp">
       <Filter>include\aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session.hpp">
+      <Filter>include\aquarius\session</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

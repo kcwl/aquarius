@@ -2,7 +2,6 @@
 #include <aquarius/core/deadline_timer.hpp>
 #include <aquarius/core/io_service_pool.hpp>
 #include <aquarius/invoke/service.hpp>
-#include <aquarius/invoke/session.hpp>
 
 namespace aquarius
 {
@@ -139,8 +138,6 @@ namespace aquarius
 
 						return;
 					}
-
-					invoke_session_helper::timeout();
 
 					this->dead_line();
 				});

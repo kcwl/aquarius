@@ -18,17 +18,12 @@ namespace aquarius
 
 			uint32_t proto{};
 
-			std::size_t total{};
-
 			if (!elastic::from_binary(proto, buffer))
 				return ec = system_errc::process_error;
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
-			std::shared_ptr<basic_context> context_ptr = session_ptr->get(proto);
-
-			if (!context_ptr)
-				context_ptr = invoke_context_helper::invoke(proto);
+			auto context_ptr = invoke_context_helper::invoke(proto);
 
 			if (!context_ptr)
 				context_ptr = std::make_shared<basic_context>();
@@ -39,12 +34,15 @@ namespace aquarius
 
 			if (!request_ptr)
 			{
-				buffer.consume(total);
-
 				request_ptr = std::make_shared<basic_message>();
 			}
 
-			request_ptr->accept(buffer, context_ptr, session_ptr, ec);
+			auto future = std::async(std::launch::async, [&]
+					   {
+						   request_ptr->accept(buffer, context_ptr, session_ptr, ec);
+					   });
+
+			future.wait_for(timeout_dura);
 
 			if (!ec)
 				session_ptr->detach(proto);
@@ -65,11 +63,6 @@ namespace aquarius
 		static void erase(std::size_t uid)
 		{
 			return router_session::instance().erase(uid);
-		}
-
-		static void timeout()
-		{
-			router_session::instance().timeout();
 		}
 
 		template <typename _Response>

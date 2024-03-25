@@ -49,16 +49,6 @@ namespace aquarius
 			}
 		}
 
-		void timeout()
-		{
-			std::lock_guard lk(mutex_);
-
-			for (auto& session : sessions_)
-			{
-				session.second->on_timeout();
-			}
-		}
-
 	private:
 		std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
 

@@ -20,16 +20,6 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual void on_close() override
-		{
-			// clear
-		}
-
-		virtual void on_timeout() override
-		{
-			// timeout
-		}
-
 		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr, error_code& ec)
 		{
 			request_ptr_ = req;

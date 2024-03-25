@@ -25,6 +25,11 @@ namespace aquarius
 			return socket_;
 		}
 
+		auto get_executor()
+		{
+			return socket_.get_executor();
+		}
+
 		template <typename _Func>
 		void start(_Func&& f)
 		{

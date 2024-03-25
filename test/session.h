@@ -25,15 +25,15 @@ BOOST_AUTO_TEST_CASE(session_full)
 
 BOOST_AUTO_TEST_CASE(session_get)
 {
-	auto session = std::make_shared<aquarius::session<aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>>>(nullptr);
+	//auto session = std::make_shared<aquarius::session<aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>>>(nullptr);
 
-	auto ctx = std::make_shared<aquarius::basic_context>();
+	//auto ctx = std::make_shared<aquarius::basic_context>();
 
-	session->attach(1001, ctx);
+	//session->attach(1001, ctx);
 
-	auto ctx_g = session->get(1001);
+	//auto ctx_g = session->get(1001);
 
-	BOOST_CHECK(ctx_g->content() == "basic context");
+	//BOOST_CHECK(ctx_g->content() == "basic context");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

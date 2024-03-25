@@ -2,7 +2,7 @@
 #include <aquarius/connect/socket_adapter.hpp>
 #include <aquarius/core/uuid.hpp>
 #include <aquarius/invoke/session.hpp>
-#include <aquarius/session.hpp>
+#include <aquarius/session/session.hpp>
 
 namespace aquarius
 {
@@ -144,6 +144,11 @@ namespace aquarius
 		void set_verify_mode(asio::ssl::verify_mode v)
 		{
 			socket_.set_verify_mode(v);
+		}
+
+		auto get_executor()
+		{
+			return socket_.get_executor();
 		}
 
 	private:

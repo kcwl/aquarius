@@ -15,6 +15,24 @@ namespace aquarius
 
 	public:
 		DEFINE_VISITABLE()
+
+	public:
+		error_code from_binary(flex_buffer_t& stream, error_code& ec)
+		{
+			std::size_t length{};
+
+			if (!elastic::from_binary(length, stream))
+				return ec = system_errc::invalid_stream;
+
+			stream.consume(length);
+
+			return ec = {};
+		}
+
+		error_code to_binary(flex_buffer_t&, error_code& ec)
+		{
+			return ec = system_errc::invalid_message;
+		}
 	};
 
 	template <typename _Header, typename _Body, std::size_t N>
