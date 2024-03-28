@@ -163,7 +163,7 @@ namespace aquarius
 
 			keep_alive(true);
 
-			if constexpr (ConnMode == conn_mode::server)
+			if constexpr (ConnMode == conn_mode::basic_server)
 			{
 				reuse_address(true);
 

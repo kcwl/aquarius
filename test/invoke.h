@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(session)
 
 		elastic::to_binary(12001u, buffer);
 
-		auto session = std::make_shared<aquarius::session<aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>>>(nullptr);
+		auto session = std::make_shared<aquarius::session<aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
 
 		aquarius::invoke_session_helper::push(session);
 

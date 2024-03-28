@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/io_service_pool.hpp>
+#include <aquarius/server/io_service_pool.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 BOOST_AUTO_TEST_SUITE(io_service_pool)

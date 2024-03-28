@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 BOOST_AUTO_TEST_CASE(call_back)
 {
 	{
-		using connect_t = aquarius::connect<aquarius::tcp, aquarius::conn_mode::server, aquarius::ssl_mode::ssl>;
+		using connect_t = aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>;
 
 		aquarius::asio::io_service io_service;
 

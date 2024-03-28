@@ -19,7 +19,7 @@ namespace aquarius
 	enum class conn_mode
 	{
 		client,
-		server
+		basic_server
 	};
 
 	enum class ssl_mode

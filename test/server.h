@@ -2,7 +2,7 @@
 #include <boost/test/unit_test_suite.hpp>
 #include <aquarius.hpp>
 
-BOOST_AUTO_TEST_SUITE(server)
+BOOST_AUTO_TEST_SUITE(basic_server)
 
 struct person_body_request
 {

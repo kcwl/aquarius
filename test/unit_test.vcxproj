@@ -182,6 +182,7 @@
     <ClInclude Include="..\include\aquarius\router\message.hpp" />
     <ClInclude Include="..\include\aquarius\router\service.hpp" />
     <ClInclude Include="..\include\aquarius\router\session.hpp" />
+    <ClInclude Include="..\include\aquarius\server\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\session\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\core\core.hpp" />
     <ClInclude Include="..\include\aquarius\core\elastic.hpp" />
@@ -189,7 +190,6 @@
     <ClInclude Include="..\include\aquarius\invoke\message.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\service.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\session.hpp" />
-    <ClInclude Include="..\include\aquarius\core\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\core\logger.hpp" />
     <ClInclude Include="..\include\aquarius\message\message.hpp" />
     <ClInclude Include="..\include\aquarius\request.hpp" />

@@ -1,35 +1,32 @@
 #pragma once
-#include <aquarius/core/deadline_timer.hpp>
-#include <aquarius/core/io_service_pool.hpp>
-#include <aquarius/invoke/service.hpp>
+#include <aquarius/server/io_service_pool.hpp>
 
 namespace aquarius
 {
-	template <typename _Connector>
-	class server
+	template <typename _Connector, typename _Service>
+	class basic_server
 	{
 		using connect_t = _Connector;
 
+		using service_t = _Service;
+
 	public:
-		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
+		explicit basic_server(int32_t port, int io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, endpoint_(asio::ip::tcp::v4(), static_cast<uint16_t>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, ssl_context_(asio::ssl_context_t::sslv23)
 			, server_name_(name)
-			, timer_(io_service_pool_.get_io_service())
 		{
 			init_ssl_context();
 
 			init_signal();
 
 			start_accept();
-
-			dead_line();
 		}
 
-		~server() = default;
+		~basic_server() = default;
 
 	public:
 		void run()
@@ -38,7 +35,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			invoke_service_helper::run();
+			service_t::run();
 
 			io_service_pool_.run();
 		}
@@ -92,11 +89,9 @@ namespace aquarius
 
 			ec ? error_message = ec.message() : std::string{};
 
-			timer_.cancel(ec);
-
 			close();
 
-			invoke_service_helper::stop();
+			service_t::stop();
 
 			io_service_pool_.stop();
 
@@ -122,25 +117,8 @@ namespace aquarius
 			signals_.add(SIGQUIT);
 #endif
 
-			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
-		}
-
-		void dead_line()
-		{
-			timer_.expires_from_now(30ms);
-
-			timer_.async_wait(
-				[this](asio::error_code ec)
-				{
-					if (ec)
-					{
-						XLOG_ERROR() << "global timer is occur error!";
-
-						return;
-					}
-
-					this->dead_line();
-				});
+			signals_.async_wait(
+				std::bind(&basic_server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 		}
 
 	private:
@@ -155,7 +133,5 @@ namespace aquarius
 		asio::ssl_context_t ssl_context_;
 
 		std::string server_name_;
-
-		deadline_timer timer_;
 	};
 } // namespace aquarius

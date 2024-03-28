@@ -7,16 +7,17 @@
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/service.hpp>
+#include <aquarius/invoke/service.hpp>
 
 namespace aquarius
 {
-	using tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::ssl>>;
+	using tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::ssl>, invoke_service_helper>;
 
-	using no_ssl_tcp_server = server<connect<tcp, conn_mode::server, ssl_mode::nossl>>;
+	using no_ssl_tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::nossl>, invoke_service_helper>;
 
-	using http_server = server<connect<http, conn_mode::server, ssl_mode::nossl>>;
+	using http_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::nossl>, invoke_service_helper>;
 
-	using https_server = server<connect<http, conn_mode::server, ssl_mode::ssl>>;
+	using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, invoke_service_helper>;
 
 	using tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::ssl>>;
 

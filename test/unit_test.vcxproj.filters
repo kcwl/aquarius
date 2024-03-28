@@ -52,6 +52,9 @@
     <Filter Include="include\aquarius\connect">
       <UniqueIdentifier>{e99ee23c-1236-4f9e-ac56-3df3e449946d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\server">
+      <UniqueIdentifier>{3ded0761-2f3e-473d-8243-94a8255ec014}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -224,9 +227,6 @@
     <ClInclude Include="..\include\aquarius\core\elastic.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\io_service_pool.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\logger.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
@@ -235,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\session\session.hpp">
       <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\server\io_service_pool.hpp">
+      <Filter>include\aquarius\server</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
