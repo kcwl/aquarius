@@ -23,64 +23,69 @@ namespace aquarius
 			virtual ~visitable() = default;
 
 		public:
-			virtual error_code accept(flex_buffer_t& buffer, std::shared_ptr<basic_context> ctx,
-									  std::shared_ptr<basic_session> session_ptr, error_code& ec) = 0;
+			virtual bool accept(flex_buffer_t& buffer, std::shared_ptr<basic_context> ctx,
+								std::shared_ptr<basic_session> session_ptr) = 0;
 		};
 
 		template <typename _Request>
-		static error_code accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<basic_context> ctx,
-											 std::shared_ptr<basic_session> session_ptr, error_code& ec)
+		static bool accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<basic_context> ctx,
+									   std::shared_ptr<basic_session> session_ptr)
 		{
 			using visitor_t = shared_visitor<_Request>;
 
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
 			if (!visit_ptr)
-				return ec = system_errc::invalid_context;
+				return false;
 
-			return visit_ptr->visit(req, session_ptr, ec);
+			return visit_ptr->visit(req, session_ptr);
 		}
 
 		template <typename _Request>
-		static error_code accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
-										   std::shared_ptr<basic_session> session_ptr, error_code& ec)
+		static bool accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
+									 std::shared_ptr<basic_session> session_ptr)
 		{
 			using visitor_t = bare_visitor<basic_message>;
 
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
 			if (!visit_ptr)
-				return ec = system_errc::invalid_context;
+				return false;
 
-			return visit_ptr->visit(req, session_ptr, ec);
+			return visit_ptr->visit(req, session_ptr);
 		}
 	} // namespace impl
 } // namespace aquarius
 
 #define DEFINE_VISITABLE_REQUEST()                                                                                     \
-	virtual aquarius::error_code accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx, \
-										std::shared_ptr<aquarius::basic_session> session_ptr, aquarius::error_code& ec)     \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
 	{                                                                                                                  \
+		aquarius::error_code ec{};                                                                                     \
 		this->from_binary(buffer, ec);                                                                                 \
 		if (ec)                                                                                                        \
 			return ec;                                                                                                 \
-		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr, ec);                                     \
+		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
 	}
 
 #define DEFINE_VISITABLE_RESPONSE()                                                                                    \
-	virtual aquarius::error_code accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx, \
-										std::shared_ptr<aquarius::basic_session> session_ptr, aquarius::error_code& ec)     \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
 	{                                                                                                                  \
+		aquarius::error_code ec{};                                                                                     \
 		this->from_binary(buffer, ec);                                                                                 \
 		if (ec)                                                                                                        \
 			return ec;                                                                                                 \
-		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr, ec);                                     \
+		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
 	}
 
 #define DEFINE_VISITABLE()                                                                                             \
-	virtual aquarius::error_code accept(                                                                               \
-		[[maybe_unused]] aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                \
-		[[maybe_unused]] std::shared_ptr<aquarius::basic_session> session_ptr, aquarius::error_code& ec)                    \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
 	{                                                                                                                  \
-		return accept_bare_impl(this, ctx, session_ptr, ec);                                                           \
+		aquarius::error_code ec{};                                                                                     \
+		this->from_binary(buffer, ec);                                                                                 \
+		if (ec)                                                                                                        \
+			return ec;                                                                                                 \
+		return accept_bare_impl(this, ctx, session_ptr);                                                               \
 	}

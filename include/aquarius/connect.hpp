@@ -1,8 +1,7 @@
 ﻿#pragma once
-#include <aquarius/connect/socket_adapter.hpp>
+#include <aquarius/connect/impl/socket_adapter.hpp>
 #include <aquarius/core/uuid.hpp>
 #include <aquarius/invoke/session.hpp>
-#include <aquarius/session/session.hpp>
 
 namespace aquarius
 {
@@ -15,20 +14,17 @@ namespace aquarius
 
 		using this_type = connect<_Protocol, ConnMode, SSLMode>;
 
-		using socket_adapter_t = socket_adapter<ConnMode, SSLMode>;
+		using socket_adapter_t = impl::socket_adapter<ConnMode, SSLMode>;
 
 	public:
-		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx,
-						 std::chrono::steady_clock::duration dura = heart_time_interval)
+		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket), ctx)
 			, read_buffer_()
-			, dura_(dura)
-			, uid_(uuid::invoke())
+			, uuid_(uuid::invoke())
 		{}
 
-		connect(asio::io_service& io_service, asio::ssl_context_t& basic_context,
-				std::chrono::steady_clock::duration dura = heart_time_interval)
-			: connect(std::move(asio::ip::tcp::socket(io_service)), basic_context, dura)
+		connect(asio::io_service& io_service, asio::ssl_context_t& basic_context)
+			: connect(std::move(asio::ip::tcp::socket(io_service)), basic_context)
 		{}
 
 		virtual ~connect()
@@ -60,11 +56,7 @@ namespace aquarius
 		{
 			auto self = this->shared_from_this();
 
-			return socket_.start(
-				[self, this]
-				{
-					this->establish_async_read();
-				});
+			return socket_.start([self, this] { this->establish_async_read(); });
 		}
 
 		void async_read()
@@ -94,27 +86,22 @@ namespace aquarius
 
 										read_buffer_.commit(bytes_transferred);
 
-										error_code ecr{};
-
-										invoke_session_helper::process(read_buffer_, uuid(), ecr);
+										invoke_session_helper::process(read_buffer_, uuid());
 
 										async_read();
 									});
 		}
 
-		template <typename _Func>
-		void async_write(flex_buffer_t&& resp_buf, _Func&& f)
+		void async_write(flex_buffer_t&& resp_buf)
 		{
 			auto self(this->shared_from_this());
 
 			socket_.async_write_some(asio::buffer(resp_buf.wdata(), resp_buf.size()),
-									 [this, self, func = std::move(f)](const asio::error_code& ec,
+									 [this, self](const asio::error_code& ec,
 																	   [[maybe_unused]] std::size_t bytes_transferred)
 									 {
 										 if (!ec)
 										 {
-											 func();
-
 											 return;
 										 }
 
@@ -138,7 +125,7 @@ namespace aquarius
 
 		std::size_t uuid() const
 		{
-			return uid_;
+			return uuid_;
 		}
 
 		void set_verify_mode(asio::ssl::verify_mode v)
@@ -155,7 +142,7 @@ namespace aquarius
 		void establish_async_read()
 		{
 			XLOG_INFO() << "handshake success at " << remote_address() << ":" << remote_port()
-				<< ", async read establish";
+						<< ", async read establish";
 
 			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
@@ -209,8 +196,6 @@ namespace aquarius
 
 		flex_buffer_t read_buffer_;
 
-		std::chrono::steady_clock::duration dura_;
-
-		std::size_t uid_;
+		std::size_t uuid_;
 	};
 } // namespace aquarius

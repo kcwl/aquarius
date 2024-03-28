@@ -59,7 +59,7 @@ namespace aquarius
 
 			req.to_binary(fs, ec);
 
-			conn_ptr_->async_write(std::move(fs), [] {});
+			conn_ptr_->async_write(std::move(fs));
 		}
 
 		std::string remote_address()

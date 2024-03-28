@@ -147,9 +147,7 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::error_code ec;
 
-		aquarius::invoke_session_helper::process(buffer, 10001, ec);
-
-		BOOST_CHECK(ec);
+		BOOST_CHECK(aquarius::invoke_session_helper::process(buffer, 10001));
 
 		elastic::to_binary(12001u, buffer);
 
@@ -157,18 +155,14 @@ BOOST_AUTO_TEST_CASE(session)
 
 		aquarius::invoke_session_helper::push(session);
 
-		aquarius::invoke_session_helper::process(buffer, session->uuid(), ec);
-
-		BOOST_CHECK(ec);
+		BOOST_CHECK(aquarius::invoke_session_helper::process(buffer, session->uuid()));
 
 		buffer.pubseekpos(0, std::ios::out);
 
 		elastic::to_binary(45u, buffer);
 		buffer.commit(45);
 
-		aquarius::invoke_session_helper::process(buffer, session->uuid(),ec);
-
-		BOOST_CHECK(ec);
+		aquarius::invoke_session_helper::process(buffer, session->uuid());
 
 		aquarius::invoke_session_helper::broadcast(person_response{});
 
@@ -196,15 +190,11 @@ BOOST_AUTO_TEST_CASE(visitor)
 
 	req->to_binary(buffer, ec);
 
-	req->accept(buffer, nullptr, nullptr, ec);
-
-	BOOST_CHECK(ec);
+	BOOST_CHECK(req->accept(buffer, nullptr, nullptr));
 
 	auto msg = std::make_shared<aquarius::basic_message>();
 
-	msg->accept(buffer, nullptr, nullptr, ec);
-
-	BOOST_CHECK(ec);
+	BOOST_CHECK(msg->accept(buffer, nullptr, nullptr));
 }
 
 BOOST_AUTO_TEST_CASE(callback)

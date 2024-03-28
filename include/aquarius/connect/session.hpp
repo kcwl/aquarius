@@ -46,7 +46,7 @@ namespace aquarius
 
 			auto ptr = conn_ptr_.lock();
 
-			ptr->async_write(std::forward<flex_buffer_t>(buffer), [] {});
+			ptr->async_write(std::forward<flex_buffer_t>(buffer));
 
 			return true;
 		}

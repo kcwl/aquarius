@@ -1,8 +1,6 @@
 #pragma once
-#include <aquarius/context.hpp>
 #include <aquarius/core/core.hpp>
 #include <aquarius/core/elastic.hpp>
-#include <aquarius/core/error_code.hpp>
 #include <aquarius/invoke/context.hpp>
 #include <aquarius/invoke/message.hpp>
 #include <aquarius/message/message.hpp>
@@ -12,16 +10,25 @@ namespace aquarius
 {
 	struct invoke_session_helper
 	{
-		static error_code process(flex_buffer_t& buffer, std::size_t uid, error_code& ec)
+		static bool process(flex_buffer_t& buffer, std::size_t uid)
 		{
 			auto session_ptr = find(uid);
 
 			uint32_t proto{};
 
 			if (!elastic::from_binary(proto, buffer))
-				return ec = system_errc::process_error;
+			{
+				XLOG_ERROR() << "parse proto error, maybe message is not complete.";
+
+				return false;
+			}
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
+
+			if (!request_ptr)
+			{
+				request_ptr = std::make_shared<basic_message>();
+			}
 
 			auto context_ptr = invoke_context_helper::invoke(proto);
 
@@ -32,22 +39,12 @@ namespace aquarius
 
 			context_ptr->on_accept();
 
-			if (!request_ptr)
-			{
-				request_ptr = std::make_shared<basic_message>();
-			}
-
-			auto future = std::async(std::launch::async, [&]
-					   {
-						   request_ptr->accept(buffer, context_ptr, session_ptr, ec);
-					   });
+			auto future =
+				std::async(std::launch::async, [&] { request_ptr->accept(buffer, context_ptr, session_ptr); });
 
 			future.wait_for(timeout_dura);
 
-			if (!ec)
-				session_ptr->detach(proto);
-
-			return ec;
+			return true;
 		}
 
 		static bool push(std::shared_ptr<basic_session> session_ptr)
@@ -73,6 +70,13 @@ namespace aquarius
 			flex_buffer_t fs{};
 			resp.to_binary(fs, ec);
 
+			if (ec)
+			{
+				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
+
+				return;
+			}
+
 			router_session::instance().broadcast(std::move(fs));
 		}
 
@@ -83,6 +87,13 @@ namespace aquarius
 
 			flex_buffer_t fs{};
 			resp.to_binary(fs, ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
+
+				return;
+			}
 
 			router_session::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
 		}

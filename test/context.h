@@ -1,9 +1,8 @@
 #pragma once
-#include <boost/test/unit_test_suite.hpp>
 #include <aquarius.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 BOOST_AUTO_TEST_SUITE(basic_context)
-
 
 struct person_body_request
 {
@@ -20,18 +19,18 @@ struct person_body_request
 private:
 	friend class elastic::access;
 
-	template<typename _Archive>
+	template <typename _Archive>
 	void serialize(_Archive& ar)
 	{
-		ar& sex;
-		ar& role_data;
-		ar& mana;
-		ar& hp;
-		ar& age;
-		ar& money;
-		ar& name;
-		ar& back_money;
-		ar& crc;
+		ar & sex;
+		ar & role_data;
+		ar & mana;
+		ar & hp;
+		ar & age;
+		ar & money;
+		ar & name;
+		ar & back_money;
+		ar & crc;
 	}
 };
 
@@ -50,18 +49,18 @@ struct person_body_response
 private:
 	friend class elastic::access;
 
-	template<typename _Archive>
+	template <typename _Archive>
 	void serialize(_Archive& ar)
 	{
-		ar& sex;
-		ar& role_data;
-		ar& mana;
-		ar& hp;
-		ar& age;
-		ar& money;
-		ar& name;
-		ar& back_money;
-		ar& crc;
+		ar & sex;
+		ar & role_data;
+		ar & mana;
+		ar & hp;
+		ar & age;
+		ar & money;
+		ar & name;
+		ar & back_money;
+		ar & crc;
 	}
 };
 
@@ -76,7 +75,7 @@ public:
 	{}
 
 public:
-	virtual aquarius::error_code handle() override
+	virtual bool handle() override
 	{
 		std::cout << "server ctx\n";
 		response_.body().age = 1;
@@ -84,7 +83,7 @@ public:
 
 		send_response(0);
 
-		return aquarius::error_code{};
+		return true;
 	}
 };
 
@@ -96,11 +95,7 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 
 	aquarius::flex_buffer_t buffer{};
 
-	aquarius::error_code ec;
-
-	req->accept(buffer, ctx, nullptr, ec);
-
-	BOOST_CHECK(ec);
+	BOOST_CHECK(req->accept(buffer, ctx, nullptr));
 }
 
 BOOST_AUTO_TEST_CASE(call_back)
@@ -117,13 +112,11 @@ BOOST_AUTO_TEST_CASE(call_back)
 		ssl_context_t ssl_context(ssl_context_t::sslv23);
 
 		ssl_context.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
-			ssl_context_t::single_dh_use);
+								ssl_context_t::single_dh_use);
 
 		ssl_context.use_certificate_chain_file("crt/server.crt");
 		ssl_context.use_private_key_file("crt/server.key", ssl_context_t::pem);
 		ssl_context.use_tmp_dh_file("crt/dh512.pem");
-
-		
 
 		auto conn = std::make_shared<connect_t>(std::move(socket), ssl_context);
 
@@ -149,7 +142,7 @@ BOOST_AUTO_TEST_CASE(function)
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
-	BOOST_CHECK(!request_ptr->accept(buffer, context_ptr, nullptr,ec));
+	BOOST_CHECK(!request_ptr->accept(buffer, context_ptr, nullptr));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

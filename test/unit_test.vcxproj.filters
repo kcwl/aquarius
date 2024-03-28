@@ -25,9 +25,6 @@
     <Filter Include="include\aquarius\message">
       <UniqueIdentifier>{0d5dd5db-33d3-4f0e-8872-6db7b9f0ecb3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\session">
-      <UniqueIdentifier>{7db6ff92-099d-452e-be84-d69c36512274}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\context">
       <UniqueIdentifier>{9924ba07-6896-417b-ac11-dfb77ea483f4}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="include\aquarius\server">
       <UniqueIdentifier>{3ded0761-2f3e-473d-8243-94a8255ec014}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\connect\impl">
+      <UniqueIdentifier>{5c96983d-6124-4322-ae2b-de5979d10039}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -127,9 +127,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\invoke\callback.hpp">
       <Filter>include\aquarius\invoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\basic_session.hpp">
-      <Filter>include\aquarius\session</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
@@ -230,14 +227,17 @@
     <ClInclude Include="..\include\aquarius\core\logger.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect\socket_adapter.hpp">
-      <Filter>include\aquarius\connect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session\session.hpp">
-      <Filter>include\aquarius\session</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\server\io_service_pool.hpp">
       <Filter>include\aquarius\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\session.hpp">
+      <Filter>include\aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\impl\session.hpp">
+      <Filter>include\aquarius\connect\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\impl\socket_adapter.hpp">
+      <Filter>include\aquarius\connect\impl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

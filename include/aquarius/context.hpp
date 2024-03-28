@@ -20,17 +20,24 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr, error_code& ec)
+		virtual bool visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
 
 			session_ptr_ = session_ptr;
 
-			return ec = handle();
+			auto result = handle();
+
+			if (!result)
+			{
+				XLOG_ERROR() << "[context] " << this->name() << " handle error";
+			}
+
+			return result;
 		}
 
 	protected:
-		virtual error_code handle() = 0;
+		virtual bool handle() = 0;
 
 		bool send_response(error_code result)
 		{
@@ -86,24 +93,28 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr, error_code& ec)
+		virtual bool visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr)
 		{
 			response_ptr_ = resp;
 
 			session_ptr_ = session_ptr;
 
-			ec = handle();
+			auto result = handle();
 
-			if (!ec)
+			if (!result)
 			{
 				invoke_callback_helper::apply(response_ptr_->uuid(), response_ptr_);
 			}
+			else
+			{
+				XLOG_ERROR() << "[context] " << this->name() << " handle error";
+			}
 
-			return ec;
+			return result;
 		}
 
 	protected:
-		virtual error_code handle() = 0;
+		virtual bool handle() = 0;
 
 	protected:
 		std::shared_ptr<_Response> response_ptr_;

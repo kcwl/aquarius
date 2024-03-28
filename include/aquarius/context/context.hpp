@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/connect/impl/session.hpp>
 #include <aquarius/context/impl/visitor.hpp>
 #include <aquarius/core/logger.hpp>
-#include <aquarius/session/basic_session.hpp>
 #include <chrono>
 
 using namespace std::chrono_literals;
@@ -34,14 +34,14 @@ namespace aquarius
 		basic_context& operator=(const basic_context&) = delete;
 
 	public:
-		virtual error_code visit(basic_message*, std::shared_ptr<basic_session> session_ptr, error_code& ec) override
+		virtual bool visit(basic_message*, std::shared_ptr<basic_session> session_ptr) override
 		{
 			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
 
-			return ec = system_errc::invalid_message;
+			return true;
 		}
 
-		std::string content()
+		std::string name()
 		{
 			return name_;
 		}

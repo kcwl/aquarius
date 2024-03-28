@@ -24,13 +24,13 @@ public:
 	{}
 
 public:
-	virtual aquarius::error_code handle() override
+	virtual bool handle() override
 	{
 		response_.body().age = 1;
 
 		send_response(1);
 
-		return aquarius::error_code{};
+		return true;
 	}
 };
 

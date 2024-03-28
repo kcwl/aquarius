@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/core/error_code.hpp>
 
 namespace aquarius
 {
@@ -18,7 +17,7 @@ namespace aquarius
 			virtual ~basic_visitor() = default;
 
 		public:
-			virtual error_code visit(_Request visited, std::shared_ptr<basic_session> session_ptr, error_code& ec) = 0;
+			virtual bool visit(_Request visited, std::shared_ptr<basic_session> session_ptr) = 0;
 		};
 
 		template <typename _Request>

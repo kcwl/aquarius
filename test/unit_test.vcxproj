@@ -156,7 +156,9 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
-    <ClInclude Include="..\include\aquarius\connect\socket_adapter.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\impl\session.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\session.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\impl\socket_adapter.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\impl\visitor.hpp" />
@@ -183,7 +185,6 @@
     <ClInclude Include="..\include\aquarius\router\service.hpp" />
     <ClInclude Include="..\include\aquarius\router\session.hpp" />
     <ClInclude Include="..\include\aquarius\server\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\session\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\core\core.hpp" />
     <ClInclude Include="..\include\aquarius\core\elastic.hpp" />
     <ClInclude Include="..\include\aquarius\invoke\context.hpp" />
@@ -196,7 +197,6 @@
     <ClInclude Include="..\include\aquarius\response.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\service.hpp" />
-    <ClInclude Include="..\include\aquarius\session\session.hpp" />
     <ClInclude Include="..\include\aquarius\core\asio.hpp" />
     <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\core\empty_value.hpp" />
