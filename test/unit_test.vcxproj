@@ -154,6 +154,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\channel.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\group.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\impl\group.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\impl\role.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\publisher.hpp" />
+    <ClInclude Include="..\include\aquarius\channel\subscriber.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
     <ClInclude Include="..\include\aquarius\connect\impl\session.hpp" />

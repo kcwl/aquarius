@@ -55,6 +55,12 @@
     <Filter Include="include\aquarius\connect\impl">
       <UniqueIdentifier>{5c96983d-6124-4322-ae2b-de5979d10039}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\channel">
+      <UniqueIdentifier>{9cda06d1-9deb-420c-8703-6164f5115028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\channel\impl">
+      <UniqueIdentifier>{e676a92a-4145-4032-95ec-b96dccc8e80e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -238,6 +244,27 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\connect\impl\socket_adapter.hpp">
       <Filter>include\aquarius\connect\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\channel.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\publisher.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\impl\role.hpp">
+      <Filter>include\aquarius\channel\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\group.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp">
+      <Filter>include\aquarius\channel\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\impl\group.hpp">
+      <Filter>include\aquarius\channel\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\subscriber.hpp">
+      <Filter>include\aquarius\channel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
