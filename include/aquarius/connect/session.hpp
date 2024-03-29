@@ -18,15 +18,11 @@ namespace aquarius
 			: conn_ptr_(conn_ptr)
 			, mutex_()
 			, ctxs_()
-			, timer_(conn_ptr->get_executor())
 		{
-			deadline();
+
 		}
 
-		virtual ~session()
-		{
-			timer_.cancel();
-		}
+		virtual ~session() = default;
 
 	public:
 		virtual std::size_t uuid() override
@@ -65,50 +61,11 @@ namespace aquarius
 			ctxs_.erase(proto);
 		}
 
-	public:
-		void on_timeout()
-		{
-			std::lock_guard lk(mutex_);
-
-			for (auto& ctx : ctxs_)
-			{
-				if (ctx.second.expired())
-					continue;
-
-				auto ptr = ctx.second.lock();
-				
-				ptr->on_timeout();
-			}
-		}
-
-	private:
-		void deadline()
-		{
-			timer_.expires_from_now(timeout_dura);
-
-			timer_.async_wait(
-				[this](const asio::error_code& ec)
-				{
-					if (ec)
-					{
-						XLOG_WARNING() << "session [" << uuid() << "] occur error: " << ec.message();
-
-						return;
-					}
-
-					on_timeout();
-
-					deadline();
-				});
-		}
-
 	private:
 		std::weak_ptr<_Connector> conn_ptr_;
 
 		std::mutex mutex_;
 
 		std::unordered_multimap<std::size_t, std::weak_ptr<basic_context>> ctxs_;
-
-		deadline_timer timer_;
 	};
 } // namespace aquarius

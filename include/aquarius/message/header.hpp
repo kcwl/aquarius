@@ -102,22 +102,14 @@ namespace aquarius
 
 		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			if (!elastic::to_binary(Number, stream))
-				return ec = system_errc::invalid_stream;
-
-			if (basic_header_type::to_binary(stream, ec) != system_errc::ok)
-				return ec;
-
 			std::size_t current = stream.size();
 
 			elastic::to_binary(uuid_, stream);
 
-			flex_buffer_t header_buffer{};
-
-			if (!elastic::to_binary(*header_ptr_, header_buffer))
+			if (!elastic::to_binary(*header_ptr_, stream))
 				return ec = system_errc::invalid_stream;
 
-			this->add_length(current - stream.size());
+			this->add_length(stream.size() - current);
 
 			return ec = {};
 		}

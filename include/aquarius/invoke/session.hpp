@@ -39,12 +39,7 @@ namespace aquarius
 
 			context_ptr->on_accept();
 
-			auto future =
-				std::async(std::launch::async, [&] { request_ptr->accept(buffer, context_ptr, session_ptr); });
-
-			future.wait_for(timeout_dura);
-
-			return true;
+			return request_ptr->accept(buffer, context_ptr, session_ptr);
 		}
 
 		static bool push(std::shared_ptr<basic_session> session_ptr)

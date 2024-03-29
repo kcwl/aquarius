@@ -101,7 +101,7 @@ namespace aquarius
 
 			auto result = handle();
 
-			if (!result)
+			if (result)
 			{
 				invoke_callback_helper::apply(response_ptr_->uuid(), response_ptr_);
 			}

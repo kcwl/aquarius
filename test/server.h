@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	cli.async_write(std::move(req));
 
 	std::this_thread::sleep_for(1s);
-	cli.close();
+	cli.stop();
 	srv.stop();
 
 	t.join();

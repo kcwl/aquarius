@@ -87,7 +87,7 @@ namespace aquarius
 
 		error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			if (!base_type::to_binary(stream, ec))
+			if (base_type::to_binary(stream, ec) != system_errc::ok)
 				return ec;
 
 			if (!elastic::to_binary(body_, stream))
