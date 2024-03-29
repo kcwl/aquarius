@@ -74,9 +74,6 @@
     <ClInclude Include="server.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="io_service_pool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="router.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -113,7 +110,7 @@
     <ClInclude Include="..\include\aquarius\invoke\session.hpp">
       <Filter>include\aquarius\invoke</Filter>
     </ClInclude>
-    <ClInclude Include="session.h">
+    <ClInclude Include="connect.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="context.h">

@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(function)
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
-	BOOST_CHECK(!request_ptr->accept(buffer, context_ptr, nullptr));
+	BOOST_CHECK(request_ptr->accept(buffer, context_ptr, nullptr));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

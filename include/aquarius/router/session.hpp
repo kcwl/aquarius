@@ -25,11 +25,16 @@ namespace aquarius
 			return true;
 		}
 
+		std::size_t size() const
+		{
+			return this->map_invokes_.size();
+		}
+
 		void broadcast(flex_buffer_t&& buffer)
 		{
 			std::lock_guard lk(mutex_);
 
-			for (auto& session : sessions_)
+			for (auto& session : map_invokes_)
 			{
 				session.second->async_write(std::forward<flex_buffer_t>(buffer));
 			}
@@ -40,7 +45,7 @@ namespace aquarius
 		{
 			std::lock_guard lk(mutex_);
 
-			for (auto& session : sessions_)
+			for (auto& session : map_invokes_)
 			{
 				if (!std::forward<_Func>(f)(session.second))
 					continue;
@@ -48,10 +53,5 @@ namespace aquarius
 				session.second->async_write(std::forward<flex_buffer_t>(buffer));
 			}
 		}
-
-	private:
-		std::unordered_map<std::size_t, std::shared_ptr<basic_session>> sessions_;
-
-		std::mutex mutex_;
 	};
 } // namespace aquarius

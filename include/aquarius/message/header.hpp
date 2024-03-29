@@ -32,11 +32,14 @@ namespace aquarius
 
 	public:
 		tcp_header(tcp_header&& other)
-			: uuid_(std::move(other.uuid_))
+			: uuid_(other.uuid_)
 			, header_ptr_(other.header_ptr_)
 		{
+			other.uuid_ = 0;
 			other.header_ptr_ = nullptr;
 		}
+
+		tcp_header& operator=(const tcp_header&) = default;
 
 	public:
 		header_type* header() noexcept

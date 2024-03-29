@@ -214,11 +214,10 @@
     <ClInclude Include="context.h" />
     <ClInclude Include="error_code.h" />
     <ClInclude Include="invoke.h" />
-    <ClInclude Include="io_service_pool.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="router.h" />
     <ClInclude Include="server.h" />
-    <ClInclude Include="session.h" />
+    <ClInclude Include="connect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -16,6 +16,13 @@ namespace aquarius
 			virtual ~basic_header() = default;
 
 		public:
+			basic_header(basic_header&& other)
+				: length_(other.length_)
+			{
+				other.length_ = 0;
+			}
+
+		public:
 			void add_length(std::size_t length)
 			{
 				length_ += length;

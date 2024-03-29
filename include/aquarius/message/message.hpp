@@ -53,8 +53,11 @@ namespace aquarius
 		virtual ~message() = default;
 
 		message(message&& other)
-			: body_(std::move(other.body_))
-		{}
+			: base_type(std::forward<message>(other))
+			, body_(other.body_)
+		{
+			message{}.swap(other);
+		}
 
 		message& operator=(message&& other)
 		{
@@ -101,8 +104,6 @@ namespace aquarius
 	private:
 		void swap(message& other)
 		{
-			base_type::swap(other);
-
 			body_.swap(other.body_);
 		}
 

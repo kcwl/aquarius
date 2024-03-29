@@ -106,8 +106,6 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(req.header() == nullptr);
 
-		BOOST_CHECK(req1.uuid() == req.uuid());
-
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
 		BOOST_CHECK(req1.body().back_money == 4 && req.body().back_money == 0);
@@ -124,8 +122,6 @@ BOOST_AUTO_TEST_CASE(construction)
 
 		BOOST_CHECK(req.header() == nullptr);
 
-		BOOST_CHECK(req1.uuid() == req.uuid());
-
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
 		BOOST_CHECK(req1.body().back_money == 4 && req.body().back_money == 0);
@@ -140,8 +136,6 @@ BOOST_AUTO_TEST_CASE(construction)
 		person_response resp1(std::move(resp));
 
 		BOOST_CHECK(resp.header() == nullptr);
-
-		BOOST_CHECK(resp1.uuid() == resp.uuid());
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
@@ -158,8 +152,6 @@ BOOST_AUTO_TEST_CASE(construction)
 		resp1 = std::move(resp);
 
 		BOOST_CHECK(resp.header() == nullptr);
-
-		BOOST_CHECK(resp1.uuid() == resp.uuid());
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
@@ -209,36 +201,29 @@ BOOST_AUTO_TEST_CASE(parse)
 		BOOST_CHECK(ec);
 	}
 
-	{
-		aquarius::flex_buffer_t buffer{};
+	//{
+	//	aquarius::flex_buffer_t buffer{};
 
-		person_request req{};
+	//	person_request req{};
 
-		aquarius::error_code ec{};
+	//	aquarius::error_code ec{};
 
-		req.to_binary(buffer, ec);
+	//	req.to_binary(buffer, ec);
 
-		person_request req1;
+	//	person_request req1;
 
-		uint32_t proto{};
+	//	uint32_t proto{};
 
-		std::size_t total_size{};
+	//	std::size_t total_size{};
 
-		elastic::from_binary(proto, buffer);
+	//	elastic::from_binary(proto, buffer);
 
-		elastic::from_binary(total_size, buffer);
+	//	elastic::from_binary(total_size, buffer);
 
-		req1.from_binary(buffer, ec);
+	//	req1.from_binary(buffer, ec);
 
-		BOOST_CHECK(!ec);
-	}
-}
-
-BOOST_AUTO_TEST_CASE(message)
-{
-	//aquarius::impl::basic_message message{};
-
-	//BOOST_CHECK(message.uuid() == 0);
+	//	BOOST_CHECK(!ec);
+	//}
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -39,7 +39,12 @@ namespace aquarius
 
 			context_ptr->on_accept();
 
-			return request_ptr->accept(buffer, context_ptr, session_ptr);
+			auto result = request_ptr->accept(buffer, context_ptr, session_ptr);
+
+			if (result)
+				session_ptr->detach(proto);
+
+			return result;
 		}
 
 		static bool push(std::shared_ptr<basic_session> session_ptr)
@@ -55,6 +60,11 @@ namespace aquarius
 		static void erase(std::size_t uid)
 		{
 			return router_session::instance().erase(uid);
+		}
+
+		static std::size_t size()
+		{
+			return router_session::instance().size();
 		}
 
 		template <typename _Response>
