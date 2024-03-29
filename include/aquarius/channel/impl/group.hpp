@@ -43,16 +43,24 @@ namespace aquarius
 					channels_.erase(topic);
 				}
 
-				void subscribe(const std::string& topic, std::shared_ptr<subscriber_t> subscriber_role)
+				void subscribe(const std::string& topic, subscriber_t* subscriber_role)
 				{
 					std::unique_lock lk(mutex_);
 
 					auto iter = channels_.find(topic);
 
-					if (iter == channels_.end())
-						return;
+					if (iter != channels_.end())
+					{
+						iter->second->subscribe(subscriber_role);
 
-					iter->second->subscribe(subscriber_role);
+						return;
+					}
+					
+					auto channel = std::make_shared<channel_t>();
+
+					channel->subscribe(subscriber_role);
+
+					channels_[topic] = channel;
 				}
 
 				template<typename... _Args>

@@ -18,7 +18,7 @@ namespace aquarius
 			explicit socket_adapter(asio::socket_t socket, asio::ssl_context_t& ctx)
 				: socket_(std::move(socket))
 				, ssl_context_(ctx)
-				, ssl_socket_(socket, ssl_context_)
+				, ssl_socket_(socket_, ssl_context_)
 			{}
 
 		public:

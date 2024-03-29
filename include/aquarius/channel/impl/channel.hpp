@@ -23,7 +23,7 @@ namespace aquarius
 				return topic_;
 			}
 
-			void subscribe(std::shared_ptr<role_t> subscribe_role)
+			void subscribe(role_t* subscribe_role)
 			{
 				subscirbers_.push_back(subscribe_role);
 			}
@@ -39,7 +39,7 @@ namespace aquarius
 		private:
 			std::string topic_;
 
-			std::vector<std::shared_ptr<role_t>> subscirbers_;
+			std::vector<role_t*> subscirbers_;
 		};
 	} // namespace channel
 } // namespace aquarius

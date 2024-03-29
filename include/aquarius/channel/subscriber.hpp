@@ -12,7 +12,7 @@ namespace aquarius
 		public:
 			void subscribe(const std::string& topic)
 			{
-				default_group::instance().subscribe(topic, deri_this()->shared_from_this());
+				default_group::instance().subscribe(topic, deri_this());
 			}
 
 		private:
