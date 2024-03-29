@@ -6,23 +6,17 @@ namespace aquarius
 {
 	namespace channel
 	{
-		template <typename _Ty>
-		class subscriber : public impl::role, public std::enable_shared_from_this<subscriber<_Ty>>
+		template<typename _Ty>
+		class subscriber : public impl::role
 		{
 		public:
 			void subscribe(const std::string& topic)
 			{
-				default_group::instance().subscribe(topic, shared_from_this());
-			}
-
-			template <typename _Func, typename... _Args>
-			void apply(_Func&& f, _Args&&... args)
-			{
-				deri_this()->process(std::forward<_Func>(f), std::forward<_Args>(args)...);
+				default_group::instance().subscribe(topic, deri_this()->shared_from_this());
 			}
 
 		private:
-			void deri_this()
+			_Ty* deri_this()
 			{
 				return static_cast<_Ty*>(this);
 			}

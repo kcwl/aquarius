@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/channel/channel.hpp>
 #include <aquarius/core/singleton.hpp>
 #include <shared_mutex>
 #include <unordered_map>
@@ -14,6 +13,8 @@ namespace aquarius
 			class basic_group : public singleton<basic_group<_Channel>>
 			{
 				using channel_t = _Channel;
+
+				using subscriber_t = typename channel_t::role_t;
 
 			public:
 				std::shared_ptr<channel_t> find(const std::string& topic)
@@ -42,7 +43,7 @@ namespace aquarius
 					channels_.erase(topic);
 				}
 
-				void subscribe(const std::string& topic, std::shared_ptr<subscriber> subscriber_role)
+				void subscribe(const std::string& topic, std::shared_ptr<subscriber_t> subscriber_role)
 				{
 					std::unique_lock lk(mutex_);
 
@@ -54,8 +55,8 @@ namespace aquarius
 					iter->second->subscribe(subscriber_role);
 				}
 
-				template<typename _Func, typename... _Args>
-				void publish(const std::string& topic, _Func&& f, _Args&&... args)
+				template<typename... _Args>
+				void publish(const std::string& topic, const std::string& command, _Args&&... args)
 				{
 					std::unique_lock lk(mutex_);
 
@@ -64,7 +65,7 @@ namespace aquarius
 					if (iter == channels_.end())
 						return;
 
-					iter->second->call(std::forward<_Func>(f), std::forward<_Args>(args)...);
+					iter->second->call(command, std::forward<_Args>(args)...);
 				}
 
 			private:

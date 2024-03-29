@@ -7,42 +7,39 @@ namespace aquarius
 {
 	namespace channel
 	{
-		namespace impl
+		template<typename _Role>
+		class basic_channel
 		{
-			template <typename _Subscribe>
-			class basic_channel
+		public:
+			using role_t = _Role;
+
+		public:
+			basic_channel() = default;
+			~basic_channel() = default;
+
+		public:
+			std::string topic() const
 			{
-				using subscribe_t = _Subscribe;
+				return topic_;
+			}
 
-			public:
-				basic_channel() = default;
-				~basic_channel() = default;
+			void subscribe(std::shared_ptr<role_t> subscribe_role)
+			{
+				subscirbers_.push_back(subscribe_role);
+			}
 
-			public:
-				std::string topic() const
+			void call(const std::string& command)
+			{
+				for (auto& subs : subscirbers_)
 				{
-					return topic_;
+					subs->apply(command);
 				}
+			}
 
-				void subscribe(std::shared_ptr<subscribe_t> subscribe_role)
-				{
-					subscirbers_.push_back(subscribe_role);
-				}
+		private:
+			std::string topic_;
 
-				template<typename _Func, typename... _Args>
-				void call(_Func&& f, _Args&&... args)
-				{
-					for (auto& subs : subscirbers_)
-					{
-						subs->apply(std::forward<_Func>(f), std::forward<_Args>(args)...);
-					}
-				}
-
-			private:
-				std::string topic_;
-
-				std::vector<std::shared_ptr<subscribe_t>> subscirbers_;
-			};
-		} // namespace impl
-	}	  // namespace channel
+			std::vector<std::shared_ptr<role_t>> subscirbers_;
+		};
+	} // namespace channel
 } // namespace aquarius

@@ -1,23 +1,24 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <aquarius/channel/publisher.hpp>
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
+#include <aquarius/invoke/service.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/service.hpp>
-#include <aquarius/invoke/service.hpp>
 
 namespace aquarius
 {
-	using tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::ssl>, invoke_service_helper>;
+	using tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::ssl>, channel::publisher>;
 
-	using no_ssl_tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::nossl>, invoke_service_helper>;
+	using no_ssl_tcp_server = basic_server<connect<tcp, conn_mode::basic_server, ssl_mode::nossl>, channel::publisher>;
 
-	using http_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::nossl>, invoke_service_helper>;
+	using http_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::nossl>, channel::publisher>;
 
-	using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, invoke_service_helper>;
+	using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, channel::publisher>;
 
 	using tcp_client = client<connect<tcp, conn_mode::client, ssl_mode::ssl>>;
 

@@ -3,12 +3,10 @@
 
 namespace aquarius
 {
-	template <typename _Connector, typename _Service>
-	class basic_server
+	template <typename _Connector, typename _Pattern>
+	class basic_server : public _Pattern
 	{
 		using connect_t = _Connector;
-
-		using service_t = _Service;
 
 	public:
 		explicit basic_server(int32_t port, int io_service_pool_size, const std::string& name = {})
@@ -35,7 +33,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			service_t::run();
+			this->publish("service", "run");
 
 			io_service_pool_.run();
 		}
@@ -91,7 +89,7 @@ namespace aquarius
 
 			close();
 
-			service_t::stop();
+			this->publish("service", "stop");
 
 			io_service_pool_.stop();
 

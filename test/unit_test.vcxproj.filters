@@ -257,14 +257,14 @@
     <ClInclude Include="..\include\aquarius\channel\group.hpp">
       <Filter>include\aquarius\channel</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp">
-      <Filter>include\aquarius\channel\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\channel\impl\group.hpp">
       <Filter>include\aquarius\channel\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\channel\subscriber.hpp">
       <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp">
+      <Filter>include\aquarius\channel\impl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
