@@ -1,79 +1,80 @@
 #pragma once
-#include <aquarius/connect/impl/session.hpp>
-#include <aquarius/context/impl/visitor.hpp>
-#include <aquarius/core/logger.hpp>
-#include <chrono>
-
-using namespace std::chrono_literals;
+#include <aquarius/context/impl/context.hpp>
+#include <aquarius/client/callback.hpp>
 
 namespace aquarius
 {
-	class basic_message;
-} // namespace aquarius
-
-namespace aquarius
-{
-	class basic_context : public impl::bare_visitor<basic_message>
+	template <typename _Request, typename _Response>
+	class context : public basic_context, public impl::shared_visitor<_Request>
 	{
 	public:
-		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
-			: name_(name)
-			, timeout_(timeout)
+		context(const std::string& name)
+			: basic_context(name, 1s)
+			, request_ptr_(nullptr)
+			, response_()
 		{}
-
-		basic_context()
-			: basic_context("basic context", 0s)
-		{}
-
-		virtual ~basic_context() = default;
-
-		basic_context(const basic_context&) = delete;
-
-		basic_context(basic_context&&) = default;
-
-		basic_context& operator=(const basic_context&) = delete;
 
 	public:
-		virtual bool visit(basic_message*, std::shared_ptr<basic_session> session_ptr) override
+		virtual void on_accept() override
 		{
-			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
+			// flow monitor
+		}
+
+		virtual bool visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
+		{
+			request_ptr_ = req;
+
+			session_ptr_ = session_ptr;
+
+			auto result = handle();
+
+			if (!result)
+			{
+				XLOG_ERROR() << "[context] " << this->name() << " handle error";
+			}
+
+			return result;
+		}
+
+	protected:
+		virtual bool handle() = 0;
+
+		bool send_response(error_code result)
+		{
+			auto fs = make_response(result);
+
+			this->send_request(std::move(fs));
 
 			return true;
 		}
 
-		std::string name()
+		void make_transfer()
 		{
-			return name_;
+			if (request_ptr_->header()->session_id != 0)
+				return;
+
+			request_ptr_->header()->session_id = this->session_ptr_->uuid();
 		}
 
-	public:
-		virtual void on_accept()
+	private:
+		flex_buffer_t make_response(error_code result)
 		{
-			return;
-		}
+			response_.set_uuid(request_ptr_->uuid());
 
-		virtual void on_timeout()
-		{
-			return;
-		}
+			response_.header()->result = static_cast<int>(result);
 
-	protected:
-		bool send_request(flex_buffer_t&& stream)
-		{
-			if (!session_ptr_)
-				return false;
+			flex_buffer_t fs;
 
-			session_ptr_->async_write(std::move(stream));
+			error_code ec{};
 
-			return true;
+			response_.to_binary(fs, ec);
+
+			return fs;
 		}
 
 	protected:
-		std::string name_;
+		std::shared_ptr<_Request> request_ptr_;
 
-		std::chrono::milliseconds timeout_;
-
-		std::shared_ptr<basic_session> session_ptr_;
+		_Response response_;
 	};
-
 } // namespace aquarius

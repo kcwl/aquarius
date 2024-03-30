@@ -4,7 +4,6 @@
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>
-#include <aquarius/invoke/service.hpp>
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <aquarius/server.hpp>
@@ -30,7 +29,7 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		router_session::instance().broadcast(std::move(fs));
+		session_manager::instance().broadcast(std::move(fs));
 	}
 
 	template <typename _Message, typename _Func>
@@ -39,6 +38,6 @@ namespace aquarius
 		flex_buffer_t fs{};
 		msg.to_binary(fs);
 
-		router_session::instance().broadcast(std::move(fs), std::forward<_Func>(f));
+		session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 	}
 } // namespace aquarius

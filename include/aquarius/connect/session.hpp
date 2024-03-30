@@ -1,7 +1,6 @@
 #pragma once
 #include <any>
-#include <aquarius/context/context.hpp>
-#include <aquarius/core/deadline_timer.hpp>
+#include <aquarius/connect/impl/session.hpp>
 #include <deque>
 #include <memory>
 #include <string>
@@ -18,9 +17,7 @@ namespace aquarius
 			: conn_ptr_(conn_ptr)
 			, mutex_()
 			, ctxs_()
-		{
-
-		}
+		{}
 
 		virtual ~session() = default;
 

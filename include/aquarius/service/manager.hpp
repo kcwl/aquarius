@@ -1,15 +1,15 @@
 #pragma once
 #include <aquarius/channel/subscriber.hpp>
 #include <aquarius/core/logger.hpp>
-#include <aquarius/router/impl/manager.hpp>
-#include <aquarius/service.hpp>
+#include <aquarius/core/manager.hpp>
+#include <aquarius/service/service.hpp>
 #include <memory>
 
 namespace aquarius
 {
-	class service_manager : public impl::single_manager<service_manager, std::shared_ptr<service>>,
-							public channel::subscriber<service_manager>
-							, public std::enable_shared_from_this<service_manager>
+	class service_manager : public single_manager<service_manager, std::shared_ptr<service>>,
+							public channel::subscriber<service_manager>,
+							public std::enable_shared_from_this<service_manager>
 	{
 	public:
 		service_manager()

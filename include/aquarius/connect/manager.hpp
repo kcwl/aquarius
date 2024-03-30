@@ -1,18 +1,13 @@
 #pragma once
-#include <aquarius/router/impl/manager.hpp>
 #include <aquarius/connect/session.hpp>
+#include <aquarius/core/manager.hpp>
 #include <functional>
 #include <mutex>
 #include <set>
 
 namespace aquarius
 {
-	class basic_message;
-} // namespace aquarius
-
-namespace aquarius
-{
-	class router_session : public impl::single_manager<router_session, std::shared_ptr<basic_session>>
+	class session_manager : public single_manager<session_manager, std::shared_ptr<basic_session>>
 	{
 	public:
 		bool push(std::shared_ptr<basic_session> session_ptr)

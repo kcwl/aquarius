@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <aquarius/connect/impl/socket_adapter.hpp>
+#include <aquarius/connect/session.hpp>
 #include <aquarius/core/uuid.hpp>
-#include <aquarius/invoke/session.hpp>
+#include <aquarius/router/router.hpp>
 
 namespace aquarius
 {
@@ -86,7 +87,7 @@ namespace aquarius
 
 										read_buffer_.commit(bytes_transferred);
 
-										invoke_session_helper::process(read_buffer_, uuid());
+										message_router::process(read_buffer_, uuid());
 
 										async_read();
 									});
@@ -96,21 +97,20 @@ namespace aquarius
 		{
 			auto self(this->shared_from_this());
 
-			socket_.async_write_some(asio::buffer(resp_buf.wdata(), resp_buf.size()),
-									 [this, self](const asio::error_code& ec,
-																	   [[maybe_unused]] std::size_t bytes_transferred)
-									 {
-										 if (!ec)
-										 {
-											 return;
-										 }
+			socket_.async_write_some(
+				asio::buffer(resp_buf.wdata(), resp_buf.size()),
+				[this, self](const asio::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+				{
+					if (!ec)
+					{
+						return;
+					}
 
-										 XLOG_ERROR() << "write error at " << remote_address() << "("
-													  << remote_address_u() << "):"
-													  << ":" << remote_port() << "\t" << ec.message();
+					XLOG_ERROR() << "write error at " << remote_address() << "(" << remote_address_u() << "):"
+								 << ":" << remote_port() << "\t" << ec.message();
 
-										 return shut_down();
-									 });
+					return shut_down();
+				});
 		}
 
 		void shut_down()

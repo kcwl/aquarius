@@ -4,15 +4,10 @@
 
 namespace aquarius
 {
-	class basic_message;
-}
-
-namespace aquarius
-{
-	template <typename _Func>
+	template <typename _Func, typename _Message>
 	struct invoker
 	{
-		static bool apply(const _Func& f, std::shared_ptr<basic_message> msg)
+		static bool apply(const _Func& f, std::shared_ptr<_Message> msg)
 		{
 			using type = function_traits<_Func>::type;
 
