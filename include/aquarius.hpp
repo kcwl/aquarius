@@ -1,6 +1,6 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
-#include <aquarius/channel/publisher.hpp>
+#include <aquarius/channel.hpp>
 #include <aquarius/client.hpp>
 #include <aquarius/connect.hpp>
 #include <aquarius/context.hpp>

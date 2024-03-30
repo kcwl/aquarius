@@ -263,5 +263,8 @@
     <ClInclude Include="..\include\aquarius\core\visitable.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

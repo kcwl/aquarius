@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\channel.hpp" />
     <ClInclude Include="..\include\aquarius\channel\channel.hpp" />
     <ClInclude Include="..\include\aquarius\channel\group.hpp" />
     <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp" />
