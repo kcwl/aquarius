@@ -185,6 +185,7 @@
     <ClInclude Include="..\include\aquarius\core\impl\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\impl\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\manager.hpp" />
+    <ClInclude Include="..\include\aquarius\core\visitable.hpp" />
     <ClInclude Include="..\include\aquarius\core\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\message\generator.hpp" />
     <ClInclude Include="..\include\aquarius\message\header.hpp" />
@@ -193,7 +194,6 @@
     <ClInclude Include="..\include\aquarius\message\impl\field.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\core\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\message\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\router\router.hpp" />
     <ClInclude Include="..\include\aquarius\server\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\core\core.hpp" />
@@ -210,7 +210,6 @@
     <ClInclude Include="..\include\aquarius\message\field.hpp" />
     <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
-    <ClInclude Include="..\include\aquarius\message\impl\visitable.hpp" />
     <ClInclude Include="..\include\aquarius\service\manager.hpp" />
     <ClInclude Include="..\include\aquarius\service\service.hpp" />
     <ClInclude Include="context.h" />

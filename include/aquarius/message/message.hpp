@@ -1,13 +1,54 @@
 #pragma once
+#include <aquarius/core/visitable.hpp>
+#include <aquarius/core/elastic.hpp>
 #include <aquarius/message/field.hpp>
 #include <aquarius/message/header.hpp>
-#include <aquarius/message/impl/visitable.hpp>
 #include <cstddef>
 #include <optional>
 
+#define DEFINE_VISITABLE_REQUEST()                                                                                     \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
+	{                                                                                                                  \
+		aquarius::error_code ec{};                                                                                     \
+		this->from_binary(buffer, ec);                                                                                 \
+		if (ec)                                                                                                        \
+			return ec;                                                                                                 \
+		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
+	}
+
+#define DEFINE_VISITABLE_RESPONSE()                                                                                    \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
+	{                                                                                                                  \
+		aquarius::error_code ec{};                                                                                     \
+		this->from_binary(buffer, ec);                                                                                 \
+		if (ec)                                                                                                        \
+			return ec;                                                                                                 \
+		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
+	}
+
+#define DEFINE_VISITABLE()                                                                                             \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
+	{                                                                                                                  \
+		aquarius::error_code ec{};                                                                                     \
+		this->from_binary(buffer, ec);                                                                                 \
+		if (ec)                                                                                                        \
+			return ec;                                                                                                 \
+		return accept_bare_impl(this, ctx, session_ptr);                                                               \
+	}
+
 namespace aquarius
 {
-	class basic_message : public impl::visitable
+	class basic_context;
+
+	class basic_session;
+}
+
+namespace aquarius
+{
+	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>
 	{
 	public:
 		basic_message() = default;

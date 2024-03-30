@@ -1,11 +1,12 @@
 #pragma once
 #include <aquarius/context/content.hpp>
 #include <aquarius/context/context.hpp>
+#include <aquarius/message/generator.hpp>
 
 #define AQUARIUS_MESSAGE_REGIST(req) static aquarius::msg_regist<req> msg_##req(req::Number)
 
 #define MESSAGE_MULTI_DEFINE(name_space, req)                                                                          \
-	static aquarius::ctx::msg_regist<name_space::req> msg_##req(name_space::req::Number)
+	static aquarius::msg_regist<name_space::req> msg_##req(name_space::req::Number)
 
 #define CONTEXT_DEFINE_IMPL(msg, basic_context)                                                                        \
 	static aquarius::ctx_regist<basic_context> ctx_##basic_context(msg::Number)

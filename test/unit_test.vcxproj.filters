@@ -173,9 +173,6 @@
     <ClInclude Include="..\include\aquarius\core\impl\system_error_message.hpp">
       <Filter>include\aquarius\core\impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\impl\visitable.hpp">
-      <Filter>include\aquarius\message\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\elastic.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
@@ -224,9 +221,6 @@
     <ClInclude Include="..\include\aquarius\message\generator.hpp">
       <Filter>include\aquarius\message</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\invoke.hpp">
-      <Filter>include\aquarius\message</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\client\async.hpp">
       <Filter>include\aquarius\client</Filter>
     </ClInclude>
@@ -264,6 +258,9 @@
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\visitor.hpp">
+      <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\visitable.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
   </ItemGroup>
