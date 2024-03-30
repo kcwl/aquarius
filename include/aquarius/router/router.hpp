@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/connect/invoke.hpp>
 #include <aquarius/context/invoke.hpp>
 #include <aquarius/core/core.hpp>
 #include <aquarius/core/elastic.hpp>
@@ -7,6 +6,7 @@
 #include <aquarius/message/invoke.hpp>
 #include <aquarius/message/message.hpp>
 #include <aquarius/context.hpp>
+#include <aquarius/context/generator.hpp>
 
 namespace aquarius
 {

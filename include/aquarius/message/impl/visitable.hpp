@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/context/impl/visitor.hpp>
+#include <aquarius/core/visitor.hpp>
 #include <aquarius/core/elastic.hpp>
 #include <aquarius/core/error_code.hpp>
 
@@ -31,7 +31,7 @@ namespace aquarius
 		static bool accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<basic_context> ctx,
 									   std::shared_ptr<basic_session> session_ptr)
 		{
-			using visitor_t = shared_visitor<_Request>;
+			using visitor_t = shared_visitor<_Request, basic_session>;
 
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
@@ -45,7 +45,7 @@ namespace aquarius
 		static bool accept_bare_impl(_Request* req, std::shared_ptr<basic_context> ctx,
 									 std::shared_ptr<basic_session> session_ptr)
 		{
-			using visitor_t = bare_visitor<basic_message>;
+			using visitor_t = bare_visitor<basic_message, basic_session>;
 
 			auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 

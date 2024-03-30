@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/connect/session.hpp>
+#include <aquarius/context/session.hpp>
 #include <aquarius/core/manager.hpp>
 #include <functional>
 #include <mutex>

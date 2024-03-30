@@ -1,15 +1,14 @@
 #pragma once
 #include <aquarius/context/impl/context.hpp>
-#include <aquarius/client/callback.hpp>
 
 namespace aquarius
 {
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public impl::shared_visitor<_Request>
+	class context : public basic_context, public shared_visitor<_Request, basic_session>
 	{
 	public:
 		context(const std::string& name)
-			: basic_context(name, 1s)
+			: basic_context(name)
 			, request_ptr_(nullptr)
 			, response_()
 		{}
@@ -46,14 +45,6 @@ namespace aquarius
 			this->send_request(std::move(fs));
 
 			return true;
-		}
-
-		void make_transfer()
-		{
-			if (request_ptr_->header()->session_id != 0)
-				return;
-
-			request_ptr_->header()->session_id = this->session_ptr_->uuid();
 		}
 
 	private:

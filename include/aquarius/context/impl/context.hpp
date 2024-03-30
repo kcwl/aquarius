@@ -1,10 +1,7 @@
 #pragma once
-#include <aquarius/connect/impl/session.hpp>
-#include <aquarius/context/impl/visitor.hpp>
+#include <aquarius/context/impl/session.hpp>
 #include <aquarius/core/logger.hpp>
-#include <chrono>
-
-using namespace std::chrono_literals;
+#include <aquarius/core/visitor.hpp>
 
 namespace aquarius
 {
@@ -13,16 +10,15 @@ namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public impl::bare_visitor<basic_message>
+	class basic_context : public bare_visitor<basic_message, basic_session>
 	{
 	public:
-		explicit basic_context(const std::string& name, std::chrono::milliseconds timeout)
+		explicit basic_context(const std::string& name)
 			: name_(name)
-			, timeout_(timeout)
 		{}
 
 		basic_context()
-			: basic_context("basic context", 0s)
+			: basic_context("basic context")
 		{}
 
 		virtual ~basic_context() = default;
@@ -52,11 +48,6 @@ namespace aquarius
 			return;
 		}
 
-		virtual void on_timeout()
-		{
-			return;
-		}
-
 	protected:
 		bool send_request(flex_buffer_t&& stream)
 		{
@@ -70,8 +61,6 @@ namespace aquarius
 
 	protected:
 		std::string name_;
-
-		std::chrono::milliseconds timeout_;
 
 		std::shared_ptr<basic_session> session_ptr_;
 	};

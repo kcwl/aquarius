@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <aquarius/connect/impl/socket_adapter.hpp>
-#include <aquarius/connect/session.hpp>
+#include <aquarius/connect/socket_adapter.hpp>
+#include <aquarius/context/session.hpp>
 #include <aquarius/core/uuid.hpp>
 #include <aquarius/router/router.hpp>
 
@@ -15,7 +15,7 @@ namespace aquarius
 
 		using this_type = connect<_Protocol, ConnMode, SSLMode>;
 
-		using socket_adapter_t = impl::socket_adapter<ConnMode, SSLMode>;
+		using socket_adapter_t = socket_adapter<ConnMode, SSLMode>;
 
 	public:
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)

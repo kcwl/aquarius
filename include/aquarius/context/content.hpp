@@ -4,11 +4,11 @@
 namespace aquarius
 {
 	template <typename _Response>
-	class content : public basic_context, public impl::shared_visitor<_Response>
+	class content : public basic_context, public shared_visitor<_Response, basic_session>
 	{
 	public:
 		content(const std::string& name)
-			: basic_context(name, 1s)
+			: basic_context(name)
 			, response_ptr_()
 		{}
 
