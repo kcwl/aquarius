@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/core/elastic.hpp>
-#include <aquarius/core/error_code.hpp>
 
 namespace aquarius
 {
@@ -34,23 +33,28 @@ namespace aquarius
 			}
 
 		protected:
-			error_code from_binary(flex_buffer_t& stream, error_code& ec)
+			bool from_binary(flex_buffer_t& stream)
 			{
+				auto cur = stream.size();
+
 				if (!elastic::from_binary(length_, stream))
-					return ec = system_errc::invalid_stream;
+					return false;
+
+				cur -= stream.size();
 
 				if (length_ > stream.size())
-					return ec = system_errc::wait_for_query;
+				{
+					stream.consume(-(static_cast<int>(cur)));
 
-				return ec = error_code{};;
+					return false;
+				}
+				
+				return true;
 			}
 
-			error_code to_binary(flex_buffer_t& stream, error_code& ec)
+			bool to_binary(flex_buffer_t& stream)
 			{
-				if (!elastic::to_binary(length_, stream))
-					return ec = system_errc::invalid_stream;
-
-				return {};
+				return elastic::to_binary(length_, stream);
 			}
 
 		private:

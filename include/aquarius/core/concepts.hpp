@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/impl/type_traits.hpp>
+#include <aquarius/core/type_traits.hpp>
 
 namespace aquarius
 {

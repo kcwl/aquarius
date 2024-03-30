@@ -99,8 +99,6 @@ BOOST_AUTO_TEST_CASE(session)
 	{
 		aquarius::flex_buffer_t buffer{};
 
-		aquarius::error_code ec;
-
 		BOOST_CHECK(!aquarius::message_router::process(buffer, 10001));
 
 		elastic::to_binary(12001u, buffer);
@@ -138,11 +136,10 @@ BOOST_AUTO_TEST_CASE(visitor)
 {
 	auto req = std::make_shared<person_request>();
 
-	aquarius::error_code ec{};
 
 	aquarius::flex_buffer_t buffer{};
 
-	req->to_binary(buffer, ec);
+	req->to_binary(buffer);
 
 	BOOST_CHECK(req->accept(buffer, nullptr, nullptr));
 

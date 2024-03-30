@@ -1,8 +1,8 @@
 #pragma once
+#include <aquarius/core/uuid.hpp>
 #include <aquarius/message/field.hpp>
 #include <aquarius/message/impl/header.hpp>
 #include <aquarius/message/impl/protocol.hpp>
-#include <aquarius/core/uuid.hpp>
 
 namespace aquarius
 {
@@ -57,7 +57,7 @@ namespace aquarius
 			return uuid_;
 		}
 
-		error_code complete(flex_buffer_t& stream, error_code& ec)
+		bool complete(flex_buffer_t& stream)
 		{
 			stream.normalize();
 
@@ -65,14 +65,14 @@ namespace aquarius
 			buffer.swap(stream);
 
 			if (!elastic::to_binary(Number, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
-			if (basic_header_type::to_binary(stream, ec) != system_errc::ok)
-				return ec;
+			if (!basic_header_type::to_binary(stream))
+				return false;
 
 			stream.append(std::move(buffer));
 
-			return {};
+			return true;
 		}
 
 		void swap(tcp_header& other)
@@ -89,32 +89,32 @@ namespace aquarius
 		}
 
 	protected:
-		error_code from_binary(flex_buffer_t& stream, error_code& ec)
+		bool from_binary(flex_buffer_t& stream)
 		{
-			if (basic_header_type::from_binary(stream, ec) != system_errc::ok)
-				return ec;
+			if (!basic_header_type::from_binary(stream))
+				return false;
 
-			if(!elastic::from_binary(uuid_, stream))
-				return ec = system_errc::invalid_stream;
+			if (!elastic::from_binary(uuid_, stream))
+				return false;
 
 			if (!elastic::from_binary(*header_ptr_, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
-			return ec = error_code{};;
+			return true;
 		}
 
-		error_code to_binary(flex_buffer_t& stream, error_code& ec)
+		bool to_binary(flex_buffer_t& stream)
 		{
 			std::size_t current = stream.size();
 
 			elastic::to_binary(uuid_, stream);
 
 			if (!elastic::to_binary(*header_ptr_, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
 			this->add_length(stream.size() - current);
 
-			return ec = {};
+			return true;
 		}
 
 	private:

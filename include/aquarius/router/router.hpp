@@ -17,12 +17,16 @@ namespace aquarius
 
 			uint32_t proto{};
 
+			auto cur = buffer.size();
+
 			if (!elastic::from_binary(proto, buffer))
 			{
 				XLOG_ERROR() << "parse proto error, maybe message is not complete.";
 
 				return false;
 			}
+
+			cur -= buffer.size();
 
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
@@ -44,6 +48,8 @@ namespace aquarius
 
 			if (result)
 				session_ptr->detach(proto);
+			else
+				buffer.consume(-(static_cast<int>(cur)));
 
 			return result;
 		}

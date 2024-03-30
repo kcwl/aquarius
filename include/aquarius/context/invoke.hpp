@@ -29,12 +29,10 @@ namespace aquarius
 		template <typename _Response>
 		static void broadcast(_Response&& resp)
 		{
-			error_code ec{};
-
 			flex_buffer_t fs{};
-			resp.to_binary(fs, ec);
+			auto result = resp.to_binary(fs);
 
-			if (ec)
+			if (!result)
 			{
 				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
 
@@ -47,12 +45,10 @@ namespace aquarius
 		template <typename _Response, typename _Pre>
 		static void broadcast_if(_Response&& resp, _Pre&& func)
 		{
-			error_code ec{};
-
 			flex_buffer_t fs{};
-			resp.to_binary(fs, ec);
+			auto result = resp.to_binary(fs);
 
-			if (ec)
+			if (!result)
 			{
 				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
 

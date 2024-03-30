@@ -177,15 +177,11 @@
     <ClInclude Include="..\include\aquarius\context\manager.hpp" />
     <ClInclude Include="..\include\aquarius\context\session.hpp" />
     <ClInclude Include="..\include\aquarius\core\apply.hpp" />
-    <ClInclude Include="..\include\aquarius\core\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\core\generator.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\error_category.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\router.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\system_errc.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\system_error_message.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\time_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\core\impl\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\manager.hpp" />
+    <ClInclude Include="..\include\aquarius\core\router.hpp" />
+    <ClInclude Include="..\include\aquarius\core\time_traits.hpp" />
+    <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\visitable.hpp" />
     <ClInclude Include="..\include\aquarius\core\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\message\generator.hpp" />
@@ -214,7 +210,6 @@
     <ClInclude Include="..\include\aquarius\service\manager.hpp" />
     <ClInclude Include="..\include\aquarius\service\service.hpp" />
     <ClInclude Include="context.h" />
-    <ClInclude Include="error_code.h" />
     <ClInclude Include="invoke.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="router.h" />

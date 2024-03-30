@@ -14,7 +14,7 @@ namespace aquarius
 		response() = default;
 		~response() = default;
 
-		DEFINE_VISITABLE_RESPONSE()
+		AQUARIUS_VISITABLE_MESSAGE()
 
 	public:
 		response(response&& req)

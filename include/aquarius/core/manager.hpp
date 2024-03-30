@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/core/impl/router.hpp>
+#include <aquarius/core/router.hpp>
 #include <aquarius/core/singleton.hpp>
 
 namespace aquarius
 {
 	template <typename _Ty>
-	class manager : public impl::router<std::size_t, _Ty>
+	class manager : public router<std::size_t, _Ty>
 	{
 	public:
 		using value_type = _Ty;

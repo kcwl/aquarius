@@ -134,11 +134,9 @@ BOOST_AUTO_TEST_CASE(function)
 {
 	auto request_ptr = std::make_shared<person_request>();
 
-	aquarius::error_code ec{};
-
 	aquarius::flex_buffer_t buffer{};
 
-	request_ptr->to_binary(buffer, ec);
+	request_ptr->to_binary(buffer);
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 

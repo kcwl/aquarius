@@ -38,7 +38,7 @@ namespace aquarius
 	protected:
 		virtual bool handle() = 0;
 
-		bool send_response(error_code result)
+		bool send_response(int result)
 		{
 			auto fs = make_response(result);
 
@@ -48,7 +48,7 @@ namespace aquarius
 		}
 
 	private:
-		flex_buffer_t make_response(error_code result)
+		flex_buffer_t make_response(int result)
 		{
 			response_.set_uuid(request_ptr_->uuid());
 
@@ -56,9 +56,7 @@ namespace aquarius
 
 			flex_buffer_t fs;
 
-			error_code ec{};
-
-			response_.to_binary(fs, ec);
+			response_.to_binary(fs);
 
 			return fs;
 		}

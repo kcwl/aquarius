@@ -34,9 +34,6 @@
     <Filter Include="include\aquarius\core">
       <UniqueIdentifier>{cc59cd76-2135-40a8-83d7-0ae05a9b6d2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\core\impl">
-      <UniqueIdentifier>{8cb9a4dc-739c-433e-9790-15f7f383bb74}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\context\impl">
       <UniqueIdentifier>{e78b2f64-a8f4-4bf6-ad81-7718c2227fab}</UniqueIdentifier>
     </Filter>
@@ -107,9 +104,6 @@
     <ClInclude Include="invoke.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="error_code.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\service.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -155,24 +149,6 @@
     <ClInclude Include="..\include\aquarius\core\singleton.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\time_traits.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\type_traits.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\error_code.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\error_category.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\system_errc.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\system_error_message.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\elastic.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
@@ -208,9 +184,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\generator.hpp">
       <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\impl\router.hpp">
-      <Filter>include\aquarius\core\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\generator.hpp">
       <Filter>include\aquarius\core</Filter>
@@ -265,6 +238,15 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\channel.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\router.hpp">
+      <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\time_traits.hpp">
+      <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\type_traits.hpp">
+      <Filter>include\aquarius\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

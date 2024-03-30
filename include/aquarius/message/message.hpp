@@ -1,41 +1,28 @@
 #pragma once
-#include <aquarius/core/visitable.hpp>
 #include <aquarius/core/elastic.hpp>
+#include <aquarius/core/visitable.hpp>
 #include <aquarius/message/field.hpp>
 #include <aquarius/message/header.hpp>
 #include <cstddef>
 #include <optional>
 
-#define DEFINE_VISITABLE_REQUEST()                                                                                     \
+#define AQUARIUS_VISITABLE_MESSAGE()                                                                                   \
 	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
 						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
 	{                                                                                                                  \
-		aquarius::error_code ec{};                                                                                     \
-		this->from_binary(buffer, ec);                                                                                 \
-		if (ec)                                                                                                        \
-			return ec;                                                                                                 \
+		auto resullt = this -> from_binary(buffer);                                                                    \
+		if (!resullt)                                                                                                  \
+			return resullt;                                                                                            \
 		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
 	}
 
-#define DEFINE_VISITABLE_RESPONSE()                                                                                    \
+#define AQUARIUS_VISITABLE_BASE()                                                                                      \
 	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
 						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
 	{                                                                                                                  \
-		aquarius::error_code ec{};                                                                                     \
-		this->from_binary(buffer, ec);                                                                                 \
-		if (ec)                                                                                                        \
-			return ec;                                                                                                 \
-		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
-	}
-
-#define DEFINE_VISITABLE()                                                                                             \
-	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
-						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
-	{                                                                                                                  \
-		aquarius::error_code ec{};                                                                                     \
-		this->from_binary(buffer, ec);                                                                                 \
-		if (ec)                                                                                                        \
-			return ec;                                                                                                 \
+		auto resullt = this -> from_binary(buffer);                                                                    \
+		if (!resullt)                                                                                                  \
+			return resullt;                                                                                            \
 		return accept_bare_impl(this, ctx, session_ptr);                                                               \
 	}
 
@@ -44,47 +31,47 @@ namespace aquarius
 	class basic_context;
 
 	class basic_session;
-}
+} // namespace aquarius
 
 namespace aquarius
 {
-	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>
+	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>, public impl::basic_header
 	{
 	public:
 		basic_message() = default;
 		virtual ~basic_message() = default;
 
 	public:
-		DEFINE_VISITABLE()
+		AQUARIUS_VISITABLE_BASE()
 
 	public:
-		error_code from_binary(flex_buffer_t& stream, error_code& ec)
+		bool from_binary(flex_buffer_t& stream)
 		{
 			std::size_t length{};
 
 			if (!elastic::from_binary(length, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
 			stream.consume(length);
 
-			return ec = {};
+			return true;
 		}
 
-		error_code to_binary(flex_buffer_t&, error_code& ec)
+		bool to_binary(flex_buffer_t&)
 		{
-			return ec = system_errc::invalid_message;
+			return true;
 		}
 	};
 
 	template <typename _Header, typename _Body, std::size_t N>
-	class message : public tcp_header<_Header, N>, public basic_message
+	class message : virtual public tcp_header<_Header, N>, virtual public basic_message
 	{
 		using base_type = tcp_header<_Header, N>;
 
 	public:
 		using body_type = _Body;
 
-		DEFINE_VISITABLE()
+		AQUARIUS_VISITABLE_BASE()
 
 	public:
 		message()
@@ -117,29 +104,29 @@ namespace aquarius
 			return body_;
 		}
 
-		error_code from_binary(flex_buffer_t& stream, error_code& ec)
+		bool from_binary(flex_buffer_t& stream)
 		{
-			if (base_type::from_binary(stream, ec) != system_errc::ok)
-				return ec;
+			if (!base_type::from_binary(stream))
+				return false;
 
 			if (!elastic::from_binary(body_, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
-			return ec = error_code{};
+			return true;
 			;
 		}
 
-		error_code to_binary(flex_buffer_t& stream, error_code& ec)
+		bool to_binary(flex_buffer_t& stream)
 		{
-			if (base_type::to_binary(stream, ec) != system_errc::ok)
-				return ec;
+			if (!base_type::to_binary(stream))
+				return false;
 
 			if (!elastic::to_binary(body_, stream))
-				return ec = system_errc::invalid_stream;
+				return false;
 
-			this->complete(stream, ec);
+			this->complete(stream);
 
-			return ec;
+			return true;
 		}
 
 	private:

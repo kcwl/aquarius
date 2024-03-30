@@ -36,15 +36,15 @@ private:
 	template <typename _Archive>
 	void serialize(_Archive& ar)
 	{
-		ar& sex;
-		ar& role_data;
-		ar& mana;
-		ar& hp;
-		ar& age;
-		ar& money;
-		ar& name;
-		ar& back_money;
-		ar& crc;
+		ar & sex;
+		ar & role_data;
+		ar & mana;
+		ar & hp;
+		ar & age;
+		ar & money;
+		ar & name;
+		ar & back_money;
+		ar & crc;
 	}
 };
 
@@ -79,15 +79,15 @@ private:
 	template <typename _Archive>
 	void serialize(_Archive& ar)
 	{
-		ar& sex;
-		ar& role_data;
-		ar& mana;
-		ar& hp;
-		ar& age;
-		ar& money;
-		ar& name;
-		ar& back_money;
-		ar& crc;
+		ar & sex;
+		ar & role_data;
+		ar & mana;
+		ar & hp;
+		ar & age;
+		ar & money;
+		ar & name;
+		ar & back_money;
+		ar & crc;
 	}
 };
 
@@ -167,28 +167,18 @@ BOOST_AUTO_TEST_CASE(parse)
 		person_request req{};
 		req.body().age = 3;
 
-		aquarius::error_code ec{};
-
-		req.to_binary(buffer, ec);
-
-		BOOST_CHECK(ec);
+		BOOST_CHECK(!req.to_binary(buffer));
 	}
 
 	{
-		aquarius::error_code ec{};
-
 		aquarius::flex_buffer_t buffer(2);
 
 		person_request req{};
 
-		req.from_binary(buffer, ec);
-
-		BOOST_CHECK(ec);
+		BOOST_CHECK(!req.from_binary(buffer));
 	}
 
 	{
-		aquarius::error_code ec{};
-
 		aquarius::flex_buffer_t buffer{};
 		elastic::to_binary(10001u, buffer);
 		elastic::to_binary(3u, buffer);
@@ -196,9 +186,7 @@ BOOST_AUTO_TEST_CASE(parse)
 
 		person_request req{};
 
-		req.from_binary(buffer, ec);
-
-		BOOST_CHECK(ec);
+		BOOST_CHECK(!req.from_binary(buffer));
 	}
 
 	//{

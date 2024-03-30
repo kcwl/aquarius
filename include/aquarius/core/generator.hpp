@@ -1,12 +1,12 @@
 #pragma once
-#include <aquarius/core/impl/router.hpp>
+#include <aquarius/core/router.hpp>
 #include <aquarius/core/singleton.hpp>
 #include <functional>
 
 namespace aquarius
 {
 	template <typename _R, typename... _Args>
-	class generator : public impl::router<std::size_t, std::function<_R(_Args...)>>
+	class generator : public router<std::size_t, std::function<_R(_Args...)>>
 	{
 	public:
 		generator() = default;
