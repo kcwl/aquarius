@@ -29,14 +29,7 @@ namespace aquarius
 					return iter->second;
 				}
 
-				void push_back(std::shared_ptr<channel_t> channel)
-				{
-					std::unique_lock lk(mutex_);
-
-					channels_.emplace(channel->topic, channel);
-				}
-
-				void earse(const std::string& topic)
+				void erase(const std::string& topic)
 				{
 					std::unique_lock lk(mutex_);
 
@@ -63,17 +56,18 @@ namespace aquarius
 					channels_[topic] = channel;
 				}
 
-				template<typename... _Args>
-				void publish(const std::string& topic, const std::string& command, _Args&&... args)
+				bool publish(const std::string& topic, const std::string& command)
 				{
 					std::unique_lock lk(mutex_);
 
 					auto iter = channels_.find(topic);
 
 					if (iter == channels_.end())
-						return;
+						return false;
 
-					iter->second->call(command, std::forward<_Args>(args)...);
+					iter->second->call(command);
+
+					return true;
 				}
 
 			private:

@@ -2,105 +2,17 @@
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include "proto_regist.h"
 
 BOOST_AUTO_TEST_SUITE(message)
-
-struct person_body_request
-{
-	bool sex;
-	std::vector<uint8_t> role_data;
-	double mana;
-	float hp;
-	int32_t age;
-	int64_t money;
-	std::string name;
-	uint32_t back_money;
-	uint64_t crc;
-
-	void swap(person_body_request& other)
-	{
-		std::swap(sex, other.sex);
-		std::swap(role_data, other.role_data);
-		std::swap(mana, other.mana);
-		std::swap(hp, other.hp);
-		std::swap(age, other.age);
-		std::swap(money, other.money);
-		std::swap(name, other.name);
-		std::swap(back_money, other.back_money);
-		std::swap(crc, other.crc);
-	}
-
-private:
-	friend class elastic::access;
-
-	template <typename _Archive>
-	void serialize(_Archive& ar)
-	{
-		ar & sex;
-		ar & role_data;
-		ar & mana;
-		ar & hp;
-		ar & age;
-		ar & money;
-		ar & name;
-		ar & back_money;
-		ar & crc;
-	}
-};
-
-struct person_body_response
-{
-	bool sex;
-	std::vector<uint8_t> role_data;
-	double mana;
-	float hp;
-	int32_t age;
-	int64_t money;
-	std::string name;
-	uint32_t back_money;
-	uint64_t crc;
-
-	void swap(person_body_response& other)
-	{
-		std::swap(sex, other.sex);
-		std::swap(role_data, other.role_data);
-		std::swap(mana, other.mana);
-		std::swap(hp, other.hp);
-		std::swap(age, other.age);
-		std::swap(money, other.money);
-		std::swap(name, other.name);
-		std::swap(back_money, other.back_money);
-		std::swap(crc, other.crc);
-	}
-
-private:
-	friend class elastic::access;
-
-	template <typename _Archive>
-	void serialize(_Archive& ar)
-	{
-		ar & sex;
-		ar & role_data;
-		ar & mana;
-		ar & hp;
-		ar & age;
-		ar & money;
-		ar & name;
-		ar & back_money;
-		ar & crc;
-	}
-};
-
-using person_request = aquarius::request<person_body_request, 10000>;
-using person_response = aquarius::response<person_body_response, 10001>;
 
 BOOST_AUTO_TEST_CASE(construction)
 {
 	{
 		person_request req{};
-
 		req.body().age = 3;
 		req.body().back_money = 4;
+		req.add_length(2);
 
 		person_request req1(std::move(req));
 
@@ -109,13 +21,17 @@ BOOST_AUTO_TEST_CASE(construction)
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
 		BOOST_CHECK(req1.body().back_money == 4 && req.body().back_money == 0);
+
+		BOOST_CHECK(req.length() == 0);
+
+		BOOST_CHECK(req.uuid() == 0);
 	}
 
 	{
 		person_request req{};
-
 		req.body().age = 3;
 		req.body().back_money = 4;
+		req.add_length(2);
 
 		person_request req1{};
 		req1 = std::move(req);
@@ -125,6 +41,10 @@ BOOST_AUTO_TEST_CASE(construction)
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
 		BOOST_CHECK(req1.body().back_money == 4 && req.body().back_money == 0);
+
+		BOOST_CHECK(req.length() == 0);
+
+		BOOST_CHECK(req.uuid() == 0);
 	}
 
 	{
@@ -140,6 +60,10 @@ BOOST_AUTO_TEST_CASE(construction)
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
 		BOOST_CHECK(resp1.body().back_money == 4 && resp.body().back_money == 0);
+
+		BOOST_CHECK(resp.length() == 0);
+
+		BOOST_CHECK(resp.uuid() == 0);
 	}
 
 	{
@@ -156,62 +80,130 @@ BOOST_AUTO_TEST_CASE(construction)
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
 		BOOST_CHECK(resp1.body().back_money == 4 && resp.body().back_money == 0);
+
+		BOOST_CHECK(resp.length() == 0);
+
+		BOOST_CHECK(resp.uuid() == 0);
 	}
 }
 
-BOOST_AUTO_TEST_CASE(parse)
+BOOST_AUTO_TEST_CASE(from_and_to_binary)
 {
 	{
-		aquarius::flex_buffer_t buffer(1);
+		aquarius::flex_buffer_t buffer{};
+		person_request req{};
+		req.header()->session_id = 1;
+		req.body().age = 3;
+
+		BOOST_CHECK(req.to_binary(buffer));
+
+		std::size_t proto{};
+		elastic::from_binary(proto, buffer);
+
+		person_request req1{};
+
+		BOOST_CHECK(req1.from_binary(buffer));
+	}
+
+	{
+		aquarius::flex_buffer_t buffer{};
+
+		elastic::to_binary(13, buffer);
+
+		person_request req{};
+
+		req.from_binary(buffer);
+
+		BOOST_CHECK(buffer.size() == 1);
+	}
+
+	{
+		aquarius::flex_buffer_t buffer(0);
 
 		person_request req{};
 		req.body().age = 3;
+
+		for (int i = 0; i < 4096; ++i)
+		{
+			req.body().name.append("h");
+		}
+
+		BOOST_CHECK(!req.to_binary(buffer));
+
+		buffer.resize(1);
+
+		BOOST_CHECK(!req.to_binary(buffer));
+
+		buffer.resize(10);
+
+		BOOST_CHECK(!req.to_binary(buffer));
+
+		buffer.resize(12);
+
+		req.header()->session_id = static_cast<uint32_t>(aquarius::uuid::invoke());
 
 		BOOST_CHECK(!req.to_binary(buffer));
 	}
 
 	{
-		aquarius::flex_buffer_t buffer(2);
+		auto message = std::make_shared<aquarius::basic_message>();
 
-		person_request req{};
+		aquarius::flex_buffer_t buffer{};
 
-		BOOST_CHECK(!req.from_binary(buffer));
+		elastic::to_binary(13, buffer);
+		
+		for (int i = 0; i < 13; ++i)
+		{
+			elastic::to_binary(0, buffer);
+		}
+
+		BOOST_CHECK(buffer.size() == 14);
+
+		BOOST_CHECK(message->from_binary(buffer));
+
+		BOOST_CHECK(buffer.size() == 0);
 	}
 
 	{
-		aquarius::flex_buffer_t buffer{};
-		elastic::to_binary(10001u, buffer);
-		elastic::to_binary(3u, buffer);
-		elastic::to_binary(1u, buffer);
+		aquarius::flex_buffer_t buffer(0);
 
 		person_request req{};
 
 		BOOST_CHECK(!req.from_binary(buffer));
 	}
+}
 
-	//{
-	//	aquarius::flex_buffer_t buffer{};
+BOOST_AUTO_TEST_CASE(process)
+{
+	aquarius::tcp_server srv(8100, 2);
 
-	//	person_request req{};
+	std::thread t([&] { srv.run(); });
 
-	//	aquarius::error_code ec{};
+	aquarius::tcp_client cli("127.0.0.1", "8100");
 
-	//	req.to_binary(buffer, ec);
+	std::thread tc([&] { cli.run(); });
 
-	//	person_request req1;
+	std::this_thread::sleep_for(1s);
 
-	//	uint32_t proto{};
+	person_request req{};
+	req.body().age = 1;
+	req.body().name = "world";
 
-	//	std::size_t total_size{};
+	cli.async_write(std::move(req),
+					[&](std::shared_ptr<person_response> resp)
+					{
+						BOOST_CHECK(true);
+					});
 
-	//	elastic::from_binary(proto, buffer);
+	std::this_thread::sleep_for(1s);
 
-	//	elastic::from_binary(total_size, buffer);
+	cli.stop();
+	srv.stop();
 
-	//	req1.from_binary(buffer, ec);
+	std::this_thread::sleep_for(1s);
 
-	//	BOOST_CHECK(!ec);
-	//}
+	t.join();
+	tc.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

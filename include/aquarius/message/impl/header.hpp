@@ -8,6 +8,9 @@ namespace aquarius
 		class basic_header
 		{
 		public:
+			using virtual_base_type = basic_header;
+
+		public:
 			basic_header()
 				: length_()
 			{}
@@ -15,7 +18,7 @@ namespace aquarius
 			virtual ~basic_header() = default;
 
 		public:
-			basic_header(basic_header&& other)
+			basic_header(basic_header&& other) noexcept
 				: length_(other.length_)
 			{
 				other.length_ = 0;
@@ -25,6 +28,11 @@ namespace aquarius
 			void add_length(std::size_t length)
 			{
 				length_ += length;
+			}
+
+			std::size_t length() const
+			{
+				return length_;
 			}
 
 			void swap(basic_header& other)
@@ -48,7 +56,7 @@ namespace aquarius
 
 					return false;
 				}
-				
+
 				return true;
 			}
 

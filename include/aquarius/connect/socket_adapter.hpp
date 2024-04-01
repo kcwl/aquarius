@@ -56,7 +56,18 @@ namespace aquarius
 			if (!socket_.is_open())
 				return {};
 
-			return socket_.remote_endpoint().address().to_string();
+			asio::error_code ec;
+
+			auto remote_endpoint = socket_.remote_endpoint(ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "remote address maybe invalid, error: " << ec.message();
+
+				return {};
+			}
+
+			return remote_endpoint.address().to_string();
 		}
 
 		uint32_t remote_address_u()

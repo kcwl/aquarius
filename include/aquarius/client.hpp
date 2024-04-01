@@ -57,12 +57,22 @@ namespace aquarius
 
 			req.to_binary(fs);
 
-			conn_ptr_->async_write(std::move(fs));
+			async_write(std::move(fs));
+		}
+
+		void async_write(flex_buffer_t&& buffer)
+		{
+			conn_ptr_->async_write(std::move(buffer));
 		}
 
 		std::string remote_address()
 		{
 			return conn_ptr_->remote_address();
+		}
+
+		uint32_t remote_address_u()
+		{
+			return conn_ptr_->remote_address_u();
 		}
 
 		int remote_port()

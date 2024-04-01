@@ -17,11 +17,7 @@ namespace aquarius
 		AQUARIUS_VISITABLE_MESSAGE()
 
 	public:
-		response(response&& req)
-			: base_type(std::move(req))
-		{
-			
-		}
+		response(response&& req) = default;
 
 		response& operator=(response&& other)
 		{

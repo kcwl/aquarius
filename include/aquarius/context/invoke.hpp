@@ -27,7 +27,7 @@ namespace aquarius
 		}
 
 		template <typename _Response>
-		static void broadcast(_Response&& resp)
+		static bool broadcast(_Response&& resp)
 		{
 			flex_buffer_t fs{};
 			auto result = resp.to_binary(fs);
@@ -36,14 +36,16 @@ namespace aquarius
 			{
 				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
 
-				return;
+				return false;
 			}
 
 			session_manager::instance().broadcast(std::move(fs));
+
+			return true;
 		}
 
 		template <typename _Response, typename _Pre>
-		static void broadcast_if(_Response&& resp, _Pre&& func)
+		static bool broadcast_if(_Response&& resp, _Pre&& func)
 		{
 			flex_buffer_t fs{};
 			auto result = resp.to_binary(fs);
@@ -52,10 +54,12 @@ namespace aquarius
 			{
 				XLOG_ERROR() << "[Message] " << resp.uuid() << "to binary occur error.";
 
-				return;
+				return false;
 			}
 
 			session_manager::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
+
+			return true;
 		}
 	};
 } // namespace aquarius

@@ -14,10 +14,8 @@ namespace aquarius
 			using value_type = typename _Alloc::value_type;
 
 		public:
-			basic_fields() = default;
-
-			basic_fields(const allocate_type& alloc) noexcept
-				: empty_value<_Alloc>(empty_init, alloc)
+			explicit basic_fields() noexcept
+				: empty_value<_Alloc>(empty_init, allocate_type{})
 			{}
 
 			virtual ~basic_fields() = default;

@@ -12,4 +12,4 @@ namespace aquarius
 	{
 		uint32_t result;
 	};
-}
+} // namespace aquarius

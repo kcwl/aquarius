@@ -17,9 +17,7 @@ namespace aquarius
 		AQUARIUS_VISITABLE_MESSAGE()
 
 	public:
-		request(request&& other)
-			: base_type(std::move(other))
-		{}
+		request(request&& other) = default;
 
 		request& operator=(request&& other)
 		{

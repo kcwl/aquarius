@@ -10,9 +10,9 @@ namespace aquarius
 		class publisher : public impl::role
 		{
 		public:
-			void publish(const std::string& topic, const std::string& command)
+			auto publish(const std::string& topic, const std::string& command)
 			{
-				default_group::instance().publish(topic, command);
+				return default_group::instance().publish(topic, command);
 			}
 		};
 	} // namespace channel

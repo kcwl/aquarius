@@ -6,6 +6,13 @@
 #include <cstddef>
 #include <optional>
 
+namespace aquarius
+{
+	class basic_context;
+
+	class basic_session;
+} // namespace aquarius
+
 #define AQUARIUS_VISITABLE_MESSAGE()                                                                                   \
 	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
 						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
@@ -28,18 +35,15 @@
 
 namespace aquarius
 {
-	class basic_context;
-
-	class basic_session;
-} // namespace aquarius
-
-namespace aquarius
-{
-	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>, public impl::basic_header
+	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>,
+						  virtual public impl::basic_header
 	{
 	public:
 		basic_message() = default;
 		virtual ~basic_message() = default;
+
+	public:
+		basic_message(basic_message&& other) = default;
 
 	public:
 		AQUARIUS_VISITABLE_BASE()
@@ -49,29 +53,21 @@ namespace aquarius
 		{
 			std::size_t length{};
 
-			if (!elastic::from_binary(length, stream))
-				return false;
+			elastic::from_binary(length, stream);
 
 			stream.consume(length);
 
 			return true;
 		}
-
-		bool to_binary(flex_buffer_t&)
-		{
-			return true;
-		}
 	};
 
 	template <typename _Header, typename _Body, std::size_t N>
-	class message : virtual public tcp_header<_Header, N>, virtual public basic_message
+	class message : public tcp_header<_Header, N>, public basic_message
 	{
 		using base_type = tcp_header<_Header, N>;
 
 	public:
 		using body_type = _Body;
-
-		AQUARIUS_VISITABLE_BASE()
 
 	public:
 		message()
@@ -80,11 +76,13 @@ namespace aquarius
 
 		virtual ~message() = default;
 
-		message(message&& other)
-			: base_type(std::forward<message>(other))
+		message(message&& other) noexcept
+			: virtual_base_type(std::move(other))
+			, base_type(std::move(other))
+			, basic_message(std::move(other))
 			, body_(other.body_)
 		{
-			message{}.swap(other);
+			body_type{}.swap(other.body_);
 		}
 
 		message& operator=(message&& other)
@@ -93,10 +91,6 @@ namespace aquarius
 
 			return *this;
 		}
-
-	private:
-		message(const message& other) = delete;
-		message& operator=(const message&) = delete;
 
 	public:
 		body_type& body() noexcept
@@ -109,11 +103,9 @@ namespace aquarius
 			if (!base_type::from_binary(stream))
 				return false;
 
-			if (!elastic::from_binary(body_, stream))
-				return false;
+			elastic::from_binary(body_, stream);
 
 			return true;
-			;
 		}
 
 		bool to_binary(flex_buffer_t& stream)
@@ -130,8 +122,13 @@ namespace aquarius
 		}
 
 	private:
+		message(const message& other) = delete;
+		message& operator=(const message&) = delete;
+
 		void swap(message& other)
 		{
+			base_type::swap(other);
+
 			body_.swap(other.body_);
 		}
 

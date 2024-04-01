@@ -101,9 +101,6 @@
     <ClInclude Include="message.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="invoke.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\service.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -247,6 +244,15 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp">
       <Filter>include\aquarius\core</Filter>
+    </ClInclude>
+    <ClInclude Include="proto_regist.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="channel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

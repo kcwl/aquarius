@@ -1,91 +1,9 @@
 #pragma once
+#include "proto_regist.h"
 #include <aquarius.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 BOOST_AUTO_TEST_SUITE(basic_context)
-
-struct person_body_request
-{
-	bool sex;
-	std::vector<uint8_t> role_data;
-	double mana;
-	float hp;
-	int32_t age;
-	int64_t money;
-	std::string name;
-	uint32_t back_money;
-	uint64_t crc;
-
-private:
-	friend class elastic::access;
-
-	template <typename _Archive>
-	void serialize(_Archive& ar)
-	{
-		ar & sex;
-		ar & role_data;
-		ar & mana;
-		ar & hp;
-		ar & age;
-		ar & money;
-		ar & name;
-		ar & back_money;
-		ar & crc;
-	}
-};
-
-struct person_body_response
-{
-	bool sex;
-	std::vector<uint8_t> role_data;
-	double mana;
-	float hp;
-	int32_t age;
-	int64_t money;
-	std::string name;
-	uint32_t back_money;
-	uint64_t crc;
-
-private:
-	friend class elastic::access;
-
-	template <typename _Archive>
-	void serialize(_Archive& ar)
-	{
-		ar & sex;
-		ar & role_data;
-		ar & mana;
-		ar & hp;
-		ar & age;
-		ar & money;
-		ar & name;
-		ar & back_money;
-		ar & crc;
-	}
-};
-
-using person_request = aquarius::request<person_body_request, 10000>;
-using person_response = aquarius::response<person_body_response, 10001>;
-
-class ctx_test_server : public aquarius::context<person_request, person_response>
-{
-public:
-	ctx_test_server()
-		: aquarius::context<person_request, person_response>("ctx_test_server")
-	{}
-
-public:
-	virtual bool handle() override
-	{
-		std::cout << "server ctx\n";
-		response_.body().age = 1;
-		response_.body().name = "hello";
-
-		send_response(0);
-
-		return true;
-	}
-};
 
 BOOST_AUTO_TEST_CASE(basic_message_context)
 {
@@ -140,7 +58,111 @@ BOOST_AUTO_TEST_CASE(function)
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
-	BOOST_CHECK(request_ptr->accept(buffer, context_ptr, nullptr));
+	BOOST_CHECK(!request_ptr->accept(buffer, context_ptr, nullptr));
+}
+
+BOOST_AUTO_TEST_CASE(manager)
+{
+	{
+		BOOST_CHECK(!aquarius::invoke_session_helper::push(nullptr));
+	}
+
+	{
+		aquarius::flex_buffer_t buffer{};
+
+		BOOST_CHECK(!aquarius::message_router::process(buffer, 10001));
+
+		elastic::to_binary(12001u, buffer);
+
+		auto session = std::make_shared<aquarius::session<
+			aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
+
+		aquarius::invoke_session_helper::push(session);
+
+		BOOST_CHECK(aquarius::message_router::process(buffer, session->uuid()));
+
+		buffer.pubseekpos(0, std::ios::out);
+
+		elastic::to_binary(45u, buffer);
+		buffer.commit(45);
+
+		aquarius::message_router::process(buffer, session->uuid());
+
+		BOOST_CHECK(aquarius::invoke_session_helper::broadcast(person_response{}));
+
+		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return true; }));
+
+		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return false; }));
+	}
+
+	{
+		person_response resp{};
+
+		for (int i = 0; i < 4096; ++i)
+		{
+			resp.body().name.append("h");
+		}
+
+		BOOST_CHECK(!aquarius::invoke_session_helper::broadcast(resp));
+
+		BOOST_CHECK(!aquarius::invoke_session_helper::broadcast_if(resp, [](auto) { return true; }));
+	}
+
+	{
+		auto size = aquarius::invoke_session_helper::size();
+
+		aquarius::invoke_session_helper::erase(0);
+
+		BOOST_CHECK(aquarius::invoke_session_helper::size() == (size - 1));
+	}
+}
+
+BOOST_AUTO_TEST_CASE(content)
+{
+	aquarius::tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	std::this_thread::sleep_for(1s);
+
+	person_request1 req{};
+	req.body().age = 1;
+	req.body().name = "world";
+
+	cli.async_write(std::move(req), [&](std::shared_ptr<person_response1> resp) { BOOST_CHECK(true); });
+
+	std::this_thread::sleep_for(1s);
+
+	cli.stop();
+	srv.stop();
+
+	std::this_thread::sleep_for(1s);
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(visitable)
+{
+	auto req = std::make_shared<person_request>();
+
+	aquarius::flex_buffer_t buffer{};
+
+	req->to_binary(buffer);
+
+	std::size_t proto;
+
+	elastic::from_binary(proto, buffer);
+
+	BOOST_CHECK(!req->accept(buffer, nullptr, nullptr));
+
+	auto msg = std::make_shared<aquarius::basic_message>();
+
+	BOOST_CHECK(!msg->accept(buffer, nullptr, nullptr));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

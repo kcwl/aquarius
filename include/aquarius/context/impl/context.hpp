@@ -14,7 +14,7 @@ namespace aquarius
 	{
 	public:
 		explicit basic_context(const std::string& name)
-			: name_(name)
+			: visitor_(name)
 		{}
 
 		basic_context()
@@ -32,14 +32,14 @@ namespace aquarius
 	public:
 		virtual bool visit(basic_message*, std::shared_ptr<basic_session> session_ptr) override
 		{
-			XLOG_WARNING() << name_ << " maybe visit an unknown message!";
+			XLOG_WARNING() << visitor_ << " maybe visit an unknown message!";
 
 			return true;
 		}
 
-		std::string name()
+		std::string visitor() const
 		{
-			return name_;
+			return visitor_;
 		}
 
 	public:
@@ -51,16 +51,13 @@ namespace aquarius
 	protected:
 		bool send_request(flex_buffer_t&& stream)
 		{
-			if (!session_ptr_)
-				return false;
-
 			session_ptr_->async_write(std::move(stream));
 
 			return true;
 		}
 
 	protected:
-		std::string name_;
+		std::string visitor_;
 
 		std::shared_ptr<basic_session> session_ptr_;
 	};

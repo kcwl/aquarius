@@ -209,9 +209,11 @@
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\service\manager.hpp" />
     <ClInclude Include="..\include\aquarius\service\service.hpp" />
+    <ClInclude Include="channel.h" />
     <ClInclude Include="context.h" />
-    <ClInclude Include="invoke.h" />
+    <ClInclude Include="core.h" />
     <ClInclude Include="message.h" />
+    <ClInclude Include="proto_regist.h" />
     <ClInclude Include="router.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="connect.h" />

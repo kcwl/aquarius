@@ -32,7 +32,7 @@ namespace aquarius
 			}
 			else
 			{
-				XLOG_ERROR() << "[context] " << this->name() << " handle error";
+				XLOG_ERROR() << "[context] " << this->visitor() << " handle error";
 			}
 
 			return result;

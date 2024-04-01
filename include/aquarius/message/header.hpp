@@ -7,14 +7,16 @@
 namespace aquarius
 {
 	template <typename _Header, std::size_t N>
-	class tcp_header : public impl::basic_header, public fields<_Header>
+	class tcp_header : virtual public impl::basic_header, public fields<_Header>
 	{
-		using basic_header_type = impl::basic_header;
-
 	public:
 		using header_type = _Header;
 
 		using field_base_type = fields<header_type>;
+
+		using base_type = impl::basic_header;
+
+		using typename base_type::virtual_base_type;
 
 		constexpr static std::size_t Number = N;
 
@@ -31,8 +33,9 @@ namespace aquarius
 		}
 
 	public:
-		tcp_header(tcp_header&& other)
-			: uuid_(other.uuid_)
+		tcp_header(tcp_header&& other) noexcept
+			: base_type(std::move(other))
+			, uuid_(other.uuid_)
 			, header_ptr_(other.header_ptr_)
 		{
 			other.uuid_ = 0;
@@ -64,11 +67,9 @@ namespace aquarius
 			flex_buffer_t buffer{};
 			buffer.swap(stream);
 
-			if (!elastic::to_binary(Number, stream))
-				return false;
+			elastic::to_binary(Number, stream);
 
-			if (!basic_header_type::to_binary(stream))
-				return false;
+			virtual_base_type::to_binary(stream);
 
 			stream.append(std::move(buffer));
 
@@ -77,7 +78,7 @@ namespace aquarius
 
 		void swap(tcp_header& other)
 		{
-			basic_header_type::swap(other);
+			virtual_base_type::swap(other);
 
 			std::swap(uuid_, other.uuid_);
 
@@ -91,14 +92,12 @@ namespace aquarius
 	protected:
 		bool from_binary(flex_buffer_t& stream)
 		{
-			if (!basic_header_type::from_binary(stream))
+			if (!virtual_base_type::from_binary(stream))
 				return false;
 
-			if (!elastic::from_binary(uuid_, stream))
-				return false;
+			elastic::from_binary(uuid_, stream);
 
-			if (!elastic::from_binary(*header_ptr_, stream))
-				return false;
+			elastic::from_binary(*header_ptr_, stream);
 
 			return true;
 		}
@@ -107,7 +106,8 @@ namespace aquarius
 		{
 			std::size_t current = stream.size();
 
-			elastic::to_binary(uuid_, stream);
+			if (!elastic::to_binary(uuid_, stream))
+				return false;
 
 			if (!elastic::to_binary(*header_ptr_, stream))
 				return false;
