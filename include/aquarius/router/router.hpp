@@ -46,12 +46,16 @@ namespace aquarius
 
 			auto result = request_ptr->accept(buffer, context_ptr, session_ptr);
 
-			if (result)
-				session_ptr->detach(proto);
-			else
+			if (!result)
+			{
 				buffer.consume(-(static_cast<int>(cur)));
 
-			return result;
+				return result;
+			}
+
+			session_ptr->detach(proto);
+
+			return buffer.size() ? process(buffer, uid) : result;
 		}
 	};
 } // namespace aquarius
