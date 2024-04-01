@@ -1,38 +1,30 @@
 #pragma once
-#include <aquarius/invoke/invoke_service.hpp>
-#include <aquarius/invoke/invoke_session.hpp>
-#include <aquarius/system/deadline_timer.hpp>
-#include <type_traits>
+#include <aquarius/server/io_service_pool.hpp>
 
 namespace aquarius
 {
-	template <typename _Connector>
-	class server
+	template <typename _Connector, typename _Pattern>
+	class basic_server : public _Pattern
 	{
-		using ssl_context_t = ssl::context;
-
 		using connect_t = _Connector;
 
 	public:
-		explicit server(int32_t port, int io_service_pool_size, const std::string& name = {})
+		explicit basic_server(int32_t port, int io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, endpoint_(asio::ip::tcp::v4(), static_cast<uint16_t>(port))
 			, signals_(io_service_pool_.get_io_service())
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
-			, ssl_context_(ssl::context::sslv23)
+			, ssl_context_(asio::ssl_context_t::sslv23)
 			, server_name_(name)
-			, timer_(io_service_pool_.get_io_service())
 		{
 			init_ssl_context();
 
 			init_signal();
 
 			start_accept();
-
-			dead_line();
 		}
 
-		~server() = default;
+		~basic_server() = default;
 
 	public:
 		void run()
@@ -41,7 +33,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			invoke_service_helper::run();
+			this->publish("service", "run");
 
 			io_service_pool_.run();
 		}
@@ -53,7 +45,7 @@ namespace aquarius
 
 		void close()
 		{
-			boost::system::error_code ec;
+			asio::error_code ec;
 			acceptor_.cancel(ec);
 			acceptor_.close(ec);
 
@@ -64,7 +56,7 @@ namespace aquarius
 		void start_accept()
 		{
 			acceptor_.async_accept(io_service_pool_.get_io_service(),
-								   [this](const boost::system::error_code& ec, asio::ip::tcp::socket sock)
+								   [this](const asio::error_code& ec, asio::ip::tcp::socket sock)
 								   {
 									   if (!acceptor_.is_open())
 									   {
@@ -82,24 +74,24 @@ namespace aquarius
 
 										   XLOG_INFO()
 											   << "[acceptor] accept connection at " << endpoint_.address().to_string()
-											   << " : " << conn_ptr->remote_address();
+											   << " : " << conn_ptr->remote_address() << "("
+											   << conn_ptr->remote_address_u() << ")[" << conn_ptr->remote_port()
+											   << "]";
 									   }
 
 									   start_accept();
 								   });
 		}
 
-		void signal_stop(boost::system::error_code ec, int signal)
+		void signal_stop(asio::error_code ec, int signal)
 		{
 			std::string error_message = "success";
 
 			ec ? error_message = ec.message() : std::string{};
 
-			timer_.cancel(ec);
-
 			close();
 
-			invoke_service_helper::stop();
+			this->publish("service", "stop");
 
 			io_service_pool_.stop();
 
@@ -109,11 +101,11 @@ namespace aquarius
 
 		void init_ssl_context()
 		{
-			ssl_context_.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
-									 ssl_context_t::single_dh_use);
+			ssl_context_.set_options(asio::ssl_context_t::default_workarounds | asio::ssl_context_t::no_sslv2 |
+									 asio::ssl_context_t::single_dh_use);
 
 			ssl_context_.use_certificate_chain_file("crt/server.crt");
-			ssl_context_.use_private_key_file("crt/server.key", ssl_context_t::pem);
+			ssl_context_.use_private_key_file("crt/server.key", asio::ssl_context_t::pem);
 			ssl_context_.use_tmp_dh_file("crt/dh512.pem");
 		}
 
@@ -125,27 +117,8 @@ namespace aquarius
 			signals_.add(SIGQUIT);
 #endif
 
-			signals_.async_wait(std::bind(&server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
-		}
-
-		void dead_line()
-		{
-			timer_.expires_from_now(30ms);
-
-			timer_.async_wait(
-				[this](boost::system::error_code ec)
-				{
-					if (ec)
-					{
-						XLOG_ERROR() << "global timer is occur error!";
-
-						return;
-					}
-
-					invoke_session_helper::timeout();
-
-					this->dead_line();
-				});
+			signals_.async_wait(
+				std::bind(&basic_server::signal_stop, this, std::placeholders::_1, std::placeholders::_2));
 		}
 
 	private:
@@ -157,10 +130,8 @@ namespace aquarius
 
 		asio::ip::tcp::acceptor acceptor_;
 
-		ssl_context_t ssl_context_;
+		asio::ssl_context_t ssl_context_;
 
 		std::string server_name_;
-
-		system::deadline_timer timer_;
 	};
 } // namespace aquarius

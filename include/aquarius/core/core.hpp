@@ -1,0 +1,31 @@
+#pragma once
+#include <chrono>
+#include <cstdint>
+
+using namespace std::chrono_literals;
+
+namespace aquarius
+{
+	constexpr static auto heart_time_interval = 10s;
+
+	constexpr static auto timeout_dura = 30ms;
+
+	struct http
+	{};
+
+	struct tcp
+	{};
+
+	enum class conn_mode
+	{
+		client,
+		basic_server
+	};
+
+	enum class ssl_mode
+	{
+		nossl,
+		ssl
+	};
+
+} // namespace aquarius

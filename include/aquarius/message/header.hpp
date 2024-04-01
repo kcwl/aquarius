@@ -1,0 +1,128 @@
+#pragma once
+#include <aquarius/core/uuid.hpp>
+#include <aquarius/message/field.hpp>
+#include <aquarius/message/impl/header.hpp>
+#include <aquarius/message/impl/protocol.hpp>
+
+namespace aquarius
+{
+	template <typename _Header, std::size_t N>
+	class tcp_header : virtual public impl::basic_header, public fields<_Header>
+	{
+	public:
+		using header_type = _Header;
+
+		using field_base_type = fields<header_type>;
+
+		using base_type = impl::basic_header;
+
+		using typename base_type::virtual_base_type;
+
+		constexpr static std::size_t Number = N;
+
+	public:
+		tcp_header()
+			: uuid_(uuid::invoke())
+		{
+			this->alloc(header_ptr_);
+		}
+
+		virtual ~tcp_header()
+		{
+			this->dealloc(header_ptr_);
+		}
+
+	public:
+		tcp_header(tcp_header&& other) noexcept
+			: base_type(std::move(other))
+			, uuid_(other.uuid_)
+			, header_ptr_(other.header_ptr_)
+		{
+			other.uuid_ = 0;
+			other.header_ptr_ = nullptr;
+		}
+
+		tcp_header& operator=(const tcp_header&) = default;
+
+	public:
+		header_type* header() noexcept
+		{
+			return header_ptr_;
+		}
+
+		void set_uuid(std::size_t uuid)
+		{
+			uuid_ = uuid;
+		}
+
+		std::size_t uuid() const
+		{
+			return uuid_;
+		}
+
+		bool complete(flex_buffer_t& stream)
+		{
+			stream.normalize();
+
+			flex_buffer_t buffer{};
+			buffer.swap(stream);
+
+			elastic::to_binary(Number, stream);
+
+			virtual_base_type::to_binary(stream);
+
+			stream.append(std::move(buffer));
+
+			return true;
+		}
+
+		void swap(tcp_header& other)
+		{
+			virtual_base_type::swap(other);
+
+			std::swap(uuid_, other.uuid_);
+
+			auto tmp_ptr = this->header_ptr_;
+
+			this->header_ptr_ = other.header_ptr_;
+
+			other.header_ptr_ = tmp_ptr;
+		}
+
+	protected:
+		bool from_binary(flex_buffer_t& stream)
+		{
+			if (!virtual_base_type::from_binary(stream))
+				return false;
+
+			elastic::from_binary(uuid_, stream);
+
+			elastic::from_binary(*header_ptr_, stream);
+
+			return true;
+		}
+
+		bool to_binary(flex_buffer_t& stream)
+		{
+			std::size_t current = stream.size();
+
+			if (!elastic::to_binary(uuid_, stream))
+				return false;
+
+			if (!elastic::to_binary(*header_ptr_, stream))
+				return false;
+
+			this->add_length(stream.size() - current);
+
+			return true;
+		}
+
+	private:
+		std::size_t uuid_;
+
+		header_type* header_ptr_;
+	};
+
+	class http_header : public impl::basic_header
+	{};
+} // namespace aquarius

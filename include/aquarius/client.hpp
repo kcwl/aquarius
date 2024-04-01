@@ -1,14 +1,12 @@
 ﻿#pragma once
-#include <aquarius/invoke/invoke_callback.hpp>
-#include <aquarius/logger.hpp>
+#include <aquarius/client/callback.hpp>
+#include <aquarius/core/asio.hpp>
+#include <aquarius/core/concepts.hpp>
+#include <aquarius/core/logger.hpp>
 #include <aquarius/response.hpp>
-#include <aquarius/system/asio.hpp>
-#include <aquarius/system/type_traits.hpp>
 #include <filesystem>
 #include <iostream>
 #include <map>
-#include <type_traits>
-
 
 namespace aquarius
 {
@@ -18,7 +16,7 @@ namespace aquarius
 	public:
 		explicit client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
-			, ssl_context_(ssl::context::sslv23)
+			, ssl_context_(asio::ssl::context::sslv23)
 			, conn_ptr_(nullptr)
 		{
 			init_ssl_context();
@@ -55,18 +53,26 @@ namespace aquarius
 		template <typename _Request>
 		void async_write(_Request&& req)
 		{
-			error_code ec{};
-
 			flex_buffer_t fs{};
 
-			req.to_binary(fs, ec);
+			req.to_binary(fs);
 
-			conn_ptr_->async_write(std::move(fs), [] {});
+			async_write(std::move(fs));
+		}
+
+		void async_write(flex_buffer_t&& buffer)
+		{
+			conn_ptr_->async_write(std::move(buffer));
 		}
 
 		std::string remote_address()
 		{
 			return conn_ptr_->remote_address();
+		}
+
+		uint32_t remote_address_u()
+		{
+			return conn_ptr_->remote_address_u();
 		}
 
 		int remote_port()
@@ -89,7 +95,7 @@ namespace aquarius
 										return;
 									}
 
-									conn_ptr_->set_verify_mode(ssl::verify_peer);
+									conn_ptr_->set_verify_mode(asio::ssl::verify_peer);
 
 									conn_ptr_->start();
 								});
@@ -108,7 +114,7 @@ namespace aquarius
 	private:
 		asio::io_service io_service_;
 
-		ssl::context ssl_context_;
+		asio::ssl::context ssl_context_;
 
 		std::shared_ptr<_Connector> conn_ptr_;
 	};

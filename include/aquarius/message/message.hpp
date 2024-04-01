@@ -1,72 +1,88 @@
 #pragma once
-#include <aquarius/system/field.hpp>
-#include <aquarius/system/visitor.hpp>
-#include <aquarius/system/uuid.hpp>
+#include <aquarius/core/elastic.hpp>
+#include <aquarius/core/visitable.hpp>
+#include <aquarius/message/field.hpp>
+#include <aquarius/message/header.hpp>
 #include <cstddef>
+#include <optional>
 
 namespace aquarius
 {
 	class basic_context;
-}
+
+	class basic_session;
+} // namespace aquarius
+
+#define AQUARIUS_VISITABLE_MESSAGE()                                                                                   \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
+	{                                                                                                                  \
+		auto resullt = this -> from_binary(buffer);                                                                    \
+		if (!resullt)                                                                                                  \
+			return resullt;                                                                                            \
+		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
+	}
+
+#define AQUARIUS_VISITABLE_BASE()                                                                                      \
+	virtual bool accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx,                 \
+						std::shared_ptr<aquarius::basic_session> session_ptr)                                          \
+	{                                                                                                                  \
+		auto resullt = this -> from_binary(buffer);                                                                    \
+		if (!resullt)                                                                                                  \
+			return resullt;                                                                                            \
+		return accept_bare_impl(this, ctx, session_ptr);                                                               \
+	}
 
 namespace aquarius
 {
-	struct null_body
-	{};
-
-	class basic_message : public system::visitable
+	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>,
+						  virtual public impl::basic_header
 	{
 	public:
 		basic_message() = default;
 		virtual ~basic_message() = default;
 
 	public:
-		DEFINE_VISITABLE()
+		basic_message(basic_message&& other) = default;
 
-		virtual std::size_t uuid()
-		{
-			return {};
-		}
+	public:
+		AQUARIUS_VISITABLE_BASE()
 
-		virtual void set_uuid(std::size_t)
+	public:
+		bool from_binary(flex_buffer_t& stream)
 		{
-			return;
+			std::size_t length{};
+
+			elastic::from_binary(length, stream);
+
+			stream.consume(length);
+
+			return true;
 		}
 	};
 
-	template <typename _Header, typename _Body, uint32_t N>
-	class message : public basic_message, public fields<_Header>
+	template <typename _Header, typename _Body, std::size_t N>
+	class message : public tcp_header<_Header, N>, public basic_message
 	{
-	public:
-		using header_type = _Header;
-		using body_type =  _Body;
+		using base_type = tcp_header<_Header, N>;
 
-		constexpr static uint32_t Number = N;
+	public:
+		using body_type = _Body;
 
 	public:
 		message()
 			: body_()
-			, uid_(uuid::invoke())
-		{
-			this->alloc(header_ptr_);
-		}
+		{}
 
-		virtual ~message()
-		{
-			this->dealloc(header_ptr_);
-		}
+		virtual ~message() = default;
 
-		message(message&& other)
-			: header_ptr_(other.header_ptr_)
+		message(message&& other) noexcept
+			: virtual_base_type(std::move(other))
+			, base_type(std::move(other))
+			, basic_message(std::move(other))
 			, body_(other.body_)
-			, uid_(other.uid_)
 		{
-			other.header_ptr_ = nullptr;
-
-			if constexpr (system::swap_t<body_type>)
-			{
-				body_type{}.swap(other.body_);
-			}
+			body_type{}.swap(other.body_);
 		}
 
 		message& operator=(message&& other)
@@ -76,100 +92,47 @@ namespace aquarius
 			return *this;
 		}
 
-	private:
-		message(const message& other) = delete;
-		message& operator=(const message&) = delete;
-
 	public:
-		header_type* header() noexcept
-		{
-			return header_ptr_;
-		}
-
 		body_type& body() noexcept
 		{
 			return body_;
 		}
 
-		error_code from_binary(flex_buffer_t& stream, error_code& ec)
+		bool from_binary(flex_buffer_t& stream)
 		{
-			if (!elastic::from_binary(uid_, stream))
-				return ec = system_errc::invalid_stream;
-
-			if (!elastic::from_binary(*header_ptr_, stream))
-				return ec = system_errc::invalid_stream;
+			if (!base_type::from_binary(stream))
+				return false;
 
 			elastic::from_binary(body_, stream);
 
-			ec = error_code{};
-
-			return ec;
+			return true;
 		}
 
-		error_code to_binary(flex_buffer_t& stream, error_code& ec)
+		bool to_binary(flex_buffer_t& stream)
 		{
-			if (!elastic::to_binary(Number, stream))
-				return ec = system_errc::invalid_stream;
+			if (!base_type::to_binary(stream))
+				return false;
 
-			flex_buffer_t uid_buffer{};
+			if (!elastic::to_binary(body_, stream))
+				return false;
 
-			elastic::to_binary(uid_, uid_buffer);
+			this->complete(stream);
 
-			flex_buffer_t body_buffer{};
-
-			elastic::to_binary(body_, body_buffer);
-
-			header_ptr_->size = body_buffer.size();
-
-			flex_buffer_t header_buffer{};
-
-			elastic::to_binary(*header_ptr_, header_buffer);
-
-			std::size_t total_size = uid_buffer.size() + header_buffer.size() + header_ptr_->size;
-
-			elastic::to_binary(total_size, stream);
-
-			stream.append(std::move(uid_buffer));
-
-			stream.append(std::move(header_buffer));
-
-			stream.append(std::move(body_buffer));
-
-			ec = error_code{};
-
-			return ec;
-		}
-
-		virtual void set_uuid(std::size_t uid) override
-		{
-			uid_ = uid;
-		}
-
-		virtual std::size_t uuid() override
-		{
-			return uid_;
+			return true;
 		}
 
 	private:
+		message(const message& other) = delete;
+		message& operator=(const message&) = delete;
+
 		void swap(message& other)
 		{
-			std::swap(uid_, other.uid_);
+			base_type::swap(other);
 
-			auto tmp_ptr = this->header_ptr_;
-			this->header_ptr_ = other.header_ptr_;
-			other.header_ptr_ = tmp_ptr;
-
-			if constexpr (system::swap_t<body_type>)
-			{
-				other.body().swap(this->body_);
-			}
+			body_.swap(other.body_);
 		}
 
 	private:
-		header_type* header_ptr_;
-
 		body_type body_;
-
-		std::size_t uid_;
 	};
 } // namespace aquarius

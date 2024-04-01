@@ -1,7 +1,4 @@
 #pragma once
-#include <aquarius/context.hpp>
-#include <aquarius/request.hpp>
-#include <aquarius/response.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include <memory>
 
@@ -24,13 +21,13 @@ public:
 	{}
 
 public:
-	virtual aquarius::error_code handle() override
+	virtual bool handle() override
 	{
 		response_.body().age = 1;
 
 		send_response(1);
 
-		return aquarius::error_code{};
+		return true;
 	}
 };
 
@@ -64,220 +61,6 @@ BOOST_AUTO_TEST_CASE(invoke_context)
 	auto handle_ptr_1 = std::dynamic_pointer_cast<ctx_test_server>(ctx_ptr_1);
 
 	BOOST_CHECK(handle_ptr_1 == nullptr);
-}
-
-class test_service : public aquarius::service
-{
-public:
-	test_service() = default;
-
-public:
-	virtual bool init() override
-	{
-		return true;
-	}
-
-	virtual bool config() override
-	{
-		return true;
-	}
-
-	virtual bool run() override
-	{
-		return true;
-	}
-
-	virtual void stop() override
-	{
-		return;
-	}
-
-	virtual bool enable() override
-	{
-		return true;
-	}
-
-	virtual std::string name() override
-	{
-		return "test_service";
-	}
-};
-
-class test_service_1 : public aquarius::service
-{
-public:
-	test_service_1() = default;
-
-public:
-	virtual bool init() override
-	{
-		return false;
-	}
-
-	virtual bool config() override
-	{
-		return true;
-	}
-
-	virtual bool run() override
-	{
-		return true;
-	}
-
-	virtual void stop() override
-	{
-		return;
-	}
-
-	virtual bool enable() override
-	{
-		return true;
-	}
-
-	virtual std::string name() override
-	{
-		return "test_service_1";
-	}
-};
-
-class test_service_2 : public aquarius::service
-{
-public:
-	test_service_2() = default;
-
-public:
-	virtual bool init() override
-	{
-		return true;
-	}
-
-	virtual bool config() override
-	{
-		return false;
-	}
-
-	virtual bool run() override
-	{
-		return true;
-	}
-
-	virtual void stop() override
-	{
-		return;
-	}
-
-	virtual bool enable() override
-	{
-		return true;
-	}
-
-	virtual std::string name() override
-	{
-		return "test_service_2";
-	}
-};
-
-class test_service_3 : public aquarius::service
-{
-public:
-	test_service_3() = default;
-
-public:
-	virtual bool init() override
-	{
-		return true;
-	}
-
-	virtual bool config() override
-	{
-		return true;
-	}
-
-	virtual bool run() override
-	{
-		return false;
-	}
-
-	virtual void stop() override
-	{
-		return;
-	}
-
-	virtual bool enable() override
-	{
-		return true;
-	}
-
-	virtual std::string name() override
-	{
-		return "test_service_3";
-	}
-};
-
-class test_service_4 : public aquarius::service
-{
-public:
-	test_service_4() = default;
-
-public:
-	virtual bool init() override
-	{
-		return true;
-	}
-
-	virtual bool config() override
-	{
-		return true;
-	}
-
-	virtual bool run() override
-	{
-		return true;
-	}
-
-	virtual void stop() override
-	{
-		return;
-	}
-
-	virtual bool enable() override
-	{
-		return false;
-	}
-
-	virtual std::string name() override
-	{
-		return "test_service_4";
-	}
-};
-
-AQUARIUS_SERVICE_REGIST(10000, test_service);
-AQUARIUS_SERVICE_REGIST(10001, test_service_1);
-AQUARIUS_SERVICE_REGIST(10002, test_service_2);
-AQUARIUS_SERVICE_REGIST(10003, test_service_3);
-AQUARIUS_SERVICE_REGIST(10004, test_service_4);
-
-BOOST_AUTO_TEST_CASE(invoke_service)
-{
-	auto res = aquarius::invoke_service_helper::run();
-
-	BOOST_CHECK_EQUAL(res, false);
-
-	res = aquarius::invoke_service_helper::stop_one(11010);
-
-	BOOST_CHECK_EQUAL(res, false);
-
-	res = aquarius::invoke_service_helper::restart_one(11010);
-
-	BOOST_CHECK_EQUAL(res, false);
-
-	res = aquarius::invoke_service_helper::stop_one(10000);
-
-	BOOST_CHECK_EQUAL(res, true);
-
-	res = aquarius::invoke_service_helper::restart_one(10000);
-
-	BOOST_CHECK_EQUAL(res, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
