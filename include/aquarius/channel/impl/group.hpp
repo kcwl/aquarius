@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/core/singleton.hpp>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
 
@@ -48,7 +49,7 @@ namespace aquarius
 
 						return;
 					}
-					
+
 					auto channel = std::make_shared<channel_t>();
 
 					channel->subscribe(subscriber_role);
