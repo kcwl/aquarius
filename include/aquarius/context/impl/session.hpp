@@ -22,5 +22,7 @@ namespace aquarius
 		virtual void attach(std::size_t proto, std::shared_ptr<basic_context> context_ptr) = 0;
 
 		virtual void detach(std::size_t proto) = 0;
+
+		virtual std::string remote_addr() = 0;
 	};
 } // namespace aquarius

@@ -58,6 +58,16 @@ namespace aquarius
 			ctxs_.erase(proto);
 		}
 
+		virtual std::string remote_addr() override
+		{
+			if (conn_ptr_.expired())
+				return false;
+
+			auto ptr = conn_ptr_.lock();
+
+			return ptr->remote_addr();
+		}
+
 	private:
 		std::weak_ptr<_Connector> conn_ptr_;
 
