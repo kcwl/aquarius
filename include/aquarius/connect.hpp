@@ -22,6 +22,8 @@ namespace aquarius
 			: socket_(std::move(socket), ctx)
 			, read_buffer_()
 			, uuid_(uuid::invoke())
+			, on_accept_()
+			, on_close_()
 		{}
 
 		connect(asio::io_service& io_service, asio::ssl_context_t& basic_context)
@@ -115,6 +117,8 @@ namespace aquarius
 
 		void shut_down()
 		{
+			on_close_(uuid());
+
 			return socket_.shut_down();
 		}
 
@@ -138,6 +142,18 @@ namespace aquarius
 			return socket_.get_executor();
 		}
 
+		template<typename _Func>
+		void regist_accept(_Func&& f)
+		{
+			on_accept_ = std::forward<_Func>(f);
+		}
+
+		template<typename _Func>
+		void regist_close(_Func&& f)
+		{
+			on_close_ = std::forward<_Func>(f);
+		}
+
 	private:
 		void establish_async_read()
 		{
@@ -147,6 +163,8 @@ namespace aquarius
 			auto session_ptr = std::make_shared<session<this_type>>(this->shared_from_this());
 
 			invoke_session_helper::push(session_ptr);
+
+			on_accept_(uuid());
 
 			keep_alive(true);
 
@@ -197,5 +215,9 @@ namespace aquarius
 		flex_buffer_t read_buffer_;
 
 		std::size_t uuid_;
+
+		std::function<void(const std::size_t)> on_accept_;
+
+		std::function<void(const std::size_t)> on_close_;
 	};
 } // namespace aquarius

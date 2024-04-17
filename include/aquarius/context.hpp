@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/context/content.hpp>
 #include <aquarius/context/context.hpp>
+#include <aquarius/core/elastic.hpp>
 #include <aquarius/message/generator.hpp>
 
 #define AQUARIUS_MESSAGE_REGIST(req) static aquarius::msg_regist<req> msg_##req(req::Number)
@@ -30,3 +31,7 @@
 
 #define CONTEXT_SYSTEM_DEFINE(basic_context)                                                                           \
 	static aquarius::ctx_regist<basic_context> ctx_system_##basic_context(basic_context::Number)
+
+#define AQUARIUS_ACCESS(...) ELASTIC_ACCESS(__VA_ARGS__)
+
+#define AQUARIUS_ACCESS_IF(base, ...) ELASTIC_ACCESS_IF(base, __VA_ARGS__)
