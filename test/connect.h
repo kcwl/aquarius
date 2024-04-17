@@ -39,7 +39,8 @@ BOOST_AUTO_TEST_CASE(ssl)
 		std::this_thread::sleep_for(1s);
 
 		aquarius::flex_buffer_t fs{};
-		fs.sputc('1');
+		uint8_t a = '1';
+		fs.save(&a, 1);
 		cli.async_write(std::move(fs));
 
 		std::this_thread::sleep_for(1s);
@@ -88,7 +89,8 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 		std::this_thread::sleep_for(1s);
 
 		aquarius::flex_buffer_t fs{};
-		fs.sputc('1');
+		uint8_t a = '1';
+		fs.save(&a, 1);
 		cli.close(true);
 		cli.async_write(std::move(fs));
 
@@ -133,7 +135,8 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 		std::this_thread::sleep_for(1s);
 
 		aquarius::flex_buffer_t fs{};
-		fs.sputc('1');
+		uint8_t a = '1';
+		fs.save(&a, 1);
 		cli.async_write(std::move(fs));
 
 		std::this_thread::sleep_for(1s);

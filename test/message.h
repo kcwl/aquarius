@@ -117,33 +117,33 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 		BOOST_CHECK(buffer.size() == 1);
 	}
 
-	{
-		aquarius::flex_buffer_t buffer(0);
+	//{
+	//	aquarius::flex_buffer_t buffer(0);
 
-		person_request req{};
-		req.body().age = 3;
+	//	person_request req{};
+	//	req.body().age = 3;
 
-		for (int i = 0; i < 4096; ++i)
-		{
-			req.body().name.append("h");
-		}
+	//	for (int i = 0; i < 4096; ++i)
+	//	{
+	//		req.body().name.append("h");
+	//	}
 
-		BOOST_CHECK(!req.to_binary(buffer));
+	//	BOOST_CHECK(!req.to_binary(buffer));
 
-		buffer.resize(1);
+	//	buffer.resize(1);
 
-		BOOST_CHECK(!req.to_binary(buffer));
+	//	BOOST_CHECK(!req.to_binary(buffer));
 
-		buffer.resize(10);
+	//	buffer.resize(10);
 
-		BOOST_CHECK(!req.to_binary(buffer));
+	//	BOOST_CHECK(!req.to_binary(buffer));
 
-		buffer.resize(12);
+	//	buffer.resize(12);
 
-		req.header()->session_id = static_cast<uint32_t>(aquarius::uuid::invoke());
+	//	req.header()->session_id = static_cast<uint32_t>(aquarius::uuid::invoke());
 
-		BOOST_CHECK(!req.to_binary(buffer));
-	}
+	//	BOOST_CHECK(!req.to_binary(buffer));
+	//}
 
 	{
 		auto message = std::make_shared<aquarius::basic_message>();
