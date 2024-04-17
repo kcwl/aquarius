@@ -64,14 +64,14 @@ namespace aquarius
 		{
 			stream.normalize();
 
-			flex_buffer_t buffer{};
+			flex_buffer_t buffer;
 			buffer.swap(stream);
 
 			elastic::to_binary(Number, stream);
 
 			virtual_base_type::to_binary(stream);
 
-			stream.append(std::move(buffer));
+			stream.append(buffer);
 
 			return true;
 		}

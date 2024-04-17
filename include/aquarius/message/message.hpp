@@ -55,7 +55,7 @@ namespace aquarius
 
 			elastic::from_binary(length, stream);
 
-			stream.consume(length);
+			stream.consume(static_cast<int>(length));
 
 			return true;
 		}

@@ -87,7 +87,7 @@ namespace aquarius
 											return shut_down();
 										}
 
-										read_buffer_.commit(bytes_transferred);
+										read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 										message_router::process(read_buffer_, uuid());
 
