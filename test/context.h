@@ -80,8 +80,17 @@ BOOST_AUTO_TEST_CASE(manager)
 		aquarius::invoke_session_helper::push(session);
 
 		BOOST_CHECK(aquarius::message_router::process(buffer, session->uuid()));
+	}
 
-		buffer.pubseekpos(0, std::ios::out);
+	{
+		aquarius::flex_buffer_t buffer{};
+
+		BOOST_CHECK(!aquarius::message_router::process(buffer, 10001));
+
+		elastic::to_binary(12001u, buffer);
+
+		auto session = std::make_shared<aquarius::session<
+			aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
 
 		elastic::to_binary(45u, buffer);
 		buffer.commit(45);
