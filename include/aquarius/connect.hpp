@@ -117,7 +117,8 @@ namespace aquarius
 
 		void shut_down()
 		{
-			on_close_(uuid());
+			if(on_close_)
+				on_close_(uuid());
 
 			return socket_.shut_down();
 		}
@@ -164,7 +165,8 @@ namespace aquarius
 
 			invoke_session_helper::push(session_ptr);
 
-			on_accept_(uuid());
+			if(on_accept_)
+				on_accept_(uuid());
 
 			keep_alive(true);
 
