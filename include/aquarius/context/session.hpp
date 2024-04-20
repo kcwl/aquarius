@@ -61,11 +61,11 @@ namespace aquarius
 		virtual std::string remote_addr() override
 		{
 			if (conn_ptr_.expired())
-				return false;
+				return {};
 
 			auto ptr = conn_ptr_.lock();
 
-			return ptr->remote_addr();
+			return ptr->remote_address();
 		}
 
 	private:
