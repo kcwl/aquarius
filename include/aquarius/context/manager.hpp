@@ -31,7 +31,7 @@ namespace aquarius
 
 			for (auto& session : map_invokes_)
 			{
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				session.second->async_write(default_proto, std::forward<flex_buffer_t>(buffer));
 			}
 		}
 
@@ -45,7 +45,7 @@ namespace aquarius
 				if (!std::forward<_Func>(f)(session.second))
 					continue;
 
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				session.second->async_write(default_proto, std::forward<flex_buffer_t>(buffer));
 			}
 		}
 	};

@@ -41,8 +41,10 @@ namespace aquarius
 		bool send_response(int result)
 		{
 			auto fs = make_response(result);
+			if (!this->session_ptr_)
+				return false;
 
-			this->send_request(std::move(fs));
+			this->session_ptr_->async_write(_Request::Number, std::move(fs));
 
 			return true;
 		}

@@ -10,6 +10,10 @@ namespace aquarius
 
 	constexpr static auto timeout_dura = 30ms;
 
+	constexpr static auto pack_limit = 65536;
+
+	constexpr static size_t default_proto = 0;
+
 	struct http
 	{};
 

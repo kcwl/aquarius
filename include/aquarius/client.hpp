@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <aquarius/client/callback.hpp>
+#include <aquarius/context/invoke.hpp>
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/concepts.hpp>
 #include <aquarius/core/logger.hpp>
@@ -43,7 +44,7 @@ namespace aquarius
 		}
 
 		template <typename _Request, typename _Func>
-		void async_write(_Request&& req, _Func f)
+		void async_write(_Request&& req, _Func&& f)
 		{
 			invoke_callback_helper::regist(req.uuid(), std::forward<_Func>(f));
 
@@ -57,12 +58,12 @@ namespace aquarius
 
 			req.to_binary(fs);
 
-			async_write(std::move(fs));
+			async_write(_Request::Number, std::move(fs));
 		}
 
 		void async_write(flex_buffer_t&& buffer)
 		{
-			conn_ptr_->async_write(std::move(buffer));
+			return this->async_write(aquarius::default_proto, std::move(buffer));
 		}
 
 		std::string remote_address()
@@ -109,6 +110,15 @@ namespace aquarius
 			path.append("server.crt");
 
 			ssl_context_.load_verify_file(path.string());
+		}
+
+		void async_write(const std::size_t proto, flex_buffer_t&& buffer)
+		{
+			// conn_ptr_->async_write(std::move(buffer));
+
+			auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
+
+			session_ptr->async_write(proto, std::move(buffer));
 		}
 
 	private:
