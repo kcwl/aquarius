@@ -110,11 +110,13 @@ namespace aquarius
 
 		bool to_binary(flex_buffer_t& stream)
 		{
-			if (!base_type::to_binary(stream))
-				return false;
+			base_type::to_binary(stream);
 
-			if (!elastic::to_binary(body_, stream))
-				return false;
+			auto current = stream.size();
+
+			elastic::to_binary(body_, stream);
+
+			this->add_length(stream.size() - current);
 
 			this->complete(stream);
 

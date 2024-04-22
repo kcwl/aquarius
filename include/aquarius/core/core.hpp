@@ -28,4 +28,11 @@ namespace aquarius
 		ssl
 	};
 
+	enum class pack_flag
+	{
+		normal = 0x01,
+		middle = 0x10,
+		end = 0x11
+	};
+
 } // namespace aquarius

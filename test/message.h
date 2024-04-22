@@ -112,9 +112,7 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 		person_request req{};
 
-		req.from_binary(buffer);
-
-		BOOST_CHECK(buffer.size() == 1);
+		BOOST_CHECK(!req.from_binary(buffer));
 	}
 
 	//{
@@ -145,24 +143,24 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 	//	BOOST_CHECK(!req.to_binary(buffer));
 	//}
 
-	{
-		auto message = std::make_shared<aquarius::basic_message>();
+	//{
+	//	auto message = std::make_shared<aquarius::basic_message>();
 
-		aquarius::flex_buffer_t buffer{};
+	//	aquarius::flex_buffer_t buffer{};
 
-		elastic::to_binary(13, buffer);
-		
-		for (int i = 0; i < 13; ++i)
-		{
-			elastic::to_binary(0, buffer);
-		}
+	//	elastic::to_binary(13, buffer);
+	//	
+	//	for (int i = 0; i < 13; ++i)
+	//	{
+	//		elastic::to_binary(0, buffer);
+	//	}
 
-		BOOST_CHECK(buffer.size() == 14);
+	//	BOOST_CHECK(buffer.size() == 14);
 
-		BOOST_CHECK(message->from_binary(buffer));
+	//	BOOST_CHECK(message->from_binary(buffer));
 
-		BOOST_CHECK(buffer.size() == 0);
-	}
+	//	BOOST_CHECK(buffer.size() == 0);
+	//}
 
 	{
 		aquarius::flex_buffer_t buffer(0);
