@@ -20,7 +20,7 @@ namespace aquarius
 	public:
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket), ctx)
-			, read_buffer_()
+			, read_buffer_(pack_limit)
 			, uuid_(uuid::invoke())
 		{}
 
@@ -105,11 +105,6 @@ namespace aquarius
 					{
 						return;
 					}
-
-					XLOG_ERROR() << "write error at " << remote_address() << "(" << remote_address_u() << "):"
-								 << ":" << remote_port() << "\t" << ec.message();
-
-					return shut_down();
 				});
 		}
 
@@ -131,11 +126,6 @@ namespace aquarius
 		void set_verify_mode(asio::ssl::verify_mode v)
 		{
 			socket_.set_verify_mode(v);
-		}
-
-		auto get_executor()
-		{
-			return socket_.get_executor();
 		}
 
 	private:

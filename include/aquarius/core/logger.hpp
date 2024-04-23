@@ -35,10 +35,9 @@ namespace aquarius
 			sinks::file::make_collector(keywords::target = "logs/", keywords::max_size = 16 * 1024 * 1024,
 										keywords::max_files = 512, keywords::min_free_space = 100 * 1024 * 1024));
 
-		sink_ptr->set_formatter(expr::format("[%1%]:[%2%]<%3%> %4%") %
+		sink_ptr->set_formatter(expr::format("[%1%]:[%2%]<%3%> %4%") % expr::attr<trivial::severity_level>("Severity") %
 								expr::attr<attrs::current_thread_id::value_type>("ThreadID") %
-								expr::attr<boost::posix_time::ptime>("TimeStamp") %
-								expr::attr<trivial::severity_level>("Severity") % expr::smessage);
+								expr::attr<boost::posix_time::ptime>("TimeStamp") % expr::smessage);
 
 		sink_ptr->set_filter(trivial::severity >= trivial::info);
 
@@ -64,7 +63,8 @@ namespace aquarius
 } // namespace aquarius
 
 #define XLOG(level)                                                                                                    \
-	BOOST_LOG_TRIVIAL(level) << "[" << aquarius::file_name::substr(std::source_location::current().file_name()) << ":" << std::source_location::current().line() << "] "
+	BOOST_LOG_TRIVIAL(level) << "[" << aquarius::file_name::substr(std::source_location::current().file_name()) << ":" \
+							 << std::source_location::current().line() << "] "
 
 #define XLOG_TRACE() XLOG(trace)
 #define XLOG_DEBUG() XLOG(debug)

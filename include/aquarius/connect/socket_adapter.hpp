@@ -67,7 +67,7 @@ namespace aquarius
 				return {};
 			}
 
-			return remote_endpoint.address().to_string();
+			return socket_.remote_endpoint().address().to_string();
 		}
 
 		uint32_t remote_address_u()

@@ -27,10 +27,10 @@ namespace aquarius
 		public:
 			void add_length(std::size_t length)
 			{
-				length_ += length;
+				length_ += static_cast<uint16_t>(length);
 			}
 
-			std::size_t length() const
+			uint16_t length() const
 			{
 				return length_;
 			}
@@ -43,16 +43,18 @@ namespace aquarius
 		protected:
 			bool from_binary(flex_buffer_t& stream)
 			{
-				auto cur = stream.size();
+				constexpr auto size_uint16 = sizeof(uint16_t);
 
-				if (!elastic::from_binary(length_, stream))
+				if (stream.size() < size_uint16)
 					return false;
 
-				cur -= stream.size();
+				std::memcpy((char*)&length_, stream.wdata(), size_uint16);
+
+				stream.consume(size_uint16);
 
 				if (length_ > stream.size())
 				{
-					stream.consume(-(static_cast<int>(cur)));
+					stream.consume(-(static_cast<int>(size_uint16)));
 
 					return false;
 				}
@@ -65,8 +67,8 @@ namespace aquarius
 				return elastic::to_binary(length_, stream);
 			}
 
-		private:
-			std::size_t length_;
+		protected:
+			uint16_t length_;
 		};
 	} // namespace impl
 } // namespace aquarius
