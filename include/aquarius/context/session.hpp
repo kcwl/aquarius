@@ -1,6 +1,7 @@
 #pragma once
 #include <any>
 #include <aquarius/context/impl/session.hpp>
+#include <aquarius/core/core.hpp>
 #include <deque>
 #include <memory>
 #include <string>
@@ -39,7 +40,20 @@ namespace aquarius
 
 			auto ptr = conn_ptr_.lock();
 
-			ptr->async_write(std::forward<flex_buffer_t>(buffer));
+			auto pack_size = buffer.size();
+
+			if (pack_size > pack_limit)
+			{
+				return async_write_large(ptr, std::forward<flex_buffer_t>(buffer), pack_size);
+			}
+
+			flex_buffer_t stream{};
+
+			elastic::to_binary(pack_flag::normal, stream);
+
+			stream.save(buffer.wdata(), buffer.size());
+
+			ptr->async_write(std::move(stream));
 
 			return true;
 		}
@@ -68,11 +82,91 @@ namespace aquarius
 			return ptr->remote_address();
 		}
 
+		virtual void attach_buffer(const std::size_t proto, flex_buffer_t& buffer) override
+		{
+			std::lock_guard lk(large_mutex_);
+
+			auto& pack = large_packs_[proto];
+
+			if (!pack)
+				pack = std::make_shared<flex_buffer_t>();
+
+			const auto buffer_size = buffer.size();
+
+			pack->save(buffer.wdata(), buffer_size);
+
+			buffer.consume(buffer_size);
+		}
+
+		virtual flex_buffer_t complete(const std::size_t proto, flex_buffer_t& buffer) override
+		{
+			attach_buffer(proto, buffer);
+
+			std::lock_guard lk(large_mutex_);
+
+			auto pack = *large_packs_[proto];
+
+			large_packs_.erase(proto);
+
+			return pack;
+		}
+
+	private:
+		bool async_write_large(std::shared_ptr<_Connector> ptr, flex_buffer_t&& buffer, std::size_t pack_size)
+		{
+			uint32_t proto{};
+
+			elastic::from_binary(proto, buffer);
+
+			while (pack_size > 0)
+			{
+				flex_buffer_t stream{};
+
+				std::size_t temp_size{};
+
+				pack_flag flag = pack_flag::middle;
+
+				if (pack_size > pack_limit)
+				{
+					temp_size = pack_limit;
+				}
+				else
+				{
+					temp_size = pack_size;
+
+					flag = pack_flag::end;
+				}
+
+				elastic::to_binary(flag, stream);
+
+				elastic::to_binary(proto, stream);
+
+				if (flag != pack_flag::end)
+				{
+					temp_size -= stream.size();
+				}
+
+				stream.save(buffer.wdata(), temp_size);
+
+				buffer.consume(temp_size);
+
+				pack_size -= temp_size;
+
+				ptr->async_write(std::move(stream));
+			}
+
+			return true;
+		}
+
 	private:
 		std::weak_ptr<_Connector> conn_ptr_;
 
 		std::mutex mutex_;
 
 		std::unordered_multimap<std::size_t, std::weak_ptr<basic_context>> ctxs_;
+
+		std::mutex large_mutex_;
+
+		std::unordered_map<std::size_t, std::shared_ptr<flex_buffer_t>> large_packs_;
 	};
 } // namespace aquarius

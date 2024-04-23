@@ -23,6 +23,8 @@ namespace aquarius
 	public:
 		tcp_header()
 			: uuid_(uuid::invoke())
+			, header_ptr_(nullptr)
+			, pos_(0)
 		{
 			this->alloc(header_ptr_);
 		}
@@ -62,16 +64,15 @@ namespace aquarius
 
 		bool complete(flex_buffer_t& stream)
 		{
-			stream.normalize();
+			const auto cur_pos = stream.pubseekoff(0, std::ios::cur, std::ios::in);
 
-			flex_buffer_t buffer;
-			buffer.swap(stream);
+			stream.pubseekpos(pos_, std::ios::in);
 
-			elastic::to_binary(Number, stream);
+			std::memcpy(stream.rdata(), &this->length_, 2);
 
-			virtual_base_type::to_binary(stream);
+			stream.pubseekpos(cur_pos, std::ios::in);
 
-			stream.append(buffer);
+			pos_ = 0;
 
 			return true;
 		}
@@ -104,13 +105,17 @@ namespace aquarius
 
 		bool to_binary(flex_buffer_t& stream)
 		{
+			elastic::to_binary(Number, stream);
+
+			pos_ = static_cast<int32_t>(stream.pubseekoff(0, std::ios::cur, std::ios::in));
+
+			stream.commit(2);
+
 			std::size_t current = stream.size();
 
-			if (!elastic::to_binary(uuid_, stream))
-				return false;
+			elastic::to_binary(uuid_, stream);
 
-			if (!elastic::to_binary(*header_ptr_, stream))
-				return false;
+			elastic::to_binary(*header_ptr_, stream);
 
 			this->add_length(stream.size() - current);
 
@@ -121,6 +126,8 @@ namespace aquarius
 		std::size_t uuid_;
 
 		header_type* header_ptr_;
+
+		int32_t pos_;
 	};
 
 	class http_header : public impl::basic_header

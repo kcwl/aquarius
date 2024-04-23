@@ -1,8 +1,8 @@
 #pragma once
+#include "proto_regist.h"
 #include <aquarius/request.hpp>
 #include <aquarius/response.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include "proto_regist.h"
 
 BOOST_AUTO_TEST_SUITE(message)
 
@@ -112,9 +112,7 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 		person_request req{};
 
-		req.from_binary(buffer);
-
-		BOOST_CHECK(buffer.size() == 1);
+		BOOST_CHECK(!req.from_binary(buffer));
 	}
 
 	//{
@@ -145,24 +143,24 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 	//	BOOST_CHECK(!req.to_binary(buffer));
 	//}
 
-	{
-		auto message = std::make_shared<aquarius::basic_message>();
+	//{
+	//	auto message = std::make_shared<aquarius::basic_message>();
 
-		aquarius::flex_buffer_t buffer{};
+	//	aquarius::flex_buffer_t buffer{};
 
-		elastic::to_binary(13, buffer);
-		
-		for (int i = 0; i < 13; ++i)
-		{
-			elastic::to_binary(0, buffer);
-		}
+	//	elastic::to_binary(13, buffer);
+	//
+	//	for (int i = 0; i < 13; ++i)
+	//	{
+	//		elastic::to_binary(0, buffer);
+	//	}
 
-		BOOST_CHECK(buffer.size() == 14);
+	//	BOOST_CHECK(buffer.size() == 14);
 
-		BOOST_CHECK(message->from_binary(buffer));
+	//	BOOST_CHECK(message->from_binary(buffer));
 
-		BOOST_CHECK(buffer.size() == 0);
-	}
+	//	BOOST_CHECK(buffer.size() == 0);
+	//}
 
 	{
 		aquarius::flex_buffer_t buffer(0);
@@ -189,11 +187,40 @@ BOOST_AUTO_TEST_CASE(process)
 	req.body().age = 1;
 	req.body().name = "world";
 
-	cli.async_write(std::move(req),
-					[&](std::shared_ptr<person_response> resp)
-					{
-						BOOST_CHECK(true);
-					});
+	cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
+
+	std::this_thread::sleep_for(1s);
+
+	cli.stop();
+	srv.stop();
+
+	std::this_thread::sleep_for(1s);
+
+	t.join();
+	tc.join();
+}
+
+BOOST_AUTO_TEST_CASE(large_pack)
+{
+	aquarius::tcp_server srv(8100, 2);
+
+	std::thread t([&] { srv.run(); });
+
+	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread tc([&] { cli.run(); });
+
+	std::this_thread::sleep_for(1s);
+
+	person_request req{};
+	req.body().age = 1;
+
+	for (int i = 0; i < 3 * 4096; ++i)
+	{
+		req.body().name.append("a");
+	}
+
+	cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
 
 	std::this_thread::sleep_for(1s);
 

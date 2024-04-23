@@ -20,7 +20,7 @@ namespace aquarius
 	public:
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket), ctx)
-			, read_buffer_()
+			, read_buffer_(pack_limit)
 			, uuid_(uuid::invoke())
 			, on_accept_()
 			, on_close_()
@@ -107,11 +107,6 @@ namespace aquarius
 					{
 						return;
 					}
-
-					XLOG_ERROR() << "write error at " << remote_address() << "(" << remote_address_u() << "):"
-								 << ":" << remote_port() << "\t" << ec.message();
-
-					return shut_down();
 				});
 		}
 
@@ -138,11 +133,6 @@ namespace aquarius
 			socket_.set_verify_mode(v);
 		}
 
-		auto get_executor()
-		{
-			return socket_.get_executor();
-		}
-
 		template<typename _Func>
 		void regist_accept(_Func&& f)
 		{
@@ -154,7 +144,6 @@ namespace aquarius
 		{
 			on_close_ = std::forward<_Func>(f);
 		}
-
 	private:
 		void establish_async_read()
 		{

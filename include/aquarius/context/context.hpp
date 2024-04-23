@@ -29,7 +29,7 @@ namespace aquarius
 
 			if (!result)
 			{
-				XLOG_ERROR() << "[context] " << this->visitor() << " handle error";
+				XLOG_ERROR() << this->visitor() << " handle error";
 			}
 
 			return result;
@@ -41,8 +41,10 @@ namespace aquarius
 		bool send_response(int result)
 		{
 			auto fs = make_response(result);
+			if (!this->session_ptr_)
+				return false;
 
-			this->send_request(std::move(fs));
+			this->session_ptr_->async_write(std::move(fs));
 
 			return true;
 		}

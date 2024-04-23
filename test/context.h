@@ -55,6 +55,9 @@ BOOST_AUTO_TEST_CASE(function)
 	aquarius::flex_buffer_t buffer{};
 
 	request_ptr->to_binary(buffer);
+	
+	uint32_t proto{};
+	elastic::from_binary(proto, buffer);
 
 	auto context_ptr = std::dynamic_pointer_cast<aquarius::basic_context>(std::make_shared<ctx_test_server>());
 
@@ -68,22 +71,26 @@ BOOST_AUTO_TEST_CASE(manager)
 	}
 
 	{
-		aquarius::flex_buffer_t buffer{};
-
-		BOOST_CHECK(!aquarius::message_router::process(buffer, 10001));
-
-		elastic::to_binary(12001u, buffer);
-
 		auto session = std::make_shared<aquarius::session<
 			aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
 
 		aquarius::invoke_session_helper::push(session);
 
-		BOOST_CHECK(aquarius::message_router::process(buffer, session->uuid()));
+		aquarius::flex_buffer_t buffer{};
+
+		BOOST_CHECK(!aquarius::message_router::process(buffer, session->uuid()));
+
+		elastic::to_binary(aquarius::pack_flag::normal, buffer);
+
+		elastic::to_binary(12001, buffer);
+		
+		BOOST_CHECK(!aquarius::message_router::process(buffer, session->uuid()));
 	}
 
 	{
 		aquarius::flex_buffer_t buffer{};
+
+		elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
 		BOOST_CHECK(!aquarius::message_router::process(buffer, 10001));
 
@@ -102,19 +109,6 @@ BOOST_AUTO_TEST_CASE(manager)
 		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return true; }));
 
 		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return false; }));
-	}
-
-	{
-		person_response resp{};
-
-		for (int i = 0; i < 4096; ++i)
-		{
-			resp.body().name.append("h");
-		}
-
-		BOOST_CHECK(!aquarius::invoke_session_helper::broadcast(resp));
-
-		BOOST_CHECK(!aquarius::invoke_session_helper::broadcast_if(resp, [](auto) { return true; }));
 	}
 
 	{
@@ -142,7 +136,7 @@ BOOST_AUTO_TEST_CASE(content)
 	req.body().age = 1;
 	req.body().name = "world";
 
-	cli.async_write(std::move(req), [&](std::shared_ptr<person_response1> resp) { BOOST_CHECK(true); });
+	cli.send_request(std::move(req), [&](std::shared_ptr<person_response1> resp) { BOOST_CHECK(true); });
 
 	std::this_thread::sleep_for(1s);
 

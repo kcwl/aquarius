@@ -24,5 +24,9 @@ namespace aquarius
 		virtual void detach(std::size_t proto) = 0;
 
 		virtual std::string remote_addr() = 0;
+
+		virtual void attach_buffer(const std::size_t proto, flex_buffer_t& buffer) = 0;
+
+		virtual flex_buffer_t complete(const std::size_t proto, flex_buffer_t& buffer) = 0;
 	};
 } // namespace aquarius

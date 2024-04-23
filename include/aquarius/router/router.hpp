@@ -15,10 +15,21 @@ namespace aquarius
 		{
 			auto session_ptr = invoke_session_helper::find(uid);
 
+			if (!session_ptr)
+				return false;
+
+			auto pos = buffer.pubseekoff(0,std::ios::cur,std::ios::out);
+
+			pack_flag flag{};
+
+			if (!elastic::from_binary(flag, buffer))
+			{
+				XLOG_ERROR() << "parse proto error, maybe message is not haved flag.";
+
+				return false;
+			}
+
 			uint32_t proto{};
-
-			auto cur = buffer.size();
-
 			if (!elastic::from_binary(proto, buffer))
 			{
 				XLOG_ERROR() << "parse proto error, maybe message is not complete.";
@@ -26,8 +37,41 @@ namespace aquarius
 				return false;
 			}
 
-			cur -= buffer.size();
+			bool result = true;
 
+			switch (flag)
+			{
+			case pack_flag::normal:
+				{
+					result = normalize(buffer, session_ptr, proto, uid);
+				}
+				break;
+			case pack_flag::middle:
+				{
+					session_ptr->attach_buffer(proto, buffer);
+				}
+				break;
+			case pack_flag::end:
+				{
+					auto buf = session_ptr->complete(proto, buffer);
+
+					result = normalize(buf, session_ptr, proto, uid);
+				}
+				break;
+			default:
+				break;
+			}
+
+			if (!result)
+				buffer.pubseekpos(pos, std::ios::out);
+
+			return result;
+		}
+
+	protected:
+		static bool normalize(flex_buffer_t& buffer, std::shared_ptr<basic_session> session_ptr,
+							  const std::size_t proto, const std::size_t uid)
+		{
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
 			if (!request_ptr)
@@ -46,14 +90,8 @@ namespace aquarius
 
 			auto result = request_ptr->accept(buffer, context_ptr, session_ptr);
 
-			if (!result)
-			{
-				buffer.consume(-(static_cast<int>(cur)));
-
-				return result;
-			}
-
-			session_ptr->detach(proto);
+			if (result)
+				session_ptr->detach(proto);
 
 			return buffer.size() ? process(buffer, uid) : result;
 		}

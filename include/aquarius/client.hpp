@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <aquarius/client/callback.hpp>
+#include <aquarius/context/invoke.hpp>
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/concepts.hpp>
 #include <aquarius/core/logger.hpp>
@@ -45,15 +46,15 @@ namespace aquarius
 		}
 
 		template <typename _Request, typename _Func>
-		void async_write(_Request&& req, _Func f)
+		void send_request(_Request&& req, _Func&& f)
 		{
 			invoke_callback_helper::regist(req.uuid(), std::forward<_Func>(f));
 
-			this->async_write(std::forward<_Request>(req));
+			this->send_request(std::forward<_Request>(req));
 		}
 
 		template <typename _Request>
-		void async_write(_Request&& req)
+		void send_request(_Request&& req)
 		{
 			flex_buffer_t fs{};
 
@@ -64,7 +65,9 @@ namespace aquarius
 
 		void async_write(flex_buffer_t&& buffer)
 		{
-			conn_ptr_->async_write(std::move(buffer));
+			auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
+
+			session_ptr->async_write(std::move(buffer));
 		}
 
 		std::string remote_address()

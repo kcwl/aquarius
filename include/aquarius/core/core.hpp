@@ -10,6 +10,8 @@ namespace aquarius
 
 	constexpr static auto timeout_dura = 30ms;
 
+	constexpr static auto pack_limit = 4096;
+
 	struct http
 	{};
 
@@ -26,6 +28,13 @@ namespace aquarius
 	{
 		nossl,
 		ssl
+	};
+
+	enum class pack_flag
+	{
+		normal = 0x01,
+		middle = 0x10,
+		end = 0x11
 	};
 
 } // namespace aquarius
