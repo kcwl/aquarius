@@ -44,26 +44,28 @@ namespace aquarius
 		}
 
 		template <typename _Request, typename _Func>
-		void async_write(_Request&& req, _Func&& f)
+		void send_request(_Request&& req, _Func&& f)
 		{
 			invoke_callback_helper::regist(req.uuid(), std::forward<_Func>(f));
 
-			this->async_write(std::forward<_Request>(req));
+			this->send_request(std::forward<_Request>(req));
 		}
 
 		template <typename _Request>
-		void async_write(_Request&& req)
+		void send_request(_Request&& req)
 		{
 			flex_buffer_t fs{};
 
 			req.to_binary(fs);
 
-			async_write(_Request::Number, std::move(fs));
+			async_write(std::move(fs));
 		}
 
 		void async_write(flex_buffer_t&& buffer)
 		{
-			return this->async_write(aquarius::default_proto, std::move(buffer));
+			auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
+
+			session_ptr->async_write(std::move(buffer));
 		}
 
 		std::string remote_address()
@@ -110,15 +112,6 @@ namespace aquarius
 			path.append("server.crt");
 
 			ssl_context_.load_verify_file(path.string());
-		}
-
-		void async_write(const std::size_t proto, flex_buffer_t&& buffer)
-		{
-			// conn_ptr_->async_write(std::move(buffer));
-
-			auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
-
-			session_ptr->async_write(proto, std::move(buffer));
 		}
 
 	private:

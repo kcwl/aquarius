@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(manager)
 
 		elastic::to_binary(12001, buffer);
 		
-		BOOST_CHECK(aquarius::message_router::process(buffer, session->uuid()));
+		BOOST_CHECK(!aquarius::message_router::process(buffer, session->uuid()));
 	}
 
 	{
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(content)
 	req.body().age = 1;
 	req.body().name = "world";
 
-	cli.async_write(std::move(req), [&](std::shared_ptr<person_response1> resp) { BOOST_CHECK(true); });
+	cli.send_request(std::move(req), [&](std::shared_ptr<person_response1> resp) { BOOST_CHECK(true); });
 
 	std::this_thread::sleep_for(1s);
 

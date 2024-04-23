@@ -33,7 +33,7 @@ namespace aquarius
 			return ptr->uuid();
 		}
 
-		virtual bool async_write(const std::size_t proto, flex_buffer_t&& buffer) override
+		virtual bool async_write(flex_buffer_t&& buffer) override
 		{
 			if (conn_ptr_.expired())
 				return false;
@@ -44,7 +44,7 @@ namespace aquarius
 
 			if (pack_size > pack_limit)
 			{
-				return async_write_large(ptr, std::forward<flex_buffer_t>(buffer), proto, pack_size);
+				return async_write_large(ptr, std::forward<flex_buffer_t>(buffer), pack_size);
 			}
 
 			flex_buffer_t stream{};
@@ -78,6 +78,9 @@ namespace aquarius
 
 			auto& pack = large_packs_[proto];
 
+			if (!pack)
+				pack = std::make_shared<flex_buffer_t>();
+
 			const auto buffer_size = buffer.size();
 
 			pack->save(buffer.wdata(), buffer_size);
@@ -99,22 +102,39 @@ namespace aquarius
 		}
 
 	private:
-		bool async_write_large(std::shared_ptr<_Connector> ptr, flex_buffer_t&& buffer, const std::size_t proto,
-							   std::size_t pack_size)
+		bool async_write_large(std::shared_ptr<_Connector> ptr, flex_buffer_t&& buffer, std::size_t pack_size)
 		{
+			uint32_t proto{};
+
+			elastic::from_binary(proto, buffer);
+
 			while (pack_size > 0)
 			{
-				std::size_t temp_size{};
-
-				pack_size > pack_limit ? temp_size = pack_limit : temp_size = pack_size;
-
 				flex_buffer_t stream{};
 
-				elastic::to_binary(pack_flag::middle, stream);
+				std::size_t temp_size{};
+
+				pack_flag flag = pack_flag::middle;
+
+				if (pack_size > pack_limit)
+				{
+					temp_size = pack_limit;
+				}
+				else
+				{
+					temp_size = pack_size;
+
+					flag = pack_flag::end;
+				}
+
+				elastic::to_binary(flag, stream);
 
 				elastic::to_binary(proto, stream);
 
-				temp_size -= stream.size();
+				if (flag != pack_flag::end)
+				{
+					temp_size -= stream.size();
+				}
 
 				stream.save(buffer.wdata(), temp_size);
 

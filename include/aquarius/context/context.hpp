@@ -44,7 +44,7 @@ namespace aquarius
 			if (!this->session_ptr_)
 				return false;
 
-			this->session_ptr_->async_write(_Request::Number, std::move(fs));
+			this->session_ptr_->async_write(std::move(fs));
 
 			return true;
 		}

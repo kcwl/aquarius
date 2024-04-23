@@ -20,7 +20,7 @@ namespace aquarius
 	public:
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket), ctx)
-			, read_buffer_()
+			, read_buffer_(pack_limit)
 			, uuid_(uuid::invoke())
 		{}
 

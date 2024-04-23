@@ -18,6 +18,8 @@ namespace aquarius
 			if (!session_ptr)
 				return false;
 
+			auto pos = buffer.pubseekoff(0,std::ios::cur,std::ios::out);
+
 			pack_flag flag{};
 
 			if (!elastic::from_binary(flag, buffer))
@@ -60,19 +62,16 @@ namespace aquarius
 				break;
 			}
 
+			if (!result)
+				buffer.pubseekpos(pos, std::ios::out);
+
 			return result;
 		}
 
 	protected:
-		static bool normalize(flex_buffer_t& buffer, std::shared_ptr<basic_session> session_ptr, const std::size_t proto, const std::size_t uid)
+		static bool normalize(flex_buffer_t& buffer, std::shared_ptr<basic_session> session_ptr,
+							  const std::size_t proto, const std::size_t uid)
 		{
-			auto cur = buffer.size();
-
-			if (cur == 0)
-				return true;
-
-			cur -= buffer.size();
-
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
 			if (!request_ptr)
@@ -91,14 +90,8 @@ namespace aquarius
 
 			auto result = request_ptr->accept(buffer, context_ptr, session_ptr);
 
-			if (!result)
-			{
-				buffer.consume(-(static_cast<int>(cur)));
-
-				return result;
-			}
-
-			session_ptr->detach(proto);
+			if (result)
+				session_ptr->detach(proto);
 
 			return buffer.size() ? process(buffer, uid) : result;
 		}
