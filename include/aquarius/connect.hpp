@@ -21,7 +21,7 @@ namespace aquarius
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket), ctx)
 			, read_buffer_(pack_limit)
-			, uuid_(uuid::invoke())
+			, uuid_(invoke_uuid<uint32_t>())
 			, on_accept_()
 			, on_close_()
 		{}
@@ -205,7 +205,7 @@ namespace aquarius
 
 		flex_buffer_t read_buffer_;
 
-		std::size_t uuid_;
+		uint32_t uuid_;
 
 		std::function<void(const std::size_t)> on_accept_;
 

@@ -22,7 +22,7 @@ namespace aquarius
 
 	public:
 		tcp_header()
-			: uuid_(uuid<uint32_t>::invoke())
+			: uuid_(invoke_uuid<uint32_t>())
 			, header_ptr_(nullptr)
 			, pos_(0)
 		{
@@ -123,7 +123,7 @@ namespace aquarius
 		}
 
 	private:
-		std::size_t uuid_;
+		uint32_t uuid_;
 
 		header_type* header_ptr_;
 
