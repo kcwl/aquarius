@@ -40,5 +40,5 @@
 private:                                                                                                               \
 	friend class elastic::access;                                                                                      \
 	template <typename _Archive>                                                                                       \
-	void serialize(_Archive& ar)                                                                                       \
+	void serialize(_Archive&)                                                                                       \
 	{}

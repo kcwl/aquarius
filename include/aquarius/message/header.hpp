@@ -52,12 +52,12 @@ namespace aquarius
 			return header_ptr_;
 		}
 
-		void set_uuid(std::size_t uuid)
+		void set_uuid(uint32_t uuid)
 		{
 			uuid_ = uuid;
 		}
 
-		std::size_t uuid() const
+		uint32_t uuid() const
 		{
 			return uuid_;
 		}
