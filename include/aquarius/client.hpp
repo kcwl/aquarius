@@ -110,13 +110,13 @@ namespace aquarius
 									{
 										XLOG_ERROR() << " maybe occur error - " << ec.message();
 
-										if(func)
-										 func(false);
+										if (func)
+											func(false);
 
 										return;
 									}
 
-									if(func)
+									if (func)
 										func(true);
 
 									conn_ptr_->set_verify_mode(asio::ssl::verify_peer);
