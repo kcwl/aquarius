@@ -1,16 +1,26 @@
 #pragma once
-#include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace aquarius
 {
-	struct uuid
+	template <typename _Ty>
+	inline _Ty hash_value(boost::uuids::uuid const& u) noexcept
 	{
-		static std::size_t invoke()
+		_Ty seed = 0;
+		for (auto i = u.begin(), e = u.end(); i != e; ++i)
 		{
-			boost::uuids::random_generator_mt19937 generator{};
-
-			return boost::uuids::hash_value(generator());
+			seed ^= static_cast<_Ty>(*i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 		}
-	};
-}
+
+		return seed;
+	}
+
+	template <typename _Ty>
+	inline _Ty invoke_uuid()
+	{
+		boost::uuids::random_generator_mt19937 generator{};
+
+		return hash_value<_Ty>(generator());
+	}
+} // namespace aquarius

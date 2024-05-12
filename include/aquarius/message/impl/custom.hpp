@@ -11,10 +11,10 @@ namespace aquarius
 		ELASTIC_ACCESS(session_id);
 	};
 
-	struct custom_tcp_response_header
+	struct custom_tcp_response_header : custom_tcp_request_header
 	{
 		uint32_t result;
 
-		ELASTIC_ACCESS(result);
+		ELASTIC_ACCESS_IF(custom_tcp_request_header, result);
 	};
 } // namespace aquarius

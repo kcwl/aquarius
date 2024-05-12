@@ -6,6 +6,7 @@
 #include <aquarius/core/logger.hpp>
 #include <aquarius/response.hpp>
 #include <filesystem>
+#include <functional>
 #include <iostream>
 #include <map>
 
@@ -15,7 +16,8 @@ namespace aquarius
 	class client : public std::enable_shared_from_this<client<_Connector>>
 	{
 	public:
-		explicit client(const std::string& ip_addr, const std::string& port)
+		explicit client(const std::string& ip_addr, const std::string& port,
+						const std::function<void(bool)>& f = nullptr)
 			: io_service_()
 			, ssl_context_(asio::ssl::context::sslv23)
 			, conn_ptr_(nullptr)
@@ -24,7 +26,7 @@ namespace aquarius
 
 			asio::ip::tcp::resolver resolve_(io_service_);
 
-			do_connect(resolve_.resolve(ip_addr, port));
+			do_connect(resolve_.resolve(ip_addr, port), f);
 		}
 
 	public:
@@ -83,20 +85,39 @@ namespace aquarius
 			return conn_ptr_->remote_port();
 		}
 
+		template <typename _Func>
+		void regist_accept(_Func&& f)
+		{
+			conn_ptr_->regist_accept(std::forward<_Func>(f));
+		}
+
+		template <typename _Func>
+		void regist_close(_Func&& f)
+		{
+			conn_ptr_->regist_close(std::forward<_Func>(f));
+		}
+
 	private:
-		void do_connect(asio::ip::tcp::resolver::results_type endpoints)
+		template <typename _Func>
+		void do_connect(asio::ip::tcp::resolver::results_type endpoints, _Func&& f)
 		{
 			conn_ptr_ = std::make_shared<_Connector>(io_service_, ssl_context_);
 
 			asio::async_connect(conn_ptr_->socket(), endpoints,
-								[this](boost::system::error_code ec, asio::ip::tcp::endpoint)
+								[this, func = std::move(f)](boost::system::error_code ec, asio::ip::tcp::endpoint)
 								{
 									if (ec)
 									{
 										XLOG_ERROR() << " maybe occur error - " << ec.message();
 
+										if (func)
+											func(false);
+
 										return;
 									}
+
+									if (func)
+										func(true);
 
 									conn_ptr_->set_verify_mode(asio::ssl::verify_peer);
 

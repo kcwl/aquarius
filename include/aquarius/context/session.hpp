@@ -72,6 +72,16 @@ namespace aquarius
 			ctxs_.erase(proto);
 		}
 
+		virtual std::string remote_addr() override
+		{
+			if (conn_ptr_.expired())
+				return {};
+
+			auto ptr = conn_ptr_.lock();
+
+			return ptr->remote_address();
+		}
+
 		virtual void attach_buffer(const std::size_t proto, flex_buffer_t& buffer) override
 		{
 			std::lock_guard lk(large_mutex_);
