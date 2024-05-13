@@ -119,8 +119,6 @@ namespace aquarius
 									if (func)
 										func(true);
 
-									conn_ptr_->set_verify_mode(asio::ssl::verify_peer);
-
 									conn_ptr_->start();
 								});
 		}

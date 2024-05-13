@@ -166,7 +166,9 @@
     <ClInclude Include="..\include\aquarius\client\async.hpp" />
     <ClInclude Include="..\include\aquarius\client\callback.hpp" />
     <ClInclude Include="..\include\aquarius\connect.hpp" />
-    <ClInclude Include="..\include\aquarius\connect\socket_adapter.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\basic_connect.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\no_ssl.hpp" />
+    <ClInclude Include="..\include\aquarius\connect\ssl.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\content.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />

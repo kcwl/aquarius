@@ -89,12 +89,6 @@ namespace aquarius
 										   conn_ptr->regist_close(on_close_);
 
 										   conn_ptr->start();
-
-										   XLOG_INFO()
-											   << "[acceptor] accept connection at " << endpoint_.address().to_string()
-											   << " : " << conn_ptr->remote_address() << "("
-											   << conn_ptr->remote_address_u() << ")[" << conn_ptr->remote_port()
-											   << "]";
 									   }
 
 									   start_accept();

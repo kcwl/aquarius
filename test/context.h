@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 BOOST_AUTO_TEST_CASE(call_back)
 {
 	{
-		using connect_t = aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>;
+		using connect_t = aquarius::ssl_tcp_server_connect;
 
 		aquarius::asio::io_service io_service;
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(function)
 	aquarius::flex_buffer_t buffer{};
 
 	request_ptr->to_binary(buffer);
-	
+
 	uint32_t proto{};
 	elastic::from_binary(proto, buffer);
 
@@ -71,8 +71,7 @@ BOOST_AUTO_TEST_CASE(manager)
 	}
 
 	{
-		auto session = std::make_shared<aquarius::session<
-			aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
+		auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
 
 		aquarius::invoke_session_helper::push(session);
 
@@ -83,7 +82,7 @@ BOOST_AUTO_TEST_CASE(manager)
 		elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
 		elastic::to_binary(12001, buffer);
-		
+
 		BOOST_CHECK(!aquarius::message_router::process(buffer, session->uuid()));
 	}
 
@@ -96,8 +95,7 @@ BOOST_AUTO_TEST_CASE(manager)
 
 		elastic::to_binary(12001u, buffer);
 
-		auto session = std::make_shared<aquarius::session<
-			aquarius::connect<aquarius::tcp, aquarius::conn_mode::basic_server, aquarius::ssl_mode::ssl>>>(nullptr);
+		auto session = std::make_shared < aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
 
 		elastic::to_binary(45u, buffer);
 		buffer.commit(45);
