@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(ssl)
 
 		std::thread t([&] { srv.run(); });
 
-		aquarius::tcp_client cli("127.0.0.1", "8100");
+		aquarius::tcp_client cli("127.0.0.1", "8100", [](auto result) {BOOST_CHECK(!result); });
 
 		std::thread tc([&] { cli.run(); });
 
