@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/core/elastic.hpp>
 #include <aquarius/core/visitable.hpp>
-#include <aquarius/message/field.hpp>
 #include <aquarius/message/header.hpp>
 #include <cstddef>
 #include <optional>
@@ -92,6 +91,9 @@ namespace aquarius
 			return *this;
 		}
 
+		message(const message& other) = default;
+		message& operator=(const message&) = default;
+
 	public:
 		body_type& body() noexcept
 		{
@@ -124,9 +126,6 @@ namespace aquarius
 		}
 
 	private:
-		message(const message& other) = delete;
-		message& operator=(const message&) = delete;
-
 		void swap(message& other)
 		{
 			base_type::swap(other);

@@ -107,12 +107,6 @@
     <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\field.hpp">
-      <Filter>include\aquarius\message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\message\impl\field.hpp">
-      <Filter>include\aquarius\message\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\message\header.hpp">
       <Filter>include\aquarius\message</Filter>
     </ClInclude>
@@ -132,9 +126,6 @@
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\empty_value.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\concepts.hpp">

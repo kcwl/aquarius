@@ -116,10 +116,10 @@ namespace aquarius
 										return;
 									}
 
+									conn_ptr_->start();
+
 									if (func)
 										func(true);
-
-									conn_ptr_->start();
 								});
 		}
 
