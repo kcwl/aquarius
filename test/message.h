@@ -10,13 +10,14 @@ BOOST_AUTO_TEST_CASE(construction)
 {
 	{
 		person_request req{};
+		req.header()->session_id = 1;
 		req.body().age = 3;
 		req.body().back_money = 4;
 		req.add_length(2);
 
 		person_request req1(std::move(req));
 
-		BOOST_CHECK(req.header() == nullptr);
+		BOOST_CHECK(req.header()->session_id == 0);
 
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
@@ -29,6 +30,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_request req{};
+		req.header()->session_id = 1;
 		req.body().age = 3;
 		req.body().back_money = 4;
 		req.add_length(2);
@@ -36,7 +38,7 @@ BOOST_AUTO_TEST_CASE(construction)
 		person_request req1{};
 		req1 = std::move(req);
 
-		BOOST_CHECK(req.header() == nullptr);
+		BOOST_CHECK(req.header()->session_id == 0);
 
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
@@ -49,13 +51,16 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_response resp{};
-
+		resp.header()->session_id = 1;
+		resp.header()->result = 2;
 		resp.body().age = 3;
 		resp.body().back_money = 4;
 
 		person_response resp1(std::move(resp));
 
-		BOOST_CHECK(resp.header() == nullptr);
+		BOOST_CHECK(resp.header()->session_id == 0);
+
+		BOOST_CHECK(resp.header()->result == 0);
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
@@ -68,14 +73,17 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_response resp{};
-
+		resp.header()->session_id = 1;
+		resp.header()->result = 2;
 		resp.body().age = 3;
 		resp.body().back_money = 4;
 
 		person_response resp1{};
 		resp1 = std::move(resp);
 
-		BOOST_CHECK(resp.header() == nullptr);
+		BOOST_CHECK(resp.header()->session_id == 0);
+
+		BOOST_CHECK(resp.header()->result == 0);
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 

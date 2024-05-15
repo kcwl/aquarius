@@ -1,18 +1,15 @@
 #pragma once
 #include <aquarius/core/uuid.hpp>
-#include <aquarius/message/field.hpp>
 #include <aquarius/message/impl/header.hpp>
 #include <aquarius/message/impl/protocol.hpp>
 
 namespace aquarius
 {
 	template <typename _Header, std::size_t N>
-	class tcp_header : virtual public impl::basic_header, public fields<_Header>
+	class tcp_header : virtual public impl::basic_header
 	{
 	public:
 		using header_type = _Header;
-
-		using field_base_type = fields<header_type>;
 
 		using base_type = impl::basic_header;
 
@@ -23,25 +20,21 @@ namespace aquarius
 	public:
 		tcp_header()
 			: uuid_(invoke_uuid<uint32_t>())
-			, header_ptr_(nullptr)
+			, header_()
 			, pos_(0)
 		{
-			this->alloc(header_ptr_);
+			
 		}
 
-		virtual ~tcp_header()
-		{
-			this->dealloc(header_ptr_);
-		}
+		virtual ~tcp_header() = default;
 
 	public:
 		tcp_header(tcp_header&& other) noexcept
 			: base_type(std::move(other))
 			, uuid_(other.uuid_)
-			, header_ptr_(other.header_ptr_)
+			, header_(std::move(other.header_))
 		{
 			other.uuid_ = 0;
-			other.header_ptr_ = nullptr;
 		}
 
 		tcp_header& operator=(const tcp_header&) = default;
@@ -49,7 +42,7 @@ namespace aquarius
 	public:
 		header_type* header() noexcept
 		{
-			return header_ptr_;
+			return &header_;
 		}
 
 		void set_uuid(uint32_t uuid)
@@ -83,11 +76,7 @@ namespace aquarius
 
 			std::swap(uuid_, other.uuid_);
 
-			auto tmp_ptr = this->header_ptr_;
-
-			this->header_ptr_ = other.header_ptr_;
-
-			other.header_ptr_ = tmp_ptr;
+			std::swap(header_, other.header_);
 		}
 
 	protected:
@@ -98,7 +87,7 @@ namespace aquarius
 
 			elastic::from_binary(uuid_, stream);
 
-			elastic::from_binary(*header_ptr_, stream);
+			elastic::from_binary(header_, stream);
 
 			return true;
 		}
@@ -115,7 +104,7 @@ namespace aquarius
 
 			elastic::to_binary(uuid_, stream);
 
-			elastic::to_binary(*header_ptr_, stream);
+			elastic::to_binary(header_, stream);
 
 			this->add_length(stream.size() - current);
 
@@ -125,7 +114,7 @@ namespace aquarius
 	private:
 		uint32_t uuid_;
 
-		header_type* header_ptr_;
+		header_type header_;
 
 		int32_t pos_;
 	};

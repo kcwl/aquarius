@@ -190,7 +190,6 @@
     <ClInclude Include="..\include\aquarius\message\header.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\custom.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\header.hpp" />
-    <ClInclude Include="..\include\aquarius\message\impl\field.hpp" />
     <ClInclude Include="..\include\aquarius\message\impl\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\core\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\router\router.hpp" />
@@ -205,8 +204,6 @@
     <ClInclude Include="..\include\aquarius\service.hpp" />
     <ClInclude Include="..\include\aquarius\core\asio.hpp" />
     <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp" />
-    <ClInclude Include="..\include\aquarius\core\empty_value.hpp" />
-    <ClInclude Include="..\include\aquarius\message\field.hpp" />
     <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\service\manager.hpp" />
