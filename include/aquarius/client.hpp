@@ -58,7 +58,9 @@ namespace aquarius
 		{
 			flex_buffer_t fs{};
 
-			req.to_binary(fs);
+			aquarius::error_code ec{};
+
+			req.to_binary(fs, ec);
 
 			async_write(std::move(fs));
 		}

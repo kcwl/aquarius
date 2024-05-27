@@ -1,7 +1,7 @@
 ﻿#pragma once
+#include <aquarius/connect/packet.hpp>
 #include <aquarius/context/session.hpp>
 #include <aquarius/core/uuid.hpp>
-#include <aquarius/router/router.hpp>
 
 namespace aquarius
 {
@@ -22,6 +22,7 @@ namespace aquarius
 			, uuid_(invoke_uuid<uint32_t>())
 			, on_accept_()
 			, on_close_()
+			, receiver_()
 		{}
 
 		basic_connect(asio::io_service& io_service, asio::ssl_context_t& basic_context)
@@ -83,7 +84,7 @@ namespace aquarius
 
 										read_buffer_.commit(static_cast<int>(bytes_transferred));
 
-										message_router::process(read_buffer_, uuid());
+										receiver_.process(read_buffer_, uuid());
 
 										async_read();
 									});
@@ -210,5 +211,7 @@ namespace aquarius
 		std::function<void(const std::size_t)> on_accept_;
 
 		std::function<void(const std::size_t)> on_close_;
+
+		packet receiver_;
 	};
 } // namespace aquarius

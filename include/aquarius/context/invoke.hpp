@@ -1,6 +1,7 @@
 #pragma once
-#include <aquarius/context/manager.hpp>
 #include <aquarius/context/impl/session.hpp>
+#include <aquarius/context/manager.hpp>
+#include <aquarius/core/error_code.hpp>
 
 namespace aquarius
 {
@@ -30,7 +31,10 @@ namespace aquarius
 		static bool broadcast(_Response&& resp)
 		{
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+
+			aquarius::error_code ec{};
+
+			resp.to_binary(fs, ec);
 
 			session_manager::instance().broadcast(std::move(fs));
 
@@ -41,7 +45,10 @@ namespace aquarius
 		static bool broadcast_if(_Response&& resp, _Pre&& func)
 		{
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+
+			aquarius::error_code ec{};
+
+			resp.to_binary(fs, ec);
 
 			session_manager::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
 

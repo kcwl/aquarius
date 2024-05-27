@@ -19,7 +19,7 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual bool visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
 		{
 			request_ptr_ = req;
 
@@ -36,7 +36,7 @@ namespace aquarius
 		}
 
 	protected:
-		virtual bool handle() = 0;
+		virtual error_code handle() = 0;
 
 		bool send_response(int result)
 		{
@@ -54,11 +54,13 @@ namespace aquarius
 		{
 			response_.set_uuid(request_ptr_->uuid());
 
-			response_.header()->result = static_cast<int>(result);
+			response_.header()->set_result(result);
 
 			flex_buffer_t fs;
 
-			response_.to_binary(fs);
+			error_code ec{};
+
+			response_.to_binary(fs, ec);
 
 			return fs;
 		}

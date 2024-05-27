@@ -10,14 +10,14 @@ BOOST_AUTO_TEST_CASE(construction)
 {
 	{
 		person_request req{};
-		req.header()->session_id = 1;
+		req.header()->set_session(1);
 		req.body().age = 3;
 		req.body().back_money = 4;
 		req.add_length(2);
 
 		person_request req1(std::move(req));
 
-		BOOST_CHECK(req.header()->session_id == 0);
+		BOOST_CHECK(req.header()->session() == 0);
 
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_request req{};
-		req.header()->session_id = 1;
+		req.header()->set_session(1);
 		req.body().age = 3;
 		req.body().back_money = 4;
 		req.add_length(2);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(construction)
 		person_request req1{};
 		req1 = std::move(req);
 
-		BOOST_CHECK(req.header()->session_id == 0);
+		BOOST_CHECK(req.header()->session() == 0);
 
 		BOOST_CHECK(req1.body().age == 3 && req.body().age == 0);
 
@@ -51,16 +51,16 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_response resp{};
-		resp.header()->session_id = 1;
-		resp.header()->result = 2;
+		resp.header()->set_session(1);
+		resp.header()->set_result( 2);
 		resp.body().age = 3;
 		resp.body().back_money = 4;
 
 		person_response resp1(std::move(resp));
 
-		BOOST_CHECK(resp.header()->session_id == 0);
+		BOOST_CHECK(resp.header()->session() == 0);
 
-		BOOST_CHECK(resp.header()->result == 0);
+		BOOST_CHECK(resp.header()->result() == 0);
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
@@ -73,17 +73,17 @@ BOOST_AUTO_TEST_CASE(construction)
 
 	{
 		person_response resp{};
-		resp.header()->session_id = 1;
-		resp.header()->result = 2;
+		resp.header()->set_session(1);
+		resp.header()->set_result(2);
 		resp.body().age = 3;
 		resp.body().back_money = 4;
 
 		person_response resp1{};
 		resp1 = std::move(resp);
 
-		BOOST_CHECK(resp.header()->session_id == 0);
+		BOOST_CHECK(resp.header()->session() == 0);
 
-		BOOST_CHECK(resp.header()->result == 0);
+		BOOST_CHECK(resp.header()->result() == 0);
 
 		BOOST_CHECK(resp1.body().age == 3 && resp.body().age == 0);
 
@@ -100,17 +100,19 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 	{
 		aquarius::flex_buffer_t buffer{};
 		person_request req{};
-		req.header()->session_id = 1;
+		req.header()->set_session(1);
 		req.body().age = 3;
 
-		BOOST_CHECK(req.to_binary(buffer));
+		aquarius::error_code ec{};
+
+		BOOST_CHECK(req.to_binary(buffer, ec));
 
 		std::size_t proto{};
 		elastic::from_binary(proto, buffer);
 
 		person_request req1{};
 
-		BOOST_CHECK(req1.from_binary(buffer));
+		BOOST_CHECK(req1.from_binary(buffer, ec));
 	}
 
 	{
@@ -120,7 +122,9 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 		person_request req{};
 
-		BOOST_CHECK(!req.from_binary(buffer));
+		aquarius::error_code ec{};
+
+		BOOST_CHECK(!req.from_binary(buffer, ec));
 	}
 
 	//{
@@ -146,7 +150,7 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 	//	buffer.resize(12);
 
-	//	req.header()->session_id = static_cast<uint32_t>(aquarius::uuid::invoke());
+	//	req.header()->session() = static_cast<uint32_t>(aquarius::uuid::invoke());
 
 	//	BOOST_CHECK(!req.to_binary(buffer));
 	//}
@@ -175,7 +179,9 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 		person_request req{};
 
-		BOOST_CHECK(!req.from_binary(buffer));
+		aquarius::error_code ec{};
+
+		BOOST_CHECK(!req.from_binary(buffer, ec));
 	}
 }
 

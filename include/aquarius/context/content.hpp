@@ -18,7 +18,7 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual bool visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr)
 		{
 			response_ptr_ = resp;
 
@@ -39,7 +39,7 @@ namespace aquarius
 		}
 
 	protected:
-		virtual bool handle() = 0;
+		virtual error_code handle() = 0;
 
 	protected:
 		std::shared_ptr<_Response> response_ptr_;

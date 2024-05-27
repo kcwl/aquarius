@@ -97,14 +97,14 @@ public:
 	{}
 
 public:
-	virtual bool handle() override
+	virtual aquarius::error_code handle() override
 	{
 		response_.body().age = 1;
 		response_.body().name = "hello";
 
 		send_response(0);
 
-		return false;
+		return aquarius::error_code_result::unknown;
 	}
 };
 
@@ -118,12 +118,12 @@ public:
 	{}
 
 public:
-	virtual bool handle() override
+	virtual aquarius::error_code handle() override
 	{
 		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
 		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return true;
+		return aquarius::error_code_result::ok;
 	}
 };
 
@@ -141,7 +141,7 @@ public:
 	{}
 
 public:
-	virtual bool handle() override
+	virtual aquarius::error_code handle() override
 	{
 		response_.body().age = 1;
 		response_.body().name = "hello";
@@ -150,7 +150,7 @@ public:
 
 		send_response(0);
 
-		return false;
+		return aquarius::error_code_result::unknown;
 	}
 };
 
@@ -164,12 +164,12 @@ public:
 	{}
 
 public:
-	virtual bool handle() override
+	virtual aquarius::error_code handle() override
 	{
 		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
 		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return false;
+		return aquarius::error_code_result::unknown;
 	}
 };
 

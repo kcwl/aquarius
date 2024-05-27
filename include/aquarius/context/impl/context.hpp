@@ -30,11 +30,11 @@ namespace aquarius
 		basic_context& operator=(const basic_context&) = delete;
 
 	public:
-		virtual bool visit(basic_message*, std::shared_ptr<basic_session> session_ptr) override
+		virtual error_code visit(basic_message*, std::shared_ptr<basic_session> session_ptr) override
 		{
 			XLOG_WARNING() << visitor_ << " maybe visit an unknown message!";
 
-			return true;
+			return error_code();
 		}
 
 		std::string visitor() const

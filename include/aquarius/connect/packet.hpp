@@ -2,48 +2,50 @@
 #include <aquarius/context.hpp>
 #include <aquarius/context/generator.hpp>
 #include <aquarius/context/invoke.hpp>
-#include <aquarius/core/core.hpp>
 #include <aquarius/core/elastic.hpp>
+#include <aquarius/core/error_code.hpp>
 #include <aquarius/core/logger.hpp>
+#include <aquarius/message/generator.hpp>
 #include <aquarius/message/message.hpp>
 
 namespace aquarius
 {
-	struct message_router
+	class packet
 	{
-		static bool process(flex_buffer_t& buffer, std::size_t uid)
+	public:
+		static error_code process(flex_buffer_t& buffer, std::size_t uid)
 		{
+			aquarius::error_code ec{};
+
 			auto session_ptr = invoke_session_helper::find(uid);
 
 			if (!session_ptr)
-				return false;
+				return ec = error_code_result::nosession;
 
-			auto pos = buffer.pubseekoff(0,std::ios::cur,std::ios::out);
+			auto pos = buffer.pubseekoff(0, std::ios::cur, std::ios::out);
 
 			pack_flag flag{};
 
 			if (!elastic::from_binary(flag, buffer))
 			{
-				XLOG_ERROR() << "parse proto error, maybe message is not haved flag.";
+				XLOG_WARNING() << "parse proto error, maybe message is not haved flag.";
 
-				return false;
+				return ec = error_code_result::incomplete;
 			}
 
 			uint32_t proto{};
 			if (!elastic::from_binary(proto, buffer))
 			{
-				XLOG_ERROR() << "parse proto error, maybe message is not complete.";
+				XLOG_WARNING() << "parse proto error, maybe message is not complete.";
 
-				return false;
+				return ec = error_code_result::unknown;
 			}
-
-			bool result = true;
 
 			switch (flag)
 			{
 			case pack_flag::normal:
 				{
-					result = normalize(buffer, session_ptr, proto, uid);
+					ec = normalize(buffer, session_ptr, proto, uid);
 				}
 				break;
 			case pack_flag::middle:
@@ -55,22 +57,23 @@ namespace aquarius
 				{
 					auto buf = session_ptr->complete(proto, buffer);
 
-					result = normalize(buf, session_ptr, proto, uid);
+					ec = normalize(buf, session_ptr, proto, uid);
 				}
 				break;
 			default:
 				break;
 			}
 
-			if (!result)
+			if (ec.value() != static_cast<int>(error_code_result::pending) &&
+				ec.value() != static_cast<int>(error_code_result::ok))
 				buffer.pubseekpos(pos, std::ios::out);
 
-			return result;
+			return ec;
 		}
 
-	protected:
-		static bool normalize(flex_buffer_t& buffer, std::shared_ptr<basic_session> session_ptr,
-							  const std::size_t proto, const std::size_t uid)
+	private:
+		static error_code normalize(flex_buffer_t& buffer, std::shared_ptr<basic_session> session_ptr,
+									const std::size_t proto, const std::size_t uid)
 		{
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
@@ -90,10 +93,10 @@ namespace aquarius
 
 			auto result = request_ptr->accept(buffer, context_ptr, session_ptr);
 
-			if (result)
+			if (result.value() == static_cast<int>(error_code_result::ok))
 				session_ptr->detach(proto);
 
-			return buffer.size() ? process(buffer, uid) : result;
+			return buffer.size() != 0 ? process(buffer, uid) : result;
 		}
 	};
 } // namespace aquarius
