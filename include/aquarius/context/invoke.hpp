@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/context/impl/session.hpp>
 #include <aquarius/context/manager.hpp>
 #include <aquarius/core/error_code.hpp>
 
@@ -7,12 +6,12 @@ namespace aquarius
 {
 	struct invoke_session_helper
 	{
-		static bool push(std::shared_ptr<basic_session> session_ptr)
+		static bool push(std::shared_ptr<basic_connect> connect_ptr)
 		{
-			return session_manager::instance().push(session_ptr);
+			return session_manager::instance().push(connect_ptr);
 		}
 
-		static std::shared_ptr<basic_session> find(std::size_t uid)
+		static std::shared_ptr<basic_connect> find(std::size_t uid)
 		{
 			return session_manager::instance().invoke(uid);
 		}

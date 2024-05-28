@@ -182,16 +182,10 @@
     <ClInclude Include="..\include\aquarius\service\service.hpp">
       <Filter>include\aquarius\service</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\impl\session.hpp">
-      <Filter>include\aquarius\context\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\context\invoke.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\manager.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\session.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\visitor.hpp">
@@ -227,7 +221,7 @@
     <ClInclude Include="..\include\aquarius\connect\ssl.hpp">
       <Filter>include\aquarius\connect</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\connect\basic_connect.hpp">
+    <ClInclude Include="..\include\aquarius\connect\connect.hpp">
       <Filter>include\aquarius\connect</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\error_code.hpp">
@@ -243,6 +237,12 @@
       <Filter>include\aquarius\message</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\connect\packet.hpp">
+      <Filter>include\aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\mode.hpp">
+      <Filter>include\aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\connect\basic_connect.hpp">
       <Filter>include\aquarius\connect</Filter>
     </ClInclude>
   </ItemGroup>

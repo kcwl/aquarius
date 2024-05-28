@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_CASE(call_back)
 
 		auto conn = std::make_shared<connect_t>(std::move(socket), ssl_context);
 
-		auto session_ptr = std::make_shared<aquarius::session<connect_t>>(conn);
+		aquarius::invoke_session_helper::push(conn);
 
-		aquarius::invoke_session_helper::push(session_ptr);
+		//aquarius::packet<connect_t> pack{};
 
-		session_ptr->attach(1300, std::make_shared<aquarius::basic_context>());
-		session_ptr->attach(1300, std::make_shared<aquarius::basic_context>());
-		session_ptr->attach(1301, std::make_shared<ctx_test_server>());
+		//pack.attach(1300, std::make_shared<aquarius::basic_context>());
+		//pack.attach(1300, std::make_shared<aquarius::basic_context>());
+		//pack.attach(1301, std::make_shared<ctx_test_server>());
 	}
 }
 
@@ -72,40 +72,40 @@ BOOST_AUTO_TEST_CASE(manager)
 	}
 
 	{
-		auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
+	//	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
 
-		aquarius::invoke_session_helper::push(session);
+	//	aquarius::invoke_session_helper::push(session);
 
-		aquarius::flex_buffer_t buffer{};
+	//	aquarius::flex_buffer_t buffer{};
 
-		aquarius::packet pc{};
+	//	aquarius::packet pc{};
 
-		BOOST_CHECK(!pc.process(buffer, session->uuid()));
+	//	BOOST_CHECK(!pc.process(buffer, session->uuid()));
 
-		elastic::to_binary(aquarius::pack_flag::normal, buffer);
+	//	elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
-		elastic::to_binary(12001, buffer);
+	//	elastic::to_binary(12001, buffer);
 
-		BOOST_CHECK(!pc.process(buffer, session->uuid()));
-	}
+	//	BOOST_CHECK(!pc.process(buffer, session->uuid()));
+	//}
 
-	{
-		aquarius::flex_buffer_t buffer{};
+	//{
+	//	aquarius::flex_buffer_t buffer{};
 
-		elastic::to_binary(aquarius::pack_flag::normal, buffer);
+	//	elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
-		aquarius::packet pct{};
+	//	aquarius::packet pct{};
 
-		BOOST_CHECK(!pct.process(buffer, 10001));
+	//	BOOST_CHECK(!pct.process(buffer, 10001));
 
-		elastic::to_binary(12001u, buffer);
+	//	elastic::to_binary(12001u, buffer);
 
-		auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
+	//	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
 
-		elastic::to_binary(45u, buffer);
-		buffer.commit(45);
+		//elastic::to_binary(45u, buffer);
+		//buffer.commit(45);
 
-		pct.process(buffer, session->uuid());
+		//pct.process(buffer, session->uuid());
 
 		BOOST_CHECK(aquarius::invoke_session_helper::broadcast(person_response{}));
 

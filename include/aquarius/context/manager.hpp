@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/context/session.hpp>
+#include <aquarius/connect/basic_connect.hpp>
 #include <aquarius/core/manager.hpp>
 #include <functional>
 #include <mutex>
@@ -7,15 +7,15 @@
 
 namespace aquarius
 {
-	class session_manager : public single_manager<session_manager, std::shared_ptr<basic_session>>
+	class session_manager : public single_manager<session_manager, std::shared_ptr<basic_connect>>
 	{
 	public:
-		bool push(std::shared_ptr<basic_session> session_ptr)
+		bool push(std::shared_ptr<basic_connect> connect_ptr)
 		{
-			if (!session_ptr)
+			if (!connect_ptr)
 				return false;
 
-			regist(session_ptr->uuid(), session_ptr);
+			regist(connect_ptr->uuid(), connect_ptr);
 
 			return true;
 		}

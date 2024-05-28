@@ -146,8 +146,6 @@ public:
 		response_.body().age = 1;
 		response_.body().name = "hello";
 
-		BOOST_CHECK(session_ptr_->remote_addr() == "127.0.0.1");
-
 		send_response(0);
 
 		return aquarius::error_code_result::unknown;

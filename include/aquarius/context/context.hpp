@@ -4,7 +4,7 @@
 namespace aquarius
 {
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public shared_visitor<_Request, basic_session>
+	class context : public basic_context, public shared_visitor<_Request, basic_connect>
 	{
 	public:
 		context(const std::string& name)
@@ -19,11 +19,11 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Request> req, std::shared_ptr<basic_session> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Request> req, basic_connect* session_ptr)
 		{
 			request_ptr_ = req;
 
-			session_ptr_ = session_ptr;
+			connect_ptr_ = session_ptr;
 
 			auto result = handle();
 
@@ -41,10 +41,10 @@ namespace aquarius
 		bool send_response(int result)
 		{
 			auto fs = make_response(result);
-			if (!this->session_ptr_)
+			if (!this->connect_ptr_)
 				return false;
 
-			this->session_ptr_->async_write(std::move(fs));
+			this->connect_ptr_->async_write(std::move(fs));
 
 			return true;
 		}

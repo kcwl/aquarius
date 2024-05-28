@@ -4,7 +4,7 @@
 namespace aquarius
 {
 	template <typename _Response>
-	class content : public basic_context, public shared_visitor<_Response, basic_session>
+	class content : public basic_context, public shared_visitor<_Response, basic_connect>
 	{
 	public:
 		content(const std::string& name)
@@ -18,11 +18,11 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Response> resp, basic_connect* connect_ptr)
 		{
 			response_ptr_ = resp;
 
-			session_ptr_ = session_ptr;
+			connect_ptr_ = connect_ptr;
 
 			auto result = handle();
 

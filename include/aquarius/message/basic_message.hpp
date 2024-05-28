@@ -7,12 +7,12 @@ namespace aquarius
 {
 	class basic_context;
 
-	class basic_session;
+	class basic_connect;
 } // namespace aquarius
 
 namespace aquarius
 {
-	class basic_message : public visitable<flex_buffer_t, basic_context, basic_session>
+	class basic_message : public visitable<flex_buffer_t, basic_context, basic_connect>
 	{
 		using length_t = uint16_t;
 

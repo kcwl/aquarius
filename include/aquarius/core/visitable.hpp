@@ -11,12 +11,12 @@ namespace aquarius
 		virtual ~visitable() = default;
 
 	public:
-		virtual error_code accept(_Stream&, std::shared_ptr<_Context>, std::shared_ptr<_Transfer>) = 0;
+		virtual error_code accept(_Stream&, std::shared_ptr<_Context>, _Transfer*) = 0;
 	};
 
 	template <typename _Request, typename _Context, typename _Transfer>
 	static error_code accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<_Context> ctx,
-								   std::shared_ptr<_Transfer> session_ptr)
+										 _Transfer* connect_ptr)
 	{
 		using visitor_t = shared_visitor<_Request, _Transfer>;
 
@@ -25,11 +25,11 @@ namespace aquarius
 		if (!visit_ptr)
 			return false;
 
-		return visit_ptr->visit(req, session_ptr);
+		return visit_ptr->visit(req, connect_ptr);
 	}
 
 	template <typename _Request, typename _Context, typename _Transfer>
-	static error_code accept_bare_impl(_Request* req, std::shared_ptr<_Context> ctx, std::shared_ptr<_Transfer> session_ptr)
+	static error_code accept_bare_impl(_Request* req, std::shared_ptr<_Context> ctx, _Transfer* connect_ptr)
 	{
 		using visitor_t = bare_visitor<_Request, _Transfer>;
 
@@ -38,28 +38,28 @@ namespace aquarius
 		if (!visit_ptr)
 			return false;
 
-		return visit_ptr->visit(req, session_ptr);
+		return visit_ptr->visit(req, connect_ptr);
 	}
 } // namespace aquarius
 
 #define AQUARIUS_VISITABLE_MESSAGE()                                                                                   \
 	virtual aquarius::error_code accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx, \
-										std::shared_ptr<aquarius::basic_session> session_ptr)                          \
+										aquarius::basic_connect* connect_ptr)                                          \
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
 		if (!ec)                                                                                                       \
 			return ec;                                                                                                 \
-		return accept_shared_impl(this->shared_from_this(), ctx, session_ptr);                                         \
+		return accept_shared_impl(this->shared_from_this(), ctx, connect_ptr);                                         \
 	}
 
 #define AQUARIUS_VISITABLE_BASE()                                                                                      \
 	virtual aquarius::error_code accept(aquarius::flex_buffer_t& buffer, std::shared_ptr<aquarius::basic_context> ctx, \
-										std::shared_ptr<aquarius::basic_session> session_ptr)                          \
+										aquarius::basic_connect* connect_ptr)                                          \
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
 		if (!ec)                                                                                                       \
 			return ec;                                                                                                 \
-		return accept_bare_impl(this, ctx, session_ptr);                                                               \
+		return accept_bare_impl(this, ctx, connect_ptr);                                                               \
 	}
