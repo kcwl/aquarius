@@ -34,7 +34,7 @@ namespace aquarius
 			{
 				XLOG_WARNING() << "parse proto error, maybe message is not haved flag.";
 
-				return ec = error_code_result::incomplete;
+				return ec = errc::incomplete;
 			}
 
 			uint32_t proto{};
@@ -42,7 +42,7 @@ namespace aquarius
 			{
 				XLOG_WARNING() << "parse proto error, maybe message is not complete.";
 
-				return ec = error_code_result::unknown;
+				return ec = errc::unknown;
 			}
 
 			switch (flag)
@@ -68,8 +68,8 @@ namespace aquarius
 				break;
 			}
 
-			if (ec.value() != static_cast<int>(error_code_result::pending) &&
-				ec.value() != static_cast<int>(error_code_result::ok))
+			if (ec.value() != static_cast<int>(errc::pending) &&
+				ec.value() != static_cast<int>(errc::ok))
 				buffer.pubseekpos(pos, std::ios::out);
 
 			return ec;
@@ -116,7 +116,7 @@ namespace aquarius
 
 			auto result = request_ptr->accept(buffer, context_ptr, connect_ptr_);
 
-			if (result.value() == static_cast<int>(error_code_result::ok))
+			if (result.value() == static_cast<int>(errc::ok))
 				detach(request_ptr->uuid());
 
 			return buffer.size() != 0 ? process(buffer) : result;

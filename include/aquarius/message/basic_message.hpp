@@ -5,8 +5,6 @@
 namespace aquarius
 {
 	class basic_context;
-
-	class basic_connect;
 } // namespace aquarius
 
 namespace aquarius
@@ -75,7 +73,7 @@ namespace aquarius
 			constexpr auto size_uint16 = sizeof(uint16_t);
 
 			if (stream.size() < size_uint16)
-				return ec = error_code_result::incomplete;
+				return ec = errc::incomplete;
 
 			std::memcpy((char*)&length_, stream.wdata(), size_uint16);
 
@@ -85,19 +83,19 @@ namespace aquarius
 			{
 				stream.consume(-(static_cast<int>(size_uint16)));
 
-				return ec = error_code_result::incomplete;
+				return ec = errc::incomplete;
 			}
 
 			stream.consume(length_);
 
-			return ec = error_code_result::ok;
+			return ec = errc::ok;
 		}
 
 		virtual error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
 			elastic::to_binary(length_, stream);
 
-			return ec = error_code_result::ok;
+			return ec = errc::ok;
 		}
 
 	protected:

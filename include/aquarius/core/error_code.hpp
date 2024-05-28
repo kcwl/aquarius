@@ -5,22 +5,25 @@
 
 namespace aquarius
 {
-	enum class error_code_result
+	enum class errc
 	{
 		ok,			// success complete
 		pending,	// waiting for handle
 		incomplete, // package is not complete
 		unknown,	// unknown protocol
-		nosession   // non session
+		nosession,  // non session
+		timeout     // timeout
 	};
 
 	inline std::map<int, std::string> error_map()
 	{
 		static const std::map<int, std::string> error_arr = {
-			{ static_cast<int>(error_code_result::ok), "successful" },
-			{ static_cast<int>(error_code_result::pending), "wait for handle pending" },
-			{ static_cast<int>(error_code_result::incomplete), "package is not complete" },
-			{ static_cast<int>(error_code_result::unknown), "unknown protocol" }
+			{ static_cast<int>(errc::ok), "successful" },
+			{ static_cast<int>(errc::pending), "wait for handle pending" },
+			{ static_cast<int>(errc::incomplete), "package is not complete" },
+			{ static_cast<int>(errc::unknown), "unknown protocol" },
+			{static_cast<int>(errc::nosession), "session is not exist"},
+			{static_cast<int>(errc::timeout), "context handle timeout"}
 		};
 
 		return error_arr;
@@ -67,14 +70,14 @@ namespace aquarius
 			: std::error_code(ec, get_error_category())
 		{}
 
-		error_code(error_code_result ec)
+		error_code(errc ec)
 			: error_code(static_cast<int>(ec))
 		{
 
 		}
 
 	public:
-		error_code& operator=(error_code_result ec)
+		error_code& operator=(errc ec)
 		{
 			this->assign(static_cast<int>(ec), get_error_category());
 

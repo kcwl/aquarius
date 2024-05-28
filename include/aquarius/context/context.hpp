@@ -1,5 +1,8 @@
 #pragma once
 #include <aquarius/context/impl/context.hpp>
+#include <future>
+
+using namespace std::chrono_literals;
 
 namespace aquarius
 {
@@ -7,10 +10,11 @@ namespace aquarius
 	class context : public basic_context, public shared_visitor<_Request>
 	{
 	public:
-		context(const std::string& name)
+		context(const std::string& name, const std::chrono::milliseconds& timeout = 10s)
 			: basic_context(name)
 			, request_ptr_(nullptr)
 			, response_()
+			, timeout_(timeout)
 		{}
 
 	public:
@@ -25,11 +29,24 @@ namespace aquarius
 
 			connect_ptr_ = session_ptr;
 
-			auto result = handle();
+			auto task = std::make_shared<std::packaged_task<error_code()>>([&] { return this->handle(); });
+
+			auto future = task->get_future();
+
+			auto status = future.wait_for(timeout_);
+
+			if (status != std::future_status::ready)
+			{
+				XLOG_WARNING() << this->visitor() << "handle timeout!";
+
+				return errc::timeout;
+			}
+
+			auto result = future.get();
 
 			if (!result)
 			{
-				XLOG_ERROR() << this->visitor() << " handle error";
+				XLOG_ERROR() << this->visitor() << " handle error, maybe " << result.message();
 			}
 
 			return result;
@@ -69,5 +86,7 @@ namespace aquarius
 		std::shared_ptr<_Request> request_ptr_;
 
 		_Response response_;
+
+		std::chrono::milliseconds timeout_;
 	};
 } // namespace aquarius

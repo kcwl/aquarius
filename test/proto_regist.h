@@ -104,7 +104,7 @@ public:
 
 		send_response(0);
 
-		return aquarius::error_code_result::unknown;
+		return aquarius::errc::unknown;
 	}
 };
 
@@ -123,7 +123,7 @@ public:
 		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
 		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return aquarius::error_code_result::ok;
+		return aquarius::errc::ok;
 	}
 };
 
@@ -148,7 +148,7 @@ public:
 
 		send_response(0);
 
-		return aquarius::error_code_result::unknown;
+		return aquarius::errc::unknown;
 	}
 };
 
@@ -167,7 +167,7 @@ public:
 		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
 		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return aquarius::error_code_result::unknown;
+		return aquarius::errc::unknown;
 	}
 };
 

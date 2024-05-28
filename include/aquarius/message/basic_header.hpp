@@ -83,7 +83,7 @@ namespace aquarius
 
 			elastic::from_binary(uuid_, stream);
 
-			return ec = error_code_result::ok;
+			return ec = errc::ok;
 		}
 
 		virtual error_code to_binary(flex_buffer_t& stream, error_code& ec) override
@@ -100,7 +100,7 @@ namespace aquarius
 
 			this->add_length(stream.size() - current);
 
-			return ec = error_code_result::ok;
+			return ec = errc::ok;
 		}
 
 	public:
