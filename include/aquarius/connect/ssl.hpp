@@ -42,13 +42,13 @@ namespace aquarius
 		template<typename _Buffer, typename _Func>
 		void async_read_some(const _Buffer& buffer, _Func&& f)
 		{
-			return socket_.async_read_some(buffer, std::forward<_Func>(f));
+			return ssl_socket_.async_read_some(buffer, std::forward<_Func>(f));
 		}
 
 		template<typename _Buffer, typename _Func>
 		void async_write_some(const _Buffer& buffer, _Func&& f)
 		{
-			return socket_.async_write_some(buffer, std::forward<_Func>(f));
+			return ssl_socket_.async_write_some(buffer, std::forward<_Func>(f));
 		}
 
 		void shut_down()
