@@ -4,7 +4,7 @@
 namespace aquarius
 {
 	template <typename _Request, typename _Response>
-	class context : public basic_context, public shared_visitor<_Request, basic_connect>
+	class context : public basic_context, public shared_visitor<_Request>
 	{
 	public:
 		context(const std::string& name)

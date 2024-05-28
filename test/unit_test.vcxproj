@@ -179,6 +179,8 @@
     <ClInclude Include="..\include\aquarius\context\impl\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\invoke.hpp" />
     <ClInclude Include="..\include\aquarius\context\manager.hpp" />
+    <ClInclude Include="..\include\aquarius\context\visitable.hpp" />
+    <ClInclude Include="..\include\aquarius\context\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\core\apply.hpp" />
     <ClInclude Include="..\include\aquarius\core\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\core\generator.hpp" />
@@ -186,8 +188,6 @@
     <ClInclude Include="..\include\aquarius\core\router.hpp" />
     <ClInclude Include="..\include\aquarius\core\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\core\visitable.hpp" />
-    <ClInclude Include="..\include\aquarius\core\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\message\basic_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\basic_message.hpp" />
     <ClInclude Include="..\include\aquarius\message\custom.hpp" />

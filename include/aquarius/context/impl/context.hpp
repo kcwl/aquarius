@@ -1,21 +1,20 @@
 #pragma once
+#include <aquarius/context/visitor.hpp>
 #include <aquarius/core/logger.hpp>
-#include <aquarius/core/visitor.hpp>
 
 namespace aquarius
 {
 	class basic_message;
-
-	class basic_connect;
 } // namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public bare_visitor<basic_message, basic_connect>
+	class basic_context : public bare_visitor<basic_message>
 	{
 	public:
 		explicit basic_context(const std::string& name)
 			: visitor_(name)
+			, connect_ptr_(nullptr)
 		{}
 
 		basic_context()
@@ -24,11 +23,11 @@ namespace aquarius
 
 		virtual ~basic_context() = default;
 
-		basic_context(const basic_context&) = delete;
+		basic_context(const basic_context&) = default;
 
 		basic_context(basic_context&&) = default;
 
-		basic_context& operator=(const basic_context&) = delete;
+		basic_context& operator=(const basic_context&) = default;
 
 	public:
 		virtual error_code visit(basic_message*, basic_connect*) override

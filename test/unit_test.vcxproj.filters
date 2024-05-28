@@ -188,12 +188,6 @@
     <ClInclude Include="..\include\aquarius\context\manager.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\visitor.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\visitable.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\channel.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -244,6 +238,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\connect\basic_connect.hpp">
       <Filter>include\aquarius\connect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\visitable.hpp">
+      <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\visitor.hpp">
+      <Filter>include\aquarius\context</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

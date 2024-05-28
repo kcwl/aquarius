@@ -3,7 +3,12 @@
 
 namespace aquarius
 {
-	template <typename _Ty, typename _Transfer>
+	class basic_connect;
+}
+
+namespace aquarius
+{
+	template <typename _Ty>
 	class basic_visitor
 	{
 	public:
@@ -11,19 +16,19 @@ namespace aquarius
 		virtual ~basic_visitor() = default;
 
 	public:
-		virtual error_code visit(_Ty visited, _Transfer*) = 0;
+		virtual error_code visit(_Ty visited, basic_connect*) = 0;
 	};
 
-	template <typename _Ty, typename _Transfer>
-	class shared_visitor : public virtual basic_visitor<std::shared_ptr<_Ty>, _Transfer>
+	template <typename _Ty>
+	class shared_visitor : public virtual basic_visitor<std::shared_ptr<_Ty>>
 	{
 	public:
 		shared_visitor() = default;
 		virtual ~shared_visitor() = default;
 	};
 
-	template <typename _Ty, typename _Transfer>
-	class bare_visitor : public virtual basic_visitor<_Ty*, _Transfer>
+	template <typename _Ty>
+	class bare_visitor : public virtual basic_visitor<_Ty*>
 	{
 	public:
 		bare_visitor() = default;

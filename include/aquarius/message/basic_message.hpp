@@ -1,7 +1,6 @@
 #pragma once
+#include <aquarius/context/visitable.hpp>
 #include <aquarius/core/elastic.hpp>
-#include <aquarius/core/error_code.hpp>
-#include <aquarius/core/visitable.hpp>
 
 namespace aquarius
 {
@@ -12,7 +11,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	class basic_message : public visitable<flex_buffer_t, basic_context, basic_connect>
+	class basic_message : public visitable<flex_buffer_t, basic_context>
 	{
 		using length_t = uint16_t;
 

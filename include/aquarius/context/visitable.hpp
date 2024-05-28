@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/core/visitor.hpp>
+#include <aquarius/context/visitor.hpp>
 
 namespace aquarius
 {
-	template <typename _Stream, typename _Context, typename _Transfer>
+	template <typename _Stream, typename _Context>
 	class visitable
 	{
 	public:
@@ -11,14 +11,14 @@ namespace aquarius
 		virtual ~visitable() = default;
 
 	public:
-		virtual error_code accept(_Stream&, std::shared_ptr<_Context>, _Transfer*) = 0;
+		virtual error_code accept(_Stream&, std::shared_ptr<_Context>, basic_connect*) = 0;
 	};
 
-	template <typename _Request, typename _Context, typename _Transfer>
+	template <typename _Request, typename _Context>
 	static error_code accept_shared_impl(std::shared_ptr<_Request> req, std::shared_ptr<_Context> ctx,
-										 _Transfer* connect_ptr)
+										 basic_connect* connect_ptr)
 	{
-		using visitor_t = shared_visitor<_Request, _Transfer>;
+		using visitor_t = shared_visitor<_Request>;
 
 		auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
@@ -28,10 +28,10 @@ namespace aquarius
 		return visit_ptr->visit(req, connect_ptr);
 	}
 
-	template <typename _Request, typename _Context, typename _Transfer>
-	static error_code accept_bare_impl(_Request* req, std::shared_ptr<_Context> ctx, _Transfer* connect_ptr)
+	template <typename _Request, typename _Context>
+	static error_code accept_bare_impl(_Request* req, std::shared_ptr<_Context> ctx, basic_connect* connect_ptr)
 	{
-		using visitor_t = bare_visitor<_Request, _Transfer>;
+		using visitor_t = bare_visitor<_Request>;
 
 		auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
