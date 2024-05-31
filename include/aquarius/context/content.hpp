@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/context/basic_context.hpp>
+#include <aquarius/core/core.hpp>
 
 namespace aquarius
 {
@@ -7,7 +8,7 @@ namespace aquarius
 	class content : public basic_context, public shared_visitor<_Response>
 	{
 	public:
-		content(const std::string& name, const std::chrono::milliseconds& timeout = 10s)
+		content(const std::string& name, const std::chrono::milliseconds& timeout = timeout_dura)
 			: basic_context(name, timeout)
 			, response_ptr_()
 		{}

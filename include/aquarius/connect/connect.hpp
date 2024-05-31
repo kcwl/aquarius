@@ -10,7 +10,9 @@
 namespace aquarius
 {
 	template <typename _Protocol, typename _ServerType, template <typename> typename _Crypto>
-	class connect : public basic_connect, public std::enable_shared_from_this<connect<_Protocol, _ServerType, _Crypto>>
+	class connect : public basic_connect,
+					public std::enable_shared_from_this<connect<_Protocol, _ServerType, _Crypto>>,
+					public timer_handle
 	{
 		constexpr static bool is_server = _ServerType::value;
 
@@ -146,6 +148,13 @@ namespace aquarius
 		void regist_close(_Func&& f)
 		{
 			on_close_ = std::forward<_Func>(f);
+		}
+
+		virtual void handle_update() override
+		{
+			deadline_.expires_from_now(deadline_dura);
+
+			deadline_.async_wait([&](asio::error_code ec) { this->handle_update(); });
 		}
 
 	private:
