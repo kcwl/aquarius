@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/context/impl/context.hpp>
+#include <aquarius/context/basic_context.hpp>
 
 namespace aquarius
 {
@@ -7,24 +7,30 @@ namespace aquarius
 	class content : public basic_context, public shared_visitor<_Response>
 	{
 	public:
-		content(const std::string& name)
-			: basic_context(name)
+		content(const std::string& name, const std::chrono::milliseconds& timeout = 10s)
+			: basic_context(name, timeout)
 			, response_ptr_()
 		{}
 
 	public:
-		virtual void on_accept() override
-		{
-			// flow monitor
-		}
-
 		virtual error_code visit(std::shared_ptr<_Response> resp, basic_connect* connect_ptr)
 		{
 			response_ptr_ = resp;
 
 			connect_ptr_ = connect_ptr;
 
-			auto result = handle();
+			auto future = this->template post<error_code>([&] { return this->handle(); });
+
+			auto status = future.wait_for(timeout_);
+
+			if (status != std::future_status::ready)
+			{
+				XLOG_WARNING() << this->visitor() << "handle timeout!";
+
+				return errc::timeout;
+			}
+
+			auto result = future.get();
 
 			if (result)
 			{
@@ -32,7 +38,7 @@ namespace aquarius
 			}
 			else
 			{
-				XLOG_ERROR() << "[context] " << this->visitor() << " handle error";
+				XLOG_ERROR() << this->visitor() << " handle error, maybe " << result.message();
 			}
 
 			return result;

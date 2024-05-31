@@ -20,23 +20,18 @@ namespace aquarius
 			return true;
 		}
 
-		std::size_t size() const
-		{
-			return this->map_invokes_.size();
-		}
-
 		void broadcast(flex_buffer_t&& buffer)
 		{
 			std::lock_guard lk(mutex_);
 
 			for (auto& session : map_invokes_)
 			{
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				session.second->async_write(std::move(buffer));
 			}
 		}
 
 		template <typename _Func>
-		void broadcast_if(flex_buffer_t&& buffer, _Func&& f)
+		void broadcast(flex_buffer_t&& buffer, _Func&& f)
 		{
 			std::lock_guard lk(mutex_);
 

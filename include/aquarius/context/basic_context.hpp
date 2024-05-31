@@ -1,7 +1,10 @@
 #pragma once
+#include <aquarius/context/async_handle.hpp>
 #include <aquarius/context/visitor.hpp>
 #include <aquarius/core/logger.hpp>
 #include <chrono>
+
+using namespace std::chrono_literals;
 
 namespace aquarius
 {
@@ -10,16 +13,17 @@ namespace aquarius
 
 namespace aquarius
 {
-	class basic_context : public bare_visitor<basic_message>
+	class basic_context : public bare_visitor<basic_message>, public async_handle
 	{
 	public:
-		explicit basic_context(const std::string& name)
+		explicit basic_context(const std::string& name, const std::chrono::milliseconds& timeout)
 			: visitor_(name)
 			, connect_ptr_(nullptr)
+			, timeout_(timeout)
 		{}
 
 		basic_context()
-			: basic_context("basic context")
+			: basic_context("basic context", 0s)
 		{}
 
 		virtual ~basic_context() = default;
@@ -53,6 +57,8 @@ namespace aquarius
 		std::string visitor_;
 
 		basic_connect* connect_ptr_;
+
+		std::chrono::milliseconds timeout_;
 	};
 
 } // namespace aquarius

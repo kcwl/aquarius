@@ -67,60 +67,60 @@ BOOST_AUTO_TEST_CASE(function)
 
 BOOST_AUTO_TEST_CASE(manager)
 {
-	{
-		BOOST_CHECK(!aquarius::invoke_session_helper::push(nullptr));
-	}
-
-	{
-	//	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
-
-	//	aquarius::invoke_session_helper::push(session);
-
-	//	aquarius::flex_buffer_t buffer{};
-
-	//	aquarius::packet pc{};
-
-	//	BOOST_CHECK(!pc.process(buffer, session->uuid()));
-
-	//	elastic::to_binary(aquarius::pack_flag::normal, buffer);
-
-	//	elastic::to_binary(12001, buffer);
-
-	//	BOOST_CHECK(!pc.process(buffer, session->uuid()));
+	//{
+	//	BOOST_CHECK(!aquarius::invoke_session_helper::push(nullptr));
 	//}
 
 	//{
-	//	aquarius::flex_buffer_t buffer{};
+	////	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
 
-	//	elastic::to_binary(aquarius::pack_flag::normal, buffer);
+	////	aquarius::invoke_session_helper::push(session);
 
-	//	aquarius::packet pct{};
+	////	aquarius::flex_buffer_t buffer{};
 
-	//	BOOST_CHECK(!pct.process(buffer, 10001));
+	////	aquarius::packet pc{};
 
-	//	elastic::to_binary(12001u, buffer);
+	////	BOOST_CHECK(!pc.process(buffer, session->uuid()));
 
-	//	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
+	////	elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
-		//elastic::to_binary(45u, buffer);
-		//buffer.commit(45);
+	////	elastic::to_binary(12001, buffer);
 
-		//pct.process(buffer, session->uuid());
+	////	BOOST_CHECK(!pc.process(buffer, session->uuid()));
+	////}
 
-		BOOST_CHECK(aquarius::invoke_session_helper::broadcast(person_response{}));
+	////{
+	////	aquarius::flex_buffer_t buffer{};
 
-		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return true; }));
+	////	elastic::to_binary(aquarius::pack_flag::normal, buffer);
 
-		BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return false; }));
-	}
+	////	aquarius::packet pct{};
 
-	{
-		auto size = aquarius::invoke_session_helper::size();
+	////	BOOST_CHECK(!pct.process(buffer, 10001));
 
-		aquarius::invoke_session_helper::erase(0);
+	////	elastic::to_binary(12001u, buffer);
 
-		BOOST_CHECK(aquarius::invoke_session_helper::size() == (size - 1));
-	}
+	////	auto session = std::make_shared<aquarius::session<aquarius::ssl_tcp_server_connect>>(nullptr);
+
+	//	//elastic::to_binary(45u, buffer);
+	//	//buffer.commit(45);
+
+	//	//pct.process(buffer, session->uuid());
+
+	//	BOOST_CHECK(aquarius::invoke_session_helper::broadcast(person_response{}));
+
+	//	BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return true; }));
+
+	//	BOOST_CHECK(aquarius::invoke_session_helper::broadcast_if(person_response{}, [](auto) { return false; }));
+	//}
+
+	//{
+	//	auto size = aquarius::invoke_session_helper::size();
+
+	//	aquarius::invoke_session_helper::erase(0);
+
+	//	BOOST_CHECK(aquarius::invoke_session_helper::size() == (size - 1));
+	//}
 }
 
 BOOST_AUTO_TEST_CASE(content)

@@ -1,8 +1,5 @@
 #pragma once
-#include <aquarius/context/impl/context.hpp>
-#include <future>
-
-using namespace std::chrono_literals;
+#include <aquarius/context/basic_context.hpp>
 
 namespace aquarius
 {
@@ -11,10 +8,9 @@ namespace aquarius
 	{
 	public:
 		context(const std::string& name, const std::chrono::milliseconds& timeout = 10s)
-			: basic_context(name)
+			: basic_context(name, timeout)
 			, request_ptr_(nullptr)
 			, response_()
-			, timeout_(timeout)
 		{}
 
 	public:
@@ -23,15 +19,13 @@ namespace aquarius
 			// flow monitor
 		}
 
-		virtual error_code visit(std::shared_ptr<_Request> req, basic_connect* session_ptr)
+		virtual error_code visit(std::shared_ptr<_Request> req, basic_connect* connect_ptr)
 		{
 			request_ptr_ = req;
 
-			connect_ptr_ = session_ptr;
+			connect_ptr_ = connect_ptr;
 
-			auto task = std::make_shared<std::packaged_task<error_code()>>([&] { return this->handle(); });
-
-			auto future = task->get_future();
+			auto future = this->template post<error_code>([&] { return this->handle(); });
 
 			auto status = future.wait_for(timeout_);
 
@@ -58,6 +52,7 @@ namespace aquarius
 		bool send_response(int result)
 		{
 			auto fs = make_response(result);
+
 			if (!this->connect_ptr_)
 				return false;
 
@@ -86,7 +81,5 @@ namespace aquarius
 		std::shared_ptr<_Request> request_ptr_;
 
 		_Response response_;
-
-		std::chrono::milliseconds timeout_;
 	};
 } // namespace aquarius
