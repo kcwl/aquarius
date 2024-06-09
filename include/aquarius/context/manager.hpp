@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/context/session.hpp>
+#include <aquarius/connect/basic_connect.hpp>
 #include <aquarius/core/manager.hpp>
 #include <functional>
 #include <mutex>
@@ -7,22 +7,16 @@
 
 namespace aquarius
 {
-	class session_manager : public single_manager<session_manager, std::shared_ptr<basic_session>>
+	class session_manager : public single_manager<session_manager, std::weak_ptr<basic_connect>>
 	{
 	public:
-		bool push(std::shared_ptr<basic_session> session_ptr)
+		bool push(std::weak_ptr<basic_connect> connect_ptr)
 		{
-			if (!session_ptr)
-				return false;
+			auto ptr = connect_ptr.lock();
 
-			regist(session_ptr->uuid(), session_ptr);
+			regist(ptr->uuid(), connect_ptr);
 
 			return true;
-		}
-
-		std::size_t size() const
-		{
-			return this->map_invokes_.size();
 		}
 
 		void broadcast(flex_buffer_t&& buffer)
@@ -31,21 +25,35 @@ namespace aquarius
 
 			for (auto& session : map_invokes_)
 			{
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				auto wptr = session.second;
+
+				if (wptr.expired())
+					continue;
+
+				auto ptr = wptr.lock();
+
+				ptr->send_packet(std::move(buffer));
 			}
 		}
 
 		template <typename _Func>
-		void broadcast_if(flex_buffer_t&& buffer, _Func&& f)
+		void broadcast(flex_buffer_t&& buffer, _Func&& f)
 		{
 			std::lock_guard lk(mutex_);
 
 			for (auto& session : map_invokes_)
 			{
-				if (!std::forward<_Func>(f)(session.second))
+				auto wptr = session.second;
+
+				if (wptr.expired())
 					continue;
 
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				auto ptr = wptr.lock();
+
+				if (!std::forward<_Func>(f)(ptr))
+					continue;
+
+				ptr->send_packet(std::forward<flex_buffer_t>(buffer));
 			}
 		}
 	};

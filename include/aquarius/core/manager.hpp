@@ -32,6 +32,13 @@ namespace aquarius
 
 			this->map_invokes_.erase(key);
 		}
+
+		std::size_t size()
+		{
+			std::lock_guard lk(this->mutex_);
+
+			return this->map_invokes_.size();
+		}
 	};
 
 	template <typename _Single, typename _Ty>

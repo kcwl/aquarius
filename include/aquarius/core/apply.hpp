@@ -15,9 +15,6 @@ namespace aquarius
 
 			auto ptr = std::dynamic_pointer_cast<element_t>(msg);
 
-			if (!ptr)
-				return false;
-
 			f(ptr);
 
 			return true;

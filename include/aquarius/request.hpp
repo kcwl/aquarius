@@ -1,6 +1,6 @@
 ﻿#pragma once
+#include <aquarius/message/custom.hpp>
 #include <aquarius/message/message.hpp>
-#include <aquarius/message/header.hpp>
 
 namespace aquarius
 {
@@ -8,26 +8,7 @@ namespace aquarius
 	class request : public message<custom_tcp_request_header, _Body, Number>,
 					public std::enable_shared_from_this<request<_Body, Number>>
 	{
-		using base_type = message<custom_tcp_request_header, _Body, Number>;
-
 	public:
-		request() = default;
-		virtual ~request() = default;
-
 		AQUARIUS_VISITABLE_MESSAGE()
-
-	public:
-		request(request&& other) = default;
-
-		request& operator=(request&& other)
-		{
-			base_type::operator=(std::move(other));
-
-			return *this;
-		}
-
-	private:
-		request(const request&) = delete;
-		request& operator=(const request& other) = delete;
 	};
 } // namespace aquarius

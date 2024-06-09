@@ -1,45 +1,52 @@
 #pragma once
-#include <aquarius/context/impl/context.hpp>
+#include <aquarius/context/basic_context.hpp>
+#include <aquarius/core/core.hpp>
 
 namespace aquarius
 {
 	template <typename _Response>
-	class content : public basic_context, public shared_visitor<_Response, basic_session>
+	class content : public basic_context, public shared_visitor<_Response>
 	{
 	public:
-		content(const std::string& name)
-			: basic_context(name)
+		content(const std::string& name, const std::chrono::milliseconds& timeout = timeout_dura)
+			: basic_context(name, timeout)
 			, response_ptr_()
 		{}
 
 	public:
-		virtual void on_accept() override
-		{
-			// flow monitor
-		}
-
-		virtual bool visit(std::shared_ptr<_Response> resp, std::shared_ptr<basic_session> session_ptr)
+		virtual error_code visit(std::shared_ptr<_Response> resp, basic_connect* connect_ptr)
 		{
 			response_ptr_ = resp;
 
-			session_ptr_ = session_ptr;
+			connect_ptr_ = connect_ptr;
 
-			auto result = handle();
+			auto future = this->template post<error_code>([&] { return this->handle(); });
 
-			if (result)
+			auto status = future.wait_for(timeout_);
+
+			if (status != std::future_status::ready)
+			{
+				XLOG_WARNING() << this->visitor_ << "handle timeout!";
+
+				return errc::timeout;
+			}
+
+			auto result = future.get();
+
+			if (!result)
 			{
 				invoke_callback_helper::apply(response_ptr_->uuid(), response_ptr_);
 			}
 			else
 			{
-				XLOG_ERROR() << "[context] " << this->visitor() << " handle error";
+				XLOG_ERROR() <<this-> visitor_ << " handle error, maybe " << result.message();
 			}
 
 			return result;
 		}
 
 	protected:
-		virtual bool handle() = 0;
+		virtual error_code handle() = 0;
 
 	protected:
 		std::shared_ptr<_Response> response_ptr_;

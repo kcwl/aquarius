@@ -1,19 +1,24 @@
 #pragma once
 #include <aquarius/context/manager.hpp>
-#include <aquarius/context/impl/session.hpp>
+#include <aquarius/core/error_code.hpp>
 
 namespace aquarius
 {
 	struct invoke_session_helper
 	{
-		static bool push(std::shared_ptr<basic_session> session_ptr)
+		static bool push(std::shared_ptr<basic_connect> connect_ptr)
 		{
-			return session_manager::instance().push(session_ptr);
+			return session_manager::instance().push(connect_ptr);
 		}
 
-		static std::shared_ptr<basic_session> find(std::size_t uid)
+		static std::shared_ptr<basic_connect> find(std::size_t uid)
 		{
-			return session_manager::instance().invoke(uid);
+			auto wptr = session_manager::instance().invoke(uid);
+
+			if (wptr.expired())
+				return nullptr;
+
+			return wptr.lock();
 		}
 
 		static void erase(std::size_t uid)
@@ -30,7 +35,10 @@ namespace aquarius
 		static bool broadcast(_Response&& resp)
 		{
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
+
+			aquarius::error_code ec{};
+
+			resp.to_binary(fs, ec);
 
 			session_manager::instance().broadcast(std::move(fs));
 
@@ -41,9 +49,12 @@ namespace aquarius
 		static bool broadcast_if(_Response&& resp, _Pre&& func)
 		{
 			flex_buffer_t fs{};
-			resp.to_binary(fs);
 
-			session_manager::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
+			aquarius::error_code ec{};
+
+			resp.to_binary(fs, ec);
+
+			session_manager::instance().broadcast(std::move(fs), std::forward<_Pre>(func));
 
 			return true;
 		}

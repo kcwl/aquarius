@@ -8,33 +8,7 @@ namespace aquarius
 {
 	constexpr static auto heart_time_interval = 10s;
 
-	constexpr static auto timeout_dura = 30ms;
+	constexpr static auto timeout_dura = 1s;
 
-	constexpr static auto pack_limit = 4096;
-
-	struct http
-	{};
-
-	struct tcp
-	{};
-
-	enum class conn_mode
-	{
-		client,
-		basic_server
-	};
-
-	enum class ssl_mode
-	{
-		nossl,
-		ssl
-	};
-
-	enum class pack_flag
-	{
-		normal = 0x01,
-		middle = 0x10,
-		end = 0x11
-	};
-
+	constexpr static auto deadline_dura = 1ms;
 } // namespace aquarius
