@@ -20,17 +20,20 @@ namespace aquarius
 
 		using crypto_t = _Crypto<_ServerType>;
 
+		template<typename _Connect>
+		friend class packet;
+
 	public:
 		explicit connect(asio::socket_t socket, asio::ssl_context_t& ctx)
 			: socket_(std::move(socket))
 			, crypto_(socket_, ctx)
 			, read_buffer_(pack_limit)
 			, uuid_(invoke_uuid<uint32_t>())
-			, on_accept_()
-			, on_close_()
-			, receiver_(this)
+			, pack_(this)
 			, deadline_(socket_.get_executor())
-		{}
+		{
+			handle_update();
+		}
 
 		connect(asio::io_service& io_service, asio::ssl_context_t& basic_context)
 			: connect(std::move(asio::ip::tcp::socket(io_service)), basic_context)
@@ -91,33 +94,24 @@ namespace aquarius
 
 										read_buffer_.commit(static_cast<int>(bytes_transferred));
 
-										receiver_.process(read_buffer_);
+										pack_.process(read_buffer_);
 
 										async_read();
 									});
 		}
 
-		virtual void async_write(flex_buffer_t&& resp_buf) override
+		virtual void send_packet(flex_buffer_t&& buffer)override
 		{
-			auto self(this->shared_from_this());
-
-			crypto_.async_write_some(
-				asio::buffer(resp_buf.wdata(), resp_buf.size()),
-				[this, self](const asio::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
-				{
-					if (!ec)
-					{
-						return;
-					}
-				});
+			pack_.async_write(std::move(buffer));
 		}
 
 		void shut_down()
 		{
-			if (on_close_)
-				on_close_(uuid_);
+			crypto_.shut_down();
 
-			return crypto_.shut_down();
+			asio::error_code ec{};
+
+			deadline_.cancel(ec);
 		}
 
 		void close(bool shutdown)
@@ -138,18 +132,6 @@ namespace aquarius
 			return uuid_;
 		}
 
-		template <typename _Func>
-		void regist_accept(_Func&& f)
-		{
-			on_accept_ = std::forward<_Func>(f);
-		}
-
-		template <typename _Func>
-		void regist_close(_Func&& f)
-		{
-			on_close_ = std::forward<_Func>(f);
-		}
-
 		virtual void handle_update() override
 		{
 			deadline_.expires_from_now(deadline_dura);
@@ -164,9 +146,6 @@ namespace aquarius
 						<< ", async read establish";
 
 			invoke_session_helper::push(this->shared_from_this());
-
-			if (on_accept_)
-				on_accept_(uuid());
 
 			keep_alive(true);
 
@@ -211,6 +190,21 @@ namespace aquarius
 			return !ec;
 		}
 
+		void async_write(flex_buffer_t&& resp_buf)
+		{
+			auto self(this->shared_from_this());
+
+			crypto_.async_write_some(
+				asio::buffer(resp_buf.wdata(), resp_buf.size()),
+				[this, self](const asio::error_code& ec, [[maybe_unused]] std::size_t bytes_transferred)
+				{
+					if (!ec)
+					{
+						return;
+					}
+				});
+		}
+
 	private:
 		asio::socket_t socket_;
 
@@ -220,11 +214,7 @@ namespace aquarius
 
 		uint32_t uuid_;
 
-		std::function<void(const std::size_t)> on_accept_;
-
-		std::function<void(const std::size_t)> on_close_;
-
-		packet<this_type> receiver_;
+		packet<this_type> pack_;
 
 		deadline_timer deadline_;
 	};

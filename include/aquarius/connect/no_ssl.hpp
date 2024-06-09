@@ -33,6 +33,9 @@ namespace aquarius
 		template <typename _Buffer, typename _Func>
 		void async_write_some(const _Buffer& buffer, _Func&& f)
 		{
+			if (!socket_.is_open())
+				return;
+
 			return socket_.async_write_some(buffer, std::forward<_Func>(f));
 		}
 

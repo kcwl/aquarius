@@ -22,7 +22,7 @@ namespace aquarius
 		{}
 
 	public:
-		error_code process(flex_buffer_t& buffer)
+		void process(flex_buffer_t& buffer)
 		{
 			aquarius::error_code ec{};
 
@@ -30,26 +30,16 @@ namespace aquarius
 
 			pack_flag flag{};
 
-			if (!elastic::from_binary(flag, buffer))
-			{
-				XLOG_WARNING() << "parse proto error, maybe message is not haved flag.";
-
-				return ec = errc::incomplete;
-			}
+			elastic::from_binary(flag, buffer);
 
 			uint32_t proto{};
-			if (!elastic::from_binary(proto, buffer))
-			{
-				XLOG_WARNING() << "parse proto error, maybe message is not complete.";
-
-				return ec = errc::unknown;
-			}
+			elastic::from_binary(proto, buffer);
 
 			switch (flag)
 			{
 			case pack_flag::normal:
 				{
-					ec = normalize(buffer, proto);
+					normalize(buffer, proto);
 				}
 				break;
 			case pack_flag::middle:
@@ -61,18 +51,12 @@ namespace aquarius
 				{
 					auto buf = complete(proto, buffer);
 
-					ec = normalize(buf, proto);
+					normalize(buf, proto);
 				}
 				break;
 			default:
 				break;
 			}
-
-			if (ec.value() != static_cast<int>(errc::pending) &&
-				ec.value() != static_cast<int>(errc::ok))
-				buffer.pubseekpos(pos, std::ios::out);
-
-			return ec;
 		}
 
 		bool async_write(flex_buffer_t&& buffer)
@@ -96,7 +80,7 @@ namespace aquarius
 		}
 
 	private:
-		error_code normalize(flex_buffer_t& buffer, const std::size_t proto)
+		void normalize(flex_buffer_t& buffer, const std::size_t proto)
 		{
 			auto request_ptr = invoke_message_helper::invoke(proto);
 
@@ -112,14 +96,15 @@ namespace aquarius
 
 			attach(request_ptr->uuid(), context_ptr);
 
-			context_ptr->on_accept();
-
 			auto result = request_ptr->accept(buffer, context_ptr, connect_ptr_);
 
 			if (result.value() == static_cast<int>(errc::ok))
 				detach(request_ptr->uuid());
 
-			return buffer.size() != 0 ? process(buffer) : result;
+			if (buffer.size() == 0)
+				return;
+
+			return process(buffer);
 		}
 
 		void attach(std::size_t uid, std::shared_ptr<basic_context> context_ptr)

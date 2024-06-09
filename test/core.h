@@ -3,22 +3,38 @@
 
 BOOST_AUTO_TEST_SUITE(core)
 
-BOOST_AUTO_TEST_CASE(apply)
+BOOST_AUTO_TEST_CASE(error_code)
 {
 	{
-		aquarius::invoke_callback_helper::regist(1, [](std::shared_ptr<person_request> ptr) {});
+		aquarius::error_code ec(-1);
 
-		std::shared_ptr<person_request> req;
-
-		BOOST_CHECK(aquarius::invoke_callback_helper::apply(2, req) == false);
+		BOOST_CHECK(ec.message() == "unknown error");
 	}
 
 	{
-		aquarius::invoke_callback_helper::regist(1, [](std::shared_ptr<person_request> ptr) {});
+		aquarius::error_code ec(0);
 
-		std::shared_ptr<person_response> resp;
+		BOOST_CHECK(std::string(ec.category_name()).compare("aquarius basic error category") == 0);
+	}
+}
 
-		BOOST_CHECK(aquarius::invoke_callback_helper::apply(1, resp) == false);
+BOOST_AUTO_TEST_CASE(async_pool)
+{
+	try
+	{
+		aquarius::post([]
+					   {
+						   std::exception_ptr exception{};
+
+
+						   throw exception;
+					   });
+
+		BOOST_CHECK(true);
+	}
+	catch (...)
+	{
+		BOOST_CHECK(false);
 	}
 }
 

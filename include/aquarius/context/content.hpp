@@ -26,20 +26,20 @@ namespace aquarius
 
 			if (status != std::future_status::ready)
 			{
-				XLOG_WARNING() << this->visitor() << "handle timeout!";
+				XLOG_WARNING() << this->visitor_ << "handle timeout!";
 
 				return errc::timeout;
 			}
 
 			auto result = future.get();
 
-			if (result)
+			if (!result)
 			{
 				invoke_callback_helper::apply(response_ptr_->uuid(), response_ptr_);
 			}
 			else
 			{
-				XLOG_ERROR() << this->visitor() << " handle error, maybe " << result.message();
+				XLOG_ERROR() <<this-> visitor_ << " handle error, maybe " << result.message();
 			}
 
 			return result;

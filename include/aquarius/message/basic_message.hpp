@@ -16,6 +16,7 @@ namespace aquarius
 	public:
 		basic_message()
 			: length_()
+			, single_(true)
 		{}
 
 		virtual ~basic_message() = default;
@@ -25,8 +26,10 @@ namespace aquarius
 
 		basic_message(basic_message&& other)
 			: length_(other.length_)
+			, single_(other.single_)
 		{
 			other.length_ = 0;
+			other.single_ = false;
 		}
 
 		basic_message& operator=(const basic_message&) = default;
@@ -54,6 +57,7 @@ namespace aquarius
 		void swap(basic_message& other)
 		{
 			std::swap(this->length_, other.length_);
+			std::swap(this->single_, other.single_);
 		}
 
 	public:
@@ -86,20 +90,32 @@ namespace aquarius
 				return ec = errc::incomplete;
 			}
 
-			stream.consume(length_);
+			if(single_)
+				stream.consume(length_);
 
 			return ec = errc::ok;
 		}
 
 		virtual error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
-			elastic::to_binary(length_, stream);
+			constexpr auto size_uint16 = sizeof(uint16_t);
+
+			std::memcpy(stream.rdata(), &this->length_, size_uint16);
+
+			stream.commit(size_uint16);
 
 			return ec = errc::ok;
 		}
 
+		void set_single(bool single)
+		{
+			single_ = single;
+		}
+
 	protected:
 		length_t length_;
+
+		bool single_;
 	};
 
 } // namespace aquarius

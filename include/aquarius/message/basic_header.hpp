@@ -26,10 +26,12 @@ namespace aquarius
 		basic_header(const basic_header&) = default;
 
 		basic_header(basic_header&& other)
-			: uuid_(other.uuid_)
+			: basic_message(std::move(other))
+			, uuid_(other.uuid_)
 			, pos_(other.pos_)
 		{
 			other.uuid_ = 0;
+			other.pos_ = 0;
 		}
 
 		basic_header& operator=(const basic_header&) = default;
@@ -47,13 +49,13 @@ namespace aquarius
 			return uuid_;
 		}
 
-		bool complete(flex_buffer_t& stream)
+		bool complete(flex_buffer_t& stream, error_code& ec)
 		{
 			const auto cur_pos = stream.pubseekoff(0, std::ios::cur, std::ios::in);
 
 			stream.pubseekpos(pos_, std::ios::in);
 
-			std::memcpy(stream.rdata(), &this->length_, 2);
+			base_type::to_binary(stream, ec);
 
 			stream.pubseekpos(cur_pos, std::ios::in);
 
@@ -78,7 +80,7 @@ namespace aquarius
 		{
 			ec = base_type::from_binary(stream, ec);
 
-			if (!ec)
+			if (ec)
 				return ec;
 
 			elastic::from_binary(uuid_, stream);

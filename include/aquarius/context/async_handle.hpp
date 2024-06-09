@@ -15,7 +15,7 @@ namespace aquarius
 
 			auto future = task->get_future();
 
-			aquarius::post([&] { (*task)(std::forward<_Args>(args)...); });
+			aquarius::post([task] { (*task)(std::forward<_Args>(args)...); });
 
 			return future;
 		}

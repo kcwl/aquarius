@@ -16,8 +16,6 @@ namespace aquarius
 			, acceptor_(io_service_pool_.get_io_service(), endpoint_)
 			, ssl_context_(asio::ssl_context_t::sslv23)
 			, server_name_(name)
-			, on_accept_()
-			, on_close_()
 		{
 			init_ssl_context();
 
@@ -54,18 +52,6 @@ namespace aquarius
 			XLOG_INFO() << "[acceptor] acceptor closed";
 		}
 
-		template<typename _Func>
-		void regist_on_accept(_Func&& f)
-		{
-			on_accept_ = std::forward<_Func>(f);
-		}
-
-		template<typename _Func>
-		void regist_on_close(_Func&& f)
-		{
-			on_close_ = std::forward<_Func>(f);
-		}
-
 	private:
 		void start_accept()
 		{
@@ -83,10 +69,6 @@ namespace aquarius
 									   if (!ec)
 									   {
 										   auto conn_ptr = std::make_shared<connect_t>(std::move(sock), ssl_context_);
-
-										   conn_ptr->regist_accept(on_accept_);
-
-										   conn_ptr->regist_close(on_close_);
 
 										   conn_ptr->start();
 									   }
@@ -145,9 +127,5 @@ namespace aquarius
 		asio::ssl_context_t ssl_context_;
 
 		std::string server_name_;
-
-		std::function<void(const std::size_t)> on_accept_;
-
-		std::function<void(const std::size_t)> on_close_;
 	};
 } // namespace aquarius

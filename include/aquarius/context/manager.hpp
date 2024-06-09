@@ -7,15 +7,14 @@
 
 namespace aquarius
 {
-	class session_manager : public single_manager<session_manager, std::shared_ptr<basic_connect>>
+	class session_manager : public single_manager<session_manager, std::weak_ptr<basic_connect>>
 	{
 	public:
-		bool push(std::shared_ptr<basic_connect> connect_ptr)
+		bool push(std::weak_ptr<basic_connect> connect_ptr)
 		{
-			if (!connect_ptr)
-				return false;
+			auto ptr = connect_ptr.lock();
 
-			regist(connect_ptr->uuid(), connect_ptr);
+			regist(ptr->uuid(), connect_ptr);
 
 			return true;
 		}
@@ -26,7 +25,14 @@ namespace aquarius
 
 			for (auto& session : map_invokes_)
 			{
-				session.second->async_write(std::move(buffer));
+				auto wptr = session.second;
+
+				if (wptr.expired())
+					continue;
+
+				auto ptr = wptr.lock();
+
+				ptr->send_packet(std::move(buffer));
 			}
 		}
 
@@ -37,10 +43,17 @@ namespace aquarius
 
 			for (auto& session : map_invokes_)
 			{
-				if (!std::forward<_Func>(f)(session.second))
+				auto wptr = session.second;
+
+				if (wptr.expired())
 					continue;
 
-				session.second->async_write(std::forward<flex_buffer_t>(buffer));
+				auto ptr = wptr.lock();
+
+				if (!std::forward<_Func>(f)(ptr))
+					continue;
+
+				ptr->send_packet(std::forward<flex_buffer_t>(buffer));
 			}
 		}
 	};

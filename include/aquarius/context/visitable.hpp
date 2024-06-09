@@ -22,9 +22,6 @@ namespace aquarius
 
 		auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
 
-		if (!visit_ptr)
-			return false;
-
 		return visit_ptr->visit(req, connect_ptr);
 	}
 
@@ -34,9 +31,6 @@ namespace aquarius
 		using visitor_t = bare_visitor<_Request>;
 
 		auto visit_ptr = std::dynamic_pointer_cast<visitor_t>(ctx);
-
-		if (!visit_ptr)
-			return false;
 
 		return visit_ptr->visit(req, connect_ptr);
 	}
@@ -48,7 +42,7 @@ namespace aquarius
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
-		if (!ec)                                                                                                       \
+		if (ec)                                                                                                       \
 			return ec;                                                                                                 \
 		return accept_shared_impl(this->shared_from_this(), ctx, connect_ptr);                                         \
 	}
@@ -59,7 +53,7 @@ namespace aquarius
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
-		if (!ec)                                                                                                       \
+		if (ec)                                                                                                       \
 			return ec;                                                                                                 \
 		return accept_bare_impl(this, ctx, connect_ptr);                                                               \
 	}

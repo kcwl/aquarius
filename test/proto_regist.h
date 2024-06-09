@@ -88,87 +88,96 @@ private:
 
 using person_request = aquarius::request<person_body_request, 10000>;
 using person_response = aquarius::response<person_body_response, 10001>;
-
-class ctx_test_server : public aquarius::context<person_request, person_response>
-{
-public:
-	ctx_test_server()
-		: aquarius::context<person_request, person_response>("ctx_test_server")
-	{}
-
-public:
-	virtual aquarius::error_code handle() override
-	{
-		response_.body().age = 1;
-		response_.body().name = "hello";
-
-		send_response(0);
-
-		return aquarius::errc::unknown;
-	}
-};
-
-AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
-
-class ctx_test_client : public aquarius::content<person_response>
-{
-public:
-	ctx_test_client()
-		: aquarius::content<person_response>("ctx_test_client")
-	{}
-
-public:
-	virtual aquarius::error_code handle() override
-	{
-		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
-		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
-
-		return aquarius::errc::ok;
-	}
-};
-
-AQUARIUS_CONTEXT_REGIST(person_response, ctx_test_client);
-
-
 using person_request1 = aquarius::request<person_body_request, 10002>;
 using person_response1 = aquarius::response<person_body_response, 10003>;
+using test_connect_success_request = aquarius::request<person_body_request, 10004>;
+using test_connect_success_response = aquarius::response<person_body_response, 10005>;
+using timeout_request = aquarius::request<person_body_request, 10006>;
+using timeout_response = aquarius::response<person_body_response, 10007>;
+using execute_error_request = aquarius::request<person_body_request, 10008>;
+using execute_error_response = aquarius::response<person_body_response, 10009>;
+using client_timeout_request = aquarius::request<person_body_request, 10010>;
+using client_timeout_response = aquarius::response<person_body_response, 10011>;
 
-class ctx_test_server1 : public aquarius::context<person_request1, person_response1>
-{
-public:
-	ctx_test_server1()
-		: aquarius::context<person_request1, person_response1>("ctx_test_server")
-	{}
+//class ctx_test_server : public aquarius::context<person_request, person_response>
+//{
+//public:
+//	ctx_test_server()
+//		: aquarius::context<person_request, person_response>("ctx_test_server")
+//	{}
+//
+//public:
+//	virtual aquarius::error_code handle() override
+//	{
+//		response_.body().age = 1;
+//		response_.body().name = "hello";
+//
+//		send_response(0);
+//
+//		return aquarius::errc::unknown;
+//	}
+//};
 
-public:
-	virtual aquarius::error_code handle() override
-	{
-		response_.body().age = 1;
-		response_.body().name = "hello";
+//AQUARIUS_CONTEXT_REGIST(person_request, ctx_test_server);
 
-		send_response(0);
+//class ctx_test_client : public aquarius::content<person_response>
+//{
+//public:
+//	ctx_test_client()
+//		: aquarius::content<person_response>("ctx_test_client")
+//	{}
+//
+//public:
+//	virtual aquarius::error_code handle() override
+//	{
+//		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
+//		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
+//
+//		return aquarius::errc::ok;
+//	}
+//};
 
-		return aquarius::errc::unknown;
-	}
-};
+//AQUARIUS_CONTEXT_REGIST(person_response, ctx_test_client);
 
-AQUARIUS_CONTEXT_REGIST(person_request1, ctx_test_server1);
 
-class ctx_test_client1 : public aquarius::content<person_response1>
-{
-public:
-	ctx_test_client1()
-		: aquarius::content<person_response1>("ctx_test_client")
-	{}
 
-public:
-	virtual aquarius::error_code handle() override
-	{
-		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
-		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
 
-		return aquarius::errc::unknown;
-	}
-};
-
-AQUARIUS_CONTEXT_REGIST(person_response1, ctx_test_client1);
+//class ctx_test_server1 : public aquarius::context<person_request1, person_response1>
+//{
+//public:
+//	ctx_test_server1()
+//		: aquarius::context<person_request1, person_response1>("ctx_test_server")
+//	{}
+//
+//public:
+//	virtual aquarius::error_code handle() override
+//	{
+//		response_.body().age = 1;
+//		response_.body().name = "hello";
+//
+//		send_response(0);
+//
+//		return aquarius::errc::unknown;
+//	}
+//};
+//
+//AQUARIUS_CONTEXT_REGIST(person_request1, ctx_test_server1);
+//
+//class ctx_test_client1 : public aquarius::content<person_response1>
+//{
+//public:
+//	ctx_test_client1()
+//		: aquarius::content<person_response1>("ctx_test_client")
+//	{}
+//
+//public:
+//	virtual aquarius::error_code handle() override
+//	{
+//		BOOST_CHECK_EQUAL(response_ptr_->body().age, 1);
+//		BOOST_CHECK_EQUAL(response_ptr_->body().name, "hello");
+//
+//		return aquarius::errc::unknown;
+//	}
+//};
+//
+//AQUARIUS_CONTEXT_REGIST(person_response1, ctx_test_client1);

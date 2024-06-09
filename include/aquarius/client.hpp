@@ -69,7 +69,7 @@ namespace aquarius
 		{
 			auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
 
-			session_ptr->async_write(std::move(buffer));
+			session_ptr->send_packet(std::move(buffer));
 		}
 
 		std::string remote_address()

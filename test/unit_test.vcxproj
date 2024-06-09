@@ -212,6 +212,7 @@
     <ClInclude Include="..\include\aquarius\service\manager.hpp" />
     <ClInclude Include="..\include\aquarius\service\service.hpp" />
     <ClInclude Include="channel.h" />
+    <ClInclude Include="client.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="message.h" />

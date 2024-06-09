@@ -84,6 +84,11 @@ namespace aquarius
 			return *this;
 		}
 
+		const char* category_name()
+		{
+			return this->category().name();
+		}
+
 	public:
 		error_code(const error_code&) = default;
 		error_code& operator=(const error_code&) = default;

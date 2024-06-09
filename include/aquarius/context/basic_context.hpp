@@ -42,17 +42,6 @@ namespace aquarius
 			return error_code();
 		}
 
-		std::string visitor() const
-		{
-			return visitor_;
-		}
-
-	public:
-		virtual void on_accept()
-		{
-			return;
-		}
-
 	protected:
 		std::string visitor_;
 

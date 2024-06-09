@@ -254,5 +254,8 @@
     <ClInclude Include="..\include\aquarius\context\async_handle.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,11 +15,6 @@ namespace aquarius
 		{}
 
 	public:
-		virtual void on_accept() override
-		{
-			// flow monitor
-		}
-
 		virtual error_code visit(std::shared_ptr<_Request> req, basic_connect* connect_ptr)
 		{
 			request_ptr_ = req;
@@ -32,16 +27,16 @@ namespace aquarius
 
 			if (status != std::future_status::ready)
 			{
-				XLOG_WARNING() << this->visitor() << "handle timeout!";
+				XLOG_WARNING() << this->visitor_ << "handle timeout!";
 
 				return errc::timeout;
 			}
 
 			auto result = future.get();
 
-			if (!result)
+			if (result)
 			{
-				XLOG_ERROR() << this->visitor() << " handle error, maybe " << result.message();
+				XLOG_ERROR() << this->visitor_ << " handle error, maybe " << result.message();
 			}
 
 			return result;
@@ -54,10 +49,7 @@ namespace aquarius
 		{
 			auto fs = make_response(result);
 
-			if (!this->connect_ptr_)
-				return false;
-
-			this->connect_ptr_->async_write(std::move(fs));
+			this->connect_ptr_->send_packet(std::move(fs));
 
 			return true;
 		}

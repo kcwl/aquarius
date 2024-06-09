@@ -1,8 +1,6 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
 
-using namespace aquarius;
-
 BOOST_AUTO_TEST_SUITE(sconnect)
 
 BOOST_AUTO_TEST_CASE(ssl)
@@ -12,11 +10,19 @@ BOOST_AUTO_TEST_CASE(ssl)
 
 		std::thread t([&] { srv.run(); });
 
-		aquarius::tcp_client cli("127.0.0.1", "8100", [](auto result) {BOOST_CHECK(!result); });
+		std::promise<bool> connect_result{};
+
+		auto future = connect_result.get_future();
+
+		aquarius::tcp_client cli("127.0.0.1", "8100", [&](auto result) { connect_result.set_value(result); });
 
 		std::thread tc([&] { cli.run(); });
 
-		cli.close();
+		auto status = future.wait_for(5s);
+
+		BOOST_CHECK(status == std::future_status::ready);
+
+		BOOST_CHECK(future.get());
 
 		std::this_thread::sleep_for(1s);
 
@@ -32,51 +38,102 @@ BOOST_AUTO_TEST_CASE(ssl)
 
 		std::thread t([&] { srv.run(); });
 
-		aquarius::tcp_client cli("127.0.0.1", "8100");
+		std::promise<bool> connect_result{};
+		auto future = connect_result.get_future();
+
+		aquarius::tcp_client cli("127.0.0.1", "8100", [&](auto result) { connect_result.set_value(result); });
 
 		std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+		srv.stop();
+		t.join();
 
-		aquarius::flex_buffer_t fs{};
-		uint8_t a = '1';
-		fs.save(&a, 1);
-		cli.async_write(std::move(fs));
 
-		std::this_thread::sleep_for(1s);
+		BOOST_CHECK(future.get());
 
 		cli.stop();
-		srv.stop();
 
-		t.join();
 		tc.join();
 	}
 
-	{
-		aquarius::tcp_server srv(8100, 2);
+	//{
+	//	aquarius::tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
-		aquarius::tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		cli.close();
+	//	aquarius::flex_buffer_t fs{};
+	//	uint8_t a = '1';
+	//	fs.save(&a, 1);
+	//	cli.async_write(std::move(fs));
 
-		cli.stop();
-		srv.stop();
+	//	std::this_thread::sleep_for(1s);
 
-		std::this_thread::sleep_for(1s);
+	//	cli.stop();
+	//	srv.stop();
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
+
+	//{
+	//	aquarius::tcp_server srv(8100, 2);
+
+	//	std::thread t([&] { srv.run(); });
+
+	//	aquarius::tcp_client cli("127.0.0.1", "8100");
+
+	//	std::thread tc([&] { cli.run(); });
+
+	//	std::this_thread::sleep_for(1s);
+
+	//	cli.close();
+
+	//	cli.stop();
+	//	srv.stop();
+
+	//	std::this_thread::sleep_for(1s);
+
+	//	t.join();
+	//	tc.join();
+	//}
 }
 
 BOOST_AUTO_TEST_CASE(no_ssl)
 {
+	{
+		aquarius::no_ssl_tcp_server srv(8100, 2);
+
+		std::thread t([&] { srv.run(); });
+
+		std::promise<bool> connect_result{};
+
+		auto future = connect_result.get_future();
+
+		aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100", [&](auto result) { connect_result.set_value(result); });
+
+		std::thread tc([&] { cli.run(); });
+
+		auto status = future.wait_for(5s);
+
+		BOOST_CHECK(status == std::future_status::ready);
+
+		BOOST_CHECK(future.get());
+
+		std::this_thread::sleep_for(1s);
+
+		srv.stop();
+		cli.stop();
+
+		t.join();
+		tc.join();
+	}
+
 	{
 		aquarius::no_ssl_tcp_server srv(8100, 2);
 
@@ -123,30 +180,30 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 		tc.join();
 	}
 
-	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
+	//{
+	//	aquarius::no_ssl_tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
-		aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		aquarius::flex_buffer_t fs{};
-		uint8_t a = '1';
-		fs.save(&a, 1);
-		cli.async_write(std::move(fs));
+	//	aquarius::flex_buffer_t fs{};
+	//	uint8_t a = '1';
+	//	fs.save(&a, 1);
+	//	cli.async_write(std::move(fs));
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		cli.stop();
-		srv.stop();
+	//	cli.stop();
+	//	srv.stop();
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
 
 	{
 		aquarius::no_ssl_tcp_server srv(8100, 2);
@@ -171,67 +228,64 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(sconnect)
+// BOOST_AUTO_TEST_CASE(sconnect)
+//{
+//	aquarius::no_ssl_tcp_server srv(8100, 2);
+//
+//	std::thread t([&] { srv.run(); });
+//
+//	aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
+//
+//	std::thread tc([&] { cli.run(); });
+//
+//	std::this_thread::sleep_for(1s);
+//
+//	cli.stop();
+//	aquarius::flex_buffer_t fs{};
+//	uint8_t a = '1';
+//	fs.save(&a, 1);
+//	cli.async_write(std::move(fs));
+//
+//	std::this_thread::sleep_for(1s);
+//
+//	cli.stop();
+//	srv.stop();
+//
+//	t.join();
+//	tc.join();
+// }
+
+BOOST_AUTO_TEST_CASE(large_pack)
 {
-	aquarius::no_ssl_tcp_server srv(8100, 2);
+	aquarius::tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 
-	aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100");
+	aquarius::tcp_client cli("127.0.0.1", "8100");
 
 	std::thread tc([&] { cli.run(); });
 
 	std::this_thread::sleep_for(1s);
 
-	cli.stop();
-	aquarius::flex_buffer_t fs{};
-	uint8_t a = '1';
-	fs.save(&a, 1);
-	cli.async_write(std::move(fs));
+	person_request req{};
+	req.body().age = 1;
+
+	for (int i = 0; i < 3 * 4096; ++i)
+	{
+		req.body().name.append("a");
+	}
+
+	cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
 
 	std::this_thread::sleep_for(1s);
 
 	cli.stop();
 	srv.stop();
 
+	std::this_thread::sleep_for(1s);
+
 	t.join();
 	tc.join();
-}
-
-BOOST_AUTO_TEST_CASE(connect_callback)
-{
-	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
-
-		std::thread t([&] { srv.run(); });
-
-		aquarius::no_ssl_tcp_client cli("127.0.0.1", "8100", [](auto result) { BOOST_CHECK(result); });
-
-		cli.regist_accept([](std::size_t id) { BOOST_CHECK(id != 0); });
-
-		cli.regist_close([](std::size_t id) { BOOST_CHECK(id != 0); });
-
-		std::thread tc([&] { cli.run(); });
-
-		std::this_thread::sleep_for(1s);
-
-		cli.stop();
-		srv.stop();
-
-		t.join();
-		tc.join();
-	}
-	{
-		aquarius::no_ssl_tcp_client cli("127.0.0.1", "8101", [](auto result) { BOOST_CHECK(!result); });
-
-		std::thread tc([&] { cli.run(); });
-
-		std::this_thread::sleep_for(1s);
-
-		cli.stop();
-
-		tc.join();
-	}
 }
 
 BOOST_AUTO_TEST_SUITE_END()

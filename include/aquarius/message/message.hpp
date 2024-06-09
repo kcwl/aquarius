@@ -54,9 +54,11 @@ namespace aquarius
 
 		virtual error_code from_binary(flex_buffer_t& stream, error_code& ec)
 		{
+			this->set_single(false);
+
 			ec = base_type::from_binary(stream, ec);
 
-			if (!ec)
+			if (ec)
 			{
 				return ec;
 			}
@@ -80,7 +82,7 @@ namespace aquarius
 
 			this->add_length(stream.size() - current);
 
-			this->complete(stream);
+			this->complete(stream, ec);
 
 			return ec = errc::ok;
 		}

@@ -27,11 +27,10 @@ namespace aquarius
 		{
 			this->stop_.store(true);
 
+			cv_.notify_all();
+
 			for (auto& t : threads_)
 			{
-				if (!t && !t->joinable())
-					continue;
-
 				t->join();
 			}
 		}
@@ -67,13 +66,19 @@ namespace aquarius
 		{
 			std::lock_guard lk(task_mutex_);
 
+			if (task_queue_.empty())
+				return;
+
 			auto& task = task_queue_.front();
 
 			try
 			{
 				task();
 			}
-			catch (...) {}
+			catch (...) 
+			{
+				XLOG_WARNING() << "some func maybe throw exception!";
+			}
 
 			task_queue_.pop();
 		}
