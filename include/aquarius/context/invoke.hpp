@@ -54,7 +54,7 @@ namespace aquarius
 
 			resp.to_binary(fs, ec);
 
-			session_manager::instance().broadcast_if(std::move(fs), std::forward<_Pre>(func));
+			session_manager::instance().broadcast(std::move(fs), std::forward<_Pre>(func));
 
 			return true;
 		}
