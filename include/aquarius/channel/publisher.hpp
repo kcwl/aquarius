@@ -1,20 +1,19 @@
 #pragma once
-#include <aquarius/channel/group.hpp>
-#include <aquarius/channel/impl/role.hpp>
-#include <string>
+#include <aquarius/channel/role.hpp>
+#include <aquarius/channel/watcher.hpp>
+#include <aquarius/channel/visitor.hpp>
+#include <functional>
 
 namespace aquarius
 {
-	namespace channel
+	template <typename _Topic, typename _Func = std::function<void()>>
+	class publisher : public channel_role<_Topic, _Func>, public visitor<_Topic,_Func>
 	{
-		class publisher : public impl::role
+	public:
+		virtual bool accept(const _Topic& topic, _Func&&)
 		{
-		public:
-			auto publish(const std::string& topic, const std::string& command)
-			{
-				return default_group::instance().publish(topic, command);
-			}
-		};
-	} // namespace channel
+			return watcher<_Topic, _Func>::instance().publish(topic);
+		}
+	};
 
 } // namespace aquarius

@@ -3,18 +3,23 @@
 #include <aquarius/core/logger.hpp>
 #include <aquarius/core/manager.hpp>
 #include <aquarius/service/service.hpp>
+#include <aquarius/channel/topic.hpp>
+#include <functional>
 #include <memory>
 
 namespace aquarius
 {
 	class service_manager : public single_manager<service_manager, std::shared_ptr<service>>,
-							public channel::subscriber<service_manager>,
+							public subscriber<channel_topic, std::function<void()>>,
 							public std::enable_shared_from_this<service_manager>
 	{
 	public:
 		service_manager()
 		{
-			this->subscribe("service");
+			this->accept(channel_topic::service_start,[&]
+			{
+				this->run();
+			});
 		}
 
 	public:
@@ -66,18 +71,6 @@ namespace aquarius
 			service->stop();
 
 			return true;
-		}
-
-		virtual void apply(const std::string& command) override
-		{
-			if (command == "run")
-			{
-				this->run();
-			}
-			else if (command == "stop")
-			{
-				this->stop();
-			}
 		}
 
 	private:

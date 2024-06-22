@@ -1,25 +1,29 @@
 #pragma once
-#include <aquarius/channel/group.hpp>
-#include <aquarius/channel/impl/role.hpp>
+#include <aquarius/channel/role.hpp>
+#include <aquarius/channel/watcher.hpp>
 
 namespace aquarius
 {
-	namespace channel
+	template <typename _Topic, typename _Func>
+	class subscriber : public channel_role<_Topic, _Func>, public std::enable_shared_from_this<subscriber<_Topic, _Func>>
 	{
-		template<typename _Ty>
-		class subscriber : public impl::role
-		{
-		public:
-			void subscribe(const std::string& topic)
-			{
-				default_group::instance().subscribe(topic, deri_this());
-			}
+	public:
+		subscriber() = default;
 
-		private:
-			_Ty* deri_this()
-			{
-				return static_cast<_Ty*>(this);
-			}
-		};
-	} // namespace channel
+		virtual ~subscriber()
+		{
+			watcher<_Topic, _Func>::instance().unsubscribe(topic_, this->uuid());
+		}
+
+	public:
+		virtual bool accept(const _Topic& topic, _Func&& f) override
+		{
+			topic_ = topic;
+
+			watcher<_Topic, _Func>::instance().subscribe(topic, this->uuid(), std::forward<_Func>(f));
+		}
+
+	private:
+		_Topic topic_;
+	};
 } // namespace aquarius

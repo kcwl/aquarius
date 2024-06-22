@@ -33,7 +33,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			this->publish("service", "run");
+			this->accept(channel_topic::service_start,[]{});
 
 			io_service_pool_.run();
 		}
@@ -85,7 +85,7 @@ namespace aquarius
 
 			close();
 
-			this->publish("service", "stop");
+			this->accept(channel_topic::service_stop,[]{});
 
 			io_service_pool_.stop();
 

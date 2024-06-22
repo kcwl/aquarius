@@ -37,9 +37,6 @@
     <Filter Include="include\aquarius\channel">
       <UniqueIdentifier>{9cda06d1-9deb-420c-8703-6164f5115028}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\channel\impl">
-      <UniqueIdentifier>{e676a92a-4145-4032-95ec-b96dccc8e80e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\client">
       <UniqueIdentifier>{fd14d040-62ab-411e-9d43-ec09cc6f0e27}</UniqueIdentifier>
     </Filter>
@@ -134,20 +131,11 @@
     <ClInclude Include="..\include\aquarius\channel\publisher.hpp">
       <Filter>include\aquarius\channel</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\impl\role.hpp">
-      <Filter>include\aquarius\channel\impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\group.hpp">
+    <ClInclude Include="..\include\aquarius\channel\watcher.hpp">
       <Filter>include\aquarius\channel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\impl\group.hpp">
-      <Filter>include\aquarius\channel\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\channel\subscriber.hpp">
       <Filter>include\aquarius\channel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\channel\impl\channel.hpp">
-      <Filter>include\aquarius\channel\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\generator.hpp">
       <Filter>include\aquarius\context</Filter>
@@ -256,6 +244,15 @@
     </ClInclude>
     <ClInclude Include="client.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\topic.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\role.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\visitor.hpp">
+      <Filter>include\aquarius\channel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
