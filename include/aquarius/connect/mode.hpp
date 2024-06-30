@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/connect/packet.hpp>
 
 namespace aquarius
 {

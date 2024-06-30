@@ -42,7 +42,7 @@ namespace aquarius
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
-		if (ec)                                                                                                       \
+		if (ec)                                                                                                        \
 			return ec;                                                                                                 \
 		return accept_shared_impl(this->shared_from_this(), ctx, connect_ptr);                                         \
 	}
@@ -53,7 +53,7 @@ namespace aquarius
 	{                                                                                                                  \
 		aquarius::error_code ec{};                                                                                     \
 		ec = this->from_binary(buffer, ec);                                                                            \
-		if (ec)                                                                                                       \
+		if (ec)                                                                                                        \
 			return ec;                                                                                                 \
 		return accept_bare_impl(this, ctx, connect_ptr);                                                               \
 	}

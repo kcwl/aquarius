@@ -46,7 +46,7 @@ namespace aquarius
 
 				if (!f)
 					continue;
-				
+
 				f();
 			}
 		}

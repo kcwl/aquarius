@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/core/error_code.hpp>
+#include <memory>
 
 namespace aquarius
 {

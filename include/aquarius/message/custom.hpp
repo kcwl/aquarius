@@ -1,6 +1,7 @@
 #pragma once
-#include <cstdint>
 #include <aquarius/core/elastic.hpp>
+#include <cstdint>
+
 
 namespace aquarius
 {

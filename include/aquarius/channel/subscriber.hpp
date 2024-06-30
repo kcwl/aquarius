@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/channel/role.hpp>
 #include <aquarius/channel/watcher.hpp>
+#include <memory>
 
 namespace aquarius
 {
 	template <typename _Topic, typename _Func>
-	class subscriber : public channel_role<_Topic, _Func>, public std::enable_shared_from_this<subscriber<_Topic, _Func>>
+	class subscriber : public std::enable_shared_from_this<subscriber<_Topic, _Func>>, public channel_role<_Topic, _Func>
 	{
 	public:
 		subscriber() = default;

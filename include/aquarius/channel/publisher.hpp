@@ -7,7 +7,7 @@
 namespace aquarius
 {
 	template <typename _Topic, typename _Func = std::function<void()>>
-	class publisher : public channel_role<_Topic, _Func>, public visitor<_Topic,_Func>
+	class publisher : public channel_role<_Topic,_Func>
 	{
 	public:
 		virtual bool accept(const _Topic& topic, _Func&&)

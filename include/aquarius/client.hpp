@@ -7,8 +7,6 @@
 #include <aquarius/response.hpp>
 #include <filesystem>
 #include <functional>
-#include <iostream>
-#include <map>
 
 namespace aquarius
 {

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/logger.hpp>
-#include <functional>
 #include <list>
 #include <thread>
 #include <vector>

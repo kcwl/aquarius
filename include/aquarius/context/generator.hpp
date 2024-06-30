@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/core/generator.hpp>
+#include <memory>
 
 namespace aquarius
 {

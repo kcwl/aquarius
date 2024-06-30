@@ -1,8 +1,7 @@
-#pragma once
-#include "proto_regist.h"
-#include <aquarius/request.hpp>
-#include <aquarius/response.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include "proto_regist.h"
+
 
 BOOST_AUTO_TEST_SUITE(message)
 

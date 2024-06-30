@@ -1,9 +1,8 @@
 #pragma once
 #include <aquarius/connect/basic_connect.hpp>
 #include <aquarius/core/manager.hpp>
-#include <functional>
+#include <memory>
 #include <mutex>
-#include <set>
 
 namespace aquarius
 {

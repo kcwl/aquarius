@@ -1,4 +1,4 @@
-#pragma once
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include "proto_regist.h"
 

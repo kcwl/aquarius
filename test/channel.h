@@ -1,7 +1,6 @@
-#pragma once
-#include "aquarius/channel/topic.hpp"
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include <aquarius/service.hpp>
+#include <aquarius.hpp>
 
 BOOST_AUTO_TEST_SUITE(channels)
 
@@ -196,14 +195,15 @@ AQUARIUS_SERVICE_REGIST(10002, test_service_2);
 AQUARIUS_SERVICE_REGIST(10003, test_service_3);
 AQUARIUS_SERVICE_REGIST(10004, test_service_4);
 
-// class pub : public aquarius::publisher<aquarius::channel_topic>
-// {
-// public:
-// 	pub()
-// 	{
-// 		BOOST_CHECK(this->accept(aquarius::channel_topic::service_start),[]{});
-// 	}
-// };
+class pub : public aquarius::publisher<aquarius::channel_topic>
+{
+public:
+	pub()
+	{
+		BOOST_CHECK(this->accept(aquarius::channel_topic::service_start, nullptr));
+
+	}
+};
 
 // class pub_not_exist : public aquarius::publisher<aquarius::channel_topic>
 // {

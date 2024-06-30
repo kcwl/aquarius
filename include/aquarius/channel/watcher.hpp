@@ -3,6 +3,7 @@
 #include <aquarius/core/singleton.hpp>
 #include <cstddef>
 #include <mutex>
+#include <memory>
 #include <shared_mutex>
 #include <unordered_map>
 

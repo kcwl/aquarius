@@ -1,6 +1,7 @@
-#pragma once
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include <memory>
+#include "proto_regist.h"
 
 BOOST_AUTO_TEST_SUITE(router)
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius.hpp>
 
 struct person_body_request
 {

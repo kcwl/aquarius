@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/channel/visitor.hpp>
-#include <memory>
+#include <cstddef>
 
 namespace aquarius
 {
@@ -12,11 +12,6 @@ namespace aquarius
 		virtual ~channel_role() = default;
 
 	public:
-		//void apply(_Func&& f)
-		//{
-		//	this->accept(std::forward<_Func>(f));
-		//}
-
 		std::size_t uuid() const
 		{
 			return uuid_;

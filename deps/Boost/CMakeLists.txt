@@ -14,5 +14,4 @@ endif()
 
 target_compile_definitions(boost INTERFACE -DBOOST_LOG_DYN_LINK)
 
-
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})

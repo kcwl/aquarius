@@ -1,11 +1,11 @@
 #pragma once
 #include <aquarius/channel/subscriber.hpp>
+#include <aquarius/channel/topic.hpp>
 #include <aquarius/core/logger.hpp>
 #include <aquarius/core/manager.hpp>
 #include <aquarius/service/service.hpp>
-#include <aquarius/channel/topic.hpp>
-#include <functional>
 #include <memory>
+
 
 namespace aquarius
 {
@@ -16,10 +16,7 @@ namespace aquarius
 	public:
 		service_manager()
 		{
-			this->accept(channel_topic::service_start,[&]
-			{
-				this->run();
-			});
+			this->accept(channel_topic::service_start, [&] { this->run(); });
 		}
 
 	public:
