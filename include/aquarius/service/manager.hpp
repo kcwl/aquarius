@@ -16,7 +16,7 @@ namespace aquarius
 	public:
 		service_manager()
 		{
-			this->accept(channel_topic::service_start, [&] { this->run(); });
+			this->subscribe(channel_topic::service_start, [&] { this->run(); });
 		}
 
 	public:

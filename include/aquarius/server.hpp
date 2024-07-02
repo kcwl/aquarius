@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/channel.hpp>
 #include <aquarius/server/io_service_pool.hpp>
 
 namespace aquarius
@@ -33,7 +34,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			this->accept(channel_topic::service_start,[]{});
+			this->publish(channel_topic::service_start);
 
 			io_service_pool_.run();
 		}
@@ -85,7 +86,7 @@ namespace aquarius
 
 			close();
 
-			this->accept(channel_topic::service_stop,[]{});
+			this->publish(channel_topic::service_stop);
 
 			io_service_pool_.stop();
 

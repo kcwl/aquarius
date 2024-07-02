@@ -12,7 +12,7 @@ namespace aquarius
 
 		using func_t = _Func;
 
-		using role_t = channel_role<topic_t, _Func>;
+		using role_t = role<topic_t>;
 
 	public:
 		channel() = default;

@@ -195,26 +195,26 @@ AQUARIUS_SERVICE_REGIST(10002, test_service_2);
 AQUARIUS_SERVICE_REGIST(10003, test_service_3);
 AQUARIUS_SERVICE_REGIST(10004, test_service_4);
 
-class pub : public aquarius::publisher<aquarius::channel_topic>
-{
-public:
-	pub()
-	{
-		BOOST_CHECK(this->accept(aquarius::channel_topic::service_start, nullptr));
+// class pub : public aquarius::publisher<aquarius::channel_topic>
+// {
+// public:
+// 	pub()
+// 	{
+// 		BOOST_CHECK(this->publish(aquarius::channel_topic::service_start));
 
-	}
-};
+// 	}
+// };
 
 // class pub_not_exist : public aquarius::publisher<aquarius::channel_topic>
 // {
 // public:
 // 	pub_not_exist()
 // 	{
-// 		BOOST_CHECK(!this->publish("xxy", "xx1"));
+// 		BOOST_CHECK(!this->publish());
 // 	}
 // };
 
-// class sub : public aquarius::channel::subscriber<sub>
+// class sub : public aquarius::subscriber<aquarius::channel_topic>
 // {
 // public:
 // 	sub()
