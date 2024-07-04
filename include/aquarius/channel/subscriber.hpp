@@ -21,6 +21,8 @@ namespace aquarius
 			topic_ = topic;
 
 			watcher<_Topic, _Func>::instance().subscribe(topic, this->uuid(), std::forward<_Func>(f));
+
+			return true;
 		}
 
 	private:
