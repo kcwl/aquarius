@@ -1,10 +1,20 @@
 #pragma once
+#include <aquarius/channel.hpp>
+#include <aquarius/core/logger.hpp>
 #include <string>
 
 namespace aquarius
 {
-	class service
+	class service : public subscriber<channel_topic>
 	{
+	public:
+		service()
+		{
+			regist_start();
+
+			regist_stop();
+		}
+
 	public:
 		virtual bool init() = 0;
 
@@ -17,5 +27,42 @@ namespace aquarius
 		virtual bool enable() = 0;
 
 		virtual std::string name() = 0;
+
+	private:
+		void regist_start()
+		{
+			this->subscribe(channel_topic::service_start,
+							[&]
+							{
+								if (!this->enable())
+									return;
+
+								if (!config())
+								{
+									XLOG_ERROR() << "[servie] " << name() << " config error!";
+
+									return;
+								}
+
+								if (!init())
+								{
+									XLOG_ERROR() << "[servie] " << name() << " init error!";
+
+									return;
+								}
+
+								if (!run())
+								{
+									XLOG_ERROR() << "[servie] " << name() << " run error!";
+
+									return;
+								}
+							});
+		}
+
+		void regist_stop()
+		{
+			this->subscribe(channel_topic::service_stop, [&] { this->stop(); });
+		}
 	};
 } // namespace aquarius
