@@ -11,4 +11,7 @@ namespace aquarius
 	constexpr static auto timeout_dura = 1s;
 
 	constexpr static auto deadline_dura = 1ms;
+
+	struct subscriber_global
+	{};
 } // namespace aquarius

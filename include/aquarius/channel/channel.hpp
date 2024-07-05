@@ -19,6 +19,11 @@ namespace aquarius
 		~channel() = default;
 
 	public:
+		bool empty() const
+		{
+			return subscribers_.empty();
+		}
+
 		topic_t topic() const
 		{
 			return topic_;

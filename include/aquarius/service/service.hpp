@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	class service : public subscriber<channel_topic>
+	class service : public subscriber<subscriber_global, channel_topic, std::function<void()>>
 	{
 	public:
 		service()

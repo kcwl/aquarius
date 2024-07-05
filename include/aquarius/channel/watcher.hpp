@@ -68,7 +68,10 @@ namespace aquarius
 			if(iter == channels_.end())
 				return;
 
-			channels_.erase(iter);
+			iter->second->unsubscribe(topic);
+
+			if (iter->second.empty())
+				channels_.erase(iter);
 		}
 
 		bool publish(const topic_t& topic)
