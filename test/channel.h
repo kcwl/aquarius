@@ -32,7 +32,7 @@ public:
 
 	virtual bool enable() override
 	{
-		return true;
+		return false;
 	}
 
 	virtual std::string name() override
@@ -54,7 +54,7 @@ public:
 
 	virtual bool config() override
 	{
-		return true;
+		return false;
 	}
 
 	virtual bool run() override
@@ -86,7 +86,7 @@ public:
 public:
 	virtual bool init() override
 	{
-		return true;
+		return false;
 	}
 
 	virtual bool config() override
@@ -195,57 +195,76 @@ AQUARIUS_SERVICE_REGIST(10002, test_service_2);
 AQUARIUS_SERVICE_REGIST(10003, test_service_3);
 AQUARIUS_SERVICE_REGIST(10004, test_service_4);
 
-// class pub : public aquarius::publisher<aquarius::channel_topic>
-// {
-// public:
-// 	pub()
-// 	{
-// 		BOOST_CHECK(this->publish(aquarius::channel_topic::service_start));
+ class pub : public aquarius::publisher<int>
+ {
+ public:
+ 	pub()
+ 	{
+ 		BOOST_CHECK(this->publish(5));
+ 	}
+ };
 
-// 	}
-// };
+ class pub_not_exist : public aquarius::publisher<int>
+ {
+ public:
+ 	pub_not_exist()
+ 	{
+ 		BOOST_CHECK(!this->publish(5));
+ 	}
+ };
 
-// class pub_not_exist : public aquarius::publisher<aquarius::channel_topic>
-// {
-// public:
-// 	pub_not_exist()
-// 	{
-// 		BOOST_CHECK(!this->publish());
-// 	}
-// };
+ class sub : public aquarius::subscriber<int, int, std::function<void()>>
+ {
+ public:
+ 	sub()
+ 	{
+		this->subscribe(5, nullptr);
+ 	}
+ };
 
-// class sub : public aquarius::subscriber<aquarius::channel_topic>
-// {
-// public:
-// 	sub()
-// 	{
-// 		this->subscribe("xxx");
-// 	}
-// };
+ class no_sub : public aquarius::subscriber<int, int, std::function<void()>>
+ {
 
-// BOOST_AUTO_TEST_CASE(group)
-// {
-// 	{
-// 		sub s1{};
+ };
 
-// 		sub s2{};
+ BOOST_AUTO_TEST_CASE(group)
+ {
+	 {
+		 pub_not_exist p{};
+	 }
 
-// 		pub p{};
+	 {
+		 sub s{};
 
-// 		pub_not_exist pp{};
+		 pub p{};
+	 }
 
-// 		auto channel = aquarius::channel::default_group::instance().find("xxx");
-
-// 		BOOST_CHECK(channel);
-// 	}
+	 {
+		 no_sub ns{};
+	 }
 	
-// 	{
-// 		aquarius::channel::default_group::instance().erase("xxx");
 
-// 		auto channel = aquarius::channel::default_group::instance().find("xxx");
+ 	//{
+ 	//	sub s1{};
 
-// 		BOOST_CHECK(!channel);
-// 	}
-// }
+ 	//	sub s2{};
+
+ 	//	pub p{};
+
+ 	//	pub_not_exist pp{};
+
+ 	//	auto channel = aquarius::channel::default_group::instance().find("xxx");
+
+ 	//	BOOST_CHECK(channel);
+ 	//}
+	
+ 	//{
+ 	//	aquarius::channel::default_group::instance().erase("xxx");
+
+ 	//	auto channel = aquarius::channel::default_group::instance().find("xxx");
+
+ 	//	BOOST_CHECK(!channel);
+ 	//}
+ }
 
 BOOST_AUTO_TEST_SUITE_END()
