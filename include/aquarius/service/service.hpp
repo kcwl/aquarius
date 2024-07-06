@@ -34,7 +34,7 @@ namespace aquarius
 			this->subscribe(channel_topic::service_start,
 							[&]
 							{
-								if (!this->enable())
+								if (!enable())
 									return;
 
 								if (!config())
