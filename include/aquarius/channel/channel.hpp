@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/channel/role.hpp>
 #include <mutex>
 #include <unordered_map>
 
@@ -11,8 +10,6 @@ namespace aquarius
 		using topic_t = _Topic;
 
 		using func_t = _Func;
-
-		using role_t = role<topic_t>;
 
 	public:
 		channel() = default;

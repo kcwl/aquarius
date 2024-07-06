@@ -1,47 +1,52 @@
 #pragma once
-#include <aquarius/channel/watcher.hpp>
 #include <aquarius/core/core.hpp>
 #include <functional>
 
 namespace aquarius
 {
-	template <typename _Type, typename _Topic, typename _Func>
-	class subscriber;
-
-	template <typename _Topic, typename _Func>
-	class subscriber<subscriber_global, _Topic, _Func> : public role<_Topic>
+	template <typename _Watcher, typename _Type = int>
+	class subscriber : public role
 	{
 	public:
-		bool subscribe(const _Topic& topic, _Func&& f)
-		{
-			watcher<_Topic, _Func>::instance().subscribe(topic, this->uuid(), std::forward<_Func>(f));
+		using func_t = typename _Watcher::func_t;
 
-			return true;
-		}
-	};
+		using topic_t = typename _Watcher::topic_t;
 
-	template <typename _Topic, typename _Func>
-	class subscriber<int, _Topic, _Func> : public role<_Topic>
-	{
 	public:
 		subscriber() = default;
 
 		virtual ~subscriber()
 		{
-			watcher<_Topic, _Func>::instance().unsubscribe(topic_, this->uuid());
+			_Watcher::instance().unsubscribe(topic_, this->uuid());
 		}
 
 	public:
-		bool subscribe(const _Topic& topic, _Func&& f)
+		bool subscribe(const topic_t& topic, func_t&& f)
 		{
 			topic_ = topic;
 
-			watcher<_Topic, _Func>::instance().subscribe(topic, this->uuid(), std::forward<_Func>(f));
+			_Watcher::instance().subscribe(topic, this->uuid(), std::forward<func_t>(f));
 
 			return true;
 		}
 
 	private:
-		_Topic topic_;
+		topic_t topic_;
+	};
+
+	template <typename _Watcher>
+	class subscriber<_Watcher, subscriber_global> : public role
+	{
+		using func_t = typename _Watcher::func_t;
+
+		using topic_t = typename _Watcher::topic_t;
+
+	public:
+		bool subscribe(const topic_t& topic, func_t&& f)
+		{
+			_Watcher::instance().subscribe(topic, this->uuid(), std::forward<func_t>(f));
+
+			return true;
+		}
 	};
 } // namespace aquarius

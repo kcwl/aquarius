@@ -13,9 +13,9 @@
 
 namespace aquarius
 {
-	using tcp_server = basic_server<ssl_tcp_server_connect, publisher<channel_topic>>;
+	using tcp_server = basic_server<ssl_tcp_server_connect, global_publisher>;
 
-	using no_ssl_tcp_server = basic_server<no_ssl_tcp_server_connect, publisher<channel_topic>>;
+	using no_ssl_tcp_server = basic_server<no_ssl_tcp_server_connect, global_publisher>;
 
 	//using http_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::nossl>, channel::publisher>;
 

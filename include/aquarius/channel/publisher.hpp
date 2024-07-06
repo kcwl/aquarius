@@ -5,13 +5,16 @@
 
 namespace aquarius
 {
-	template <typename _Topic, typename _Func = std::function<void()>>
-	class publisher : public role<_Topic>
+	template <typename _Watcher>
+	class publisher : public role
 	{
 	public:
-		bool publish(const _Topic& topic)
+		using topic_t = typename _Watcher::topic_t;
+		
+	public:
+		bool publish(const topic_t& topic)
 		{
-			return watcher<_Topic, _Func>::instance().publish(topic);
+			return _Watcher::instance().publish(topic);
 		}
 	};
 

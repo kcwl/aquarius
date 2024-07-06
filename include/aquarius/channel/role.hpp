@@ -1,11 +1,18 @@
 #pragma once
 #include <cstddef>
+#include <aquarius/core/uuid.hpp>
 
 namespace aquarius
 {
-	template <typename _Topic>
 	class role
 	{
+	public:
+		role()
+			: uuid_(invoke_uuid<std::size_t>())
+		{
+
+		}
+
 	public:
 		std::size_t uuid() const
 		{

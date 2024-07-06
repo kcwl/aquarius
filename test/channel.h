@@ -49,7 +49,7 @@ public:
 public:
 	virtual bool init() override
 	{
-		return false;
+		return true;
 	}
 
 	virtual bool config() override
@@ -91,7 +91,7 @@ public:
 
 	virtual bool config() override
 	{
-		return false;
+		return true;
 	}
 
 	virtual bool run() override
@@ -195,7 +195,10 @@ AQUARIUS_SERVICE_REGIST(10002, test_service_2);
 AQUARIUS_SERVICE_REGIST(10003, test_service_3);
 AQUARIUS_SERVICE_REGIST(10004, test_service_4);
 
- class pub : public aquarius::publisher<int>
+using test_watcher = aquarius::watcher<int,std::function<void()>>;
+using test_subscriber = aquarius::subscriber<test_watcher>;
+
+ class pub : public aquarius::publisher<test_watcher>
  {
  public:
  	pub()
@@ -204,7 +207,7 @@ AQUARIUS_SERVICE_REGIST(10004, test_service_4);
  	}
  };
 
- class pub_not_exist : public aquarius::publisher<int>
+ class pub_not_exist : public aquarius::publisher<test_watcher>
  {
  public:
  	pub_not_exist()
@@ -213,7 +216,9 @@ AQUARIUS_SERVICE_REGIST(10004, test_service_4);
  	}
  };
 
- class sub : public aquarius::subscriber<int, int, std::function<void()>>
+
+
+ class sub : public test_subscriber
  {
  public:
  	sub()
@@ -222,7 +227,7 @@ AQUARIUS_SERVICE_REGIST(10004, test_service_4);
  	}
  };
 
- class no_sub : public aquarius::subscriber<int, int, std::function<void()>>
+ class no_sub : public aquarius::scope_subscriber
  {
 
  };

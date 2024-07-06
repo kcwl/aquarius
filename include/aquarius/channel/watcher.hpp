@@ -17,7 +17,6 @@ namespace aquarius
 
 		using func_t = _Func;
 
-
 		using channel_t = channel<topic_t, func_t>;
 	public:
 		std::shared_ptr<channel_t> find(const topic_t& topic)
@@ -93,5 +92,4 @@ namespace aquarius
 
 		std::unordered_map<topic_t, std::shared_ptr<channel_t>> channels_;
 	};
-
 } // namespace aquarius
