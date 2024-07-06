@@ -68,9 +68,9 @@ namespace aquarius
 			if(iter == channels_.end())
 				return;
 
-			iter->second->unsubscribe(topic);
+			iter->second->unsubscribe(role_id);
 
-			if (iter->second.empty())
+			if (iter->second->empty())
 				channels_.erase(iter);
 		}
 
