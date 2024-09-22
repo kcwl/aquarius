@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c4419a49-ee6d-4862-9c40-c218bc74d96b}</ProjectGuid>
-    <RootNamespace>generator</RootNamespace>
+    <ProjectGuid>{2e041b95-954a-4949-adfd-45009b7403a3}</ProjectGuid>
+    <RootNamespace>lazytool</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -100,13 +100,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,8 +120,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,19 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="command_line.cpp" />
-    <ClCompile Include="file_descriptor.cpp" />
-    <ClCompile Include="generator.cpp" />
-    <ClCompile Include="idle_gen_cpp.cpp" />
+    <ClCompile Include="lazytool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="command_line.h" />
-    <ClInclude Include="common.hpp" />
-    <ClInclude Include="file_descriptor.h" />
-    <ClInclude Include="file_struct.hpp" />
-    <ClInclude Include="idle_gen_cpp.h" />
-    <ClInclude Include="defines.h" />
-    <ClInclude Include="key_word.hpp" />
+    <ClInclude Include="command_line.hpp" />
+    <ClInclude Include="file_descripe.hpp" />
+    <ClInclude Include="file_outer.hpp" />
+    <ClInclude Include="message_info.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

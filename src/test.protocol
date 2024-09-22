@@ -1,0 +1,40 @@
+syntax aquarius;
+
+namespace proto;
+
+enum this_enum
+{
+	red;
+	black;
+}
+
+message this_message
+{
+	int32 a;
+
+	message netest_msg
+	{
+		int32 b;
+	}
+
+	netest_msg msg;
+}
+
+[[request]] message test = 10000
+{
+	int32 a;
+	int32 b;
+	float c;
+}
+
+[[response]] message test = 10001
+{
+	int32 result;
+}
+
+message test_multi 
+{
+	vector<int> a;
+	map<int,int> b;
+	oneof<int,int,int> c;
+}

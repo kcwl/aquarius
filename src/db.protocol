@@ -1,0 +1,99 @@
+syntax aquarius;
+
+namespace db;
+
+[[request]] message query_role_lit = 10000
+{
+	bytes data;
+}
+
+[[response]] message query_role_list = 10001
+{
+	bytes data;
+}
+
+[[request]] message create_role = 10002
+{
+	bytes data;
+}
+
+[[response]] message create_role = 10003
+{
+}
+
+[[request]] message delete_role = 10004
+{
+	bytes data;
+}
+
+[[response]] message delete_role = 10005
+{
+
+}
+
+[[request]] message query_grad_list = 10006
+{
+	bytes data;
+}
+
+[[response]] message query_grad_list = 10007
+{
+	bytes data;
+}
+
+[[request]] message save_role = 10008
+{
+	bytes data;
+}
+
+[[response]] message save_role = 10009
+{
+}
+
+[[request]] message query_role_info = 10010
+{
+	bytes data;
+}
+
+[[response]] message query_role_info = 10011
+{
+	bytes data;
+}
+
+[[request]] message lock_role = 10012
+{
+	bytes data;
+}
+
+[[response]] message lock_role = 10013
+{
+}
+
+[[request]] message game_statistic = 10014
+{
+}
+
+[[response]] message game_statistic = 10015
+{
+	bytes data;
+}
+
+[[request]] message change_name = 10016
+{
+	bytes data;
+}
+
+[[response]] message change_name = 10017
+{
+	bytes data;
+}
+
+[[request]] message online_change_name = 10018
+{
+	bytes data;
+}
+
+[[response]] message online_change_name = 10019
+{
+	bytes data;
+}

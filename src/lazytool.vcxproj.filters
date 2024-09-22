@@ -15,39 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="generator.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="command_line.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="idle_gen_cpp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="file_descriptor.cpp">
+    <ClCompile Include="lazytool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="command_line.h">
+    <ClInclude Include="command_line.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="common.hpp">
+    <ClInclude Include="file_descripe.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="idle_gen_cpp.h">
+    <ClInclude Include="file_outer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="defines.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="file_descriptor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="key_word.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="file_struct.hpp">
+    <ClInclude Include="message_info.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
