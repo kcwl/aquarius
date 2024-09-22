@@ -10,6 +10,10 @@
 #include <aquarius/service.hpp>
 #include <aquarius/connect/ssl.hpp>
 #include <aquarius/connect/no_ssl.hpp>
+#include <aquarius/core/ini_tree.hpp>
+#include <aquarius/core/crc.hpp>
+#include <aquarius/core/singleton.hpp>
+#include <aquarius/core/core.hpp>
 
 namespace aquarius
 {

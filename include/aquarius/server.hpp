@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/server/io_service_pool.hpp>
+#include <string>
 
 namespace aquarius
 {

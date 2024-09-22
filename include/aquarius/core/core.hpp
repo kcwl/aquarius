@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 #include <cstdint>
+#include <string>
 
 using namespace std::chrono_literals;
 
@@ -11,4 +12,9 @@ namespace aquarius
 	constexpr static auto timeout_dura = 1s;
 
 	constexpr static auto deadline_dura = 1ms;
+
+	inline std::string md5(const std::string& value)
+	{
+		return value;
+	}
 } // namespace aquarius

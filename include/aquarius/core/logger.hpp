@@ -25,6 +25,8 @@ namespace aquarius
 {
 	inline void init_logger()
 	{
+		logging::add_console_log(std::clog, keywords::format = "%TimeStamp%:[%Severity%] %Message%");
+
 		using file_sink = sinks::synchronous_sink<sinks::text_file_backend>;
 
 		auto sink_ptr = boost::make_shared<file_sink>(keywords::file_name = "file.log",
@@ -50,25 +52,25 @@ namespace aquarius
 		logging::core::get()->add_global_attribute("Line", attrs::mutable_constant<int>(0));
 	}
 
-	struct file_name
-	{
-		static std::string substr(const std::string& path)
-		{
-			auto pos = path.find_last_of("/\\");
+	//struct file_name
+	//{
+	//	static std::string substr(const std::string& path)
+	//	{
+	//		auto pos = path.find_last_of("/\\");
 
-			return path.substr(pos + 1);
-		}
-	};
+	//		return path.substr(pos + 1);
+	//	}
+	//};
 
 } // namespace aquarius
 
-#define XLOG(level)                                                                                                    \
-	BOOST_LOG_TRIVIAL(level) << "[" << aquarius::file_name::substr(std::source_location::current().file_name()) << ":" \
-							 << std::source_location::current().line() << "] "
+//#define XLOG(level)                                                                                                    \
+//	BOOST_LOG_TRIVIAL(level) << "[" << aquarius::file_name::substr(std::source_location::current().file_name()) << ":" \
+//							 << std::source_location::current().line() << "] "
 
-#define XLOG_TRACE() XLOG(trace)
-#define XLOG_DEBUG() XLOG(debug)
-#define XLOG_INFO() XLOG(info)
-#define XLOG_WARNING() XLOG(warning)
-#define XLOG_ERROR() XLOG(error)
-#define XLOG_FATAL() XLOG(fatal)
+#define XLOG_TRACE() BOOST_LOG_TRIVIAL(trace)
+#define XLOG_DEBUG() BOOST_LOG_TRIVIAL(debug)
+#define XLOG_INFO() BOOST_LOG_TRIVIAL(info)
+#define XLOG_WARNING() BOOST_LOG_TRIVIAL(warning)
+#define XLOG_ERROR() BOOST_LOG_TRIVIAL(error)
+#define XLOG_FATAL() BOOST_LOG_TRIVIAL(fatal)
