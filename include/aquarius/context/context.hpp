@@ -32,14 +32,22 @@ namespace aquarius
 				return errc::timeout;
 			}
 
-			auto result = future.get();
-
-			if (result)
+			try
 			{
-				XLOG_ERROR() << this->visitor_ << " handle error, maybe " << result.message();
-			}
+				auto result = future.get();
 
-			return result;
+				if (result)
+				{
+					XLOG_ERROR() << this->visitor_ << " handle error, maybe " << result.message();
+				}
+
+				return result;
+			}
+			catch (std::exception& ec)
+			{
+				XLOG_ERROR() << ec.what();
+			}
+			return errc::ok;
 		}
 
 	protected:
@@ -47,6 +55,7 @@ namespace aquarius
 
 		bool send_response(int result)
 		{
+			response_.header()->set_session(request_ptr_->header()->session());
 			auto fs = make_response(result);
 
 			this->connect_ptr_->send_packet(std::move(fs));
