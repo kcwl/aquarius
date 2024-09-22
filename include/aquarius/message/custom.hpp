@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <aquarius/core/elastic.hpp>
+#include <aquarius/serialize.hpp>
 
 namespace aquarius
 {
@@ -48,7 +48,7 @@ namespace aquarius
 		~custom_tcp_response_header() = default;
 
 	public:
-		custom_tcp_response_header(custom_tcp_response_header&& other)
+		custom_tcp_response_header(custom_tcp_response_header&& other) noexcept
 			: custom_tcp_request_header(std::forward<custom_tcp_response_header>(other))
 			, result_(other.result_)
 		{

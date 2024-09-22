@@ -134,9 +134,9 @@ namespace aquarius
 
 		virtual void handle_update() override
 		{
-			deadline_.expires_from_now(deadline_dura);
+			//deadline_.expires_from_now(deadline_dura);
 
-			deadline_.async_wait([&](asio::error_code ec) { this->handle_update(); });
+			//deadline_.async_wait([&](asio::error_code) { this->handle_update(); });
 		}
 
 	private:

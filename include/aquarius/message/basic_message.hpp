@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/context/visitable.hpp>
-#include <aquarius/core/elastic.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
