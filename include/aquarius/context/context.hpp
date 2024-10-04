@@ -21,33 +21,34 @@ namespace aquarius
 
 			connect_ptr_ = connect_ptr;
 
-			auto future = this->template post<error_code>([&] { return this->handle(); });
+			//auto future = this->template post<error_code>([&] { return this->handle(); });
 
-			auto status = future.wait_for(timeout_);
+			//auto status = future.wait_for(timeout_);
 
-			if (status != std::future_status::ready)
-			{
-				XLOG_WARNING() << this->visitor_ << "handle timeout!";
+			//if (status != std::future_status::ready)
+			//{
+			//	XLOG_WARNING() << this->visitor_ << "handle timeout!";
 
-				return errc::timeout;
-			}
+			//	return errc::timeout;
+			//}
 
-			try
-			{
-				auto result = future.get();
+			//try
+			//{
+			//	auto result = future.get();
 
-				if (result)
-				{
-					XLOG_ERROR() << this->visitor_ << " handle error, maybe " << result.message();
-				}
+			//	if (result)
+			//	{
+			//		XLOG_ERROR() << this->visitor_ << " handle error, maybe " << result.message();
+			//	}
 
-				return result;
-			}
-			catch (std::exception& ec)
-			{
-				XLOG_ERROR() << ec.what();
-			}
-			return errc::ok;
+			//	return result;
+			//}
+			//catch (std::exception& ec)
+			//{
+			//	XLOG_ERROR() << ec.what();
+			//}
+			return this->handle();
+			//return errc::ok;
 		}
 
 	protected:

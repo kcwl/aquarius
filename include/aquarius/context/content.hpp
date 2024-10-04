@@ -20,18 +20,20 @@ namespace aquarius
 
 			connect_ptr_ = connect_ptr;
 
-			auto future = this->template post<error_code>([&] { return this->handle(); });
+			auto result = this->handle();
 
-			auto status = future.wait_for(timeout_);
+			//auto future = this->template post<error_code>([&] { return this->handle(); });
 
-			if (status != std::future_status::ready)
-			{
-				XLOG_WARNING() << this->visitor_ << "handle timeout!";
+			//auto status = future.wait_for(timeout_);
 
-				return errc::timeout;
-			}
+			//if (status != std::future_status::ready)
+			//{
+			//	XLOG_WARNING() << this->visitor_ << "handle timeout!";
 
-			auto result = future.get();
+			//	return errc::timeout;
+			//}
+
+			//auto result = future.get();
 
 			if (!result)
 			{
