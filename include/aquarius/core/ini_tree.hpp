@@ -8,11 +8,14 @@ namespace aquarius
 	class ini_tree
 	{
 	public:
-		explicit ini_tree(const std::string& file_name)
+		explicit ini_tree(const std::string& file_name, int mode = std::ios::in)
 			: pt_()
 			, file_name_(file_name)
 		{
-			boost::property_tree::ini_parser::read_ini(file_name_, pt_);
+			if (mode == std::ios::in)
+			{
+				boost::property_tree::ini_parser::read_ini(file_name_, pt_);
+			}
 		}
 
 	public:
@@ -45,6 +48,11 @@ namespace aquarius
 			{
 				std::forward<_Func>(f)(sec);
 			}
+		}
+
+		void save()
+		{
+			boost::property_tree::ini_parser::write_ini(file_name_, pt_);
 		}
 
 	private:
