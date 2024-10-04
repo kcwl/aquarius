@@ -89,6 +89,11 @@ namespace aquarius
 												XLOG_ERROR() << "on read some occur error - " << ec.message();
 											}
 
+											channel::publisher pub{};
+											pub.publish("login_event", "disconnect",uuid());
+
+											invoke_session_helper::erase(this->uuid());
+
 											return shut_down();
 										}
 

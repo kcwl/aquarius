@@ -68,7 +68,7 @@ namespace aquarius
 			return true;
 		}
 
-		virtual void apply(const std::string& command) override
+		virtual void apply(const std::string& command, std::size_t id) override
 		{
 			if (command == "run")
 			{

@@ -28,11 +28,11 @@ namespace aquarius
 				subscirbers_.push_back(subscribe_role);
 			}
 
-			void call(const std::string& command)
+			void call(const std::string& command, std::size_t id)
 			{
 				for (auto& subs : subscirbers_)
 				{
-					subs->apply(command);
+					subs->apply(command, id);
 				}
 			}
 

@@ -34,7 +34,7 @@ namespace aquarius
 
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			this->publish("service", "run");
+			this->publish("service", "run", 0);
 
 			io_service_pool_.run();
 		}
@@ -71,6 +71,8 @@ namespace aquarius
 									   {
 										   auto conn_ptr = std::make_shared<connect_t>(std::move(sock), ssl_context_);
 
+										   this->publish("login_event", "connect", conn_ptr->uuid());
+
 										   conn_ptr->start();
 									   }
 
@@ -86,7 +88,7 @@ namespace aquarius
 
 			close();
 
-			this->publish("service", "stop");
+			this->publish("service", "stop", 0);
 
 			io_service_pool_.stop();
 

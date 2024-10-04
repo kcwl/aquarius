@@ -57,7 +57,8 @@ namespace aquarius
 					channels_[topic] = channel;
 				}
 
-				bool publish(const std::string& topic, const std::string& command)
+				template<typename... _Args>
+				bool publish(const std::string& topic, const std::string& command, _Args&&... args)
 				{
 					std::unique_lock lk(mutex_);
 
@@ -66,7 +67,7 @@ namespace aquarius
 					if (iter == channels_.end())
 						return false;
 
-					iter->second->call(command);
+					iter->second->call(command, std::forward<_Args>(args)...);
 
 					return true;
 				}
