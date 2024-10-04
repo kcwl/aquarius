@@ -33,7 +33,8 @@ namespace aquarius
 	inline void broadcast(_Message&& msg)
 	{
 		flex_buffer_t fs{};
-		msg.to_binary(fs);
+		error_code ec{};
+		msg.to_binary(fs, ec);
 
 		session_manager::instance().broadcast(std::move(fs));
 	}
@@ -42,7 +43,8 @@ namespace aquarius
 	inline void broadcast(_Message&& msg, _Func&& f)
 	{
 		flex_buffer_t fs{};
-		msg.to_binary(fs);
+		error_code ec{};
+		msg.to_binary(fs, ec);
 
 		session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
 	}
