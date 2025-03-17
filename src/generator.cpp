@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 	aquarius::compiler::cpp::generate_cpp cpp{};
 
 	aquarius::compiler::command_line cl;
+
 	cl.register_generator("--cpp_out", &cpp, "heiheihei");
 
 	cl.run(argc, argv);
