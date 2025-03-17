@@ -10,7 +10,7 @@ namespace aquarius
 		class publisher : public impl::role
 		{
 		public:
-			auto publish(const std::string& topic, const std::string& command, std::size_t id)
+			auto publish(const std::string& topic, const std::string& command, std::size_t id = 0)
 			{
 				return default_group::instance().publish(topic, command, id);
 			}

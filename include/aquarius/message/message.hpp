@@ -66,8 +66,8 @@ namespace aquarius
 
 			aquarius::from_binary(header_, stream);
 
-			//aquarius::from_binary(body_, stream);
-			body_.from_binary(stream);
+			aquarius::from_binary(body_, stream);
+			//body_.from_binary(stream);
 
 			return ec = errc::ok;
 		}
@@ -82,8 +82,8 @@ namespace aquarius
 
 			aquarius::to_binary(header_, stream);
 
-			//aquarius::to_binary(body_, stream);
-			body_.to_binary(stream);
+			aquarius::to_binary(body_, stream);
+			//body_.to_binary(stream);
 
 			this->add_length(stream.size() - current);
 
