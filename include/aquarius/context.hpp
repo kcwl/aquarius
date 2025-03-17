@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/context/content.hpp>
 #include <aquarius/context/context.hpp>
-#include <aquarius/core/elastic.hpp>
 #include <aquarius/message/generator.hpp>
 
 #define AQUARIUS_MESSAGE_REGIST(req) static aquarius::msg_regist<req> msg_##req(req::Number)

@@ -26,7 +26,7 @@ struct person_body_request
 	}
 
 private:
-	friend class elastic::access;
+	friend class aquarius::access;
 
 	template <typename _Archive>
 	void serialize(_Archive& ar)
@@ -69,7 +69,7 @@ struct person_body_response
 	}
 
 private:
-	friend class elastic::access;
+	friend class aquarius::access;
 
 	template <typename _Archive>
 	void serialize(_Archive& ar)

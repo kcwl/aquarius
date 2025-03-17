@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/message/basic_header.hpp>
+#include <aquarius/serialize.hpp>
 
 namespace aquarius
 {
@@ -63,22 +64,26 @@ namespace aquarius
 				return ec;
 			}
 
-			elastic::from_binary(header_, stream);
+			aquarius::from_binary(header_, stream);
 
-			elastic::from_binary(body_, stream);
+			aquarius::from_binary(body_, stream);
+			//body_.from_binary(stream);
 
 			return ec = errc::ok;
 		}
 
 		virtual error_code to_binary(flex_buffer_t& stream, error_code& ec)
 		{
+			this->reset();
+
 			base_type::to_binary(stream, ec);
 
 			auto current = stream.size();
 
-			elastic::to_binary(header_, stream);
+			aquarius::to_binary(header_, stream);
 
-			elastic::to_binary(body_, stream);
+			aquarius::to_binary(body_, stream);
+			//body_.to_binary(stream);
 
 			this->add_length(stream.size() - current);
 

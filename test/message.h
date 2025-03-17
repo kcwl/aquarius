@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 	{
 		aquarius::flex_buffer_t buffer{};
 
-		elastic::to_binary(13, buffer);
+		aquarius::to_binary(13, buffer);
 
 		person_request req{};
 

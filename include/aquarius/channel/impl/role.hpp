@@ -1,5 +1,5 @@
 #pragma once
-#include <cstring>
+#include <string>
 
 namespace aquarius
 {
@@ -14,8 +14,7 @@ namespace aquarius
 				virtual ~role() = default;
 
 			public:
-				virtual void apply(const std::string&)
-				{}
+				virtual void apply(const std::string& command, std::size_t id) {}
 
 			public:
 				std::size_t uuid_;

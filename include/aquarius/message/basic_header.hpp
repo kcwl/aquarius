@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/message/basic_message.hpp>
 #include <aquarius/core/uuid.hpp>
+#include <aquarius/serialize.hpp>
 
 namespace aquarius
 {
@@ -83,14 +84,14 @@ namespace aquarius
 			if (ec)
 				return ec;
 
-			elastic::from_binary(uuid_, stream);
+			aquarius::from_binary(uuid_, stream);
 
 			return ec = errc::ok;
 		}
 
 		virtual error_code to_binary(flex_buffer_t& stream, error_code& ec) override
 		{
-			elastic::to_binary(Number, stream);
+			aquarius::to_binary(Number, stream);
 
 			pos_ = static_cast<int32_t>(stream.pubseekoff(0, std::ios::cur, std::ios::in));
 
@@ -98,7 +99,7 @@ namespace aquarius
 
 			std::size_t current = stream.size();
 
-			elastic::to_binary(uuid_, stream);
+			aquarius::to_binary(uuid_, stream);
 
 			this->add_length(stream.size() - current);
 

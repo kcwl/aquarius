@@ -49,6 +49,12 @@
     <Filter Include="include\aquarius\core\async">
       <UniqueIdentifier>{6152b607-78d9-4f27-96ba-96366e6bf252}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\serialize">
+      <UniqueIdentifier>{7b0396c7-6c52-48ef-a6be-48e0c33d1694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\serialize\detail">
+      <UniqueIdentifier>{6ae493c2-beaa-4d95-b907-0f8f67adc1d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -117,9 +123,6 @@
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\singleton.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\elastic.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\logger.hpp">
@@ -256,6 +259,51 @@
     </ClInclude>
     <ClInclude Include="client.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\access.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary_iarchive.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary_iprimitive.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary_oarchive.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary_oprimitive.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\macro_expand.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\type_define.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\detail\basic_primitive.hpp">
+      <Filter>include\aquarius\serialize\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\detail\flex_buffer.hpp">
+      <Filter>include\aquarius\serialize\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\detail\interface_iarchive.hpp">
+      <Filter>include\aquarius\serialize\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\detail\interface_oarchive.hpp">
+      <Filter>include\aquarius\serialize\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\core\crc.hpp">
+      <Filter>include\aquarius\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

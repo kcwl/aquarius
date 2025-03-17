@@ -3,11 +3,11 @@
 #include <aquarius/context.hpp>
 #include <aquarius/context/generator.hpp>
 #include <aquarius/context/invoke.hpp>
-#include <aquarius/core/elastic.hpp>
 #include <aquarius/core/error_code.hpp>
 #include <aquarius/core/logger.hpp>
 #include <aquarius/message/generator.hpp>
 #include <aquarius/message/message.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -30,10 +30,10 @@ namespace aquarius
 
 			pack_flag flag{};
 
-			elastic::from_binary(flag, buffer);
+			from_binary(flag, buffer);
 
 			uint32_t proto{};
-			elastic::from_binary(proto, buffer);
+			from_binary(proto, buffer);
 
 			switch (flag)
 			{
@@ -70,7 +70,7 @@ namespace aquarius
 
 			flex_buffer_t stream{};
 
-			elastic::to_binary(pack_flag::normal, stream);
+			to_binary(pack_flag::normal, stream);
 
 			stream.save(buffer.wdata(), buffer.size());
 
@@ -146,7 +146,7 @@ namespace aquarius
 		{
 			uint32_t proto{};
 
-			elastic::from_binary(proto, buffer);
+			from_binary(proto, buffer);
 
 			while (pack_size > 0)
 			{
@@ -167,9 +167,9 @@ namespace aquarius
 					flag = pack_flag::end;
 				}
 
-				elastic::to_binary(flag, stream);
+				to_binary(flag, stream);
 
-				elastic::to_binary(proto, stream);
+				to_binary(proto, stream);
 
 				if (flag != pack_flag::end)
 				{

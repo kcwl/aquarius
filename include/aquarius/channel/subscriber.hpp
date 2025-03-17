@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace channel
 	{
-		template<typename _Ty>
+		template <typename _Ty>
 		class subscriber : public impl::role
 		{
 		public:
