@@ -6,7 +6,7 @@ BOOST_AUTO_TEST_SUITE(sconnect)
 BOOST_AUTO_TEST_CASE(ssl)
 {
 	{
-		aquarius::tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(ssl)
 	}
 
 	{
-		aquarius::tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(ssl)
 BOOST_AUTO_TEST_CASE(no_ssl)
 {
 	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	}
 
 	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	}
 
 	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	//}
 
 	{
-		aquarius::no_ssl_tcp_server srv(8100, 2);
+		aquarius::async_tcp_server srv(8100, 2);
 
 		std::thread t([&] { srv.run(); });
 
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 
 BOOST_AUTO_TEST_CASE(large_pack)
 {
-	aquarius::tcp_server srv(8100, 2);
+	aquarius::async_tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 

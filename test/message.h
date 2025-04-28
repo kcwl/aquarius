@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(from_and_to_binary)
 
 BOOST_AUTO_TEST_CASE(process)
 {
-	aquarius::tcp_server srv(8100, 2);
+	aquarius::async_tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 

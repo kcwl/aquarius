@@ -59,7 +59,7 @@ namespace aquarius
 			response_.header()->set_session(request_ptr_->header()->session());
 			auto fs = make_response(result);
 
-			this->connect_ptr_->send_packet(std::move(fs));
+			//this->connect_ptr_->send_packet(std::move(fs));
 
 			return true;
 		}

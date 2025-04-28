@@ -46,7 +46,7 @@ AQUARIUS_CONTEXT_REGIST(test_connect_success_response, ctn_connect_success);
 BOOST_AUTO_TEST_CASE(success)
 {
 	const char* ip_addr = "127.0.0.1";
-	aquarius::no_ssl_tcp_server srv(8100, 5);
+	aquarius::async_tcp_server srv(8100, 5);
 	std::thread srv_t([&] {srv.run(); });
 
 	std::promise<bool> conn_result{};

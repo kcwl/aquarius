@@ -128,56 +128,56 @@ BOOST_AUTO_TEST_CASE(basic_message_context)
 
 	BOOST_CHECK(req->accept(buffer, ctx, nullptr));
 }
-
-BOOST_AUTO_TEST_CASE(invoke)
-{
-	using connect_t = aquarius::ssl_tcp_server_connect;
-
-	{
-		std::size_t uid = 0;
-
-		std::size_t conn_size = 0;
-
-		{
-			aquarius::asio::io_service io_service;
-
-			aquarius::asio::ip::tcp::socket socket(io_service);
-
-			using ssl_context_t = aquarius::asio::ssl_context_t;
-
-			ssl_context_t ssl_context(ssl_context_t::sslv23);
-
-			ssl_context.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
-									ssl_context_t::single_dh_use);
-
-			ssl_context.use_certificate_chain_file("crt/server.crt");
-			ssl_context.use_private_key_file("crt/server.key", ssl_context_t::pem);
-			ssl_context.use_tmp_dh_file("crt/dh512.pem");
-
-			auto conn = std::make_shared<connect_t>(std::move(socket), ssl_context);
-
-			conn_size = aquarius::invoke_session_helper::size();
-
-			aquarius::invoke_session_helper::push(conn);
-
-			uid = conn->uuid();
-
-			BOOST_CHECK(conn_size + 1 == aquarius::invoke_session_helper::size());
-		}
-
-		auto ptr = aquarius::invoke_session_helper::find(123);
-
-		BOOST_CHECK(!ptr);
-
-		ptr = aquarius::invoke_session_helper::find(uid);
-
-		BOOST_CHECK(!ptr);
-
-		aquarius::invoke_session_helper::erase(uid);
-
-		BOOST_CHECK(conn_size == aquarius::invoke_session_helper::size());
-	}
-}
+//
+//BOOST_AUTO_TEST_CASE(invoke)
+//{
+//	using connect_t = aquarius::ssl_tcp_server_connect;
+//
+//	{
+//		std::size_t uid = 0;
+//
+//		std::size_t conn_size = 0;
+//
+//		{
+//			aquarius::asio::io_service io_service;
+//
+//			aquarius::asio::ip::tcp::socket socket(io_service);
+//
+//			using ssl_context_t = aquarius::asio::ssl_context_t;
+//
+//			ssl_context_t ssl_context(ssl_context_t::sslv23);
+//
+//			ssl_context.set_options(ssl_context_t::default_workarounds | ssl_context_t::no_sslv2 |
+//									ssl_context_t::single_dh_use);
+//
+//			ssl_context.use_certificate_chain_file("crt/server.crt");
+//			ssl_context.use_private_key_file("crt/server.key", ssl_context_t::pem);
+//			ssl_context.use_tmp_dh_file("crt/dh512.pem");
+//
+//			auto conn = std::make_shared<connect_t>(std::move(socket), ssl_context);
+//
+//			conn_size = aquarius::invoke_session_helper::size();
+//
+//			aquarius::invoke_session_helper::push(conn);
+//
+//			uid = conn->uuid();
+//
+//			BOOST_CHECK(conn_size + 1 == aquarius::invoke_session_helper::size());
+//		}
+//
+//		auto ptr = aquarius::invoke_session_helper::find(123);
+//
+//		BOOST_CHECK(!ptr);
+//
+//		ptr = aquarius::invoke_session_helper::find(uid);
+//
+//		BOOST_CHECK(!ptr);
+//
+//		aquarius::invoke_session_helper::erase(uid);
+//
+//		BOOST_CHECK(conn_size == aquarius::invoke_session_helper::size());
+//	}
+//}
 //
 //BOOST_AUTO_TEST_CASE(function)
 //{
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(invoke)
 
 BOOST_AUTO_TEST_CASE(content)
 {
-	aquarius::tcp_server srv(8100, 2);
+	aquarius::async_tcp_server srv(8100, 2);
 
 	std::thread t([&] { srv.run(); });
 
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(timeout)
 {
 	{
 		const char* ip_addr = "127.0.0.1";
-		aquarius::no_ssl_tcp_server srv(8100, 5);
+		aquarius::async_tcp_server srv(8100, 5);
 		std::thread srv_t([&] {srv.run(); });
 
 		std::promise<bool> conn_result{};
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(timeout)
 
 	{
 		const char* ip_addr = "127.0.0.1";
-		aquarius::no_ssl_tcp_server srv(8100, 5);
+		aquarius::async_tcp_server srv(8100, 5);
 		std::thread srv_t([&] {srv.run(); });
 
 		std::promise<bool> conn_result{};
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(timeout)
 BOOST_AUTO_TEST_CASE(exe_error)
 {
 	const char* ip_addr = "127.0.0.1";
-	aquarius::no_ssl_tcp_server srv(8100, 5);
+	aquarius::async_tcp_server srv(8100, 5);
 	std::thread srv_t([&] {srv.run(); });
 
 	std::promise<bool> conn_result{};

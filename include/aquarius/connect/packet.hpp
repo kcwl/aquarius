@@ -2,7 +2,6 @@
 #include <aquarius/connect/mode.hpp>
 #include <aquarius/context.hpp>
 #include <aquarius/context/generator.hpp>
-#include <aquarius/context/invoke.hpp>
 #include <aquarius/core/error_code.hpp>
 #include <aquarius/core/logger.hpp>
 #include <aquarius/message/generator.hpp>
@@ -96,10 +95,10 @@ namespace aquarius
 
 			attach(request_ptr->uuid(), context_ptr);
 
-			auto result = request_ptr->accept(buffer, context_ptr, connect_ptr_);
+			//auto result = request_ptr->accept(buffer, context_ptr, connect_ptr_);
 
-			if (result.value() == static_cast<int>(errc::ok))
-				detach(request_ptr->uuid());
+			//if (result.value() == static_cast<int>(errc::ok))
+			//	detach(request_ptr->uuid());
 
 			if (buffer.size() == 0)
 				return;
