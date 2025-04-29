@@ -266,7 +266,7 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp">
+    <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
