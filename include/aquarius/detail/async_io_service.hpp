@@ -118,7 +118,7 @@ namespace aquarius
 		}
 
 		template <typename ConstBuffer>
-		auto async_read_some(implementation_type& impl, ConstBuffer& buffer,
+		auto async_read_some(implementation_type& impl, const ConstBuffer& buffer,
 							 boost::system::error_code& ec) -> boost::asio::awaitable<std::size_t>
 		{
 			if constexpr (ssl_mode<SSL>)

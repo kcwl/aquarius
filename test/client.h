@@ -1,47 +1,7 @@
 #pragma once
 #include <boost/test/unit_test_suite.hpp>
-#include "proto_regist.h"
 
 BOOST_AUTO_TEST_SUITE(client_test)
-
-class ctx_connect_success : public aquarius::context<test_connect_success_request, test_connect_success_response>
-{
-public:
-	ctx_connect_success()
-		: aquarius::context<test_connect_success_request, test_connect_success_response>("ctx_connect_success")
-	{
-
-	}
-
-public:
-	virtual aquarius::error_code handle()
-	{
-
-		send_response(0);
-
-		return aquarius::errc::ok;
-	}
-};
-
-class ctn_connect_success : public aquarius::content<test_connect_success_response>
-{
-public:
-	ctn_connect_success()
-		: aquarius::content<test_connect_success_response>("ctn_connect_success")
-	{
-
-	}
-
-public:
-	virtual aquarius::error_code handle()
-	{
-		return aquarius::errc::ok;
-	}
-};
-
-AQUARIUS_CONTEXT_REGIST(test_connect_success_request, ctx_connect_success);
-AQUARIUS_CONTEXT_REGIST(test_connect_success_response, ctn_connect_success);
-
 
 BOOST_AUTO_TEST_CASE(success)
 {
@@ -71,14 +31,14 @@ BOOST_AUTO_TEST_CASE(success)
 
 	BOOST_CHECK(cli.remote_port() == 8100);
 
-	test_connect_success_request req{};
-	req.body().age = 1;
-	req.body().name = "person";
+	//test_connect_success_request req{};
+	//req.body().age = 1;
+	//req.body().name = "person";
 
-	cli.send_request(std::move(req), [&](std::shared_ptr<test_connect_success_response> resp_ptr)
-					 {
-						 BOOST_CHECK(resp_ptr);
-					 });
+	//cli.send_request(std::move(req), [&](std::shared_ptr<test_connect_success_response> resp_ptr)
+	//				 {
+	//					 BOOST_CHECK(resp_ptr);
+	//				 });
 
 	std::this_thread::sleep_for(3s);
 

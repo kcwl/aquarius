@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 
 		aquarius::flex_buffer_t fs{};
 		uint8_t a = '1';
-		fs.save(&a, 1);
+		//fs.save(&a, 1);
 		cli.close();
 		cli.async_write(std::move(fs));
 
@@ -267,15 +267,15 @@ BOOST_AUTO_TEST_CASE(large_pack)
 
 	std::this_thread::sleep_for(1s);
 
-	person_request req{};
-	req.body().age = 1;
+	//person_request req{};
+	//req.body().age = 1;
 
-	for (int i = 0; i < 3 * 4096; ++i)
-	{
-		req.body().name.append("a");
-	}
+	//for (int i = 0; i < 3 * 4096; ++i)
+	//{
+	//	req.body().name.append("a");
+	//}
 
-	cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
+	//cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
 
 	std::this_thread::sleep_for(1s);
 

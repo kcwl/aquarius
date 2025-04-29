@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/connect/packet.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/core/uuid.hpp>
 
 namespace aquarius
 {
@@ -16,12 +16,13 @@ namespace aquarius
 
 		using this_type = basic_session<IO>;
 
+		constexpr static std::size_t pack_limit = 4096;
+
 	public:
 		explicit basic_session(socket_type socket)
 			: impl_(std::move(socket))
-			, read_buffer_(pack_limit)
+			, read_buffer_()
 			, uuid_(invoke_uuid<uint32_t>())
-			, pack_(this)
 		{}
 
 		template <execution_context_convertible ExecutionContext>
@@ -29,7 +30,6 @@ namespace aquarius
 			: impl_(context)
 			, read_buffer_(pack_limit)
 			, uuid_(invoke_uuid<uint32_t>())
-			, pack_(this)
 		{}
 
 		virtual ~basic_session() = default;
@@ -61,7 +61,7 @@ namespace aquarius
 
 		void send_packet(flex_buffer_t&& buffer)
 		{
-			pack_.async_write(std::move(buffer));
+			//pack_.async_write(std::move(buffer));
 		}
 
 		void shutdown()
@@ -77,17 +77,16 @@ namespace aquarius
 	private:
 		auto read_messages() -> boost::asio::awaitable<void>
 		{
-			read_buffer_.normalize();
+			//read_buffer_.normalize();
 
-			read_buffer_.ensure();
+			//read_buffer_.ensure();
 
 			auto self(this->shared_from_this());
 
-			auto buffer = boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active());
-
 			boost::system::error_code ec;
 
-			std::size_t bytes_transferred = co_await impl_.get_service().async_read_some(impl_.get_implementation(), buffer, ec);
+			std::size_t bytes_transferred =
+				co_await impl_.get_service().async_read_some(impl_.get_implementation(), boost::asio::buffer(read_buffer_), ec);
 
 			if (ec)
 			{
@@ -96,14 +95,12 @@ namespace aquarius
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 
-				//invoke_session_helper::erase(this->uuid());
+				// invoke_session_helper::erase(this->uuid());
 
 				co_return impl_.get_service().shutdown();
 			}
 
-			read_buffer_.commit(static_cast<int>(bytes_transferred));
-
-			pack_.process(read_buffer_);
+			//read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 			co_await read_messages();
 		}
@@ -111,10 +108,8 @@ namespace aquarius
 	private:
 		session_object_impl<IO, executor_type, IO::ssl_version> impl_;
 
-		flex_buffer_t read_buffer_;
+		std::array<uint8_t, pack_limit> read_buffer_;
 
 		uint32_t uuid_;
-
-		packet<this_type> pack_;
 	};
 } // namespace aquarius
