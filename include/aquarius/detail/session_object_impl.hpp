@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/asio/detail/io_object_impl.hpp>
-#include <aquarius/detail/ssl_context.hpp>
+#include <aquarius/detail/ssl_context_factory.hpp>
 
 namespace aquarius
 {

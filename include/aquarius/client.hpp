@@ -38,9 +38,9 @@ namespace aquarius
 			io_service_.stop();
 		}
 
-		void close(bool shutdown = false)
+		void close()
 		{
-			session_ptr_->close(shutdown);
+			session_ptr_->shutdown();
 		}
 
 		template <typename _Request, typename _Func>

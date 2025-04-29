@@ -118,33 +118,33 @@ namespace aquarius
 		}
 
 		template <typename ConstBuffer>
-		auto async_read_some(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred,
-							 boost::system::error_code& ec) -> boost::asio::awaitable<void>
+		auto async_read_some(implementation_type& impl, ConstBuffer& buffer,
+							 boost::system::error_code& ec) -> boost::asio::awaitable<std::size_t>
 		{
 			if constexpr (ssl_mode<SSL>)
 			{
-				bytes_transferred = co_await impl.ssl_socket->async_read_some(
+				co_return co_await impl.ssl_socket->async_read_some(
 					buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
 			else
 			{
-				bytes_transferred = co_await impl.socket->async_read_some(
+				co_return co_await impl.socket->async_read_some(
 					buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
 		}
 
 		template <typename ConstBuffer>
 		auto async_write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
+			-> boost::asio::awaitable<std::size_t>
 		{
 			if constexpr (ssl_mode<SSL>)
 			{
-				co_await impl.ssl_socket->async_write_some(buffer,
+				co_return co_await impl.ssl_socket->async_write_some(buffer,
 														   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
 			else
 			{
-				co_await impl.socket->async_write_some(buffer,
+				co_return co_await impl.socket->async_write_some(buffer,
 													   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
 		}
@@ -165,6 +165,8 @@ namespace aquarius
 			this->keep_alive(impl, true);
 
 			this->set_nodelay(impl, true);
+
+			co_return;
 		}
 
 		bool keep_alive(implementation_type& impl, bool value)

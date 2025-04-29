@@ -184,9 +184,8 @@
     <ClInclude Include="..\include\aquarius\detail\io_concepts.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\async_io_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\ssl_socket_io_base.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\ssl_traits.hpp" />
     <ClInclude Include="..\include\aquarius\message\basic_header.hpp" />
     <ClInclude Include="..\include\aquarius\message\basic_message.hpp" />
     <ClInclude Include="..\include\aquarius\message\custom.hpp" />

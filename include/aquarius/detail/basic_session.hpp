@@ -8,17 +8,11 @@ namespace aquarius
 	template <typename IO>
 	class basic_session : public std::enable_shared_from_this<basic_session<IO>>
 	{
-
-#ifdef AQUARIUS_ENABLE_SSL
-		using object_impl = std::conditional_t<std::is_same_v<typename IO::ssl_type, void>, session_object_impl<IO>,
-											   ssl_session_object_impl<IO>>;
-#else
-		using object_impl = session_object_impl<IO>;
-#endif
-
 		using executor_type = typename IO::executor_type;
 
 		using socket_type = typename IO::socket_type;
+
+		using ssl_socket_type = typename IO::ssl_socket_type;
 
 		using this_type = basic_session<IO>;
 
@@ -56,13 +50,13 @@ namespace aquarius
 			return impl_.get_service().remote_port(impl_.get_implementation());
 		}
 
-		void start()
+		auto start() -> boost::asio::awaitable<void>
 		{
 			// invoke_session_helper::push(this->shared_from_this());
 
-			impl_.get_service().start(impl_.get_implementation());
+			co_await impl_.get_service().start(impl_.get_implementation());
 
-			read_messages();
+			co_await read_messages();
 		}
 
 		void send_packet(flex_buffer_t&& buffer)
@@ -75,23 +69,13 @@ namespace aquarius
 			return impl_.get_service().shutdown();
 		}
 
-		void close(bool shutdown)
-		{
-			return impl_.get_service().close(impl_.get_implementation(), shutdown);
-		}
-
 		std::size_t uuid() const
 		{
 			return uuid_;
 		}
 
-		session_object_impl<IO>& get_implemention()
-		{
-			return impl_;
-		}
-
 	private:
-		void read_messages()
+		auto read_messages() -> boost::asio::awaitable<void>
 		{
 			read_buffer_.normalize();
 
@@ -103,9 +87,7 @@ namespace aquarius
 
 			boost::system::error_code ec;
 
-			std::size_t bytes_transferred{};
-
-			impl_.get_service().read(impl_.get_implementation(), buffer, bytes_transferred, ec);
+			std::size_t bytes_transferred = co_await impl_.get_service().async_read_some(impl_.get_implementation(), buffer, ec);
 
 			if (ec)
 			{
@@ -114,20 +96,20 @@ namespace aquarius
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 
-				// invoke_session_helper::erase(this->uuid());
+				//invoke_session_helper::erase(this->uuid());
 
-				return impl_.get_service().shutdown();
+				co_return impl_.get_service().shutdown();
 			}
 
 			read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 			pack_.process(read_buffer_);
 
-			read_messages();
+			co_await read_messages();
 		}
 
 	private:
-		object_impl impl_;
+		session_object_impl<IO, executor_type, IO::ssl_version> impl_;
 
 		flex_buffer_t read_buffer_;
 

@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 		aquarius::flex_buffer_t fs{};
 		uint8_t a = '1';
 		fs.save(&a, 1);
-		cli.close(true);
+		cli.close();
 		cli.async_write(std::move(fs));
 
 		std::this_thread::sleep_for(1s);
