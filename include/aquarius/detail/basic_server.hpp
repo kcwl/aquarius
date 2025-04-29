@@ -21,7 +21,7 @@ namespace aquarius
 		{
 			init_signal();
 
-			start_accept();
+			boost::asio::co_spawn(acceptor_.get_executor(), start_accept(), boost::asio::detached);
 		}
 
 		~basic_server() = default;
@@ -36,24 +36,26 @@ namespace aquarius
 
 		void stop()
 		{
+			acceptor_.close();
+
 			io_service_pool_.stop();
 		}
 
 	private:
-		void start_accept()
+		auto start_accept() -> boost::asio::awaitable<void>
 		{
 			boost::system::error_code ec;
 
-			auto sock = acceptor_.accept(ec);
+			auto sock = co_await acceptor_.accept(ec);
 
 			if (!ec)
 			{
-				//auto conn_ptr = std::make_shared<session_type>(std::move(sock.await_resume()));
+				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
-				//conn_ptr->start();
+				conn_ptr->start();
 			}
 
-			start_accept();
+			co_await start_accept();
 		}
 
 		void init_signal()
@@ -65,7 +67,7 @@ namespace aquarius
 
 					ec ? error_message = ec.message() : std::string{};
 
-					acceptor_.close(ec);
+					acceptor_.close();
 
 					io_service_pool_.stop();
 
