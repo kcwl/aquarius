@@ -1,13 +1,21 @@
 #pragma once
+#include <aquarius/connect/packet.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <aquarius/connect/packet.hpp>
 
 namespace aquarius
 {
-	template<typename IO>
+	template <typename IO>
 	class basic_session : public std::enable_shared_from_this<basic_session<IO>>
 	{
+
+#ifdef AQUARIUS_ENABLE_SSL
+		using object_impl = std::conditional_t<std::is_same_v<typename IO::ssl_type, void>, session_object_impl<IO>,
+											   ssl_session_object_impl<IO>>;
+#else
+		using object_impl = session_object_impl<IO>;
+#endif
+
 		using executor_type = typename IO::executor_type;
 
 		using socket_type = typename IO::socket_type;
@@ -20,19 +28,15 @@ namespace aquarius
 			, read_buffer_(pack_limit)
 			, uuid_(invoke_uuid<uint32_t>())
 			, pack_(this)
-		{
+		{}
 
-		}
-
-		template<execution_context_convertible ExecutionContext>
+		template <execution_context_convertible ExecutionContext>
 		explicit basic_session(ExecutionContext& context)
 			: impl_(context)
 			, read_buffer_(pack_limit)
 			, uuid_(invoke_uuid<uint32_t>())
 			, pack_(this)
-		{
-
-		}
+		{}
 
 		virtual ~basic_session() = default;
 
@@ -54,7 +58,7 @@ namespace aquarius
 
 		void start()
 		{
-			//invoke_session_helper::push(this->shared_from_this());
+			// invoke_session_helper::push(this->shared_from_this());
 
 			impl_.get_service().start(impl_.get_implementation());
 
@@ -110,7 +114,7 @@ namespace aquarius
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 
-				//invoke_session_helper::erase(this->uuid());
+				// invoke_session_helper::erase(this->uuid());
 
 				return impl_.get_service().shutdown();
 			}
@@ -123,7 +127,7 @@ namespace aquarius
 		}
 
 	private:
-		session_object_impl<IO> impl_;
+		object_impl impl_;
 
 		flex_buffer_t read_buffer_;
 
@@ -131,4 +135,4 @@ namespace aquarius
 
 		packet<this_type> pack_;
 	};
-}
+} // namespace aquarius

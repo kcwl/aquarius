@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename Protocol, typename Executor>
-	class socket_io_base
+	class async_io_base
 	{
 	public:
 		using socket_type = boost::asio::basic_stream_socket<Protocol, Executor>;
@@ -16,6 +16,11 @@ namespace aquarius
 		};
 
 	public:
+		void construct(implementation_type_base& impl)
+		{
+			impl.socket = new socket_type(this->context());
+		}
+
 		void base_move_copy(implementation_type_base& impl, socket_type socket)
 		{
 			impl.socket = new socket_type(std::move(socket));
@@ -44,15 +49,15 @@ namespace aquarius
 			impl.socket->close(ec);
 		}
 
-		void close(implementation_type_base& impl, bool shutdown)
+		void close(implementation_type_base& impl, bool enable)
 		{
 			boost::system::error_code ec;
 
 			if (!impl.socket->is_open())
 				return;
 
-			if (shutdown)
-				return base_shutdown();
+			if (enable)
+				return base_shutdown(impl);
 
 			impl.socket->close(ec);
 		}

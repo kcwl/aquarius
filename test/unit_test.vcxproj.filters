@@ -242,7 +242,7 @@
     <ClInclude Include="..\include\aquarius\detail\async_acceptor.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\async_io.hpp">
+    <ClInclude Include="..\include\aquarius\detail\async_io_service.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\basic_session.hpp">
@@ -254,13 +254,10 @@
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\socket_io_base.hpp">
+    <ClInclude Include="..\include\aquarius\detail\async_io_base.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\ssl_socket_io_base.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\sync_io.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\basic_server.hpp">

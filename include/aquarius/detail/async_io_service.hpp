@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/core/logger.hpp>
 #include <aquarius/detail/io_concepts.hpp>
-#include <aquarius/detail/socket_io_base.hpp>
+#include <aquarius/detail/async_io_base.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
 
@@ -14,10 +14,10 @@
 namespace aquarius
 {
 
-	template <typename Protocol, typename Executor>
+	template <typename Protocol, typename Executor, typename = void>
 	class async_io_service
-		: public boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor>>,
-		  public socket_io_base<Protocol, Executor>
+		: public boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor, void>>,
+		  public async_io_base<Protocol, Executor>
 	{
 	public:
 		using resolver_type = typename Protocol::resolver;
@@ -25,11 +25,13 @@ namespace aquarius
 		using execution_base_type =
 			boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor>>;
 
-		using io_base = socket_io_base<Protocol, Executor>;
+		using io_base = async_io_base<Protocol, Executor>;
 
 		using executor_type = Executor;
 
 		using typename io_base::socket_type;
+
+		using ssl_type = void;
 
 		struct implementation_type : io_base::implementation_type_base
 		{};
@@ -48,7 +50,7 @@ namespace aquarius
 	public:
 		void construct(implementation_type& impl)
 		{
-			impl.socket = new socket_type(this->context());
+			// this->base_construct(impl);
 		}
 
 		void move_copy(implementation_type& impl, socket_type socket)
@@ -66,39 +68,26 @@ namespace aquarius
 			return;
 		}
 
-		auto connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
-					 boost::system::error_code& ec) -> boost::asio::awaitable<void>
+		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
+						   boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
 			resolver_type resolver(impl.socket->get_executor());
 
 			auto endpoint = resolver.resolve(ip_addr, port);
 
-			//co_await boost::asio::async_connect(impl.socket, endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
 		template <typename ConstBuffer>
-		auto read(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
+		auto async_read_some(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred,
+					   boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
-			bytes_transferred = co_await boost::asio::async_read(impl.socket, buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			bytes_transferred = co_await impl.socket->async_read_some(
+				buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
 		template <typename ConstBuffer>
-		auto read_some(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
-		{
-			bytes_transferred = co_await impl.socket->async_read_some(buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-		}
-
-		template <typename ConstBuffer>
-		auto write(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
-		{
-			co_await impl.socket->async_write(buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-		}
-
-		template <typename ConstBuffer>
-		auto write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
+		auto async_write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
 			-> boost::asio::awaitable<void>
 		{
 			co_await impl.socket->async_write_some(buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
@@ -116,15 +105,18 @@ namespace aquarius
 	};
 
 #ifdef AQUARIUS_ENABLE_SSL
-	template <bool IsServer, typename Protocol, typename Executor>
-	class async_ssl_io_service : public boost::asio::detail::execution_context_service_base<
-									 async_ssl_io_service<IsServer, Protocol, Executor>>,
-								 public socket_io_base<Protocol, Executor>
+	struct ssl
+	{};
+
+	template <typename Protocol, typename Executor>
+	class async_io_service<Protocol, Executor, std::void_t<ssl>>
+		: public boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor, SSL>>,
+		  public async_io_base<Protocol, Executor>
 	{
 	public:
 		using socket_type = boost::asio::basic_stream_socket<Protocol, Executor>;
 
-		using io_base = socket_io_base<Protocol, Executor>;
+		using io_base = async_io_base<Protocol, Executor>;
 
 		using resolver_type = typename Protocol::resolver;
 
@@ -134,8 +126,10 @@ namespace aquarius
 
 		using executor_type = Executor;
 
+		using ssl_type = ssl;
+
 		using base_type =
-			boost::asio::detail::execution_context_service_base<async_ssl_io_service<IsServer, Protocol, Executor>>;
+			boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor, SSL>>;
 
 		struct implementation_type : io_base::implementation_type_base
 		{
@@ -143,11 +137,11 @@ namespace aquarius
 		};
 
 	public:
-		explicit async_ssl_io_service(const Executor& ex)
+		explicit async_io_service(const Executor& ex)
 			: base_type(ex)
 		{}
 
-		async_ssl_io_service(boost::asio::execution_context& context)
+		async_io_service(boost::asio::execution_context& context)
 			: base_type(context)
 		{}
 
@@ -161,10 +155,10 @@ namespace aquarius
 
 			impl.ssl_socket = new ssl_socket_type(*impl.socket, ssl_context);
 
-			if constexpr (!IsServer)
-			{
-				impl.ssl_socket.set_verify_mode(boost::asio::ssl::verify_peer);
-			}
+			//if constexpr (!IsServer)
+			//{
+			//	impl.ssl_socket.set_verify_mode(boost::asio::ssl::verify_peer);
+			//}
 		}
 
 		void destroy(implementation_type& impl)
@@ -186,45 +180,29 @@ namespace aquarius
 			return;
 		}
 
-		auto connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
-					 boost::system::error_code& ec) -> boost::asio::awaitable<void>
+		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
+			boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
-			resolver_type resolve(impl.socket->get_executor());
+			resolver_type resolver(impl.socket->get_executor());
 
-			//auto endpoint = resolve.resolver(ip_addr, port);
+			auto endpoint = resolver.resolve(ip_addr, port);
 
-			//co_await impl.socket->connect(endpoint,
-			//										boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
 		template <typename ConstBuffer>
-		auto read(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
+		auto async_read_some(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred,
+			boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
-			bytes_transferred = co_await boost::asio::async_read(impl.ssl_socket, buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			bytes_transferred = co_await impl.ssl_socket->async_read_some(
+				buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
 		template <typename ConstBuffer>
-		auto read_some(implementation_type& impl, ConstBuffer& buffer, std::size_t& bytes_transferred, boost::system::error_code& ec)
+		auto async_write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
 			-> boost::asio::awaitable<void>
 		{
-			bytes_transferred = co_await impl.ssl_socket->async_read_some(buffer,
-													  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-		}
-
-		template <typename ConstBuffer>
-		auto write(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
-		{
-			co_await impl.ssl_socket->async_write(buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-		}
-
-		template <typename ConstBuffer>
-		auto write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
-			-> boost::asio::awaitable<void>
-		{
-			co_await impl.ssl_socket->async_write_some(buffer,
-													   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			co_await impl.ssl_socket->async_write_some(buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
 		void start(implementation_type& impl)
@@ -279,10 +257,11 @@ namespace aquarius
 			return !ec;
 		}
 
-		auto handshake(implementation_type& impl, boost::system::error_code& ec) -> boost::asio::awaitable<void>
+	private:
+		auto handshake(implementation_type& impl, bool is_server, boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
 			co_await impl.ssl_socket->async_handshake(
-				static_cast<boost::asio::ssl::stream_base::handshake_type>(IsServer),
+				static_cast<boost::asio::ssl::stream_base::handshake_type>(is_server),
 				boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 	};
