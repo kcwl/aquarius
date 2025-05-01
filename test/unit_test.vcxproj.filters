@@ -161,5 +161,20 @@
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\basic_dispatcher.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\dispatch_service.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\dispatcher_op.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\package_base.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\basic_request.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

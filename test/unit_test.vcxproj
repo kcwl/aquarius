@@ -169,8 +169,12 @@
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_acceptor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_io_service.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\basic_request.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_session.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\basic_dispatcher.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\dispatcher_op.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\dispatch_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\handle_method.hpp" />
     <ClInclude Include="..\include\aquarius\detail\handle_method_base.hpp" />
@@ -178,6 +182,7 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\method_visitor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\auto_register.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\package_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_traits.hpp" />
