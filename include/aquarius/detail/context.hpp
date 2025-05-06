@@ -1,38 +1,71 @@
 #pragma once
-#include <aquarius/detail/handle_method_base.hpp>
 #include <aquarius/detail/auto_register.hpp>
+#include <aquarius/detail/context_base.hpp>
 
 namespace aquarius
 {
 	template <typename Request, typename Response>
-	class handle_method : public handle_method_base, public method_visitor<Request>
+	class context : public context_base, public visitor<Request>
 	{
 	public:
-		handle_method() = default;
+		context(const std::string& name, const std::chrono::milliseconds& timeout = 100ms)
+			: context_base(name, timeout)
+			, request_ptr_(nullptr)
+			, response_()
+		{}
 
 	public:
-		virtual void visit(std::unique_ptr<Request> req, flex_buffer_t& ar) override
+		virtual int visit(Request* req, std::shared_ptr<session_base> session_ptr)
 		{
 			request_ptr_ = req;
 
-			handle();
+			session_ptr_ = session_ptr;
 
-			resp_.to_binary(ar);
+			int result = this->handle();
+
+			send_response(result);
+
+			return result;
 		}
 
 	protected:
-		virtual void handle() = 0;
+		virtual int handle() = 0;
+
+		bool send_response(int result)
+		{
+			auto fs = make_response(result);
+
+			this->session_ptr_->send_packet(std::move(fs));
+
+			return true;
+		}
 
 	private:
-		std::unique_ptr<Request> request_ptr_;
+		flex_buffer_t make_response(int result)
+		{
+			response_.set_uuid(request_ptr_->uuid());
 
-		Response resp_;
+			response_.header()->set_result(result);
+
+			flex_buffer_t fs;
+
+			error_code ec{};
+
+			response_.to_binary(fs, ec);
+
+			return fs;
+		}
+
+	protected:
+		std::shared_ptr<Request> request_ptr_;
+
+		Response response_;
 	};
 } // namespace aquarius
 
-#define AQUARIUS_HANDLE_SUITE(suite_name) \
-namespace suite_name \
-{ \
+#define AQUARIUS_HANDLE_SUITE(suite_name)                                                                              \
+	namespace suite_name                                                                                               \
+	{
 
 #define AQUARIUS_HANDLE_SUITE_END() }
 
@@ -41,7 +74,7 @@ namespace suite_name \
 #define AQUARIUS_HANDLE_METHOD(method, request, response)                                                              \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::auto_register<method> __auto_register_##method(AQUARIUS_GLOBAL_ID(request));     \
-	class method : public aquarius::handle_method<request, response>                                                   \
+	class method : public aquarius::context<request, response>                                                         \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using request_type = request;                                                                                  \

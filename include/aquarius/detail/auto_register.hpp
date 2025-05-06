@@ -26,4 +26,15 @@ namespace aquarius
 			module::instance().regist(hash<std::string_view>()(ID), [] { return std::make_shared<T>(); });
 		}
 	};
+
+	inline auto find_request(std::size_t proto)
+	{
+		return nullptr;
+	}
+
+	inline auto find_context(std::size_t proto)
+	{
+		return nullptr;
+	}
+
 } // namespace aquarius

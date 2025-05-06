@@ -1,9 +1,11 @@
 #pragma once
 #include <aquarius/core/uuid.hpp>
-#include <aquarius/detail/basic_dispatcher.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/package_base.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
+#include <aquarius/detail/serialize.hpp>
+#include <aquarius/detail/msg_accept.hpp>
+#include <aquarius/detail/session_base.hpp>
 
 namespace aquarius
 {
@@ -12,7 +14,7 @@ namespace aquarius
 	class request;
 
 	template <typename IO>
-	class basic_session : public std::enable_shared_from_this<basic_session<IO>>, public package_base
+	class basic_session : public std::enable_shared_from_this<basic_session<IO>>, public package_base, public session_base
 	{
 		using executor_type = typename IO::executor_type;
 
@@ -63,6 +65,11 @@ namespace aquarius
 			co_await impl_.get_service().start(impl_.get_implementation());
 
 			co_await read_messages();
+		}
+
+		virtual void send_packet(flex_buffer_t&&)
+		{
+			return;
 		}
 
 		void write(std::size_t proto, flex_buffer_t& buffer)
@@ -271,18 +278,35 @@ namespace aquarius
 
 			auto self = this->shared_from_this();
 
-			dispatchers_[proto]->async_dispatch(proto, std::move(complete_buffer),
-												[this, self](boost::system : error_code ec,
-															 std::unique_ptr<handle_method_base> method_ptr,
-															 std::unique_ptr<request> request_ptr)
-												{
-													if (ec)
-													{
-														return;
-													}
+			boost::asio::post(impl_.get_executor(), [&, self]
+				{
+					auto request = find_request(proto);
 
-													request_ptr->accept(method_ptr, self);
-												});
+					if (!request)
+					{
+						return;
+					}
+
+					if (!aquarius::from_binary(request, complete_buffer))
+					{
+						return;
+					}
+
+					boost::asio::post(impl_.get_executor(, [&, self]
+						{
+							auto handle_method_ptr = find_method(proto);
+							if (!handle_method_ptr)
+							{
+								return;
+							}
+
+							aquarius::msg_accept(request, handle_method_ptr, self);
+
+
+						});
+
+
+				});
 
 			buffers_.erase(proto);
 
@@ -295,7 +319,5 @@ namespace aquarius
 		flex_buffer_t read_buffer_;
 
 		uint32_t uuid_;
-
-		std::map<std::size_t, std::shared_ptr<basic_dispatcher<>>> dispatchers_;
 	};
 } // namespace aquarius
