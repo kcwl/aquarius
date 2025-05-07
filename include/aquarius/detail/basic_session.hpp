@@ -1,20 +1,19 @@
 #pragma once
 #include <aquarius/core/uuid.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/detail/package_base.hpp>
-#include <aquarius/detail/session_object_impl.hpp>
-#include <aquarius/detail/serialize.hpp>
 #include <aquarius/detail/msg_accept.hpp>
+#include <aquarius/detail/package_base.hpp>
+#include <aquarius/detail/serialize.hpp>
 #include <aquarius/detail/session_base.hpp>
+#include <aquarius/detail/session_object_impl.hpp>
+#include <aquarius/detail/auto_register.hpp>
 
 namespace aquarius
 {
-	class handle_method_base;
-
-	class request;
-
 	template <typename IO>
-	class basic_session : public std::enable_shared_from_this<basic_session<IO>>, public package_base, public session_base
+	class basic_session : public std::enable_shared_from_this<basic_session<IO>>,
+						  public package_base,
+						  public session_base
 	{
 		using executor_type = typename IO::executor_type;
 
@@ -25,6 +24,7 @@ namespace aquarius
 		using this_type = basic_session<IO>;
 
 		constexpr static std::size_t pack_limit = 4096;
+
 
 	public:
 		explicit basic_session(socket_type socket)
@@ -144,14 +144,14 @@ namespace aquarius
 				co_return impl_.get_service().shutdown();
 			}
 
-			read(std::move(read_buffer_));
+			read(read_buffer_);
 
 			read_buffer_.commit(static_cast<int>(bytes_transferred));
 
 			co_await read_messages();
 		}
 
-		void write_package(std::size_t proto, MutableBuffer& buffer)
+		void write_package(std::size_t proto, flex_buffer_t& buffer)
 		{
 			auto buffer_size = buffer.size();
 
@@ -176,7 +176,7 @@ namespace aquarius
 
 				boost::asio::streambuf write_buffer{};
 				write_buffer.sputn((char*)&flag, 1);
-				write_buffer.sputn((char*)buffer.data() + counter * 4095, cur_size);
+				write_buffer.sputn((char*)buffer.wdata() + counter * 4095, cur_size);
 				buffer_size -= cur_size;
 			}
 		}
@@ -187,7 +187,7 @@ namespace aquarius
 			boost::asio::streambuf write_buffer{};
 			write_buffer.sputn((char*)&flag, 1);
 			write_buffer.sputn((char*)&proto, sizeof(uint32_t));
-			write_buffer.sputn((char*)buffer.data(), buffer.size());
+			write_buffer.sputn((char*)buffer.wdata(), buffer.size());
 
 			// send
 			boost::asio::co_spawn(impl_.get_executor(), impl_.get_service().async_write_some(buffer),
@@ -212,13 +212,6 @@ namespace aquarius
 			auto& pack = buffers_[proto];
 			pack.total = total;
 			pack.buffers.push_back(sequence::block{ 0, std::move(buffer) });
-
-			auto& dispatch_ptr = dispatchers_[proto];
-
-			if (!dispatch_ptr)
-			{
-				dispatch_ptr = std::make_shared<basic_dispatcher<>>(impl_.get_executor());
-			}
 		}
 
 		bool read_package(std::size_t proto, std::size_t seq, flex_buffer_t& buffer)
@@ -231,6 +224,8 @@ namespace aquarius
 			{
 				dispatch(proto, pack);
 			}
+			
+			return true;
 		}
 
 		void read_complete(std::size_t proto, std::size_t seq, flex_buffer_t& buffer)
@@ -243,10 +238,10 @@ namespace aquarius
 
 		void read_normal(std::size_t proto, flex_buffer_t& buffer)
 		{
-			boost::asio::post(io_,
+			boost::asio::post(impl_.get_executor(),
 							  [&, buf = std::move(buffer), this]
 							  {
-								  package pack{};
+								  sequence pack{};
 								  pack.buffers.push_back({ 1, buffer });
 
 								  dispatch(proto, pack);
@@ -262,51 +257,49 @@ namespace aquarius
 
 			flex_buffer_t complete_buffer;
 
-			for (auto iter = buffer.begin(); iter != buffer.end();)
+			for (auto iter = pack.buffers.begin(); iter != pack.buffers.end();)
 			{
 				if (iter->seq == counter++)
 				{
-					complete_buffer.sputn((char*)iter->buffer.data(), iter->buffer.size());
+					complete_buffer.save(iter->buffer.rdata(), iter->buffer.size());
 
 					iter++;
 				}
 				else
 				{
-					partical_insert_sort(buffer, iter, buffer.end(), counter);
+					partical_insert_sort(pack.buffers, iter, pack.buffers.end(), counter);
 				}
 			}
 
 			auto self = this->shared_from_this();
 
-			boost::asio::post(impl_.get_executor(), [&, self]
-				{
-					auto request = find_request(proto);
+			boost::asio::post(impl_.get_executor(),
+							  [&, self]
+							  {
+								  auto request = find_request(proto);
 
-					if (!request)
-					{
-						return;
-					}
+								  if (!request)
+								  {
+									  return;
+								  }
 
-					if (!aquarius::from_binary(request, complete_buffer))
-					{
-						return;
-					}
+								  if (!aquarius::from_binary(request, complete_buffer))
+								  {
+									  return;
+								  }
 
-					boost::asio::post(impl_.get_executor(, [&, self]
-						{
-							auto handle_method_ptr = find_method(proto);
-							if (!handle_method_ptr)
-							{
-								return;
-							}
+								  boost::asio::post(impl_.get_executor(),
+													[&, self]
+													{
+														auto handle_method_ptr = find_context(proto);
+														if (!handle_method_ptr)
+														{
+															return;
+														}
 
-							aquarius::msg_accept(request, handle_method_ptr, self);
-
-
-						});
-
-
-				});
+														aquarius::msg_accept(request, handle_method_ptr, self);
+													});
+							  });
 
 			buffers_.erase(proto);
 

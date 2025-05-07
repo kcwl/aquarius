@@ -7,7 +7,7 @@
 #include <aquarius/core/singleton.hpp>
 #include <aquarius/core/core.hpp>
 #include <aquarius/session.hpp>
-#include <aquarius/detail/handle_method.hpp>
+#include <aquarius/detail/context.hpp>
 
 namespace aquarius
 {

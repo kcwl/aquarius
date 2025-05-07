@@ -47,13 +47,7 @@ namespace aquarius
 
 			response_.header()->set_result(result);
 
-			flex_buffer_t fs;
-
-			error_code ec{};
-
-			response_.to_binary(fs, ec);
-
-			return fs;
+			return response_.to_binary<flex_buffer_t>();
 		}
 
 	protected:
