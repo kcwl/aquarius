@@ -1,6 +1,6 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
-//#include <aquarius/client.hpp>
+#include <aquarius/client.hpp>
 #include <aquarius/server.hpp>
 #include <aquarius/core/ini_tree.hpp>
 #include <aquarius/core/crc.hpp>
@@ -22,7 +22,7 @@ namespace aquarius
 
 	//using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, channel::publisher>;
 
-	//using tcp_client = client<async_tcp_session<>>;
+	using async_tcp_client = client<async_tcp_session<>>;
 
 	//using no_ssl_tcp_client = client<async_tcp_ssl_session<>>;
 

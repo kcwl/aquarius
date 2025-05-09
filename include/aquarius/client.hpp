@@ -10,19 +10,18 @@
 
 namespace aquarius
 {
-	template <typename IO>
-	class client : public std::enable_shared_from_this<client<IO>>
+	template <typename Session>
+	class client : public std::enable_shared_from_this<client<Session>>
 	{
 	public:
-		explicit client(const std::string& ip_addr, const std::string& port,
-						const std::function<void(bool)>& f = nullptr)
+		explicit client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
-			, ssl_context_(asio::ssl::context::sslv23)
-		//, session_ptr_(new IO(io_service_))
+			, socket_(io_service_)
+			//, ssl_context_(asio::ssl::context::sslv23)
 		{
 			asio::ip::tcp::resolver resolve_(io_service_);
 
-			// do_connect(ip_addr, port);
+			do_connect(ip_addr, port);
 		}
 
 	public:
@@ -54,18 +53,18 @@ namespace aquarius
 		{
 			flex_buffer_t fs{};
 
-			//aquarius::error_code ec{};
+			 //aquarius::error_code ec{};
 
-			//req.to_binary(fs, ec);
+			 //req.to_binary(fs, ec);
 
-			//async_write(std::move(fs));
+			 //async_write(std::move(fs));
 		}
 
 		void async_write(flex_buffer_t&& buffer)
 		{
-			// auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
+			 //auto session_ptr = invoke_session_helper::find(conn_ptr_->uuid());
 
-			// session_ptr->send_packet(std::move(buffer));
+			 //session_ptr->send_packet(std::move(buffer));
 		}
 
 		std::string remote_address()
@@ -98,18 +97,22 @@ namespace aquarius
 	private:
 		void do_connect(const std::string& ip_addr, const std::string& port)
 		{
-			boost::system::error_code ec;
-			session_ptr_->get_implemention().get_service().connect(
-				session_ptr_->get_implemention().get_implementation(), ip_addr, port, ec);
+			boost::asio::ip::tcp::resolver resolver(io_service_);
 
-			if (ec)
-			{
-				XLOG_ERROR() << " maybe occur error - " << ec.message();
+			auto endpoints = resolver.resolve(ip_addr, port);
 
-				return;
-			}
+			boost::asio::async_connect(socket_, endpoints,
+									   [this](boost::system::error_code ec, boost::asio::ip::tcp::endpoint)
+									   {
+										   if (ec)
+										   {
+											   XLOG_ERROR() << " maybe occur error - " << ec.message();
 
-			session_ptr_->start();
+											   return;
+										   }
+
+										   session_ptr_->start();
+									   });
 		}
 
 		// void init_ssl_context()
@@ -125,8 +128,8 @@ namespace aquarius
 	private:
 		asio::io_service io_service_;
 
-		asio::ssl::context ssl_context_;
+		boost::asio::ip::tcp::socket socket_;
 
-		std::shared_ptr<IO> session_ptr_;
+		std::shared_ptr<Session> session_ptr_;
 	};
 } // namespace aquarius
