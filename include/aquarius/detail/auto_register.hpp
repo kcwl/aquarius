@@ -1,13 +1,9 @@
 #pragma once
 #include <aquarius/core/generator.hpp>
+#include <aquarius/detail/io_service_pool.hpp>
 
 namespace aquarius
 {
-	class handle_method_base;
-
-	class module : public single_generator<module, std::shared_ptr<handle_method_base>>
-	{};
-
 	template <typename T>
 	struct hash
 	{
@@ -17,24 +13,25 @@ namespace aquarius
 		}
 	};
 
-	template <typename T>
+	template<typename Request, typename Context>
 	struct auto_register
 	{
-		explicit auto_register(std::string_view ID)
+		explicit auto_register(std::size_t proto)
 		{
-			std::declval<int>();
-			module::instance().regist(hash<std::string_view>()(ID), [] { return std::make_shared<T>(); });
+			context_router::get_const_instance().regist<Request, Context>(proto);
 		}
 	};
 
-	inline auto find_request(std::size_t proto)
+	template<typename Session>
+	inline void invoke_context(std::size_t proto, flex_buffer_t& buffer, std::shared_ptr<Session> session)
 	{
-		return nullptr;
-	}
+		static io_service_pool router_pool(10);
 
-	inline auto find_context(std::size_t proto)
-	{
-		return nullptr;
+		boost::asio::post(router_pool.get_io_service(),
+			[&]
+			{
+				context_router::get_mutable_instance().invoke(proto, router_pool.get_io_service(), std::ref(buffer), session);
+			});
 	}
 
 } // namespace aquarius

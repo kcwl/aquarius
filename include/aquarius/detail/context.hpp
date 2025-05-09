@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename Request, typename Response>
-	class context : public context_base, public visitor<Request>
+	class context : public context_base
 	{
 	public:
 		context(const std::string& name, const std::chrono::milliseconds& timeout = 100ms)
@@ -15,7 +15,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual int visit(Request* req, std::shared_ptr<session_base> session_ptr)
+		int visit(std::shared_ptr<Request> req, std::shared_ptr<session_base> session_ptr)
 		{
 			request_ptr_ = req;
 
@@ -31,13 +31,14 @@ namespace aquarius
 	protected:
 		virtual int handle() = 0;
 
-		bool send_response(int result)
+		void send_response(int result)
 		{
+			if (!this->session_ptr_)
+				return;
+
 			auto fs = make_response(result);
 
 			this->session_ptr_->send_packet(std::move(fs));
-
-			return true;
 		}
 
 	private:
@@ -47,7 +48,7 @@ namespace aquarius
 
 			response_.header()->set_result(result);
 
-			return response_.to_binary<flex_buffer_t>();
+			return response_.template to_binary<flex_buffer_t>();
 		}
 
 	protected:
@@ -67,7 +68,8 @@ namespace aquarius
 
 #define AQUARIUS_HANDLE_METHOD(method, request, response)                                                              \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::auto_register<method> __auto_register_##method(AQUARIUS_GLOBAL_ID(request));     \
+	[[maybe_unused]] static aquarius::auto_register<request, method> __auto_register_##method(                         \
+		AQUARIUS_GLOBAL_ID(request));                                                                                  \
 	class method : public aquarius::context<request, response>                                                         \
 	{                                                                                                                  \
 	public:                                                                                                            \

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <aquarius/client/callback.hpp>
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/concepts.hpp>
 #include <aquarius/core/logger.hpp>

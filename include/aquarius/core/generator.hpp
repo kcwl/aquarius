@@ -1,31 +1,43 @@
 #pragma once
 #include <aquarius/core/router.hpp>
-#include <aquarius/core/singleton.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/serialization/singleton.hpp>
 #include <functional>
+#include <boost/asio/post.hpp>
 
 namespace aquarius
 {
-	template <typename _R, typename... _Args>
-	class generator : public router<std::size_t, std::function<_R(_Args...)>>
+	class session_base;
+}
+
+namespace aquarius
+{
+	template <typename T, typename Result, typename... Args>
+	class single_router : public basic_router<Result, Args...>, public boost::serialization::singleton<T>
+	{};
+
+	class context_router : public single_router<context_router, void, boost::asio::io_context&, flex_buffer_t&,
+												std::shared_ptr<session_base>>
 	{
 	public:
-		generator() = default;
+		context_router() = default;
 
 	public:
-		_R invoke(std::size_t key, _Args&... args)
+		template <typename Request, typename context>
+		void regist(std::size_t proto)
 		{
-			std::lock_guard lk(this->mutex_);
+			auto func = [&](boost::asio::io_context& io, flex_buffer_t& buffer, std::shared_ptr<session_base> session)
+			{
+				auto request = std::make_shared<Request>();
 
-			auto iter = this->map_invokes_.find(key);
+				request->from_binary(buffer);
 
-			if (iter == this->map_invokes_.end())
-				return _R();
+				boost::asio::post(io, [&] { std::make_shared<context>()->visit(request, session); });
+			};
 
-			return iter->second(args...);
+			map_invokes_[proto] = func;
 		}
 	};
 
-	template <typename _Single, typename _R, typename... _Args>
-	class single_generator : public generator<_R, _Args...>, public singleton<_Single>
-	{};
 } // namespace aquarius

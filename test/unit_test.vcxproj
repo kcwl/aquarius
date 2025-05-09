@@ -155,8 +155,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
-    <ClInclude Include="..\include\aquarius\client\async.hpp" />
-    <ClInclude Include="..\include\aquarius\client\callback.hpp" />
     <ClInclude Include="..\include\aquarius\core\apply.hpp" />
     <ClInclude Include="..\include\aquarius\core\async.hpp" />
     <ClInclude Include="..\include\aquarius\core\async\async_pool.hpp" />
@@ -180,7 +178,6 @@
     <ClInclude Include="..\include\aquarius\detail\session_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\auto_register.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\msg_accept.hpp" />
     <ClInclude Include="..\include\aquarius\detail\package_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\serialize.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />

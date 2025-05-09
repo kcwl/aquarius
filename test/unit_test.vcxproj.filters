@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\core">
       <UniqueIdentifier>{cc59cd76-2135-40a8-83d7-0ae05a9b6d2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\client">
-      <UniqueIdentifier>{fd14d040-62ab-411e-9d43-ec09cc6f0e27}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\core\async">
       <UniqueIdentifier>{6152b607-78d9-4f27-96ba-96366e6bf252}</UniqueIdentifier>
     </Filter>
@@ -79,12 +76,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\manager.hpp">
       <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\client\async.hpp">
-      <Filter>include\aquarius\client</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\client\callback.hpp">
-      <Filter>include\aquarius\client</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\apply.hpp">
       <Filter>include\aquarius\core</Filter>
@@ -168,9 +159,6 @@
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\serialize.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\msg_accept.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_base.hpp">

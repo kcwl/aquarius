@@ -1,12 +1,10 @@
 #pragma once
 #include <aquarius/core/uuid.hpp>
+#include <aquarius/detail/auto_register.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/detail/msg_accept.hpp>
 #include <aquarius/detail/package_base.hpp>
-#include <aquarius/detail/serialize.hpp>
 #include <aquarius/detail/session_base.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
-#include <aquarius/detail/auto_register.hpp>
 
 namespace aquarius
 {
@@ -24,7 +22,6 @@ namespace aquarius
 		using this_type = basic_session<IO>;
 
 		constexpr static std::size_t pack_limit = 4096;
-
 
 	public:
 		explicit basic_session(socket_type socket)
@@ -224,7 +221,7 @@ namespace aquarius
 			{
 				dispatch(proto, pack);
 			}
-			
+
 			return true;
 		}
 
@@ -273,33 +270,7 @@ namespace aquarius
 
 			auto self = this->shared_from_this();
 
-			boost::asio::post(impl_.get_executor(),
-							  [&, self]
-							  {
-								  auto request = find_request(proto);
-
-								  if (!request)
-								  {
-									  return;
-								  }
-
-								  if (!aquarius::from_binary(request, complete_buffer))
-								  {
-									  return;
-								  }
-
-								  boost::asio::post(impl_.get_executor(),
-													[&, self]
-													{
-														auto handle_method_ptr = find_context(proto);
-														if (!handle_method_ptr)
-														{
-															return;
-														}
-
-														aquarius::msg_accept(request, handle_method_ptr, self);
-													});
-							  });
+			invoke_context(proto, complete_buffer, self);
 
 			buffers_.erase(proto);
 
