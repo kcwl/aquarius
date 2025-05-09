@@ -4,8 +4,6 @@
 #include <boost/asio/use_awaitable.hpp>
 #include <aquarius/detail/ssl_traits.hpp>
 
-#define AQUARIUS_ENABLE_SSL
-
 #ifdef AQUARIUS_ENABLE_SSL
 #include <boost/asio/ssl.hpp>
 #endif
@@ -17,7 +15,9 @@ namespace aquarius
 								 async_io_service<Protocol, Executor, IsServer, SSL>>
 	{
 	public:
+#ifdef AQUARIUS_ENABLE_SSL
 		constexpr static auto handshake = static_cast<boost::asio::ssl::stream_base::handshake_type>(IsServer);
+#endif
 
 		constexpr static std::size_t ssl_version = ssl_version_traits<SSL>::value;
 
@@ -153,7 +153,7 @@ namespace aquarius
 		{
 			XLOG_INFO() << "handshake success at " << remote_address(impl) << ":" << remote_port(impl)
 						<< ", async read establish";
-
+#ifdef AQUARIUS_ENABLE_SSL
 			if constexpr (ssl_mode<SSL>)
 			{
 				boost::system::error_code ec;
@@ -161,6 +161,7 @@ namespace aquarius
 				co_await impl.ssl_socket->async_handshake(handshake,
 														  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
+#endif
 
 			this->keep_alive(impl, true);
 

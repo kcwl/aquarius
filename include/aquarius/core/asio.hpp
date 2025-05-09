@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
+//#include <boost/asio/ssl.hpp>
 
 namespace aquarius
 {
@@ -12,9 +12,9 @@ namespace aquarius
 
 		using socket_t = ip::tcp::socket;
 
-		using ssl_socket_t = ssl::stream<socket_t&>;
+		//using ssl_socket_t = ssl::stream<socket_t&>;
 
-		using ssl_context_t = ssl::context;
+		//using ssl_context_t = ssl::context;
 	}
 
 	inline uint32_t ip_addr_to_uint(const std::string& ip_addr)

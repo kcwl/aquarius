@@ -1,11 +1,13 @@
 #pragma once
+#ifdef AQUARIUS_ENABLE_SSL
 #include <boost/asio/ssl/context.hpp>
+#endif
 
 namespace aquarius
 {
 	template <typename T, std::size_t SSLVersion>
 	struct ssl_context_factory;
-
+#ifdef AQUARIUS_ENABLE_SSL
 	template <>
 	struct ssl_context_factory<boost::asio::ssl::context&, boost::asio::ssl::context::sslv23>
 	{
@@ -23,7 +25,7 @@ namespace aquarius
 			return ssl_context;
 		}
 	};
-
+#endif
 	template <typename T>
 	struct ssl_context_factory<T, std::size_t(-1)>
 	{

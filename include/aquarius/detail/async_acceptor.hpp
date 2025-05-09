@@ -4,6 +4,7 @@
 #include <boost/asio/basic_socket_acceptor.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace aquarius
 {
