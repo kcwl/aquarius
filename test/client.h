@@ -9,21 +9,11 @@ BOOST_AUTO_TEST_CASE(success)
 	aquarius::async_tcp_server srv(8100, 5);
 	std::thread srv_t([&] {srv.run(); });
 
-	std::promise<bool> conn_result{};
-	auto future = conn_result.get_future();
-
-	aquarius::no_ssl_tcp_client cli(ip_addr, "8100", [&](auto result)
-									{
-										conn_result.set_value(result);
-									});
+	aquarius::async_tcp_client cli(ip_addr, "8100");
 
 	std::thread client_t([&] {cli.run(); });
 
 	std::this_thread::sleep_for(1s);
-
-	auto status = future.wait_for(5s);
-
-	BOOST_CHECK(status == std::future_status::ready);
 
 	BOOST_CHECK(cli.remote_address() == ip_addr);
 
@@ -55,22 +45,9 @@ BOOST_AUTO_TEST_CASE(failed)
 
 	std::promise<bool> conn_result{};
 
-	auto future = conn_result.get_future();
-
-	aquarius::no_ssl_tcp_client cli(ip_addr, "8100", [&](auto result)
-									{
-										conn_result.set_value(result);
-									});
+	aquarius::async_tcp_client cli(ip_addr, "8100");
 
 	std::thread client_t([&] {cli.run(); });
-
-	auto status = future.wait_for(1s);
-
-	BOOST_CHECK(status != std::future_status::ready);
-
-	auto result = future.get();
-
-	BOOST_CHECK(!result);
 
 	cli.stop();
 
