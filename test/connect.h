@@ -317,6 +317,8 @@ public:
 class test_response
 {
 public:
+	constexpr static auto Number = 1002;
+public:
 	test_response()
 		: content_()
 	{
@@ -348,9 +350,16 @@ public:
 	std::string content_;
 };
 
-AQUARIUS_HANDLE_METHOD(ctx_test, test_request, test_response)
+AQUARIUS_SERVER_CONTEXT(ctx_test, test_request, test_response)
 {
-	response().content_ = request()->content_;
+	response().content_ = message()->content_;
+
+	return 0;
+}
+
+AQUARIUS_CLIENT_CONTEXT(ctn_test, test_response)
+{
+	std::cout << "client recv!\n";
 
 	return 0;
 }

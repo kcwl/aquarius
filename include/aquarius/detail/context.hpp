@@ -4,42 +4,63 @@
 
 namespace aquarius
 {
-	template <typename Request, typename Response>
-	class context : public context_base
+	template <typename Message>
+	class basic_context : public context_base
 	{
 	public:
-		context(const std::string& name, const std::chrono::milliseconds& timeout = 100ms)
+		basic_context(const std::string& name, const std::chrono::milliseconds timeout)
 			: context_base(name, timeout)
-			, request_ptr_(nullptr)
-			, response_()
 		{}
 
 	public:
 		template <typename Session>
-		int visit(std::shared_ptr<Request> req, std::shared_ptr<Session> session_ptr)
+		int visit(std::shared_ptr<Message> msg, std::shared_ptr<Session> session_ptr)
 		{
-			request_ptr_ = req;
+			message_ptr_ = msg;
 
-			auto result = this->handle();
+			return this->handle();
+		}
+
+		std::shared_ptr<Message> message()
+		{
+			return message_ptr_;
+		}
+
+	protected:
+		virtual int handle() = 0;
+
+	protected:
+		std::shared_ptr<Message> message_ptr_;
+	};
+
+	template <typename Request, typename Response>
+	class server_context : public basic_context<Request>
+	{
+		using base_type = basic_context<Request>;
+
+	public:
+		server_context(const std::string& name, const std::chrono::milliseconds& timeout = 100ms)
+			: base_type(name, timeout)
+		{}
+
+	public:
+		template <typename Session>
+		int visit(std::shared_ptr<Request> msg, std::shared_ptr<Session> session_ptr)
+		{
+			auto result = base_type::visit(msg, session_ptr);
 
 			send_response(result, session_ptr);
 
 			return result;
 		}
 
-		std::shared_ptr<Request> request()
-		{
-			return request_ptr_;
-		}
-
+	public:
 		Response& response()
 		{
 			return response_;
 		}
 
 	protected:
-		virtual int handle() = 0;
-
 		template <typename Session>
 		void send_response(int result, std::shared_ptr<Session> session_ptr)
 		{
@@ -48,20 +69,28 @@ namespace aquarius
 
 			auto fs = make_response(result);
 
-			boost::asio::co_spawn(session_ptr->get_executor(), session_ptr->send_packet(Request::Number, std::move(fs)),
+			boost::asio::co_spawn(session_ptr->get_executor(), session_ptr->send_packet(Response::Number, std::move(fs)),
 								  boost::asio::detached);
 		}
 
-	private:
 		flex_buffer_t make_response(int result)
 		{
 			return response_.to_binary<flex_buffer_t>();
 		}
 
 	protected:
-		std::shared_ptr<Request> request_ptr_;
-
 		Response response_;
+	};
+
+	template <typename Response>
+	class client_context : public basic_context<Response>
+	{
+		using base_type = basic_context<Response>;
+
+	public:
+		client_context(const std::string& name, const std::chrono::milliseconds& timeout = 100ms)
+			: base_type(name, timeout)
+		{}
 	};
 } // namespace aquarius
 
@@ -79,20 +108,39 @@ namespace aquarius
 	class basic_session;
 }
 
-#define AQUARIUS_HANDLE_METHOD(method, __request, __response)                                                          \
+#define AQUARIUS_SERVER_CONTEXT(method, __request, __response)                                                         \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<>, __request, method>                      \
 		__auto_register_##method(__request::Number);                                                                   \
-	class method : public aquarius::context<__request, __response>                                                     \
+	class method : public aquarius::server_context<__request, __response>                                              \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using request_type = __request;                                                                                \
-		using base_type = aquarius::context<__request, __response>;                                                    \
+		using base_type = aquarius::server_context<__request, __response>;                                             \
+                                                                                                                       \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_ID(__context_##__request))                                                     \
 		{}                                                                                                             \
+                                                                                                                       \
 	protected:                                                                                                         \
 		virtual int handle() override;                                                                                 \
 	};                                                                                                                 \
-	inline int method::handle()                                                                                        \
+	inline int method::handle()																						   \
+
+#define AQUARIUS_CLIENT_CONTEXT(method, __response)                                                                    \
+	class method;                                                                                                      \
+	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<>, __response, method>                     \
+		__auto_register_##method(__response::Number);                                                                  \
+	class method : public aquarius::client_context<__response>                                                         \
+	{                                                                                                                  \
+	public:                                                                                                            \
+		using base_type = aquarius::client_context<__response>;                                                        \
+	public:                                                                                                            \
+		method()                                                                                                       \
+			: base_type(AQUARIUS_GLOBAL_ID(__context_##__response))                                                    \
+		{}                                                                                                             \
+	protected:                                                                                                         \
+		virtual int handle() override;                                                                                 \
+	};                                                                                                                 \
+	inline int method::handle()																						   \
