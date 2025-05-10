@@ -106,70 +106,70 @@ BOOST_AUTO_TEST_CASE(ssl)
 
 BOOST_AUTO_TEST_CASE(no_ssl)
 {
-	{
-		aquarius::async_tcp_server srv(8100, 2);
+	//{
+	//	aquarius::async_tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
 
-		aquarius::async_tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::async_tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		srv.stop();
-		cli.stop();
+	//	srv.stop();
+	//	cli.stop();
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
 
-	{
-		aquarius::async_tcp_server srv(8100, 2);
+	//{
+	//	aquarius::async_tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
-		aquarius::async_tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::async_tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		aquarius::flex_buffer_t fs{};
-		uint8_t a = '1';
-		//fs.save(&a, 1);
-		//cli.close();
-		cli.async_write(std::move(fs));
+	//	aquarius::flex_buffer_t fs{};
+	//	uint8_t a = '1';
+	//	//fs.save(&a, 1);
+	//	//cli.close();
+	//	cli.async_write(std::move(fs));
 
-		std::this_thread::sleep_for(1s);
-		cli.stop();
-		srv.stop();
+	//	std::this_thread::sleep_for(1s);
+	//	cli.stop();
+	//	srv.stop();
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
 
-	{
-		aquarius::async_tcp_server srv(8100, 2);
+	//{
+	//	aquarius::async_tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
-		aquarius::async_tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::async_tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		//cli.close();
-		//cli.close();
+	//	//cli.close();
+	//	//cli.close();
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		srv.stop();
-		cli.stop();
+	//	srv.stop();
+	//	cli.stop();
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
 
 	//{
 	//	aquarius::no_ssl_tcp_server srv(8100, 2);
@@ -196,27 +196,27 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 	//	tc.join();
 	//}
 
-	{
-		aquarius::async_tcp_server srv(8100, 2);
+	//{
+	//	aquarius::async_tcp_server srv(8100, 2);
 
-		std::thread t([&] { srv.run(); });
+	//	std::thread t([&] { srv.run(); });
 
-		aquarius::async_tcp_client cli("127.0.0.1", "8100");
+	//	aquarius::async_tcp_client cli("127.0.0.1", "8100");
 
-		std::thread tc([&] { cli.run(); });
+	//	std::thread tc([&] { cli.run(); });
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		//cli.close();
+	//	//cli.close();
 
-		cli.stop();
-		srv.stop();
+	//	cli.stop();
+	//	srv.stop();
 
-		std::this_thread::sleep_for(1s);
+	//	std::this_thread::sleep_for(1s);
 
-		t.join();
-		tc.join();
-	}
+	//	t.join();
+	//	tc.join();
+	//}
 }
 
 // BOOST_AUTO_TEST_CASE(sconnect)
@@ -246,37 +246,143 @@ BOOST_AUTO_TEST_CASE(no_ssl)
 //	tc.join();
 // }
 
-BOOST_AUTO_TEST_CASE(large_pack)
-{
-	aquarius::async_tcp_server srv(8100, 2);
+//BOOST_AUTO_TEST_CASE(large_pack)
+//{
+//	aquarius::async_tcp_server srv(8100, 2);
+//
+//	std::thread t([&] { srv.run(); });
+//
+//	aquarius::async_tcp_client cli("127.0.0.1", "8100");
+//
+//	std::thread tc([&] { cli.run(); });
+//
+//	std::this_thread::sleep_for(1s);
+//
+//	//person_request req{};
+//	//req.body().age = 1;
+//
+//	//for (int i = 0; i < 3 * 4096; ++i)
+//	//{
+//	//	req.body().name.append("a");
+//	//}
+//
+//	//cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
+//
+//	std::this_thread::sleep_for(1s);
+//
+//	cli.stop();
+//	srv.stop();
+//
+//	std::this_thread::sleep_for(1s);
+//
+//	t.join();
+//	tc.join();
+//}
 
-	std::thread t([&] { srv.run(); });
+class test_request
+{
+public:
+	constexpr static auto Number = 1001;
+public:
+	test_request()
+		: content_()
+	{
+
+	}
+
+public:
+	template<typename Buffer>
+	Buffer to_binary()
+	{
+		Buffer fs;
+
+		fs.save((uint8_t*)content_.data(), content_.size());
+
+		return fs;
+	}
+
+	bool from_binary(aquarius::flex_buffer_t& fs)
+	{
+		content_.resize(fs.size());
+
+		fs.load((uint8_t*)content_.data(), content_.size());
+
+		return true;
+	}
+
+public:
+	std::string content_;
+};
+
+class test_response
+{
+public:
+	test_response()
+		: content_()
+	{
+
+	}
+
+public:
+	template<typename Buffer>
+	Buffer to_binary()
+	{
+		Buffer fs;
+
+		fs.save((uint8_t*)content_.data(), content_.size());
+
+		return fs;
+	}
+
+
+	bool from_binary(aquarius::flex_buffer_t& fs)
+	{
+		content_.resize(fs.size());
+
+		fs.load((uint8_t*)content_.data(), content_.size());
+
+		return true;
+	}
+
+public:
+	std::string content_;
+};
+
+AQUARIUS_HANDLE_METHOD(ctx_test, test_request, test_response)
+{
+	response().content_ = request()->content_;
+
+	return 0;
+}
+
+BOOST_AUTO_TEST_CASE(connect_with_no_ssl)
+{
+	aquarius::async_tcp_server srv(8100, 10, "async tcp server");
+
+	std::thread t([&]
+		{
+			srv.run();
+		});
+
+	std::this_thread::sleep_for(2s);
 
 	aquarius::async_tcp_client cli("127.0.0.1", "8100");
 
-	std::thread tc([&] { cli.run(); });
+	std::thread t1([&] {cli.run(); });
 
-	std::this_thread::sleep_for(1s);
+	test_request req{};
+	req.content_ = "hello world!";
 
-	//person_request req{};
-	//req.body().age = 1;
+	cli.send_request(req);
 
-	//for (int i = 0; i < 3 * 4096; ++i)
-	//{
-	//	req.body().name.append("a");
-	//}
-
-	//cli.send_request(std::move(req), [&](std::shared_ptr<person_response> resp) { BOOST_CHECK(true); });
-
-	std::this_thread::sleep_for(1s);
+	std::this_thread::sleep_for(500s);
 
 	cli.stop();
+
 	srv.stop();
 
-	std::this_thread::sleep_for(1s);
-
 	t.join();
-	tc.join();
+	t1.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

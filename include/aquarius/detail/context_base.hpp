@@ -3,8 +3,6 @@
 
 namespace aquarius
 {
-    class session_base;
-
     class context_base
     {
     public:
@@ -18,7 +16,5 @@ namespace aquarius
         std::string ctx_name_;
 
         std::chrono::milliseconds timeout_;
-
-        std::shared_ptr<session_base> session_ptr_;
     };
 } // namespace aquarius

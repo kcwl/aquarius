@@ -25,14 +25,14 @@ namespace aquarius
         basic_router() = default;
 
     public:
-        Result invoke(std::size_t key, Args&&... args)
+        Result invoke(std::size_t key, Args... args)
         {
             auto iter = this->map_invokes_.find(key);
 
             if (iter == this->map_invokes_.end())
                 return Result();
 
-            return iter->second(std::forward<Args>(args)...);
+            return iter->second(args...);
         }
     };
 } // namespace aquarius

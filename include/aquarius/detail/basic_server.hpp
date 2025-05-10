@@ -52,7 +52,7 @@ namespace aquarius
 			{
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
-				conn_ptr->start();
+				boost::asio::co_spawn(conn_ptr->get_executor(), conn_ptr->start(), boost::asio::detached);
 			}
 
 			co_await start_accept();

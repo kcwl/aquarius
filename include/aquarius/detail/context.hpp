@@ -15,40 +15,47 @@ namespace aquarius
 		{}
 
 	public:
-		int visit(std::shared_ptr<Request> req, std::shared_ptr<session_base> session_ptr)
+		template <typename Session>
+		int visit(std::shared_ptr<Request> req, std::shared_ptr<Session> session_ptr)
 		{
 			request_ptr_ = req;
 
-			session_ptr_ = session_ptr;
+			auto result = this->handle();
 
-			int result = this->handle();
-
-			send_response(result);
+			send_response(result, session_ptr);
 
 			return result;
+		}
+
+		std::shared_ptr<Request> request()
+		{
+			return request_ptr_;
+		}
+
+		Response& response()
+		{
+			return response_;
 		}
 
 	protected:
 		virtual int handle() = 0;
 
-		void send_response(int result)
+		template <typename Session>
+		void send_response(int result, std::shared_ptr<Session> session_ptr)
 		{
-			if (!this->session_ptr_)
+			if (!session_ptr)
 				return;
 
 			auto fs = make_response(result);
 
-			this->session_ptr_->send_packet(std::move(fs));
+			boost::asio::co_spawn(session_ptr->get_executor(), session_ptr->send_packet(Request::Number, std::move(fs)),
+								  boost::asio::detached);
 		}
 
 	private:
 		flex_buffer_t make_response(int result)
 		{
-			response_.set_uuid(request_ptr_->uuid());
-
-			response_.header()->set_result(result);
-
-			return response_.template to_binary<flex_buffer_t>();
+			return response_.to_binary<flex_buffer_t>();
 		}
 
 	protected:
@@ -66,19 +73,26 @@ namespace aquarius
 
 #define AQUARIUS_GLOBAL_ID(request) #request
 
-#define AQUARIUS_HANDLE_METHOD(method, request, response)                                                              \
+namespace aquarius
+{
+	template <typename IO = async_io_service<boost::asio::ip::tcp, boost::asio::any_io_executor>>
+	class basic_session;
+}
+
+#define AQUARIUS_HANDLE_METHOD(method, __request, __response)                                                          \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::auto_register<request, method> __auto_register_##method(                         \
-		AQUARIUS_GLOBAL_ID(request));                                                                                  \
-	class method : public aquarius::context<request, response>                                                         \
+	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<>, __request, method>                      \
+		__auto_register_##method(__request::Number);                                                                   \
+	class method : public aquarius::context<__request, __response>                                                     \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using request_type = request;                                                                                  \
-                                                                                                                       \
+		using request_type = __request;                                                                                \
+		using base_type = aquarius::context<__request, __response>;                                                    \
 	public:                                                                                                            \
-		method() = default;                                                                                            \
-                                                                                                                       \
+		method()                                                                                                       \
+			: base_type(AQUARIUS_GLOBAL_ID(__context_##__request))                                                     \
+		{}                                                                                                             \
 	protected:                                                                                                         \
-		virtual void handle() override;                                                                                \
+		virtual int handle() override;                                                                                 \
 	};                                                                                                                 \
-	void method::handle()                                                                                              \
+	inline int method::handle()                                                                                        \

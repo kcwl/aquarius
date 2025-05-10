@@ -32,7 +32,7 @@ namespace aquarius
 
 		template <execution_context_convertible ExecutionContext>
 		explicit basic_session(ExecutionContext& context)
-			: impl_(context)
+			: impl_(std::move(socket_type(context)))
 			, read_buffer_(pack_limit)
 			, uuid_(invoke_uuid<uint32_t>())
 		{}
@@ -64,9 +64,32 @@ namespace aquarius
 			co_await read_messages();
 		}
 
-		virtual void send_packet(flex_buffer_t&&)
+		auto async_connect(std::string ip_addr, std::string port) -> boost::asio::awaitable<void>
 		{
-			return;
+			boost::system::error_code ec;
+
+			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
+
+			if (ec)
+			{
+				co_return;
+			}
+
+			boost::asio::co_spawn(impl_.get_executor(), start(), boost::asio::detached);
+		}
+
+		virtual boost::asio::awaitable<void> send_packet(std::size_t proto, flex_buffer_t fs)
+		{
+			boost::system::error_code ec;
+
+			write(proto, fs);
+
+			co_await impl_.get_service().async_write_some(impl_.get_implementation(), fs, ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async write is failed! maybe " << ec.message();
+			}
 		}
 
 		void write(std::size_t proto, flex_buffer_t& buffer)
@@ -78,13 +101,15 @@ namespace aquarius
 
 		void read(flex_buffer_t& buffer)
 		{
-			auto flag = from_binary<uint8_t>(buffer);
+			uint8_t flag{};
+			buffer.load(&flag, 1);
 
-			auto req_id = from_binary<uint32_t>(buffer);
+			uint32_t req_id{};
+			buffer.load((uint8_t*)&req_id, sizeof(uint32_t));
 
 			auto seq = flag >> 2;
 
-			switch (static_cast<mvcc>(flag & 0x4))
+			switch (static_cast<mvcc>(flag & 0x3))
 			{
 			case mvcc::header:
 				{
@@ -121,6 +146,11 @@ namespace aquarius
 			return uuid_;
 		}
 
+		const executor_type& get_executor()
+		{
+			return impl_.get_executor();
+		}
+
 	private:
 		auto read_messages() -> boost::asio::awaitable<void>
 		{
@@ -128,8 +158,10 @@ namespace aquarius
 
 			boost::system::error_code ec;
 
-			std::size_t bytes_transferred = co_await impl_.get_service().async_read_some(
-				impl_.get_implementation(), boost::asio::buffer(read_buffer_.rdata(), read_buffer_.active()), ec);
+			auto bytes_transferred =
+				co_await impl_.get_service().async_read_some(impl_.get_implementation(), read_buffer_, ec);
+
+			read_buffer_.commit(bytes_transferred);
 
 			if (ec)
 			{
@@ -143,8 +175,6 @@ namespace aquarius
 
 			read(read_buffer_);
 
-			read_buffer_.commit(static_cast<int>(bytes_transferred));
-
 			co_await read_messages();
 		}
 
@@ -157,7 +187,7 @@ namespace aquarius
 			uint8_t flag = (total << 2) | static_cast<uint8_t>(mvcc::header);
 
 			int counter = 0;
-
+			flex_buffer_t write_buffer{};
 			while (buffer_size != 0)
 			{
 				auto cur_size = std::min<std::size_t>(buffer_size, 4095);
@@ -171,24 +201,23 @@ namespace aquarius
 					flag = (counter << 2) | static_cast<uint8_t>(mvcc::middle);
 				}
 
-				boost::asio::streambuf write_buffer{};
-				write_buffer.sputn((char*)&flag, 1);
-				write_buffer.sputn((char*)buffer.wdata() + counter * 4095, cur_size);
+				write_buffer.save((uint8_t*)&flag, 1);
+				write_buffer.save((uint8_t*)buffer.wdata() + counter * 4095, cur_size);
 				buffer_size -= cur_size;
 			}
+
+			buffer = std::move(write_buffer);
 		}
 
 		void write_normal(std::size_t proto, flex_buffer_t& buffer)
 		{
 			uint8_t flag = static_cast<uint8_t>(mvcc::normal);
-			boost::asio::streambuf write_buffer{};
-			write_buffer.sputn((char*)&flag, 1);
-			write_buffer.sputn((char*)&proto, sizeof(uint32_t));
-			write_buffer.sputn((char*)buffer.wdata(), buffer.size());
+			flex_buffer_t write_buffer{};
+			write_buffer.save((uint8_t*)&flag, 1);
+			write_buffer.save((uint8_t*)&proto, sizeof(uint32_t));
+			write_buffer.save((uint8_t*)buffer.wdata(), buffer.size());
 
-			// send
-			boost::asio::co_spawn(impl_.get_executor(), impl_.get_service().async_write_some(buffer),
-								  boost::asio::detached);
+			buffer = std::move(write_buffer);
 		}
 
 		template <typename Iterator>
@@ -236,10 +265,11 @@ namespace aquarius
 		void read_normal(std::size_t proto, flex_buffer_t& buffer)
 		{
 			boost::asio::post(impl_.get_executor(),
-							  [&, buf = std::move(buffer), this]
+							  [proto, buf = std::move(buffer), this]
 							  {
 								  sequence pack{};
-								  pack.buffers.push_back({ 1, buffer });
+								  pack.buffers.push_back({ 0, std::move(buf) });
+								  pack.total = 1;
 
 								  dispatch(proto, pack);
 							  });
@@ -258,7 +288,7 @@ namespace aquarius
 			{
 				if (iter->seq == counter++)
 				{
-					complete_buffer.save(iter->buffer.rdata(), iter->buffer.size());
+					complete_buffer.save(iter->buffer.wdata(), iter->buffer.size());
 
 					iter++;
 				}

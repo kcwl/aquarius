@@ -3,6 +3,7 @@
 #include <aquarius/core/concepts.hpp>
 #include <aquarius/core/logger.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
 #include <filesystem>
@@ -17,13 +18,15 @@ namespace aquarius
 	{
 		using socket_type = boost::asio::basic_stream_socket<Protocol>;
 
+		using endpoint_type = boost::asio::ip::basic_endpoint<Protocol>;
+
 		using resolve_type = boost::asio::ip::basic_resolver<Protocol>;
 
 	public:
 		explicit client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
 		{
-			boost::asio::co_spawn(io_service_, do_connect(ip_addr, port), boost::asio::detached);
+			do_connect(ip_addr, port);
 		}
 
 	public:
@@ -40,18 +43,11 @@ namespace aquarius
 		}
 
 		template <typename Request>
-		void send_request(const Request& req)
+		void send_request(Request& req)
 		{
-			flex_buffer_t fs{};
+			flex_buffer_t fs = req.template to_binary<flex_buffer_t>();
 
-			req.template to_binary<flex_buffer_t>(fs);
-
-			async_write(std::move(fs));
-		}
-
-		void async_write(flex_buffer_t&& buffer)
-		{
-			 session_ptr_->send_packet(std::move(buffer));
+			boost::asio::co_spawn(io_service_, session_ptr_->send_packet(Request::Number, fs), boost::asio::detached);
 		}
 
 		std::string remote_address()
@@ -69,28 +65,12 @@ namespace aquarius
 			return session_ptr_->remote_port();
 		}
 
-	private:
-		auto do_connect(const std::string& ip_addr, const std::string& port) -> boost::asio::awaitable<void>
+	public:
+		void do_connect(const std::string& ip_addr, const std::string& port)
 		{
-			socket_type socket(io_service_);
+			session_ptr_ = std::make_shared<Session>(io_service_);
 
-			boost::system::error_code ec;
-
-			resolve_type resolver(io_service_);
-			auto endpoints = resolver.resolve(ip_addr, port);
-
-			co_await boost::asio::async_connect(socket, endpoints, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << " maybe occur error - " << ec.message();
-
-				co_return;
-			}
-
-			session_ptr_ = std::make_shared<Session>(std::move(socket));
-
-			session_ptr_->start();
+			boost::asio::co_spawn(io_service_, session_ptr_->async_connect(ip_addr, port), boost::asio::detached);
 		}
 
 		// void init_ssl_context()

@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/core/logger.hpp>
+#include <aquarius/detail/ssl_traits.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
-#include <aquarius/detail/ssl_traits.hpp>
 
 #ifdef AQUARIUS_ENABLE_SSL
 #include <boost/asio/ssl.hpp>
@@ -21,7 +21,7 @@ namespace aquarius
 
 		constexpr static std::size_t ssl_version = ssl_version_traits<SSL>::value;
 
-		using resolver_type = typename Protocol::resolver;
+		using endpoint_type = boost::asio::ip::basic_endpoint<Protocol>;
 
 		using execution_base_type =
 			boost::asio::detail::execution_context_service_base<async_io_service<Protocol, Executor, IsServer, SSL>>;
@@ -110,43 +110,66 @@ namespace aquarius
 		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
 						   boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
-			resolver_type resolver(impl.socket->get_executor());
+			std::promise<bool> connect_status;
 
-			auto endpoint = resolver.resolve(ip_addr, port);
+			connect_future_ = connect_status.get_future();
 
-			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			impl.socket->connect(endpoint_type(boost::asio::ip::address::from_string(ip_addr),
+											   static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str()))));
+
+			// co_await impl.socket->async_connect(endpoint_type(boost::asio::ip::address::from_string(ip_addr),
+			//												  static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str()))),
+			//									boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+
+			connect_status.set_value(!ec);
+
+			co_return;
 		}
 
-		template <typename ConstBuffer>
-		auto async_read_some(implementation_type& impl, const ConstBuffer& buffer,
-							 boost::system::error_code& ec) -> boost::asio::awaitable<std::size_t>
-		{
-			if constexpr (ssl_mode<SSL>)
-			{
-				co_return co_await impl.ssl_socket->async_read_some(
-					buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-			}
-			else
-			{
-				co_return co_await impl.socket->async_read_some(
-					buffer, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-			}
-		}
-
-		template <typename ConstBuffer>
-		auto async_write_some(implementation_type& impl, const ConstBuffer& buffer, boost::system::error_code& ec)
+		auto async_read_some(implementation_type& impl, flex_buffer_t& buffer, boost::system::error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			if constexpr (ssl_mode<SSL>)
 			{
-				co_return co_await impl.ssl_socket->async_write_some(buffer,
-														   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+				co_return co_await impl.ssl_socket->async_read_some(
+					boost::asio::buffer(buffer.rdata(), buffer.active()),
+					boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
 			else
 			{
-				co_return co_await impl.socket->async_write_some(buffer,
-													   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+				co_return co_await impl.socket->async_read_some(
+					boost::asio::buffer(buffer.rdata(), buffer.active()),
+					boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 			}
+		}
+
+		auto async_write_some(implementation_type& impl, flex_buffer_t buffer, boost::system::error_code& ec)
+			-> boost::asio::awaitable<std::size_t>
+		{
+			if (connect_future_.valid())
+			{
+				auto status = connect_future_.get();
+
+				if (!status)
+					co_return 0;
+			}
+
+			std::size_t byte_transfers{};
+
+			if constexpr (ssl_mode<SSL>)
+			{
+				byte_transfers = co_await impl.ssl_socket->async_write_some(
+					boost::asio::buffer(buffer.wdata(), buffer.size()),
+					boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			}
+			else
+			{
+				byte_transfers =
+					co_await impl.socket->async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
+														   boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			}
+
+			co_return byte_transfers;
 		}
 
 		auto start(implementation_type& impl) -> boost::asio::awaitable<void>
@@ -205,5 +228,8 @@ namespace aquarius
 		{
 			return impl.socket->remote_endpoint().port();
 		}
+
+	private:
+		std::future<bool> connect_future_;
 	};
 } // namespace aquarius

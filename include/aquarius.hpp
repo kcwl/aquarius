@@ -8,6 +8,7 @@
 #include <aquarius/core/core.hpp>
 #include <aquarius/session.hpp>
 #include <aquarius/detail/context.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 
 namespace aquarius
 {

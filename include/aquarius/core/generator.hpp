@@ -17,8 +17,9 @@ namespace aquarius
 	class single_router : public basic_router<Result, Args...>, public boost::serialization::singleton<T>
 	{};
 
-	class context_router : public single_router<context_router, void, boost::asio::io_context&, flex_buffer_t&,
-												std::shared_ptr<session_base>>
+	template<typename Session>
+	class context_router : public single_router<context_router<Session>, void, flex_buffer_t&,
+												std::shared_ptr<Session>>
 	{
 	public:
 		context_router() = default;
@@ -27,16 +28,16 @@ namespace aquarius
 		template <typename Request, typename context>
 		void regist(std::size_t proto)
 		{
-			auto func = [&](boost::asio::io_context& io, flex_buffer_t& buffer, std::shared_ptr<session_base> session)
+			auto func = [&](flex_buffer_t& buffer, std::shared_ptr<Session> session)
 			{
 				auto request = std::make_shared<Request>();
 
 				request->from_binary(buffer);
 
-				boost::asio::post(io, [&] { std::make_shared<context>()->visit(request, session); });
+				boost::asio::post(session->get_executor(), [=] { std::make_shared<context>()->visit(request, session); });
 			};
 
-			map_invokes_[proto] = func;
+			this->map_invokes_[proto] = func;
 		}
 	};
 
