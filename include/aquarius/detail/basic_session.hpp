@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/uuid.hpp>
+#include <aquarius/uuid.hpp>
 #include <aquarius/detail/auto_register.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/package_base.hpp>

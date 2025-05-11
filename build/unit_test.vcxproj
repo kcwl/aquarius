@@ -181,7 +181,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
-    <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
