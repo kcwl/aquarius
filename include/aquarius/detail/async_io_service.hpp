@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/logger.hpp>
 #include <aquarius/detail/ssl_traits.hpp>
+#include <aquarius/logger.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
 
@@ -81,7 +81,7 @@ namespace aquarius
 			if (!impl.socket->is_open())
 				return;
 
-			boost::system::error_code ec{};
+			error_code ec{};
 
 			if (impl.socket)
 			{
@@ -106,7 +106,7 @@ namespace aquarius
 		}
 
 		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
-						   boost::system::error_code& ec) -> boost::asio::awaitable<void>
+						   error_code& ec) -> boost::asio::awaitable<void>
 		{
 			std::promise<bool> connect_status;
 
@@ -124,7 +124,7 @@ namespace aquarius
 			co_return;
 		}
 
-		auto async_read_some(implementation_type& impl, flex_buffer_t& buffer, boost::system::error_code& ec)
+		auto async_read_some(implementation_type& impl, flex_buffer_t& buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			if constexpr (ssl_mode<SSL>)
@@ -141,7 +141,7 @@ namespace aquarius
 			}
 		}
 
-		auto async_write_some(implementation_type& impl, flex_buffer_t buffer, boost::system::error_code& ec)
+		auto async_write_some(implementation_type& impl, flex_buffer_t buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			if (connect_future_.valid())
@@ -177,7 +177,7 @@ namespace aquarius
 #ifdef AQUARIUS_ENABLE_SSL
 			if constexpr (ssl_mode<SSL>)
 			{
-				boost::system::error_code ec;
+				error_code ec;
 
 				co_await impl.ssl_socket->async_handshake(handshake,
 														  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
@@ -193,7 +193,7 @@ namespace aquarius
 
 		bool keep_alive(implementation_type& impl, bool value)
 		{
-			boost::system::error_code ec;
+			error_code ec;
 
 			impl.socket->set_option(boost::asio::socket_base::keep_alive(value), ec);
 
@@ -204,7 +204,7 @@ namespace aquarius
 
 		bool set_nodelay(implementation_type& impl, bool enable)
 		{
-			boost::system::error_code ec;
+			error_code ec;
 			impl.socket->set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 
 			XLOG_INFO() << "set nodelay :" << enable;

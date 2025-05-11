@@ -5,6 +5,7 @@
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/noncopyable.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
@@ -34,7 +35,7 @@ namespace aquarius
         virtual ~async_acceptor() = default;
 
     public:
-        auto accept(boost::system::error_code& ec) -> boost::asio::awaitable<typename protocol_type::socket>
+        auto accept(error_code& ec) -> boost::asio::awaitable<typename protocol_type::socket>
         {
             auto sock = co_await impl_.async_accept(boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 
@@ -51,7 +52,7 @@ namespace aquarius
             return impl_.get_executor();
         }
 
-        void close(boost::system::error_code& ec)
+        void close(error_code& ec)
         {
             impl_.cancel(ec);
 

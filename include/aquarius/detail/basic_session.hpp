@@ -66,7 +66,7 @@ namespace aquarius
 
 		auto async_connect(std::string ip_addr, std::string port) -> boost::asio::awaitable<void>
 		{
-			boost::system::error_code ec;
+			error_code ec;
 
 			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
 
@@ -80,7 +80,7 @@ namespace aquarius
 
 		virtual boost::asio::awaitable<void> send_packet(std::size_t proto, flex_buffer_t fs)
 		{
-			boost::system::error_code ec;
+			error_code ec;
 
 			write(proto, fs);
 
@@ -156,7 +156,7 @@ namespace aquarius
 		{
 			auto self(this->shared_from_this());
 
-			boost::system::error_code ec;
+			error_code ec;
 
 			auto bytes_transferred =
 				co_await impl_.get_service().async_read_some(impl_.get_implementation(), read_buffer_, ec);

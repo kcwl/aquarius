@@ -63,9 +63,6 @@
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\error_code.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -148,6 +145,15 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\crc.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\error_category.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error_code.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>

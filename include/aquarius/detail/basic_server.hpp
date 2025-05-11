@@ -2,6 +2,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <boost/asio/signal_set.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
@@ -44,7 +45,7 @@ namespace aquarius
 	private:
 		auto start_accept() -> boost::asio::awaitable<void>
 		{
-			boost::system::error_code ec;
+			error_code ec;
 
 			auto sock = co_await acceptor_.accept(ec);
 
@@ -61,7 +62,7 @@ namespace aquarius
 		void init_signal()
 		{
 			signals_.async_wait(
-				[&](boost::system::error_code ec, int signal)
+				[&](error_code ec, int signal)
 				{
 					std::string error_message = "success";
 
