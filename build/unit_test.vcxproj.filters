@@ -63,9 +63,6 @@
     <ClInclude Include="..\include\aquarius\core\manager.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\apply.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\router.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>

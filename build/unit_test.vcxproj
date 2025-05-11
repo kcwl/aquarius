@@ -152,7 +152,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
-    <ClInclude Include="..\include\aquarius\core\apply.hpp" />
     <ClInclude Include="..\include\aquarius\core\crc.hpp" />
     <ClInclude Include="..\include\aquarius\core\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\core\generator.hpp" />
