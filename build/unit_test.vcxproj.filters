@@ -39,9 +39,6 @@
     <ClInclude Include="..\include\aquarius\core\asio.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\concepts.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
@@ -142,6 +139,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\logger.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\time_traits.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\steady_timer.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\deadline_timer.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>

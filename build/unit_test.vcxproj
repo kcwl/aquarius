@@ -159,6 +159,7 @@
     <ClInclude Include="..\include\aquarius\core\router.hpp" />
     <ClInclude Include="..\include\aquarius\core\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
+    <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_acceptor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_request.hpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\include\aquarius\detail\io_concepts.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_base.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\auto_register.hpp" />
     <ClInclude Include="..\include\aquarius\detail\package_base.hpp" />
@@ -181,10 +183,10 @@
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\core\asio.hpp" />
-    <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
+    <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />
     <ClInclude Include="..\test\core.h" />
