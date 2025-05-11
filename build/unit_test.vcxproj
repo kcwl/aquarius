@@ -178,7 +178,6 @@
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\core\core.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\core\asio.hpp" />

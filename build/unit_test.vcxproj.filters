@@ -39,9 +39,6 @@
     <ClInclude Include="..\include\aquarius\core\asio.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\core.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\core\deadline_timer.hpp">
       <Filter>include\aquarius\core</Filter>
     </ClInclude>

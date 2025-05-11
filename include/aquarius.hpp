@@ -5,7 +5,6 @@
 #include <aquarius/core/ini_tree.hpp>
 #include <aquarius/core/crc.hpp>
 #include <aquarius/core/singleton.hpp>
-#include <aquarius/core/core.hpp>
 #include <aquarius/session.hpp>
 #include <aquarius/detail/context.hpp>
 #include <aquarius/detail/flex_buffer.hpp>

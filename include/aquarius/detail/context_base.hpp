@@ -2,6 +2,8 @@
 #include <string>
 #include <chrono>
 
+using namespace std::chrono_literals;
+
 namespace aquarius
 {
     class context_base
