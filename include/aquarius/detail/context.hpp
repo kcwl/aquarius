@@ -75,7 +75,7 @@ namespace aquarius
 
 		flex_buffer_t make_response(int result)
 		{
-			return response_.to_binary<flex_buffer_t>();
+			return response_.template to_binary<flex_buffer_t>();
 		}
 
 	protected:
@@ -126,7 +126,7 @@ namespace aquarius
 	protected:                                                                                                         \
 		virtual int handle() override;                                                                                 \
 	};                                                                                                                 \
-	inline int method::handle()																						   \
+	inline int method::handle()																						   
 
 #define AQUARIUS_CLIENT_CONTEXT(method, __response)                                                                    \
 	class method;                                                                                                      \
@@ -143,4 +143,4 @@ namespace aquarius
 	protected:                                                                                                         \
 		virtual int handle() override;                                                                                 \
 	};                                                                                                                 \
-	inline int method::handle()																						   \
+	inline int method::handle()																						   

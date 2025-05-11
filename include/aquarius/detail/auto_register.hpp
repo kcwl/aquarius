@@ -16,7 +16,7 @@ namespace aquarius
 	{
 		explicit auto_register(std::size_t proto)
 		{
-			context_router<Session>::get_mutable_instance().regist<Request, Context>(proto);
+			context_router<Session>::get_mutable_instance().template regist<Request, Context>(proto);
 		}
 	};
 
