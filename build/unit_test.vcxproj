@@ -152,13 +152,13 @@
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
-    <ClInclude Include="..\include\aquarius\core\crc.hpp" />
     <ClInclude Include="..\include\aquarius\core\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\core\generator.hpp" />
     <ClInclude Include="..\include\aquarius\core\manager.hpp" />
     <ClInclude Include="..\include\aquarius\core\router.hpp" />
     <ClInclude Include="..\include\aquarius\core\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
+    <ClInclude Include="..\include\aquarius\crc.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_acceptor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\async_io_service.hpp" />
