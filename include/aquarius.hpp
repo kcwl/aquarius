@@ -2,7 +2,6 @@
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/client.hpp>
 #include <aquarius/server.hpp>
-#include <aquarius/core/ini_tree.hpp>
 #include <aquarius/crc.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/session.hpp>

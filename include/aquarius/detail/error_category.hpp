@@ -11,12 +11,12 @@ namespace aquarius
 		inline std::map<int, std::string> error_map()
 		{
 			static const std::map<int, std::string> error_arr = {
-				{ static_cast<int>(error::ok), "successful" },
-				{ static_cast<int>(error::pending), "wait for handle pending" },
-				{ static_cast<int>(error::incomplete), "package is not complete" },
-				{ static_cast<int>(error::unknown), "unknown protocol" },
-				{ static_cast<int>(error::nosession), "session is not exist" },
-				{ static_cast<int>(error::timeout), "context handle timeout" }
+				{ static_cast<int>(package::ok), "successful" },
+				{ static_cast<int>(package::pending), "wait for handle pending" },
+				{ static_cast<int>(package::incomplete), "package is not complete" },
+				{ static_cast<int>(package::unknown), "unknown protocol" },
+				{ static_cast<int>(package::nosession), "session is not exist" },
+				{ static_cast<int>(package::timeout), "context handle timeout" }
 			};
 
 			return error_arr;

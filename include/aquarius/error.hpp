@@ -3,16 +3,13 @@
 
 namespace aquarius
 {
-	namespace error
+	enum package
 	{
-		enum package
-		{
-			ok,			// success complete
-			pending,	// waiting for handle
-			incomplete, // package is not complete
-			unknown,	// unknown protocol
-			nosession,	// non session
-			timeout		// timeout
-		};
-	} // namespace error
+		ok,			// success complete
+		pending,	// waiting for handle
+		incomplete, // package is not complete
+		unknown,	// unknown protocol
+		nosession,	// non session
+		timeout		// timeout
+	};
 } // namespace aquarius

@@ -1,14 +1,11 @@
 ﻿#pragma once
-#include <aquarius/core/asio.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <boost/asio/detached.hpp>
-#include <boost/asio/redirect_error.hpp>
-#include <boost/asio/use_awaitable.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
+#include <aquarius/detail/asio.hpp>
 
 namespace aquarius
 {
@@ -83,7 +80,7 @@ namespace aquarius
 		//}
 
 	private:
-		asio::io_service io_service_;
+		io_service io_service_;
 
 		std::shared_ptr<Session> session_ptr_;
 	};

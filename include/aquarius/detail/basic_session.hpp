@@ -5,6 +5,7 @@
 #include <aquarius/detail/package_base.hpp>
 #include <aquarius/detail/session_base.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
+#include <aquarius/detail/asio.hpp>
 
 namespace aquarius
 {
@@ -165,7 +166,7 @@ namespace aquarius
 
 			if (ec)
 			{
-				if (ec != asio::error::eof)
+				if (ec != error::eof)
 				{
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
