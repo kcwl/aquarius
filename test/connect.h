@@ -346,6 +346,11 @@ public:
 		return true;
 	}
 
+	void set_result(int)
+	{
+		return;
+	}
+
 public:
 	std::string content_;
 };

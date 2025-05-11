@@ -75,6 +75,8 @@ namespace aquarius
 
 		flex_buffer_t make_response(int result)
 		{
+			response_.set_result(result);
+
 			return response_.template to_binary<flex_buffer_t>();
 		}
 

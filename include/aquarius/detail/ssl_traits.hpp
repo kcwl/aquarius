@@ -1,6 +1,6 @@
 #pragma once
-#include <concepts>
 #include <boost/system/error_code.hpp>
+#include <concepts>
 
 namespace aquarius
 {
@@ -12,7 +12,7 @@ namespace aquarius
 #else
 	struct ssl
 	{
-		static constexpr std::size_t version = -1;
+		static constexpr std::size_t version = static_cast<std::size_t>(-1);
 	};
 #endif
 
@@ -38,7 +38,7 @@ namespace aquarius
 	template <typename T>
 	struct ssl_version_traits
 	{
-		static constexpr std::size_t value = -1;
+		static constexpr std::size_t value = static_cast<std::size_t>(-1);
 	};
 
 	template <>

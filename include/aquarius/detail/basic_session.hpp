@@ -194,14 +194,15 @@ namespace aquarius
 
 				if (cur_size == buffer_size)
 				{
-					flag = (counter << 2) | static_cast<uint8_t>(mvcc::complete);
+					flag = static_cast<uint8_t>(counter << 2) | static_cast<uint8_t>(mvcc::complete);
 				}
 				else
 				{
-					flag = (counter << 2) | static_cast<uint8_t>(mvcc::middle);
+					flag = static_cast<uint8_t>(counter << 2) | static_cast<uint8_t>(mvcc::middle);
 				}
 
 				write_buffer.save((uint8_t*)&flag, 1);
+				write_buffer.save((uint8_t*)&proto, sizeof(uint32_t));
 				write_buffer.save((uint8_t*)buffer.wdata() + counter * 4095, cur_size);
 				buffer_size -= cur_size;
 			}

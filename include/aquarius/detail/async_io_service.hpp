@@ -64,7 +64,7 @@ namespace aquarius
 		virtual ~async_io_service() = default;
 
 	public:
-		void construct(implementation_type& impl)
+		void construct(implementation_type& /*impl*/)
 		{
 			// this->base_construct(impl);
 		}
@@ -94,8 +94,6 @@ namespace aquarius
 
 			if (impl.ssl_socket)
 			{
-				boost::system::error_code ec;
-
 				impl.ssl_socket->shutdown(ec);
 
 				delete impl.ssl_socket;
