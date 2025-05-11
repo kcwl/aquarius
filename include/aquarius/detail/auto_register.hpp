@@ -1,5 +1,6 @@
 #pragma once
-#include <aquarius/core/generator.hpp>
+#include <aquarius/context_router.hpp>
+
 namespace aquarius
 {
 	template <typename T>

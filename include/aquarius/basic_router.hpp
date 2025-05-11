@@ -1,7 +1,8 @@
 #pragma once
-#include <mutex>
 #include <unordered_map>
+#include <functional>
 #include <boost/noncopyable.hpp>
+#include <aquarius/singleton.hpp>
 
 
 namespace aquarius
@@ -35,4 +36,10 @@ namespace aquarius
             return iter->second(args...);
         }
     };
+
+    template <typename T, typename Result, typename... Args>
+    class single_router : public basic_router<Result, Args...>, public singleton<T>
+    {
+    };
+
 } // namespace aquarius

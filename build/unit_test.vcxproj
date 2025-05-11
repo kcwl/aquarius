@@ -151,10 +151,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
-    <ClInclude Include="..\include\aquarius\core\generator.hpp" />
+    <ClInclude Include="..\include\aquarius\context_router.hpp" />
     <ClInclude Include="..\include\aquarius\core\manager.hpp" />
-    <ClInclude Include="..\include\aquarius\core\router.hpp" />
     <ClInclude Include="..\include\aquarius\core\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\core\type_traits.hpp" />
     <ClInclude Include="..\include\aquarius\crc.hpp" />
@@ -179,7 +179,6 @@
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\core\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\error.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
@@ -188,6 +187,7 @@
     <ClInclude Include="..\include\aquarius\core\uuid.hpp" />
     <ClInclude Include="..\include\aquarius\core\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
+    <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />
