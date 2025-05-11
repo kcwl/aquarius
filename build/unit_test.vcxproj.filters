@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\core">
       <UniqueIdentifier>{cc59cd76-2135-40a8-83d7-0ae05a9b6d2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\core\async">
-      <UniqueIdentifier>{6152b607-78d9-4f27-96ba-96366e6bf252}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\detail">
       <UniqueIdentifier>{84cb43f8-9ce7-4049-8236-9a4143c089c6}</UniqueIdentifier>
     </Filter>
@@ -80,12 +77,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\error_code.hpp">
       <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\async.hpp">
-      <Filter>include\aquarius\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\core\async\async_pool.hpp">
-      <Filter>include\aquarius\core\async</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\core\crc.hpp">
       <Filter>include\aquarius\core</Filter>
