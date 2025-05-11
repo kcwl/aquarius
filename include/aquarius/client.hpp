@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <aquarius/core/asio.hpp>
 #include <aquarius/core/concepts.hpp>
-#include <aquarius/core/logger.hpp>
+#include <aquarius/logger.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/redirect_error.hpp>

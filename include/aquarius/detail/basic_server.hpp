@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/logger.hpp>
+#include <aquarius/logger.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <boost/asio/signal_set.hpp>
 

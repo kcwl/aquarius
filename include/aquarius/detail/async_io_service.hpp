@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/logger.hpp>
+#include <aquarius/logger.hpp>
 #include <aquarius/detail/ssl_traits.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>

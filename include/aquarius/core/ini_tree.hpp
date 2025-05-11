@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/core/logger.hpp>
+#include <aquarius/logger.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
