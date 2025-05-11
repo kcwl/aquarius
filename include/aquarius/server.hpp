@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/async_acceptor.hpp>
+#include <aquarius/async_acceptor.hpp>
 #include <aquarius/detail/basic_server.hpp>
 #include <boost/asio/any_io_executor.hpp>
 
