@@ -19,6 +19,8 @@ namespace aquarius
 
 		using socket_type = typename SSLService::socket_type;
 
+		using protocol_type = Protocol;
+
 		struct implementation_type
 		{
 			socket_type* socket;

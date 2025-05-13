@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/detail/auto_register.hpp>
 #include <aquarius/detail/context_base.hpp>
+#include <aquarius/tcp/package_processor.hpp>
 
 namespace aquarius
 {
@@ -106,13 +107,13 @@ namespace aquarius
 
 namespace aquarius
 {
-	template <typename IO = tcp::async_io_service<ssl::no_ssl_protocol>>
+	template <typename IO /*= tcp::async_io_service<ssl::no_ssl_protocol>*/, template<typename> typename Processor>
 	class basic_session;
 }
 
 #define AQUARIUS_SERVER_CONTEXT(method, __request, __response)                                                         \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<>, __request, method>                      \
+	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<aquarius::tcp::async_io_service<aquarius::ssl::no_ssl_protocol>, aquarius::package_processor>, __request, method>                      \
 		__auto_register_##method(__request::Number);                                                                   \
 	class method : public aquarius::server_context<__request, __response>                                              \
 	{                                                                                                                  \
@@ -132,7 +133,7 @@ namespace aquarius
 
 #define AQUARIUS_CLIENT_CONTEXT(method, __response)                                                                    \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<>, __response, method>                     \
+	[[maybe_unused]] static aquarius::auto_register<aquarius::basic_session<aquarius::tcp::async_io_service<aquarius::ssl::no_ssl_protocol>, aquarius::package_processor>, __response, method>                     \
 		__auto_register_##method(__response::Number);                                                                  \
 	class method : public aquarius::client_context<__response>                                                         \
 	{                                                                                                                  \
