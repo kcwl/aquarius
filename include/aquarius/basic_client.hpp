@@ -10,7 +10,7 @@
 namespace aquarius
 {
 	template <typename Protocol, typename Session>
-	class client : public std::enable_shared_from_this<client<Protocol, Session>>
+	class basic_client : public std::enable_shared_from_this<basic_client<Protocol, Session>>
 	{
 		using socket_type = boost::asio::basic_stream_socket<Protocol>;
 
@@ -19,7 +19,7 @@ namespace aquarius
 		using resolve_type = boost::asio::ip::basic_resolver<Protocol>;
 
 	public:
-		explicit client(const std::string& ip_addr, const std::string& port)
+		explicit basic_client(const std::string& ip_addr, const std::string& port)
 			: io_service_()
 		{
 			do_connect(ip_addr, port);

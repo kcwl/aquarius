@@ -37,8 +37,7 @@ namespace aquarius
 			{
 				if (!socket_.is_open())
 				{
-					//co_yield socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),
-					//											 redirect_error(boost::asio::use_awaitable, ec));
+					//co_yield 0;
 				}
 
 				co_return co_await socket_.async_write_some(boost::asio::buffer(buffer.wdata(), buffer.size()),

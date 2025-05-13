@@ -78,7 +78,7 @@ namespace aquarius
 		}
 
 	private:
-		io_service_pool io_service_pool_;
+		detail::io_service_pool io_service_pool_;
 
 		boost::asio::signal_set signals_;
 

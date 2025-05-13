@@ -5,29 +5,31 @@
 
 namespace aquarius
 {
-
-	template <typename Session>
-	class context_router : public single_router<context_router<Session>, void, flex_buffer_t&, std::shared_ptr<Session>>
+	namespace tcp
 	{
-	public:
-		context_router() = default;
-
-	public:
-		template <typename Request, typename context>
-		void regist(std::size_t proto)
+		template <typename Session>
+		class context_router
+			: public single_router<context_router<Session>, void, flex_buffer_t&, std::shared_ptr<Session>>
 		{
-			auto func = [&](flex_buffer_t& buffer, std::shared_ptr<Session> session)
+		public:
+			context_router() = default;
+
+		public:
+			template <typename Request, typename context>
+			void regist(std::size_t proto)
 			{
-				auto request = std::make_shared<Request>();
+				auto func = [&](flex_buffer_t& buffer, std::shared_ptr<Session> session)
+				{
+					auto request = std::make_shared<Request>();
 
-				request->from_binary(buffer);
+					request->from_binary(buffer);
 
-				boost::asio::post(session->get_executor(),
-								  [=] { std::make_shared<context>()->visit(request, session); });
-			};
+					boost::asio::post(session->get_executor(),
+									  [=] { std::make_shared<context>()->visit(request, session); });
+				};
 
-			this->map_invokes_[proto] = func;
-		}
-	};
-
+				this->map_invokes_[proto] = func;
+			}
+		};
+	} // namespace tcp
 } // namespace aquarius

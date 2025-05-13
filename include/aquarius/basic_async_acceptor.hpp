@@ -7,7 +7,7 @@
 namespace aquarius
 {
 	template <typename Protocol, typename Executor>
-	class async_acceptor : public noncopyable
+	class basic_async_acceptor : public detail::noncopyable
 	{
 	public:
 		using acceptor_type = boost::asio::basic_socket_acceptor<Protocol, Executor>;
@@ -20,15 +20,15 @@ namespace aquarius
 
 	public:
 		template <execution_context_convertible ExecutionContext>
-		async_acceptor(ExecutionContext& context, uint16_t port, bool reuse_addr = true)
+		basic_async_acceptor(ExecutionContext& context, uint16_t port, bool reuse_addr = true)
 			: impl_(context, endpoint_type{ protocol_type::v4(), port }, reuse_addr)
 		{}
 
-		async_acceptor(async_acceptor&&) = default;
+		basic_async_acceptor(basic_async_acceptor&&) = default;
 
-		async_acceptor& operator=(async_acceptor&&) = default;
+		basic_async_acceptor& operator=(basic_async_acceptor&&) = default;
 
-		virtual ~async_acceptor() = default;
+		virtual ~basic_async_acceptor() = default;
 
 	public:
 		auto accept(error_code& ec) -> boost::asio::awaitable<typename protocol_type::socket>

@@ -371,7 +371,7 @@ AQUARIUS_CLIENT_CONTEXT(ctn_test, test_response)
 
 BOOST_AUTO_TEST_CASE(connect_with_no_ssl)
 {
-	aquarius::async_tcp_server srv(8100, 10, "async tcp server");
+	aquarius::tcp::async_server srv(8100, 10, "async tcp server");
 
 	std::thread t([&]
 		{
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE(connect_with_no_ssl)
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::async_tcp_client cli("127.0.0.1", "8100");
+	aquarius::tcp::async_client cli("127.0.0.1", "8100");
 
 	std::thread t1([&] {cli.run(); });
 

@@ -1,7 +1,8 @@
 #pragma once
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/ssl_traits.hpp>
+#include <aquarius/ssl/ssl_traits.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 
 namespace aquarius
 {

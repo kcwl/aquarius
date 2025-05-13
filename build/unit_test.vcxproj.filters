@@ -30,37 +30,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\aquarius\client.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\server.hpp">
+    <ClInclude Include="..\include\aquarius\basic_client.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_server.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\auto_register.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_request.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\serialize.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\test\client.h">
@@ -77,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\logger.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\time_traits.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\steady_timer.hpp">
       <Filter>include\aquarius</Filter>
@@ -99,7 +75,7 @@
     <ClInclude Include="..\include\aquarius\error.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\async_acceptor.hpp">
+    <ClInclude Include="..\include\aquarius\basic_async_acceptor.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_async_io_service.hpp">
@@ -111,19 +87,10 @@
     <ClInclude Include="..\include\aquarius\concepts.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\singleton.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl_traits.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\ssl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\async_io_service.hpp">
@@ -157,6 +124,30 @@
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\context_router.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ssl\ssl.hpp">
+      <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ssl\ssl_context_factory.hpp">
+      <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ssl\ssl_traits.hpp">
+      <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_server.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\async_server.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\async_client.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\async_acceptor.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
   </ItemGroup>

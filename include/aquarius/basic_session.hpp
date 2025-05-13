@@ -2,6 +2,7 @@
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
+#include <aquarius/concepts.hpp>
 
 namespace aquarius
 {
@@ -75,7 +76,7 @@ namespace aquarius
 
 			for (auto& buf : buffers)
 			{
-				co_await impl_.get_service().async_write_some(fs, ec);
+				co_await impl_.get_service().async_write_some(buf, ec);
 
 				if (ec)
 				{
@@ -123,7 +124,7 @@ namespace aquarius
 
 
 	private:
-		session_object_impl<IO, executor_type> impl_;
+		detail::session_object_impl<IO, executor_type> impl_;
 
 		flex_buffer_t read_buffer_;
 

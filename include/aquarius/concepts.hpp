@@ -1,10 +1,13 @@
 #pragma once
 #include <concepts>
 
-namespace aquarius
+namespace boost
 {
-	class execution_context;
-}
+	namespace asio
+	{
+		class execution_context;
+	}
+} // namespace boost
 
 namespace aquarius
 {

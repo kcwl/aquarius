@@ -2,9 +2,9 @@
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/package_processor.hpp>
+#include <aquarius/tcp/auto_register.hpp>
 #include <list>
 #include <map>
-#include <aquarius/detail/auto_register.hpp>
 
 namespace aquarius
 {
@@ -44,7 +44,7 @@ namespace aquarius
 	{
 		static constexpr std::size_t package_limit = 4096;
 
-		template<typename Session>
+		template <typename Session>
 		void read(flex_buffer_t& buffer, std::shared_ptr<Session> session_ptr)
 		{
 			uint8_t flag{};
@@ -98,7 +98,7 @@ namespace aquarius
 					}
 				}
 
-				invoke_context(req_id, complete_buffer, session_ptr);
+				tcp::invoke_context(req_id, complete_buffer, session_ptr);
 
 				buffers.erase(req_id);
 			}
