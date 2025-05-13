@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/auto_register.hpp>
-#include <aquarius/detail/context_base.hpp>
+#include <aquarius/tcp/context_base.hpp>
 #include <aquarius/tcp/package_processor.hpp>
 
 namespace aquarius

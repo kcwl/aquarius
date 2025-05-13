@@ -157,7 +157,6 @@
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
-    <ClInclude Include="..\include\aquarius\context_router.hpp" />
     <ClInclude Include="..\include\aquarius\crc.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
@@ -165,8 +164,6 @@
     <ClInclude Include="..\include\aquarius\detail\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\detail\error_category.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\context.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\context_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
@@ -188,6 +185,9 @@
     <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\async_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\async_session.hpp" />
+    <ClInclude Include="..\include\aquarius\tcp\context.hpp" />
+    <ClInclude Include="..\include\aquarius\tcp\context_base.hpp" />
+    <ClInclude Include="..\include\aquarius\tcp\context_router.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\package_processor.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />

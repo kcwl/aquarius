@@ -4,10 +4,9 @@
 #include <aquarius/server.hpp>
 #include <aquarius/crc.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/session.hpp>
-#include <aquarius/detail/context.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/tcp/async_session.hpp>
+#include <aquarius/tcp/context.hpp>
 
 namespace aquarius
 {

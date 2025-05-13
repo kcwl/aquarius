@@ -48,13 +48,7 @@
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\context_base.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\context.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\auto_register.hpp">
@@ -117,9 +111,6 @@
     <ClInclude Include="..\include\aquarius\concepts.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context_router.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -157,6 +148,15 @@
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\async_session.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\context.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\context_base.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\context_router.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
   </ItemGroup>
