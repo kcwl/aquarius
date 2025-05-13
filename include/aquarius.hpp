@@ -11,7 +11,7 @@
 namespace aquarius
 {
 	//using tcp_server = basic_server<ssl_tcp_server_connect, channel::publisher>;
-	using async_tcp_server = async_server<boost::asio::ip::tcp, async_tcp_session<>>;
+	using async_tcp_server = async_server<boost::asio::ip::tcp, async_tcp_session>;
 #ifdef AQUARIUS_ENABLE_SSL
 	//using no_ssl_tcp_server = basic_server<no_ssl_tcp_server_connect, channel::publisher>;
 	using async_ssl_tcp_server = async_server<boost::asio::ip::tcp, async_tcp_ssl_session<>>;
@@ -21,7 +21,7 @@ namespace aquarius
 
 	//using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, channel::publisher>;
 
-	using async_tcp_client = client<boost::asio::ip::tcp, async_tcp_session<>>;
+	using async_tcp_client = client<boost::asio::ip::tcp, async_tcp_session>;
 
 	//using no_ssl_tcp_client = client<async_tcp_ssl_session<>>;
 

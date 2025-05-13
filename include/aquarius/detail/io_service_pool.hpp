@@ -11,9 +11,9 @@ namespace aquarius
 	class io_service_pool
 	{
 	private:
-		using io_service_ptr_t = std::shared_ptr<io_service>;
+		using io_service_ptr_t = std::shared_ptr<boost::asio::io_service>;
 
-		using work_guard = executor_work_guard<io_context::executor_type>;
+		using work_guard = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
 
 	public:
 		explicit io_service_pool(std::size_t pool_size)
@@ -27,7 +27,7 @@ namespace aquarius
 
 			for (std::size_t i = 0; i < pool_size_; ++i)
 			{
-				io_service_ptr_t io_service_ptr(new io_service{});
+				io_service_ptr_t io_service_ptr(new boost::asio::io_service{});
 
 				io_services_.push_back(io_service_ptr);
 
@@ -65,9 +65,9 @@ namespace aquarius
 			}
 		}
 
-		io_service& get_io_service()
+		boost::asio::io_service& get_io_service()
 		{
-			io_service& io_service = *io_services_[next_to_service_];
+			boost::asio::io_service& io_service = *io_services_[next_to_service_];
 			++next_to_service_;
 
 			if (next_to_service_ == io_services_.size())

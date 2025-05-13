@@ -18,8 +18,6 @@ namespace aquarius
 
 		using socket_type = typename IO::socket_type;
 
-		using ssl_socket_type = typename IO::ssl_socket_type;
-
 		using this_type = basic_session<IO>;
 
 		constexpr static std::size_t pack_limit = 4096;
@@ -43,24 +41,24 @@ namespace aquarius
 	public:
 		std::string remote_address() const
 		{
-			return impl_.get_service().remote_address(impl_.get_implementation());
+			return impl_.get_service().remote_address();
 		}
 
 		uint32_t remote_address_u() const
 		{
-			return impl_.get_service().remote_address_u(impl_.get_implementation());
+			return impl_.get_service().remote_address_u();
 		}
 
 		uint16_t remote_port() const
 		{
-			return impl_.get_service().remote_port(impl_.get_implementation());
+			return impl_.get_service().remote_port();
 		}
 
 		auto start() -> boost::asio::awaitable<void>
 		{
 			// invoke_session_helper::push(this->shared_from_this());
 
-			co_await impl_.get_service().start(impl_.get_implementation());
+			co_await impl_.get_service().start();
 
 			co_await read_messages();
 		}
@@ -69,7 +67,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
+			co_await impl_.get_service().async_connect(ip_addr, port, ec);
 
 			if (ec)
 			{
@@ -85,7 +83,7 @@ namespace aquarius
 
 			write(proto, fs);
 
-			co_await impl_.get_service().async_write_some(impl_.get_implementation(), fs, ec);
+			co_await impl_.get_service().async_write_some(fs, ec);
 
 			if (ec)
 			{
@@ -160,13 +158,13 @@ namespace aquarius
 			error_code ec;
 
 			auto bytes_transferred =
-				co_await impl_.get_service().async_read_some(impl_.get_implementation(), read_buffer_, ec);
+				co_await impl_.get_service().async_read_some(read_buffer_, ec);
 
 			read_buffer_.commit(bytes_transferred);
 
 			if (ec)
 			{
-				if (ec != error::eof)
+				if (ec != boost::asio::error::eof)
 				{
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
@@ -310,7 +308,7 @@ namespace aquarius
 		}
 
 	private:
-		session_object_impl<IO, executor_type, IO::ssl_version> impl_;
+		session_object_impl<IO, executor_type> impl_;
 
 		flex_buffer_t read_buffer_;
 

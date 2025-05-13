@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\async_acceptor.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_async_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\client.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
@@ -159,7 +160,6 @@
     <ClInclude Include="..\include\aquarius\crc.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\async_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_request.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_session.hpp" />
@@ -170,6 +170,7 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_base.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\ssl.hpp" />
     <ClInclude Include="..\include\aquarius\detail\time_traits.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visitor.hpp" />
     <ClInclude Include="..\include\aquarius\detail\auto_register.hpp" />
@@ -177,14 +178,17 @@
     <ClInclude Include="..\include\aquarius\detail\serialize.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context_factory.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\ssl_traits.hpp" />
     <ClInclude Include="..\include\aquarius\error.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server.hpp" />
     <ClInclude Include="..\include\aquarius\session.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
+    <ClInclude Include="..\include\aquarius\ssl\no_ssl_protocol.hpp" />
+    <ClInclude Include="..\include\aquarius\ssl\ssl_protocol.hpp" />
+    <ClInclude Include="..\include\aquarius\ssl_traits.hpp" />
     <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
+    <ClInclude Include="..\include\aquarius\tcp\async_io_service.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />
     <ClInclude Include="..\test\core.h" />

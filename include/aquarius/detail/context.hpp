@@ -106,7 +106,7 @@ namespace aquarius
 
 namespace aquarius
 {
-	template <typename IO = async_io_service<boost::asio::ip::tcp, boost::asio::any_io_executor>>
+	template <typename IO = tcp::async_io_service<ssl::no_ssl_protocol>>
 	class basic_session;
 }
 

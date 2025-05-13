@@ -10,7 +10,7 @@ namespace aquarius
 	class async_acceptor : public noncopyable
 	{
 	public:
-		using acceptor_type = basic_socket_acceptor<Protocol, Executor>;
+		using acceptor_type = boost::asio::basic_socket_acceptor<Protocol, Executor>;
 
 		using protocol_type = typename acceptor_type::protocol_type;
 
@@ -31,13 +31,13 @@ namespace aquarius
 		virtual ~async_acceptor() = default;
 
 	public:
-		auto accept(error_code& ec) -> awaitable<typename protocol_type::socket>
+		auto accept(error_code& ec) -> boost::asio::awaitable<typename protocol_type::socket>
 		{
-			auto sock = co_await impl_.async_accept(redirect_error(use_awaitable, ec));
+			auto sock = co_await impl_.async_accept(redirect_error(boost::asio::use_awaitable, ec));
 
 			if (!impl_.is_open())
 			{
-				ec = error::bad_descriptor;
+				ec = boost::asio::error::bad_descriptor;
 			}
 
 			co_return sock;

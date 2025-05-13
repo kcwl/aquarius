@@ -80,7 +80,7 @@ namespace aquarius
 		//}
 
 	private:
-		io_service io_service_;
+		boost::asio::io_service io_service_;
 
 		std::shared_ptr<Session> session_ptr_;
 	};
