@@ -62,7 +62,7 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         export VCPKG_ROOT=${{github.workspace}}/vcpkg
-        ./${{VCPKG_ROOT}}/vcpkg install boost openssl
+        ./vcpkg/vcpkg install boost openssl
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
