@@ -3,5 +3,8 @@
 
 namespace aquarius
 {
-	using namespace boost::asio;
+	namespace ssl
+	{
+		using context = boost::asio::ssl::context;
+	}
 }

@@ -49,7 +49,7 @@ namespace aquarius
 
 		auto start() -> boost::asio::awaitable<void>
 		{
-			co_await impl_.get_service().start();
+			co_await impl_.get_service().start(impl_.get_implementation());
 
 			co_await read_messages();
 		}
@@ -58,7 +58,7 @@ namespace aquarius
 		{
 			boost::system::error_code ec;
 
-			co_await impl_.get_service().async_connect(ip_addr, port, ec);
+			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
 
 			if (ec)
 			{
@@ -76,7 +76,7 @@ namespace aquarius
 
 			for (auto& buf : buffers)
 			{
-				co_await impl_.get_service().async_write_some(buf, ec);
+				co_await impl_.get_service().async_write_some(impl_.get_implementation(), buf, ec);
 
 				if (ec)
 				{
@@ -101,7 +101,7 @@ namespace aquarius
 		{
 			boost::system::error_code ec;
 
-			auto bytes_transferred = co_await impl_.get_service().async_read_some(read_buffer_, ec);
+			auto bytes_transferred = co_await impl_.get_service().async_read_some(impl_.get_implementation(), read_buffer_, ec);
 
 			if (ec)
 			{

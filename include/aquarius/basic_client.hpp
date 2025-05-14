@@ -69,16 +69,6 @@ namespace aquarius
 			boost::asio::co_spawn(io_service_, session_ptr_->async_connect(ip_addr, port), boost::asio::detached);
 		}
 
-		// void init_ssl_context()
-		//{
-		//	auto path = std::filesystem::current_path();
-
-		//	path.append("crt");
-		//	path.append("server.crt");
-
-		//	ssl_context_.load_verify_file(path.string());
-		//}
-
 	private:
 		boost::asio::io_service io_service_;
 
