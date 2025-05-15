@@ -64,12 +64,11 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         ./bootstrap-vcpkg.sh
-      env:
-        VCPKG_ROOT: ${{github.workspace}}/vcpkg
+        echo "VCPKG_ROOT=${{ github.workspace}}/vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-    - name: output vcpkg root
+    - name: show vcpkg root
       shell: bash
-      run: echo $VCPKG_ROOT
+      run: echo ${{env.VCPKG_ROOT}}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
