@@ -60,7 +60,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y autoconf automake autoconf-archive
+        sudo apt-get install -y autoconf automake autoconf-archive ninja
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         ./bootstrap-vcpkg.sh
@@ -77,7 +77,7 @@ jobs:
         -DCMAKE_COVERAGE=true
         -DBOOST_SHARED_FLAG=true
         -S ${{ github.workspace }}
-        -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        --preset=vcpkg
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
