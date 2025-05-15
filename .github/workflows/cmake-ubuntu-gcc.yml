@@ -67,7 +67,7 @@ jobs:
         ./bootstrap-vcpkg.sh -disableMetrics
 
       env:
-        VCPKG_ROOT: ${{ github.workspace}}/vcpkg
+        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
     - name: show vcpkg root
       shell: bash
