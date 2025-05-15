@@ -64,7 +64,8 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         ./bootstrap-vcpkg.sh
-        echo "VCPKG_ROOT=${{ github.workspace}}/vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
+      env:
+        VCPKG_ROOT: ${{ github.workspace}}/vcpkg
 
     - name: show vcpkg root
       shell: bash
