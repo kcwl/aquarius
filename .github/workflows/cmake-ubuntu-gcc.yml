@@ -83,9 +83,7 @@ jobs:
         -DCMAKE_COVERAGE=true
         -DBOOST_SHARED_FLAG=true
         -S ${{ github.workspace }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake 
-        -DVCPKG_TARGET_TRIPLET=<triplet> 
-        -DVCPKG_MANIFEST_MODE=OFF
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
