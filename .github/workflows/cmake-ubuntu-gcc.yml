@@ -8,9 +8,6 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env:
-    VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-
 jobs:
   gcc-build-cov:
     runs-on: ${{ matrix.os }}
@@ -86,7 +83,9 @@ jobs:
         -DCMAKE_COVERAGE=true
         -DBOOST_SHARED_FLAG=true
         -S ${{ github.workspace }}
-        --preset=vcpkg
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake 
+        -DVCPKG_TARGET_TRIPLET=<triplet> 
+        -DVCPKG_MANIFEST_MODE=OFF
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
