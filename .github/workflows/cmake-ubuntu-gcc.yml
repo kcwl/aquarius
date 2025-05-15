@@ -60,7 +60,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y autoconf automake autoconf-archive ninja
+        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         ./bootstrap-vcpkg.sh
