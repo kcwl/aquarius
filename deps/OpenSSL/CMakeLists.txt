@@ -6,7 +6,7 @@ if (NOT AQUARIUS_ENABLE_SSL)
 return()
 endif()
 
-find_package(OpenSSL)
+find_package(OpenSSL CONFIG)
 
 if(NOT OpenSSL_FOUND)
 message(STATUS FATAL_ERROR "OpenSSL not found.")

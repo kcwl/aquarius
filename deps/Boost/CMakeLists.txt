@@ -2,7 +2,7 @@ if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 endif()
 
-find_package(Boost REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 
 add_library(boost INTERFACE)
 
