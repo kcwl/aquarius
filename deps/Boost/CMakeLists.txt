@@ -5,7 +5,7 @@ endif()
 find_package(Boost CONFIG REQUIRED)
 
 if(Boost_FOUND)
-message(STATUS "Found Boost ${Boost_VERSION}")
+message(STATUS "Found Boost ${Boost_VERSION} ${Boost_INCLUDE_DIRS}")
 endif()
 
 add_library(boost INTERFACE)
