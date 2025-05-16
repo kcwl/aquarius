@@ -4,6 +4,10 @@ endif()
 
 find_package(Boost CONFIG REQUIRED)
 
+if(Boost_FOUND)
+message(STATUS "Found Boost ${Boost_VERSION}")
+endif()
+
 add_library(boost INTERFACE)
 
 if(WIN32)
