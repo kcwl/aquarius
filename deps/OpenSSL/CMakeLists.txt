@@ -2,7 +2,11 @@ if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 endif()
 
-find_package(OpenSSL)
+if (NOT AQUARIUS_ENABLE_SSL)
+return()
+endif()
+
+find_package(OpenSSL CONFIG)
 
 if(NOT OpenSSL_FOUND)
 message(STATUS FATAL_ERROR "OpenSSL not found.")

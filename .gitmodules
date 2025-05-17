@@ -1,3 +1,0 @@
-[submodule "3rd/elastic"]
-	path = 3rd/elastic
-	url = https://github.com/kcwl/elastic.git

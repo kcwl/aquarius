@@ -2,7 +2,17 @@ if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 endif()
 
-find_package(Boost REQUIRED)
+set(AQUARIUS_NEED_BOOST 
+	unit_test_framework
+	log
+	system
+)
+
+find_package(Boost CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
+
+if(Boost_FOUND)
+message(STATUS "Found Boost ${Boost_VERSION}")
+endif()
 
 add_library(boost INTERFACE)
 
