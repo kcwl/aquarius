@@ -5,6 +5,7 @@ endif()
 set(AQUARIUS_NEED_BOOST 
 	unit_test_framework
 	log
+	log_setup
 	system
 )
 
