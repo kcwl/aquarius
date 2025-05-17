@@ -70,7 +70,12 @@ namespace aquarius
 		error_code connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
 						   error_code& ec)
 		{
-			endpoint_type endpoint(boost::asio::ip::address::from_string(ip_addr), static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
+			auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
+
+			if (ec)
+				return ec;
+
+			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
 
 			impl.socket->connect(endpoint, ec);
 
@@ -80,7 +85,12 @@ namespace aquarius
 		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
 						   error_code& ec) -> boost::asio::awaitable<void>
 		{
-			endpoint_type endpoint(boost::asio::ip::address::from_string(ip_addr), static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
+			auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
+
+			if (ec)
+				co_return;
+
+			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
 
 			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
