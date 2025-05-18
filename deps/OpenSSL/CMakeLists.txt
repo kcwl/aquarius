@@ -2,7 +2,7 @@ if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 endif()
 
-if (NOT DEFINED AQUARIUS_ENABLE_SSL)
+if (NOT AQUARIUS_ENABLE_SSL)
 return()
 endif()
 
