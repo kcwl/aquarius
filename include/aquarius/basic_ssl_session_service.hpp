@@ -4,6 +4,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/ssl/ssl_context_factory.hpp>
 
+#ifdef AQUARIUS_ENABLE_SSL
 namespace aquarius
 {
 	template <bool Server, typename Protocol, typename Executor, std::size_t SSLVersion>
@@ -13,8 +14,8 @@ namespace aquarius
 	public:
 		using endpoint_type = boost::asio::ip::basic_endpoint<Protocol>;
 
-		using execution_base_type =
-			boost::asio::detail::execution_context_service_base<basic_ssl_session_service<Server, Protocol, Executor, SSLVersion>>;
+		using execution_base_type = boost::asio::detail::execution_context_service_base<
+			basic_ssl_session_service<Server, Protocol, Executor, SSLVersion>>;
 
 		using executor_type = Executor;
 
@@ -43,11 +44,13 @@ namespace aquarius
 		{
 			if constexpr (Server)
 			{
-				impl.socket = new socket_type(std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_server()));
+				impl.socket = new socket_type(
+					std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_server()));
 			}
 			else
 			{
-				impl.socket = new socket_type(std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_client()));
+				impl.socket = new socket_type(
+					std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_client()));
 			}
 		}
 
@@ -55,11 +58,13 @@ namespace aquarius
 		{
 			if constexpr (Server)
 			{
-				*impl.socket = std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server()));
+				*impl.socket =
+					std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server()));
 			}
 			else
 			{
-				*impl.socket = std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client()));
+				*impl.socket =
+					std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client()));
 			}
 		}
 
@@ -192,3 +197,4 @@ namespace aquarius
 		}
 	};
 } // namespace aquarius
+#endif

@@ -4,6 +4,7 @@
 
 namespace aquarius
 {
+#ifdef AQUARIUS_ENABLE_SSL
 	template <>
 	struct ssl_context_factory<boost::asio::ssl::context::sslv23>
 	{
@@ -35,4 +36,5 @@ namespace aquarius
 			return ssl_context;
 		}
 	};
+#endif
 } // namespace aquarius
