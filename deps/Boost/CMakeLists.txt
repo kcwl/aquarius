@@ -12,7 +12,7 @@ set(AQUARIUS_NEED_BOOST
 find_package(Boost CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
 
 if(Boost_FOUND)
-message(STATUS "Found Boost ${Boost_VERSION}")
+message(STATUS "Found Boost ${Boost_VERSION} ${Boost_LIBRARIES}")
 endif()
 
 add_library(boost INTERFACE)
