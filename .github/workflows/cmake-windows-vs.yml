@@ -46,24 +46,10 @@ jobs:
     - name: install boost openssl
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         git pull
         ./bootstrap-vcpkg.sh -disableMetrics
-
-    - name: set BOOST_ROOT
-      shell: powershell
-      run: |
-        echo "BOOST_ROOT=${{ github.workspace}}\windows-temp-package\boost_1_83" | Out-File -FilePath $env:GITHUB_ENV -Append
-        echo "OPENSSL_ROOT=${{ github.workspace}}\windows-temp-package\openssl" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-    - name: show BOOST_ROOT
-      shell: powershell
-      run: |
-        echo ${{env.BOOST_ROOT}}
-        echo ${{env.OPENSSL_ROOT}}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -73,7 +59,9 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DAQUARIUS_ENABLE_SSL=true
         -S ${{ github.workspace }}
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
