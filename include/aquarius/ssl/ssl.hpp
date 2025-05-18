@@ -1,7 +1,7 @@
 #pragma once
+#ifdef AQUARIUS_ENABLE_SSL
 #include <boost/asio/ssl.hpp>
 
-#ifdef AQUARIUS_ENABLE_SSL
 namespace aquarius
 {
 	namespace ssl

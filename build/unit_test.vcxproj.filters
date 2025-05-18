@@ -156,6 +156,12 @@
     <ClInclude Include="..\include\aquarius\client_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ssl\tcp_server.hpp">
+      <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ssl\tcp_client.hpp">
+      <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

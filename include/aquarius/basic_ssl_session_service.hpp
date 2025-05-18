@@ -7,25 +7,28 @@
 #ifdef AQUARIUS_ENABLE_SSL
 namespace aquarius
 {
-	template <bool Server, typename Protocol, typename Executor, std::size_t SSLVersion>
+	template <bool Server, typename Protocol, std::size_t SSLVersion = boost::asio::ssl::context::sslv23,
+			  typename Executor = boost::asio::any_io_executor>
 	class basic_ssl_session_service : public boost::asio::detail::execution_context_service_base<
-										  basic_ssl_session_service<Server, Protocol, Executor, SSLVersion>>
+										  basic_ssl_session_service<Server, Protocol, SSLVersion, Executor>>
 	{
 	public:
 		using endpoint_type = boost::asio::ip::basic_endpoint<Protocol>;
 
 		using execution_base_type = boost::asio::detail::execution_context_service_base<
-			basic_ssl_session_service<Server, Protocol, Executor, SSLVersion>>;
+			basic_ssl_session_service<Server, Protocol, SSLVersion, Executor>>;
 
 		using executor_type = Executor;
 
-		using next_layer_type = boost::asio::basic_stream_socket<Protocol, Executor>;
+		using socket_type = boost::asio::basic_stream_socket<Protocol, Executor>;
 
-		using socket_type = boost::asio::ssl::stream<next_layer_type>;
+		using ssl_socket_type = boost::asio::ssl::stream<socket_type>;
+
+		using protocol_type = Protocol;
 
 		struct implementation_type
 		{
-			socket_type* socket;
+			ssl_socket_type* socket;
 		};
 
 	public:
@@ -40,18 +43,18 @@ namespace aquarius
 		virtual ~basic_ssl_session_service() = default;
 
 	public:
-		void construct(implementation_type& impl)
+		void construct(implementation_type& /*impl*/)
 		{
-			if constexpr (Server)
-			{
-				impl.socket = new socket_type(
-					std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_server()));
-			}
-			else
-			{
-				impl.socket = new socket_type(
-					std::move(socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_client()));
-			}
+			//if constexpr (Server)
+			//{
+			//	impl.socket = new ssl_socket_type(
+			//		std::move(ssl_socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_server()));
+			//}
+			//else
+			//{
+			//	impl.socket = new ssl_socket_type(
+			//		std::move(ssl_socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_client()));
+			//}
 		}
 
 		void move_copy(implementation_type& impl, socket_type socket)
@@ -59,12 +62,12 @@ namespace aquarius
 			if constexpr (Server)
 			{
 				*impl.socket =
-					std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server()));
+					std::move(ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server()));
 			}
 			else
 			{
 				*impl.socket =
-					std::move(socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client()));
+					std::move(ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client()));
 			}
 		}
 
@@ -75,9 +78,7 @@ namespace aquarius
 
 			error_code ec{};
 
-			impl.socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
-
-			impl.socket->close(ec);
+			impl.socket->shutdown(ec);
 
 			delete impl.socket;
 		}
@@ -90,11 +91,14 @@ namespace aquarius
 		error_code connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
 						   error_code& ec)
 		{
-			auto resolver = boost::asio::ip::tcp::resolver(this->get_executor());
+			auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
 
-			auto endpoint = resolver.resolve(ip_addr, port);
+			if (ec)
+				co_return;
 
-			ec = boost::asio::connect(impl.socket->lowest_layer(), endpoint, ec);
+			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
+
+			ec = impl.socket->lowest_layer().connect(endpoint, ec);
 
 			return ec;
 		}
@@ -102,11 +106,14 @@ namespace aquarius
 		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
 						   error_code& ec) -> boost::asio::awaitable<void>
 		{
-			auto resolver = boost::asio::ip::tcp::resolver(this->get_executor());
+			auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
 
-			auto endpoint = resolver.resolve(ip_addr, port);
+			if (ec)
+				co_return;
 
-			co_return co_await boost::asio::async_connect(impl.socket->lowest_layer(), endpoint,
+			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
+
+			co_return co_await impl.socket->lowest_layer().async_connect(endpoint,
 														  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
@@ -138,7 +145,7 @@ namespace aquarius
 
 		auto start(implementation_type& impl) -> boost::asio::awaitable<void>
 		{
-			XLOG_INFO() << "start success at " << remote_address() << ":" << remote_port() << ", async read establish";
+			XLOG_INFO() << "start success at " << remote_address(impl) << ":" << remote_port(impl) << ", async read establish";
 
 			error_code ec;
 
@@ -164,7 +171,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			impl.socket->set_option(boost::asio::socket_base::keep_alive(value), ec);
+			impl.socket->lowest_layer().set_option(boost::asio::socket_base::keep_alive(value), ec);
 
 			XLOG_INFO() << "set keep alive :" << value;
 
@@ -174,7 +181,7 @@ namespace aquarius
 		bool set_nodelay(implementation_type& impl, bool enable)
 		{
 			error_code ec;
-			impl.socket->set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+			impl.socket->lowest_layer().set_option(boost::asio::ip::tcp::no_delay(enable), ec);
 
 			XLOG_INFO() << "set nodelay :" << enable;
 

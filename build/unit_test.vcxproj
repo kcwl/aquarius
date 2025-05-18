@@ -113,11 +113,11 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;AQUARIUS_ENABLE_SSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;D:\openssl\include;F:\boost_1_88_0;../src;E:\常用软件\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;F:\boost_1_88_0;../src;E:\常用软件\Visual Leak Detector\include;D:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -177,6 +177,8 @@
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\ssl\ssl.hpp" />
     <ClInclude Include="..\include\aquarius\ssl\ssl_context_factory.hpp" />
+    <ClInclude Include="..\include\aquarius\ssl\tcp_client.hpp" />
+    <ClInclude Include="..\include\aquarius\ssl\tcp_server.hpp" />
     <ClInclude Include="..\include\aquarius\ssl_factory.hpp" />
     <ClInclude Include="..\include\aquarius\steady_timer.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\async_acceptor.hpp" />

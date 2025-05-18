@@ -399,4 +399,36 @@ BOOST_AUTO_TEST_CASE(connect_with_no_ssl)
 	t1.join();
 }
 
+#ifdef AQUARIUS_ENABLE_SSL
+BOOST_AUTO_TEST_CASE(connect_with_ssl)
+{
+	aquarius::ssl::tcp_server srv(8100, 10, "async tcp server");
+
+	std::thread t([&]
+		{
+			srv.run();
+		});
+
+	std::this_thread::sleep_for(2s);
+
+	aquarius::ssl::tcp_client cli("127.0.0.1", "8100");
+
+	std::thread t1([&] {cli.run(); });
+
+	test_request req{};
+	req.content_ = "hello world!";
+
+	cli.send_request(req);
+
+	std::this_thread::sleep_for(500s);
+
+	cli.stop();
+
+	srv.stop();
+
+	t.join();
+	t1.join();
+}
+#endif
+
 BOOST_AUTO_TEST_SUITE_END()
