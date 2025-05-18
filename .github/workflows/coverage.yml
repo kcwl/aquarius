@@ -1,6 +1,6 @@
 # This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: ubuntu(gcc)
+name: coverage
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest]
-        build_type: [Debug,Release]
+        build_type: [Release]
         c_compiler: [gcc]
         include:
           - os: ubuntu-latest
@@ -95,3 +95,16 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - name: generate codecov report
+      working-directory: ${{ github.workspace }}/build
+      run: |
+          make coverage
+
+    - name: upload coverage reports to codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ${{github.workspace}}/build/coverage.xml
+        fail_ci_if_error: true
+        slug: kcwl/aquarius

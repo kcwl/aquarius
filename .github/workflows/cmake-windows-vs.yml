@@ -43,13 +43,15 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install 3rd libraries
+    - name: install boost openssl
       shell: bash
       run: |
-        git clone https://github.com/kcwl/windows-temp-package.git
-        cd windows-temp-package/boost_1_83/stage/lib
-        cat libboost.tar.gz* > libboost.tar.gz
-        tar zxvf libboost.tar.gz
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        git pull
+        ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: set BOOST_ROOT
       shell: powershell
