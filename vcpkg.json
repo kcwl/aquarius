@@ -1,6 +1,8 @@
 {
     "dependencies": [
-        "boost",
+        "boost-log",
+        "boost-system",
+        "boost-test",
 	    "openssl"
     ]
 }
