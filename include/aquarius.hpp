@@ -1,45 +1,29 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
-#include <aquarius/client.hpp>
-#include <aquarius/server.hpp>
-#include <aquarius/core/ini_tree.hpp>
-#include <aquarius/core/crc.hpp>
-#include <aquarius/core/singleton.hpp>
-#include <aquarius/core/core.hpp>
-#include <aquarius/session.hpp>
-#include <aquarius/detail/context.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
-
-namespace aquarius
-{
-	//using tcp_server = basic_server<ssl_tcp_server_connect, channel::publisher>;
-	using async_tcp_server = async_server<boost::asio::ip::tcp, async_tcp_session<>>;
-#ifdef AQUARIUS_ENABLE_SSL
-	//using no_ssl_tcp_server = basic_server<no_ssl_tcp_server_connect, channel::publisher>;
-	using async_ssl_tcp_server = async_server<boost::asio::ip::tcp, async_tcp_ssl_session<>>;
-#endif
-
-	//using http_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::nossl>, channel::publisher>;
-
-	//using https_server = basic_server<connect<http, conn_mode::basic_server, ssl_mode::ssl>, channel::publisher>;
-
-	using async_tcp_client = client<boost::asio::ip::tcp, async_tcp_session<>>;
-
-	//using no_ssl_tcp_client = client<async_tcp_ssl_session<>>;
-
-	template <typename _Message>
-	inline void broadcast(_Message&& msg)
-	{
-		flex_buffer_t fs{};
-
-		//session_manager::instance().broadcast(std::move(fs));
-	}
-
-	template <typename _Message, typename _Func>
-	inline void broadcast(_Message&& msg, _Func&& f)
-	{
-		flex_buffer_t fs{};
-
-		//session_manager::instance().broadcast(std::move(fs), std::forward<_Func>(f));
-	}
-} // namespace aquarius
+#include <aquarius/basic_async_acceptor.hpp>
+#include <aquarius/basic_client.hpp>
+#include <aquarius/basic_context.hpp>
+#include <aquarius/basic_router.hpp>
+#include <aquarius/basic_server.hpp>
+#include <aquarius/basic_session.hpp>
+#include <aquarius/basic_session_service.hpp>
+#include <aquarius/basic_ssl_session_service.hpp>
+#include <aquarius/client_context.hpp>
+#include <aquarius/concepts.hpp>
+#include <aquarius/crc.hpp>
+#include <aquarius/deadline_timer.hpp>
+#include <aquarius/error.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/logger.hpp>
+#include <aquarius/package_processor.hpp>
+#include <aquarius/server_context.hpp>
+#include <aquarius/singleton.hpp>
+#include <aquarius/ssl/ssl.hpp>
+#include <aquarius/ssl/ssl_context_factory.hpp>
+#include <aquarius/ssl/tcp_client.hpp>
+#include <aquarius/ssl/tcp_server.hpp>
+#include <aquarius/steady_timer.hpp>
+#include <aquarius/tcp/async_client.hpp>
+#include <aquarius/tcp/async_server.hpp>
+#include <aquarius/tcp/context.hpp>
+#include <aquarius/tcp/session.hpp>

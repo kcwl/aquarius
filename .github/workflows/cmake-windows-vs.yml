@@ -43,25 +43,13 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install 3rd libraries
+    - name: install boost openssl
       shell: bash
       run: |
-        git clone https://github.com/kcwl/windows-temp-package.git
-        cd windows-temp-package/boost_1_83/stage/lib
-        cat libboost.tar.gz* > libboost.tar.gz
-        tar zxvf libboost.tar.gz
-
-    - name: set BOOST_ROOT
-      shell: powershell
-      run: |
-        echo "BOOST_ROOT=${{ github.workspace}}\windows-temp-package\boost_1_83" | Out-File -FilePath $env:GITHUB_ENV -Append
-        echo "OPENSSL_ROOT=${{ github.workspace}}\windows-temp-package\openssl" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-    - name: show BOOST_ROOT
-      shell: powershell
-      run: |
-        echo ${{env.BOOST_ROOT}}
-        echo ${{env.OPENSSL_ROOT}}
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        git pull
+        ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -71,7 +59,10 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DBOOST_SHARED_FLAG=true
+        -DAQUARIUS_ENABLE_SSL=true
         -S ${{ github.workspace }}
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).

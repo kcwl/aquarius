@@ -36,7 +36,7 @@
 .vs/
 Debug/
 Release/
-build/
+centos_build/
 
 # log
 logs/*

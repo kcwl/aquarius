@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(aquarius)
-
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -15,8 +13,6 @@ APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 add_subdirectory(deps)
-
-add_subdirectory(src)
 
 add_subdirectory(test)
 

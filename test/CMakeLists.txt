@@ -8,7 +8,11 @@ include_directories(${AQUARIUS_INCLUDE})
 
 add_executable(unittest ${TEST_SRCS} ${TEST_MAIN})
 
-target_link_libraries(unittest PUBLIC boost openssl)
+target_link_libraries(unittest PUBLIC boost)
+
+if (AQUARIUS_ENABLE_SLL)
+target_link_libraries(unittest PUBLIC openssl)
+endif()
 
 if(WIN32)
 target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN)
