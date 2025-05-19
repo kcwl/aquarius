@@ -15,7 +15,7 @@ target_link_libraries(unittest PUBLIC openssl)
 endif()
 
 if(WIN32)
-target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN -DBOOST_WINAPI_VERSION_WIN7)
+target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN)
 target_compile_options(unittest PUBLIC /bigobj)
 endif()
 
