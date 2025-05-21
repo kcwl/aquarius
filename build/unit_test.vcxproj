@@ -151,6 +151,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\aoi\cross_list.hpp" />
+    <ClInclude Include="..\include\aquarius\aoi\liner.hpp" />
+    <ClInclude Include="..\include\aquarius\aoi\nine_grid.hpp" />
+    <ClInclude Include="..\include\aquarius\aoi\space_cross_list.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_area_of_interesting.hpp" />
     <ClInclude Include="..\include\aquarius\basic_async_acceptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session_service.hpp" />
@@ -162,6 +167,7 @@
     <ClInclude Include="..\include\aquarius\client_context.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\crc.hpp" />
+    <ClInclude Include="..\include\aquarius\cross_list.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\error_category.hpp" />
@@ -172,6 +178,7 @@
     <ClInclude Include="..\include\aquarius\error.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
+    <ClInclude Include="..\include\aquarius\nine_grid.hpp" />
     <ClInclude Include="..\include\aquarius\package_processor.hpp" />
     <ClInclude Include="..\include\aquarius\server_context.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
