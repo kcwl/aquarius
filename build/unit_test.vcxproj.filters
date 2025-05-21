@@ -28,6 +28,9 @@
     <Filter Include="include\aquarius\tcp">
       <UniqueIdentifier>{4e5459dc-f83e-4137-a57c-209848e30777}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\aoi">
+      <UniqueIdentifier>{86e9eeb3-22bf-41ea-99a0-08bd737a3f50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
@@ -161,6 +164,27 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ssl\tcp_client.hpp">
       <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\cross_list.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\nine_grid.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_area_of_interesting.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\aoi\nine_grid.hpp">
+      <Filter>include\aquarius\aoi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\aoi\liner.hpp">
+      <Filter>include\aquarius\aoi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\aoi\cross_list.hpp">
+      <Filter>include\aquarius\aoi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\aoi\space_cross_list.hpp">
+      <Filter>include\aquarius\aoi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
