@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/asio.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/detail/protocol.hpp>
 #include <aquarius/logger.hpp>
 
 namespace aquarius
@@ -40,7 +40,7 @@ namespace aquarius
 	public:
 		void construct(implementation_type& /*impl*/)
 		{
-			//impl.socket = new socket_type(this->get_executor());
+			// impl.socket = new socket_type(this->get_executor());
 		}
 
 		void move_copy(implementation_type& impl, socket_type socket)
@@ -95,12 +95,12 @@ namespace aquarius
 			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
-		error_code read_some(implementation_type& impl, flex_buffer_t& buffer, error_code& ec)
+		error_code read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
 		{
 			return impl.socket->read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), ec);
 		}
 
-		auto async_read_some(implementation_type& impl, flex_buffer_t& buffer, error_code& ec)
+		auto async_read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			co_return co_await impl.socket->async_read_some(
@@ -108,12 +108,12 @@ namespace aquarius
 				boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
-		error_code write_some(implementation_type& impl, flex_buffer_t buffer, error_code& ec)
+		error_code write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)
 		{
 			return impl.socket->write_some(boost::asio::buffer(buffer.wdata(), buffer.size()), ec);
 		}
 
-		auto async_write_some(implementation_type& impl, flex_buffer_t buffer, error_code& ec)
+		auto async_write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			co_return co_await impl.socket->async_write_some(

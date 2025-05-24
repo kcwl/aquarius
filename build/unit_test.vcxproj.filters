@@ -39,9 +39,6 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\client.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -99,12 +96,6 @@
     <ClInclude Include="..\include\aquarius\basic_session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\package_processor.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tcp\package_processor.hpp">
-      <Filter>include\aquarius\tcp</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\session.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
@@ -161,6 +152,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ssl\tcp_client.hpp">
       <Filter>include\aquarius\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\protocol.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

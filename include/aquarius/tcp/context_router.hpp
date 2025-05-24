@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/basic_router.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/detail/protocol.hpp>
 #include <boost/asio/post.hpp>
 
 namespace aquarius
@@ -9,7 +9,7 @@ namespace aquarius
 	{
 		template <typename Session>
 		class context_router
-			: public single_router<context_router<Session>, void, flex_buffer_t&, std::shared_ptr<Session>>
+			: public single_router<context_router<Session>, void, flex_buffer&, std::shared_ptr<Session>>
 		{
 		public:
 			context_router() = default;
@@ -18,7 +18,7 @@ namespace aquarius
 			template <typename Request, typename context>
 			void regist(std::size_t proto)
 			{
-				auto func = [&](flex_buffer_t& buffer, std::shared_ptr<Session> session)
+				auto func = [&](flex_buffer& buffer, std::shared_ptr<Session> session)
 				{
 					auto request = std::make_shared<Request>();
 

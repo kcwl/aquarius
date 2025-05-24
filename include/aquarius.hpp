@@ -15,7 +15,6 @@
 #include <aquarius/error.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/package_processor.hpp>
 #include <aquarius/server_context.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/ssl/ssl.hpp>

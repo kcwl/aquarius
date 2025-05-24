@@ -39,15 +39,16 @@ namespace aquarius
 
 			auto fs = make_response(result);
 
-			boost::asio::co_spawn(session_ptr->get_executor(),
-								  session_ptr->send_packet(Response::Number, std::move(fs)), boost::asio::detached);
+			boost::asio::co_spawn(session_ptr->get_executor(), session_ptr->send_packet(Response::proto, std::move(fs)),
+								  boost::asio::detached);
 		}
 
-		flex_buffer_t make_response(int result)
+		flex_buffer make_response(int /*result*/)
 		{
-			response_.set_result(result);
-
-			return response_.template to_binary<flex_buffer_t>();
+			// response_.set_result(result);
+			flex_buffer fs{};
+			response_.to_binary(fs);
+			return fs;
 		}
 
 	protected:

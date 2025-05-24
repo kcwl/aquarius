@@ -1,11 +1,11 @@
 ﻿#pragma once
+#include <aquarius/detail/asio.hpp>
+#include <aquarius/detail/protocol.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
-#include <aquarius/detail/asio.hpp>
 
 namespace aquarius
 {
@@ -41,9 +41,10 @@ namespace aquarius
 		template <typename Request>
 		void send_request(Request& req)
 		{
-			flex_buffer_t fs = req.template to_binary<flex_buffer_t>();
+			flex_buffer fs{};
+			req.to_binary(fs);
 
-			boost::asio::co_spawn(io_service_, session_ptr_->send_packet(Request::Number, fs), boost::asio::detached);
+			boost::asio::co_spawn(io_service_, session_ptr_->send_packet(Request::proto, fs), boost::asio::detached);
 		}
 
 		std::string remote_address()

@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/asio.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/detail/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/ssl/ssl_context_factory.hpp>
 
@@ -45,16 +45,16 @@ namespace aquarius
 	public:
 		void construct(implementation_type& /*impl*/)
 		{
-			//if constexpr (Server)
+			// if constexpr (Server)
 			//{
 			//	impl.socket = new ssl_socket_type(
 			//		std::move(ssl_socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_server()));
-			//}
-			//else
+			// }
+			// else
 			//{
 			//	impl.socket = new ssl_socket_type(
 			//		std::move(ssl_socket_type(this->get_executor()), ssl_context_factory<SSLVersion>::create_client()));
-			//}
+			// }
 		}
 
 		void move_copy(implementation_type& impl, socket_type socket)
@@ -113,16 +113,16 @@ namespace aquarius
 
 			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
 
-			co_return co_await impl.socket->lowest_layer().async_connect(endpoint,
-														  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			co_return co_await impl.socket->lowest_layer().async_connect(
+				endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
-		error_code read_some(implementation_type& impl, flex_buffer_t& buffer, error_code& ec)
+		error_code read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
 		{
 			return impl.socket->read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), ec);
 		}
 
-		auto async_read_some(implementation_type& impl, flex_buffer_t& buffer, error_code& ec)
+		auto async_read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			co_return co_await impl.socket->async_read_some(
@@ -130,12 +130,12 @@ namespace aquarius
 				boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
-		error_code write_some(implementation_type& impl, flex_buffer_t buffer, error_code& ec)
+		error_code write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)
 		{
 			return impl.socket->write_some(boost::asio::buffer(buffer.wdata(), buffer.size()), ec);
 		}
 
-		auto async_write_some(implementation_type& impl, flex_buffer_t buffer, error_code& ec)
+		auto async_write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)
 			-> boost::asio::awaitable<std::size_t>
 		{
 			co_return co_await impl.socket->async_write_some(
@@ -145,7 +145,8 @@ namespace aquarius
 
 		auto start(implementation_type& impl) -> boost::asio::awaitable<void>
 		{
-			XLOG_INFO() << "start success at " << remote_address(impl) << ":" << remote_port(impl) << ", async read establish";
+			XLOG_INFO() << "start success at " << remote_address(impl) << ":" << remote_port(impl)
+						<< ", async read establish";
 
 			error_code ec;
 
