@@ -67,7 +67,7 @@ namespace aquarius
 					co_return;
 				}
 
-				auto [proto, buffer] = processor_.read(std::move(read_buffer));
+				auto [proto, buffer] = processor_.read(read_buffer);
 
 				if (!buffer.empty())
 				{

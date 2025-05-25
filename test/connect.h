@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE(connect_with_no_ssl)
 
 	cli.send_request(req);
 
-	std::this_thread::sleep_for(500s);
+	std::this_thread::sleep_for(5s);
 
 	cli.stop();
 
@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE(connect_with_ssl)
 
 	cli.send_request(req);
 
-	std::this_thread::sleep_for(500s);
+	std::this_thread::sleep_for(5s);
 
 	cli.stop();
 

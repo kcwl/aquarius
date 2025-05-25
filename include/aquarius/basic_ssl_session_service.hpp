@@ -61,13 +61,11 @@ namespace aquarius
 		{
 			if constexpr (Server)
 			{
-				*impl.socket =
-					std::move(ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server()));
+				impl.socket = new ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_server());
 			}
 			else
 			{
-				*impl.socket =
-					std::move(ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client()));
+				impl.socket = new ssl_socket_type(std::move(socket), ssl_context_factory<SSLVersion>::create_client());
 			}
 		}
 
