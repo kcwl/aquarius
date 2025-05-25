@@ -122,12 +122,17 @@ namespace aquarius
 			return impl.socket->read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), ec);
 		}
 
-		auto async_read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
-			-> boost::asio::awaitable<std::size_t>
+		auto async_read_some(implementation_type& impl, error_code& ec) -> boost::asio::awaitable<flex_buffer>
 		{
-			co_return co_await impl.socket->async_read_some(
-				boost::asio::buffer(buffer.rdata(), buffer.active()),
-				boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			flex_buffer buffer{};
+
+			auto bytes_transferred =
+				co_await impl.socket->async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()),
+													  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+
+			buffer.commit(bytes_transferred);
+
+			co_return buffer;
 		}
 
 		error_code write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)

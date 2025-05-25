@@ -20,13 +20,11 @@ namespace aquarius
 	public:
 		explicit basic_session(socket_type socket)
 			: impl_(std::move(socket))
-			, read_buffer_()
 		{}
 
 		template <execution_context_convertible ExecutionContext>
 		explicit basic_session(ExecutionContext& context)
 			: impl_(std::move(socket_type(context)))
-			, read_buffer_()
 		{}
 
 		virtual ~basic_session() = default;
@@ -51,7 +49,31 @@ namespace aquarius
 		{
 			co_await impl_.get_service().start(impl_.get_implementation());
 
-			co_await read_messages();
+			boost::system::error_code ec;
+
+			for (;;)
+			{
+				auto read_buffer = co_await impl_.get_service().async_read_some(impl_.get_implementation(), ec);
+
+				if (ec)
+				{
+					if (ec != boost::asio::error::eof)
+					{
+						XLOG_ERROR() << "on read some occur error - " << ec.message();
+					}
+
+					shutdown();
+
+					co_return;
+				}
+
+				auto [proto, buffer] = processor_.read(std::move(read_buffer));
+
+				if (!buffer.empty())
+				{
+					tcp::invoke_context(proto, buffer, this->shared_from_this());
+				}
+			}
 		}
 
 		auto async_connect(std::string ip_addr, std::string port) -> boost::asio::awaitable<void>
@@ -97,41 +119,7 @@ namespace aquarius
 		}
 
 	private:
-		auto read_messages() -> boost::asio::awaitable<void>
-		{
-			boost::system::error_code ec;
-
-			auto bytes_transferred = co_await impl_.get_service().async_read_some(impl_.get_implementation(), read_buffer_, ec);
-
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-
-				shutdown();
-
-				co_return;
-			}
-
-			read_buffer_.commit(bytes_transferred);
-
-			auto [proto, buffer] = processor_.read(read_buffer_);
-
-			if (!buffer.empty())
-			{
-				tcp::invoke_context(proto, buffer, this->shared_from_this());
-			}
-
-			co_await read_messages();
-		}
-
-
-	private:
 		detail::session_object_impl<IO, executor_type> impl_;
-
-		flex_buffer read_buffer_;
 
 		process_type processor_;
 	};

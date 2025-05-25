@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/logger.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
-#include <boost/asio/signal_set.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/logger.hpp>
+#include <boost/asio/signal_set.hpp>
 
 namespace aquarius
 {
@@ -47,16 +47,20 @@ namespace aquarius
 		{
 			error_code ec;
 
-			auto sock = co_await acceptor_.accept(ec);
-
-			if (!ec)
+			for (;;)
 			{
+				auto sock = co_await acceptor_.accept(ec);
+
+				if (ec)
+					break;
+
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
-				boost::asio::co_spawn(conn_ptr->get_executor(), conn_ptr->start(), boost::asio::detached);
+				boost::asio::co_spawn(
+					conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->start(); }, boost::asio::detached);
 			}
 
-			co_await start_accept();
+			co_return;
 		}
 
 		void init_signal()
