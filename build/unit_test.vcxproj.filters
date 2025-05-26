@@ -156,10 +156,18 @@
     <ClInclude Include="..\include\aquarius\detail\protocol.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\test\protocol.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\test\CMakeLists.txt">
+      <Filter>源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

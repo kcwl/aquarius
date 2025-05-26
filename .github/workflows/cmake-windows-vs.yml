@@ -62,7 +62,9 @@ jobs:
         -DBOOST_SHARED_FLAG=true
         -DAQUARIUS_ENABLE_SSL=true
         -S ${{ github.workspace }}
+        -D_WIN32_WINNT=0x0A00
         -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
