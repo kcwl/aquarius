@@ -24,7 +24,7 @@ namespace aquarius
 		};
 
 		template <typename Session>
-		inline void invoke_context(std::size_t proto, flex_buffer_t& buffer, std::shared_ptr<Session> session)
+		inline void invoke_context(std::size_t proto, flex_buffer& buffer, std::shared_ptr<Session> session)
 		{
 			boost::asio::post(session->get_executor(), [proto, buf = std::move(buffer), session]() mutable
 							  { context_router<Session>::get_mutable_instance().invoke(proto, buf, session); });

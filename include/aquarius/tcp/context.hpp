@@ -14,7 +14,7 @@
 #define AQUARIUS_SERVER_CONTEXT(method, __request, __response)                                                         \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __request, method>                    \
-		__auto_register_##method(__request::Number);                                                                   \
+		__auto_register_##method(__request::proto);                                                                   \
 	class method : public aquarius::server_context<__request, __response>											   \
 	{                                                                                                                  \
 	public:                                                                                                            \
@@ -32,7 +32,7 @@
 #define AQUARIUS_CLIENT_CONTEXT(method, __response)                                                                    \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __response, method>                   \
-		__auto_register_##method(__response::Number);                                                                  \
+		__auto_register_##method(__response::proto);                                                                  \
 	class method : public aquarius::client_context<__response>		                                                   \
 	{                                                                                                                  \
 	public:                                                                                                            \

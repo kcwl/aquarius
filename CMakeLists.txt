@@ -7,6 +7,8 @@ project(aquarius)
 
 set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+set(AQUARIUS_PROTOCOL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/3rd/aquarius_protocol/include)
+
 if(CMAKE_COVERAGE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CodeCoverage.cmake)
 APPEND_COVERAGE_COMPILER_FLAGS()

@@ -6,6 +6,8 @@ file(GLOB TEST_MAIN "*.cpp")
 
 include_directories(${AQUARIUS_INCLUDE})
 
+include_directories(${AQUARIUS_PROTOCOL_INCLUDE})
+
 add_executable(unittest ${TEST_SRCS} ${TEST_MAIN})
 
 target_link_libraries(unittest PUBLIC boost)
