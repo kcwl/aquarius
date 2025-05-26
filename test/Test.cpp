@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE UnitTest
 #include <boost/test/included/unit_test.hpp>
 #include "protocol.hpp"
-
+#include "detail.h"
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {

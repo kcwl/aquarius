@@ -164,13 +164,10 @@
     <ClInclude Include="..\include\aquarius\crc.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\error_category.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
-    <ClInclude Include="..\include\aquarius\error.hpp" />
-    <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server_context.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
@@ -192,7 +189,7 @@
     <ClInclude Include="..\test\connect.h" />
     <ClInclude Include="..\test\core.h" />
     <ClInclude Include="..\test\protocol.hpp" />
-    <ClInclude Include="..\test\server.h" />
+    <ClInclude Include="..\test\detail.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp" />
