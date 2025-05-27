@@ -50,9 +50,6 @@ namespace aquarius
 
 		void destroy(implementation_type& impl)
 		{
-			if (!impl.socket) [[unlikely]]
-				return;
-
 			error_code ec{};
 
 			impl.socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
@@ -65,21 +62,6 @@ namespace aquarius
 		virtual void shutdown() override
 		{
 			return;
-		}
-
-		error_code connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
-						   error_code& ec)
-		{
-			auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
-
-			if (ec)
-				return ec;
-
-			endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
-
-			impl.socket->connect(endpoint, ec);
-
-			return ec;
 		}
 
 		auto async_connect(implementation_type& impl, const std::string& ip_addr, const std::string& port,
@@ -95,28 +77,17 @@ namespace aquarius
 			co_await impl.socket->async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 		}
 
-		error_code read_some(implementation_type& impl, flex_buffer& buffer, error_code& ec)
-		{
-			return impl.socket->read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), ec);
-		}
-
-		auto async_read_some(implementation_type& impl, error_code& ec)
-			-> boost::asio::awaitable<flex_buffer>
+		auto async_read_some(implementation_type& impl, error_code& ec) -> boost::asio::awaitable<flex_buffer>
 		{
 			flex_buffer buffer{};
 
-			auto bytes_transferred = co_await impl.socket->async_read_some(
-				boost::asio::buffer(buffer.rdata(), buffer.active()),
-				boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+			auto bytes_transferred =
+				co_await impl.socket->async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()),
+													  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 
 			buffer.commit(bytes_transferred);
 
 			co_return buffer;
-		}
-
-		error_code write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)
-		{
-			return impl.socket->write_some(boost::asio::buffer(buffer.wdata(), buffer.size()), ec);
 		}
 
 		auto async_write_some(implementation_type& impl, flex_buffer buffer, error_code& ec)

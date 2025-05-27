@@ -45,10 +45,10 @@
     <ClInclude Include="..\test\connect.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\core.h">
+    <ClInclude Include="..\test\context.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\server.h">
+    <ClInclude Include="..\test\detail.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\logger.hpp">
@@ -61,15 +61,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\crc.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\error_category.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\error_code.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\error.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_async_acceptor.hpp">
@@ -156,10 +147,27 @@
     <ClInclude Include="..\include\aquarius\detail\protocol.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\test\protocol.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\error_category.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error_code.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\test\CMakeLists.txt">
+      <Filter>源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>
