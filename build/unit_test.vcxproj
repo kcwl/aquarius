@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;AQUARIUS_ENABLE_SSL;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -164,10 +164,13 @@
     <ClInclude Include="..\include\aquarius\crc.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\error_category.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\protocol.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
+    <ClInclude Include="..\include\aquarius\error.hpp" />
+    <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\server_context.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
@@ -187,7 +190,7 @@
     <ClInclude Include="..\include\aquarius\tcp\context_router.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />
-    <ClInclude Include="..\test\core.h" />
+    <ClInclude Include="..\test\context.h" />
     <ClInclude Include="..\test\protocol.hpp" />
     <ClInclude Include="..\test\detail.h" />
   </ItemGroup>

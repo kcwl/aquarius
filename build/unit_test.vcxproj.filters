@@ -45,7 +45,7 @@
     <ClInclude Include="..\test\connect.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\core.h">
+    <ClInclude Include="..\test\context.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\test\detail.h">
@@ -149,6 +149,15 @@
     </ClInclude>
     <ClInclude Include="..\test\protocol.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\error_category.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\error_code.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

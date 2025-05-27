@@ -2,6 +2,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include "protocol.hpp"
 #include "detail.h"
+#include "context.h"
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {
@@ -54,6 +55,8 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 	std::thread t1([&] { cli.run(); });
 
+	std::this_thread::sleep_for(5s);
+
 	test_request req{};
 	req.header()->crc32_ = 1;
 	req.header()->timestamp_ = 1;
@@ -69,8 +72,6 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
 	cli.send_request(req);
-
-	std::this_thread::sleep_for(5s);
 
 	cli.stop();
 

@@ -34,9 +34,6 @@ namespace aquarius
 		template <typename Session>
 		void send_response(int result, std::shared_ptr<Session> session_ptr)
 		{
-			if (!session_ptr)
-				return;
-
 			auto fs = make_response(result);
 
 			boost::asio::co_spawn(session_ptr->get_executor(), session_ptr->send_packet(Response::proto, std::move(fs)),
