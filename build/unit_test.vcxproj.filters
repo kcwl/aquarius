@@ -90,7 +90,7 @@
     <ClInclude Include="..\include\aquarius\tcp\session.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tcp\context.hpp">
+    <ClInclude Include="..\include\aquarius\tcp\handler.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\context_router.hpp">
@@ -158,6 +158,30 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\error_code.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_handler.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_stream_handler.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\context_base.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_tcp_stream_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_broadcast_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_transfer_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\handler_router.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\context.hpp">
+      <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

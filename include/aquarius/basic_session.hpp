@@ -76,10 +76,8 @@ namespace aquarius
 			}
 		}
 
-		auto async_connect(std::string ip_addr, std::string port) -> boost::asio::awaitable<void>
+		auto async_connect(std::string ip_addr, std::string port, boost::system::error_code& ec) -> boost::asio::awaitable<void>
 		{
-			boost::system::error_code ec;
-
 			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
 
 			if (ec)

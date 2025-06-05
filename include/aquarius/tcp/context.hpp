@@ -1,47 +1,23 @@
 #pragma once
-#include <aquarius/server_context.hpp>
-#include <aquarius/client_context.hpp>
+#include <aquarius/tcp/handler.hpp>
 #include <aquarius/tcp/session.hpp>
 
-#define AQUARIUS_HANDLE_SUITE(suite_name)                                                                              \
-	namespace suite_name                                                                                               \
-	{
+#define AQUARIUS_CONTEXT(mode, method, __request, __response) \
+[[maybe_unused]] static aquarius::tcp::auto_context_register<aquarius::tcp::session, __request, method>                    \
+__auto_context_register_##method(mode);
 
-#define AQUARIUS_HANDLE_SUITE_END() }
 
-#define AQUARIUS_GLOBAL_ID(request) #request
+#define AQUARIUS_STREAM_CONTEXT(method, __request, __response) \
+AQUARIUS_CONTEXT(context_kind::tcp_stream, method, __request, __response) \
+AQUARIUS_STREAM_HANDLER(method, __request, __response)
 
-#define AQUARIUS_SERVER_CONTEXT(method, __request, __response)                                                         \
-	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __request, method>                    \
-		__auto_register_##method(__request::proto);                                                                   \
-	class method : public aquarius::server_context<__request, __response>											   \
-	{                                                                                                                  \
-	public:                                                                                                            \
-		using request_type = __request;                                                                                \
-		using base_type = aquarius::server_context<__request, __response>;		                                       \
-	public:                                                                                                            \
-		method()                                                                                                       \
-			: base_type(AQUARIUS_GLOBAL_ID(__context_##__request))                                                     \
-		{}                                                                                                             \
-	protected:                                                                                                         \
-		virtual int handle() override;                                                                                 \
-	};                                                                                                                 \
-	inline int method::handle()
+#define AQUARIUS_BROADCASE_CONTEXT(method, __request, __response) \
+AQUARIUS_CONTEXT(context_kind::broadcast, method, __request, __response) \
+AQUARIUS_BROADCAST_HANDLER(method, __request, __response)
 
-#define AQUARIUS_CLIENT_CONTEXT(method, __response)                                                                    \
-	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __response, method>                   \
-		__auto_register_##method(__response::proto);                                                                  \
-	class method : public aquarius::client_context<__response>		                                                   \
-	{                                                                                                                  \
-	public:                                                                                                            \
-		using base_type = aquarius::client_context<__response>;														   \
-	public:                                                                                                            \
-		method()                                                                                                       \
-			: base_type(AQUARIUS_GLOBAL_ID(__context_##__response))                                                    \
-		{}                                                                                                             \
-	protected:                                                                                                         \
-		virtual int handle() override;                                                                                 \
-	};                                                                                                                 \
-	inline int method::handle()
+
+#define AQUARIUS_TRANSFER_CONTEXT(method) \
+AQUARIUS_CONTEXT(context_kind::transfer, method, aquarius::flex_buffer, void)\
+AQUARIUS_DEFAULT_HANDLER(method, aquarius::flex_buffer)
+
+

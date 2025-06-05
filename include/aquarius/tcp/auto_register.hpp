@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/tcp/context_router.hpp>
+#include <aquarius/tcp/handler_router.hpp>
 
 namespace aquarius
 {
@@ -15,19 +16,21 @@ namespace aquarius
 		};
 
 		template <typename Session, typename Request, typename Context>
-		struct auto_register
+		struct auto_handler_register
 		{
-			explicit auto_register(std::size_t proto)
+			explicit auto_context_register(std::size_t proto)
 			{
-				context_router<Session>::get_mutable_instance().template regist<Request, Context>(proto);
+				handler_router<Session>::get_mutable_instance().template regist<Request, Context>(proto);
 			}
 		};
 
-		template <typename Session>
-		inline void invoke_context(std::size_t proto, flex_buffer& buffer, std::shared_ptr<Session> session)
+		template <typename Session, typename Request, typename Context>
+		struct auto_context_register
 		{
-			boost::asio::post(session->get_executor(), [proto, buf = std::move(buffer), session]() mutable
-							  { context_router<Session>::get_mutable_instance().invoke(proto, buf, session); });
-		}
+			explicit auto_context_register(std::size_t mode)
+			{
+				context_router<Session>::get_mutable_instance().template regist<Request, Context>(mode);
+			}
+		};
 	} // namespace tcp
 } // namespace aquarius
