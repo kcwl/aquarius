@@ -1,6 +1,7 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/basic_async_acceptor.hpp>
+#include <aquarius/basic_broadcast_context.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_context.hpp>
 #include <aquarius/basic_router.hpp>
@@ -8,6 +9,9 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/basic_session_service.hpp>
 #include <aquarius/basic_ssl_session_service.hpp>
+#include <aquarius/basic_stream_handler.hpp>
+#include <aquarius/basic_tcp_stream_context.hpp>
+#include <aquarius/basic_transfer_context.hpp>
 #include <aquarius/client_context.hpp>
 #include <aquarius/concepts.hpp>
 #include <aquarius/crc.hpp>
@@ -15,7 +19,6 @@
 #include <aquarius/error.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/server_context.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/ssl/ssl.hpp>
 #include <aquarius/ssl/ssl_context_factory.hpp>
@@ -25,4 +28,6 @@
 #include <aquarius/tcp/async_client.hpp>
 #include <aquarius/tcp/async_server.hpp>
 #include <aquarius/tcp/context.hpp>
+#include <aquarius/tcp/handler.hpp>
+#include <aquarius/tcp/handler_router.hpp>
 #include <aquarius/tcp/session.hpp>

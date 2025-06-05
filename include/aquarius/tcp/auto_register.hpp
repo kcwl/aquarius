@@ -18,7 +18,7 @@ namespace aquarius
 		template <typename Session, typename Request, typename Context>
 		struct auto_handler_register
 		{
-			explicit auto_context_register(std::size_t proto)
+			explicit auto_handler_register(std::size_t proto)
 			{
 				handler_router<Session>::get_mutable_instance().template regist<Request, Context>(proto);
 			}

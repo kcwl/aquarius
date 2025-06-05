@@ -178,7 +178,6 @@
     <ClInclude Include="..\include\aquarius\error.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\server_context.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\ssl\ssl.hpp" />
     <ClInclude Include="..\include\aquarius\ssl\ssl_context_factory.hpp" />

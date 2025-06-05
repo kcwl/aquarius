@@ -129,9 +129,6 @@
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\server_context.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>

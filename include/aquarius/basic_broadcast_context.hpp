@@ -1,9 +1,9 @@
 #pragma once
 #include <aquarius/basic_context.hpp>
+#include <aquarius/detail/protocol.hpp>
 
 namespace aquarius
 {
-
 	template <typename Executor>
 	class basic_broadcast_context : public basic_context<Executor, context_kind::tcp_broadcast>
 	{

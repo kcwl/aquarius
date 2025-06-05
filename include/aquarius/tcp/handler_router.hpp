@@ -31,30 +31,5 @@ namespace aquarius
 				this->map_invokes_[proto] = func;
 			}
 		};
-
-		class client_invokes : public single_router<client_invokes, void, flex_buffer>
-		{
-			template <typename Response, typename Func>
-			struct invoke_traits
-			{
-				static void apply(Func&& f, flex_buffer buffer)
-				{
-					Response resp{};
-					resp.from(buffer);
-					std::apply(f, resp);
-				}
-			};
-
-		public:
-			client_invokes() = default;
-
-		public:
-			template <typename Response, typename Func>
-			void regist(std::size_t id, Func&& func)
-			{
-				this->map_invokes_[id] =
-					std::bind(&invoke_traits<Response, Func>::apply, std::forward<Func>(func), std::placeholders::_1);
-			}
-		};
 	} // namespace tcp
 } // namespace aquarius
