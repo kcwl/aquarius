@@ -23,9 +23,9 @@ BOOST_AUTO_TEST_CASE(io_service_pool)
 BOOST_AUTO_TEST_CASE(error_code)
 {
 	{
-		aquarius::error_code ec(std::error_code((int)aquarius::package::pending, aquarius::detail::get_error_category()));
+		aquarius::error_code ec(std::error_code((int)aquarius::error::package::pending, aquarius::detail::get_error_category()));
 
-		BOOST_CHECK_EQUAL(ec.value(), static_cast<int>(aquarius::package::pending));
+		BOOST_CHECK_EQUAL(ec.value(), static_cast<int>(aquarius::error::package::pending));
 
 		BOOST_CHECK_EQUAL(ec.message(), "wait for handle pending");
 	}

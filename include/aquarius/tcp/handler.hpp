@@ -5,56 +5,57 @@
 
 #define AQUARIUS_GLOBAL_ID(request) #request
 
-#define AQUARIUS_DEFAULT_HANDLER(method, __request)                                                         \
+#define AQUARIUS_DEFAULT_HANDLER(method, __request)                                                                    \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __request, method>                    \
+	[[maybe_unused]] static aquarius::tcp::auto_handler_register<aquarius::tcp::server_session, __request, method>     \
 		__auto_register_##method(__request::proto);                                                                    \
-	class method : public aquarius::basic_handler<__request, int>                                   \
+	class method : public aquarius::basic_handler<__request, int>                                                      \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using request_type = __request;                                                                                \
-		using base_type = aquarius::basic_handler<__request, int>;                                  \
+		using base_type = aquarius::basic_handler<__request, int>;                                                     \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_ID(__handler_##__request))                                                     \
 		{}                                                                                                             \
 	protected:                                                                                                         \
-		virtual int handle() override;                                                                                 \
+		virtual auto handle() -> boost::asio::awaitable<int> override;                                                 \
 	};                                                                                                                 \
-	inline int method::handle()
+	inline auto method::handle() -> boost::asio::awaitable<int>
 
-#define AQUARIUS_STREAM_HANDLER(method, __request, __response)                                                         \
+#define AQUARIUS_STREAM_HANDLER(method, __rpc)                                                                         \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __request, method>                    \
-		__auto_register_##method(__request::proto);                                                                    \
-	class method : public aquarius::basic_stream_handler<__request, __response, int>                                   \
+	[[maybe_unused]] static aquarius::tcp::auto_handler_register<aquarius::tcp::server_session,                        \
+																 __rpc::tcp_request, method>          \
+		__auto_register_##method(__rpc::tcp_request::proto);                                                           \
+	class method                                                                                                       \
+		: public aquarius::basic_stream_handler<std::shared_ptr<__rpc::tcp_request>, __rpc::tcp_response, int>         \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using request_type = __request;                                                                                \
-		using base_type = aquarius::basic_stream_handler<__request, __response, int>;                                  \
+		using request_type = __rpc::tcp_request;                                                                       \
+		using base_type =                                                                                              \
+			aquarius::basic_stream_handler<std::shared_ptr<__rpc::tcp_request>, __rpc::tcp_response, int>;             \
 	public:                                                                                                            \
 		method()                                                                                                       \
-			: base_type(AQUARIUS_GLOBAL_ID(__handler_##__request))                                                     \
+			: base_type(AQUARIUS_GLOBAL_ID(__handler_##__rpc))                                                         \
 		{}                                                                                                             \
-	protected:                                                                                                         \
-		virtual int handle() override;                                                                                 \
+		virtual auto handle() -> boost::asio::awaitable<int> override;                                                 \
 	};                                                                                                                 \
-	inline int method::handle()
+	inline auto method::handle() -> boost::asio::awaitable<int>
 
 #define AQUARIUS_BROADCAST_HANDLER(method, __response)                                                                 \
 	class method;                                                                                                      \
-	[[maybe_unused]] static aquarius::tcp::auto_register<aquarius::tcp::session, __response, method>                   \
+	[[maybe_unused]] static aquarius::tcp::auto_handler_register<aquarius::tcp::server_session, __response, method>    \
 		__auto_register_##method(__response::proto);                                                                   \
 	class method : public aquarius::basic_handler<__response, int>                                                     \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using base_type = aquarius::basic_handler<__response, int>;                                                    \
-                                                                                                                       \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_ID(__handler_##__response))                                                    \
 		{}                                                                                                             \
 	protected:                                                                                                         \
-		virtual int handle() override;                                                                                 \
+		virtual auto handle() -> boost::asio::awaitable<int> override;                                                 \
 	};                                                                                                                 \
-	inline int method::handle()
+	inline auto method::handle() -> boost::asio::awaitable<int>

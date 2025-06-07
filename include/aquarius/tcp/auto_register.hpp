@@ -24,12 +24,12 @@ namespace aquarius
 			}
 		};
 
-		template <typename Session, typename Request, typename Context>
+		template <typename Context>
 		struct auto_context_register
 		{
-			explicit auto_context_register(std::size_t mode)
+			explicit auto_context_register()
 			{
-				context_router<Session>::get_mutable_instance().template regist<Request, Context>(mode);
+				context_router::get_mutable_instance().template regist<Context>();
 			}
 		};
 	} // namespace tcp

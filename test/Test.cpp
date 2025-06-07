@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 
 	std::thread t1([&] { cli.run(); });
 
-	test_request req{};
+	test::tcp_request req{};
 	req.header()->crc32_ = 1;
 	req.header()->timestamp_ = 1;
 	req.body().sex = true;
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	req.body().name = "John";
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
-	cli.send_request(req);
+	cli.async_send<test>(req);
 
 	std::this_thread::sleep_for(5s);
 

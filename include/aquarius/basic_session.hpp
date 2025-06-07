@@ -1,30 +1,38 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/protocol.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
-#include <aquarius/concepts.hpp>
+#include <aquarius/detail/session_service.hpp>
+
+#ifdef AQUARIUS_ENABLE_SSL
+#include <aquarius/detail/ssl_session_service.hpp>
+#endif
 
 namespace aquarius
 {
-	template <typename IO, typename Processor>
-	class basic_session : public std::enable_shared_from_this<basic_session<IO, Processor>>
+	template <bool Server, typename Protocol, typename Processor, typename Executor = boost::asio::any_io_executor>
+	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol, Processor, Executor>>
 	{
-		using executor_type = typename IO::executor_type;
+	public:
+		using executor_type = Executor;
 
-		using socket_type = typename IO::socket_type;
-
-		using protocol_type = typename IO::protocol_type;
+#ifdef AQUARIUS_ENABLE_SSL
+		using socket_type = typename detail::ssl_session_service<Server, Protocol, executor_type>::ssl_socket_type;
+		using impl_type =
+			detail::session_object_impl<detail::ssl_session_service<Server, Protocol, executor_type>, executor_type>;
+#else
+		using socket_type = typename detail::session_service<Protocol, executor_type>::socket_type;
+		using impl_type = detail::session_object_impl<detail::session_service<Protocol, executor_type>, executor_type>;
+#endif
 
 		using process_type = Processor;
+
+		using protocol_type = Protocol;
 
 	public:
 		explicit basic_session(socket_type socket)
 			: impl_(std::move(socket))
-		{}
-
-		template <execution_context_convertible ExecutionContext>
-		explicit basic_session(ExecutionContext& context)
-			: impl_(std::move(socket_type(context)))
 		{}
 
 		virtual ~basic_session() = default;
@@ -45,7 +53,7 @@ namespace aquarius
 			return impl_.get_service().remote_port(impl_.get_implementation());
 		}
 
-		auto start() -> boost::asio::awaitable<void>
+		auto async_read() -> boost::asio::awaitable<boost::system::error_code>
 		{
 			co_await impl_.get_service().start(impl_.get_implementation());
 
@@ -64,31 +72,16 @@ namespace aquarius
 
 					shutdown();
 
-					co_return;
+					co_return ec;
 				}
 
-				auto [proto, buffer] = processor_.read(read_buffer);
-
-				if (!buffer.empty())
-				{
-					tcp::invoke_context(proto, buffer, this->shared_from_this());
-				}
-			}
-		}
-
-		auto async_connect(std::string ip_addr, std::string port, boost::system::error_code& ec) -> boost::asio::awaitable<void>
-		{
-			co_await impl_.get_service().async_connect(impl_.get_implementation(), ip_addr, port, ec);
-
-			if (ec)
-			{
-				co_return;
+				boost::asio::co_spawn(get_executor(), processor_.read(std::move(read_buffer)), boost::asio::detached);
 			}
 
-			co_return co_await start();
+			std::unreachable();
 		}
 
-		boost::asio::awaitable<void> send_packet(std::size_t proto, flex_buffer fs)
+		auto async_send(std::size_t proto, flex_buffer fs) -> boost::asio::awaitable<void>
 		{
 			boost::system::error_code ec;
 
@@ -108,7 +101,28 @@ namespace aquarius
 
 		void shutdown()
 		{
-			return impl_.get_service().shutdown();
+			impl_.get_service().shutdown();
+
+			if (close_func_)
+			{
+				close_func_();
+			}
+		}
+
+		void close()
+		{
+			impl_.get_service().close();
+
+			if (close_func_)
+			{
+				close_func_();
+			}
+		}
+
+		template<typename Func>
+		void regist_close(Func&& f)
+		{
+			close_func_ = std::forward<Func>(f);
 		}
 
 		const executor_type& get_executor()
@@ -117,8 +131,10 @@ namespace aquarius
 		}
 
 	private:
-		detail::session_object_impl<IO, executor_type> impl_;
+		impl_type impl_;
 
 		process_type processor_;
+
+		std::function<void()> close_func_;
 	};
 } // namespace aquarius

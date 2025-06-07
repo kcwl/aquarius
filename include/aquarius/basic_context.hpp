@@ -40,20 +40,19 @@ namespace aquarius
 
 	enum class context_kind
 	{
-		tcp_stream,
+		stream,
 		tcp_broadcast,
 		transfer
 	};
 
-	template <typename Executor, auto Mode>
+	template <auto Mode>
 	class basic_context : public context_base
 	{
 	public:
-		template <typename ExecutorContext>
-		explicit basic_context(ExecutorContext& ex, const std::string& name,
-							   std::chrono::steady_clock::duration timeout = 30ms)
+		constexpr static auto mode = Mode;
+	public:
+		explicit basic_context(const std::string& name, std::chrono::steady_clock::duration timeout = 30ms)
 			: context_base(name, timeout)
-			, executor_(ex.get_executor())
 		{}
 
 		template <typename... Args>
@@ -61,14 +60,5 @@ namespace aquarius
 		{
 			return;
 		}
-
-	public:
-		Executor get_executor()
-		{
-			return executor_;
-		}
-
-	private:
-		Executor executor_;
 	};
 } // namespace aquarius

@@ -63,10 +63,7 @@
     <ClInclude Include="..\include\aquarius\crc.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_async_acceptor.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_session_service.hpp">
+    <ClInclude Include="..\include\aquarius\session_service.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_router.hpp">
@@ -80,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tcp\session_service.hpp">
-      <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_session.hpp">
       <Filter>include\aquarius</Filter>
@@ -111,10 +105,7 @@
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tcp\async_acceptor.hpp">
-      <Filter>include\aquarius\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_ssl_session_service.hpp">
+    <ClInclude Include="..\include\aquarius\ssl_session_service.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ssl_factory.hpp">
@@ -134,12 +125,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\client_context.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl\tcp_server.hpp">
-      <Filter>include\aquarius\ssl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl\tcp_client.hpp">
-      <Filter>include\aquarius\ssl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\protocol.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -165,19 +150,28 @@
     <ClInclude Include="..\include\aquarius\detail\context_base.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_tcp_stream_context.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_broadcast_context.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_transfer_context.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\handler_router.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tcp\context.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\processor.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\processor.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\broadcast_context.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\stream_context.hpp">
+      <Filter>include\aquarius\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tcp\transfer_context.hpp">
       <Filter>include\aquarius\tcp</Filter>
     </ClInclude>
   </ItemGroup>

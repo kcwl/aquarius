@@ -25,7 +25,12 @@ namespace aquarius
 					request->from_binary(buffer);
 
 					boost::asio::post(session->get_executor(),
-									  [=] { std::make_shared<context>()->visit(request, session); });
+									  [=]
+									  {
+										  boost::asio::co_spawn(session->get_executor(),
+																std::make_shared<context>()->visit(request),
+																boost::asio::detached);
+									  });
 				};
 
 				this->map_invokes_[proto] = func;

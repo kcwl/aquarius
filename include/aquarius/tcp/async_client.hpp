@@ -6,6 +6,6 @@ namespace aquarius
 {
 	namespace tcp
 	{
-		using async_client = basic_client<boost::asio::ip::tcp, tcp::session>;
+		using async_client = basic_client<client_session>;
 	}
 } // namespace aquarius

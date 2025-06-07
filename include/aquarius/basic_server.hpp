@@ -6,18 +6,24 @@
 
 namespace aquarius
 {
-	template <typename Acceptor, typename Session>
+	template <typename Session>
 	class basic_server
 	{
-		using acceptor_type = Acceptor;
-
 		using session_type = Session;
+
+		using protocol_type = typename session_type::protocol_type;
+
+		using executor_type = typename session_type::executor_type;
+
+		using acceptor_type = boost::asio::basic_socket_acceptor<protocol_type, executor_type>;
+
+		using endpoint_type = typename acceptor_type::endpoint_type;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), port)
+			, acceptor_(io_service_pool_.get_io_service(), endpoint_type{ protocol_type::v4(), port })
 			, server_name_(name)
 		{
 			init_signal();
@@ -49,7 +55,12 @@ namespace aquarius
 
 			for (;;)
 			{
-				auto sock = co_await acceptor_.accept(ec);
+				auto sock = co_await acceptor_.async_accept(redirect_error(boost::asio::use_awaitable, ec));
+
+				if (!acceptor_.is_open())
+				{
+					ec = boost::asio::error::bad_descriptor;
+				}
 
 				if (ec)
 					break;
@@ -57,7 +68,7 @@ namespace aquarius
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
 				boost::asio::co_spawn(
-					conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->start(); }, boost::asio::detached);
+					conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->async_read(); }, boost::asio::detached);
 			}
 
 			co_return;

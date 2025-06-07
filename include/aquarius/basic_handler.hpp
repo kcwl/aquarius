@@ -7,7 +7,12 @@ namespace aquarius
 	class basic_handler
 	{
 	public:
-		basic_handler() = default;
+		basic_handler(const std::string& name)
+			: name_(name)
+		{
+
+		}
+
 		virtual ~basic_handler() = default;
 
 	public:
@@ -28,5 +33,7 @@ namespace aquarius
 
 	protected:
 		T message_;
+
+		std::string name_;
 	};
 } // namespace aquarius
