@@ -33,6 +33,7 @@ namespace aquarius
 			, timeout_(timeout)
 			, ip_addr_()
 			, port_()
+			, thread_ptr_(nullptr)
 		{}
 
 		explicit basic_client(const std::string& ip_addr, const std::string& port, int reconnect_times = 3,
@@ -53,6 +54,11 @@ namespace aquarius
 			io_service_.stop();
 
 			session_ptr_->shutdown();
+
+			if (thread_ptr_ && thread_ptr_->joinable())
+			{
+				thread_ptr_->join();
+			}
 		}
 
 		void close()
@@ -67,10 +73,10 @@ namespace aquarius
 
 			socket_type socket(io_service_);
 
-			boost::asio::co_spawn(
+			auto future = boost::asio::co_spawn(
 				io_service_,
 				[reconnect_times = this->reconnect_times_, ip_addr, port, sock = std::move(socket),
-				 this] mutable -> boost::asio::awaitable<void>
+				 this] mutable -> boost::asio::awaitable<bool>
 				{
 					error_code ec{};
 
@@ -78,7 +84,7 @@ namespace aquarius
 
 					if (ec)
 					{
-						co_return;
+						co_return false;
 					}
 
 					endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
@@ -87,7 +93,7 @@ namespace aquarius
 
 					if (!create_session(std::move(sock)))
 					{
-						co_return;
+						co_return false;
 					}
 
 					ec = co_await session_ptr_->async_read();
@@ -102,12 +108,17 @@ namespace aquarius
 
 						if (reconnect_times == 0)
 						{
+							co_return false;
 						}
 					}
-				},
-				boost::asio::detached);
 
-			return true;
+					co_return true;
+				},
+				boost::asio::use_future);
+
+			thread_ptr_ = std::make_shared<std::thread>([&] {this->io_service_.run(); });
+
+			return future.get();
 		}
 
 		template <typename RPC, typename Request = typename RPC::tcp_request, typename Response = RPC::tcp_response>
@@ -228,5 +239,7 @@ namespace aquarius
 		std::string ip_addr_;
 
 		std::string port_;
+
+		std::shared_ptr<std::thread> thread_ptr_;
 	};
 } // namespace aquarius
