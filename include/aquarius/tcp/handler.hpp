@@ -59,3 +59,18 @@
 		virtual auto handle() -> boost::asio::awaitable<int> override;                                                 \
 	};                                                                                                                 \
 	inline auto method::handle() -> boost::asio::awaitable<int>
+
+#define AQUARIUS_TRANSFER_HANDLER(method, buffer)																	   \
+	class method : public aquarius::basic_handler<buffer, int>                                                         \
+	{                                                                                                                  \
+	public:                                                                                                            \
+		using request_type = buffer;                                                                                   \
+		using base_type = aquarius::basic_handler<buffer, int>;                                                        \
+	public:                                                                                                            \
+		method()                                                                                                       \
+			: base_type(AQUARIUS_GLOBAL_ID(__handler_##buffer))														   \
+		{}                                                                                                             \
+	protected:                                                                                                         \
+		virtual auto handle() -> boost::asio::awaitable<int> override;                                                 \
+	};                                                                                                                 \
+	inline auto method::handle() -> boost::asio::awaitable<int>

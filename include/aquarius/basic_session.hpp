@@ -89,7 +89,7 @@ namespace aquarius
 
 			for (auto& buf : buffers)
 			{
-				co_await impl_.get_service().async_write_some(impl_.get_implementation(), buf, ec);
+				co_await async_send(buf, ec);
 
 				if (ec)
 				{
@@ -97,6 +97,18 @@ namespace aquarius
 					break;
 				}
 			}
+		}
+
+		auto async_send(flex_buffer buf, error_code& ec) -> boost::asio::awaitable<error_code>
+		{
+			co_await impl_.get_service().async_write_some(impl_.get_implementation(), buf, ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async write is failed! maybe " << ec.message();
+			}
+
+			co_return ec;
 		}
 
 		void shutdown()

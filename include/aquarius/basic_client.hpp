@@ -151,6 +151,15 @@ namespace aquarius
 								  boost::asio::detached);
 		}
 
+		void async_send(flex_buffer buffer)
+		{
+			boost::asio::co_spawn(io_service_, [buf = std::move(buffer), this] ->boost::asio::awaitable<void>
+				{
+					error_code ec{};
+					co_await session_ptr_->async_send(std::move(buf), ec);
+				}, boost::asio::detached);
+		}
+
 		std::string remote_address()
 		{
 			return session_ptr_->remote_address();
