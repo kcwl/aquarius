@@ -111,7 +111,7 @@ namespace aquarius
 
 		void close()
 		{
-			impl_.get_service().close();
+			impl_.get_service().close(impl_.get_implementation());
 
 			if (close_func_)
 			{

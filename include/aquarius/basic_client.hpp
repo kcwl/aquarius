@@ -140,7 +140,7 @@ namespace aquarius
 
 		template <typename RPC, typename Func, typename Request = typename RPC::tcp_request,
 				  typename Response = typename RPC::tcp_response>
-		void async_send(Request&& req, Func&& f)
+		void async_send(Request req, Func&& f)
 		{
 			flex_buffer fs{};
 			req.to_binary(fs);
