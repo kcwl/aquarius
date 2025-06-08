@@ -7,7 +7,8 @@ namespace aquarius
 {
 	namespace tcp
 	{
-		class context_router : public single_router<context_router, void, flex_buffer>
+		template<typename Session>
+		class context_router : public single_router<context_router<Session>, void, flex_buffer, std::size_t, std::shared_ptr<Session>>
 		{
 		public:
 			context_router() = default;
@@ -16,7 +17,7 @@ namespace aquarius
 			template <typename Context>
 			void regist()
 			{
-				auto func = [&](flex_buffer buffer) { std::make_shared<Context>()->visit(std::move(buffer)); };
+				auto func = [&](flex_buffer buffer, std::size_t proto, std::shared_ptr<Session> session) { std::make_shared<Context>()->visit(std::move(buffer),proto, session); };
 
 				constexpr auto mode = static_cast<std::size_t>(Context::mode);
 

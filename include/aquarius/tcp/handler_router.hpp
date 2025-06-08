@@ -9,16 +9,16 @@ namespace aquarius
 	{
 		template <typename Session>
 		class handler_router
-			: public single_router<handler_router<Session>, void, flex_buffer&, std::shared_ptr<Session>>
+			: public single_router<handler_router<Session>, void, flex_buffer, std::shared_ptr<Session>>
 		{
 		public:
 			handler_router() = default;
 
 		public:
-			template <typename Request, typename context>
+			template <typename Request, typename Context>
 			void regist(std::size_t proto)
 			{
-				auto func = [&](flex_buffer& buffer, std::shared_ptr<Session> session)
+				auto func = [&](flex_buffer buffer, std::shared_ptr<Session> session)
 				{
 					auto request = std::make_shared<Request>();
 
@@ -27,9 +27,18 @@ namespace aquarius
 					boost::asio::post(session->get_executor(),
 									  [=]
 									  {
-										  boost::asio::co_spawn(session->get_executor(),
-																std::make_shared<context>()->visit(request),
-																boost::asio::detached);
+										  boost::asio::co_spawn(
+											  session->get_executor(),
+											  [=] -> boost::asio::awaitable<void>
+											  {
+												  auto resp = co_await std::make_shared<Context>()->visit(request);
+
+												  flex_buffer resp_buf{};
+												  resp.to_binary(resp_buf);
+
+												  session->async_send(proto, resp_buf);
+											  },
+											  boost::asio::detached);
 									  });
 				};
 
