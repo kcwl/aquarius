@@ -65,14 +65,15 @@ namespace aquarius
 			ip_addr_ = ip_addr;
 			port_ = port;
 
-			error_code ec{};
-
 			socket_type socket(io_service_);
 
-			auto future = boost::asio::co_spawn(
+			boost::asio::co_spawn(
 				io_service_,
-				[&] -> boost::asio::awaitable<void>
+				[reconnect_times = this->reconnect_times_, ip_addr, port, sock = std::move(socket),
+				 this] mutable -> boost::asio::awaitable<void>
 				{
+					error_code ec{};
+
 					auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
 
 					if (ec)
@@ -82,24 +83,14 @@ namespace aquarius
 
 					endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
 
-					co_await socket.async_connect(endpoint,
-												  boost::asio::redirect_error(boost::asio::use_awaitable, ec));
-				},
-				boost::asio::use_future);
+					co_await sock.async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
 
-			if (future.get(), ec)
-				return false;
+					if (!create_session(std::move(sock)))
+					{
+						co_return;
+					}
 
-			if (!create_session(std::move(socket)))
-			{
-				return false;
-			}
-
-			boost::asio::co_spawn(
-				io_service_,
-				[=, reconnect_times = this->reconnect_times_] mutable -> boost::asio::awaitable<void>
-				{
-					auto ec = co_await session_ptr_->async_read();
+					ec = co_await session_ptr_->async_read();
 
 					if (ec)
 					{
@@ -153,11 +144,14 @@ namespace aquarius
 
 		void async_send(flex_buffer buffer)
 		{
-			boost::asio::co_spawn(io_service_, [buf = std::move(buffer), this] ->boost::asio::awaitable<void>
+			boost::asio::co_spawn(
+				io_service_,
+				[buf = std::move(buffer), this] -> boost::asio::awaitable<void>
 				{
 					error_code ec{};
 					co_await session_ptr_->async_send(std::move(buf), ec);
-				}, boost::asio::detached);
+				},
+				boost::asio::detached);
 		}
 
 		std::string remote_address()
