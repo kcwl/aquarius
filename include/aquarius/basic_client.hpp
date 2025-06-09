@@ -102,21 +102,24 @@ namespace aquarius
 						co_return false;
 					}
 
-					ec = co_await session_ptr_->async_read();
-
-					if (ec)
-					{
-						while (reconnect_times--)
+					boost::asio::co_spawn(this->io_service_, [reconnect_times, this] mutable->boost::asio::awaitable<void>
 						{
-							if (async_connect(ip_addr_, port_))
-								break;
-						}
+							auto ec = co_await session_ptr_->async_read();
 
-						if (reconnect_times == 0)
-						{
-							co_return false;
-						}
-					}
+							if (ec)
+							{
+								while (reconnect_times--)
+								{
+									if (async_connect(ip_addr_, port_))
+										break;
+								}
+
+								if (reconnect_times == 0)
+								{
+									co_return;
+								}
+							}
+						}, boost::asio::detached);
 
 					co_return true;
 				},
