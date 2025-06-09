@@ -11,6 +11,8 @@ namespace boost
 
 namespace aquarius
 {
+	class execution_context;
+
 	template <typename T>
-	concept execution_context_convertible = std::is_convertible_v<T&, boost::asio::execution_context&>;
+	concept execution_context_convertible = std::is_convertible_v<T&, execution_context&>;
 }

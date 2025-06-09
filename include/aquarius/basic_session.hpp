@@ -1,9 +1,11 @@
 #pragma once
 #include <aquarius/concepts.hpp>
-#include <aquarius/detail/asio.hpp>
-#include <aquarius/detail/protocol.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/detail/session_service.hpp>
+#include <aquarius/any_io_executor.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/awaitable.hpp>
 
 #ifdef AQUARIUS_ENABLE_SSL
 #include <aquarius/detail/ssl_session_service.hpp>
@@ -11,7 +13,7 @@
 
 namespace aquarius
 {
-	template <bool Server, typename Protocol, typename Processor, typename Executor = boost::asio::any_io_executor>
+	template <bool Server, typename Protocol, typename Processor, typename Executor = any_io_executor>
 	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol, Processor, Executor>>
 	{
 	public:
@@ -53,11 +55,11 @@ namespace aquarius
 			return impl_.get_service().remote_port(impl_.get_implementation());
 		}
 
-		auto async_read() -> boost::asio::awaitable<boost::system::error_code>
+		auto async_read() -> awaitable<error_code>
 		{
 			co_await impl_.get_service().start(impl_.get_implementation());
 
-			boost::system::error_code ec;
+			error_code ec;
 
 			for (;;)
 			{
@@ -75,15 +77,15 @@ namespace aquarius
 					co_return ec;
 				}
 
-				boost::asio::co_spawn(get_executor(), processor_.read(std::move(read_buffer)), boost::asio::detached);
+				co_spawn(get_executor(), processor_.read(std::move(read_buffer)), detached);
 			}
 
 			std::unreachable();
 		}
 
-		auto async_send(std::size_t proto, flex_buffer fs) -> boost::asio::awaitable<void>
+		auto async_send(std::size_t proto, flex_buffer fs) ->awaitable<void>
 		{
-			boost::system::error_code ec;
+			error_code ec;
 
 			auto buffers = processor_.write(proto, fs);
 
@@ -99,7 +101,7 @@ namespace aquarius
 			}
 		}
 
-		auto async_send(flex_buffer buf, error_code& ec) -> boost::asio::awaitable<error_code>
+		auto async_send(flex_buffer buf, error_code& ec) -> awaitable<error_code>
 		{
 			co_await impl_.get_service().async_write_some(impl_.get_implementation(), buf, ec);
 

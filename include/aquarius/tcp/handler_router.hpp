@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/basic_router.hpp>
-#include <aquarius/detail/protocol.hpp>
-#include <boost/asio/post.hpp>
+#include <aquarius/flex_buffer.hpp>
+#include <aquarius/post.hpp>
 
 namespace aquarius
 {
@@ -24,22 +24,22 @@ namespace aquarius
 
 					request->from_binary(buffer);
 
-					boost::asio::post(session->get_executor(),
-									  [=]
-									  {
-										  boost::asio::co_spawn(
-											  session->get_executor(),
-											  [=] -> boost::asio::awaitable<void>
-											  {
-												  auto resp = co_await std::make_shared<Context>()->visit(request);
+					post(session->get_executor(),
+						 [=]
+						 {
+							 co_spawn(
+								 session->get_executor(),
+								 [=] -> awaitable<void>
+								 {
+									 auto resp = co_await std::make_shared<Context>()->visit(request);
 
-												  flex_buffer resp_buf{};
-												  resp.to_binary(resp_buf);
+									 flex_buffer resp_buf{};
+									 resp.to_binary(resp_buf);
 
-												  session->async_send(proto, resp_buf);
-											  },
-											  boost::asio::detached);
-									  });
+									 session->async_send(proto, resp_buf);
+								 },
+								 detached);
+						 });
 				};
 
 				this->map_invokes_[proto] = func;

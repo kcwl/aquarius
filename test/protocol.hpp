@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <aquarius.hpp>
+#include <aquarius_protocol.hpp>
 
 
 struct person
@@ -86,8 +87,8 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 
 struct test
 {
-	using tcp_request = aquarius::ip::tcp::request<person, 1001>;
-	using tcp_response = aquarius::ip::tcp::response<person, 1002>;
+	using tcp_request = aquarius::ip::request<person, 1001>;
+	using tcp_response = aquarius::ip::response<person, 1002>;
 };
 
 

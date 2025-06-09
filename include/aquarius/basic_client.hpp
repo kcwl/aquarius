@@ -1,9 +1,17 @@
 ﻿#pragma once
+#include <aquarius/awaitable.hpp>
 #include <aquarius/client_context.hpp>
-#include <aquarius/detail/asio.hpp>
-#include <aquarius/detail/protocol.hpp>
+#include <aquarius/co_spawn.hpp>
+#include <aquarius/deadline_timer.hpp>
+#include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/io_context.hpp>
+#include <aquarius/ip/address.hpp>
+#include <aquarius/ip/basic_endpoint.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/redirect_error.hpp>
+#include <aquarius/use_awaitable.hpp>
+#include <aquarius/use_future.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
@@ -20,9 +28,7 @@ namespace aquarius
 
 		using protocol_type = typename session_type::protocol_type;
 
-		using endpoint_type = boost::asio::ip::basic_endpoint<protocol_type>;
-
-		using resolve_type = boost::asio::ip::basic_resolver<protocol_type>;
+		using endpoint_type = ip::basic_endpoint<protocol_type>;
 
 	public:
 		basic_client(int reconnect_times = 3, std::chrono::steady_clock::duration timeout = 30ms)
@@ -73,23 +79,23 @@ namespace aquarius
 
 			socket_type socket(io_service_);
 
-			auto future = boost::asio::co_spawn(
+			auto future = co_spawn(
 				io_service_,
 				[reconnect_times = this->reconnect_times_, ip_addr, port, sock = std::move(socket),
-				 this] mutable -> boost::asio::awaitable<bool>
+				 this] mutable -> awaitable<bool>
 				{
 					error_code ec{};
 
-					auto addr = boost::asio::ip::make_address(ip_addr.c_str(), ec);
+					auto addr = ip::make_address(ip_addr.c_str(), ec);
 
 					if (ec)
 					{
 						co_return false;
 					}
 
-					endpoint_type endpoint(addr, static_cast<boost::asio::ip::port_type>(std::atoi(port.c_str())));
+					endpoint_type endpoint(addr, static_cast<ip::port_type>(std::atoi(port.c_str())));
 
-					co_await sock.async_connect(endpoint, boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+					co_await sock.async_connect(endpoint, redirect_error(use_awaitable, ec));
 
 					if (!create_session(std::move(sock)))
 					{
@@ -114,9 +120,9 @@ namespace aquarius
 
 					co_return true;
 				},
-				boost::asio::use_future);
+				use_future);
 
-			thread_ptr_ = std::make_shared<std::thread>([&] {this->io_service_.run(); });
+			thread_ptr_ = std::make_shared<std::thread>([&] { this->io_service_.run(); });
 
 			return future.get();
 		}
@@ -134,8 +140,7 @@ namespace aquarius
 											[promise = std::move(resp_promise)](Response resp) mutable
 											{ promise.set_value(std::move(resp)); });
 
-			boost::asio::co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)),
-								  boost::asio::detached);
+			co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)), detached);
 
 			return future.get();
 		}
@@ -149,20 +154,19 @@ namespace aquarius
 
 			client_invoke::regist<Response>(random_session_id(), std::forward<Func>(f));
 
-			boost::asio::co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)),
-								  boost::asio::detached);
+			co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)), detached);
 		}
 
 		void async_send(flex_buffer buffer)
 		{
-			boost::asio::co_spawn(
+			co_spawn(
 				io_service_,
-				[buf = std::move(buffer), this] -> boost::asio::awaitable<void>
+				[buf = std::move(buffer), this] -> awaitable<void>
 				{
 					error_code ec{};
 					co_await session_ptr_->async_send(std::move(buf), ec);
 				},
-				boost::asio::detached);
+				detached);
 		}
 
 		std::string remote_address()
@@ -183,11 +187,11 @@ namespace aquarius
 		template <typename Func>
 		void async_wait(std::chrono::system_clock::duration dura, Func&& f)
 		{
-			boost::system::error_code ec;
+			error_code ec;
 			timer_.expires_after(dura);
 
 			timer_.async_wait(
-				[&](const boost::system::error_code& ec)
+				[&](const error_code& ec)
 				{
 					if (ec)
 						return;
@@ -224,11 +228,11 @@ namespace aquarius
 		}
 
 	private:
-		boost::asio::io_context io_service_;
+		io_context io_service_;
 
 		std::shared_ptr<Session> session_ptr_;
 
-		boost::asio::steady_timer timer_;
+		steady_timer timer_;
 
 		std::function<void()> close_func_;
 

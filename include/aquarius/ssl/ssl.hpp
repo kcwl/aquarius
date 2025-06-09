@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace ssl
 	{
-		using context = boost::asio::ssl::context;
+		using boost::asio::ssl::context;
 	}
-}
+} // namespace aquarius
 #endif

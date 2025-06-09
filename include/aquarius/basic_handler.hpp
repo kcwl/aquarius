@@ -16,7 +16,7 @@ namespace aquarius
 		virtual ~basic_handler() = default;
 
 	public:
-		auto visit(T message) -> boost::asio::awaitable<E>
+		auto visit(T message) -> awaitable<E>
 		{
 			message_ = message;
 
@@ -29,7 +29,7 @@ namespace aquarius
 		}
 
 	protected:
-		virtual auto handle() -> boost::asio::awaitable<E> = 0;
+		virtual auto handle() -> awaitable<E> = 0;
 
 	protected:
 		T message_;

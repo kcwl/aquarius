@@ -1,5 +1,6 @@
 #pragma once
-#include <boost/asio.hpp>
+#include <aquarius/basic_stream_socket.hpp>
+#include <aquarius/ip/tcp.hpp>
 
 namespace aquarius
 {
@@ -9,7 +10,7 @@ namespace aquarius
 		class session_service_base
 		{
 		public:
-			using socket_type = boost::asio::basic_stream_socket<Protocol, Executor>;
+			using socket_type = basic_stream_socket<Protocol, Executor>;
 
 			struct implementation_type_base
 			{
@@ -26,7 +27,7 @@ namespace aquarius
 			{
 				error_code ec{};
 
-				impl.socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
+				impl.socket->shutdown(socket_base::shutdown_both, ec);
 
 				impl.socket->close(ec);
 
@@ -37,7 +38,7 @@ namespace aquarius
 			{
 				error_code ec{};
 
-				impl.socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
+				impl.socket->shutdown(socket_base::shutdown_both, ec);
 			}
 
 			void close(implementation_type_base& impl)
@@ -66,7 +67,7 @@ namespace aquarius
 			{
 				error_code ec;
 
-				impl.socket->set_option(boost::asio::socket_base::keep_alive(value), ec);
+				impl.socket->set_option(socket_base::keep_alive(value), ec);
 
 				if (ec)
 				{
@@ -83,7 +84,7 @@ namespace aquarius
 			bool set_nodelay(implementation_type_base& impl, bool enable)
 			{
 				error_code ec;
-				impl.socket->set_option(boost::asio::ip::tcp::no_delay(enable), ec);
+				impl.socket->set_option(ip::tcp::no_delay(enable), ec);
 
 				if (ec)
 				{

@@ -4,5 +4,5 @@
 
 namespace aquarius
 {
-	using error_code = boost::system::error_code;
+	using boost::system::error_code;
 } // namespace aquarius

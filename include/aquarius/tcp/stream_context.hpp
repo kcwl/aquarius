@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/basic_context.hpp>
-#include <aquarius/detail/protocol.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <aquarius/tcp/handler_router.hpp>
 
 namespace aquarius
@@ -23,8 +23,8 @@ namespace aquarius
 			template <typename Session, typename... Args>
 			void visit(flex_buffer buffer, std::size_t proto, std::shared_ptr<Session> session, Args&&...)
 			{
-				boost::asio::post(session->get_executor(), [session, proto, buf = std::move(buffer)]() mutable
-								  { tcp::handler_router<Session>::get_mutable_instance().invoke(proto, buf, session); });
+				post(session->get_executor(), [session, proto, buf = std::move(buffer)]() mutable
+					 { tcp::handler_router<Session>::get_mutable_instance().invoke(proto, buf, session); });
 			}
 		};
 	} // namespace tcp
