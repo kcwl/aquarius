@@ -1,30 +1,41 @@
 #pragma once
+#include <aquarius/awaitable.hpp>
+#include <aquarius/context/auto_context.hpp>
 #include <aquarius/flex_buffer.hpp>
-#include <aquarius/ip/tcp.hpp>
-#include <aquarius/processor.hpp>
-#include <boost/asio.hpp>
-#include <generator>
+#include <vector>
 
 namespace aquarius
 {
-	struct package
+	namespace ip
 	{
-		std::size_t total;
+		class tcp;
+	}
+}
 
-		std::list<flex_buffer> generators;
-
-		bool check_complete()
-		{
-			return total == generators.size();
-		}
-	};
+namespace aquarius
+{
+	template <typename T>
+	struct basic_processor;
 
 	template <>
-	struct processor<ip::tcp>
+	struct basic_processor<ip::tcp>
 	{
+		struct package
+		{
+			std::size_t total;
+
+			std::list<flex_buffer> generators;
+
+			bool check_complete()
+			{
+				return total == generators.size();
+			}
+		};
+
 		static constexpr std::size_t package_limit = 4096 - 5;
 
-		auto read(flex_buffer buffer) -> awaitable<void>
+		template <typename Session>
+		auto read(flex_buffer buffer, std::shared_ptr<Session> session) -> awaitable<void>
 		{
 			uint32_t proto{};
 			buffer.load((uint8_t*)&proto, sizeof(uint32_t));
@@ -41,6 +52,11 @@ namespace aquarius
 				{
 					complete_buffer.save(gen.wdata(), gen.size());
 				}
+
+				uint8_t mode{};
+				complete_buffer.load(&mode, sizeof(mode));
+
+				context::auto_context_invoke<Session>::apply(mode, complete_buffer, proto, session);
 			}
 
 			co_return;
@@ -65,20 +81,24 @@ namespace aquarius
 
 			auto buffer_size = buffer.size();
 
-			uint8_t total = static_cast<uint8_t>((buffer_size + package_limit) / package_limit);
+			auto total = (buffer_size + package_limit) / package_limit;
 
-			// uint8_t flag = total == 1 ? total << 2 | static_cast<uint8_t>(tcp::mvcc::normal)
-			//     : total << 2 | static_cast<uint8_t>(tcp::mvcc::header);
+			if (total > (std::numeric_limits<uint8_t>::max)())
+				return {};
 
-			int counter = 0;
+			uint16_t flag = static_cast<uint8_t>(total) << 8;
+
+			uint8_t counter = 0;
 
 			while (true)
 			{
+				flag |= counter;
+
 				auto cur_size = std::min<std::size_t>(buffer_size, package_limit);
 
 				complete_buffers.push_back({});
 				auto& write_buffer = complete_buffers.back();
-				// write_buffer.save((uint8_t*)&flag, 1);
+				write_buffer.save((uint8_t*)&flag, sizeof(flag));
 				write_buffer.save((uint8_t*)&proto, sizeof(uint32_t));
 				write_buffer.save((uint8_t*)buffer.wdata(), cur_size);
 				buffer.consume(cur_size);
@@ -88,10 +108,6 @@ namespace aquarius
 
 				if (buffer_size == 0)
 					break;
-
-				// buffer_size > package_limit
-				//     ? flag = static_cast<uint8_t>(counter << 2) | static_cast<uint8_t>(tcp::mvcc::package)
-				//     : flag = static_cast<uint8_t>(counter << 2) | static_cast<uint8_t>(tcp::mvcc::complete);
 			}
 
 			return complete_buffers;

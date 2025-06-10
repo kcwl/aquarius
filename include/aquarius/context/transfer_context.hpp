@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/basic_context.hpp>
+#include <aquarius/context/basic_tcp_context.hpp>
 
 namespace aquarius
 {
-	namespace tcp
+	namespace context
 	{
 		template <typename Handler>
-		class transfer_context : public basic_context<context_kind::transfer>
+		class transfer_context : public basic_tcp_context<context_kind::transfer>
 		{
-			using base_type = basic_context<context_kind::transfer>;
+			using base_type = basic_tcp_context<context_kind::transfer>;
 
 		public:
 			using base_type::mode;
@@ -28,5 +28,5 @@ namespace aquarius
 		private:
 			Handler handler_;
 		};
-	} // namespace tcp
+	} // namespace context
 } // namespace aquarius

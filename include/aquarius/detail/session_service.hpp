@@ -5,33 +5,28 @@
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
+#include <aquarius/use_awaitable.hpp>
 
 namespace aquarius
 {
 	namespace detail
 	{
-		template <typename Protocol, typename Executor>
-		class session_service : public execution_context_service_base<session_service<Protocol, Executor>>,
-								public session_service_base<Protocol, Executor>
+		template <typename Protocol>
+		class session_service : public execution_context_service_base<session_service<Protocol>>,
+								public session_service_base<Protocol>
 		{
 		public:
-			using base_type = session_service_base<Protocol, Executor>;
+			using base_type = session_service_base<Protocol>;
 
-			using execution_base_type = execution_context_service_base<session_service<Protocol, Executor>>;
+			using execution_base_type = execution_context_service_base<session_service<Protocol>>;
 
-			using socket_type = typename base_type::socket_type;
-
-			using executor_type = Executor;
+			using socket_type = typename Protocol::socket;
 
 			struct implementation_type : base_type::implementation_type_base
 			{};
 
 		public:
-			explicit session_service(const executor_type& ex)
-				: execution_base_type(ex)
-			{}
-
-			session_service(boost::asio::execution_context& context)
+			session_service(execution_context& context)
 				: execution_base_type(context)
 			{}
 
@@ -70,8 +65,7 @@ namespace aquarius
 				co_return buff;
 			}
 
-			auto async_write_some(implementation_type& impl, flex_buffer buf, error_code& ec)
-				-> awaitable<std::size_t>
+			auto async_write_some(implementation_type& impl, flex_buffer buf, error_code& ec) -> awaitable<std::size_t>
 			{
 				co_return co_await impl.socket->async_write_some(buffer(buf.wdata(), buf.size()),
 																 redirect_error(use_awaitable, ec));

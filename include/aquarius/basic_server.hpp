@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/basic_socket_acceptor.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
@@ -11,16 +10,12 @@
 
 namespace aquarius
 {
-	template <typename Session>
+	template <typename Protocol>
 	class basic_server
 	{
-		using session_type = Session;
+		using session_type = typename Protocol::server_session;
 
-		using protocol_type = typename session_type::protocol_type;
-
-		using executor_type = typename session_type::executor_type;
-
-		using acceptor_type = basic_socket_acceptor<protocol_type, executor_type>;
+		using acceptor_type = typename Protocol::acceptor;
 
 		using endpoint_type = typename acceptor_type::endpoint_type;
 
@@ -28,7 +23,7 @@ namespace aquarius
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), endpoint_type{ protocol_type::v4(), port })
+			, acceptor_(io_service_pool_.get_io_service(), endpoint_type{ Protocol::v4(), port })
 			, server_name_(name)
 		{
 			init_signal();

@@ -1,11 +1,12 @@
 #pragma once
+#include <aquarius/any_io_executor.hpp>
+#include <aquarius/awaitable.hpp>
 #include <aquarius/concepts.hpp>
-#include <aquarius/flex_buffer.hpp>
+#include <aquarius/detached.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/detail/session_service.hpp>
-#include <aquarius/any_io_executor.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/awaitable.hpp>
+#include <aquarius/flex_buffer.hpp>
 
 #ifdef AQUARIUS_ENABLE_SSL
 #include <aquarius/detail/ssl_session_service.hpp>
@@ -13,24 +14,21 @@
 
 namespace aquarius
 {
-	template <bool Server, typename Protocol, typename Processor, typename Executor = any_io_executor>
-	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol, Processor, Executor>>
+	template <bool Server, typename Protocol>
+	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol>>
 	{
 	public:
-		using executor_type = Executor;
-
 #ifdef AQUARIUS_ENABLE_SSL
-		using socket_type = typename detail::ssl_session_service<Server, Protocol, executor_type>::ssl_socket_type;
-		using impl_type =
-			detail::session_object_impl<detail::ssl_session_service<Server, Protocol, executor_type>, executor_type>;
+		using socket_type = typename detail::ssl_session_service<Server, Protocol>::ssl_socket_type;
+		using impl_type = detail::session_object_impl<detail::ssl_session_service<Server, Protocol>>;
 #else
-		using socket_type = typename detail::session_service<Protocol, executor_type>::socket_type;
-		using impl_type = detail::session_object_impl<detail::session_service<Protocol, executor_type>, executor_type>;
+		using socket_type = typename detail::session_service<Protocol>::socket_type;
+		using impl_type = detail::session_object_impl<detail::session_service<Protocol>>;
 #endif
 
-		using process_type = Processor;
+		using processor = typename Protocol::processor;
 
-		using protocol_type = Protocol;
+		using acceptor = typename Protocol::acceptor;
 
 	public:
 		explicit basic_session(socket_type socket)
@@ -77,13 +75,13 @@ namespace aquarius
 					co_return ec;
 				}
 
-				co_spawn(get_executor(), processor_.read(std::move(read_buffer)), detached);
+				co_spawn(get_executor(), processor_.read(std::move(read_buffer), this->shared_from_this()), detached);
 			}
 
 			std::unreachable();
 		}
 
-		auto async_send(std::size_t proto, flex_buffer fs) ->awaitable<void>
+		auto async_send(std::size_t proto, flex_buffer fs) -> awaitable<void>
 		{
 			error_code ec;
 
@@ -133,13 +131,13 @@ namespace aquarius
 			}
 		}
 
-		template<typename Func>
+		template <typename Func>
 		void regist_close(Func&& f)
 		{
 			close_func_ = std::forward<Func>(f);
 		}
 
-		const executor_type& get_executor()
+		const auto& get_executor()
 		{
 			return impl_.get_executor();
 		}
@@ -147,7 +145,7 @@ namespace aquarius
 	private:
 		impl_type impl_;
 
-		process_type processor_;
+		processor processor_;
 
 		std::function<void()> close_func_;
 	};

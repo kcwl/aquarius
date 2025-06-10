@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template <typename Service, typename Executor>
+		template <typename Service, typename Executor = any_io_executor>
 		class session_object_impl : public io_object_impl<Service, Executor>
 		{
 		public:

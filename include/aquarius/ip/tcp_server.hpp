@@ -1,12 +1,11 @@
 #pragma once
 #include <aquarius/basic_server.hpp>
-#include <aquarius/tcp/session.hpp>
 #include <boost/asio/any_io_executor.hpp>
 
 namespace aquarius
 {
-	namespace tcp
+	namespace ip
 	{
-		using async_server = basic_server<server_session>;
+		using tcp_server = basic_server<tcp>;
 	}
 } // namespace aquarius

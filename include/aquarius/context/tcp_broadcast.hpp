@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/basic_context.hpp>
+#include <aquarius/context/basic_tcp_context.hpp>
 #include <aquarius/flex_buffer.hpp>
 
 namespace aquarius
 {
-	namespace tcp
+	namespace context
 	{
-		class broadcast_context : public basic_context<context_kind::tcp_broadcast>
+		class broadcast_context : public basic_tcp_context<context_kind::tcp_broadcast>
 		{
-			using base_type = basic_context<context_kind::tcp_broadcast>;
+			using base_type = basic_tcp_context<context_kind::tcp_broadcast>;
 
 		public:
 			using base_type::mode;
@@ -23,5 +23,5 @@ namespace aquarius
 			void visit(flex_buffer buffer, std::size_t proto, Args&&...)
 			{}
 		};
-	} // namespace tcp
+	} // namespace context
 } // namespace aquarius

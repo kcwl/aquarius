@@ -1,14 +1,14 @@
 #pragma once
 #include <unordered_map>
 #include <functional>
-#include <boost/noncopyable.hpp>
+#include <aquarius/noncopyable.hpp>
 #include <aquarius/singleton.hpp>
 
 
 namespace aquarius
 {
     template <typename Key, typename Value>
-    class router_base : public boost::noncopyable
+    class router_base : public noncopyable
     {
     public:
         router_base() = default;

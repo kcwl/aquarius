@@ -3,6 +3,5 @@
 
 namespace aquarius
 {
-	template <typename T>
-	using singleton = boost::serialization::singleton<T>;
+	using boost::serialization::singleton;
 } // namespace aquarius

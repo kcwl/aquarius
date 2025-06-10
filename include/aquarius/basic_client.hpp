@@ -1,13 +1,12 @@
 ﻿#pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/client_context.hpp>
 #include <aquarius/co_spawn.hpp>
+#include <aquarius/context/context.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_context.hpp>
 #include <aquarius/ip/address.hpp>
-#include <aquarius/ip/basic_endpoint.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
 #include <aquarius/use_awaitable.hpp>
@@ -19,16 +18,14 @@
 
 namespace aquarius
 {
-	template <typename Session>
-	class basic_client : public std::enable_shared_from_this<basic_client<Session>>
+	template <typename Protocol>
+	class basic_client : public std::enable_shared_from_this<basic_client<Protocol>>
 	{
-		using session_type = Session;
+		using session_type = Protocol::client_session;
 
-		using socket_type = typename session_type::socket_type;
+		using socket_type = typename Protocol::socket;
 
-		using protocol_type = typename session_type::protocol_type;
-
-		using endpoint_type = ip::basic_endpoint<protocol_type>;
+		using endpoint_type = typename Protocol::endpoint;
 
 	public:
 		basic_client(int reconnect_times = 3, std::chrono::steady_clock::duration timeout = 30ms)
@@ -102,7 +99,9 @@ namespace aquarius
 						co_return false;
 					}
 
-					boost::asio::co_spawn(this->io_service_, [reconnect_times, this] mutable->boost::asio::awaitable<void>
+					boost::asio::co_spawn(
+						this->io_service_,
+						[reconnect_times, this] mutable -> boost::asio::awaitable<void>
 						{
 							auto ec = co_await session_ptr_->async_read();
 
@@ -119,7 +118,8 @@ namespace aquarius
 									co_return;
 								}
 							}
-						}, boost::asio::detached);
+						},
+						boost::asio::detached);
 
 					co_return true;
 				},
@@ -139,7 +139,7 @@ namespace aquarius
 			std::promise<Response> resp_promise{};
 			auto future = resp_promise.get_future();
 
-			client_invoke::regist<Response>(random_session_id(),
+			context::client_invoke::regist<Response>(random_session_id(),
 											[promise = std::move(resp_promise)](Response resp) mutable
 											{ promise.set_value(std::move(resp)); });
 
@@ -155,7 +155,7 @@ namespace aquarius
 			flex_buffer fs{};
 			req.to_binary(fs);
 
-			client_invoke::regist<Response>(random_session_id(), std::forward<Func>(f));
+			context::client_invoke::regist<Response>(random_session_id(), std::forward<Func>(f));
 
 			co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)), detached);
 		}
@@ -233,7 +233,7 @@ namespace aquarius
 	private:
 		io_context io_service_;
 
-		std::shared_ptr<Session> session_ptr_;
+		std::shared_ptr<session_type> session_ptr_;
 
 		steady_timer timer_;
 
