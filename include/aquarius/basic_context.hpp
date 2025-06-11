@@ -1,28 +1,25 @@
 #pragma once
 #include <aquarius/detail/context_base.hpp>
 #include <aquarius/use_future.hpp>
+#include <aquarius/flex_buffer.hpp>
 
 namespace aquarius
 {
-	template <typename Protocol, auto Mode>
+	template <typename Session>
 	class basic_context : public context_base
 	{
-	public:
-		constexpr static auto mode = Mode;
-
 	public:
 		basic_context(const std::string& name, std::chrono::steady_clock::duration timeout)
 			: context_base(name, timeout)
 		{}
 
 	public:
-		template <typename... Args>
-		void visit(Args&&...)
+		virtual void visit(flex_buffer buff, std::shared_ptr<Session> session)
 		{
 			return;
 		}
 
-		template <typename Session, typename Func>
+		template <typename Func>
 		void invoke(std::shared_ptr<Session> session, Func&& f)
 		{
 			auto future =

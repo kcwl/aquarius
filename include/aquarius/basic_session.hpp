@@ -7,6 +7,7 @@
 #include <aquarius/detail/session_service.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/flex_buffer.hpp>
+#include <span>
 
 #ifdef AQUARIUS_ENABLE_SSL
 #include <aquarius/detail/ssl_session_service.hpp>
@@ -26,13 +27,12 @@ namespace aquarius
 		using impl_type = detail::session_object_impl<detail::session_service<Protocol>>;
 #endif
 
-		using processor = typename Protocol::processor;
-
 		using acceptor = typename Protocol::acceptor;
 
 	public:
 		explicit basic_session(socket_type socket)
 			: impl_(std::move(socket))
+			, proto_(Protocol::v4())
 		{}
 
 		virtual ~basic_session() = default;
@@ -61,7 +61,9 @@ namespace aquarius
 
 			for (;;)
 			{
-				auto read_buffer = co_await impl_.get_service().async_read_some(impl_.get_implementation(), ec);
+				std::size_t length = proto_.get_header_length();
+
+				auto header_buffer = co_await impl_.get_service().async_read(impl_.get_implementation(), length, ec);
 
 				if (ec)
 				{
@@ -75,28 +77,15 @@ namespace aquarius
 					co_return ec;
 				}
 
-				co_spawn(get_executor(), processor_.read(std::move(read_buffer), this->shared_from_this()), detached);
+				length = proto_.get_body_length(header_buffer);
+
+				auto body_buffer = co_await impl_.get_service().async_read(impl_.get_implementation(), length, ec);
+
+				co_spawn(this->get_executor(), proto_.process(std::move(body_buffer), this->shared_from_this()),
+						 detached);
 			}
 
 			std::unreachable();
-		}
-
-		auto async_send(std::size_t proto, flex_buffer fs) -> awaitable<void>
-		{
-			error_code ec;
-
-			auto buffers = processor_.write(proto, fs);
-
-			for (auto& buf : buffers)
-			{
-				co_await async_send(buf, ec);
-
-				if (ec)
-				{
-					XLOG_ERROR() << "async write is failed! maybe " << ec.message();
-					break;
-				}
-			}
 		}
 
 		auto async_send(flex_buffer buf, error_code& ec) -> awaitable<error_code>
@@ -145,8 +134,8 @@ namespace aquarius
 	private:
 		impl_type impl_;
 
-		processor processor_;
-
 		std::function<void()> close_func_;
+
+		Protocol proto_;
 	};
 } // namespace aquarius

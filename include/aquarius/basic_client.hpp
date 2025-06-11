@@ -143,7 +143,9 @@ namespace aquarius
 											[promise = std::move(resp_promise)](Response resp) mutable
 											{ promise.set_value(std::move(resp)); });
 
-			co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)), detached);
+			error_code ec{};
+
+			co_spawn(io_service_, session_ptr_->async_send(std::move(fs), ec), detached);
 
 			return future.get();
 		}

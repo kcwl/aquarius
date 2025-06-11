@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
+#include <aquarius/context/context.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <aquarius/error_code.hpp>

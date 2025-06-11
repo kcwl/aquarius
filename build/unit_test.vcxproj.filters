@@ -117,9 +117,6 @@
     <ClInclude Include="..\include\aquarius\detail\context_base.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_processor.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -180,7 +177,7 @@
     <ClInclude Include="..\include\aquarius\ip\tcp_server.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\tcp_broadcast.hpp">
+    <ClInclude Include="..\include\aquarius\context\basic_rpc_context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
@@ -189,13 +186,13 @@
     <ClInclude Include="..\include\aquarius\context\handler.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\stream_context.hpp">
+    <ClInclude Include="..\include\aquarius\context\basic_stream_context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\stream_handler.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\transfer_context.hpp">
+    <ClInclude Include="..\include\aquarius\context\basic_transfer_context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\detail\context_router.hpp">
@@ -203,9 +200,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\detail\handler_router.hpp">
       <Filter>include\aquarius\context\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\basic_tcp_context.hpp">
-      <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\detail\client_router.hpp">
       <Filter>include\aquarius\context\detail</Filter>
@@ -215,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\auto_context.hpp">
       <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\session_service.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

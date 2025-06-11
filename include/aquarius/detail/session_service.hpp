@@ -1,11 +1,13 @@
 #pragma once
 #include <aquarius/buffer.hpp>
+#include <aquarius/context/auto_context.hpp>
 #include <aquarius/detail/execution_context.hpp>
 #include <aquarius/detail/session_service_base.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
 #include <aquarius/use_awaitable.hpp>
+#include <boost/asio/read.hpp>
 
 namespace aquarius
 {
@@ -20,7 +22,7 @@ namespace aquarius
 
 			using execution_base_type = execution_context_service_base<session_service<Protocol>>;
 
-			using socket_type = typename Protocol::socket;
+			using socket_type = typename Protocol::socket_type;
 
 			struct implementation_type : base_type::implementation_type_base
 			{};
@@ -53,14 +55,11 @@ namespace aquarius
 				return;
 			}
 
-			auto async_read_some(implementation_type& impl, error_code& ec) -> awaitable<flex_buffer>
+			auto async_read(implementation_type& impl, std::size_t length, error_code& ec) -> awaitable<flex_buffer>
 			{
-				flex_buffer buff{};
+				flex_buffer buff(length);
 
-				auto bytes_transferred = co_await impl.socket->async_read_some(buffer(buff.rdata(), buff.active()),
-																			   redirect_error(use_awaitable, ec));
-
-				buff.commit(bytes_transferred);
+				co_await boost::asio::async_read(*impl.socket, buffer(buff.rdata(), buff.active()), redirect_error(use_awaitable, ec));
 
 				co_return buff;
 			}

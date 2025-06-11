@@ -1,8 +1,9 @@
 #pragma once
 #include <aquarius/basic_router.hpp>
+#include <aquarius/detached.hpp>
+#include <aquarius/error_code.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/post.hpp>
-#include <aquarius/detached.hpp>
 
 namespace aquarius
 {
@@ -39,7 +40,9 @@ namespace aquarius
 										 flex_buffer resp_buf{};
 										 resp.to_binary(resp_buf);
 
-										 session->async_send(proto, resp_buf);
+										 error_code ec{};
+
+										 session->async_send(resp_buf, ec);
 									 },
 									 detached);
 							 });

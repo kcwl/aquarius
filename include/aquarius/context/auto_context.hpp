@@ -6,12 +6,12 @@ namespace aquarius
 {
 	namespace context
 	{
-		template <typename Session, typename Context>
+		template <typename Session, template<typename> typename Context>
 		struct auto_context_register
 		{
 			explicit auto_context_register()
 			{
-				detail::context_router<Session>::get_mutable_instance().template regist<Context>();
+				detail::context_router<Session>::get_mutable_instance().template regist<Context<Session>>();
 			}
 		};
 
