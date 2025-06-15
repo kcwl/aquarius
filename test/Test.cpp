@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 
 	auto cli = std::make_shared<aquarius::tcp_client>();
 
-	cli->async_connect("127.0.0.1", "8100");
+	BOOST_CHECK(cli->async_connect("127.0.0.1", "8100"));
 
 	rpc_test::request req{};
 	req.header()->uuid_ = 1;
