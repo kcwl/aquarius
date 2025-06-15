@@ -155,7 +155,6 @@
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\buffer.hpp" />
     <ClInclude Include="..\include\aquarius\context\auto_context.hpp" />
     <ClInclude Include="..\include\aquarius\context\detail\client_router.hpp" />
     <ClInclude Include="..\include\aquarius\context\basic_rpc_context.hpp" />

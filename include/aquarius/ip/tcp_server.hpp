@@ -4,8 +4,5 @@
 
 namespace aquarius
 {
-	namespace ip
-	{
-		using tcp_server = basic_server<tcp>;
-	}
+	using tcp_server = basic_server<tcp>;
 } // namespace aquarius

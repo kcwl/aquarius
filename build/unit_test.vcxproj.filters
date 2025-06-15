@@ -165,9 +165,6 @@
     <ClInclude Include="..\include\aquarius\detail\execution_context.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\buffer.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\io_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>

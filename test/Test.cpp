@@ -6,19 +6,17 @@
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {
-	aquarius::ip::tcp_server srv(8100, 10, "async tcp server");
+	aquarius::tcp_server srv(8100, 10, "async tcp server");
 
 	std::thread t([&] { srv.run(); });
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::ip::tcp_client cli("127.0.0.1", "8100");
+	aquarius::tcp_client cli("127.0.0.1", "8100");
 
-	std::thread t1([&] { cli.run(); });
-
-	test::tcp_request req{};
-	req.header()->crc32_ = 1;
-	req.header()->timestamp_ = 1;
+	rpc_test test{};
+	auto& req = test.request();
+	req.header()->uuid_ = 1;
 	req.body().sex = true;
 	req.body().addr = 2;
 	req.body().age = 15;
@@ -30,16 +28,13 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	req.body().name = "John";
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
-	cli.async_send<test>(req);
+	auto resp = cli.async_send<rpc_test>(test);
 
-	std::this_thread::sleep_for(5s);
-
-	cli.stop();
+	BOOST_CHECK_EQUAL((*resp).body(), req.body());
 
 	srv.stop();
 
 	t.join();
-	t1.join();
 }
 
 #ifdef AQUARIUS_ENABLE_SSL

@@ -3,10 +3,10 @@
 
 namespace aquarius
 {
-	template <typename T, typename R, typename E>
-	class stream_handler : public basic_handler<T, E>
+	template <typename RPC, typename E>
+	class stream_handler : public basic_handler<RPC, E>
 	{
-		using base_type = basic_handler<T, E>;
+		using base_type = basic_handler<RPC, E>;
 
 	public:
 		stream_handler(const std::string& name)
@@ -14,27 +14,19 @@ namespace aquarius
 		{}
 
 	public:
-		auto visit(T message) -> awaitable<R>
+		auto visit(std::shared_ptr<RPC> message) -> awaitable<E>
 		{
 			auto result = co_await base_type::visit(message);
 
 			make_response(result);
 
-			co_return response_;
-		}
-
-		R& response()
-		{
-			return response_;
+			co_return result;
 		}
 
 	private:
 		void make_response(E result)
 		{
-			response_.header()->set_result(static_cast<int64_t>(result));
+			this->response().header()->set_result(static_cast<int64_t>(result));
 		}
-
-	protected:
-		R response_;
 	};
 } // namespace aquarius

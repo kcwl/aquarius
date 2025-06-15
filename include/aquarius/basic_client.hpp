@@ -21,17 +21,15 @@ namespace aquarius
 	template <typename Protocol>
 	class basic_client : public std::enable_shared_from_this<basic_client<Protocol>>
 	{
-		using session_type = Protocol::client_session;
-
-		using socket_type = typename Protocol::socket;
-
-		using endpoint_type = typename Protocol::endpoint;
+		using session = Protocol::client_session;
+		using socket = typename Protocol::socket;
+		using resolver = typename Protocol::resolver;
+		using port_type = uint16_t;
 
 	public:
 		basic_client(int reconnect_times = 3, std::chrono::steady_clock::duration timeout = 30ms)
-			: io_service_()
+			: io_context_()
 			, session_ptr_(nullptr)
-			, timer_(io_service_)
 			, reconnect_times_(reconnect_times)
 			, timeout_(timeout)
 			, ip_addr_()
@@ -39,176 +37,114 @@ namespace aquarius
 			, thread_ptr_(nullptr)
 		{}
 
-		explicit basic_client(const std::string& ip_addr, const std::string& port, int reconnect_times = 3,
-							  std::chrono::steady_clock::duration timeout = 30ms)
+		basic_client(const std::string& ip_addr, const std::string& port, int reconnect_times = 3,
+					 std::chrono::steady_clock::duration timeout = 30ms)
 			: basic_client(reconnect_times, timeout)
 		{
 			async_connect(ip_addr, port);
 		}
 
+		basic_client(const std::string& ip_addr, port_type port, int reconnect_times = 3,
+					 std::chrono::steady_clock::duration timeout = 30ms)
+			: basic_client(ip_addr, std::to_string(port), reconnect_times, timeout)
+		{}
+
+		virtual ~basic_client()
+		{
+			stop();
+		}
+
 	public:
-		void run()
-		{
-			io_service_.run();
-		}
-
-		void stop()
-		{
-			io_service_.stop();
-
-			session_ptr_->shutdown();
-
-			if (thread_ptr_ && thread_ptr_->joinable())
-			{
-				thread_ptr_->join();
-			}
-		}
-
-		void close()
-		{
-			session_ptr_->close();
-		}
-
 		bool async_connect(const std::string& ip_addr, const std::string& port)
 		{
 			ip_addr_ = ip_addr;
 			port_ = port;
 
-			socket_type socket(io_service_);
+			auto self = this->shared_from_this();
 
 			auto future = co_spawn(
-				io_service_,
-				[reconnect_times = this->reconnect_times_, ip_addr, port, sock = std::move(socket),
-				 this] mutable -> awaitable<bool>
+				io_context_,
+				[this, self] mutable -> awaitable<bool>
 				{
+					socket _socket(io_context_);
+
+					resolver resolve(io_context_);
+
+					auto endpoints = resolve.resolve(ip_addr_, port_);
+
 					error_code ec{};
 
-					auto addr = ip::make_address(ip_addr.c_str(), ec);
+					co_await boost::asio::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
 
 					if (ec)
 					{
+						XLOG_ERROR() << "connect " << ip_addr_ << " failed! maybe" << ec.what();
 						co_return false;
 					}
 
-					endpoint_type endpoint(addr, static_cast<ip::port_type>(std::atoi(port.c_str())));
+					create_session(std::move(_socket));
 
-					co_await sock.async_connect(endpoint, redirect_error(use_awaitable, ec));
-
-					if (!create_session(std::move(sock)))
-					{
-						co_return false;
-					}
-
-					boost::asio::co_spawn(
-						this->io_service_,
-						[reconnect_times, this] mutable -> boost::asio::awaitable<void>
+					co_spawn(
+						this->io_context_,
+						[this, self] mutable -> awaitable<void>
 						{
-							auto ec = co_await session_ptr_->async_read();
-
+							auto ec = co_await session_ptr_->protocol();
 							if (ec)
 							{
+								auto reconnect_times = this->reconnect_times_;
+
 								while (reconnect_times--)
 								{
 									if (async_connect(ip_addr_, port_))
 										break;
 								}
-
-								if (reconnect_times == 0)
-								{
-									co_return;
-								}
 							}
 						},
-						boost::asio::detached);
-
+						detached);
 					co_return true;
 				},
 				use_future);
-
-			thread_ptr_ = std::make_shared<std::thread>([&] { this->io_service_.run(); });
-
-			return future.get();
+			thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
+			auto status = future.wait_for(timeout_);
+			return status == std::future_status::timeout ? false : future.get();
 		}
-
-		template <typename RPC, typename Request = typename RPC::tcp_request, typename Response = RPC::tcp_response>
-		std::optional<Response> async_send(Request req)
+		template <typename RPC>
+		std::optional<typename RPC::response_type> async_send(RPC rpc)
 		{
-			flex_buffer fs{};
-			req.to_binary(fs);
-
-			std::promise<Response> resp_promise{};
+			auto fs = rpc.pack_req();
+			std::promise<std::optional<typename RPC::response_type>> resp_promise{};
 			auto future = resp_promise.get_future();
 
-			context::client_invoke::regist<Response>(random_session_id(),
-											[promise = std::move(resp_promise)](Response resp) mutable
-											{ promise.set_value(std::move(resp)); });
+			int id = 0;
 
 			error_code ec{};
+			co_spawn(io_context_,
+					 session_ptr_->async_send(std::move(fs), id, [promise = std::move(resp_promise)](
+																 std::optional<typename RPC::response_type> resp) mutable
+											  { promise.set_value(std::move(resp)); }),
+					 detached);
 
-			co_spawn(io_service_, session_ptr_->async_send(std::move(fs), ec), detached);
-
-			return future.get();
+			auto status = future.wait_for(timeout_);
+			return status == std::future_status::timeout ? std::nullopt : future.get();
 		}
 
-		template <typename RPC, typename Func, typename Request = typename RPC::tcp_request,
-				  typename Response = typename RPC::tcp_response>
-		void async_send(Request req, Func&& f)
-		{
-			flex_buffer fs{};
-			req.to_binary(fs);
-
-			context::client_invoke::regist<Response>(random_session_id(), std::forward<Func>(f));
-
-			co_spawn(io_service_, session_ptr_->async_send(Request::proto, std::move(fs)), detached);
-		}
-
-		void async_send(flex_buffer buffer)
+		void async_send(std::vector<char> buffer)
 		{
 			co_spawn(
-				io_service_,
-				[buf = std::move(buffer), this] -> awaitable<void>
-				{
-					error_code ec{};
-					co_await session_ptr_->async_send(std::move(buf), ec);
-				},
-				detached);
+				io_context_, [buf = std::move(buffer), this] -> awaitable<void>
+				{ co_await session_ptr_->async_send(std::move(buf)); }, detached);
 		}
-
 		std::string remote_address()
 		{
 			return session_ptr_->remote_address();
 		}
-
 		uint32_t remote_address_u()
 		{
 			return session_ptr_->remote_address_u();
 		}
-
 		int remote_port()
 		{
 			return session_ptr_->remote_port();
-		}
-
-		template <typename Func>
-		void async_wait(std::chrono::system_clock::duration dura, Func&& f)
-		{
-			error_code ec;
-			timer_.expires_after(dura);
-
-			timer_.async_wait(
-				[&](const error_code& ec)
-				{
-					if (ec)
-						return;
-
-					if (timer_.expiry() <= std::chrono::steady_clock::now())
-					{
-						f();
-						return;
-					}
-
-					async_wait(dura, std::forward<Func>(f));
-				});
 		}
 
 		template <typename Func>
@@ -218,37 +154,29 @@ namespace aquarius
 		}
 
 	private:
-		std::size_t random_session_id()
+		void create_session(socket socket)
 		{
-			return 0;
-		}
-
-		bool create_session(socket_type socket)
-		{
-			session_ptr_ = std::make_shared<session_type>(std::move(socket));
-
+			session_ptr_ = std::make_shared<session>(std::move(socket));
 			session_ptr_->regist_close(close_func_);
-
-			return true;
+		}
+		void stop()
+		{
+			io_context_.stop();
+			session_ptr_->shutdown();
+			if (thread_ptr_ && thread_ptr_->joinable())
+			{
+				thread_ptr_->join();
+			}
 		}
 
 	private:
-		io_context io_service_;
-
-		std::shared_ptr<session_type> session_ptr_;
-
-		steady_timer timer_;
-
+		io_context io_context_;
+		std::shared_ptr<session> session_ptr_;
 		std::function<void()> close_func_;
-
 		int reconnect_times_;
-
 		std::chrono::steady_clock::duration timeout_;
-
 		std::string ip_addr_;
-
 		std::string port_;
-
 		std::shared_ptr<std::thread> thread_ptr_;
 	};
 } // namespace aquarius

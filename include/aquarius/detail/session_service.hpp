@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/buffer.hpp>
 #include <aquarius/context/auto_context.hpp>
 #include <aquarius/detail/execution_context.hpp>
 #include <aquarius/detail/session_service_base.hpp>
@@ -55,19 +54,17 @@ namespace aquarius
 				return;
 			}
 
-			auto async_read(implementation_type& impl, std::size_t length, error_code& ec) -> awaitable<flex_buffer>
+			template <typename BufferSequence>
+			auto async_read(implementation_type& impl, BufferSequence& buff, error_code& ec) -> awaitable<void>
 			{
-				flex_buffer buff(length);
-
-				co_await boost::asio::async_read(*impl.socket, buffer(buff.rdata(), buff.active()), redirect_error(use_awaitable, ec));
-
-				co_return buff;
+				co_await boost::asio::async_read(*impl.socket, buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
-			auto async_write_some(implementation_type& impl, flex_buffer buf, error_code& ec) -> awaitable<std::size_t>
+			template <typename BufferSequence>
+			auto async_write_some(implementation_type& impl, BufferSequence buff, error_code& ec)
+				-> awaitable<std::size_t>
 			{
-				co_return co_await impl.socket->async_write_some(buffer(buf.wdata(), buf.size()),
-																 redirect_error(use_awaitable, ec));
+				co_return co_await impl.socket->async_write_some(buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			auto start(implementation_type& impl) -> awaitable<void>

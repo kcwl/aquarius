@@ -7,7 +7,6 @@
 #include <aquarius/basic_router.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
-#include <aquarius/buffer.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/concepts.hpp>
 #include <aquarius/context/auto_context.hpp>

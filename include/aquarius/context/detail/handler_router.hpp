@@ -13,32 +13,31 @@ namespace aquarius
 		{
 			template <typename Session>
 			class handler_router
-				: public single_router<handler_router<Session>, void, flex_buffer, std::shared_ptr<Session>>
+				: public single_router<handler_router<Session>, void, std::vector<char>&, std::shared_ptr<Session>>
 			{
 			public:
 				handler_router() = default;
 
 			public:
-				template <typename Request, typename Context>
+				template <typename RPC, typename Context>
 				void regist(std::size_t proto)
 				{
-					auto func = [&](flex_buffer buffer, std::shared_ptr<Session> session)
+					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session)
 					{
-						auto request = std::make_shared<Request>();
+						auto rpc = std::make_shared<RPC>();
 
-						request->from_binary(buffer);
+						rpc->unpack_req(buffer);
 
 						post(session->get_executor(),
 							 [=]
 							 {
 								 co_spawn(
 									 session->get_executor(),
-									 [=] -> awaitable<void>
+									 [session, rpc] -> awaitable<void>
 									 {
-										 auto resp = co_await std::make_shared<Context>()->visit(request);
+										 co_await std::make_shared<Context>()->visit(rpc);
 
-										 flex_buffer resp_buf{};
-										 resp.to_binary(resp_buf);
+										 auto resp_buf = rpc->pack_resp();
 
 										 error_code ec{};
 

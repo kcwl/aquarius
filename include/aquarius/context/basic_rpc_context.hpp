@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/basic_context.hpp>
-#include <aquarius/flex_buffer.hpp>
 #include <aquarius/context/detail/client_router.hpp>
 
 namespace aquarius
@@ -11,6 +10,8 @@ namespace aquarius
 		class basic_rpc_context : public basic_context<Session>
 		{
 			using base_type = basic_context<Session>;
+
+			using buffer_type = typename Session::buffer_type;
 
 		public:
 			basic_rpc_context(std::chrono::steady_clock::duration timeout = 30ms)
@@ -25,7 +26,7 @@ namespace aquarius
 																						std::forward<Func>(f));
 			}
 
-			virtual void visit(flex_buffer buff, std::shared_ptr<Session> session) override
+			virtual void visit(buffer_type buff, std::shared_ptr<Session> session) override
 			{
 				post(session->get_executor(),
 					 [session, buff = std::move(buff), this] mutable

@@ -8,7 +8,7 @@ namespace aquarius
 	{
 		namespace detail
 		{
-			class client_router : public single_router<client_router, void, flex_buffer>
+			class client_router : public single_router<client_router, void, std::vector<char>&>
 			{
 			public:
 				client_router() = default;
@@ -17,7 +17,7 @@ namespace aquarius
 				template <typename Response, typename Func>
 				void regist(std::size_t id, Func&& func)
 				{
-					this->map_invokes_[id] = [&](flex_buffer buffer)
+					this->map_invokes_[id] = [&](std::vector<char>& buffer)
 					{
 						Response resp{};
 						resp.from_binary(buffer);

@@ -16,7 +16,7 @@ namespace aquarius
 			{}
 
 		public:
-			virtual void visit(flex_buffer buff, std::shared_ptr<Session> session)
+			virtual void visit(std::vector<char>& buff, std::shared_ptr<Session> session)
 			{
 				return handler_.visit(buff, session);
 			}

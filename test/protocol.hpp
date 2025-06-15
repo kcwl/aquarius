@@ -85,16 +85,12 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 	return os;
 }
 
-struct test
-{
-	using tcp_request = aquarius::ip::request<person, 1001>;
-	using tcp_response = aquarius::ip::response<person, 1002>;
-};
+using rpc_test = aquarius::basic_rpc<aquarius::basic_request<aquarius::tcp, person>, aquarius::basic_response<aquarius::tcp, person>>;
 
 
-AQUARIUS_STREAM_HANDLER(ctx_test, test)
+AQUARIUS_STREAM_HANDLER(ctx_test, rpc_test)
 {
-	response().body() = message()->body();
+	response().body() = request().body();
 
 	co_return 0;
 }

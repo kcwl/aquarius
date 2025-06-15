@@ -18,7 +18,7 @@ namespace aquarius
             }
 
         public:
-            virtual void visit(flex_buffer buff, std::shared_ptr<Session> session) override
+            virtual void visit(std::vector<char>& buff, std::shared_ptr<Session> session) override
             {
                 post(session->get_executor(), [session, buff = std::move(buff), this] mutable
                     {

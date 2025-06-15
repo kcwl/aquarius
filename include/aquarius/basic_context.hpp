@@ -1,20 +1,20 @@
 #pragma once
 #include <aquarius/detail/context_base.hpp>
 #include <aquarius/use_future.hpp>
-#include <aquarius/flex_buffer.hpp>
 
 namespace aquarius
 {
 	template <typename Session>
 	class basic_context : public context_base
 	{
+		using buffer_type = typename Session::buffer_type;
 	public:
 		basic_context(const std::string& name, std::chrono::steady_clock::duration timeout)
 			: context_base(name, timeout)
 		{}
 
 	public:
-		virtual void visit(flex_buffer buff, std::shared_ptr<Session> session)
+		virtual void visit(buffer_type buff, std::shared_ptr<Session> session)
 		{
 			return;
 		}

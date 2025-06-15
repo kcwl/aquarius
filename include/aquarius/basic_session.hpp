@@ -32,7 +32,6 @@ namespace aquarius
 	public:
 		explicit basic_session(socket_type socket)
 			: impl_(std::move(socket))
-			, proto_(Protocol::v4())
 		{}
 
 		virtual ~basic_session() = default;
@@ -53,7 +52,7 @@ namespace aquarius
 			return impl_.get_service().remote_port(impl_.get_implementation());
 		}
 
-		auto async_read() -> awaitable<error_code>
+		auto protocol() -> awaitable<error_code>
 		{
 			co_await impl_.get_service().start(impl_.get_implementation());
 
@@ -61,36 +60,55 @@ namespace aquarius
 
 			for (;;)
 			{
-				std::size_t length = proto_.get_header_length();
-
-				auto header_buffer = co_await impl_.get_service().async_read(impl_.get_implementation(), length, ec);
+				co_await Protocol::read(this->shared_from_this(), ec);
 
 				if (ec)
 				{
 					if (ec != boost::asio::error::eof)
 					{
-						XLOG_ERROR() << "on read some occur error - " << ec.message();
+						XLOG_ERROR() << "on read some occur error - " << ec.what();
 					}
 
 					shutdown();
 
 					co_return ec;
 				}
-
-				length = proto_.get_body_length(header_buffer);
-
-				auto body_buffer = co_await impl_.get_service().async_read(impl_.get_implementation(), length, ec);
-
-				co_spawn(this->get_executor(), proto_.process(std::move(body_buffer), this->shared_from_this()),
-						 detached);
 			}
 
 			std::unreachable();
 		}
 
-		auto async_send(flex_buffer buf, error_code& ec) -> awaitable<error_code>
+		template <typename BufferSequence>
+		auto async_read(BufferSequence& buff) -> awaitable<error_code>
 		{
-			co_await impl_.get_service().async_write_some(impl_.get_implementation(), buf, ec);
+			error_code ec;
+
+			co_await impl_.get_service().async_read(impl_.get_implementation(), buff, ec);
+
+			co_return ec;
+		}
+
+		template <typename BufferSequence>
+		// requires(boost::asio::is_dynamic_buffer<BufferSequence>)
+		auto async_send(BufferSequence buffer, error_code& ec) -> awaitable<error_code>
+		{
+			co_await impl_.get_service().async_write_some(impl_.get_implementation(), std::move(buffer), ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async write is failed! maybe " << ec.message();
+			}
+
+			co_return ec;
+		}
+
+		template <typename BufferSequence, typename Func>
+		// requires(boost::asio::is_dynamic_buffer<BufferSequence>)
+		auto async_send(BufferSequence buffer,std::size_t uid, Func&& f) -> awaitable<error_code>
+		{
+			error_code ec{};
+
+			co_await impl_.get_service().async_write_some(impl_.get_implementation(), std::move(buffer), ec);
 
 			if (ec)
 			{
@@ -135,7 +153,5 @@ namespace aquarius
 		impl_type impl_;
 
 		std::function<void()> close_func_;
-
-		Protocol proto_;
 	};
 } // namespace aquarius
