@@ -17,12 +17,12 @@ namespace aquarius
 				template <typename Response, typename Func>
 				void regist(std::size_t id, Func&& func)
 				{
-					this->map_invokes_[id] = [&](std::vector<char>& buffer)
+					this->map_invokes_[id] = [&](std::vector<char> buffer)
 					{
-						Response resp{};
-						resp.from_binary(buffer);
+						Response req{};
+						req.unpack(buffer);
 
-						func(std::move(resp));
+						func(std::move(req));
 					};
 				}
 			};

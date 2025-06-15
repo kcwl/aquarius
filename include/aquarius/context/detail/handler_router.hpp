@@ -19,25 +19,27 @@ namespace aquarius
 				handler_router() = default;
 
 			public:
-				template <typename RPC, typename Context>
+				template <typename Request, typename Context>
 				void regist(std::size_t proto)
 				{
 					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session)
 					{
-						auto rpc = std::make_shared<RPC>();
+						auto req = std::make_shared<Request>();
 
-						rpc->unpack_req(buffer);
+						req->unpack(buffer);
 
 						post(session->get_executor(),
 							 [=]
 							 {
 								 co_spawn(
 									 session->get_executor(),
-									 [session, rpc] -> awaitable<void>
+									 [session, req] -> awaitable<void>
 									 {
-										 co_await std::make_shared<Context>()->visit(rpc);
+										 auto ctx = std::make_shared<Context>();
 
-										 auto resp_buf = rpc->pack_resp();
+										 co_await ctx->visit(req);
+
+										 auto resp_buf = ctx->response().pack();
 
 										 error_code ec{};
 

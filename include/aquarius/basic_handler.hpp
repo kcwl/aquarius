@@ -4,13 +4,9 @@
 
 namespace aquarius
 {
-	template <typename RPC, typename E>
+	template <typename Request, typename Response, typename E>
 	class basic_handler
 	{
-		using request_type = typename RPC::request_type;
-
-		using response_type = typename RPC::response_type;
-
 	public:
 		basic_handler(const std::string& name)
 			: name_(name)
@@ -21,28 +17,30 @@ namespace aquarius
 		virtual ~basic_handler() = default;
 
 	public:
-		auto visit(std::shared_ptr<RPC> message) -> awaitable<E>
+		auto visit(std::shared_ptr<Request> message) -> awaitable<E>
 		{
-			message_ = message;
+			request_ = message;
 
 			co_return co_await this->handle();
 		}
 
-		request_type request() const
+		std::shared_ptr<Request> request() const
 		{
-			return message_->request();
+			return request_;
 		}
 
-		response_type& response()
+		Response& response()
 		{
-			return message_->response();
+			return response_;
 		}
 
 	protected:
 		virtual auto handle() -> awaitable<E> = 0;
 
 	protected:
-		std::shared_ptr<RPC> message_;
+		std::shared_ptr<Request> request_;
+
+		Response response_;
 
 		std::string name_;
 	};

@@ -1,10 +1,9 @@
 #pragma once
-#include <string>
-#include <cstdint>
-#include <vector>
 #include <aquarius.hpp>
 #include <aquarius_protocol.hpp>
-
+#include <cstdint>
+#include <string>
+#include <vector>
 
 struct person
 {
@@ -55,14 +54,14 @@ struct aquarius::reflect<person>
 inline bool operator==(const person& lhs, const person& rhs)
 {
 	return lhs.sex == rhs.sex && lhs.addr == rhs.addr && lhs.age == rhs.age && lhs.telephone == rhs.telephone &&
-		lhs.score == rhs.score && lhs.hp == rhs.hp && lhs.mana && rhs.mana && lhs.info == rhs.info &&
-		lhs.name == rhs.name && lhs.orders == rhs.orders;
+		   lhs.score == rhs.score && lhs.hp == rhs.hp && lhs.mana && rhs.mana && lhs.info == rhs.info &&
+		   lhs.name == rhs.name && lhs.orders == rhs.orders;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const person& p)
 {
 	os << p.sex << "," << p.addr << "," << p.age << "," << p.telephone << "," << p.score << "," << p.hp << "," << p.mana
-		<< ", [";
+	   << ", [";
 
 	for (auto& v : p.info)
 	{
@@ -85,12 +84,15 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 	return os;
 }
 
-using rpc_test = aquarius::basic_rpc<aquarius::basic_request<aquarius::tcp, person>, aquarius::basic_response<aquarius::tcp, person>>;
-
+struct rpc_test
+{
+	using request = aquarius::basic_request<aquarius::tcp, person>;
+	using response = aquarius::basic_response<aquarius::tcp, person>;
+};
 
 AQUARIUS_STREAM_HANDLER(ctx_test, rpc_test)
 {
-	response().body() = request().body();
+	response().body() = request()->body();
 
 	co_return 0;
 }

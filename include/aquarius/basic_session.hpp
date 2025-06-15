@@ -89,25 +89,8 @@ namespace aquarius
 		}
 
 		template <typename BufferSequence>
-		// requires(boost::asio::is_dynamic_buffer<BufferSequence>)
 		auto async_send(BufferSequence buffer, error_code& ec) -> awaitable<error_code>
 		{
-			co_await impl_.get_service().async_write_some(impl_.get_implementation(), std::move(buffer), ec);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "async write is failed! maybe " << ec.message();
-			}
-
-			co_return ec;
-		}
-
-		template <typename BufferSequence, typename Func>
-		// requires(boost::asio::is_dynamic_buffer<BufferSequence>)
-		auto async_send(BufferSequence buffer,std::size_t uid, Func&& f) -> awaitable<error_code>
-		{
-			error_code ec{};
-
 			co_await impl_.get_service().async_write_some(impl_.get_implementation(), std::move(buffer), ec);
 
 			if (ec)

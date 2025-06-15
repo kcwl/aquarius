@@ -12,7 +12,7 @@ namespace aquarius
 		{
 			explicit auto_handler_register(std::size_t proto)
 			{
-				detail::handler_router<Session>::get_mutable_instance().template regist<RPC, Context>(proto);
+				detail::handler_router<Session>::get_mutable_instance().template regist<typename RPC::request, Context>(proto);
 			}
 		};
 	} // namespace context
@@ -26,10 +26,10 @@ namespace aquarius
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::context::auto_handler_register<                                                  \
 		aquarius::tcp::server_session, __rpc, method> __auto_register_##method(AQUARIUS_GLOBAL_ID(__rpc));    \
-	class method : public aquarius::stream_handler<__rpc, int>              \
+	class method : public aquarius::stream_handler<__rpc::request, __rpc::response, int>              \
 	{                                                                                                                  \
 	public:                                                                                                                  \
-		using base_type = aquarius::stream_handler<__rpc, int>;             \
+		using base_type = aquarius::stream_handler<__rpc::request, __rpc::response, int>;             \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##__rpc))                                                         \

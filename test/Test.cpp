@@ -12,10 +12,11 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::tcp_client cli("127.0.0.1", "8100");
+	auto cli = std::make_shared<aquarius::tcp_client>();
 
-	rpc_test test{};
-	auto& req = test.request();
+	cli->async_connect("127.0.0.1", "8100");
+
+	rpc_test::request req{};
 	req.header()->uuid_ = 1;
 	req.body().sex = true;
 	req.body().addr = 2;
@@ -28,7 +29,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	req.body().name = "John";
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
-	auto resp = cli.async_send<rpc_test>(test);
+	auto resp = cli->async_send<rpc_test>(req);
 
 	BOOST_CHECK_EQUAL((*resp).body(), req.body());
 

@@ -2,6 +2,7 @@
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/context/context.hpp>
+#include <aquarius/context/detail/client_router.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
@@ -35,18 +36,6 @@ namespace aquarius
 			, ip_addr_()
 			, port_()
 			, thread_ptr_(nullptr)
-		{}
-
-		basic_client(const std::string& ip_addr, const std::string& port, int reconnect_times = 3,
-					 std::chrono::steady_clock::duration timeout = 30ms)
-			: basic_client(reconnect_times, timeout)
-		{
-			async_connect(ip_addr, port);
-		}
-
-		basic_client(const std::string& ip_addr, port_type port, int reconnect_times = 3,
-					 std::chrono::steady_clock::duration timeout = 30ms)
-			: basic_client(ip_addr, std::to_string(port), reconnect_times, timeout)
 		{}
 
 		virtual ~basic_client()
@@ -104,35 +93,44 @@ namespace aquarius
 					co_return true;
 				},
 				use_future);
-			thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
+
+			if (!thread_ptr_)
+			{
+				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
+			}
+
 			auto status = future.wait_for(timeout_);
+
 			return status == std::future_status::timeout ? false : future.get();
 		}
 		template <typename RPC>
-		std::optional<typename RPC::response_type> async_send(RPC rpc)
+		std::optional<typename RPC::response> async_send(typename RPC::request req)
 		{
-			auto fs = rpc.pack_req();
-			std::promise<std::optional<typename RPC::response_type>> resp_promise{};
+			auto fs = req.pack();
+			std::promise<std::optional<typename RPC::response>> resp_promise{};
 			auto future = resp_promise.get_future();
 
 			int id = 0;
+			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
+				id, [promise = std::move(resp_promise)](std::optional<typename RPC::response> resp) mutable
+				{ promise.set_value(std::move(resp)); });
 
 			error_code ec{};
-			co_spawn(io_context_,
-					 session_ptr_->async_send(std::move(fs), id, [promise = std::move(resp_promise)](
-																 std::optional<typename RPC::response_type> resp) mutable
-											  { promise.set_value(std::move(resp)); }),
-					 detached);
+
+			async_send(std::move(fs), ec);
 
 			auto status = future.wait_for(timeout_);
+
 			return status == std::future_status::timeout ? std::nullopt : future.get();
 		}
 
-		void async_send(std::vector<char> buffer)
+		void async_send(std::vector<char> buffer, error_code& ec)
 		{
 			co_spawn(
-				io_context_, [buf = std::move(buffer), this] -> awaitable<void>
-				{ co_await session_ptr_->async_send(std::move(buf)); }, detached);
+				io_context_, [buf = std::move(buffer), this, &ec] -> awaitable<void>
+				{ 
+					co_await session_ptr_->async_send(std::move(buf), ec); 
+				}, detached);
 		}
 		std::string remote_address()
 		{
