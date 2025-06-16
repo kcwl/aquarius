@@ -53,7 +53,7 @@ namespace aquarius
 
 			auto future = co_spawn(
 				io_context_,
-				[this, self] mutable -> awaitable<bool>
+				[this, self /*, conn_promise = std::move(connect_pormise)*/] mutable -> awaitable<error_code>
 				{
 					socket _socket(io_context_);
 
@@ -68,29 +68,31 @@ namespace aquarius
 					if (ec)
 					{
 						XLOG_ERROR() << "connect " << ip_addr_ << " failed! maybe" << ec.what();
-						co_return false;
+					}
+					else
+					{
+						create_session(std::move(_socket));
+
+						co_spawn(
+							this->io_context_,
+							[this, self] mutable -> awaitable<void>
+							{
+								auto ec = co_await session_ptr_->protocol();
+								if (ec)
+								{
+									auto reconnect_times = this->reconnect_times_;
+
+									while (reconnect_times--)
+									{
+										if (async_connect(ip_addr_, port_))
+											break;
+									}
+								}
+							},
+							detached);
 					}
 
-					create_session(std::move(_socket));
-
-					co_spawn(
-						this->io_context_,
-						[this, self] mutable -> awaitable<void>
-						{
-							auto ec = co_await session_ptr_->protocol();
-							if (ec)
-							{
-								auto reconnect_times = this->reconnect_times_;
-
-								while (reconnect_times--)
-								{
-									if (async_connect(ip_addr_, port_))
-										break;
-								}
-							}
-						},
-						detached);
-					co_return true;
+					co_return ec;
 				},
 				use_future);
 
@@ -99,9 +101,7 @@ namespace aquarius
 				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
 			}
 
-			auto status = future.wait_for(timeout_);
-
-			return status == std::future_status::timeout ? false : future.get();
+			return !future.get();
 		}
 		template <typename RPC>
 		std::optional<typename RPC::response> async_send(typename RPC::request req)
@@ -128,9 +128,7 @@ namespace aquarius
 		{
 			co_spawn(
 				io_context_, [buf = std::move(buffer), this, &ec] -> awaitable<void>
-				{ 
-					co_await session_ptr_->async_send(std::move(buf), ec); 
-				}, detached);
+				{ co_await session_ptr_->async_send(std::move(buf), ec); }, detached);
 		}
 		std::string remote_address()
 		{
@@ -159,8 +157,16 @@ namespace aquarius
 		}
 		void stop()
 		{
-			io_context_.stop();
-			session_ptr_->shutdown();
+			if (!io_context_.stopped())
+			{
+				io_context_.stop();
+			}
+
+			if (session_ptr_)
+			{
+				session_ptr_->shutdown();
+			}
+
 			if (thread_ptr_ && thread_ptr_->joinable())
 			{
 				thread_ptr_->join();
