@@ -86,11 +86,12 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 
 struct rpc_test
 {
+	constexpr static auto id = 1001;
 	using request = aquarius::basic_request<aquarius::tcp, person>;
 	using response = aquarius::basic_response<aquarius::tcp, person>;
 };
 
-AQUARIUS_STREAM_HANDLER(ctx_test, rpc_test)
+AQUARIUS_STREAM_CONTEXT(ctx_test, rpc_test)
 {
 	response().body() = request()->body();
 

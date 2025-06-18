@@ -4,10 +4,17 @@
 
 namespace aquarius
 {
+	enum class mode
+	{
+		stream,
+		transfer
+	};
+
 	template <typename Session>
 	class basic_context : public context_base
 	{
 		using buffer_type = typename Session::buffer_type;
+
 	public:
 		basic_context(const std::string& name, std::chrono::steady_clock::duration timeout)
 			: context_base(name, timeout)
@@ -32,4 +39,15 @@ namespace aquarius
 			}
 		}
 	};
+
+	template <typename Handler>
+	struct basic_transfer_context
+	{
+		template<typename Session>
+		static auto invoke(std::vector<char>, std::shared_ptr<Session>)
+		{
+			return;
+		}
+	};
+
 } // namespace aquarius

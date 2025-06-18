@@ -13,7 +13,7 @@ namespace aquarius
 		{
 			template <typename Session>
 			class handler_router
-				: public single_router<handler_router<Session>, void, std::vector<char>&, std::shared_ptr<Session>>
+				: public single_router<handler_router<Session>, void, std::vector<char>, std::shared_ptr<Session>>
 			{
 			public:
 				handler_router() = default;
@@ -43,7 +43,7 @@ namespace aquarius
 
 										 error_code ec{};
 
-										 session->async_send(resp_buf, ec);
+										 co_await session->async_send(resp_buf, ec);
 									 },
 									 detached);
 							 });

@@ -117,18 +117,18 @@ namespace aquarius
 
 			error_code ec{};
 
-			async_send(std::move(fs), 0, ec);
+			async_send(std::move(fs), static_cast<uint8_t>(mode::stream), RPC::id, ec);
 
 			auto status = future.wait_for(timeout_);
 
 			return status == std::future_status::timeout ? std::nullopt : future.get();
 		}
 
-		void async_send(std::vector<char> buffer, uint8_t mode, error_code& ec)
+		void async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
 		{
 			co_spawn(
-				io_context_, [buf = std::move(buffer), mode, this, &ec] -> awaitable<void>
-				{ co_await session_ptr_->async_send(std::move(buf),mode, ec); }, detached);
+				io_context_, [buf = std::move(buffer), mode, rpc_id, this, &ec] -> awaitable<void>
+				{ co_await session_ptr_->async_send(std::move(buf), mode, rpc_id, ec); }, detached);
 		}
 		std::string remote_address()
 		{

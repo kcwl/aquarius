@@ -213,9 +213,9 @@ namespace aquarius
 		}
 
 		template <typename BufferSequence>
-		auto async_send(BufferSequence buffer, uint8_t mode, error_code& ec) -> awaitable<error_code>
+		auto async_send(BufferSequence buffer, uint8_t mode, std::size_t rpc_id, error_code& ec) -> awaitable<error_code>
 		{
-			co_await Protocol::client_send(this->shared_from_this(), mode, std::move(buffer), ec);
+			co_await Protocol::client_send(this->shared_from_this(), mode, rpc_id, std::move(buffer), ec);
 
 			co_return ec;
 		}
