@@ -33,6 +33,8 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 
 	auto resp = cli->async_send<rpc_test>(req);
 
+	BOOST_ASSERT(resp.has_value());
+
 	BOOST_CHECK_EQUAL((*resp).body(), req.body());
 
 	srv.stop();

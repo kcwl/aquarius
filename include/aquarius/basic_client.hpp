@@ -28,7 +28,7 @@ namespace aquarius
 		using port_type = uint16_t;
 
 	public:
-		basic_client(int reconnect_times = 3, std::chrono::steady_clock::duration timeout = 30ms)
+		basic_client(int reconnect_times = 3, std::chrono::steady_clock::duration timeout = 100000ms)
 			: io_context_()
 			, session_ptr_(nullptr)
 			, reconnect_times_(reconnect_times)
@@ -107,28 +107,28 @@ namespace aquarius
 		std::optional<typename RPC::response> async_send(typename RPC::request req)
 		{
 			auto fs = req.pack();
-			std::promise<std::optional<typename RPC::response>> resp_promise{};
-			auto future = resp_promise.get_future();
+			auto promise_ptr = std::make_shared<std::promise<std::optional<typename RPC::response>>>();
+			auto future = promise_ptr->get_future();
 
 			int id = 0;
 			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
-				id, [promise = std::move(resp_promise)](std::optional<typename RPC::response> resp) mutable
-				{ promise.set_value(std::move(resp)); });
+				id, [promise_ptr](std::optional<typename RPC::response> resp) mutable
+				{ promise_ptr->set_value(std::move(resp)); });
 
 			error_code ec{};
 
-			async_send(std::move(fs), ec);
+			async_send(std::move(fs), 0, ec);
 
 			auto status = future.wait_for(timeout_);
 
 			return status == std::future_status::timeout ? std::nullopt : future.get();
 		}
 
-		void async_send(std::vector<char> buffer, error_code& ec)
+		void async_send(std::vector<char> buffer, uint8_t mode, error_code& ec)
 		{
 			co_spawn(
-				io_context_, [buf = std::move(buffer), this, &ec] -> awaitable<void>
-				{ co_await session_ptr_->async_send(std::move(buf), ec); }, detached);
+				io_context_, [buf = std::move(buffer), mode, this, &ec] -> awaitable<void>
+				{ co_await session_ptr_->async_send(std::move(buf),mode, ec); }, detached);
 		}
 		std::string remote_address()
 		{

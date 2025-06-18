@@ -4,6 +4,7 @@
 #include <aquarius/context/auto_context.hpp>
 #include <aquarius_protocol/tcp_header.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/context/detail/client_router.hpp>
 
 namespace aquarius
 {
@@ -34,7 +35,7 @@ namespace aquarius
 
 	public:
 		template <typename Session>
-		static auto read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
+		static auto server_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
 		{
 			constexpr auto header_length = sizeof(local_header);
 			char header_buffer[header_length] = { 0 };
@@ -78,6 +79,74 @@ namespace aquarius
 					co_return;
 				},
 				detached);
+		}
+
+		template <typename Session>
+		static auto client_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
+		{
+			constexpr auto header_length = sizeof(local_header);
+			char header_buffer[header_length] = { 0 };
+			ec = co_await session->async_read(header_buffer);
+
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
+				}
+				session->shutdown();
+				co_return;
+			}
+
+			local_header header{};
+
+			std::memcpy((char*)&header, &header_buffer[0], header_length);
+
+			std::vector<char> body_buffer(header.length);
+
+			ec = co_await session->async_read(body_buffer);
+
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
+				}
+				session->shutdown();
+				co_return;
+			}
+
+			co_spawn(
+				session->get_executor(),
+				[buffer = std::move(body_buffer), session, header] -> awaitable<void>
+				{
+					context::detail::client_router::get_mutable_instance().invoke(header.context_id, std::move(buffer));
+
+					co_return;
+				},
+				detached);
+		}
+
+		template<typename Session, typename BufferSequence>
+		static auto client_send(std::shared_ptr<Session> session, uint8_t mode, BufferSequence buff, error_code& ec) -> awaitable<void>
+		{
+			local_header header{};
+			header.mode = mode;
+			header.length = buff.size();
+
+			co_await session->async_write_some(buffer((char*)&header, sizeof(header)), ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async write header is failed! maybe " << ec.message();
+			}
+
+			co_await session->async_write_some(std::move(buff), ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async write body is failed! maybe " << ec.message();
+			}
 		}
 	};
 } // namespace aquarius

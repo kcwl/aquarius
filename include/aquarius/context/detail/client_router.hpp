@@ -8,7 +8,7 @@ namespace aquarius
 	{
 		namespace detail
 		{
-			class client_router : public single_router<client_router, void, std::vector<char>&>
+			class client_router : public single_router<client_router, void, std::vector<char>>
 			{
 			public:
 				client_router() = default;
