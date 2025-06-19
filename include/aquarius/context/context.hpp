@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/context/auto_context.hpp>
 #include <aquarius/context/handler.hpp>
+#include <aquarius/detail/context_base.hpp>
 #include <aquarius/ip/tcp.hpp>
 
 #define AQUARIUS_TRANSFER_HANDLER(method, buffer)                                                                      \
@@ -23,7 +23,7 @@
 #define AQUARIUS_STREAM_CONTEXT_BY(session, error, method, __rpc)                                                      \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::context::auto_handler_register<session, __rpc, method> __auto_register_##method( \
-		__rpc::id);                                                                                    \
+		__rpc::id);                                                                                                    \
 	class method : public aquarius::stream_handler<__rpc::request, __rpc::response, error>                             \
 	{                                                                                                                  \
 	public:                                                                                                            \
@@ -37,18 +37,27 @@
 	};                                                                                                                 \
 	inline auto method::handle() -> aquarius::awaitable<error>
 
-#define AQUARIUS_STREAM_CONTEXT(method, __rpc) AQUARIUS_STREAM_CONTEXT_BY(aquarius::tcp::server_session, int, method, __rpc)
+#define AQUARIUS_STREAM_CONTEXT(method, __rpc)                                                                         \
+	AQUARIUS_STREAM_CONTEXT_BY(aquarius::tcp::server_session, int, method, __rpc)
 
 #define AQUARIUS_TRANSFER_CONTEXT_BY(session)                                                                          \
 	AQUARIUS_TRANSFER_HANDLER(transfer_handler, std::vector<char>)                                                     \
 	template <>                                                                                                        \
-	struct basic_transfer_context<transfer_handler>                                                                    \
+	class transfer_context<transfer_handler> : public context_base                                                     \
 	{                                                                                                                  \
-		static auto invoke(std::vector<char> buff, std::shared_ptr<session> session_ptr)                               \
+		using base_type = context_base;                                                                                \
+                                                                                                                       \
+	public:                                                                                                            \
+		template <typename Session>                                                                                    \
+		auto invoke(std::vector<char> buff, std::shared_ptr<Session> session_ptr)                                      \
 		{                                                                                                              \
-			static transfer_handler handler;                                                                           \
-			auto resp = handler.visit(buff);                                                                           \
-			session_ptr->send(resp);                                                                                   \
+			base_type::invoke(session_ptr->executor(),                                                                 \
+							  [&] -> awaitable<void>                                                                   \
+							  {                                                                                        \
+								  static transfer_handler handler;                                                     \
+								  auto resp = co_await handler.visit(buff);                                            \
+								  session_ptr->send(resp);                                                             \
+							  });                                                                                      \
 		}                                                                                                              \
 	};
 

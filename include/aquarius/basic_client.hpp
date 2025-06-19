@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
+#include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>
-#include <aquarius/context/detail/client_router.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>

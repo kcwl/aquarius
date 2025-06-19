@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/context/detail/handler_router.hpp>
+#include <aquarius/context/handler_router.hpp>
 #include <aquarius/context/stream_handler.hpp>
 
 namespace aquarius

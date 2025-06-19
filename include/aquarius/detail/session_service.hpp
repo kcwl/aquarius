@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/context/auto_context.hpp>
 #include <aquarius/detail/execution_context.hpp>
 #include <aquarius/detail/session_service_base.hpp>
 #include <aquarius/flex_buffer.hpp>

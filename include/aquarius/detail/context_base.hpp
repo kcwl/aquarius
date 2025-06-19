@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/use_future.hpp>
 #include <chrono>
 #include <string>
 
@@ -23,6 +24,16 @@ namespace aquarius
 		auto timeout() const
 		{
 			return timeout_;
+		}
+
+		template <typename Executor, typename Func>
+		auto invoke(const Executor& ex, Func&& f)
+		{
+			auto future = co_spawn(ex, [func = std::move(f)] -> awaitable<void> { func(); co_return; }, use_future);
+
+			auto status = future.wait_for(timeout_);
+
+			return status;
 		}
 
 	private:

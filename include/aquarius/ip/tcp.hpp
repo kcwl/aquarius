@@ -1,13 +1,14 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/basic_context.hpp>
 #include <aquarius/basic_session.hpp>
-#include <aquarius/context/auto_context.hpp>
+#include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>
-#include <aquarius/context/detail/client_router.hpp>
-#include <aquarius/context/detail/handler_router.hpp>
+#include <aquarius/context/handler_router.hpp>
+#include <aquarius/context/stream_context.hpp>
+#include <aquarius/ip/lowyer_header.hpp>
 #include <aquarius_protocol/tcp_header.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/basic_context.hpp>
 
 namespace aquarius
 {
@@ -21,16 +22,6 @@ namespace aquarius
 		using request_header = tcp_request_header;
 
 		using response_header = tcp_response_header;
-
-		struct local_header
-		{
-			uint32_t context_id;
-			uint64_t rpc_id;
-			uint8_t mode;
-			uint64_t length;
-			uint32_t crc;
-			int64_t timestamp;
-		};
 
 	public:
 		using client_session = basic_session<false, tcp>;
@@ -77,21 +68,33 @@ namespace aquarius
 				session->get_executor(),
 				[buffer = std::move(body_buffer), session, header] -> awaitable<void>
 				{
-					switch (static_cast<mode>(header.mode))
+					static context::stream_context stream{};
+
+					auto status = stream.invoke(
+						session->get_executor(),
+						[buffer = std::move(buffer), session, header]
+						{
+							switch (static_cast<mode>(header.mode))
+							{
+							case mode::stream:
+								{
+									context::detail::handler_router<Session>::get_mutable_instance().invoke(
+										header.rpc_id, std::move(buffer), session, header);
+								}
+								break;
+							case mode::transfer:
+								{
+									basic_transfer_context<class transfer_handler>::invoke(std::move(buffer), session);
+									break;
+								default:
+									break;
+								}
+							}
+						});
+
+					if (status == std::future_status::timeout)
 					{
-					case mode::stream:
-						{
-							context::detail::handler_router<Session>::get_mutable_instance().invoke(
-								header.rpc_id, std::move(buffer), session);
-						}
-						break;
-					case mode::transfer:
-						{
-							basic_transfer_context<class transfer_handler>::invoke(std::move(buffer), session);
-							break;
-						default:
-							break;
-						}
+						;
 					}
 
 					co_return;
@@ -146,26 +149,25 @@ namespace aquarius
 		}
 
 		template <typename Session, typename BufferSequence>
-		static auto client_send(std::shared_ptr<Session> session, uint8_t mode, std::size_t rpc_id, BufferSequence buff, error_code& ec)
-			-> awaitable<void>
+		static auto client_send(std::shared_ptr<Session> session, uint8_t mode, std::size_t rpc_id, BufferSequence buff,
+								error_code& ec) -> awaitable<void>
 		{
 			local_header header{};
 			header.mode = mode;
 			header.length = buff.size();
 			header.rpc_id = rpc_id;
 
-			co_await session->async_write_some(buffer((char*)&header, sizeof(header)), ec);
+			std::vector<char> complete_buffer(sizeof(local_header));
+
+			std::memcpy(complete_buffer.data(), (char*)&header, sizeof(local_header));
+
+			complete_buffer.insert(complete_buffer.end(), buff.begin(), buff.end());
+
+			co_await session->async_write_some(buffer(complete_buffer), ec);
 
 			if (ec)
 			{
 				XLOG_ERROR() << "async write header is failed! maybe " << ec.message();
-			}
-
-			co_await session->async_write_some(std::move(buff), ec);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "async write body is failed! maybe " << ec.message();
 			}
 		}
 	};

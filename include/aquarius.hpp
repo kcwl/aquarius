@@ -9,13 +9,11 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/concepts.hpp>
-#include <aquarius/context/auto_context.hpp>
-#include <aquarius/context/basic_rpc_context.hpp>
-#include <aquarius/context/basic_stream_context.hpp>
-#include <aquarius/context/basic_transfer_context.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/context/handler.hpp>
+#include <aquarius/context/stream_context.hpp>
 #include <aquarius/context/stream_handler.hpp>
+#include <aquarius/context/transfer_context.hpp>
 #include <aquarius/crc.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
