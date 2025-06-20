@@ -23,6 +23,8 @@ namespace aquarius
 
 		using response_header = tcp_response_header;
 
+		using typename base_type::no_delay;
+
 	public:
 		using client_session = basic_session<false, tcp>;
 
