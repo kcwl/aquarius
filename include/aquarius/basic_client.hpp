@@ -106,7 +106,8 @@ namespace aquarius
 		template <typename RPC>
 		std::optional<typename RPC::response> async_send(typename RPC::request req)
 		{
-			auto fs = req.pack();
+			std::vector<char> fs{};
+			req.pack(fs);
 			auto promise_ptr = std::make_shared<std::promise<std::optional<typename RPC::response>>>();
 			auto future = promise_ptr->get_future();
 

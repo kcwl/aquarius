@@ -31,9 +31,6 @@
     <Filter Include="include\aquarius\context">
       <UniqueIdentifier>{ba1d6629-1712-4c21-bce4-3ec708cdc4ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\context\detail">
-      <UniqueIdentifier>{60cec9c6-dbe1-4f86-80d5-5bb86f3423ca}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
@@ -174,41 +171,35 @@
     <ClInclude Include="..\include\aquarius\ip\tcp_server.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\basic_rpc_context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\handler.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\basic_stream_context.hpp">
+    <ClInclude Include="..\include\aquarius\context\stream_context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\stream_handler.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\basic_transfer_context.hpp">
+    <ClInclude Include="..\include\aquarius\context\transfer_context.hpp">
       <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\detail\context_router.hpp">
-      <Filter>include\aquarius\context\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\detail\handler_router.hpp">
-      <Filter>include\aquarius\context\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\detail\client_router.hpp">
-      <Filter>include\aquarius\context\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\socket_base.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\auto_context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_service.hpp">
       <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\client_router.hpp">
+      <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\handler_router.hpp">
+      <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\lowyer_header.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
