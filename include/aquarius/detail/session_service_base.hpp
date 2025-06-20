@@ -85,7 +85,7 @@ namespace aquarius
 			bool set_nodelay(implementation_type_base& impl, bool enable)
 			{
 				error_code ec;
-				impl.socket->set_option(Protocol::no_delay(enable), ec);
+				impl.socket->set_option(typename Protocol::no_delay(enable), ec);
 
 				if (ec)
 				{
