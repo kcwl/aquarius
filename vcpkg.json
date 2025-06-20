@@ -1,6 +1,6 @@
 {
     "dependencies": [
-        "boost:x64-static",
+        "boost:x64-linux-static",
 	    "openssl"
     ]
 }
