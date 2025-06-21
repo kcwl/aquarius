@@ -101,33 +101,28 @@ namespace aquarius
 
 			return !future.get();
 		}
-		template <typename RPC>
-		std::optional<typename RPC::response> async_send(typename RPC::request req)
+		template <typename RPC, typename Func>
+		void async_send(typename RPC::request req, Func&& f)
 		{
 			std::vector<char> fs{};
 			req.pack(fs);
 			auto promise_ptr = std::make_shared<std::promise<std::optional<typename RPC::response>>>();
 			auto future = promise_ptr->get_future();
 
-			int id = 0;
 			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
-				id, [promise_ptr](std::optional<typename RPC::response> resp) mutable
-				{ promise_ptr->set_value(std::move(resp)); });
+				RPC::id, std::forward<Func>(f));
 
 			error_code ec{};
 
 			async_send(std::move(fs), static_cast<uint8_t>(mode::stream), RPC::id, ec);
-
-			auto status = future.wait_for(timeout_);
-
-			return status == std::future_status::timeout ? std::nullopt : future.get();
 		}
 
-		void async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
+		auto async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
 		{
-			co_spawn(
-				io_context_, [buf = std::move(buffer), mode, rpc_id, this, &ec] -> awaitable<void>
-				{ co_await session_ptr_->async_send(std::move(buf), mode, rpc_id, ec); }, detached);
+			co_spawn(io_context_, [this, buff = std::move(buffer), mode, rpc_id, &ec]->awaitable<void>
+				{
+					co_await session_ptr_->async_send(std::move(buff), mode, rpc_id, ec);
+				}, detached);
 		}
 		std::string remote_address()
 		{
@@ -146,11 +141,6 @@ namespace aquarius
 		void set_close_func(Func&& f)
 		{
 			close_func_ = std::forward<Func>(f);
-		}
-
-		auto get_executor()
-		{
-			return io_context_.get_executor();
 		}
 
 		void stop()

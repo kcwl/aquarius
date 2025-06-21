@@ -139,15 +139,7 @@ namespace aquarius
 				co_return;
 			}
 
-			co_spawn(
-				session->get_executor(),
-				[buffer = std::move(body_buffer), session, header] -> awaitable<void>
-				{
-					context::detail::client_router::get_mutable_instance().invoke(header.context_id, std::move(buffer));
-
-					co_return;
-				},
-				detached);
+			context::detail::client_router::get_mutable_instance().invoke(header.rpc_id, std::move(body_buffer));
 		}
 
 		template <typename Session, typename BufferSequence>
