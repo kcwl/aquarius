@@ -46,6 +46,11 @@ namespace aquarius
 	public:
 		bool async_connect(const std::string& ip_addr, const std::string& port)
 		{
+			if (io_context_.stopped())
+			{
+				io_context_.restart();
+			}
+
 			ip_addr_ = ip_addr;
 			port_ = port;
 
@@ -94,7 +99,7 @@ namespace aquarius
 				},
 				use_future);
 
-			if (!thread_ptr_)
+			if (!thread_ptr_ || !thread_ptr_->joinable())
 			{
 				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
 			}
