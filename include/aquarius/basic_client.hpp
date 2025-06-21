@@ -20,7 +20,7 @@
 namespace aquarius
 {
 	template <typename Protocol>
-	class basic_client : public std::enable_shared_from_this<basic_client<Protocol>>
+	class basic_client
 	{
 		using session = Protocol::client_session;
 		using socket = typename Protocol::socket;
@@ -49,11 +49,9 @@ namespace aquarius
 			ip_addr_ = ip_addr;
 			port_ = port;
 
-			auto self = this->shared_from_this();
-
 			auto future = co_spawn(
 				io_context_,
-				[this, self /*, conn_promise = std::move(connect_pormise)*/] mutable -> awaitable<error_code>
+				[this] mutable -> awaitable<error_code>
 				{
 					socket _socket(io_context_);
 
@@ -75,7 +73,7 @@ namespace aquarius
 
 						co_spawn(
 							this->io_context_,
-							[this, self] mutable -> awaitable<void>
+							[this] mutable -> awaitable<void>
 							{
 								auto ec = co_await session_ptr_->protocol();
 								if (ec)
