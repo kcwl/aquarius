@@ -148,7 +148,7 @@ namespace aquarius
 			close_func_ = std::forward<Func>(f);
 		}
 
-		auto get_executor() const
+		auto get_executor()
 		{
 			return io_context_.get_executor();
 		}
