@@ -150,12 +150,11 @@ namespace aquarius
 			close_func_ = std::forward<Func>(f);
 		}
 
-	private:
-		void create_session(socket socket)
+		auto get_executor() const
 		{
-			session_ptr_ = std::make_shared<session>(std::move(socket));
-			session_ptr_->regist_close(close_func_);
+			return io_context_.get_executor();
 		}
+
 		void stop()
 		{
 			if (!io_context_.stopped())
@@ -172,6 +171,13 @@ namespace aquarius
 			{
 				thread_ptr_->join();
 			}
+		}
+
+	private:
+		void create_session(socket socket)
+		{
+			session_ptr_ = std::make_shared<session>(std::move(socket));
+			session_ptr_->regist_close(close_func_);
 		}
 
 	private:
