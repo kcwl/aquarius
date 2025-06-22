@@ -76,22 +76,12 @@ namespace aquarius
 						session->get_executor(),
 						[buffer = std::move(buffer), session, header]
 						{
-							auto id = header.rpc_id;
-							switch (static_cast<mode>(header.mode))
+							if (!context::detail::handler_router<Session>::get_mutable_instance().invoke(
+								header.rpc_id, std::move(buffer), session, header))
 							{
-							case mode::stream:
-								break;
-							case mode::transfer:
-								{
-									id = __transfer_proto;
-									break;
-								}
-							default:
-								break;
+								context::detail::handler_router<Session>::get_mutable_instance().invoke(
+									__transfer_proto, std::move(buffer), session, header);
 							}
-
-							context::detail::handler_router<Session>::get_mutable_instance().invoke(
-								id, std::move(buffer), session, header);
 						});
 
 					if (status == std::future_status::timeout)

@@ -14,7 +14,7 @@ namespace aquarius
 		{
 			template <typename Session>
 			class handler_router
-				: public single_router<handler_router<Session>, void, std::vector<char>, std::shared_ptr<Session>, local_header>
+				: public single_router<handler_router<Session>, bool, std::vector<char>, std::shared_ptr<Session>, local_header>
 			{
 			public:
 				handler_router() = default;
@@ -54,6 +54,8 @@ namespace aquarius
 									 },
 									 detached);
 							 });
+
+						return true;
 					};
 
 					this->map_invokes_[proto] = func;
@@ -73,8 +75,6 @@ namespace aquarius
 										{
 											auto ctx = std::make_shared<TransferContext>();
 
-											std::memcpy(ctx->request()->data(), (char*)&resp_header, sizeof(local_header));
-
 											auto buff_ptr = std::make_shared<std::vector<char>>();
 
 											ctx->set_rpc_id(resp_header.rpc_id);
@@ -91,6 +91,8 @@ namespace aquarius
 										},
 										detached);
 								});
+
+							return true;
 						};
 
 					this->map_invokes_[proto] = func;
