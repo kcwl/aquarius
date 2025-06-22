@@ -26,7 +26,7 @@ namespace aquarius
 	private:
 		void make_response(E result)
 		{
-			this->response().header()->set_result(static_cast<int64_t>(result));
+			//this->response().header()->set_result(static_cast<int64_t>(result));
 		}
 	};
 } // namespace aquarius

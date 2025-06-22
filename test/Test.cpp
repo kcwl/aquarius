@@ -31,11 +31,15 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	req.body().name = "John";
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
-	auto resp = cli->async_send<rpc_test>(req);
+	cli->async_send<rpc_test>(req, [&](std::optional<rpc_test::response> resp) 
+		{
+			BOOST_ASSERT(resp.has_value()); 
 
-	BOOST_ASSERT(resp.has_value());
+			BOOST_CHECK_EQUAL((*resp).body(), req.body());
+		});
 
-	BOOST_CHECK_EQUAL((*resp).body(), req.body());
+	std::this_thread::sleep_for(5s);
+
 
 	srv.stop();
 

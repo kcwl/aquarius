@@ -40,14 +40,13 @@ namespace aquarius
 		}
 	};
 
-	template <typename Handler>
-	struct basic_transfer_context
+	constexpr static auto __transfer_proto = 1;
+
+	struct rpc_transfer
 	{
-		template<typename Session>
-		static auto invoke(std::vector<char>, std::shared_ptr<Session>)
-		{
-			return;
-		}
+		constexpr static auto id = __transfer_proto;
+		using request = std::vector<char>;
+		using response = std::vector<char>;
 	};
 
 } // namespace aquarius

@@ -58,6 +58,43 @@ namespace aquarius
 
 					this->map_invokes_[proto] = func;
 				}
+
+				template<typename TransferContext>
+				void regist(std::size_t proto)
+				{
+					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session, local_header header)
+						{
+							post(session->get_executor(),
+								[=, buffer = std::move(buffer)]
+								{
+									co_spawn(
+										session->get_executor(),
+										[session, resp_header = std::move(header), buffer = std::move(buffer)] mutable -> awaitable<void>
+										{
+											auto ctx = std::make_shared<TransferContext>();
+
+											std::memcpy(ctx->request()->data(), (char*)&resp_header, sizeof(local_header));
+
+											auto buff_ptr = std::make_shared<std::vector<char>>();
+
+											ctx->set_rpc_id(resp_header.rpc_id);
+
+											std::copy((char*)&resp_header, (char*)&resp_header + sizeof(local_header), std::back_inserter(*buff_ptr));
+
+											std::copy(buffer.begin(), buffer.end(), std::back_inserter(*buff_ptr));
+
+											co_await ctx->visit(buff_ptr);
+
+											error_code ec{};
+
+											co_await session->async_send(ctx->response(), ec);
+										},
+										detached);
+								});
+						};
+
+					this->map_invokes_[proto] = func;
+				}
 			};
 		} // namespace detail
 	} // namespace context

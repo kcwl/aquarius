@@ -34,6 +34,16 @@ namespace aquarius
 			return response_;
 		}
 
+		void set_rpc_id(std::size_t rpc_id)
+		{
+			rpc_id_ = rpc_id;
+		}
+
+		std::size_t rpc_id() const
+		{
+			return rpc_id_;
+		}
+
 	protected:
 		virtual auto handle() -> awaitable<E> = 0;
 
@@ -43,5 +53,7 @@ namespace aquarius
 		Response response_;
 
 		std::string name_;
+
+		std::size_t rpc_id_;
 	};
 } // namespace aquarius

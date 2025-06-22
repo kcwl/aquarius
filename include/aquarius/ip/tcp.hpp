@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
+#include <aquarius/basic_context.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>
@@ -8,7 +9,6 @@
 #include <aquarius/ip/lowyer_header.hpp>
 #include <aquarius_protocol/tcp_header.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <aquarius/basic_context.hpp>
 
 namespace aquarius
 {
@@ -76,22 +76,22 @@ namespace aquarius
 						session->get_executor(),
 						[buffer = std::move(buffer), session, header]
 						{
+							auto id = header.rpc_id;
 							switch (static_cast<mode>(header.mode))
 							{
 							case mode::stream:
-								{
-									context::detail::handler_router<Session>::get_mutable_instance().invoke(
-										header.rpc_id, std::move(buffer), session, header);
-								}
 								break;
 							case mode::transfer:
 								{
-									basic_transfer_context<class transfer_handler>::invoke(std::move(buffer), session);
-									break;
-								default:
+									id = __transfer_proto;
 									break;
 								}
+							default:
+								break;
 							}
+
+							context::detail::handler_router<Session>::get_mutable_instance().invoke(
+								id, std::move(buffer), session, header);
 						});
 
 					if (status == std::future_status::timeout)
