@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
+
 project(aquarius)
 
 set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(AQUARIUS_PROTOCOL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/3rd/aquarius_protocol/include)
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/triplet/x64-window-win10.cmake")
 
 if(WIN32)
 set(VCPKG_C_FLAG "-D_WIN32_WINNT=0x0A00 $VCPKG_C_FLAG")
