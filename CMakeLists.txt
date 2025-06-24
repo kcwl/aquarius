@@ -4,7 +4,7 @@ if(WIN32)
 set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
 set(VCPKG_TARGET_TRIPLET "x64-windows-win10")
 
-message(STATUS "set vcpkg target triplet: $VCPKG_TARGET_TRIPLET")
+message(STATUS "set vcpkg target triplet: ${VCPKG_TARGET_TRIPLET}")
 endif()
 
 project(aquarius)
