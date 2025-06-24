@@ -1,17 +1,15 @@
 cmake_minimum_required(VERSION 3.12)
 
+if(WIN32)
+message(STATUS "set vcpkg target triplet")
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
+set(VCPKG_TARGET_TRIPET "x64-windows-win10")
+endif()
+
 project(aquarius)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
-
-if(WIN32)
-message(STATUS "set vcpkg target triplet")
-set(VCPKG_TARGET_TRIPET "x64-windows-win10")
-endif()
-
 
 
 set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
