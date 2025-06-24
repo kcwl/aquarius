@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(WIN32)
 set(VCPKG_C_FLAGS -D_WIN32_WINNT=0x0A00)
 set(VCPKG_CXX_FLAGS -D_WIN32_WINNT=0x0A00)
+message(STATUS "win32 vcpkg config")
 endif()
 
 project(aquarius)
