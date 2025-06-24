@@ -9,9 +9,7 @@ set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(AQUARIUS_PROTOCOL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/3rd/aquarius_protocol/include)
 
-set(VCPKG_HASH_ADDITIONAL_FILES
-  "${CMAKE_CURRENT_SOURCE_DIR}/triplet/x64-window-win10.cmake"
-)
+include("${CMAKE_CURRENT_SOURCE_DIR}/triplet/x64-window-win10.cmake")
 
 if(WIN32)
 set(VCPKG_C_FLAG "-D_WIN32_WINNT=0x0A00 $VCPKG_C_FLAG")
