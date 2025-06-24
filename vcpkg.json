@@ -1,13 +1,6 @@
 {
     "dependencies": [
-        {
-            "name": "boost",
-            "platform": "!windows"
-        },
-        {
-            "name": "boost:x64-window-win10",
-            "platform": "window"
-        },
+        "boost",
         "openssl"
     ]
 }
