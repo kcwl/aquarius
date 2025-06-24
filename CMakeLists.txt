@@ -7,6 +7,7 @@ set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
 
 if(WIN32)
 set(VCPKG_TARGET_TRIPET "x64-windows-win10")
+endif()
 
 project(aquarius)
 
