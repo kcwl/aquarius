@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE UnitTest
-#ifdef WIN32
+#ifdef _WIN32
 #include <sdkddkver.h>
 #endif
 
