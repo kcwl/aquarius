@@ -5,6 +5,7 @@
         "boost-pfr",
         "boost-system",
         "boost-test",
+        "boost-crc",
         "openssl"
     ]
 }
