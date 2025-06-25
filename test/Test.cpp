@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE UnitTest
-#ifdef AQUARIUS_USE_VCPKG
-#define BOOST_USE_WINAPI_VERSION BOOST_WINAPI_VERSION_WIN7
+#ifdef WIN32
+#include <sdkddkver.h>
 #endif
 
 #include <boost/test/included/unit_test.hpp>
