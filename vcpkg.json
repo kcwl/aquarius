@@ -4,6 +4,7 @@
         "boost-log",
         "boost-pfr",
         "boost-system",
+        "boost-test",
         "openssl"
     ]
 }
