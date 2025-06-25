@@ -1,6 +1,9 @@
 {
     "dependencies": [
-        "boost",
+        "boost-asio",
+        "boost-log",
+        "boost-pfr",
+        "boost-system",
         "openssl"
     ]
 }
