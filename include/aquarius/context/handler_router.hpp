@@ -34,7 +34,7 @@ namespace aquarius
 							 {
 								 co_spawn(
 									 session->get_executor(),
-									 [session, req, resp_header = std::move(header)] mutable -> awaitable<void>
+									 [session, req, resp_header = std::move(header)]() mutable -> awaitable<void>
 									 {
 										 auto ctx = std::make_shared<Context>();
 
@@ -71,7 +71,7 @@ namespace aquarius
 								{
 									co_spawn(
 										session->get_executor(),
-										[session, resp_header = std::move(header), buffer = std::move(buffer)] mutable -> awaitable<void>
+										[session, resp_header = std::move(header), buffer = std::move(buffer)]() mutable -> awaitable<void>
 										{
 											auto ctx = std::make_shared<TransferContext>();
 

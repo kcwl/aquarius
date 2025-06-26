@@ -29,7 +29,7 @@ namespace aquarius
 		template <typename Executor, typename Func>
 		auto invoke(const Executor& ex, Func&& f)
 		{
-			auto future = co_spawn(ex, [func = std::move(f)] -> awaitable<void> { func(); co_return; }, use_future);
+			auto future = co_spawn(ex, [func = std::move(f)]() -> awaitable<void> { func(); co_return; }, use_future);
 
 			auto status = future.wait_for(timeout_);
 

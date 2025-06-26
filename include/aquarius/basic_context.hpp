@@ -30,7 +30,7 @@ namespace aquarius
 		void invoke(std::shared_ptr<Session> session, Func&& f)
 		{
 			auto future =
-				co_spawn(session->get_executor(), [func = std::move(f)] -> awaitable<void> { func(); co_return; }, use_future);
+				co_spawn(session->get_executor(), [func = std::move(f)]() -> awaitable<void> { func(); co_return; }, use_future);
 
 			auto status = future.wait_for(this->timeout());
 			if (status == std::future_status::timeout)

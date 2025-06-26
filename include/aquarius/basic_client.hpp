@@ -56,7 +56,7 @@ namespace aquarius
 
 			auto future = co_spawn(
 				io_context_,
-				[this] mutable -> awaitable<error_code>
+				[this]() mutable -> awaitable<error_code>
 				{
 					socket _socket(io_context_);
 
@@ -78,7 +78,7 @@ namespace aquarius
 
 						co_spawn(
 							this->io_context_,
-							[this] mutable -> awaitable<void>
+							[this]() mutable -> awaitable<void>
 							{
 								auto ec = co_await session_ptr_->protocol();
 								if (ec)
@@ -124,7 +124,7 @@ namespace aquarius
 
 		auto async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
 		{
-			co_spawn(io_context_, [this, buff = std::move(buffer), mode, rpc_id, &ec]->awaitable<void>
+			co_spawn(io_context_, [this, buff = std::move(buffer), mode, rpc_id, &ec]()->awaitable<void>
 				{
 					co_await session_ptr_->async_send(std::move(buff), mode, rpc_id, ec);
 				}, detached);

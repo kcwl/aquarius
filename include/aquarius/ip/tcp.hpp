@@ -68,7 +68,7 @@ namespace aquarius
 
 			co_spawn(
 				session->get_executor(),
-				[buffer = std::move(body_buffer), session, header] -> awaitable<void>
+				[buffer = std::move(body_buffer), session, header]() -> awaitable<void>
 				{
 					static context::stream_context stream{};
 
