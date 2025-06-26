@@ -1,28 +1,35 @@
 #pragma once
+#include <aquarius/awaitable.hpp>
+#include <aquarius/co_spawn.hpp>
+#include <aquarius/context/context.hpp>
+#include <aquarius/detached.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <boost/asio/signal_set.hpp>
+#include <aquarius/signal_set.hpp>
+#include <aquarius/use_awaitable.hpp>
 
 namespace aquarius
 {
-	template <typename Acceptor, typename Session>
+	template <typename Protocol>
 	class basic_server
 	{
-		using acceptor_type = Acceptor;
+		using session_type = typename Protocol::server_session;
 
-		using session_type = Session;
+		using acceptor_type = typename Protocol::acceptor;
+
+		using endpoint_type = typename acceptor_type::endpoint_type;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), port)
+			, acceptor_(io_service_pool_.get_io_service(), endpoint_type{ Protocol::v4(), port })
 			, server_name_(name)
 		{
 			init_signal();
 
-			boost::asio::co_spawn(acceptor_.get_executor(), start_accept(), boost::asio::detached);
+			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 		}
 
 		~basic_server() = default;
@@ -43,21 +50,25 @@ namespace aquarius
 		}
 
 	private:
-		auto start_accept() -> boost::asio::awaitable<void>
+		auto start_accept() -> awaitable<void>
 		{
 			error_code ec;
 
 			for (;;)
 			{
-				auto sock = co_await acceptor_.accept(ec);
+				auto sock = co_await acceptor_.async_accept(redirect_error(use_awaitable, ec));
+
+				if (!acceptor_.is_open())
+				{
+					ec = boost::asio::error::bad_descriptor;
+				}
 
 				if (ec)
 					break;
 
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
-				boost::asio::co_spawn(
-					conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->start(); }, boost::asio::detached);
+				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
 			}
 
 			co_return;
@@ -84,7 +95,7 @@ namespace aquarius
 	private:
 		detail::io_service_pool io_service_pool_;
 
-		boost::asio::signal_set signals_;
+		signal_set signals_;
 
 		acceptor_type acceptor_;
 

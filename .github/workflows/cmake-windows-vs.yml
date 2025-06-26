@@ -62,7 +62,6 @@ jobs:
         -DBOOST_SHARED_FLAG=true
         -DAQUARIUS_ENABLE_SSL=true
         -S ${{ github.workspace }}
-        -D_WIN32_WINNT=0x0A00
         -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         
 

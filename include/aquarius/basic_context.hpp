@@ -1,44 +1,52 @@
 #pragma once
-#include <aquarius/tcp/auto_register.hpp>
-#include <chrono>
-#include <string>
-
-using namespace std::chrono_literals;
+#include <aquarius/detail/context_base.hpp>
+#include <aquarius/use_future.hpp>
 
 namespace aquarius
 {
-	template <typename Message>
-	class basic_context
+	enum class mode
 	{
+		stream,
+		transfer
+	};
+
+	template <typename Session>
+	class basic_context : public context_base
+	{
+		using buffer_type = typename Session::buffer_type;
+
 	public:
-		basic_context(const std::string& name, const std::chrono::milliseconds timeout)
-			: message_ptr_(nullptr)
-			, ctx_name_(name)
-			, timeout_(timeout)
+		basic_context(const std::string& name, std::chrono::steady_clock::duration timeout)
+			: context_base(name, timeout)
 		{}
 
 	public:
-		template <typename Session>
-		int visit(std::shared_ptr<Message> msg, std::shared_ptr<Session>)
+		virtual void visit(buffer_type buff, std::shared_ptr<Session> session)
 		{
-			message_ptr_ = msg;
-
-			return this->handle();
+			return;
 		}
 
-		std::shared_ptr<Message> message()
+		template <typename Func>
+		void invoke(std::shared_ptr<Session> session, Func&& f)
 		{
-			return message_ptr_;
+			auto future =
+				co_spawn(session->get_executor(), [func = std::move(f)]() -> awaitable<void> { func(); co_return; }, use_future);
+
+			auto status = future.wait_for(this->timeout());
+			if (status == std::future_status::timeout)
+			{
+				//
+			}
 		}
-
-	protected:
-		virtual int handle() = 0;
-
-	protected:
-		std::shared_ptr<Message> message_ptr_;
-
-		std::string ctx_name_;
-
-		std::chrono::milliseconds timeout_;
 	};
+
+	constexpr static auto __transfer_proto = 1;
+
+	struct rpc_transfer
+	{
+		constexpr static auto id = __transfer_proto;
+		using request = std::vector<char>;
+		using response = std::vector<char>;
+	};
+
 } // namespace aquarius

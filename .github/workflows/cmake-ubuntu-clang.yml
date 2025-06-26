@@ -25,11 +25,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         build_type: [Debug, Release]
-        c_compiler: [clang-17]
+        c_compiler: [clang-20]
         include:
           - os: ubuntu-latest
-            c_compiler: clang-17
-            cpp_compiler: clang++-17
+            c_compiler: clang-20
+            cpp_compiler: clang++-20
 
     steps:
     - uses: actions/checkout@v3
@@ -44,12 +44,12 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         clang --version
 
-    - name: install clang 17
+    - name: install clang 20
       shell: bash
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod u+x llvm.sh
-        sudo ./llvm.sh 17
+        sudo ./llvm.sh 20
 
     - name: install boost openssl
       shell: bash

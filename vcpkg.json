@@ -1,6 +1,11 @@
 {
     "dependencies": [
-        "boost",
-	    "openssl"
+        "boost-asio",
+        "boost-log",
+        "boost-pfr",
+        "boost-system",
+        "boost-test",
+        "boost-crc",
+        "openssl"
     ]
 }

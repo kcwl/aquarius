@@ -1,4 +1,8 @@
 #define BOOST_TEST_MODULE UnitTest
+#ifdef _WIN32
+#include <sdkddkver.h>
+#endif
+
 #include <boost/test/included/unit_test.hpp>
 #include "protocol.hpp"
 #include "detail.h"
@@ -6,19 +10,20 @@
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {
-	aquarius::tcp::async_server srv(8100, 10, "async tcp server");
+	aquarius::tcp_server srv(8100, 10, "async tcp server");
 
 	std::thread t([&] { srv.run(); });
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::tcp::async_client cli("127.0.0.1", "8100");
+	auto cli = std::make_shared<aquarius::tcp_client>();
 
-	std::thread t1([&] { cli.run(); });
 
-	test_request req{};
-	req.header()->crc32_ = 1;
-	req.header()->timestamp_ = 1;
+	BOOST_CHECK(cli->async_connect("127.0.0.1", "8100"));
+	
+
+	rpc_test::request req{};
+	req.header()->uuid_ = 1;
 	req.body().sex = true;
 	req.body().addr = 2;
 	req.body().age = 15;
@@ -30,16 +35,19 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	req.body().name = "John";
 	req.body().orders = { 1, 2, 3, 4, 5 };
 
-	cli.send_request(req);
+	cli->async_send<rpc_test>(req, [&](std::optional<rpc_test::response> resp) 
+		{
+			BOOST_ASSERT(resp.has_value()); 
+
+			BOOST_CHECK_EQUAL((*resp).body(), req.body());
+		});
 
 	std::this_thread::sleep_for(5s);
 
-	cli.stop();
 
 	srv.stop();
 
 	t.join();
-	t1.join();
 }
 
 #ifdef AQUARIUS_ENABLE_SSL

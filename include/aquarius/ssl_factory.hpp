@@ -3,6 +3,6 @@
 
 namespace aquarius
 {
-	template <std::size_t SSLVersion>
+	template <bool Server, auto SSLVersion>
 	struct ssl_context_factory;
 }
