@@ -6,8 +6,6 @@ set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/triplet")
 set(VCPKG_TARGET_TRIPLET "x64-windows-win10")
 #message(STATUS "set vcpkg default triplet: ${VCPKG_DEFAULT_TRIPLET}")
 message(STATUS "set vcpkg target triplet: ${VCPKG_TARGET_TRIPLET}")
-set(VCPKG_C_FLAGS "/D_WIN32_WINNT=0x0A00 ${VCPKG_C_FLAGS}")
-set(VCPKG_CXX_FLAGS "/D_WIN32_WINNT=0x0A00 ${VCPKG_CXX_FLAGS}")
 endif()
 
 project(aquarius)
