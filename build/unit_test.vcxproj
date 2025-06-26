@@ -151,13 +151,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\aoi\cross_list.hpp" />
-    <ClInclude Include="..\include\aquarius\aoi\liner.hpp" />
-    <ClInclude Include="..\include\aquarius\aoi\nine_grid.hpp" />
-    <ClInclude Include="..\include\aquarius\aoi\space_cross_list.hpp" />
     <ClInclude Include="..\include\aquarius\basic_area_of_interesting.hpp" />
     <ClInclude Include="..\include\aquarius\basic_async_acceptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_cross_list.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
@@ -167,7 +164,6 @@
     <ClInclude Include="..\include\aquarius\client_context.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\crc.hpp" />
-    <ClInclude Include="..\include\aquarius\cross_list.hpp" />
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\error_category.hpp" />
@@ -197,6 +193,8 @@
     <ClInclude Include="..\include\aquarius\tcp\context.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\context_router.hpp" />
     <ClInclude Include="..\include\aquarius\tcp\package_processor.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_area.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_level.hpp" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\connect.h" />
     <ClInclude Include="..\test\core.h" />

@@ -1,8 +1,11 @@
 #pragma once
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <aquarius/basic_area.hpp>
 #include <aquarius/basic_async_acceptor.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_context.hpp>
+#include <aquarius/basic_cross_list.hpp>
+#include <aquarius/basic_level.hpp>
 #include <aquarius/basic_router.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
