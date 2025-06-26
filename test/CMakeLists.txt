@@ -19,9 +19,8 @@ endif()
 target_compile_definitions(unittest PUBLIC -DBOOST_ASIO_HAS_INLINE_VARIABLES)
 
 if(WIN32)
-target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK)
+target_compile_definitions(unittest PUBLIC -D_WIN32_WINNT=0x0602 -DWIN32_LEAN_AND_MEAN -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK)
 target_compile_options(unittest PUBLIC /bigobj )
-add_definitions(-D_WIN32_WINNT=0x0602)
 endif()
 
 
