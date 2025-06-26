@@ -25,11 +25,11 @@ jobs:
       matrix:
         os: [windows-latest]
         build_type: [Debug, Release]
-        c_compiler: [cl]
+        c_compiler: [msvc]
         include:
           - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
+            c_compiler: msvc
+            cpp_compiler: msvc
 
     steps:
     - uses: actions/checkout@v3
