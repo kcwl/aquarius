@@ -10,7 +10,6 @@ namespace aquarius
 {
 	namespace detail
 	{
-
 		class io_service_pool
 		{
 		private:
