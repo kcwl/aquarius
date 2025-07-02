@@ -14,7 +14,7 @@ namespace aquarius
 		{
 			template <typename Session>
 			class handler_router
-				: public single_router<handler_router<Session>, bool, std::vector<char>, std::shared_ptr<Session>, local_header>
+				: public single_router<handler_router<Session>, bool, std::vector<char>, std::shared_ptr<Session>>
 			{
 			public:
 				handler_router() = default;
@@ -23,7 +23,7 @@ namespace aquarius
 				template <typename Request, typename Context>
 				void regist(std::size_t proto)
 				{
-					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session, local_header header)
+					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session)
 					{
 						auto req = std::make_shared<Request>();
 
@@ -34,19 +34,17 @@ namespace aquarius
 							 {
 								 co_spawn(
 									 session->get_executor(),
-									 [session, req, resp_header = std::move(header)]() mutable -> awaitable<void>
+									 [session, req]() mutable -> awaitable<void>
 									 {
 										 auto ctx = std::make_shared<Context>();
 
 										 co_await ctx->visit(req);
 
-										 std::vector<char> resp_buf(sizeof(local_header));
+										 std::vector<char> resp_buf{};
+
+										 ctx->response().length(resp_buf.size() - sizeof(ctx->response().header()));
 
 										 ctx->response().pack(resp_buf);
-
-										 resp_header.length = resp_buf.size() - sizeof(local_header);
-
-										 std::memcpy(resp_buf.data(), (char*)&resp_header, sizeof(local_header));
 
 										 error_code ec{};
 

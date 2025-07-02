@@ -22,24 +22,24 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	BOOST_CHECK(cli->async_connect("127.0.0.1", "8100"));
 	
 
-	rpc_test::request req{};
-	req.header()->uuid_ = 1;
-	req.body().sex = true;
-	req.body().addr = 2;
-	req.body().age = 15;
-	req.body().telephone = 15230214856;
-	req.body().score = 100;
-	req.body().hp = 200;
-	req.body().mana = 300;
-	req.body().info = { 1, 1, 1, 1, 1, 1 };
-	req.body().name = "John";
-	req.body().orders = { 1, 2, 3, 4, 5 };
+	auto req = std::make_shared<rpc_test::request>();
+	req->header()->uuid(1);
+	req->body().sex = true;
+	req->body().addr = 2;
+	req->body().age = 15;
+	req->body().telephone = 15230214856;
+	req->body().score = 100;
+	req->body().hp = 200;
+	req->body().mana = 300;
+	req->body().info = { 1, 1, 1, 1, 1, 1 };
+	req->body().name = "John";
+	req->body().orders = { 1, 2, 3, 4, 5 };
 
-	cli->async_send<rpc_test>(req, [&](std::optional<rpc_test::response> resp) 
+	cli->async_send<rpc_test>(*req, [req](std::optional<rpc_test::response> resp) 
 		{
 			BOOST_ASSERT(resp.has_value()); 
 
-			BOOST_CHECK_EQUAL((*resp).body(), req.body());
+			BOOST_CHECK_EQUAL((*resp).body(), req->body());
 		});
 
 	std::this_thread::sleep_for(5s);

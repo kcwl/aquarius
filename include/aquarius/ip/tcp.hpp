@@ -7,34 +7,54 @@
 #include <aquarius/context/handler_router.hpp>
 #include <aquarius/context/stream_context.hpp>
 #include <aquarius/ip/lowyer_header.hpp>
-#include <aquarius_protocol/tcp_header.hpp>
+#include <aquarius_protocol/tcp_response.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
 {
-	class tcp : public boost::asio::ip::tcp
+	class tcp
 	{
 	public:
-		using base_type = boost::asio::ip::tcp;
+		using impl_type = boost::asio::ip::tcp;
 
-		using socket_type = typename base_type::socket;
+		using socket_type = typename impl_type::socket;
 
-		using request_header = tcp_request_header;
+		using no_delay = typename impl_type::no_delay;
 
-		using response_header = tcp_response_header;
+		using socket = typename impl_type::socket;
 
-		using typename base_type::no_delay;
+		using acceptor = typename impl_type::acceptor;
 
-	public:
+		using resolver = typename impl_type::resolver;
+
 		using client_session = basic_session<false, tcp>;
 
 		using server_session = basic_session<true, tcp>;
 
+		using request_header = basic_tcp_header<true>;
+
+		using response_header = basic_tcp_header<false>;
+
+		using endpoint_type = typename acceptor::endpoint_type;
+
+	public:
+		static endpoint_type make_v4_endpoint(uint16_t port)
+		{
+			return endpoint_type(boost::asio::ip::tcp::v4(), port);
+		}
+
+		static endpoint_type make_v6_endpoint(uint16_t port)
+		{
+			return endpoint_type(boost::asio::ip::tcp::v6(), port);
+		}
+
 	public:
 		template <typename Session>
-		static auto server_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
+		auto server_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
 		{
-			constexpr auto header_length = sizeof(local_header);
+			static_assert(Session::is_server, "session must be for server");
+
+			constexpr auto header_length = sizeof(request_header);
 			char header_buffer[header_length] = { 0 };
 			ec = co_await session->async_read(header_buffer);
 
@@ -48,11 +68,11 @@ namespace aquarius
 				co_return;
 			}
 
-			local_header header{};
+			request_header header{};
 
 			std::memcpy((char*)&header, &header_buffer[0], header_length);
 
-			std::vector<char> body_buffer(header.length);
+			std::vector<char> body_buffer(header.length());
 
 			ec = co_await session->async_read(body_buffer);
 
@@ -72,17 +92,17 @@ namespace aquarius
 				{
 					static context::stream_context stream{};
 
-					auto status = stream.invoke(
-						session->get_executor(),
-						[buffer = std::move(buffer), session, header]
-						{
-							if (!context::detail::handler_router<Session>::get_mutable_instance().invoke(
-								header.rpc_id, std::move(buffer), session, header))
-							{
-								context::detail::handler_router<Session>::get_mutable_instance().invoke(
-									__transfer_proto, std::move(buffer), session, header);
-							}
-						});
+					auto status =
+						stream.invoke(session->get_executor(),
+									  [buffer = std::move(buffer), session, header]
+									  {
+										  if (!context::detail::handler_router<Session>::get_mutable_instance().invoke(
+												  header.rpc_id(), std::move(buffer), session, header))
+										  {
+											  context::detail::handler_router<Session>::get_mutable_instance().invoke(
+												  __transfer_proto, std::move(buffer), session, header);
+										  }
+									  });
 
 					if (status == std::future_status::timeout)
 					{
@@ -95,9 +115,11 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto client_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
+		auto client_read(std::shared_ptr<Session> session, error_code& ec) -> awaitable<void>
 		{
-			constexpr auto header_length = sizeof(local_header);
+			static_assert(!Session::is_server, "session must be for client");
+
+			constexpr auto header_length = sizeof(response_header);
 			char header_buffer[header_length] = { 0 };
 			ec = co_await session->async_read(header_buffer);
 
@@ -111,11 +133,11 @@ namespace aquarius
 				co_return;
 			}
 
-			local_header header{};
+			response_header header{};
 
 			std::memcpy((char*)&header, &header_buffer[0], header_length);
 
-			std::vector<char> body_buffer(header.length);
+			std::vector<char> body_buffer(header.length());
 
 			ec = co_await session->async_read(body_buffer);
 
@@ -129,23 +151,19 @@ namespace aquarius
 				co_return;
 			}
 
-			context::detail::client_router::get_mutable_instance().invoke(header.rpc_id, std::move(body_buffer));
+			context::detail::client_router::get_mutable_instance().invoke(header.rpc_id(), std::move(body_buffer));
 		}
 
-		template <typename Session, typename BufferSequence>
-		static auto client_send(std::shared_ptr<Session> session, uint8_t mode, std::size_t rpc_id, BufferSequence buff,
-								error_code& ec) -> awaitable<void>
+		template <typename RPC, typename Session>
+		auto client_send(std::shared_ptr<Session> session, typename RPC::request req, error_code& ec) -> awaitable<void>
 		{
-			local_header header{};
-			header.mode = mode;
-			header.length = buff.size();
-			header.rpc_id = rpc_id;
+			static_assert(!Session::is_server, "session must be for client");
 
-			std::vector<char> complete_buffer(sizeof(local_header));
+			std::vector<char> complete_buffer{};
 
-			std::memcpy(complete_buffer.data(), (char*)&header, sizeof(local_header));
-
-			complete_buffer.insert(complete_buffer.end(), buff.begin(), buff.end());
+			req.uuid(RPC::id);
+			req.pack(complete_buffer);
+			req.length(complete_buffer.size());
 
 			co_await session->async_write_some(buffer(complete_buffer), ec);
 

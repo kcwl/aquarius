@@ -119,16 +119,12 @@ namespace aquarius
 
 			error_code ec{};
 
-			async_send(std::move(fs), static_cast<uint8_t>(mode::stream), RPC::id, ec);
-		}
-
-		auto async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
-		{
-			co_spawn(io_context_, [this, buff = std::move(buffer), mode, rpc_id, &ec]()->awaitable<void>
+			co_spawn(io_context_, [this, req = std::move(req), &ec]()->awaitable<void>
 				{
-					co_await session_ptr_->async_send(std::move(buff), mode, rpc_id, ec);
+					co_await session_ptr_->async_send<RPC>(std::move(req), ec);
 				}, detached);
 		}
+
 		std::string remote_address()
 		{
 			return session_ptr_->remote_address();
