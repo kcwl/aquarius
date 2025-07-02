@@ -5,6 +5,7 @@
 #include <aquarius/context/context.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
+#include <aquarius/detail/connect.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_context.hpp>
 #include <aquarius/ip/address.hpp>
@@ -22,7 +23,7 @@ namespace aquarius
 	template <typename Protocol>
 	class basic_client
 	{
-		using session = Protocol::client_session;
+		using session = typename Protocol::session;
 		using socket = typename Protocol::socket;
 		using resolver = typename Protocol::resolver;
 		using port_type = uint16_t;
@@ -66,7 +67,7 @@ namespace aquarius
 
 					error_code ec{};
 
-					co_await boost::asio::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
+					co_await detail::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
 
 					if (ec)
 					{
@@ -119,10 +120,9 @@ namespace aquarius
 
 			error_code ec{};
 
-			co_spawn(io_context_, [this, req = std::move(req), &ec]()->awaitable<void>
-				{
-					co_await session_ptr_->async_send<RPC>(std::move(req), ec);
-				}, detached);
+			co_spawn(
+				io_context_, [this, req = std::move(req), &ec]() -> awaitable<void>
+				{ co_await session_ptr_->async_send<RPC>(std::move(req), ec); }, detached);
 		}
 
 		std::string remote_address()

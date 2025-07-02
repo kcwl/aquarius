@@ -62,7 +62,7 @@ namespace aquarius
 
 			for (;;)
 			{
-				co_await proto_.server_read(this->shared_from_this(), ec);
+				co_await proto_.recv(this->shared_from_this(), ec);
 
 				if (ec)
 				{
@@ -190,7 +190,7 @@ namespace aquarius
 
 			for (;;)
 			{
-				co_await proto_.client_read(this->shared_from_this(), ec);
+				co_await proto_.recv(this->shared_from_this(), ec);
 
 				if (ec)
 				{
@@ -221,7 +221,7 @@ namespace aquarius
 		template <typename RPC>
 		auto async_send(typename RPC::request req, error_code& ec) -> awaitable<error_code>
 		{
-			co_await proto_.template client_send<RPC>(this->shared_from_this(), std::move(req), ec);
+			co_await proto_.send<RPC>(this->shared_from_this(), std::move(req), ec);
 
 			co_return ec;
 		}

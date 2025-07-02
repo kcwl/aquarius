@@ -20,7 +20,7 @@ namespace aquarius
 
 			using execution_base_type = execution_context_service_base<session_service<Protocol>>;
 
-			using socket_type = typename Protocol::socket_type;
+			using socket = typename Protocol::socket;
 
 			struct implementation_type : base_type::implementation_type_base
 			{};
@@ -38,9 +38,9 @@ namespace aquarius
 				return;
 			}
 
-			void move_copy(implementation_type& impl, socket_type socket)
+			void move_copy(implementation_type& impl, socket sock)
 			{
-				return base_type::move_copy(impl, std::move(socket));
+				return base_type::move_copy(impl, std::move(sock));
 			}
 
 			void destroy(implementation_type& impl)

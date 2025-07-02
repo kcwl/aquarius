@@ -77,5 +77,5 @@ AQUARIUS_STREAM_CONTEXT(ctx_test, rpc_test)
 {
 	response().body() = request()->body();
 
-	co_return 0;
+	co_return aquarius::error_code{};
 }

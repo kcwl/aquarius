@@ -29,7 +29,13 @@
       <UniqueIdentifier>{cf7c6020-7747-4b7b-9416-25a34e6b2419}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\aquarius\context">
-      <UniqueIdentifier>{ba1d6629-1712-4c21-bce4-3ec708cdc4ec}</UniqueIdentifier>
+      <UniqueIdentifier>{f44714dd-dc50-4169-9bb2-9751f5e00e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\context\detail">
+      <UniqueIdentifier>{fcecfe06-d5b5-4308-86e6-7c5bc78c0395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ip\detail">
+      <UniqueIdentifier>{267a6585-6276-4f65-b484-eb0df2b5cba1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,7 +99,7 @@
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_context.hpp">
+    <ClInclude Include="..\include\aquarius\context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\test\protocol.hpp">
@@ -108,11 +114,8 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_handler.hpp">
+    <ClInclude Include="..\include\aquarius\handler.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\context_base.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -165,41 +168,35 @@
     <ClInclude Include="..\include\aquarius\detail\io_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp_client.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp_server.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\handler.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\stream_context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\stream_handler.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\context\transfer_context.hpp">
-      <Filter>include\aquarius\context</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\socket_base.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_service.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\context.hpp">
+      <Filter>include\aquarius\context</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\aquarius\context\client_router.hpp">
+      <Filter>include\aquarius\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\context\handler.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\handler_router.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\lowyer_header.hpp">
-      <Filter>include\aquarius\ip</Filter>
+    <ClInclude Include="..\include\aquarius\context\detail\context_base.hpp">
+      <Filter>include\aquarius\context\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\detail\tcp.hpp">
+      <Filter>include\aquarius\ip\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\connect.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\detail\tcp_base.hpp">
+      <Filter>include\aquarius\ip\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

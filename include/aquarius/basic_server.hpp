@@ -14,7 +14,7 @@ namespace aquarius
 	template <typename Protocol>
 	class basic_server
 	{
-		using session_type = typename Protocol::server_session;
+		using session_type = typename Protocol::session;
 
 		using acceptor_type = typename Protocol::acceptor;
 

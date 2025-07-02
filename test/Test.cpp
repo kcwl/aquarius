@@ -10,13 +10,13 @@
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {
-	aquarius::tcp_server srv(8100, 10, "async tcp server");
+	aquarius::ip::tcp_server srv(8100, 10, "async tcp server");
 
 	std::thread t([&] { srv.run(); });
 
 	std::this_thread::sleep_for(2s);
 
-	auto cli = std::make_shared<aquarius::tcp_client>();
+	auto cli = std::make_shared<aquarius::ip::tcp_client>();
 
 
 	BOOST_CHECK(cli->async_connect("127.0.0.1", "8100"));

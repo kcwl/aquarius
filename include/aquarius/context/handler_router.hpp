@@ -2,100 +2,65 @@
 #include <aquarius/basic_router.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/flex_buffer.hpp>
-#include <aquarius/ip/lowyer_header.hpp>
 #include <aquarius/post.hpp>
+#include <vector>
 
 namespace aquarius
 {
 	namespace context
 	{
-		namespace detail
+		template <typename Protocol>
+		class handler_router : public single_router<handler_router<Protocol>, bool, std::shared_ptr<typename Protocol::session>, std::vector<char>,
+													 typename Protocol::header>
 		{
-			template <typename Session>
-			class handler_router
-				: public single_router<handler_router<Session>, bool, std::vector<char>, std::shared_ptr<Session>>
+		public:
+			using session = typename Protocol::session;
+
+			using header = typename Protocol::header;
+
+			using body_buffer = std::vector<char>;
+
+		public:
+			handler_router() = default;
+
+		public:
+			template <typename Request, typename Context>
+			void regist(std::size_t proto)
 			{
-			public:
-				handler_router() = default;
-
-			public:
-				template <typename Request, typename Context>
-				void regist(std::size_t proto)
+				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer,  header h)
 				{
-					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session)
-					{
-						auto req = std::make_shared<Request>();
+					auto req = std::make_shared<Request>(h);
+					req->unpack(buffer);
+					post(session->get_executor(),
+						 [=]
+						 {
+							 co_spawn(
+								 session->get_executor(),
+								 [session, req]() mutable -> awaitable<void>
+								 {
+									 auto ctx = std::make_shared<Context>();
 
-						req->unpack(buffer);
+									 auto ec = co_await ctx->visit(req);
 
-						post(session->get_executor(),
-							 [=]
-							 {
-								 co_spawn(
-									 session->get_executor(),
-									 [session, req]() mutable -> awaitable<void>
+									 if (!ec)
 									 {
-										 auto ctx = std::make_shared<Context>();
+										 std::vector<char> body_buff{};
+										 ctx->response().pack(body_buff);
+										 ctx->response().header()->length(body_buff.size());
+										 ctx->response().header()->rpc_id(req->header()->rpc_id());
+										 std::vector<char> header_buff{};
+										 ctx->response().header()->pack(header_buff);
+										 header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
 
-										 co_await ctx->visit(req);
-
-										 std::vector<char> resp_buf{};
-
-										 ctx->response().length(resp_buf.size() - sizeof(ctx->response().header()));
-
-										 ctx->response().pack(resp_buf);
-
-										 error_code ec{};
-
-										 co_await session->async_send(resp_buf, ec);
-									 },
-									 detached);
-							 });
-
-						return true;
-					};
-
-					this->map_invokes_[proto] = func;
-				}
-
-				template<typename TransferContext>
-				void regist(std::size_t proto)
-				{
-					auto func = [&](std::vector<char> buffer, std::shared_ptr<Session> session, local_header header)
-						{
-							post(session->get_executor(),
-								[=, buffer = std::move(buffer)]
-								{
-									co_spawn(
-										session->get_executor(),
-										[session, resp_header = std::move(header), buffer = std::move(buffer)]() mutable -> awaitable<void>
-										{
-											auto ctx = std::make_shared<TransferContext>();
-
-											auto buff_ptr = std::make_shared<std::vector<char>>();
-
-											ctx->set_rpc_id(resp_header.rpc_id);
-
-											std::copy((char*)&resp_header, (char*)&resp_header + sizeof(local_header), std::back_inserter(*buff_ptr));
-
-											std::copy(buffer.begin(), buffer.end(), std::back_inserter(*buff_ptr));
-
-											co_await ctx->visit(buff_ptr);
-
-											error_code ec{};
-
-											co_await session->async_send(ctx->response(), ec);
-										},
-										detached);
-								});
-
-							return true;
-						};
-
-					this->map_invokes_[proto] = func;
-				}
-			};
-		} // namespace detail
+										 co_await session->async_send(std::move(header_buff), ec);
+									 }
+								 },
+								 detached);
+						 });
+					return true;
+				};
+				this->map_invokes_[proto] = func;
+			}
+		};
 	} // namespace context
 } // namespace aquarius
