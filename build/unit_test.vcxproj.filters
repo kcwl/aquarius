@@ -37,6 +37,12 @@
     <Filter Include="include\aquarius\ip\detail">
       <UniqueIdentifier>{267a6585-6276-4f65-b484-eb0df2b5cba1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\channel">
+      <UniqueIdentifier>{b41139fa-aa50-4dd4-a50d-0637a971466c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\channel\detail">
+      <UniqueIdentifier>{9dcb3111-a169-4dcf-bb7d-b0868e04752c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
@@ -197,6 +203,33 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\detail\tcp_base.hpp">
       <Filter>include\aquarius\ip\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\publisher.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\detail\basic_channel.hpp">
+      <Filter>include\aquarius\channel\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\detail\basic_group.hpp">
+      <Filter>include\aquarius\channel\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\detail\basic_role.hpp">
+      <Filter>include\aquarius\channel\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\detail\basic_subscriber.hpp">
+      <Filter>include\aquarius\channel\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\group.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\channel.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel\subscriber.hpp">
+      <Filter>include\aquarius\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\channel.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
