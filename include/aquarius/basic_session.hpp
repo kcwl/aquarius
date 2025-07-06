@@ -39,6 +39,11 @@ namespace aquarius
 		virtual ~basic_session() = default;
 
 	public:
+		std::size_t id()const
+		{
+			return id_;
+		}
+
 		std::string remote_address() const
 		{
 			return impl_.get_service().remote_address(impl_.get_implementation());
@@ -137,7 +142,7 @@ namespace aquarius
 	private:
 		impl_type impl_;
 
-		Protocol proto_;
+		Protocol proto_; std::size_t id_;
 
 		std::function<void()> close_func_;
 	};
@@ -167,6 +172,11 @@ namespace aquarius
 		virtual ~basic_session() = default;
 
 	public:
+		std::size_t id() const
+		{
+			return id_;
+		}
+
 		std::string remote_address() const
 		{
 			return impl_.get_service().remote_address(impl_.get_implementation());
@@ -267,6 +277,8 @@ namespace aquarius
 
 	private:
 		impl_type impl_;
+
+		std::size_t id_;
 
 		Protocol proto_;
 

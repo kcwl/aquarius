@@ -1,11 +1,12 @@
 #pragma once
 #include <memory>
+#include <aquarius/session_store.hpp>
 
 namespace aquarius
 {
 	namespace context
 	{
-		template <typename Request, typename Response, typename E>
+		template <typename Session, typename Request, typename Response, typename E>
 		class basic_handler
 		{
 		public:
@@ -32,7 +33,7 @@ namespace aquarius
 			{
 				return response_;
 			}
-
+			
 			void set_rpc_id(std::size_t rpc_id)
 			{
 				rpc_id_ = rpc_id;
@@ -41,6 +42,12 @@ namespace aquarius
 			std::size_t rpc_id() const
 			{
 				return rpc_id_;
+			}
+
+			template<typename T>
+			auto defer(std::size_t id)
+			{
+				return defer<Session, T>(id);
 			}
 
 		protected:
@@ -56,10 +63,10 @@ namespace aquarius
 			std::size_t rpc_id_;
 		};
 
-		template <typename Request, typename Response, typename E>
-		class stream_handler : public basic_handler<Request, Response, E>
+		template <typename Session, typename Request, typename Response, typename E>
+		class stream_handler : public basic_handler<Session, Request, Response, E>
 		{
-			using base_type = basic_handler<Request, Response, E>;
+			using base_type = basic_handler<Session, Request, Response, E>;
 
 		public:
 			stream_handler(const std::string& name)
@@ -108,11 +115,11 @@ namespace aquarius
 
 #define AQUARIUS_GLOBAL_STR_ID(request) #request
 
-#define AQUARIUS_STREAM_HANDLER(method, error, __rpc)                                                                  \
-	class method : public aquarius::context::stream_handler<__rpc::request, __rpc::response, error>                    \
+#define AQUARIUS_STREAM_HANDLER(__session, method, error, __rpc)                                                                  \
+	class method : public aquarius::context::stream_handler<__session, __rpc::request, __rpc::response, error>                    \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::context::stream_handler<__rpc::request, __rpc::response, error>;                   \
+		using base_type = aquarius::context::stream_handler<__session, __rpc::request, __rpc::response, error>;                   \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##method))                                                    \

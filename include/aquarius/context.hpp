@@ -7,13 +7,13 @@
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::context::auto_handler_register<protocol, __rpc, method>                          \
 		__auto_register_##method(__rpc::id);                                                                           \
-	AQUARIUS_STREAM_HANDLER(method, error, __rpc)
+	AQUARIUS_STREAM_HANDLER(typename protocol::session, method, error, __rpc)
 
 #define AQUARIUS_TRANSFER_CONTEXT_BY(protocol, error, method, __rpc)                                                   \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::context::auto_transfer_handler_register<protocol, method>                        \
 		__auto_register_##method(__rpc::id);                                                                           \
-	AQUARIUS_STREAM_HANDLER(method, error, __rpc)
+	AQUARIUS_STREAM_HANDLER(typename protocol::session, method, error, __rpc)
 
 #define AQUARIUS_STREAM_CONTEXT(method, __rpc)                                                                         \
 	AQUARIUS_STREAM_CONTEXT_BY(aquarius::ip::server_tcp_protocol, aquarius::error_code, method, __rpc)

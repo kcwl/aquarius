@@ -168,6 +168,7 @@
     <ClInclude Include="..\include\aquarius\context\detail\context_base.hpp" />
     <ClInclude Include="..\include\aquarius\context\handler.hpp" />
     <ClInclude Include="..\include\aquarius\context\handler_router.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp" />
     <ClInclude Include="..\include\aquarius\detail\connect.hpp" />
     <ClInclude Include="..\include\aquarius\handler.hpp" />
     <ClInclude Include="..\include\aquarius\co_spawn.hpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\signal_set.hpp" />
     <ClInclude Include="..\include\aquarius\socket_base.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />

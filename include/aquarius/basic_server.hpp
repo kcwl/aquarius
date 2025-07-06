@@ -8,6 +8,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/signal_set.hpp>
 #include <aquarius/use_awaitable.hpp>
+#include <aquarius/session_store.hpp>
 
 namespace aquarius
 {
@@ -69,6 +70,8 @@ namespace aquarius
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
 				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
+
+				store<Protocol>(conn_ptr);
 			}
 
 			co_return;

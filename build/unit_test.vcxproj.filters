@@ -231,6 +231,12 @@
     <ClInclude Include="..\include\aquarius\channel.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session_store.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
