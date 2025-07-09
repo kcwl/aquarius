@@ -73,7 +73,7 @@ namespace aquarius
 		};
 
 		template<typename Protocol>
-		struct transfer
+		struct _transfer
 		{
 			constexpr static auto __transfer_proto = 1;
 
