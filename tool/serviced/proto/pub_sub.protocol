@@ -1,0 +1,43 @@
+
+message channel_publish_req
+{
+    uint32 topic;
+    bytes channel_data;
+}
+
+message channel_publish_resp
+{
+}
+
+message channel_subscribe_req
+{
+    uint32 topic;
+}
+
+message channel_subscribe_resp
+{
+}
+
+message channel_remove_req
+{
+    repeated uint32 topics;
+}
+
+message channel_remove_resp
+{
+}
+
+tcp channel_publish = 990
+{
+    rpc channel_publish_req return channel_publish_resp;
+}
+
+tcp channel_subscribe = 991
+{
+    rpc channel_subscribe_req return channel_subscribe_resp;
+}
+
+tcp channel_remove = 992
+{
+    rpc channel_remove_req return channel_remove_resp;
+}

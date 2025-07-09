@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <aquarius/any_io_executor.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/concepts.hpp>
@@ -96,8 +97,9 @@ namespace aquarius
 		}
 
 		template <typename BufferSequence>
-		auto async_send(BufferSequence buffer, error_code& ec) -> awaitable<error_code>
+		auto async_send(BufferSequence buffer) -> awaitable<error_code>
 		{
+			error_code ec{};
 			co_await impl_.get_service().async_write_some(impl_.get_implementation(), std::move(buffer), ec);
 
 			if (ec)
@@ -231,7 +233,7 @@ namespace aquarius
 		template <typename RPC>
 		auto async_send(typename RPC::request req, error_code& ec) -> awaitable<error_code>
 		{
-			co_await proto_.send<RPC>(this->shared_from_this(), std::move(req), ec);
+			co_await proto_.template send<RPC>(this->shared_from_this(), std::move(req), ec);
 
 			co_return ec;
 		}

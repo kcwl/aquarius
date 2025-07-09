@@ -18,10 +18,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\tool\serviced\channel_role.hpp">
+    <ClInclude Include="..\tool\serviced\server.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\tool\serviced\server.h">
+    <ClInclude Include="..\tool\serviced\proto\pub_sub.proto.hpp">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tool\serviced\sdnode.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tool\serviced\sdtree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tool\serviced\transfer.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tool\serviced\tcp_transfer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,8 +44,14 @@
     <ClCompile Include="..\tool\serviced\server.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\tool\serviced\proto\pub_sub,proto">
-      <Filter>proto</Filter>
+    <ClCompile Include="..\tool\serviced\ctx_transfer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tool\serviced\sdnode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tool\serviced\sdtree.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

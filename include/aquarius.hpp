@@ -1,14 +1,13 @@
 #pragma once
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <aquarius/any_io_executor.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_router.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
-#include <aquarius/channel.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/concepts.hpp>
+#include <aquarius/config.hpp>
 #include <aquarius/context.hpp>
 #include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>

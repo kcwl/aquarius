@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <boost/crc.hpp>
 
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/context/context.hpp>
@@ -71,7 +72,7 @@ namespace aquarius
 
 				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
 
-				store<Protocol>(conn_ptr);
+				session::store<Protocol>(conn_ptr);
 			}
 
 			co_return;

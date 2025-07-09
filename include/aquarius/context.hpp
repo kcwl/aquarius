@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/context/handler.hpp>
 #include <aquarius/error_code.hpp>

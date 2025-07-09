@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <aquarius/config.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/context/client_router.hpp>

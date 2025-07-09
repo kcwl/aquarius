@@ -52,7 +52,7 @@ namespace aquarius
 										 ctx->response().header()->pack(header_buff);
 										 header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
 
-										 co_await session->async_send(std::move(header_buff), ec);
+										 co_await session->async_send(std::move(header_buff));
 									 }
 								 },
 								 detached);

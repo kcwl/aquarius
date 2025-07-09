@@ -1,5 +1,7 @@
 #pragma once
 #include <aquarius/ip/detail/tcp.hpp>
+#include <aquarius/basic_client.hpp>
+#include <aquarius/basic_server.hpp>
 
 namespace aquarius
 {

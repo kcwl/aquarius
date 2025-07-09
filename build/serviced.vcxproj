@@ -102,11 +102,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;F:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>F:\boost_1_88_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,11 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\tool\serviced\channel_role.hpp" />
+    <ClInclude Include="..\tool\serviced\proto\pub_sub.proto.hpp" />
+    <ClInclude Include="..\tool\serviced\sdnode.h" />
+    <ClInclude Include="..\tool\serviced\sdtree.h" />
     <ClInclude Include="..\tool\serviced\server.h" />
+    <ClInclude Include="..\tool\serviced\tcp_transfer.hpp" />
+    <ClInclude Include="..\tool\serviced\transfer.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\tool\serviced\proto\pub_sub,proto" />
+    <ClCompile Include="..\tool\serviced\ctx_transfer.cpp" />
+    <ClCompile Include="..\tool\serviced\sdnode.cpp" />
+    <ClCompile Include="..\tool\serviced\sdtree.cpp" />
     <ClCompile Include="..\tool\serviced\server.cpp" />
     <ClCompile Include="..\tool\serviced\serviced.cpp" />
   </ItemGroup>

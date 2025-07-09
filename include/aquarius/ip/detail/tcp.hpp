@@ -6,6 +6,7 @@
 #include <aquarius/context/handler_router.hpp>
 #include <aquarius/ip/detail/tcp_base.hpp>
 #include <aquarius_protocol/tcp_response.hpp>
+#include <aquarius/co_spawn.hpp>
 
 namespace aquarius
 {
