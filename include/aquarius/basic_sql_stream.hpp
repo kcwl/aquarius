@@ -120,7 +120,7 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream select()
 		{
-			constexpr auto struct_name = name<T>();
+			constexpr auto struct_name = detail::name<T>();
 
 			constexpr std::string_view select_sql = "select * from "sv;
 
