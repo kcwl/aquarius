@@ -8,15 +8,15 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace io
 	{
-
+		template <typename IO>
 		class io_service_pool
 		{
 		private:
-			using io_service_ptr_t = std::shared_ptr<io_context>;
+			using io_service_ptr_t = std::shared_ptr<IO>;
 
-			using work_guard = executor_work_guard<io_context::executor_type>;
+			using work_guard = boost::asio::executor_work_guard<typename IO::executor_type>;
 
 		public:
 			explicit io_service_pool(std::size_t pool_size)
@@ -93,5 +93,5 @@ namespace aquarius
 
 			std::list<work_guard> works_;
 		};
-	} // namespace detail
+	} // namespace io
 } // namespace aquarius

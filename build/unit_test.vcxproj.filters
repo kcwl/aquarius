@@ -37,6 +37,9 @@
     <Filter Include="include\aquarius\session\detail">
       <UniqueIdentifier>{7d9df3a7-bbf4-4bab-a56d-45b3beb85bbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\io">
+      <UniqueIdentifier>{21b080ed-7866-4fa8-a155-bcff6ff5f161}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
@@ -44,9 +47,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\test\client.h">
       <Filter>头文件</Filter>
@@ -90,9 +90,6 @@
     <ClInclude Include="..\include\aquarius\ssl_factory.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -108,9 +105,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\awaitable.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -121,9 +115,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\any_io_executor.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\io_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
@@ -153,17 +144,8 @@
     <ClInclude Include="..\include\aquarius\signal_set.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\execution_context.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\io_object_impl.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\socket_base.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\session_service.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
@@ -182,9 +164,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\connect.hpp">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
-      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\session_store.hpp">
       <Filter>include\aquarius</Filter>
@@ -236,6 +215,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\flow.hpp">
       <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\io\mysql_io.hpp">
+      <Filter>include\aquarius\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\io\io_service_pool.hpp">
+      <Filter>include\aquarius\io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
