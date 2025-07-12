@@ -153,8 +153,10 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\any_io_executor.hpp" />
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_attribute.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\context\client_router.hpp" />
     <ClInclude Include="..\include\aquarius\context\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\handler.hpp" />
@@ -164,10 +166,13 @@
     <ClInclude Include="..\include\aquarius\context\transfer_context.hpp" />
     <ClInclude Include="..\include\aquarius\co_spawn.hpp" />
     <ClInclude Include="..\include\aquarius\detached.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_object_impl.hpp" />
     <ClInclude Include="..\include\aquarius\detail\execution_context.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\ip\lowyer_header.hpp" />
@@ -175,6 +180,7 @@
     <ClInclude Include="..\include\aquarius\ip\tcp_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\address.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
+    <ClInclude Include="..\include\aquarius\mysql_pool.hpp" />
     <ClInclude Include="..\include\aquarius\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\post.hpp" />
     <ClInclude Include="..\include\aquarius\redirect_error.hpp" />

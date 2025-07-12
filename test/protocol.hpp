@@ -33,24 +33,6 @@ struct person
 	}
 };
 
-template <>
-struct aquarius::reflect<person>
-{
-	using value_type = person;
-
-	constexpr static std::string_view topic()
-	{
-		return "person"sv;
-	}
-
-	constexpr static std::array<std::string_view, 10> fields()
-	{
-		return {
-			"sex"sv, "addr"sv, "age"sv, "telephone"sv, "score"sv, "hp"sv, "mana"sv, "info"sv, "name"sv, "orders"sv
-		};
-	}
-};
-
 inline bool operator==(const person& lhs, const person& rhs)
 {
 	return lhs.sex == rhs.sex && lhs.addr == rhs.addr && lhs.age == rhs.age && lhs.telephone == rhs.telephone &&
@@ -87,8 +69,8 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 struct rpc_test
 {
 	constexpr static auto id = 1001;
-	using request = aquarius::basic_request<aquarius::tcp, person>;
-	using response = aquarius::basic_response<aquarius::tcp, person>;
+	using request = aquarius::tcp_request<person>;
+	using response = aquarius::tcp_request<person>;
 };
 
 AQUARIUS_STREAM_CONTEXT(ctx_test, rpc_test)

@@ -7,7 +7,7 @@
 #include <aquarius/context/handler_router.hpp>
 #include <aquarius/context/stream_context.hpp>
 #include <aquarius/ip/lowyer_header.hpp>
-#include <aquarius_protocol/tcp_header.hpp>
+#include <aquarius_protocol/basic_tcp_header.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
@@ -19,9 +19,9 @@ namespace aquarius
 
 		using socket_type = typename base_type::socket;
 
-		using request_header = tcp_request_header;
+		using request_header = basic_tcp_header<true>;
 
-		using response_header = tcp_response_header;
+		using response_header = basic_tcp_header<false>;
 
 		using typename base_type::no_delay;
 
