@@ -6,6 +6,7 @@
         "boost-system",
         "boost-test",
         "boost-crc",
+        "boost-mysql",
         "openssl"
     ]
 }
