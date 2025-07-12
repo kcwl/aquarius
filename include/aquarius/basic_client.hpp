@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <aquarius/config.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
+#include <aquarius/config.hpp>
 #include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/deadline_timer.hpp>
@@ -119,11 +119,20 @@ namespace aquarius
 			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
 				RPC::id, std::forward<Func>(f));
 
-			error_code ec{};
+			std::vector<char> complete_buffer{};
+			req.uuid(RPC::id);
+			req.pack(complete_buffer);
+			req.length(complete_buffer.size());
 
+			async_send(std::move(buffer));
+		}
+
+		template<typename BuffSequence>
+		void async_send(BuffSequence buffer)
+		{
 			co_spawn(
-				io_context_, [this, req = std::move(req), &ec]() -> awaitable<void>
-				{ co_await session_ptr_->async_send<RPC>(std::move(req), ec); }, detached);
+				io_context_, [this, buffer = std::move(buffer)]() -> awaitable<void>
+				{ co_await session_ptr_->async_send(std::move(buffer)); }, detached);
 		}
 
 		std::string remote_address()
@@ -167,7 +176,6 @@ namespace aquarius
 		void create_session(socket socket)
 		{
 			session_ptr_ = std::make_shared<session>(std::move(socket));
-			session_ptr_->regist_close(close_func_);
 		}
 
 	private:

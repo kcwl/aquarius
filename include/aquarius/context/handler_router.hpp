@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/awaitable.hpp>
 #include <aquarius/basic_router.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
@@ -10,8 +11,9 @@ namespace aquarius
 	namespace context
 	{
 		template <typename Protocol>
-		class handler_router : public single_router<handler_router<Protocol>, bool, std::shared_ptr<typename Protocol::session>, std::vector<char>,
-													 typename Protocol::header>
+		class handler_router
+			: public single_router<handler_router<Protocol>, bool, std::shared_ptr<typename Protocol::session>,
+								   std::vector<char>, typename Protocol::header>
 		{
 		public:
 			using session = typename Protocol::session;
@@ -27,7 +29,7 @@ namespace aquarius
 			template <typename Request, typename Context>
 			void regist(std::size_t proto)
 			{
-				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer,  header h)
+				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer, header h)
 				{
 					auto req = std::make_shared<Request>(h);
 					req->unpack(buffer);

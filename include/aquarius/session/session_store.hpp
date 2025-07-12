@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/config.hpp>
-#include <aquarius/detail/basic_session_store.hpp>
+#include <aquarius/session/detail/basic_session_store.hpp>
 
 namespace aquarius
 {

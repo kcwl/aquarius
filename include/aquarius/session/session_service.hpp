@@ -1,24 +1,24 @@
 #pragma once
-#include <aquarius/detail/execution_context.hpp>
-#include <aquarius/detail/session_service_base.hpp>
+#include <aquarius/session/detail/execution_context.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
+#include <aquarius/session/detail/session_service_base.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <boost/asio/read.hpp>
 
 namespace aquarius
 {
-	namespace detail
+	namespace session
 	{
 		template <typename Protocol>
-		class session_service : public execution_context_service_base<session_service<Protocol>>,
-								public session_service_base<Protocol>
+		class session_service : public detail::execution_context_service_base<session_service<Protocol>>,
+								public detail::session_service_base<Protocol>
 		{
 		public:
-			using base_type = session_service_base<Protocol>;
+			using base_type = detail::session_service_base<Protocol>;
 
-			using execution_base_type = execution_context_service_base<session_service<Protocol>>;
+			using execution_base_type = detail::execution_context_service_base<session_service<Protocol>>;
 
 			using socket = typename Protocol::socket;
 
@@ -26,7 +26,7 @@ namespace aquarius
 			{};
 
 		public:
-			session_service(execution_context& context)
+			session_service(detail::execution_context& context)
 				: execution_base_type(context)
 			{}
 
@@ -78,5 +78,5 @@ namespace aquarius
 				co_return;
 			}
 		};
-	} // namespace detail
+	} // namespace session
 } // namespace aquarius

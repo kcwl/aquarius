@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace session
 	{
 		using boost::asio::detail::io_object_impl;
 	}

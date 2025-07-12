@@ -8,7 +8,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace session
 	{
 		template <bool Server, typename Protocol, typename Executor,
 			std::size_t SSLVersion = boost::asio::ssl::context::sslv23>

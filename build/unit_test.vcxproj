@@ -153,6 +153,7 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\any_io_executor.hpp" />
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
+    <ClInclude Include="..\include\aquarius\cmd_options.hpp" />
     <ClInclude Include="..\include\aquarius\config.hpp" />
     <ClInclude Include="..\include\aquarius\context.hpp" />
     <ClInclude Include="..\include\aquarius\context\client_router.hpp" />
@@ -170,9 +171,9 @@
     <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\detail\tcp.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\basic_tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\address.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\detail\tcp_base.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\flow.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\post.hpp" />
@@ -181,6 +182,18 @@
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\session\detail\basic_session_store.hpp" />
+    <ClInclude Include="..\include\aquarius\session\detail\execution_context.hpp" />
+    <ClInclude Include="..\include\aquarius\session\detail\session_service_base.hpp" />
+    <ClInclude Include="..\include\aquarius\session\detail\socket_base.hpp" />
+    <ClInclude Include="..\include\aquarius\session\io_object_impl.hpp" />
+    <ClInclude Include="..\include\aquarius\session\session_object_impl.hpp" />
+    <ClInclude Include="..\include\aquarius\session\session_service.hpp" />
+    <ClInclude Include="..\include\aquarius\session\session_store.hpp" />
+    <ClInclude Include="..\include\aquarius\session\ssl.hpp" />
+    <ClInclude Include="..\include\aquarius\session\ssl_context_factory.hpp" />
+    <ClInclude Include="..\include\aquarius\session\ssl_factory.hpp" />
+    <ClInclude Include="..\include\aquarius\session\ssl_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\signal_set.hpp" />
     <ClInclude Include="..\include\aquarius\socket_base.hpp" />
@@ -195,8 +208,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\ssl\ssl.hpp" />
-    <ClInclude Include="..\include\aquarius\ssl\ssl_context_factory.hpp" />
     <ClInclude Include="..\include\aquarius\ssl_factory.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\use_future.hpp" />

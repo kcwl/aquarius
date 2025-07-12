@@ -27,7 +27,5 @@
 #include <aquarius/redirect_error.hpp>
 #include <aquarius/signal_set.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/ssl/ssl.hpp>
-#include <aquarius/ssl/ssl_context_factory.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <aquarius/use_future.hpp>

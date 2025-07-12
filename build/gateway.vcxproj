@@ -18,11 +18,20 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\gateway\ctx_transfer.cpp" />
+    <ClCompile Include="..\src\gateway\gateway.cpp" />
+    <ClCompile Include="..\src\gateway\transfer_client.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\gateway\server.hpp" />
+    <ClInclude Include="..\src\gateway\transfer_client.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8c2c35e2-16f5-4a46-ab78-7f24a013512f}</ProjectGuid>
-    <RootNamespace>serviced</RootNamespace>
+    <ProjectGuid>{a412a9f6-9de0-4ac0-a24a-93985185645b}</ProjectGuid>
+    <RootNamespace>gateway</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -102,9 +111,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;F:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;F:\boost_1_88_0;$(SolutionDir)../3rd/aquarius_protocol/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,21 +135,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\serviced\proto\pub_sub.proto.hpp" />
-    <ClInclude Include="..\src\serviced\sdnode.h" />
-    <ClInclude Include="..\src\serviced\sdtree.h" />
-    <ClInclude Include="..\src\serviced\server.h" />
-    <ClInclude Include="..\src\serviced\tcp_transfer.hpp" />
-    <ClInclude Include="..\src\serviced\transfer.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\serviced\ctx_transfer.cpp" />
-    <ClCompile Include="..\src\serviced\sdnode.cpp" />
-    <ClCompile Include="..\src\serviced\sdtree.cpp" />
-    <ClCompile Include="..\src\serviced\server.cpp" />
-    <ClCompile Include="..\src\serviced\serviced.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

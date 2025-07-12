@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\detail">
       <UniqueIdentifier>{84cb43f8-9ce7-4049-8236-9a4143c089c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\ssl">
-      <UniqueIdentifier>{72ec4c08-f9b2-44fe-9963-b3fc31367dd9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\ip">
       <UniqueIdentifier>{cf7c6020-7747-4b7b-9416-25a34e6b2419}</UniqueIdentifier>
     </Filter>
@@ -34,8 +31,11 @@
     <Filter Include="include\aquarius\context\detail">
       <UniqueIdentifier>{fcecfe06-d5b5-4308-86e6-7c5bc78c0395}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\ip\detail">
-      <UniqueIdentifier>{267a6585-6276-4f65-b484-eb0df2b5cba1}</UniqueIdentifier>
+    <Filter Include="include\aquarius\session">
+      <UniqueIdentifier>{f06d07bd-38a1-41ad-82b8-dfb4c42b1478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\session\detail">
+      <UniqueIdentifier>{7d9df3a7-bbf4-4bab-a56d-45b3beb85bbc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -81,9 +81,6 @@
     <ClInclude Include="..\include\aquarius\basic_session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl\ssl_context_factory.hpp">
-      <Filter>include\aquarius\ssl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_server.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -92,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ssl_factory.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl\ssl.hpp">
-      <Filter>include\aquarius\ssl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -186,14 +180,8 @@
     <ClInclude Include="..\include\aquarius\context\detail\context_base.hpp">
       <Filter>include\aquarius\context\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\detail\tcp.hpp">
-      <Filter>include\aquarius\ip\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\connect.hpp">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\detail\tcp_base.hpp">
-      <Filter>include\aquarius\ip\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -203,6 +191,51 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\config.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\cmd_options.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session_object_impl.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session_service.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\session_store.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\ssl_session_service.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\detail\basic_session_store.hpp">
+      <Filter>include\aquarius\session\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\ssl_factory.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\ssl.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\ssl_context_factory.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\detail\session_service_base.hpp">
+      <Filter>include\aquarius\session\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\detail\socket_base.hpp">
+      <Filter>include\aquarius\session\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\io_object_impl.hpp">
+      <Filter>include\aquarius\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\session\detail\execution_context.hpp">
+      <Filter>include\aquarius\session\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\basic_tcp.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\flow.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

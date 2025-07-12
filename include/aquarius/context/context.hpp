@@ -57,8 +57,8 @@ namespace aquarius
 			}
 		};
 
-		template <typename Protocol>
-		class transfer_context : public basic_context<Protocol>
+		template <typename Protocol, typename Tr>
+		class transfer_context
 		{
 		public:
 			using base_type = basic_context<Protocol>;
@@ -67,9 +67,12 @@ namespace aquarius
 
 		public:
 			template <typename... Args>
-			transfer_context(std::size_t id, std::shared_ptr<session> session, Args&&... args)
-				: base_type("transfer context", 10s, id, session, std::forward_like<Args>(args)...)
-			{}
+			transfer_context(std::shared_ptr<session> session, Args&&... args)
+			{
+				static Tr trans{};
+
+				trans.visit(session, std::forward_like<Args>(args)...);
+			}
 		};
 
 		template<typename Protocol>
@@ -78,10 +81,10 @@ namespace aquarius
 			constexpr static auto __transfer_proto = 1;
 
 			template <typename... Args>
-			constexpr transfer_context<Protocol> operator()(std::shared_ptr<typename Protocol::session> session,
+			constexpr auto operator()(std::shared_ptr<typename Protocol::session> session,
 															Args&&... args)
 			{
-				return transfer_context<Protocol>(__transfer_proto, session, std::forward_like<Args>(args)...);
+				return transfer_context<Protocol, class transfer_handle>(session, std::forward_like<Args>(args)...);
 			}
 		};
 

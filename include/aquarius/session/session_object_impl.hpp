@@ -1,10 +1,11 @@
 #pragma once
-#include <aquarius/ssl/ssl_context_factory.hpp>
-#include <aquarius/detail/io_object_impl.hpp>
+#include <aquarius/any_io_executor.hpp>
+#include <aquarius/session/io_object_impl.hpp>
+#include <aquarius/session/ssl_context_factory.hpp>
 
 namespace aquarius
 {
-	namespace detail
+	namespace session
 	{
 		template <typename Service, typename Executor = any_io_executor>
 		class session_object_impl : public io_object_impl<Service, Executor>
