@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 	
 
 	rpc_test::request req{};
-	req.header()->uuid_ = 1;
+	req.header()->uuid(1);
 	req.body().sex = true;
 	req.body().addr = 2;
 	req.body().age = 15;

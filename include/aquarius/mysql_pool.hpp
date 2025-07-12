@@ -3,6 +3,7 @@
 #include <boost/mysql.hpp>
 #include <string_view>
 #include <aquarius/singleton.hpp>
+#include <boost/pfr.hpp>
 
 #ifdef AQUARIUS_ENABLE_SSL
 #include <aquarius/ssl/ssl.hpp>

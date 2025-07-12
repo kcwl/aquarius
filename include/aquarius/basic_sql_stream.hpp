@@ -93,7 +93,7 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream remove(T value)
 		{
-			constexpr auto struct_name = boost::pfr::<T>();
+			constexpr auto struct_name = detail::name<T>();
 
 			constexpr auto delete_sql = detail::concat_v<"delete from "sv, struct_name>;
 
