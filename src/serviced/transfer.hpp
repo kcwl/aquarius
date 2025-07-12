@@ -2,7 +2,7 @@
 #include <string_view>
 #include "sdtree.h"
 #include <aquarius/singleton.hpp>
-#include <aquarius/session_store.hpp>
+#include <aquarius/session/session_store.hpp>
 
 using namespace std::string_view_literals;
 
