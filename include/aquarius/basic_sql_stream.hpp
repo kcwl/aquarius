@@ -6,6 +6,59 @@
 
 namespace aquarius
 {
+	namespace detail
+	{
+
+		template <typename _Ty>
+		static constexpr std::string_view name()
+		{
+			using namespace std::string_view_literals;
+
+#ifndef __linux
+			constexpr std::string_view name = __FUNCSIG__ ""sv;
+
+			constexpr auto left_bracket = name.find_last_of("<");
+
+			constexpr auto end_bracket = name.find_last_of(">");
+
+			constexpr auto temp_name = name.substr(left_bracket + 1, end_bracket - left_bracket - 1);
+
+			constexpr auto start = name.find_last_of(":");
+
+			if constexpr (start == std::string_view::npos)
+			{
+				return temp_name;
+			}
+			else
+			{
+				return name.substr(start + 1, end_bracket - start - 1);
+			}
+#else
+			constexpr std::string_view name = __PRETTY_FUNCTION__;
+
+			constexpr auto left_bracket = name.find_last_of("[");
+			constexpr auto right_bracket = name.find_last_of("]");
+			constexpr auto name_in_bracket = name.substr(left_bracket + 1, right_bracket - left_bracket - 1);
+
+			constexpr auto left_equ = name_in_bracket.find_first_of("=");
+			constexpr auto right_f = name_in_bracket.find_first_of(";");
+
+			constexpr auto first_name = name_in_bracket.substr(left_equ + 2, right_f - left_equ - 2);
+
+			constexpr auto sp = first_name.find_last_of(":");
+
+			if constexpr (sp == std::string_view::npos)
+			{
+				return first_name;
+			}
+			else
+			{
+				return first_name.substr(sp + 1);
+			}
+#endif
+		}
+	}
+
 	template <typename Stream = std::stringstream>
 	class basic_sql_stream
 	{
@@ -40,7 +93,7 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream remove(T value)
 		{
-			constexpr auto struct_name = name<T>();
+			constexpr auto struct_name = boost::pfr::<T>();
 
 			constexpr auto delete_sql = detail::concat_v<"delete from "sv, struct_name>;
 
@@ -52,7 +105,7 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream update(T value)
 		{
-			constexpr auto struct_name = name<T>();
+			constexpr auto struct_name = detail::name<T>();
 
 			constexpr auto update_sql = detail::concat_v<"update "sv, struct_name, " set "sv>;
 
