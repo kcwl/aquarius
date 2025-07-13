@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <aquarius/session/session_store.hpp>
+#include <aquarius/basic_sql_stream.hpp>
 
 namespace aquarius
 {
@@ -17,8 +18,10 @@ namespace aquarius
 			virtual ~basic_handler() = default;
 
 		public:
-			auto visit(std::shared_ptr<Request> message) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<Request> message) -> awaitable<E>
 			{
+				session_ptr_ = sessoin_ptr;
+
 				request_ = message;
 
 				co_return co_await this->handle();
@@ -47,7 +50,12 @@ namespace aquarius
 			template<typename T>
 			auto defer(std::size_t id)
 			{
-				return defer<Session, T>(id);
+				return session::defer<Session, T>(id);
+			}
+
+			auto sql_engine()
+			{
+				return basic_sql_stream<>(session_ptr_->get_executor());
 			}
 
 		protected:
@@ -61,6 +69,10 @@ namespace aquarius
 			std::string name_;
 
 			std::size_t rpc_id_;
+
+			std::shared_ptr<Session> session_ptr_;
+
+
 		};
 
 		template <typename Session, typename Request, typename Response, typename E>

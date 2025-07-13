@@ -61,9 +61,7 @@ namespace aquarius
 		class transfer_context
 		{
 		public:
-			using base_type = basic_context<Protocol>;
-
-			using typename base_type::session;
+			using session = Protocol::session;
 
 		public:
 			template <typename... Args>

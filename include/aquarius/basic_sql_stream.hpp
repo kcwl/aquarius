@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/mysql_pool.hpp>
+#include <aquarius/io/io_context.hpp>
 
 namespace aquarius
 {
@@ -63,7 +63,11 @@ namespace aquarius
 	class basic_sql_stream
 	{
 	public:
-		basic_sql_stream() = default;
+		basic_sql_stream(io::io_context& context)
+			:context_(context)
+		{
+
+		}
 
 	public:
 		template <typename U>
@@ -132,18 +136,18 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_query() -> awaitable<std::vector<T>>
+		auto query() -> awaitable<std::vector<T>>
 		{
 			ss_ << ";";
 
 			co_return co_await mysql_pool::get_mutable_instance().async_query<T>(ss_.str());
 		}
 
-		auto async_execute()
+		auto execute() -> awaitable<bool>
 		{
 			ss_ << ";";
 
-			co_return co_await mysql_pool::get_mutable_instance().async_execute(ss_.str());
+			co_return co_await context_.sql_execute(ss_.str());
 		}
 
 		std::string sql()
@@ -190,5 +194,7 @@ namespace aquarius
 
 	private:
 		Stream ss_;
+
+		io::io_context context_;
 	};
 } // namespace aquarius
