@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <aquarius/io_context.hpp>
+#include <aquarius/io/io_context.hpp>
 #include <aquarius/logger.hpp>
 #include <functional>
 #include <list>
@@ -10,13 +10,12 @@ namespace aquarius
 {
 	namespace io
 	{
-		template <typename IO>
 		class io_service_pool
 		{
 		private:
-			using io_service_ptr_t = std::shared_ptr<IO>;
+			using io_service_ptr_t = std::shared_ptr<io_context>;
 
-			using work_guard = boost::asio::executor_work_guard<typename IO::executor_type>;
+			using work_guard = boost::asio::executor_work_guard<io_context::executor_type>;
 
 		public:
 			explicit io_service_pool(std::size_t pool_size)
@@ -79,6 +78,15 @@ namespace aquarius
 				return io_service;
 			}
 
+			template<typename... Args>
+			void sql_set_params(Args&&... args)
+			{
+				for (auto& io_service : io_services_)
+				{
+					io_service->sql_set_param(std::forward_like<Args>(args)...);
+				}
+			}
+			
 		private:
 			io_service_pool(const io_service_pool&) = delete;
 

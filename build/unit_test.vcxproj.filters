@@ -87,9 +87,6 @@
     <ClInclude Include="..\include\aquarius\detail\noncopyable.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ssl_factory.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -144,9 +141,6 @@
     <ClInclude Include="..\include\aquarius\signal_set.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\socket_base.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\context\context.hpp">
       <Filter>include\aquarius\context</Filter>
     </ClInclude>
@@ -164,9 +158,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\connect.hpp">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session_store.hpp">
-      <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\config.hpp">
       <Filter>include\aquarius</Filter>
@@ -216,11 +207,23 @@
     <ClInclude Include="..\include\aquarius\ip\flow.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\io\mysql_io.hpp">
+    <ClInclude Include="..\include\aquarius\basic_sql_stream.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_attribute.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\io\io_context.hpp">
       <Filter>include\aquarius\io</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\io\io_service_pool.hpp">
       <Filter>include\aquarius\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_context.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_handler.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 #include <aquarius/config.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/detached.hpp>
-#include <aquarius/detail/io_service_pool.hpp>
+#include <aquarius/io/io_service_pool.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/session/session_store.hpp>
@@ -96,8 +96,8 @@ namespace aquarius
 				});
 		}
 
-	private:
-		detail::io_service_pool io_service_pool_;
+	protected:
+		io::io_service_pool io_service_pool_;
 
 		signal_set signals_;
 

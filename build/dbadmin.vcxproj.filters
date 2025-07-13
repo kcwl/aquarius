@@ -21,12 +21,15 @@
     <ClCompile Include="..\src\dbadmin\transfer_client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\dbadmin\server.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\dbadmin\transfer_client.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\dbadmin\server.hpp">
+    <ClInclude Include="..\src\dbadmin\server.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

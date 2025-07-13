@@ -4,14 +4,15 @@
 #include <iostream>
 #include <aquarius/cmd_options.hpp>
 #include "transfer_client.h"
-#include "server.hpp"
+#include "server.h"
 
 int main(int argc, char* argv[])
 {
     aquarius::cmd_options cmd{};
     cmd.add_option<uint16_t>("--listen_port", "listen port");
     cmd.add_option<std::string>("--db_addr", "db ip address");
-    cmd.add_option<std::string>("--db_port", "db port");
+    cmd.add_option<std::string>("--db_user", "db user");
+    cmd.add_option<std::string>("--db_passwd", "db user password");
     cmd.add_option<std::string>("--name", "server name");
     cmd.add_option<std::string>("--transfer", "transfer address");
     cmd.add_option<std::string>("--pool_size", "server thread size");
@@ -19,7 +20,7 @@ int main(int argc, char* argv[])
     TRANSFER.set_addr(cmd.option<std::string>("--transfer"));
 
     db::server srv(cmd.option<uint16_t>("--listen"), cmd.option<int32_t>("--pool_size"),
-        cmd.option<std::string>("--name"));
+        cmd.option<std::string>("--name"), cmd.option<std::string>("--db_addr"), cmd.option<std::string>("--db_user"), cmd.option<std::string>("--db_passwd"));
 
     srv.run();
 

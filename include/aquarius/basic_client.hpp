@@ -8,7 +8,7 @@
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/connect.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/io_context.hpp>
+#include <aquarius/io/io_context.hpp>
 #include <aquarius/ip/address.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
@@ -179,7 +179,7 @@ namespace aquarius
 		}
 
 	private:
-		io_context io_context_;
+		io::io_context io_context_;
 		std::shared_ptr<session> session_ptr_;
 		std::function<void()> close_func_;
 		int reconnect_times_;
