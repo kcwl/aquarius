@@ -16,68 +16,68 @@ namespace aquarius
 		~attributes() = default;
 
 	public:
-		template <typename _Ty>
-		attributes& operator==(_Ty&& t)
+		template <typename T>
+		attributes& operator==(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, EQUAL, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
 
-		template <typename _Ty>
-		attributes& operator!=(_Ty&& t)
+		template <typename T>
+		attributes& operator!=(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, NOT, EQUAL, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
 
-		template <typename _Ty>
-		attributes& operator<(_Ty&& t)
+		template <typename T>
+		attributes& operator<(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, LESS, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
 
-		template <typename _Ty>
-		attributes& operator<=(_Ty&& t)
+		template <typename T>
+		attributes& operator<=(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, LESS, EQUAL, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
 
-		template <typename _Ty>
-		attributes& operator>(_Ty&& t)
+		template <typename T>
+		attributes& operator>(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, GREATER, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
 
-		template <typename _Ty>
-		attributes& operator>=(_Ty&& t)
+		template <typename T>
+		attributes& operator>=(T&& t)
 		{
 			constexpr auto sql = detail::concat_v<sql_begin, SPACE, GREATER, EQUAL, SPACE>;
 
 			attr_str_ += sql;
-			add_value(std::forward<_Ty>(t));
+			add_value(std::forward<T>(t));
 
 			return *this;
 		}
@@ -105,10 +105,10 @@ namespace aquarius
 		}
 
 	private:
-		template <typename _Ty>
-		void add_value(_Ty&& t)
+		template <typename T>
+		void add_value(T&& t)
 		{
-			if constexpr (std::same_as<_Ty, std::string>)
+			if constexpr (std::same_as<T, std::string>)
 			{
 				attr_str_.append("'");
 				attr_str_.append(t);
@@ -124,3 +124,5 @@ namespace aquarius
 		std::string attr_str_;
 	};
 } // namespace aquarius
+
+#define AQUARIUS_EXPR(attr) aquarius::attributes<#attr>()

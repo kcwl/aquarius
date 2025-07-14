@@ -1,8 +1,8 @@
 #pragma once
-#include <sstream>
-#include <string>
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/io/io_context.hpp>
+#include <sstream>
+#include <string>
 
 namespace aquarius
 {
@@ -57,17 +57,15 @@ namespace aquarius
 			}
 #endif
 		}
-	}
+	} // namespace detail
 
 	template <typename Stream = std::stringstream>
 	class basic_sql_stream
 	{
 	public:
 		basic_sql_stream(io::io_context& context)
-			:context_(context)
-		{
-
-		}
+			: context_(context)
+		{}
 
 	public:
 		template <typename U>
@@ -140,7 +138,20 @@ namespace aquarius
 		{
 			ss_ << ";";
 
-			co_return co_await mysql_pool::get_mutable_instance().async_query<T>(ss_.str());
+			co_return co_await context_.sql_query<T>(ss_.str());
+		}
+
+		template <typename T>
+		auto query_one() -> awaitable<std::optional<T>>
+		{
+			ss_ << ";";
+
+			auto results = co_await query<T>();
+
+			if (results.empty())
+				return std::nullopt;
+
+			return *results.begin();
 		}
 
 		auto execute() -> awaitable<bool>
@@ -155,23 +166,26 @@ namespace aquarius
 			return ss_.str();
 		}
 
-		basic_sql_stream& where()
+		template <typename Attribute>
+		basic_sql_stream& where(const Attribute& attr)
 		{
-			ss_ << " where ";
+			ss_ << " where " << attr.aql();
 
 			return *this;
 		}
 
-		basic_sql_stream& _and()
+		template <typename Attribute>
+		basic_sql_stream& _and(const Attribute& attr)
 		{
-			ss_ << " and ";
+			ss_ << " and " << attr.sql();
 
 			return *this;
 		}
 
-		basic_sql_stream& _or()
+		template <typename Attribute>
+		basic_sql_stream& _or(const Attribute& attr)
 		{
-			ss_ << " or ";
+			ss_ << " or " << attr.sql();
 
 			return *this;
 		}

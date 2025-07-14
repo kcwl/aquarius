@@ -1,0 +1,14 @@
+message query_account_req
+{
+	string account;
+}
+
+message query_account_resp
+{
+	string passwd;
+}
+
+tcp query_account = 100
+{
+	rpc query_account_req return query_account_resp;
+}

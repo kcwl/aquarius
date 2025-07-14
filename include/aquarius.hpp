@@ -20,11 +20,9 @@
 #include <aquarius/detached.hpp>
 #include <aquarius/error.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/io_context.hpp>
 #include <aquarius/ip/address.hpp>
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/mysql_pool.hpp>
 #include <aquarius/noncopyable.hpp>
 #include <aquarius/post.hpp>
 #include <aquarius/redirect_error.hpp>

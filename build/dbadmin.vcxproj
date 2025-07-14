@@ -19,13 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\dbadmin\ctx_account.cpp" />
     <ClCompile Include="..\src\dbadmin\dbadmin.cpp" />
     <ClCompile Include="..\src\dbadmin\server.cpp" />
     <ClCompile Include="..\src\dbadmin\transfer_client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\dbadmin\account_table.h" />
+    <ClInclude Include="..\src\dbadmin\error.hpp" />
+    <ClInclude Include="..\src\dbadmin\proto\account.proto.hpp" />
     <ClInclude Include="..\src\dbadmin\server.h" />
     <ClInclude Include="..\src\dbadmin\transfer_client.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\dbadmin\proto\account.protocol" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
