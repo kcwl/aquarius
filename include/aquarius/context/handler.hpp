@@ -10,6 +10,7 @@ namespace aquarius
 		template <typename Session, typename Request, typename Response, typename E>
 		class basic_handler
 		{
+			using context_t = boost::asio::execution::context_t;
 		public:
 			basic_handler(const std::string& name)
 				: name_(name)
@@ -55,7 +56,7 @@ namespace aquarius
 
 			auto sql_engine()
 			{
-				return basic_sql_stream<>(session_ptr_->get_executor());
+				return basic_sql_stream<>(static_cast<aquarius::io::io_context&>(session_ptr_->get_executor().query(context_t{})));
 			}
 
 		protected:

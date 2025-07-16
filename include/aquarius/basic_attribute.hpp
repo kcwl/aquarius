@@ -99,7 +99,7 @@ namespace aquarius
 			return *this;
 		}
 
-		std::string sql()
+		std::string sql() const
 		{
 			return attr_str_;
 		}

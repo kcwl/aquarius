@@ -14,9 +14,9 @@ namespace aquarius
 				constexpr auto len = (args.size() + ... + 0);
 				std::array<char, len + 1> arr{};
 
-				auto f = [i = 0, &arr](auto const& str) mutable
+				auto f = [i = 0, &arr](const auto& str) mutable
 				{
-					for (auto s : str)
+					for (const auto& s : str)
 						arr[i++] = s;
 
 					return arr;

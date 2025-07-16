@@ -76,7 +76,7 @@ namespace aquarius
 				create_ssl_context();
 
 				connector_pool_ptr_ =
-					std::make_shared<boost::mysql::connection_pool>(context_, std::move(conn_params_));
+					std::make_shared<boost::mysql::connection_pool>(*this, std::move(conn_params_));
 
 				connector_pool_ptr_->async_run(detached);
 			}
@@ -131,8 +131,6 @@ namespace aquarius
 			}
 
 		private:
-			boost::asio::io_context context_;
-
 			boost::mysql::pool_params conn_params_;
 
 			std::shared_ptr<boost::mysql::connection_pool> connector_pool_ptr_;

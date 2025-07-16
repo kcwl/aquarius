@@ -48,3 +48,9 @@ namespace db
 		return aquarius::error_code(std::error_code(static_cast<int>(result), db_result_category()));
 	}
 } // namespace db
+
+namespace std
+{
+	template<>
+	struct is_error_code_enum<db::db_result> : std::true_type {};
+}

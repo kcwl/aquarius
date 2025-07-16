@@ -3,14 +3,15 @@
 #include <aquarius/io/io_context.hpp>
 #include <sstream>
 #include <string>
+#include <aquarius/detail/mysql_keyword.hpp>
+#include <vector>
 
 namespace aquarius
 {
 	namespace detail
 	{
-
 		template <typename _Ty>
-		static constexpr std::string_view name()
+		inline consteval std::string_view name()
 		{
 			using namespace std::string_view_literals;
 
@@ -122,11 +123,9 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream select()
 		{
-			constexpr auto struct_name = detail::name<T>();
+			constexpr std::string_view struct_name = detail::name<T>();
 
-			constexpr std::string_view select_sql = "select * from "sv;
-
-			constexpr auto complete_sql = detail::concat_v<select_sql, struct_name>;
+			constexpr auto complete_sql = detail::concat_v<SELECT,SPACE, ASTERISK, FROM,SPACE, struct_name>;
 
 			ss_ << complete_sql.data();
 
@@ -149,9 +148,9 @@ namespace aquarius
 			auto results = co_await query<T>();
 
 			if (results.empty())
-				return std::nullopt;
+				co_return std::nullopt;
 
-			return *results.begin();
+			co_return *results.begin();
 		}
 
 		auto execute() -> awaitable<bool>
@@ -169,7 +168,7 @@ namespace aquarius
 		template <typename Attribute>
 		basic_sql_stream& where(const Attribute& attr)
 		{
-			ss_ << " where " << attr.aql();
+			ss_ << " where " << attr.sql();
 
 			return *this;
 		}
@@ -209,6 +208,6 @@ namespace aquarius
 	private:
 		Stream ss_;
 
-		io::io_context context_;
+		io::io_context& context_;
 	};
 } // namespace aquarius
