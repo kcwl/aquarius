@@ -24,9 +24,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\serviced-ssh\client.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\serviced-ssh\proto\cmd.protocol" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

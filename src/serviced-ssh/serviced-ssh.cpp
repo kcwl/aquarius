@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         if (input == "quit" || input == "q")
             break;
 
-        CLIENT.async_send()
+        //CLIENT.async_send()
     }
 
     return 0;
