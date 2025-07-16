@@ -46,19 +46,17 @@ namespace aquarius
 		}
 
 	public:
-		bool async_connect(const std::string& ip_addr, const std::string& port)
+		auto async_connect(const std::string& ip_addr, const std::string& port)
 		{
-			if (io_context_.stopped())
-			{
-				io_context_.restart();
-			}
+			if (ip_addr_.empty() || port_.empty())
+				return std::future<bool>{};
 
 			ip_addr_ = ip_addr;
 			port_ = port;
 
 			auto future = co_spawn(
 				io_context_,
-				[this]() mutable -> awaitable<error_code>
+				[this]() mutable -> awaitable<bool>
 				{
 					socket _socket(io_context_);
 
@@ -73,10 +71,12 @@ namespace aquarius
 					if (ec)
 					{
 						XLOG_ERROR() << "connect " << ip_addr_ << " failed! maybe" << ec.what();
+						co_return false;
 					}
-					else
-					{
-						create_session(std::move(_socket));
+
+					create_session(std::move(_socket));
+
+					if ()
 
 						co_spawn(
 							this->io_context_,
@@ -85,19 +85,21 @@ namespace aquarius
 								auto ec = co_await session_ptr_->protocol();
 								if (ec)
 								{
+									if (close_func_)
+										this->close_func_();
+
 									auto reconnect_times = this->reconnect_times_;
 
 									while (reconnect_times--)
 									{
-										if (async_connect(ip_addr_, port_))
+										if (reconnect())
 											break;
 									}
 								}
 							},
 							detached);
-					}
 
-					co_return ec;
+					co_return true;
 				},
 				use_future);
 
@@ -106,28 +108,39 @@ namespace aquarius
 				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
 			}
 
-			return !future.get();
+			return future;
 		}
-		template <typename RPC, typename Func>
-		void async_send(typename RPC::request req, Func&& f)
+
+		bool reconnect()
+		{
+			if (ip_addr_.empty() || port_.empty())
+				return;
+
+			if (io_context_.stopped()) [[likely]]
+			{
+				io_context_.restart();
+			}
+
+			auto future = async_connect(ip_addr_, port_);
+
+			return future.get();
+		}
+
+		template <typename RPC, >
+		void async_send(typename RPC::request req)
 		{
 			std::vector<char> fs{};
 			req.pack(fs);
-			auto promise_ptr = std::make_shared<std::promise<std::optional<typename RPC::response>>>();
-			auto future = promise_ptr->get_future();
-
-			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
-				RPC::id, std::forward<Func>(f));
 
 			std::vector<char> complete_buffer{};
 			req.uuid(RPC::id);
 			req.pack(complete_buffer);
 			req.length(complete_buffer.size());
 
-			async_send(std::move(buffer));
+			async_send(std::move(complete_buffer));
 		}
 
-		template<typename BuffSequence>
+		template <typename BuffSequence>
 		void async_send(BuffSequence buffer)
 		{
 			co_spawn(
