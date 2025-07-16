@@ -165,9 +165,12 @@
     <ClInclude Include="..\include\aquarius\context\detail\context_base.hpp" />
     <ClInclude Include="..\include\aquarius\context\handler.hpp" />
     <ClInclude Include="..\include\aquarius\context\handler_router.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\connect.hpp" />
     <ClInclude Include="..\include\aquarius\co_spawn.hpp" />
     <ClInclude Include="..\include\aquarius\detached.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\io\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\io\io_context.hpp" />

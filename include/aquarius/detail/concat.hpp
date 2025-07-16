@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template <const std::string_view&... args>
+		template <const auto&... args>
 		struct concat
 		{
 			constexpr static auto impl() noexcept
@@ -14,9 +14,11 @@ namespace aquarius
 				constexpr auto len = (args.size() + ... + 0);
 				std::array<char, len + 1> arr{};
 
-				auto f = [i = 0, &arr](const auto& str) mutable
+				int i = 0;
+
+				auto f = [&i, &arr](const auto& str) mutable
 				{
-					for (const auto& s : str)
+					for (auto s : str)
 						arr[i++] = s;
 
 					return arr;
@@ -34,7 +36,7 @@ namespace aquarius
 			static constexpr std::string_view value{ arr.data(), arr.size() - 1 };
 		};
 
-		template <std::string_view const&... args>
+		template <const auto&... args>
 		constexpr static auto concat_v = concat<args...>::value;
 	} // namespace detail
 } // namespace aquarius

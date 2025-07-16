@@ -225,6 +225,15 @@
     <ClInclude Include="..\include\aquarius\basic_handler.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\concat.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

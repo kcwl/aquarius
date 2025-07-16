@@ -125,7 +125,9 @@ namespace aquarius
 		{
 			constexpr std::string_view struct_name = detail::name<T>();
 
-			constexpr auto complete_sql = detail::concat_v<SELECT,SPACE, ASTERISK, FROM,SPACE, struct_name>;
+			constexpr auto complete_sql = detail::concat_v<SELECT,SPACE, ASTERISK, FROM,SPACE>;
+
+			constexpr auto sql = detail::concat_v<complete_sql, struct_name>;
 
 			ss_ << complete_sql.data();
 

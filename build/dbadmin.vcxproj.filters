@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="protocol">
-      <UniqueIdentifier>{5eabf9f4-1714-41db-9679-1dafb86fdf34}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dbadmin\dbadmin.cpp">
@@ -27,9 +24,6 @@
     <ClCompile Include="..\src\dbadmin\server.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\dbadmin\ctx_account.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\dbadmin\transfer_client.h">
@@ -38,19 +32,8 @@
     <ClInclude Include="..\src\dbadmin\server.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\dbadmin\proto\account.proto.hpp">
-      <Filter>protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\dbadmin\account_table.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\dbadmin\error.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\dbadmin\proto\account.protocol">
-      <Filter>protocol</Filter>
-    </None>
   </ItemGroup>
 </Project>
