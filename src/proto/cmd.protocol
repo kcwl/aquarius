@@ -1,0 +1,67 @@
+message help_req
+{
+}
+
+message help_resp
+{
+	string msg;
+}
+
+message list_req
+{
+}
+
+message list_resp
+{
+	message options
+	{
+		message cmd_info
+		{
+			string param;
+			string desc;
+		}
+
+		string cmd;
+		repeated cmd_info infos;
+	}
+
+	repeated options ops;
+}
+
+message add_req
+{
+	string input;
+}
+
+message add_resp
+{
+}
+
+message remove_req
+{
+	string input;
+}
+
+message remove_resp
+{
+}
+
+tcp cmd_help = 201
+{
+	rpc help_req return help_resp;
+}
+
+tcp cmd_list = 202
+{
+	rpc list_req return help_resp;
+}
+
+tcp cmd_add = 203
+{
+	rpc add_req return add_resp;
+}
+
+tcp cmd_remove = 204
+{
+	rpc remove_req return remove_resp;
+}

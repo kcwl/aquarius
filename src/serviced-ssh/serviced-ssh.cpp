@@ -3,7 +3,36 @@
 
 #include <iostream>
 #include <aquarius/cmd_options.hpp>
+#include <cmd.proto.hpp>
 #include "client.h"
+
+void help()
+{
+    rpc_cmd_help::request req{};
+    CLIENT.async_send<rpc_cmd_help>(req);
+}
+
+void list()
+{
+    rpc_cmd_list::request req{};
+    CLIENT.async_send<rpc_cmd_list>(req);
+}
+
+void add(const std::string& input)
+{
+    rpc_cmd_add::request req{};
+    req.body().input = input;
+
+    CLIENT.async_send<rpc_cmd_add>(req);
+}
+
+void remove(const std::string& input)
+{
+    rpc_cmd_add::request req{};
+    req.body().input = input;
+
+    CLIENT.async_send<rpc_cmd_add>(req);
+}
 
 int main(int argc, char* argv[])
 {
@@ -11,6 +40,8 @@ int main(int argc, char* argv[])
 
     cmd.add_option<std::string>("--ip_addr", "serviced ip addr");
     cmd.add_option<std::string>("--port", "serviced port");
+
+    cmd.load_options(argc, argv);
 
     auto ip_addr = cmd.option<std::string>("--ip_addr");
 
@@ -46,7 +77,31 @@ int main(int argc, char* argv[])
         if (input == "quit" || input == "q")
             break;
 
-        //CLIENT.async_send()
+        auto pos = input.find_first_of(" ");
+        if (pos == std::string::npos)
+        {
+            XLOG_ERROR() << "command error!";
+            continue;
+        }
+
+        auto key = input.substr(0, pos);
+
+        if (key == "help")
+        {
+            help();
+        }
+        else if (key == "list")
+        {
+            list();
+        }
+        else if (key == "add")
+        {
+            add(input);
+        }
+        else if (key == "remove")
+        {
+            remove(input);
+        }
     }
 
     return 0;

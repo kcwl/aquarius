@@ -76,28 +76,26 @@ namespace aquarius
 
 					create_session(std::move(_socket));
 
-					if ()
-
-						co_spawn(
-							this->io_context_,
-							[this]() mutable -> awaitable<void>
+					co_spawn(
+						this->io_context_,
+						[this]() mutable -> awaitable<void>
+						{
+							auto ec = co_await session_ptr_->protocol();
+							if (ec)
 							{
-								auto ec = co_await session_ptr_->protocol();
-								if (ec)
+								if (close_func_)
+									this->close_func_();
+
+								auto reconnect_times = this->reconnect_times_;
+
+								while (reconnect_times--)
 								{
-									if (close_func_)
-										this->close_func_();
-
-									auto reconnect_times = this->reconnect_times_;
-
-									while (reconnect_times--)
-									{
-										if (reconnect())
-											break;
-									}
+									if (reconnect())
+										break;
 								}
-							},
-							detached);
+							}
+						},
+						detached);
 
 					co_return true;
 				},
@@ -114,7 +112,7 @@ namespace aquarius
 		bool reconnect()
 		{
 			if (ip_addr_.empty() || port_.empty())
-				return;
+				return false;
 
 			if (io_context_.stopped()) [[likely]]
 			{
@@ -126,7 +124,7 @@ namespace aquarius
 			return future.get();
 		}
 
-		template <typename RPC, >
+		template <typename RPC>
 		void async_send(typename RPC::request req)
 		{
 			std::vector<char> fs{};
@@ -137,11 +135,11 @@ namespace aquarius
 			req.pack(complete_buffer);
 			req.length(complete_buffer.size());
 
-			async_send(std::move(complete_buffer));
+			transfer(std::move(complete_buffer));
 		}
 
 		template <typename BuffSequence>
-		void async_send(BuffSequence buffer)
+		void transfer(BuffSequence buffer)
 		{
 			co_spawn(
 				io_context_, [this, buffer = std::move(buffer)]() -> awaitable<void>

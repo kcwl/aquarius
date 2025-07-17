@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="protocol">
+      <UniqueIdentifier>{6965479d-1231-4c81-b681-a99e644a9e54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced-ssh\serviced-ssh.cpp">
@@ -23,5 +26,13 @@
     <ClInclude Include="..\src\serviced-ssh\client.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\proto\cmd.proto.hpp">
+      <Filter>protocol</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\proto\cmd.protocol">
+      <Filter>protocol</Filter>
+    </None>
   </ItemGroup>
 </Project>
