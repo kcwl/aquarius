@@ -7,54 +7,18 @@
 #include "client.h"
 #include <ranges>
 
-void help()
-{
-    rpc_cmd_help::request req{};
-    CLIENT.async_send<rpc_cmd_help>(req);
-}
-
-void list()
-{
-    rpc_cmd_list::request req{};
-    CLIENT.async_send<rpc_cmd_list>(req);
-}
-
-void add(const std::string& input)
-{
-    rpc_cmd_add::request req{};
-
-    for (auto cmd : input | std::views::split(' '))
-    {
-        req.body().input.push_back(cmd.data());
-    }
-
-    CLIENT.async_send<rpc_cmd_add>(req);
-}
-
-void remove(const std::string& input)
-{
-    rpc_cmd_add::request req{};
-
-    for (auto cmd : input | std::views::split(' '))
-    {
-        req.body().input.push_back(cmd.data());
-    }
-
-    CLIENT.async_send<rpc_cmd_add>(req);
-}
-
 int main(int argc, char* argv[])
 {
     aquarius::cmd_options cmd("serviced");
 
-    cmd.add_option<std::string>("--ip_addr", "serviced ip addr");
-    cmd.add_option<std::string>("--port", "serviced port");
+    cmd.add_option<std::string>("ip_addr", "serviced ip addr");
+    cmd.add_option<std::string>("port", "serviced port");
 
     cmd.load_options(argc, argv);
 
-    auto ip_addr = cmd.option<std::string>("--ip_addr");
+    auto ip_addr = cmd.option<std::string>("ip_addr");
 
-    auto port = cmd.option<std::string>("--port");
+    auto port = cmd.option<std::string>("port");
 
     if (ip_addr.empty())
     {
@@ -81,36 +45,19 @@ int main(int argc, char* argv[])
 
     while (true)
     {
-        std::cin >> input;
+        std::cout << "serviced-ssh> ";
 
-        if (input == "quit" || input == "q")
+        rpc_cmd::request req{};
+
+        std::cin >> req.body().input;
+
+        if (req.body().input.empty())
+            continue;
+
+        if (req.body().input == "quit" || req.body().input == "q")
             break;
 
-        auto pos = input.find_first_of(" ");
-        if (pos == std::string::npos)
-        {
-            XLOG_ERROR() << "command error!";
-            continue;
-        }
-
-        auto key = input.substr(0, pos);
-
-        if (key == "help")
-        {
-            help();
-        }
-        else if (key == "list")
-        {
-            list();
-        }
-        else if (key == "add")
-        {
-            add(input);
-        }
-        else if (key == "remove")
-        {
-            remove(input);
-        }
+        CLIENT.async_send<rpc_cmd>(std::move(req));
     }
 
     return 0;

@@ -2,58 +2,17 @@
 #include <aquarius_protocol.hpp>
 
 
-struct help_req
+struct cmd_req
 {
+	std::string input;
 };
-struct help_resp
+struct cmd_resp
 {
-	std::string msg;
-};
-struct list_req
-{
-};
-struct list_resp
-{
-	std::string msg;
-};
-struct add_req
-{
-	std::vector<std::string> input;
-};
-struct add_resp
-{
-};
-struct remove_req
-{
-	std::vector<std::string> input;
-};
-struct remove_resp
-{
-};struct rpc_cmd_help
+	std::string output;
+};struct rpc_cmd
 {
 	constexpr static auto id = 201;
-	using request = aquarius::tcp_request<help_req>;
-	using response = aquarius::tcp_response<help_resp>;
-};
-
-struct rpc_cmd_list
-{
-	constexpr static auto id = 202;
-	using request = aquarius::tcp_request<list_req>;
-	using response = aquarius::tcp_response<help_resp>;
-};
-
-struct rpc_cmd_add
-{
-	constexpr static auto id = 203;
-	using request = aquarius::tcp_request<add_req>;
-	using response = aquarius::tcp_response<add_resp>;
-};
-
-struct rpc_cmd_remove
-{
-	constexpr static auto id = 204;
-	using request = aquarius::tcp_request<remove_req>;
-	using response = aquarius::tcp_response<remove_resp>;
+	using request = aquarius::tcp_request<cmd_req>;
+	using response = aquarius::tcp_response<cmd_resp>;
 };
 

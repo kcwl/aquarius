@@ -2,21 +2,21 @@
 
 namespace serviced
 {
-	void cmd_store::insert(std::shared_ptr<aquarius::cmd_options> cmd)
+	void cmd_store::insert(std::shared_ptr<cmd_info> cmd)
 	{
 		std::lock_guard lk(mutex_);
 
-		cmds_[cmd->desc()] = cmd;
+		cmds_[cmd->cmd_ptr->desc()] = cmd;
 	}
 
-	std::map<std::string, std::shared_ptr<aquarius::cmd_options>> cmd_store::cmds()
+	std::map<std::string, std::shared_ptr<cmd_info>> cmd_store::cmds()
 	{
 		std::lock_guard lk(mutex_);
 
 		return cmds_;
 	}
 
-	std::shared_ptr<aquarius::cmd_options> cmd_store::find(const std::string& cmd)
+	std::shared_ptr<cmd_info> cmd_store::find(const std::string& cmd)
 	{
 		std::lock_guard lk(mutex_);
 

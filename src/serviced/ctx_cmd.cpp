@@ -1,81 +1,34 @@
+#include "client_factory.h"
 #include "cmd_store.h"
+#include "error.hpp"
 #include <aquarius.hpp>
 #include <proto/cmd.proto.hpp>
-#include "error.hpp"
-#include "client_factory.h"
+#include <ranges>
 
 namespace serviced
 {
-	AQUARIUS_STREAM_CONTEXT(cmd_help, rpc_cmd_help)
+	AQUARIUS_STREAM_CONTEXT(cmd_opt, rpc_cmd)
 	{
-		auto cmds = CMD.cmds();
+		std::string_view input = request()->body().input;
 
-		for (auto& c : cmds)
+		std::vector<std::string> cmds{};
+
+		for (auto c : std::views::split(input, " "))
 		{
-			if (!c.second)
-				continue;
-
-			this->response().body().msg.append(c.second->desc()+"\t\t");
-
-			for (const auto& o : c.second->options())
-			{
-				if (!o)
-					continue;
-
-				this->response().body().msg.append(o->description());
-			}
-
-
-			this->response().body().msg.append("\n");
+			cmds.push_back(c.data());
 		}
 
-		co_return errc::success;
-	}
-
-	AQUARIUS_STREAM_CONTEXT(cmd_list, rpc_cmd_list)
-	{
-		auto clients = CLIENT.get_client();
-
-		for (auto& c : clients)
-		{
-			response().body().msg.append(c->remote_address() + ":" + std::to_string(c->remote_port()) + "\n");
-		}
-
-		co_return errc::success;
-	}
-
-	AQUARIUS_STREAM_CONTEXT(cmd_add, rpc_cmd_add)
-	{
-		auto client_ptr = std::make_shared<client_factory::client>();
-
-		auto cmd = CMD.find("add");
-
-		if (!cmd)
+		if (cmds.empty())
 			co_return errc::invalid_cmd;
 
-		(*cmd).load_options(request()->body().input);
+		auto cmd_str = *cmds.begin();
 
-		auto ip_addr = (*cmd).option<std::string>("--ip_addr");
+		auto cmd_ptr = CMD.find(cmd_str);
 
-		client_ptr->async_connect(ip_addr, (*cmd).option<std::string>("--port"));
-
-		CLIENT.insert(ip_addr, client_ptr);
-
-		co_return errc::success;
-	}
-
-	AQUARIUS_STREAM_CONTEXT(cmd_remove, rpc_cmd_remove)
-	{
-		auto cmd = CMD.find("add");
-
-		if (!cmd)
+		if (!cmd_ptr)
 			co_return errc::invalid_cmd;
 
-		(*cmd).load_options(request()->body().input);
-
-		auto ip_addr = (*cmd).option<std::string>("--ip_addr");
-
-		CLIENT.remove(ip_addr);
+		cmd_ptr->opt_func(response().body().output);
 
 		co_return errc::success;
 	}

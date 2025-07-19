@@ -48,9 +48,6 @@ namespace aquarius
 	public:
 		auto async_connect(const std::string& ip_addr, const std::string& port)
 		{
-			if (ip_addr_.empty() || port_.empty())
-				return std::future<bool>{};
-
 			ip_addr_ = ip_addr;
 			port_ = port;
 

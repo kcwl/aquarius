@@ -1,55 +1,14 @@
-message help_req
+message cmd_req
 {
+	string input;
 }
 
-message help_resp
+message cmd_resp
 {
-	string msg;
+	string output;
 }
 
-message list_req
+tcp cmd = 201
 {
-}
-
-message list_resp
-{
-	string msg;
-}
-
-message add_req
-{
-	repeated string input;
-}
-
-message add_resp
-{
-}
-
-message remove_req
-{
-	repeated string input;
-}
-
-message remove_resp
-{
-}
-
-tcp cmd_help = 201
-{
-	rpc help_req return help_resp;
-}
-
-tcp cmd_list = 202
-{
-	rpc list_req return help_resp;
-}
-
-tcp cmd_add = 203
-{
-	rpc add_req return add_resp;
-}
-
-tcp cmd_remove = 204
-{
-	rpc remove_req return remove_resp;
+	rpc cmd_req return cmd_resp;
 }

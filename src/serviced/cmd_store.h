@@ -3,26 +3,41 @@
 #include <string>
 #include <map>
 #include <mutex>
+#include <string>
 #include <aquarius/cmd_options.hpp>
 
 namespace serviced
 {
+	struct cmd_info
+	{
+		cmd_info(const std::string& desc)
+			: opt_func()
+			, cmd_ptr(new aquarius::cmd_options(desc))
+		{
+
+		}
+
+		std::function<void(std::string&)> opt_func;
+
+		std::shared_ptr<aquarius::cmd_options> cmd_ptr;
+	};
+
 	class cmd_store : public aquarius::singleton<cmd_store>
 	{
 	public:
 		cmd_store() = default;
 
 	public:
-		void insert(std::shared_ptr<aquarius::cmd_options> cmd);
+		void insert(std::shared_ptr<cmd_info> cmd);
 
-		std::map<std::string, std::shared_ptr<aquarius::cmd_options>> cmds();
+		std::map<std::string, std::shared_ptr<cmd_info>> cmds();
 
-		std::shared_ptr<aquarius::cmd_options> find(const std::string& cmd);
+		std::shared_ptr<cmd_info> find(const std::string& cmd);
 
 	private:
 		std::mutex mutex_;
 
-		std::map<std::string, std::shared_ptr<aquarius::cmd_options>> cmds_;
+		std::map<std::string, std::shared_ptr<cmd_info>> cmds_;
 	};
 }
 
