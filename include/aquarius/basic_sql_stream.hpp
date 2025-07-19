@@ -1,16 +1,17 @@
 #pragma once
+#include <aquarius/detail/concat.hpp>
+#include <aquarius/io/io_context.hpp>
 #include <sstream>
 #include <string>
-#include <aquarius/detail/concat.hpp>
-#include <aquarius/mysql_pool.hpp>
+#include <aquarius/detail/mysql_keyword.hpp>
+#include <vector>
 
 namespace aquarius
 {
 	namespace detail
 	{
-
 		template <typename _Ty>
-		static constexpr std::string_view name()
+		inline consteval std::string_view name()
 		{
 			using namespace std::string_view_literals;
 
@@ -57,13 +58,15 @@ namespace aquarius
 			}
 #endif
 		}
-	}
+	} // namespace detail
 
 	template <typename Stream = std::stringstream>
 	class basic_sql_stream
 	{
 	public:
-		basic_sql_stream() = default;
+		basic_sql_stream(io::io_context& context)
+			: context_(context)
+		{}
 
 	public:
 		template <typename U>
@@ -120,11 +123,11 @@ namespace aquarius
 		template <typename T>
 		basic_sql_stream select()
 		{
-			constexpr auto struct_name = detail::name<T>();
+			constexpr std::string_view struct_name = detail::name<T>();
 
-			constexpr std::string_view select_sql = "select * from "sv;
+			constexpr auto complete_sql = detail::concat_v<SELECT,SPACE, ASTERISK, FROM,SPACE>;
 
-			constexpr auto complete_sql = detail::concat_v<select_sql, struct_name>;
+			constexpr auto sql = detail::concat_v<complete_sql, struct_name>;
 
 			ss_ << complete_sql.data();
 
@@ -132,18 +135,31 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_query() -> awaitable<std::vector<T>>
+		auto query() -> awaitable<std::vector<T>>
 		{
 			ss_ << ";";
 
-			co_return co_await mysql_pool::get_mutable_instance().async_query<T>(ss_.str());
+			co_return co_await context_.sql_query<T>(ss_.str());
 		}
 
-		auto async_execute()
+		template <typename T>
+		auto query_one() -> awaitable<std::optional<T>>
 		{
 			ss_ << ";";
 
-			co_return co_await mysql_pool::get_mutable_instance().async_execute(ss_.str());
+			auto results = co_await query<T>();
+
+			if (results.empty())
+				co_return std::nullopt;
+
+			co_return *results.begin();
+		}
+
+		auto execute() -> awaitable<bool>
+		{
+			ss_ << ";";
+
+			co_return co_await context_.sql_execute(ss_.str());
 		}
 
 		std::string sql()
@@ -151,23 +167,26 @@ namespace aquarius
 			return ss_.str();
 		}
 
-		basic_sql_stream& where()
+		template <typename Attribute>
+		basic_sql_stream& where(const Attribute& attr)
 		{
-			ss_ << " where ";
+			ss_ << " where " << attr.sql();
 
 			return *this;
 		}
 
-		basic_sql_stream& _and()
+		template <typename Attribute>
+		basic_sql_stream& _and(const Attribute& attr)
 		{
-			ss_ << " and ";
+			ss_ << " and " << attr.sql();
 
 			return *this;
 		}
 
-		basic_sql_stream& _or()
+		template <typename Attribute>
+		basic_sql_stream& _or(const Attribute& attr)
 		{
-			ss_ << " or ";
+			ss_ << " or " << attr.sql();
 
 			return *this;
 		}
@@ -190,5 +209,7 @@ namespace aquarius
 
 	private:
 		Stream ss_;
+
+		io::io_context& context_;
 	};
 } // namespace aquarius

@@ -70,12 +70,12 @@ struct rpc_test
 {
 	constexpr static auto id = 1001;
 	using request = aquarius::tcp_request<person>;
-	using response = aquarius::tcp_request<person>;
+	using response = aquarius::tcp_response<person>;
 };
 
 AQUARIUS_STREAM_CONTEXT(ctx_test, rpc_test)
 {
 	response().body() = request()->body();
 
-	co_return 0;
+	co_return aquarius::error_code{};
 }

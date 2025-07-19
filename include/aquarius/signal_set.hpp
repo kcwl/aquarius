@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <boost/asio/signal_set.hpp>
 
 namespace aquarius

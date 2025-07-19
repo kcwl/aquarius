@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/config.hpp>
 #include <boost/asio/buffer.hpp>
 
 namespace aquarius

@@ -1,12 +1,14 @@
 ﻿#pragma once
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
+#include <aquarius/config.hpp>
 #include <aquarius/context/client_router.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
+#include <aquarius/detail/connect.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/io_context.hpp>
+#include <aquarius/io/io_context.hpp>
 #include <aquarius/ip/address.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/redirect_error.hpp>
@@ -22,7 +24,7 @@ namespace aquarius
 	template <typename Protocol>
 	class basic_client
 	{
-		using session = Protocol::client_session;
+		using session = typename Protocol::session;
 		using socket = typename Protocol::socket;
 		using resolver = typename Protocol::resolver;
 		using port_type = uint16_t;
@@ -44,19 +46,14 @@ namespace aquarius
 		}
 
 	public:
-		bool async_connect(const std::string& ip_addr, const std::string& port)
+		auto async_connect(const std::string& ip_addr, const std::string& port)
 		{
-			if (io_context_.stopped())
-			{
-				io_context_.restart();
-			}
-
 			ip_addr_ = ip_addr;
 			port_ = port;
 
 			auto future = co_spawn(
 				io_context_,
-				[this]() mutable -> awaitable<error_code>
+				[this]() mutable -> awaitable<bool>
 				{
 					socket _socket(io_context_);
 
@@ -66,36 +63,38 @@ namespace aquarius
 
 					error_code ec{};
 
-					co_await boost::asio::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
+					co_await detail::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
 
 					if (ec)
 					{
 						XLOG_ERROR() << "connect " << ip_addr_ << " failed! maybe" << ec.what();
+						co_return false;
 					}
-					else
-					{
-						create_session(std::move(_socket));
 
-						co_spawn(
-							this->io_context_,
-							[this]() mutable -> awaitable<void>
+					create_session(std::move(_socket));
+
+					co_spawn(
+						this->io_context_,
+						[this]() mutable -> awaitable<void>
+						{
+							auto ec = co_await session_ptr_->protocol();
+							if (ec)
 							{
-								auto ec = co_await session_ptr_->protocol();
-								if (ec)
+								if (close_func_)
+									this->close_func_();
+
+								auto reconnect_times = this->reconnect_times_;
+
+								while (reconnect_times--)
 								{
-									auto reconnect_times = this->reconnect_times_;
-
-									while (reconnect_times--)
-									{
-										if (async_connect(ip_addr_, port_))
-											break;
-									}
+									if (reconnect())
+										break;
 								}
-							},
-							detached);
-					}
+							}
+						},
+						detached);
 
-					co_return ec;
+					co_return true;
 				},
 				use_future);
 
@@ -104,31 +103,46 @@ namespace aquarius
 				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
 			}
 
-			return !future.get();
+			return future;
 		}
-		template <typename RPC, typename Func>
-		void async_send(typename RPC::request req, Func&& f)
+
+		bool reconnect()
+		{
+			if (ip_addr_.empty() || port_.empty())
+				return false;
+
+			if (io_context_.stopped()) [[likely]]
+			{
+				io_context_.restart();
+			}
+
+			auto future = async_connect(ip_addr_, port_);
+
+			return future.get();
+		}
+
+		template <typename RPC>
+		void async_send(typename RPC::request req)
 		{
 			std::vector<char> fs{};
 			req.pack(fs);
-			auto promise_ptr = std::make_shared<std::promise<std::optional<typename RPC::response>>>();
-			auto future = promise_ptr->get_future();
 
-			context::detail::client_router::get_mutable_instance().regist<typename RPC::response>(
-				RPC::id, std::forward<Func>(f));
+			std::vector<char> complete_buffer{};
+			req.uuid(RPC::id);
+			req.pack(complete_buffer);
+			req.length(complete_buffer.size());
 
-			error_code ec{};
-
-			async_send(std::move(fs), static_cast<uint8_t>(mode::stream), RPC::id, ec);
+			transfer(std::move(complete_buffer));
 		}
 
-		auto async_send(std::vector<char> buffer, uint8_t mode, std::size_t rpc_id, error_code& ec)
+		template <typename BuffSequence>
+		void transfer(BuffSequence buffer)
 		{
-			co_spawn(io_context_, [this, buff = std::move(buffer), mode, rpc_id, &ec]()->awaitable<void>
-				{
-					co_await session_ptr_->async_send(std::move(buff), mode, rpc_id, ec);
-				}, detached);
+			co_spawn(
+				io_context_, [this, buffer = std::move(buffer)]() -> awaitable<void>
+				{ co_await session_ptr_->async_send(std::move(buffer)); }, detached);
 		}
+
 		std::string remote_address()
 		{
 			return session_ptr_->remote_address();
@@ -170,11 +184,10 @@ namespace aquarius
 		void create_session(socket socket)
 		{
 			session_ptr_ = std::make_shared<session>(std::move(socket));
-			session_ptr_->regist_close(close_func_);
 		}
 
 	private:
-		io_context io_context_;
+		io::io_context io_context_;
 		std::shared_ptr<session> session_ptr_;
 		std::function<void()> close_func_;
 		int reconnect_times_;
