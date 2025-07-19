@@ -36,6 +36,21 @@
     <ClInclude Include="..\src\serviced\tcp_transfer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\proto\cmd.proto.hpp">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\cmd_store.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\error.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\client_factory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\cmd_register.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\serviced.cpp">
@@ -51,6 +66,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\sdtree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\cmd_store.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\ctx_cmd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\client_factory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\cmd_register.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

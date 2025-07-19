@@ -3,9 +3,12 @@
 
 #include <iostream>
 #include "server.h"
+#include "cmd_register.h"
 
 int main()
 {
+    serviced::cmd_register();
+
     serviced::tcp_server srv(3399, 10, "serviced");
 
     srv.run();

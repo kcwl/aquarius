@@ -9,9 +9,9 @@ namespace aquarius
 	class cmd_options
 	{
 	public:
-		cmd_options()
-			: desc_("server usage")
-
+		cmd_options(const std::string& desc)
+			: desc_str_(desc)
+			, desc_(desc)
 		{
 
 		}
@@ -19,6 +19,31 @@ namespace aquarius
 	public:
 		void load_options(int argc, char* argv[])
 		{
+			try
+			{
+				boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc_), vm_);
+
+				boost::program_options::notify(vm_);
+			}
+			catch (const std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+		}
+
+
+		void load_options(const std::vector<std::string>& argvs)
+		{
+			int argc = static_cast<int>(argvs.size());
+
+			char** argv = new char*[argc];
+
+			int i = 0;
+			for (auto a : argvs)
+			{
+				argv[i++] = a.data();
+			}
+
 			try
 			{
 				boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc_), vm_);
@@ -46,37 +71,21 @@ namespace aquarius
 			return vm_[op].as<T>();
 		}
 
-		auto get_transfer() const
+		std::string desc() const
 		{
-			return transfer_;
+			return desc_str_;
 		}
 
-		std::size_t pool_size() const
+		auto options() const
 		{
-			return pool_size_;
-		}
-
-		int listen_port() const
-		{
-			return listen_port_;
-		}
-
-		std::string server_name() const
-		{
-			return name_;
+			return desc_.options();
 		}
 
 	private:
+		std::string desc_str_;
+
 		boost::program_options::options_description desc_;
 
 		boost::program_options::variables_map vm_;
-
-		std::pair<std::string, uint16_t> transfer_;
-
-		std::size_t pool_size_;
-
-		int listen_port_;
-
-		std::string name_;
 	};
 } // namespace aquarius

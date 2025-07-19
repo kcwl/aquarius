@@ -102,14 +102,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;F:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;F:\boost_1_88_0;$(SolutionDir)../src/;D:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\boost_1_88_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\boost_1_88_0\stage\lib;D:\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,6 +128,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\proto\cmd.proto.hpp" />
+    <ClInclude Include="..\src\serviced\client_factory.h" />
+    <ClInclude Include="..\src\serviced\cmd_register.h" />
+    <ClInclude Include="..\src\serviced\cmd_store.h" />
+    <ClInclude Include="..\src\serviced\error.hpp" />
     <ClInclude Include="..\src\serviced\proto\pub_sub.proto.hpp" />
     <ClInclude Include="..\src\serviced\sdnode.h" />
     <ClInclude Include="..\src\serviced\sdtree.h" />
@@ -135,6 +141,10 @@
     <ClInclude Include="..\src\serviced\transfer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\serviced\client_factory.cpp" />
+    <ClCompile Include="..\src\serviced\cmd_register.cpp" />
+    <ClCompile Include="..\src\serviced\cmd_store.cpp" />
+    <ClCompile Include="..\src\serviced\ctx_cmd.cpp" />
     <ClCompile Include="..\src\serviced\ctx_transfer.cpp" />
     <ClCompile Include="..\src\serviced\sdnode.cpp" />
     <ClCompile Include="..\src\serviced\sdtree.cpp" />

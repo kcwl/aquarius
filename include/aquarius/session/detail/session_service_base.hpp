@@ -51,17 +51,17 @@ namespace aquarius
 					impl.socket->close(ec);
 				}
 
-				std::string remote_address(implementation_type_base& impl) const
+				std::string remote_address(const implementation_type_base& impl) const
 				{
 					return impl.socket->remote_endpoint().address().to_string();
 				}
 
-				uint32_t remote_address_u(implementation_type_base& impl) const
+				uint32_t remote_address_u(const implementation_type_base& impl) const
 				{
 					return impl.socket->remote_endpoint().address().to_v4().to_uint();
 				}
 
-				uint16_t remote_port(implementation_type_base& impl) const
+				uint16_t remote_port(const implementation_type_base& impl) const
 				{
 					return impl.socket->remote_endpoint().port();
 				}

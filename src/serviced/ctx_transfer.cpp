@@ -1,5 +1,5 @@
 #include "tcp_transfer.hpp"
-#include "proto/pub_sub.proto.hpp"
+#include <proto/pub_sub.proto.hpp>
 #include "sdnode.h"
 
 namespace serviced

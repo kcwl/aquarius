@@ -87,9 +87,9 @@ namespace aquarius
 			{}
 
 		public:
-			auto visit(std::shared_ptr<Request> request) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request) -> awaitable<E>
 			{
-				auto result = co_await base_type::visit(request);
+				auto result = co_await base_type::visit(session_ptr, request);
 
 				make_response(result);
 

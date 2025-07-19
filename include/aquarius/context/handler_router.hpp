@@ -42,7 +42,7 @@ namespace aquarius
 								 {
 									 auto ctx = std::make_shared<Context>();
 
-									 auto ec = co_await ctx->visit(req);
+									 auto ec = co_await ctx->visit(session, req);
 
 									 if (!ec)
 									 {

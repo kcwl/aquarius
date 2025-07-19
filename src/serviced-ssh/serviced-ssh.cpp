@@ -5,6 +5,7 @@
 #include <aquarius/cmd_options.hpp>
 #include <cmd.proto.hpp>
 #include "client.h"
+#include <ranges>
 
 void help()
 {
@@ -21,7 +22,11 @@ void list()
 void add(const std::string& input)
 {
     rpc_cmd_add::request req{};
-    req.body().input = input;
+
+    for (auto cmd : input | std::views::split(' '))
+    {
+        req.body().input.push_back(cmd.data());
+    }
 
     CLIENT.async_send<rpc_cmd_add>(req);
 }
@@ -29,14 +34,18 @@ void add(const std::string& input)
 void remove(const std::string& input)
 {
     rpc_cmd_add::request req{};
-    req.body().input = input;
+
+    for (auto cmd : input | std::views::split(' '))
+    {
+        req.body().input.push_back(cmd.data());
+    }
 
     CLIENT.async_send<rpc_cmd_add>(req);
 }
 
 int main(int argc, char* argv[])
 {
-    aquarius::cmd_options cmd{};
+    aquarius::cmd_options cmd("serviced");
 
     cmd.add_option<std::string>("--ip_addr", "serviced ip addr");
     cmd.add_option<std::string>("--port", "serviced port");

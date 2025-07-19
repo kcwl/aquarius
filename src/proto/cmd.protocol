@@ -13,24 +13,12 @@ message list_req
 
 message list_resp
 {
-	message options
-	{
-		message cmd_info
-		{
-			string param;
-			string desc;
-		}
-
-		string cmd;
-		repeated cmd_info infos;
-	}
-
-	repeated options ops;
+	string msg;
 }
 
 message add_req
 {
-	string input;
+	repeated string input;
 }
 
 message add_resp
@@ -39,7 +27,7 @@ message add_resp
 
 message remove_req
 {
-	string input;
+	repeated string input;
 }
 
 message remove_resp

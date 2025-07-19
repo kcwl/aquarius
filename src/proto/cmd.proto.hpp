@@ -14,18 +14,18 @@ struct list_req
 };
 struct list_resp
 {
-	std::vector<std::string> msg;
+	std::string msg;
 };
 struct add_req
 {
-	std::string input;
+	std::vector<std::string> input;
 };
 struct add_resp
 {
 };
 struct remove_req
 {
-	std::string input;
+	std::vector<std::string> input;
 };
 struct remove_resp
 {
