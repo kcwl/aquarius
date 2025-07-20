@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/singleton.hpp>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <mutex>
 #include <string>
 #include <aquarius/cmd_options.hpp>
@@ -30,14 +30,14 @@ namespace serviced
 	public:
 		void insert(std::shared_ptr<cmd_info> cmd);
 
-		std::map<std::string, std::shared_ptr<cmd_info>> cmds();
+		std::unordered_map<std::string, std::shared_ptr<cmd_info>> cmds();
 
 		std::shared_ptr<cmd_info> find(const std::string& cmd);
 
 	private:
 		std::mutex mutex_;
 
-		std::map<std::string, std::shared_ptr<cmd_info>> cmds_;
+		std::unordered_map<std::string, std::shared_ptr<cmd_info>> cmds_;
 	};
 }
 

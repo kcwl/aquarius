@@ -9,7 +9,7 @@ namespace serviced
 		cmds_[cmd->cmd_ptr->desc()] = cmd;
 	}
 
-	std::map<std::string, std::shared_ptr<cmd_info>> cmd_store::cmds()
+	std::unordered_map<std::string, std::shared_ptr<cmd_info>> cmd_store::cmds()
 	{
 		std::lock_guard lk(mutex_);
 

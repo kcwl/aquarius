@@ -127,10 +127,13 @@ namespace aquarius
 			std::vector<char> fs{};
 			req.pack(fs);
 
-			std::vector<char> complete_buffer{};
-			req.uuid(RPC::id);
+			std::vector<char> complete_buffer;
+			req.mark(complete_buffer);
+			auto header_size = complete_buffer.size();
+			req.rpc_id(RPC::id);
 			req.pack(complete_buffer);
-			req.length(complete_buffer.size());
+			req.length(complete_buffer.size() - header_size);
+			req.header()->commit(complete_buffer);
 
 			transfer(std::move(complete_buffer));
 		}

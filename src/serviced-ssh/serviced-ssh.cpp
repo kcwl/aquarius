@@ -43,10 +43,10 @@ int main(int argc, char* argv[])
 
     std::string input{};
 
+    std::cout << "serviced-ssh> ";
+
     while (true)
     {
-        std::cout << "serviced-ssh> ";
-
         rpc_cmd::request req{};
 
         std::cin >> req.body().input;

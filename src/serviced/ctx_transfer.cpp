@@ -6,7 +6,7 @@ namespace serviced
 {
 	AQUARIUS_STREAM_CONTEXT(subscriber, rpc_channel_subscribe)
 	{
-		auto node = std::make_shared<sdnode>(this->request()->header()->uuid());
+		auto node = std::make_shared<sdnode>(this->request()->uuid());
 
 		tcp_transfer::get_mutable_instance().channel_subscribe(std::to_string(this->request()->body().topic), node);
 
@@ -24,7 +24,7 @@ namespace serviced
 	{
 		for (auto& t : this->request()->body().topics)
 		{
-			tcp_transfer::get_mutable_instance().channel_unsubscribe(std::to_string(t), this->request()->header()->uuid());
+			tcp_transfer::get_mutable_instance().channel_unsubscribe(std::to_string(t), this->request()->uuid());
 		}
 
 		co_return aquarius::error_code{};

@@ -24,7 +24,7 @@ namespace serviced
 						if (!o)
 							continue;
 
-						output.append(o->description());
+						output.append("--" + o->long_name() + "\t" + o->description());
 					}
 
 					output.append("\n");
@@ -34,8 +34,8 @@ namespace serviced
 		CMD.insert(help_op);
 
 		auto  list_op = std::make_shared<cmd_info>("list");
-		help_op->cmd_ptr->add_option<std::string>("h", "show server infos");
-		help_op->opt_func = [](std::string& output)
+		list_op->cmd_ptr->add_option<std::string>("h", "show server infos");
+		list_op->opt_func = [](std::string& output)
 			{
 				auto clients = CLIENT.get_client();
 

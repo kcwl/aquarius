@@ -7,6 +7,7 @@
 #include <aquarius/context/handler_router.hpp>
 #include <aquarius_protocol/tcp_response.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <array>
 
 namespace aquarius
 {
@@ -30,9 +31,7 @@ namespace aquarius
 
 			using session = basic_session<basic_tcp>;
 
-			using header = basic_tcp_header<Flow::is_server>;
-
-			constexpr static auto is_server = Flow::is_server;
+			using header = basic_tcp_header<true>;
 
 		public:
 			static endpoint_type make_v4_endpoint(uint16_t port)
@@ -48,8 +47,10 @@ namespace aquarius
 		public:
 			auto recv(std::shared_ptr<session> session_ptr, error_code& ec) -> awaitable<void>
 			{
-				constexpr auto header_length = sizeof(header);
-				char header_buffer[header_length] = { 0 };
+				constexpr auto header_length = header::impl_size;
+
+				std::array<char, header_length>header_buffer = { 0 };
+
 				ec = co_await session_ptr->async_read(header_buffer);
 				if (ec)
 				{
@@ -60,9 +61,12 @@ namespace aquarius
 					session_ptr->shutdown();
 					co_return;
 				}
+
 				header req_header{};
-				std::memcpy((char*)&req_header, &header_buffer[0], header_length);
+				req_header.consume(header_buffer);
+
 				std::vector<char> body_buffer(req_header.length());
+
 				ec = co_await session_ptr->async_read(body_buffer);
 				if (ec)
 				{
