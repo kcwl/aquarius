@@ -31,7 +31,9 @@ namespace aquarius
 
 			using session = basic_session<basic_tcp>;
 
-			using header = basic_tcp_header<true>;
+			constexpr static bool is_server = Flow::is_server;
+
+			using header = basic_tcp_header<is_server>;
 
 		public:
 			static endpoint_type make_v4_endpoint(uint16_t port)
@@ -49,7 +51,7 @@ namespace aquarius
 			{
 				constexpr auto header_length = header::impl_size;
 
-				std::array<char, header_length>header_buffer = { 0 };
+				std::vector<char> header_buffer(header_length);
 
 				ec = co_await session_ptr->async_read(header_buffer);
 				if (ec)

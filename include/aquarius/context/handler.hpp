@@ -10,7 +10,10 @@ namespace aquarius
 		template <typename Session, typename Request, typename Response, typename E>
 		class basic_handler
 		{
+		public:
 			using context_t = boost::asio::execution::context_t;
+
+			using message_type = std::conditional_t<Session::is_server, Request, Response>;
 		public:
 			basic_handler(const std::string& name)
 				: name_(name)
@@ -19,7 +22,7 @@ namespace aquarius
 			virtual ~basic_handler() = default;
 
 		public:
-			auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<Request> message) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<message_type> message) -> awaitable<E>
 			{
 				session_ptr_ = sessoin_ptr;
 
@@ -28,7 +31,7 @@ namespace aquarius
 				co_return co_await this->handle();
 			}
 
-			std::shared_ptr<Request> request() const
+			std::shared_ptr<message_type> request() const
 			{
 				return request_;
 			}
@@ -63,7 +66,7 @@ namespace aquarius
 			virtual auto handle() -> awaitable<E> = 0;
 
 		protected:
-			std::shared_ptr<Request> request_;
+			std::shared_ptr<message_type> request_;
 
 			Response response_;
 
@@ -72,22 +75,22 @@ namespace aquarius
 			std::size_t rpc_id_;
 
 			std::shared_ptr<Session> session_ptr_;
-
-
 		};
 
 		template <typename Session, typename Request, typename Response, typename E>
 		class stream_handler : public basic_handler<Session, Request, Response, E>
 		{
+		public:
 			using base_type = basic_handler<Session, Request, Response, E>;
 
+			using typename base_type::message_type;
 		public:
 			stream_handler(const std::string& name)
 				: base_type(name)
 			{}
 
 		public:
-			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<message_type> request) -> awaitable<E>
 			{
 				auto result = co_await base_type::visit(session_ptr, request);
 
@@ -109,7 +112,7 @@ namespace aquarius
 			explicit auto_handler_register(std::size_t proto)
 			{
 				context::handler_router<Protocol>::get_mutable_instance()
-					.template regist<typename RPC::request, Context>(proto);
+					.template regist<RPC, Context>(proto);
 			}
 		};
 

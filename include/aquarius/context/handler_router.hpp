@@ -5,6 +5,7 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/post.hpp>
 #include <vector>
+#include <type_traits>
 
 namespace aquarius
 {
@@ -26,12 +27,15 @@ namespace aquarius
 			handler_router() = default;
 
 		public:
-			template <typename Request, typename Context>
+			template <typename RPC, typename Context>
 			void regist(std::size_t proto)
 			{
 				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer, header h)
 				{
-					auto req = std::make_shared<Request>(h);
+					using message_type =
+						std::conditional_t<session::is_server, typename RPC::request, typename RPC::response>;
+
+					auto req = std::make_shared<message_type>(h);
 					req->unpack(buffer);
 					post(session->get_executor(),
 						 [=]
@@ -54,7 +58,10 @@ namespace aquarius
 										 ctx->response().header()->pack(header_buff);
 										 header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
 
-										 co_await session->async_send(std::move(header_buff));
+										 if constexpr (session::is_server)
+										 {
+											 co_await session->async_send(std::move(header_buff));
+										 }
 									 }
 								 },
 								 detached);

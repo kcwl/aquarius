@@ -21,6 +21,9 @@
     <ClCompile Include="..\src\serviced-ssh\serviced-ssh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\serviced-ssh\ctx_service.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\serviced-ssh\client.h">
@@ -28,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="..\src\proto\cmd.proto.hpp">
       <Filter>protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced-ssh\error.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,8 @@ namespace aquarius
 
         using acceptor = typename Protocol::acceptor;
 
+        constexpr static auto is_server = Protocol::is_server;
+
     public:
         explicit basic_session(socket_type socket)
             : impl_(std::move(socket))

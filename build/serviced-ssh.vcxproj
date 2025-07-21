@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\serviced-ssh\ctx_service.cpp" />
     <ClCompile Include="..\src\serviced-ssh\serviced-ssh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\proto\cmd.proto.hpp" />
     <ClInclude Include="..\src\serviced-ssh\client.h" />
+    <ClInclude Include="..\src\serviced-ssh\error.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\proto\cmd.protocol" />

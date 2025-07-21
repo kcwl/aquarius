@@ -35,3 +35,6 @@
 
 #define AQUARIUS_TRANSFER_CONTEXT()                                                                                    \
 	AQUARIUS_TRANSFER_CONTEXT_BY(aquarius::ip::server_tcp_protocol, aquarius::error_code, transfer_handle)
+
+#define AQUARIUS_STREAM_RESPONSE(method, __rpc) \
+	AQUARIUS_STREAM_CONTEXT_BY(aquarius::ip::client_tcp_protocol, aquarius::error_code, method, __rpc)
