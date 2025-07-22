@@ -8,12 +8,9 @@ namespace aquarius
 	namespace ip
 	{
 		template <bool Server>
-		struct tcp_stream_flow;
-
-		template <>
-		struct tcp_stream_flow<true>
+		struct tcp_stream_flow
 		{
-			constexpr static bool is_server = true;
+			constexpr static bool is_server = Server;
 
 			template <typename Session, typename BuffSequence, typename Header>
 			static void recv(std::shared_ptr<Session> session_ptr, BuffSequence buffer, Header h)
@@ -32,17 +29,17 @@ namespace aquarius
 			}
 		};
 
-		template <>
-		struct tcp_stream_flow<false>
-		{
-			constexpr static bool is_server = false;
+		//template <>
+		//struct tcp_stream_flow<false>
+		//{
+		//	constexpr static bool is_server = false;
 
-			template <typename Session, typename BuffSequence, typename Header>
-			static void recv(std::shared_ptr<Session>, BuffSequence buffer, Header h)
-			{
-				context::detail::client_router::get_mutable_instance().invoke(h.rpc_id(), std::move(buffer));
-			}
-		};
+		//	template <typename Session, typename BuffSequence, typename Header>
+		//	static void recv(std::shared_ptr<Session>, BuffSequence buffer, Header h)
+		//	{
+		//		context::detail::client_router::get_mutable_instance().invoke(h.rpc_id(), std::move(buffer));
+		//	}
+		//};
 
 
 		template <bool Server>

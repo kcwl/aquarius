@@ -7,9 +7,9 @@
 
 namespace serviced
 {
-	AQUARIUS_STREAM_CONTEXT(cmd_opt, rpc_cmd)
+	AQUARIUS_CONTEXT(cmd_opt, rpc_cmd)
 	{
-		std::string_view input = request()->body().input;
+		std::string_view input = message()->body().input;
 
 		std::vector<std::string> cmds{};
 

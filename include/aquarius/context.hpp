@@ -2,39 +2,20 @@
 #include <aquarius/config.hpp>
 #include <aquarius/context/context.hpp>
 #include <aquarius/context/handler.hpp>
-#include <aquarius/error_code.hpp>
 
-#define AQUARIUS_STREAM_CONTEXT_BY(protocol, error, method, __rpc)                                                     \
+#define AQUARIUS_CONTEXT_BY(protocol, method, __rpc)                                                                   \
 	class method;                                                                                                      \
 	[[maybe_unused]] static aquarius::context::auto_handler_register<protocol, __rpc, method>                          \
 		__auto_register_##method(__rpc::id);                                                                           \
-	AQUARIUS_STREAM_HANDLER(typename protocol::session, method, error, __rpc)
+	AQUARIUS_POSITIVE_HANDLER(typename protocol::session, method, __rpc::request, __rpc::response)
 
-#define AQUARIUS_TRANSFER_CONTEXT_BY(protocol, error, method)                                                          \
-	class method                                                                                                       \
-	{                                                                                                                  \
-	public:                                                                                                            \
-		error visit(std::vector<char> buffer)                                                                          \
-		{                                                                                                              \
-			buffer_ = std::move(buffer);                                                                               \
-			return handle();                                                                                           \
-		}                                                                                                              \
-		auto buffer()                                                                                                  \
-		{                                                                                                              \
-			return buffer_;                                                                                            \
-		}                                                                                                              \
-	protected:                                                                                                         \
-		error handle();                                                                                                \
-	private:                                                                                                           \
-		std::vector<char> buffer_;                                                                                     \
-	};                                                                                                                 \
-	inline error method::handle()
+#define AQUARIUS_CONTEXT(method, __rpc) AQUARIUS_CONTEXT_BY(aquarius::ip::server_tcp_protocol, method, __rpc)
 
-#define AQUARIUS_STREAM_CONTEXT(method, __rpc)                                                                         \
-	AQUARIUS_STREAM_CONTEXT_BY(aquarius::ip::server_tcp_protocol, aquarius::error_code, method, __rpc)
+#define AQUARIUS_RAW_CONTEXT()                                                                                         \
+	AQUARIUS_HANDLER(aquarius::ip::server_tcp_protocol::session, transfer_handle, std::vector<char>)
 
-#define AQUARIUS_TRANSFER_CONTEXT()                                                                                    \
-	AQUARIUS_TRANSFER_CONTEXT_BY(aquarius::ip::server_tcp_protocol, aquarius::error_code, transfer_handle)
-
-#define AQUARIUS_STREAM_RESPONSE(method, __rpc) \
-	AQUARIUS_STREAM_CONTEXT_BY(aquarius::ip::client_tcp_protocol, aquarius::error_code, method, __rpc)
+#define AQUARIUS_RESPONSE(method, __rpc)                                                                               \
+	class method;                                                                                                      \
+	[[maybe_unused]] static aquarius::context::auto_handler_register<aquarius::ip::client_tcp_protocol, __rpc, method> \
+		__auto_register_##method(__rpc::id);                                                                           \
+	AQUARIUS_HANDLER(aquarius::ip::client_tcp_protocol::session, method, __rpc::response)

@@ -4,8 +4,8 @@
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/post.hpp>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace aquarius
 {
@@ -48,18 +48,18 @@ namespace aquarius
 
 									 auto ec = co_await ctx->visit(session, req);
 
-									 if (!ec)
+									 if constexpr (session::is_server)
 									 {
-										 std::vector<char> body_buff{};
-										 ctx->response().pack(body_buff);
-										 ctx->response().header()->length(body_buff.size());
-										 ctx->response().header()->rpc_id(req->header()->rpc_id());
-										 std::vector<char> header_buff{};
-										 ctx->response().header()->pack(header_buff);
-										 header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
-
-										 if constexpr (session::is_server)
+										 if (!ec)
 										 {
+											 std::vector<char> body_buff{};
+											 ctx->response().pack(body_buff);
+											 ctx->response().header()->length(body_buff.size());
+											 ctx->response().header()->rpc_id(req->header()->rpc_id());
+											 std::vector<char> header_buff{};
+											 ctx->response().header()->pack(header_buff);
+											 header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
+
 											 co_await session->async_send(std::move(header_buff));
 										 }
 									 }

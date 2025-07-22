@@ -4,9 +4,9 @@
 
 namespace srdh
 {
-	AQUARIUS_STREAM_RESPONSE(cmd_resp, rpc_cmd)
+	AQUARIUS_RESPONSE(cmd_resp, rpc_cmd)
 	{
-		std::cout << this->request()->body().output << std::endl;
+		std::cout << this->message()->body().output;
 
 		std::cout << "serviced-ssh> ";
 

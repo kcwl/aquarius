@@ -4,27 +4,27 @@
 
 namespace serviced
 {
-	AQUARIUS_STREAM_CONTEXT(subscriber, rpc_channel_subscribe)
+	AQUARIUS_CONTEXT(subscriber, rpc_channel_subscribe)
 	{
-		auto node = std::make_shared<sdnode>(this->request()->uuid());
+		auto node = std::make_shared<sdnode>(this->message()->uuid());
 
-		tcp_transfer::get_mutable_instance().channel_subscribe(std::to_string(this->request()->body().topic), node);
+		tcp_transfer::get_mutable_instance().channel_subscribe(std::to_string(this->message()->body().topic), node);
 
 		co_return aquarius::error_code{};
 	}
 
-	AQUARIUS_STREAM_CONTEXT(publish, rpc_channel_publish)
+	AQUARIUS_CONTEXT(publish, rpc_channel_publish)
 	{
-		tcp_transfer::get_mutable_instance().publish(std::to_string(this->request()->body().topic), this->request()->body().channel_data);
+		tcp_transfer::get_mutable_instance().publish(std::to_string(this->message()->body().topic), this->message()->body().channel_data);
 
 		co_return aquarius::error_code{};
 	}
 
-	AQUARIUS_STREAM_CONTEXT(remove, rpc_channel_remove)
+	AQUARIUS_CONTEXT(remove, rpc_channel_remove)
 	{
-		for (auto& t : this->request()->body().topics)
+		for (auto& t : this->message()->body().topics)
 		{
-			tcp_transfer::get_mutable_instance().channel_unsubscribe(std::to_string(t), this->request()->uuid());
+			tcp_transfer::get_mutable_instance().channel_unsubscribe(std::to_string(t), this->message()->uuid());
 		}
 
 		co_return aquarius::error_code{};

@@ -1,19 +1,18 @@
 #pragma once
-#include <memory>
-#include <aquarius/session/session_store.hpp>
 #include <aquarius/basic_sql_stream.hpp>
+#include <aquarius/session/session_store.hpp>
+#include <memory>
 
 namespace aquarius
 {
 	namespace context
 	{
-		template <typename Session, typename Request, typename Response, typename E>
+		template <typename Session, typename Message>
 		class basic_handler
 		{
 		public:
-			using context_t = boost::asio::execution::context_t;
+			using message_type = Message;
 
-			using message_type = std::conditional_t<Session::is_server, Request, Response>;
 		public:
 			basic_handler(const std::string& name)
 				: name_(name)
@@ -22,75 +21,56 @@ namespace aquarius
 			virtual ~basic_handler() = default;
 
 		public:
-			auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<message_type> message) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<message_type> message)
+				-> awaitable<error_code>
 			{
 				session_ptr_ = sessoin_ptr;
 
-				request_ = message;
+				message_ = message;
 
 				co_return co_await this->handle();
 			}
 
-			std::shared_ptr<message_type> request() const
+			std::shared_ptr<message_type> message() const
 			{
-				return request_;
+				return message_;
 			}
 
-			Response& response()
+			std::string name() const
 			{
-				return response_;
-			}
-			
-			void set_rpc_id(std::size_t rpc_id)
-			{
-				rpc_id_ = rpc_id;
-			}
-
-			std::size_t rpc_id() const
-			{
-				return rpc_id_;
-			}
-
-			template<typename T>
-			auto defer(std::size_t id)
-			{
-				return session::defer<Session, T>(id);
-			}
-
-			auto sql_engine()
-			{
-				return basic_sql_stream<>(static_cast<aquarius::io::io_context&>(session_ptr_->get_executor().query(context_t{})));
+				return name_;
 			}
 
 		protected:
-			virtual auto handle() -> awaitable<E> = 0;
+			virtual auto handle() -> awaitable<error_code> = 0;
 
-		protected:
-			std::shared_ptr<message_type> request_;
+			auto session()
+			{
+				return session_ptr_;
+			}
 
-			Response response_;
-
+		private:
 			std::string name_;
 
-			std::size_t rpc_id_;
+			std::shared_ptr<message_type> message_;
 
 			std::shared_ptr<Session> session_ptr_;
 		};
 
-		template <typename Session, typename Request, typename Response, typename E>
-		class stream_handler : public basic_handler<Session, Request, Response, E>
+		template <typename Session, typename Request, typename Response>
+		class basic_positive_handler : public basic_handler<Session, Request>
 		{
-		public:
-			using base_type = basic_handler<Session, Request, Response, E>;
+			using base_type = basic_handler<Session, Request>;
 
-			using typename base_type::message_type;
+			using context_t = boost::asio::execution::context_t;
+
 		public:
-			stream_handler(const std::string& name)
+			basic_positive_handler(const std::string& name)
 				: base_type(name)
 			{}
 
 		public:
-			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<message_type> request) -> awaitable<E>
+			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request) -> awaitable<error_code>
 			{
 				auto result = co_await base_type::visit(session_ptr, request);
 
@@ -99,11 +79,31 @@ namespace aquarius
 				co_return result;
 			}
 
-		private:
-			void make_response(E result)
+			Response& response()
 			{
-				// this->response().header()->set_result(static_cast<int64_t>(result));
+				return response_;
 			}
+
+		protected:
+			template <typename T>
+			auto defer(std::size_t id)
+			{
+				return session::defer<Session, T>(id);
+			}
+
+			auto sql_engine()
+			{
+				basic_sql_stream<>(
+					static_cast<aquarius::io::io_context&>(this->session()->get_executor().query(context_t{})));
+			}
+
+			void make_response(error_code result)
+			{
+				//this->response().header()->set_result(static_cast<int64_t>(result));
+			}
+
+		private:
+			Response response_;
 		};
 
 		template <typename Protocol, typename RPC, typename Context>
@@ -111,35 +111,38 @@ namespace aquarius
 		{
 			explicit auto_handler_register(std::size_t proto)
 			{
-				context::handler_router<Protocol>::get_mutable_instance()
-					.template regist<RPC, Context>(proto);
-			}
-		};
-
-		template <typename Protocol, typename Context>
-		struct auto_transfer_handler_register
-		{
-			explicit auto_transfer_handler_register(std::size_t proto)
-			{
-				context::handler_router<Protocol>::get_mutable_instance().template regist<Context>(proto);
+				context::handler_router<Protocol>::get_mutable_instance().template regist<RPC, Context>(proto);
 			}
 		};
 	} // namespace context
 } // namespace aquarius
 
-#define AQUARIUS_GLOBAL_ID(request) std::hash<std::string>()(#request)
-
 #define AQUARIUS_GLOBAL_STR_ID(request) #request
 
-#define AQUARIUS_STREAM_HANDLER(__session, method, error, __rpc)                                                                  \
-	class method : public aquarius::context::stream_handler<__session, __rpc::request, __rpc::response, error>                    \
+#define AQUARIUS_HANDLER(__session, method, __request)                                                                 \
+	class method final : public aquarius::context::basic_handler<__session, __request>                                 \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::context::stream_handler<__session, __rpc::request, __rpc::response, error>;                   \
+		using base_type = aquarius::context::basic_handler<__session, __request>;                                      \
+                                                                                                                       \
 	public:                                                                                                            \
 		method()                                                                                                       \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##method))                                                    \
 		{}                                                                                                             \
-		virtual auto handle() -> aquarius::awaitable<error> override;                                                  \
+		virtual auto handle() -> aquarius::awaitable<aquarius::error_code> override;                                   \
 	};                                                                                                                 \
-	inline auto method::handle() -> aquarius::awaitable<error>
+	inline auto method::handle() -> aquarius::awaitable<aquarius::error_code>
+
+#define AQUARIUS_POSITIVE_HANDLER(__session, method, __request, __response)                                            \
+	class method final : public aquarius::context::basic_positive_handler<__session, __request, __response>            \
+	{                                                                                                                  \
+	public:                                                                                                            \
+		using base_type = aquarius::context::basic_positive_handler<__session, __request, __response>;                 \
+                                                                                                                       \
+	public:                                                                                                            \
+		method()                                                                                                       \
+			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##method))                                                    \
+		{}                                                                                                             \
+		virtual auto handle() -> aquarius::awaitable<aquarius::error_code> override;                                   \
+	};                                                                                                                 \
+	inline auto method::handle() -> aquarius::awaitable<aquarius::error_code>
