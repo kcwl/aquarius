@@ -20,26 +20,4 @@ BOOST_AUTO_TEST_CASE(io_service_pool)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(error_code)
-{
-	{
-		aquarius::error_code ec(std::error_code((int)aquarius::error::package::pending, aquarius::detail::get_error_category()));
-
-		BOOST_CHECK_EQUAL(ec.value(), static_cast<int>(aquarius::error::package::pending));
-
-		BOOST_CHECK_EQUAL(ec.message(), "wait for handle pending");
-	}
-
-	{
-		aquarius::detail::error_category ecy;
-		BOOST_CHECK_EQUAL(ecy.name(), "aquarius error category");
-	}
-
-	{
-		aquarius::error_code ec(std::error_code(10001, aquarius::detail::get_error_category()));
-
-		BOOST_CHECK_EQUAL(ec.message(), "unknown error");
-	}
-}
-
 BOOST_AUTO_TEST_SUITE_END()

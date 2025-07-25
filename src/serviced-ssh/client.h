@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/ip/tcp.hpp>
 #include <aquarius/singleton.hpp>
+#include <aquarius/executor/tcp_client.hpp>
 
 namespace srdh
 {
-	class client : public aquarius::ip::tcp_client, public aquarius::singleton<client>
+	class client : public aquarius::tcp_client, public aquarius::singleton<client>
 	{
 	public:
 

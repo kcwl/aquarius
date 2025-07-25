@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/config.hpp>
+#include <aquarius/detail/config.hpp>
 #include <boost/asio/co_spawn.hpp>
 
 namespace aquarius

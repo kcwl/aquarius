@@ -3,5 +3,5 @@
 
 namespace serviced
 {
-	using tcp_server = aquarius::ip::tcp_server;
+	using tcp_server = aquarius::tcp_server;
 }

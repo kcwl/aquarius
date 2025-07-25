@@ -1,6 +1,6 @@
 #pragma once
+#include <aquarius/executor/tcp_client.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/ip/tcp.hpp>
 #include <mutex>
 
 namespace serviced
@@ -8,7 +8,7 @@ namespace serviced
 	class client_factory : public aquarius::singleton<client_factory>
 	{
 	public:
-		using client = aquarius::ip::tcp_client;
+		using client = aquarius::tcp_client;
 
 	public:
 		client_factory() = default;
@@ -27,6 +27,6 @@ namespace serviced
 
 		std::map<std::string, std::shared_ptr<client>> clients_;
 	};
-}
+} // namespace serviced
 
 #define CLIENT serviced::client_factory::get_mutable_instance()

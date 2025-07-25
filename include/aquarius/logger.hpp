@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/config.hpp>
+#include <aquarius/detail/config.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/log/attributes.hpp>
 #include <boost/log/common.hpp>

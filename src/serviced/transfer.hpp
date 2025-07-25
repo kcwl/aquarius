@@ -1,8 +1,8 @@
 #pragma once
-#include <string_view>
 #include "sdtree.h"
+#include <aquarius/detail/impl/session_store.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/session/session_store.hpp>
+#include <string_view>
 
 using namespace std::string_view_literals;
 
@@ -52,7 +52,7 @@ namespace serviced
 			{
 				auto id = child->id();
 
-				auto session = aquarius::session::defer<Protocol>(id);
+				auto session = aquarius::detail::impl::defer<Protocol>(id);
 
 				if (!session)
 					continue;

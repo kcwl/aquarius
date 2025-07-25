@@ -11,24 +11,24 @@ int main(int argc, char* argv[])
 {
     aquarius::cmd_options cmd("serviced");
 
-    cmd.add_option<std::string>("ip_addr", "serviced ip addr");
+    cmd.add_option<std::string>("host", "serviced ip addr");
     cmd.add_option<std::string>("port", "serviced port");
 
     cmd.load_options(argc, argv);
 
-    auto ip_addr = cmd.option<std::string>("ip_addr");
+    auto ip_addr = cmd.option<std::string>("host");
 
     auto port = cmd.option<std::string>("port");
 
     if (ip_addr.empty())
     {
-        std::cout << "ip addr:" << ip_addr << "is not invalid!" << std::endl;
+        std::cout << "host:" << ip_addr << "is not invalid!" << std::endl;
         return 0;
     }
 
     if (port.empty())
     {
-        std::cout << "ip addr:" << port << "is not invalid!" << std::endl;
+        std::cout << "host:" << port << "is not invalid!" << std::endl;
         return 0;
     }
 

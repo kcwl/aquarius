@@ -1,9 +1,10 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/io/io_context.hpp>
+#include <aquarius/detail/config.hpp>
+#include <aquarius/detail/impl/mysql_keyword.hpp>
+#include <aquarius/io_context.hpp>
 #include <sstream>
 #include <string>
-#include <aquarius/detail/mysql_keyword.hpp>
 #include <vector>
 
 namespace aquarius
@@ -64,7 +65,7 @@ namespace aquarius
 	class basic_sql_stream
 	{
 	public:
-		basic_sql_stream(io::io_context& context)
+		basic_sql_stream(io_context& context)
 			: context_(context)
 		{}
 
@@ -98,7 +99,7 @@ namespace aquarius
 		{
 			constexpr auto struct_name = detail::name<T>();
 
-			constexpr auto delete_sql = detail::concat_v<"delete from "sv, struct_name>;
+			constexpr auto delete_sql = concat_v<"delete from "sv, struct_name>;
 
 			ss_ << delete_sql;
 
@@ -110,7 +111,7 @@ namespace aquarius
 		{
 			constexpr auto struct_name = detail::name<T>();
 
-			constexpr auto update_sql = detail::concat_v<"update "sv, struct_name, " set "sv>;
+			constexpr auto update_sql = concat_v<"update "sv, struct_name, " set "sv>;
 
 			ss_ << update_sql;
 
@@ -125,9 +126,9 @@ namespace aquarius
 		{
 			constexpr std::string_view struct_name = detail::name<T>();
 
-			constexpr auto complete_sql = detail::concat_v<SELECT,SPACE, ASTERISK, FROM,SPACE>;
+			constexpr auto complete_sql = concat_v<SELECT, SPACE, ASTERISK, FROM, SPACE>;
 
-			constexpr auto sql = detail::concat_v<complete_sql, struct_name>;
+			constexpr auto sql = concat_v<complete_sql, struct_name>;
 
 			ss_ << complete_sql.data();
 
@@ -210,6 +211,6 @@ namespace aquarius
 	private:
 		Stream ss_;
 
-		io::io_context& context_;
+		io_context& context_;
 	};
 } // namespace aquarius

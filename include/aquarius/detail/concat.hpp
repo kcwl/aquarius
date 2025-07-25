@@ -1,6 +1,6 @@
 #pragma once
-#include <string_view>
 #include <array>
+#include <string_view>
 
 namespace aquarius
 {
@@ -35,8 +35,8 @@ namespace aquarius
 
 			static constexpr std::string_view value{ arr.data(), arr.size() - 1 };
 		};
-
-		template <const auto&... args>
-		constexpr static auto concat_v = concat<args...>::value;
 	} // namespace detail
+
+	template <const auto&... args>
+	constexpr static auto concat_v = detail::concat<args...>::value;
 } // namespace aquarius

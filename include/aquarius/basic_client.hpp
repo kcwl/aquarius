@@ -1,17 +1,13 @@
 ﻿#pragma once
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
-#include <aquarius/config.hpp>
-#include <aquarius/context/client_router.hpp>
-#include <aquarius/context/context.hpp>
-#include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
+#include <aquarius/detail/config.hpp>
 #include <aquarius/detail/connect.hpp>
+#include <aquarius/detail/redirect_error.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/io/io_context.hpp>
-#include <aquarius/ip/address.hpp>
+#include <aquarius/io_context.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/redirect_error.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <aquarius/use_future.hpp>
 #include <filesystem>
@@ -21,12 +17,12 @@
 
 namespace aquarius
 {
-	template <typename Protocol>
+	template <typename Session>
 	class basic_client
 	{
-		using session = typename Protocol::session;
-		using socket = typename Protocol::socket;
-		using resolver = typename Protocol::resolver;
+		using session = Session;
+		using socket = typename Session::socket;
+		using resolver = typename Session::resolver;
 		using port_type = uint16_t;
 
 	public:
@@ -184,13 +180,13 @@ namespace aquarius
 		}
 
 	private:
-		void create_session(socket socket)
+		void create_session(socket sock)
 		{
-			session_ptr_ = std::make_shared<session>(std::move(socket));
+			session_ptr_ = std::make_shared<session>(std::move(sock));
 		}
 
 	private:
-		io::io_context io_context_;
+		io_context io_context_;
 		std::shared_ptr<session> session_ptr_;
 		std::function<void()> close_func_;
 		int reconnect_times_;

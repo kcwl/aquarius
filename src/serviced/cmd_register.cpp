@@ -17,17 +17,15 @@ namespace serviced
 					if (!c.second)
 						continue;
 
-					output.append(c.second->cmd_ptr->desc() + "\t\t");
+					output.append(c.second->cmd_ptr->desc() + ":\n");
 
 					for (const auto& o : c.second->cmd_ptr->options())
 					{
 						if (!o)
 							continue;
 
-						output.append("--" + o->long_name() + "\t" + o->description());
+						output.append("\t--" + o->long_name() + "\t" + o->description() + "\n");
 					}
-
-					output.append("\n");
 				}
 			};
 
@@ -48,16 +46,17 @@ namespace serviced
 		CMD.insert(list_op);
 
 		auto  add_op = std::make_shared<cmd_info>("add");
-		add_op->cmd_ptr->add_option<std::string>("ip_addr", "server addr");
+		add_op->cmd_ptr->add_option<std::string>("host", "server addr");
 		add_op->cmd_ptr->add_option<std::string>("port", "server port");
+		add_op->cmd_ptr->add_option<int>("topic", "channel topic");
 
 		add_op->opt_func = [&](std::string& output)
 			{
 				auto client_ptr = std::make_shared<client_factory::client>();
 
-				auto ip_addr = add_op->cmd_ptr->option<std::string>("ip_addr");
+				auto ip_addr = add_op->cmd_ptr->option<std::string>("host");
 
-				client_ptr->async_connect(ip_addr, add_op->cmd_ptr->option<std::string>("--port"));
+				client_ptr->async_connect(ip_addr, add_op->cmd_ptr->option<std::string>("port"));
 
 				CLIENT.insert(ip_addr, client_ptr);
 			};
@@ -65,7 +64,7 @@ namespace serviced
 		CMD.insert(add_op);
 
 		auto remove_op = std::make_shared<cmd_info>("remove");
-		remove_op->cmd_ptr->add_option<std::string>("ip_addr", "server addr");
+		remove_op->cmd_ptr->add_option<std::string>("host", "server addr");
 		remove_op->cmd_ptr->add_option<std::string>("port", "server port");
 
 		remove_op->opt_func = [&](std::string& output)
