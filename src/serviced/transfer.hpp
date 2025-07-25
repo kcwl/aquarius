@@ -1,6 +1,6 @@
 #pragma once
 #include "sdtree.h"
-#include <aquarius/detail/impl/session_store.hpp>
+#include <aquarius/detail/session_store.hpp>
 #include <aquarius/singleton.hpp>
 #include <string_view>
 
@@ -52,7 +52,7 @@ namespace serviced
 			{
 				auto id = child->id();
 
-				auto session = aquarius::detail::impl::defer<Protocol>(id);
+				auto session = aquarius::detail::defer<Protocol>(id);
 
 				if (!session)
 					continue;

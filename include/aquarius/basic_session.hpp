@@ -6,7 +6,7 @@
 #include <aquarius/detail/config.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/flex_buffer.hpp>
-#include <aquarius/detail/impl/session_object_impl.hpp>
+#include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/detail/session_service.hpp>
 #include <span>
 
@@ -20,7 +20,7 @@ namespace aquarius
 
 		using socket = typename detail::session_service::socket;
 
-		using impl_type = detail::impl::session_object_impl<detail::session_service>;
+		using impl_type = detail::session_object_impl<detail::session_service>;
 
 		using endpoint = typename detail::session_service::endpoint;
 

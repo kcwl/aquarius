@@ -37,9 +37,6 @@
     <Filter Include="include\aquarius\traits">
       <UniqueIdentifier>{ac53b292-9677-4d2b-86ab-127ae4e3bff0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\detail\impl">
-      <UniqueIdentifier>{a3122c19-a988-4e7a-9aca-9ba03ffc163a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -192,38 +189,41 @@
     <ClInclude Include="..\include\aquarius\executor\tcp_server_session.hpp">
       <Filter>include\aquarius\executor</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\basic_session_store.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\basic_session_service.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\client_router.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\context.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\client_router.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\handler.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\handler.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\handler_router.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\handler_router.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\io_object_impl.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\mysql_keyword.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\session_object_impl.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\session_service.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\session_service.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\session_service_base.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\detail\session_store.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\impl\session_store.hpp">
-      <Filter>include\aquarius\detail\impl</Filter>
+    <ClInclude Include="..\include\aquarius\flow_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\concepts\concepts.hpp">
+      <Filter>include\aquarius\concepts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,5 @@
 #pragma once
-#include <aquarius/detail/impl/context.hpp>
-#include <aquarius/detail/impl/handler_router.hpp>
+#include <aquarius/detail/handler_router.hpp>
 
 namespace aquarius
 {
@@ -16,8 +15,8 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[buffer = std::move(buffer), session_ptr, h = std::move(h)]() mutable -> awaitable<void>
 				{
-					detail::impl::handler_router<Session>::get_mutable_instance().invoke(h.rpc_id(), session_ptr,
-																				 std::move(buffer), h);
+					detail::handler_router<Session>::get_mutable_instance().invoke(h.rpc_id(), session_ptr,
+																				   std::move(buffer), h);
 					co_return;
 				},
 				detached);

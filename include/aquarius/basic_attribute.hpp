@@ -2,7 +2,7 @@
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/string_literal.hpp>
-#include <aquarius/detail/impl/mysql_keyword.hpp>
+#include <aquarius/detail/mysql_keyword.hpp>
 
 namespace aquarius
 {

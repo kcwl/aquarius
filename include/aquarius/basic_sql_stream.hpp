@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/config.hpp>
-#include <aquarius/detail/impl/mysql_keyword.hpp>
+#include <aquarius/detail/mysql_keyword.hpp>
 #include <aquarius/io_context.hpp>
 #include <sstream>
 #include <string>

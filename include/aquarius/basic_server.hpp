@@ -5,7 +5,7 @@
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <aquarius/detail/signal_set.hpp>
-#include <aquarius/detail/impl/session_store.hpp>
+#include <aquarius/detail/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/use_awaitable.hpp>
@@ -71,7 +71,7 @@ namespace aquarius
 
 				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
 
-				detail::impl::store<session_type>(conn_ptr);
+				detail::store<session_type>(conn_ptr);
 			}
 
 			co_return;
