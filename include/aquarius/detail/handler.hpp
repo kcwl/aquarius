@@ -97,7 +97,7 @@ namespace aquarius
 				basic_sql_stream<>(static_cast<io_context&>(this->session()->get_executor().query(context_t{})));
 			}
 
-			void make_response(error_code result)
+			void make_response(error_code /*result*/)
 			{
 				// this->response().header()->set_result(static_cast<int64_t>(result));
 			}

@@ -103,3 +103,5 @@ namespace aquarius
 		};
 	} // namespace detail
 } // namespace aquarius
+
+#define IO_POOL aquarius::detail::io_service_pool::get_mutable_instance()

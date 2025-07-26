@@ -1,6 +1,7 @@
 #include "cmd_register.h"
 #include "cmd_store.h"
 #include "client_factory.h"
+#include <aquarius/async.hpp>
 
 namespace serviced
 {
@@ -52,7 +53,7 @@ namespace serviced
 
 		add_op->opt_func = [add_op](std::string& output)
 			{
-				auto client_ptr = std::make_shared<client_factory::client>();
+				auto client_ptr = aquarius::async_generator<client_factory::client>();
 
 				auto ip_addr = add_op->cmd_ptr->option<std::string>("host");
 
