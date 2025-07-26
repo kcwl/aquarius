@@ -49,13 +49,15 @@ int main(int argc, char* argv[])
     {
         rpc_cmd::request req{};
 
-        std::cin >> req.body().input;
+        std::getline(std::cin>> std::ws, input);
 
-        if (req.body().input.empty())
+        if (input.empty())
             continue;
 
-        if (req.body().input == "quit" || req.body().input == "q")
+        if (input == "quit" || input == "q")
             break;
+
+        std::copy(input.begin(), input.end(), std::back_inserter(req.body().input));
 
         CLIENT.async_send<rpc_cmd>(std::move(req));
     }

@@ -4,7 +4,7 @@
 
 struct cmd_req
 {
-	std::string input;
+	std::vector<char> input;
 };
 struct cmd_resp
 {

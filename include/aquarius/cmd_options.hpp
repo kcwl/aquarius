@@ -34,19 +34,9 @@ namespace aquarius
 
 		void load_options(const std::vector<std::string>& argvs)
 		{
-			int argc = static_cast<int>(argvs.size());
-
-			char** argv = new char*[argc];
-
-			int i = 0;
-			for (auto a : argvs)
-			{
-				argv[i++] = a.data();
-			}
-
 			try
 			{
-				boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc_), vm_);
+				boost::program_options::store(boost::program_options::command_line_parser(argvs).options(desc_).style(0).extra_parser({}).run(), vm_);
 
 				boost::program_options::notify(vm_);
 			}

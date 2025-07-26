@@ -9,13 +9,13 @@ namespace serviced
 {
 	AQUARIUS_CONTEXT(cmd_opt, rpc_cmd)
 	{
-		std::string_view input = message()->body().input;
+		auto input = message()->body().input;
 
 		std::vector<std::string> cmds{};
 
-		for (auto c : std::views::split(input, " "))
+		for (auto c : std::views::split(input, ' '))
 		{
-			cmds.push_back(c.data());
+			cmds.push_back(std::string(std::string_view(c)));
 		}
 
 		if (cmds.empty())
@@ -28,7 +28,19 @@ namespace serviced
 		if (!cmd_ptr)
 			co_return errc::invalid_cmd;
 
-		cmd_ptr->opt_func(response().body().output);
+		if(!cmd_ptr->cmd_ptr)
+			co_return errc::invalid_cmd;
+
+		cmd_ptr->cmd_ptr->load_options(cmds);
+
+		try
+		{
+			cmd_ptr->opt_func(response().body().output);
+		}
+		catch (std::exception& ec)
+		{
+			XLOG_ERROR() << ec.what();
+		}
 
 		co_return errc::success;
 	}
