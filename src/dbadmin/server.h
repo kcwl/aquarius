@@ -1,17 +1,17 @@
 #pragma once
-#include <aquarius/ip/tcp.hpp>
+#include <aquarius/executor/tcp_server.hpp>
 
 namespace db
 {
-	class server : public aquarius::ip::tcp_server
+	class server : public aquarius::tcp_server
 	{
 	public:
-		using base_type = aquarius::ip::tcp_server;
+		using base_type = aquarius::tcp_server;
 
 	public:
-		server(uint16_t listen_port, int32_t pool_size, const std::string& server_name, const std::string& db_addr, const std::string& db_user, const std::string& db_passwd);
+		server(uint16_t listen_port, int32_t pool_size, const std::string& server_name, const std::string& host,
+			   const std::string& user, const std::string& passwd);
 
 	public:
-
 	};
 } // namespace db

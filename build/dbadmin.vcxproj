@@ -21,12 +21,10 @@
   <ItemGroup>
     <ClCompile Include="..\src\dbadmin\dbadmin.cpp" />
     <ClCompile Include="..\src\dbadmin\server.cpp" />
-    <ClCompile Include="..\src\dbadmin\transfer_client.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\dbadmin\error.hpp" />
     <ClInclude Include="..\src\dbadmin\server.h" />
-    <ClInclude Include="..\src\dbadmin\transfer_client.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

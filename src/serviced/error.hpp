@@ -11,7 +11,8 @@ namespace serviced
 	{
 		success,
 		no_return,
-		invalid_cmd
+		invalid_cmd,
+		not_connected
 	};
 
 	inline std::string_view db_result_map(int result)
@@ -19,7 +20,8 @@ namespace serviced
 		static std::map<int, std::string_view> db_results{
 			{ static_cast<int>(errc::success), "success"sv },
 			{ static_cast<int>(errc::no_return), "no operator for return back"sv },
-			{ static_cast<int>(errc::invalid_cmd), "invalid command"sv }
+			{ static_cast<int>(errc::invalid_cmd), "invalid command"sv },
+			{ static_cast<int>(errc::not_connected), "not connect server"sv }
 		};
 
 		return db_results[result];
@@ -43,7 +45,7 @@ namespace serviced
 		}
 	};
 
-	aquarius::error_code make_error_code(errc result)
+	inline aquarius::error_code make_error_code(errc result)
 	{
 		return aquarius::error_code(std::error_code(static_cast<int>(result), db_result_category()));
 	}

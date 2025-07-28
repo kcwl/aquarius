@@ -3,24 +3,22 @@
 
 #include <iostream>
 #include <aquarius/cmd_options.hpp>
-#include "transfer_client.h"
 #include "server.h"
 
 int main(int argc, char* argv[])
 {
-    aquarius::cmd_options cmd{};
-    cmd.add_option<uint16_t>("--listen_port", "listen port");
-    cmd.add_option<std::string>("--db_addr", "db ip address");
-    cmd.add_option<std::string>("--db_user", "db user");
-    cmd.add_option<std::string>("--db_passwd", "db user password");
-    cmd.add_option<std::string>("--name", "server name");
-    cmd.add_option<std::string>("--transfer", "transfer address");
-    cmd.add_option<std::string>("--pool_size", "server thread size");
+    aquarius::cmd_options cmd{"dbamind"};
+    cmd.add_option<uint16_t>("listen", "listen port");
+    cmd.add_option<std::string>("host", "db ip address");
+    cmd.add_option<std::string>("user", "db user");
+    cmd.add_option<std::string>("passwd", "db user password");
+    cmd.add_option<std::string>("name", "server name");
+    cmd.add_option<int32_t>("pool_size", "server thread size");
 
-    TRANSFER.set_addr(cmd.option<std::string>("--transfer"));
+    cmd.load_options(argc, argv);
 
-    db::server srv(cmd.option<uint16_t>("--listen"), cmd.option<int32_t>("--pool_size"),
-        cmd.option<std::string>("--name"), cmd.option<std::string>("--db_addr"), cmd.option<std::string>("--db_user"), cmd.option<std::string>("--db_passwd"));
+    db::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+        cmd.option<std::string>("name"), cmd.option<std::string>("host"), cmd.option<std::string>("user"), cmd.option<std::string>("passwd"));
 
     srv.run();
 

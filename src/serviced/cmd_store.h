@@ -5,6 +5,8 @@
 #include <mutex>
 #include <string>
 #include <aquarius/cmd_options.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/awaitable.hpp>
 
 namespace serviced
 {
@@ -17,7 +19,7 @@ namespace serviced
 
 		}
 
-		std::function<void(std::string&)> opt_func;
+		std::function<aquarius::awaitable<aquarius::error_code>(std::string&)> opt_func;
 
 		std::shared_ptr<aquarius::cmd_options> cmd_ptr;
 	};

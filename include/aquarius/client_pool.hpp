@@ -5,7 +5,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		inline static std::size_t client_pool_size;
+		inline static std::size_t client_pool_size = 4;
 	} // namespace detail
 
 	inline void set_client_pool_size(std::size_t pool_size)

@@ -33,14 +33,18 @@ namespace serviced
 
 		cmd_ptr->cmd_ptr->load_options(cmds);
 
+		aquarius::error_code ec;
+
 		try
 		{
-			cmd_ptr->opt_func(response().body().output);
+			ec = co_await cmd_ptr->opt_func(response().body().output);
 		}
 		catch (std::exception& ec)
 		{
 			XLOG_ERROR() << ec.what();
 		}
+
+		response().header()->result(ec.value());
 
 		co_return errc::success;
 	}

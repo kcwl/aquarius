@@ -3,10 +3,10 @@
 namespace db
 {
 	server::server(uint16_t listen_port, int32_t pool_size,
-				   const std::string& server_name, const std::string& db_addr, const std::string& db_user, const std::string& db_passwd)
+				   const std::string& server_name, const std::string& host, const std::string& user, const std::string& passwd)
 		: base_type(listen_port, pool_size, server_name)
 	{
-		io_service_pool_.sql_set_params(db_addr, db_user, db_passwd);
+		//io_service_pool_.sql_set_params(host, user, user);
 	}
 
 
