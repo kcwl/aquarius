@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/ip/tcp.hpp>
+#include <aquarius/executor/tcp_server.hpp>
 
 namespace gateway
 {
-	using server = aquarius::ip::tcp_server;
+	using server = aquarius::tcp_server;
 }

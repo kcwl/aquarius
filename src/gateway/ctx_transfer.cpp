@@ -1,10 +1,10 @@
 #include "transfer_client.h"
-#include <aquarius/context.hpp>
+#include <aquarius.hpp>
 
 namespace gateway
 {
-	AQUARIUS_TRANSFER_CONTEXT()
+	AQUARIUS_RAW_CONTEXT()
 	{
-		TRANSFER.async_send(this->buffer());
+		TRANSFER.async_send(this->message());
 	}
 } // namespace gateway

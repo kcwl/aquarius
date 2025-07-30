@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/ip/tcp.hpp>
+#include <aquarius/executor/tcp_client.hpp>
 #include <aquarius/singleton.hpp>
 
 namespace gateway
 {
-	class transfer_client : public aquarius::ip::tcp_client, public aquarius::singleton<transfer_client>
+	class transfer_client : public aquarius::tcp_client, public aquarius::singleton<transfer_client>
 	{
 	public:
 		void set_addr(const std::string& ip_addr);
