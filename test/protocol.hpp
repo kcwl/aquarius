@@ -17,20 +17,6 @@ struct person
 	std::vector<uint8_t> info;
 	std::string name;
 	std::vector<int> orders;
-
-	void swap(person& other)
-	{
-		std::swap(sex, other.sex);
-		std::swap(addr, other.addr);
-		std::swap(age, other.age);
-		std::swap(telephone, other.telephone);
-		std::swap(score, other.score);
-		std::swap(hp, other.hp);
-		std::swap(mana, other.mana);
-		std::swap(info, other.info);
-		std::swap(name, other.name);
-		std::swap(orders, other.orders);
-	}
 };
 
 inline bool operator==(const person& lhs, const person& rhs)
@@ -70,12 +56,12 @@ struct rpc_test
 {
 	constexpr static auto id = 1001;
 	using request = aquarius::tcp_request<person>;
-	using response = aquarius::tcp_request<person>;
+	using response = aquarius::tcp_response<person>;
 };
 
-AQUARIUS_STREAM_CONTEXT(ctx_test, rpc_test)
+AQUARIUS_CONTEXT(ctx_test, rpc_test)
 {
-	response().body() = request()->body();
+	response().body() = message()->body();
 
-	co_return 0;
+	co_return aquarius::error_code{};
 }

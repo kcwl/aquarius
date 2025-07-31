@@ -5,34 +5,37 @@
 
 namespace aquarius
 {
-	template <bool Server>
-	struct ssl_context_factory<Server, ssl::context::sslv23>
+	namespace session
 	{
-		static ssl::context& create()
+		template <bool Server>
+		struct ssl_context_factory<Server, ssl::context::sslv23>
 		{
-			static ssl::context ssl_context(ssl::context::sslv23);
-
-			if constexpr (Server)
+			static ssl::context& create()
 			{
-				ssl_context.set_options(ssl::context::default_workarounds | ssl::context::no_sslv2 |
-										ssl::context::single_dh_use);
+				static ssl::context ssl_context(ssl::context::sslv23);
 
-				ssl_context.use_certificate_chain_file("crt/server.crt");
-				ssl_context.use_private_key_file("crt/server.key", ssl::context::pem);
-				ssl_context.use_tmp_dh_file("crt/dh512.pem");
+				if constexpr (Server)
+				{
+					ssl_context.set_options(ssl::context::default_workarounds | ssl::context::no_sslv2 |
+						ssl::context::single_dh_use);
+
+					ssl_context.use_certificate_chain_file("crt/server.crt");
+					ssl_context.use_private_key_file("crt/server.key", ssl::context::pem);
+					ssl_context.use_tmp_dh_file("crt/dh512.pem");
+				}
+				else
+				{
+					auto path = std::filesystem::current_path();
+
+					path.append("crt");
+					path.append("server.crt");
+
+					ssl_context.load_verify_file(path.string());
+				}
+
+				return ssl_context;
 			}
-			else
-			{
-				auto path = std::filesystem::current_path();
-
-				path.append("crt");
-				path.append("server.crt");
-
-				ssl_context.load_verify_file(path.string());
-			}
-
-			return ssl_context;
-		}
-	};
+		};
+	}
 } // namespace aquarius
 #endif

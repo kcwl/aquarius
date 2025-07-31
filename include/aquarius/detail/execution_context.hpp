@@ -8,5 +8,5 @@ namespace aquarius
 		using boost::asio::detail::execution_context_service_base;
 
 		using boost::asio::execution_context;
-	}
-}
+	} // namespace detail
+} // namespace aquarius

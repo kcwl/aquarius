@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/detail/error_category.hpp>
-#include <aquarius/error.hpp>
+#include <aquarius/detail/config.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace aquarius
 {

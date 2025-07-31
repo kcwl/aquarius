@@ -4,9 +4,12 @@
 
 namespace aquarius
 {
-	namespace ssl
+	namespace session
 	{
-		using boost::asio::ssl::context;
-	}
+		namespace ssl
+		{
+			using boost::asio::ssl::context;
+		}
+	} // namespace session
 } // namespace aquarius
 #endif

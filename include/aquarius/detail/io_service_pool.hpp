@@ -15,7 +15,7 @@ namespace aquarius
 		private:
 			using io_service_ptr_t = std::shared_ptr<io_context>;
 
-			using work_guard = executor_work_guard<io_context::executor_type>;
+			using work_guard = boost::asio::executor_work_guard<io_context::executor_type>;
 
 		public:
 			explicit io_service_pool(std::size_t pool_size)
@@ -78,6 +78,15 @@ namespace aquarius
 				return io_service;
 			}
 
+			template <typename... Args>
+			void sql_set_params(Args&&... args)
+			{
+				for (auto& io_service : io_services_)
+				{
+					io_service->sql_set_param(std::forward_like<Args>(args)...);
+				}
+			}
+
 		private:
 			io_service_pool(const io_service_pool&) = delete;
 
@@ -94,3 +103,5 @@ namespace aquarius
 		};
 	} // namespace detail
 } // namespace aquarius
+
+#define IO_POOL aquarius::detail::io_service_pool::get_mutable_instance()

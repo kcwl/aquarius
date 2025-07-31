@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/detail/config.hpp>
 #include <boost/asio/use_future.hpp>
 
 namespace aquarius

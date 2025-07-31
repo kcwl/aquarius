@@ -1,30 +1,31 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
 #include <aquarius/co_spawn.hpp>
-#include <aquarius/context/context.hpp>
 #include <aquarius/detached.hpp>
+#include <aquarius/detail/config.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
+#include <aquarius/detail/signal_set.hpp>
+#include <aquarius/detail/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/signal_set.hpp>
 #include <aquarius/use_awaitable.hpp>
 
 namespace aquarius
 {
-	template <typename Protocol>
+	template <typename Session>
 	class basic_server
 	{
-		using session_type = typename Protocol::server_session;
+		using session_type = Session;
 
-		using acceptor_type = typename Protocol::acceptor;
+		using acceptor = typename Session::acceptor;
 
-		using endpoint_type = typename acceptor_type::endpoint_type;
+		using endpoint = typename acceptor::endpoint_type;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), endpoint_type{ Protocol::v4(), port })
+			, acceptor_(io_service_pool_.get_io_service(), session_type::make_v4_endpoint(port))
 			, server_name_(name)
 		{
 			init_signal();
@@ -69,6 +70,8 @@ namespace aquarius
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
 				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
+
+				detail::store<session_type>(conn_ptr);
 			}
 
 			co_return;
@@ -92,12 +95,12 @@ namespace aquarius
 				});
 		}
 
-	private:
+	protected:
 		detail::io_service_pool io_service_pool_;
 
-		signal_set signals_;
+		detail::signal_set signals_;
 
-		acceptor_type acceptor_;
+		acceptor acceptor_;
 
 		std::string server_name_;
 	};

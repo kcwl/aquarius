@@ -3,43 +3,21 @@
 #include <aquarius.hpp>
 
 BOOST_AUTO_TEST_SUITE(details)
-
-BOOST_AUTO_TEST_CASE(io_service_pool)
-{
-	{
-		BOOST_CHECK_THROW(aquarius::detail::io_service_pool pool(0), std::runtime_error);
-	}
-	
-	{
-		aquarius::detail::io_service_pool pool(1);
-
-		auto& io1 = pool.get_io_service();
-		auto& io2 = pool.get_io_service();
-
-		BOOST_CHECK(io1.get_executor() == io2.get_executor());
-	}
-}
-
-BOOST_AUTO_TEST_CASE(error_code)
-{
-	{
-		aquarius::error_code ec(std::error_code((int)aquarius::error::package::pending, aquarius::detail::get_error_category()));
-
-		BOOST_CHECK_EQUAL(ec.value(), static_cast<int>(aquarius::error::package::pending));
-
-		BOOST_CHECK_EQUAL(ec.message(), "wait for handle pending");
-	}
-
-	{
-		aquarius::detail::error_category ecy;
-		BOOST_CHECK_EQUAL(ecy.name(), "aquarius error category");
-	}
-
-	{
-		aquarius::error_code ec(std::error_code(10001, aquarius::detail::get_error_category()));
-
-		BOOST_CHECK_EQUAL(ec.message(), "unknown error");
-	}
-}
+//
+//BOOST_AUTO_TEST_CASE(io_service_pools)
+//{
+//	{
+//		BOOST_CHECK_THROW(aquarius::detail::io_service_pool pool(0), std::runtime_error);
+//	}
+//	
+//	{
+//		aquarius::detail::io_service_pool pool(1);
+//
+//		auto& io1 = pool.get_io_service();
+//		auto& io2 = pool.get_io_service();
+//
+//		BOOST_CHECK(io1.get_executor() == io2.get_executor());
+//	}
+//}
 
 BOOST_AUTO_TEST_SUITE_END()

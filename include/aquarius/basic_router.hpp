@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/detail/config.hpp>
 #include <unordered_map>
 #include <functional>
 #include <aquarius/noncopyable.hpp>
