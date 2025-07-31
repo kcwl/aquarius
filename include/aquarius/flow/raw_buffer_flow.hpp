@@ -1,14 +1,22 @@
 #pragma once
-#include <aquarius/impl/context.hpp>
+#include <memory>
 
 namespace aquarius
 {
-	struct raw_buffer_flow
+	struct transfer_flow_req
 	{
-		template <typename Session, typename BuffSequence, typename Header>
-		static void recv(std::shared_ptr<Session> session_ptr, BuffSequence buffer, Header h)
-		{
-			//impl::transfer<Session>()(session_ptr, std::move(buffer), h);
-		}
+		std::vector<char> data;
+	};
+
+	struct transfer_flow_resp
+	{
+		std::vector<char> data;
+	};
+
+	struct rpc_transfer_flow
+	{
+		constexpr static std::size_t id = 1;
+		using request = transfer_flow_req;
+		using response = transfer_flow_resp;
 	};
 } // namespace aquarius

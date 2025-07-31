@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 			BOOST_CHECK(is_connect);
 
 			auto req = std::make_shared<rpc_test::request>();
-			req->uuid(1);
+			req->header().uuid(1);
 			req->body().sex = true;
 			req->body().addr = 2;
 			req->body().age = 15;

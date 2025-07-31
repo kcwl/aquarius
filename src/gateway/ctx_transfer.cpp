@@ -5,6 +5,6 @@ namespace gateway
 {
 	AQUARIUS_RAW_CONTEXT()
 	{
-		TRANSFER.async_send(this->message());
+		TRANSFER.transfer(this->message());
 	}
 } // namespace gateway

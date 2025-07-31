@@ -106,15 +106,15 @@ namespace aquarius
 		auto async_send(std::shared_ptr<typename RPC::request> req) -> awaitable<void>
 		{
 			std::vector<char> fs{};
-			req->pack(fs);
+			req->commit(fs);
 
 			std::vector<char> complete_buffer;
 			req->mark(complete_buffer);
 			auto header_size = complete_buffer.size();
-			req->rpc_id(RPC::id);
-			req->pack(complete_buffer);
+			req->rpc(RPC::id);
+			req->commit(complete_buffer);
 			req->length(complete_buffer.size() - header_size);
-			req->header()->commit(complete_buffer);
+			req->header().commit(complete_buffer);
 
 			co_return co_await transfer(std::move(complete_buffer));
 		}

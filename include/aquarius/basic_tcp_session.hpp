@@ -1,15 +1,17 @@
 #pragma once
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/config.hpp>
+#include <aquarius/flow/raw_buffer_flow.hpp>
+#include <aquarius/flow_context.hpp>
 
 namespace aquarius
 {
-	template <bool Server, typename Flow, typename Header>
+	template <bool Server, typename Header>
 	class basic_tcp_session : public basic_session<Server>,
-							  public std::enable_shared_from_this<basic_tcp_session<Server, Flow, Header>>
+							  public std::enable_shared_from_this<basic_tcp_session<Server, Header>>
 	{
 		using base_type = basic_session<Server>;
-		
+
 	public:
 		using base_type::is_server;
 
@@ -24,8 +26,7 @@ namespace aquarius
 	public:
 		explicit basic_tcp_session(socket sock)
 			: base_type(std::move(sock))
-		{
-		}
+		{}
 
 	public:
 		auto protocol() -> awaitable<error_code>
@@ -70,9 +71,9 @@ namespace aquarius
 				this->shutdown();
 				co_return;
 			}
-			header req_header{};
-			req_header.consume(header_buffer);
-			std::vector<char> body_buffer(req_header.length());
+			header h{};
+			h.consume(header_buffer);
+			std::vector<char> body_buffer(h.length());
 			ec = co_await this->async_read(body_buffer);
 			if (ec)
 			{
@@ -83,7 +84,19 @@ namespace aquarius
 				this->shutdown();
 				co_return;
 			}
-			Flow::recv(this->shared_from_this(), std::move(body_buffer), req_header);
+
+			std::size_t rpc_id = h.transfer() ? h.rpc() : rpc_transfer_flow::id;
+
+			co_spawn(
+				this->get_executor(),
+				[buffer = std::move(body_buffer), session_ptr = this->shared_from_this(),
+				 h = std::move(h), rpc_id]() mutable -> awaitable<void>
+				{
+					detail::handler_router<basic_tcp_session>::get_mutable_instance().invoke(rpc_id, session_ptr,
+																							 std::move(buffer), h);
+					co_return;
+				},
+				detached);
 		}
 	};
 
