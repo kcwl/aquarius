@@ -27,7 +27,7 @@ namespace aquarius
 
 		public:
 			template <typename RPC, typename Context>
-			void regist(std::size_t proto)
+			void regist(std::string_view proto)
 			{
 				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer, header h)
 				{
@@ -64,7 +64,7 @@ namespace aquarius
 						 });
 					return true;
 				};
-				this->map_invokes_[proto] = func;
+				this->map_invokes_->add(proto, func);
 			}
 		};
 	} // namespace detail

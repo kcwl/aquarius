@@ -1,46 +1,47 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
-#include <unordered_map>
-#include <functional>
+#include <aquarius/detail/trie.hpp>
 #include <aquarius/noncopyable.hpp>
 #include <aquarius/singleton.hpp>
-
+#include <functional>
 
 namespace aquarius
 {
-    template <typename Key, typename Value>
-    class router_base : public noncopyable
-    {
-    public:
-        router_base() = default;
+	template <typename Key, typename Value>
+	class router_base : public noncopyable
+	{
+		using func_trie = detail::trie<Value>;
 
-        virtual ~router_base() = default;
+	public:
+		router_base()
+			: map_invokes_(new func_trie())
+		{
 
-    protected:
-        std::unordered_map<Key, Value> map_invokes_;
-    };
+		}
 
-    template <typename Result, typename... Args>
-    class basic_router : public router_base<std::size_t, std::function<Result(Args...)>>
-    {
-    public:
-        basic_router() = default;
+		virtual ~router_base() = default;
 
-    public:
-        Result invoke(std::size_t key, Args... args)
-        {
-            auto iter = this->map_invokes_.find(key);
+	protected:
+		std::shared_ptr<func_trie> map_invokes_;
+	};
 
-            if (iter == this->map_invokes_.end())
-                return Result();
+	template <typename Result, typename... Args>
+	class basic_router : public router_base<std::string_view, std::function<Result(Args...)>>
+	{
+	public:
+		basic_router() = default;
 
-            return iter->second(args...);
-        }
-    };
+	public:
+		Result invoke(std::string_view key, Args... args)
+		{
+			auto func = this->map_invokes_->find(key);
 
-    template <typename T, typename Result, typename... Args>
-    class single_router : public basic_router<Result, Args...>, public singleton<T>
-    {
-    };
+			return func == nullptr ? Result{} : func(args...);
+		}
+	};
+
+	template <typename T, typename Result, typename... Args>
+	class single_router : public basic_router<Result, Args...>, public singleton<T>
+	{};
 
 } // namespace aquarius

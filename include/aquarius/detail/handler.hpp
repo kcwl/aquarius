@@ -109,7 +109,7 @@ namespace aquarius
 		template <typename Protocol, typename RPC, typename Context>
 		struct auto_handler_register
 		{
-			explicit auto_handler_register(std::size_t proto)
+			explicit auto_handler_register(std::string_view proto)
 			{
 				handler_router<Protocol>::get_mutable_instance().template regist<RPC, Context>(proto);
 			}
