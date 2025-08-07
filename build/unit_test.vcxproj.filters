@@ -240,6 +240,12 @@
     <ClInclude Include="..\include\aquarius\detail\trie.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\executor\http_server_session.hpp">
+      <Filter>include\aquarius\executor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\executor\http_server.hpp">
+      <Filter>include\aquarius\executor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

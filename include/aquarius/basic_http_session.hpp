@@ -11,6 +11,8 @@ namespace aquarius
 		using base_type = basic_session<Server>;
 
 		constexpr static std::size_t max_http_length = 8192;
+	public:
+		using header = basic_http_header<Server>;
 
 	public:
 		using base_type::is_server;
@@ -58,9 +60,9 @@ namespace aquarius
 	private:
 		auto recv(error_code& ec) -> awaitable<void>
 		{
-			std::array<char, max_http_length> buffer{};
+			std::vector<char> buffer(max_http_length);
 
-			co_await this->service().async_read_some(buffer, ec);
+			co_await this->service().async_read_some(this->implementation(), buffer, ec);
 
 			if (ec)
 			{
@@ -81,9 +83,9 @@ namespace aquarius
 				//find req
 				co_spawn(
 					this->get_executor(),
-					[buffer = std::move(body_buffer), session_ptr = this->shared_from_this(), h = std::move(header)]() mutable -> awaitable<void>
+					[buffer = std::move(buffer), session_ptr = this->shared_from_this(), h = std::move(header)]() mutable -> awaitable<void>
 					{
-						detail::handler_router<basic_http_session>::get_mutable_instance().invoke(header.path(), session_ptr,
+						detail::handler_router<basic_http_session>::get_mutable_instance().invoke(h.path(), session_ptr,
 							std::move(buffer), h);
 						co_return;
 					},
