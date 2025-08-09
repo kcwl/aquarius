@@ -3,6 +3,35 @@
 
 #include <iostream>
 #include <aquarius.hpp>
+#include <boost/describe.hpp>
+
+struct test_login_req
+{
+	std::string user;
+	std::string passwd;
+};
+struct test_login_resp
+{
+}; 
+
+struct rpc_test_login
+{
+	constexpr static auto id = "/login";
+	using request = aquarius::http_request<test_login_req>;
+	using response = aquarius::http_response<test_login_resp>;
+};
+
+
+BOOST_DESCRIBE_STRUCT(test_login_req, (), (user, passwd))
+
+
+
+AQUARIUS_HTTP_CONTEXT(ctx_login, rpc_test_login)
+{
+	response().result(aquarius::http_status::ok);
+
+	co_return aquarius::error_code{};
+}
 
 int main()
 {

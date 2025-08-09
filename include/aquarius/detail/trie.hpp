@@ -11,6 +11,7 @@ namespace aquarius
 		struct tri_node
 		{
 			T key;
+
 			Func func;
 
 			std::size_t next;
@@ -48,12 +49,21 @@ namespace aquarius
 
 				for (auto c : key)
 				{
+					if (cur_node->key == 0)
+					{
+						cur_node->key = c;
+						cur_node->next++;
+						continue;
+					}
+
 					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
 										   [&](auto node) { return node->key == c; });
 
 					if (it == cur_node->children.end())
 					{
-						cur_node->children.push_back(new node{ c, nullptr });
+						auto n = new node{ c, nullptr };
+						cur_node->children.push_back(n);
+						cur_node = n;
 					}
 					else
 					{
@@ -64,26 +74,34 @@ namespace aquarius
 				}
 
 				cur_node->func = func;
-				cur_node->next--;
 				cur_node->end++;
 			}
 
-			node_func find(std::string_view ley)
+			node_func find(std::string_view key)
 			{
 				auto cur_node = root;
 
-				for (auto c : ley)
-				{
-					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
-										   [&](auto node) { return node->key == c; });
+				auto iter = key.begin();
 
-					if (it == cur_node->children.end())
+				while (iter != key.end())
+				{
+					if (*iter == cur_node->key)
 					{
-						return nullptr;
+						iter++;
 					}
 					else
 					{
-						cur_node = *it;
+						auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
+							[&](auto node) { return node->key == *iter; });
+
+						if (it == cur_node->children.end())
+						{
+							return nullptr;
+						}
+						else
+						{
+							cur_node = *it;
+						}
 					}
 				}
 

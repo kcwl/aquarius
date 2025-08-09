@@ -17,8 +17,6 @@ namespace aquarius
 	public:
 		using base_type::is_server;
 
-		using http_request_header = basic_http_header<true>;
-
 		using typename base_type::socket;
 
 		using typename base_type::acceptor;
@@ -74,23 +72,57 @@ namespace aquarius
 				co_return;
 			}
 
-			http_request_header header{};
+			auto header_span = parse_header_span(buffer);
 
-			header.consume(buffer);
+			header h{};
 
-			if (!header.path().empty())
+			if (h.consume(header_span))
 			{
-				//find req
-				co_spawn(
-					this->get_executor(),
-					[buffer = std::move(buffer), session_ptr = this->shared_from_this(), h = std::move(header)]() mutable -> awaitable<void>
-					{
-						detail::handler_router<basic_http_session>::get_mutable_instance().invoke(h.path(), session_ptr,
-							std::move(buffer), h);
-						co_return;
-					},
-					detached);
+				if (!h.path().empty())
+				{
+					co_spawn(
+						this->get_executor(),
+						[buffer = std::move(buffer), session_ptr = this->shared_from_this(), h = std::move(h)]() mutable -> awaitable<void>
+						{
+							detail::handler_router<basic_http_session>::get_mutable_instance().invoke(h.path(), session_ptr,
+								std::move(buffer), h);
+							co_return;
+						},
+						detached);
+				}
 			}
+		}
+
+		template<typename BufferSequence>
+		auto parse_header_span(BufferSequence& buffer)
+		{
+			constexpr std::string_view delm = "\r\n";
+
+			constexpr auto delm_size = delm.size();
+
+			auto buf_span = std::span<char>(buffer);
+
+			auto buf_view = buf_span | std::views::slide(delm_size);
+
+			auto itor = std::ranges::find_if(buf_view, [](const auto& v)
+				{
+					if (v.size() < delm_size)
+						return false;
+
+					return std::string_view(v) == delm;
+				});
+
+			if (itor == buf_view.end())
+				return;
+
+			auto header_line_pos = std::distance(buf_view.begin(), itor);
+			auto header_line_span = buf_span.subspan(0, header_line_pos);
+
+			auto dy_buffer = boost::asio::dynamic_buffer(buffer);
+
+			dy_buffer.consume(header_line_span.size());
+
+			return header_line_span;
 		}
 	};
 } // namespace aquarius

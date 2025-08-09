@@ -111,7 +111,16 @@ namespace aquarius
 		{
 			explicit auto_handler_register(std::string_view proto)
 			{
-				handler_router<Protocol>::get_mutable_instance().template regist<RPC, Context>(proto);
+				handler_router<Protocol>::get_mutable_instance().template regist_tcp<RPC, Context>(proto);
+			}
+		};
+
+		template <typename Protocol, typename RPC, typename Context>
+		struct auto_http_handler_register
+		{
+			explicit auto_http_handler_register(std::string_view proto)
+			{
+				handler_router<Protocol>::get_mutable_instance().template regist_http<RPC, Context>(proto);
 			}
 		};
 	} // namespace detail
