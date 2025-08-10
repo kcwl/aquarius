@@ -1,18 +1,18 @@
 ﻿// http_server.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include <iostream>
 #include <aquarius.hpp>
 #include <boost/describe.hpp>
+#include <iostream>
 
 struct test_login_req
 {
-	std::string user;
-	std::string passwd;
+	std::string name;
+
+	BOOST_DESCRIBE_STRUCT(test_login_req, (), (name))
 };
 struct test_login_resp
-{
-}; 
+{};
 
 struct rpc_test_login
 {
@@ -21,10 +21,23 @@ struct rpc_test_login
 	using response = aquarius::http_response<test_login_resp>;
 };
 
+void tag_invoke(boost::json::value_from_tag, boost::json::value& jv, test_login_req const& s)
+{
+	jv = {
+		{ "name", s.name },
+	};
+}
 
-BOOST_DESCRIBE_STRUCT(test_login_req, (), (user, passwd))
+test_login_req tag_invoke(boost::json::value_to_tag<test_login_req>, boost::json::value const& jv)
+{
+	test_login_req s{};
 
+	const auto& obj = jv.as_object();
 
+	s.name = boost::json::value_to<std::string>(obj.at("name"));
+
+	return s;
+}
 
 AQUARIUS_HTTP_CONTEXT(ctx_login, rpc_test_login)
 {
@@ -35,17 +48,17 @@ AQUARIUS_HTTP_CONTEXT(ctx_login, rpc_test_login)
 
 int main()
 {
-    aquarius::http_server srv(80, 10, "test http server");
+	aquarius::http_server srv(80, 10, "test http server");
 
-    srv.run();
+	srv.run();
 
-    return 0;
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
 // 调试程序: F5 或调试 >“开始调试”菜单
 
-// 入门使用技巧: 
+// 入门使用技巧:
 //   1. 使用解决方案资源管理器窗口添加/管理文件
 //   2. 使用团队资源管理器窗口连接到源代码管理
 //   3. 使用输出窗口查看生成输出和其他消息

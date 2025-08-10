@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/basic_session.hpp>
 #include <aquarius_protocol.hpp>
+#include <ranges>
 
 namespace aquarius
 {
@@ -72,7 +73,7 @@ namespace aquarius
 				co_return;
 			}
 
-			auto header_span = parse_header_span(buffer);
+			auto [header_span, next_span] = parse_header_span(buffer);
 
 			header h{};
 
@@ -82,10 +83,10 @@ namespace aquarius
 				{
 					co_spawn(
 						this->get_executor(),
-						[buffer = std::move(buffer), session_ptr = this->shared_from_this(), h = std::move(h)]() mutable -> awaitable<void>
+						[next_span, session_ptr = this->shared_from_this(), h = std::move(h)]() mutable -> awaitable<void>
 						{
 							detail::handler_router<basic_http_session>::get_mutable_instance().invoke(h.path(), session_ptr,
-								std::move(buffer), h);
+								next_span, h);
 							co_return;
 						},
 						detached);
@@ -94,7 +95,7 @@ namespace aquarius
 		}
 
 		template<typename BufferSequence>
-		auto parse_header_span(BufferSequence& buffer)
+		auto parse_header_span(BufferSequence& buffer) -> std::pair<std::span<char>, std::span<char>>
 		{
 			constexpr std::string_view delm = "\r\n";
 
@@ -113,16 +114,13 @@ namespace aquarius
 				});
 
 			if (itor == buf_view.end())
-				return;
+				return {};
 
 			auto header_line_pos = std::distance(buf_view.begin(), itor);
+
 			auto header_line_span = buf_span.subspan(0, header_line_pos);
 
-			auto dy_buffer = boost::asio::dynamic_buffer(buffer);
-
-			dy_buffer.consume(header_line_span.size());
-
-			return header_line_span;
+			return { header_line_span, buf_span.subspan(header_line_pos + 2) };
 		}
 	};
 } // namespace aquarius

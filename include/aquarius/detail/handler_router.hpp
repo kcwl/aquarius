@@ -13,14 +13,14 @@ namespace aquarius
 	{
 		template <typename Session>
 		class handler_router : public single_router<handler_router<Session>, bool, std::shared_ptr<Session>,
-													std::vector<char>, typename Session::header>
+													std::span<char>, typename Session::header>
 		{
 		public:
 			using session = Session;
 
 			using header = typename Session::header;
 
-			using body_buffer = std::vector<char>;
+			using body_buffer = std::span<char>;
 
 		public:
 			handler_router() = default;
@@ -100,7 +100,7 @@ namespace aquarius
 												//header_buff.push_back('\n');
 
 												//header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
-
+												ctx->response().base_header().version(req->base_header().version());
 												std::vector<char> header_buff{};
 												ctx->response().base_header().commit(header_buff);
 												header_buff.push_back('\r');
