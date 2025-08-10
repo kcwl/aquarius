@@ -1,3 +1,4 @@
-[submodule "3rd/aquarius_protocol"]
-	path = 3rd/aquarius_protocol
-	url = https://github.com/kcwl/aquarius_protocol.git
+
+[submodule "3rd/virgo"]
+	path = 3rd/virgo
+	url = https://github.com/kcwl/virgo.git
