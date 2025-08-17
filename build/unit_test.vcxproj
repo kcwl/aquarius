@@ -157,6 +157,7 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_http_session.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
@@ -187,6 +188,9 @@
     <ClInclude Include="..\include\aquarius\detail\session_service_base.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\detail\signal_set.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\trie.hpp" />
+    <ClInclude Include="..\include\aquarius\executor\http_server.hpp" />
+    <ClInclude Include="..\include\aquarius\executor\http_server_session.hpp" />
     <ClInclude Include="..\include\aquarius\executor\tcp_client.hpp" />
     <ClInclude Include="..\include\aquarius\executor\tcp_client_session.hpp" />
     <ClInclude Include="..\include\aquarius\executor\tcp_server.hpp" />

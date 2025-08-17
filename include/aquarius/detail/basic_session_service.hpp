@@ -61,6 +61,12 @@ namespace aquarius
 				co_await boost::asio::async_read(*impl.socket_, buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
+			template<typename BufferSequence>
+			auto async_read_some(implementation_type& impl, BufferSequence& buff, error_code& ec) -> awaitable<void>
+			{
+				co_await impl.socket_->async_read_some(buffer(buff), redirect_error(use_awaitable, ec));
+			}
+
 			template <typename BufferSequence>
 			auto async_write_some(implementation_type& impl, BufferSequence buff, error_code& ec)
 				-> awaitable<std::size_t>

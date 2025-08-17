@@ -15,7 +15,7 @@ namespace aquarius
 
 	struct rpc_transfer_flow
 	{
-		constexpr static std::size_t id = 1;
+		constexpr static std::string_view id = "1"sv;
 		using request = transfer_flow_req;
 		using response = transfer_flow_resp;
 	};

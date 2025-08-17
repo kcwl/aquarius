@@ -13,6 +13,7 @@
 #include <aquarius/deadline_timer.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/executor/http_server.hpp>
 #include <aquarius/executor/tcp_client.hpp>
 #include <aquarius/executor/tcp_server.hpp>
 #include <aquarius/flex_buffer.hpp>

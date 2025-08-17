@@ -85,7 +85,7 @@ namespace aquarius
 				co_return;
 			}
 
-			std::size_t rpc_id = h.transfer() ? h.rpc() : rpc_transfer_flow::id;
+			std::string_view rpc_id = h.transfer() ? h.rpc() : rpc_transfer_flow::id;
 
 			co_spawn(
 				this->get_executor(),

@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <string_view>
+
+using namespace std::string_view_literals;
 
 struct person
 {
@@ -52,9 +55,11 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 	return os;
 }
 
+
+
 struct rpc_test
 {
-	constexpr static auto id = 1001;
+	constexpr static auto id = "1001"sv;
 	using request = aquarius::tcp_request<person>;
 	using response = aquarius::tcp_response<person>;
 };
