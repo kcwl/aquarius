@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/any_io_executor.hpp>
 #include <boost/asio/detail/io_object_impl.hpp>
 
 namespace aquarius

@@ -1,7 +1,8 @@
 #pragma once
+#include <boost/test/unit_test_suite.hpp>
 #include "protocol.hpp"
 #include <aquarius.hpp>
-#include <boost/test/unit_test_suite.hpp>
+
 
 
 BOOST_AUTO_TEST_SUITE(session_test)

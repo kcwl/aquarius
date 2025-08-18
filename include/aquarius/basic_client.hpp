@@ -14,6 +14,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <boost/asio/connect.hpp>
 
 namespace aquarius
 {
