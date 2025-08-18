@@ -2,7 +2,6 @@
 #include <aquarius/awaitable.hpp>
 #include <aquarius/basic_attribute.hpp>
 #include <aquarius/basic_client.hpp>
-#include <aquarius/basic_router.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/basic_sql_stream.hpp>
