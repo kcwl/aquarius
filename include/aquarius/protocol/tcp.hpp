@@ -1,0 +1,87 @@
+#pragma once
+#include <aquarius/flow/raw_buffer_flow.hpp>
+#include <aquarius/flow_context.hpp>
+#include <virgo.hpp>
+
+namespace aquarius
+{
+	template <bool Server>
+	class tcp
+	{
+	public:
+		using header = virgo::tcp::detail::layer_header;
+
+	public:
+		template <typename Session>
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		{
+			co_await session_ptr->service().start(session_ptr->implementation());
+
+			error_code ec;
+
+			for (;;)
+			{
+				co_await recv(session_ptr, ec);
+
+				if (ec)
+				{
+					if (ec != boost::asio::error::eof)
+					{
+						XLOG_ERROR() << "on read some occur error - " << ec.what();
+					}
+
+					session_ptr->shutdown();
+
+					co_return ec;
+				}
+			}
+
+			std::unreachable();
+		}
+
+	private:
+		template <typename Session>
+		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
+		{
+			constexpr auto header_length = header::impl_size;
+
+			std::vector<char> header_buffer(header_length);
+			ec = co_await session_ptr->async_read(header_buffer);
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
+				}
+				session_ptr->shutdown();
+				co_return;
+			}
+			header h{};
+			h.consume(header_buffer);
+			std::vector<char> body_buffer(h.length());
+			ec = co_await session_ptr->async_read(body_buffer);
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
+				}
+				session_ptr->shutdown();
+				co_return;
+			}
+
+			std::string_view rpc_id = h.transfer() ? h.rpc() : rpc_transfer_flow::id;
+
+			co_spawn(
+				session_ptr->get_executor(),
+				[buffer = std::move(body_buffer), session_ptr, h = std::move(h),
+				 rpc_id]() mutable -> awaitable<void>
+				{
+					detail::handler_router<Session>::get_mutable_instance().invoke(rpc_id, session_ptr, std::move(buffer),
+																			   h);
+					co_return;
+				},
+				detached);
+		}
+	};
+} // namespace aquarius

@@ -5,6 +5,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <boost/asio/read.hpp>
+#include <aquarius/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -71,7 +72,7 @@ namespace aquarius
 			auto async_write_some(implementation_type& impl, BufferSequence buff, error_code& ec)
 				-> awaitable<std::size_t>
 			{
-				co_return co_await impl.socket_->async_write_some(buffer(buff), redirect_error(use_awaitable, ec));
+				co_return co_await impl.socket_->async_write_some((buffer)(buff), redirect_error(use_awaitable, ec));
 			}
 
 			auto start(implementation_type& impl) -> awaitable<void>

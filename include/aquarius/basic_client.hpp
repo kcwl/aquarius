@@ -69,7 +69,7 @@ namespace aquarius
 				this->io_context_,
 				[this]() mutable -> awaitable<void>
 				{
-					auto ec = co_await session_ptr_->protocol();
+					auto ec = co_await session_ptr_->accept();
 					if (ec)
 					{
 						if (close_func_)

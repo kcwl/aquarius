@@ -1,44 +1,31 @@
 #pragma once
-#include <aquarius/basic_session.hpp>
-#include <aquarius_protocol.hpp>
+#include <aquarius/awaitable.hpp>
+#include <aquarius/detail/handler_router.hpp>
+#include <aquarius/error_code.hpp>
 #include <ranges>
+#include <virgo.hpp>
 
 namespace aquarius
 {
 	template <bool Server>
-	class basic_http_session : public basic_session<Server>,
-							   public std::enable_shared_from_this<basic_http_session<Server>>
+	class http
 	{
-		using base_type = basic_session<Server>;
-
 		constexpr static std::size_t max_http_length = 8192;
-	public:
-		using header = basic_http_header<Server>;
 
 	public:
-		using base_type::is_server;
-
-		using typename base_type::socket;
-
-		using typename base_type::acceptor;
-
-		using typename base_type::resolver;
+		using header = virgo::http::detail::basic_header<Server>;
 
 	public:
-		explicit basic_http_session(socket sock)
-			: base_type(std::move(sock))
-		{}
-
-	public:
-		auto protocol() -> awaitable<error_code>
+		template <typename Session>
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			co_await this->service().start(this->implementation());
+			co_await session_ptr->service().start(session_ptr->implementation());
 
 			error_code ec;
 
 			for (;;)
 			{
-				co_await recv(ec);
+				co_await recv(session_ptr, ec);
 
 				if (ec)
 				{
@@ -47,7 +34,7 @@ namespace aquarius
 						XLOG_ERROR() << "on read some occur error - " << ec.what();
 					}
 
-					this->shutdown();
+					session_ptr->shutdown();
 
 					co_return ec;
 				}
@@ -57,11 +44,12 @@ namespace aquarius
 		}
 
 	private:
-		auto recv(error_code& ec) -> awaitable<void>
+		template <typename Session>
+		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
 		{
 			std::vector<char> buffer(max_http_length);
 
-			co_await this->service().async_read_some(this->implementation(), buffer, ec);
+			co_await session_ptr->service().async_read_some(session_ptr->implementation(), buffer, ec);
 
 			if (ec)
 			{
@@ -69,7 +57,7 @@ namespace aquarius
 				{
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
-				this->shutdown();
+				session_ptr->shutdown();
 				co_return;
 			}
 
@@ -82,11 +70,12 @@ namespace aquarius
 				if (!h.path().empty())
 				{
 					co_spawn(
-						this->get_executor(),
-						[next_span, session_ptr = this->shared_from_this(), h = std::move(h)]() mutable -> awaitable<void>
+						session_ptr->get_executor(),
+						[next_span, session_ptr = session_ptr->shared_from_this(),
+						 h = std::move(h)]() mutable -> awaitable<void>
 						{
-							detail::handler_router<basic_http_session>::get_mutable_instance().invoke(h.path(), session_ptr,
-								next_span, h);
+							detail::handler_router<Session>::get_mutable_instance().invoke(h.path(), session_ptr,
+																						   next_span, h);
 							co_return;
 						},
 						detached);
@@ -94,7 +83,7 @@ namespace aquarius
 			}
 		}
 
-		template<typename BufferSequence>
+		template <typename BufferSequence>
 		auto parse_header_span(BufferSequence& buffer) -> std::pair<std::span<char>, std::span<char>>
 		{
 			constexpr std::string_view delm = "\r\n";
@@ -105,13 +94,14 @@ namespace aquarius
 
 			auto buf_view = buf_span | std::views::slide(delm_size);
 
-			auto itor = std::ranges::find_if(buf_view, [](const auto& v)
-				{
-					if (v.size() < delm_size)
-						return false;
+			auto itor = std::ranges::find_if(buf_view,
+											 [](const auto& v)
+											 {
+												 if (v.size() < delm_size)
+													 return false;
 
-					return std::string_view(v) == delm;
-				});
+												 return std::string_view(v) == delm;
+											 });
 
 			if (itor == buf_view.end())
 				return {};

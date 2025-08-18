@@ -69,7 +69,7 @@ namespace aquarius
 
 				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
 
-				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->protocol(); }, detached);
+				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->accept(); }, detached);
 
 				detail::store<session_type>(conn_ptr);
 			}

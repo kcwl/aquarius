@@ -113,18 +113,18 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;F:\boost_1_88_0;../src;E:\常用软件\Visual Leak Detector\include;D:\openssl\include;$(SolutionDir)../3rd/aquarius_protocol/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;../src;E:\常用软件\Visual Leak Detector\include;D:\openssl\include;$(SolutionDir)../3rd/virgo/include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\openssl\lib;F:\boost_1_88_0\stage\lib;E:\常用软件\Visual Leak Detector\lib\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\openssl\lib;D:\boost_1_88_0\stage\lib;E:\常用软件\Visual Leak Detector\lib\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -151,18 +151,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\any_io_executor.hpp" />
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\basic_attribute.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_context.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_http_session.hpp" />
+    <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\basic_sql_stream.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_tcp_session.hpp" />
     <ClInclude Include="..\include\aquarius\client_pool.hpp" />
     <ClInclude Include="..\include\aquarius\cmd_options.hpp" />
     <ClInclude Include="..\include\aquarius\concepts\async.hpp" />
@@ -203,7 +199,9 @@
     <ClInclude Include="..\include\aquarius\flow\future_flow.hpp" />
     <ClInclude Include="..\include\aquarius\flow\raw_buffer_flow.hpp" />
     <ClInclude Include="..\include\aquarius\flow\stream_flow.hpp" />
-    <ClInclude Include="..\include\aquarius\io_context.hpp" />
+    <ClInclude Include="..\include\aquarius\protocol\http.hpp" />
+    <ClInclude Include="..\include\aquarius\protocol\tcp.hpp" />
+    <ClInclude Include="..\include\aquarius\sql_context.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\post.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />

@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/basic_tcp_session.hpp>
-#include <aquarius_protocol.hpp>
+#include <aquarius/basic_session.hpp>
+#include <aquarius/protocol/tcp.hpp>
 
 namespace aquarius
 {
-	using tcp_client_session = basic_tcp_session<false, layer_tcp_header>;
+	using tcp_client_session = basic_session<false, tcp>;
 }

@@ -4,17 +4,19 @@
 #include <aquarius/concepts/concepts.hpp>
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
-#include <aquarius/error_code.hpp>
-#include <aquarius/flex_buffer.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/detail/session_service.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/flex_buffer.hpp>
 #include <span>
 
 namespace aquarius
 {
-	template <bool Server>
-	class basic_session
+	template <bool Server, template <bool> typename Protocol>
+	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol>>
 	{
+		friend class Protocol<Server>;
+
 	public:
 		constexpr static auto is_server = Server;
 
@@ -27,6 +29,8 @@ namespace aquarius
 		using acceptor = typename detail::session_service::acceptor;
 
 		using resolver = typename detail::session_service::resolver;
+
+		using header = typename Protocol<is_server>::header;
 
 	public:
 		explicit basic_session(socket sock)
@@ -93,6 +97,11 @@ namespace aquarius
 			service().close(implementation());
 		}
 
+		auto accept() -> awaitable<error_code>
+		{
+			return proto_.accept(this->shared_from_this());
+		}
+
 	public:
 		static endpoint make_v4_endpoint(uint16_t port)
 		{
@@ -119,5 +128,7 @@ namespace aquarius
 		impl_type impl_;
 
 		std::size_t id_;
+
+		Protocol<Server> proto_;
 	};
 } // namespace aquarius

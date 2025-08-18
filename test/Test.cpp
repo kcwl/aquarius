@@ -2,11 +2,11 @@
 #ifdef _WIN32
 #include <sdkddkver.h>
 #endif
-
+#include <boost/test/included/unit_test.hpp>
 #include "context.h"
 #include "detail.h"
 #include "protocol.hpp"
-#include <boost/test/included/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
 {
