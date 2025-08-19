@@ -9,6 +9,10 @@
 #include <boost/mysql.hpp>
 #include <boost/pfr.hpp>
 
+#ifdef AQUARIUS_ENABLE_SSL
+#include <boost/asio/ssl.hpp>
+#endif
+
 using namespace std::chrono_literals;
 
 namespace aquarius

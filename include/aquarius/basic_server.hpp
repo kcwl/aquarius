@@ -25,7 +25,7 @@ namespace aquarius
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), session_type::make_v4_endpoint(port))
+			, acceptor_(io_service_pool_.get_io_service(), session_type::protocol::make_v4_endpoint(port))
 			, server_name_(name)
 		{
 			init_signal();

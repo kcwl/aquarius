@@ -5,10 +5,15 @@
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
-#include <aquarius/detail/session_service.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <span>
+
+#ifdef AQUARIUS_ENABLE_SSL
+#include <aquarius/detail/basic_ssl_session_service.hpp>
+#else
+#include <aquarius/detail/basic_session_service.hpp>
+#endif
 
 namespace aquarius
 {
@@ -18,19 +23,25 @@ namespace aquarius
 		friend class Protocol<Server>;
 
 	public:
+		using protocol = Protocol<Server>;
+
 		constexpr static auto is_server = Server;
 
-		using socket = typename detail::session_service::socket;
+		using socket = typename protocol::socket;
 
+		using endpoint = typename protocol::endpoint;
+
+		using acceptor = typename protocol::acceptor;
+
+		using resolver = typename protocol::resolver;
+
+		using header = typename protocol::header;
+
+#ifdef AQUARIUS_ENABLE_SSL
+		using impl_type = detail::session_object_impl<detail::basic_ssl_session_service<Server, protocol>, typename socket::executor_type>;
+#else
 		using impl_type = detail::session_object_impl<detail::session_service>;
-
-		using endpoint = typename detail::session_service::endpoint;
-
-		using acceptor = typename detail::session_service::acceptor;
-
-		using resolver = typename detail::session_service::resolver;
-
-		using header = typename Protocol<is_server>::header;
+#endif
 
 	public:
 		explicit basic_session(socket sock)
@@ -100,17 +111,6 @@ namespace aquarius
 		auto accept() -> awaitable<error_code>
 		{
 			return proto_.accept(this->shared_from_this());
-		}
-
-	public:
-		static endpoint make_v4_endpoint(uint16_t port)
-		{
-			return endpoint(typename detail::session_service::protocol::v4(), port);
-		}
-
-		static endpoint make_v6_endpoint(uint16_t port)
-		{
-			return endpoint(typename detail::session_service::protocol::v6(), port);
 		}
 
 	protected:

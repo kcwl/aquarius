@@ -9,6 +9,14 @@ namespace aquarius
 	class tcp
 	{
 	public:
+		using socket = boost::asio::ip::tcp::socket;
+
+		using endpoint = boost::asio::ip::tcp::endpoint;
+
+		using acceptor = boost::asio::ip::tcp::acceptor;
+
+		using resolver = boost::asio::ip::tcp::resolver;
+
 		using header = virgo::tcp::detail::layer_header;
 
 	public:
@@ -37,6 +45,17 @@ namespace aquarius
 			}
 
 			std::unreachable();
+		}
+
+	public:
+		static endpoint make_v4_endpoint(uint16_t port)
+		{
+			return endpoint(boost::asio::ip::tcp::v4(), port);
+		}
+
+		static endpoint make_v6_endpoint(uint16_t port)
+		{
+			return endpoint(boost::asio::ip::tcp::v6(), port);
 		}
 
 	private:
