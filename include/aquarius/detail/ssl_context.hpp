@@ -7,7 +7,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template <bool Server, std::size_t SSLVersion>
+		template <bool Server, auto SSLVersion>
 		struct ssl_context_factory
 		{
 			static boost::asio::ssl::context& create()

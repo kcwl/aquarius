@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE UnitTest
 #ifdef _WIN32
 #include <sdkddkver.h>
+#define NOMINMAX
 #endif
 #include <boost/test/included/unit_test.hpp>
 #include "context.h"

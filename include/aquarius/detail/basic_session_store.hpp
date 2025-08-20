@@ -19,12 +19,12 @@ namespace aquarius
 			{
 				std::lock_guard lk(mutex_);
 
-				auto iter = sessions_.find(session->id());
+				auto iter = sessions_.find(session->uuid());
 
 				if (iter != sessions_.end())
 					return;
 
-				sessions_.emplace(session->id(), session);
+				sessions_.emplace(session->uuid(), session);
 			}
 
 			void erase(std::size_t id)

@@ -5,6 +5,7 @@
 #include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/session_object_impl.hpp>
+#include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <span>
@@ -17,6 +18,7 @@
 
 namespace aquarius
 {
+
 	template <bool Server, template <bool> typename Protocol>
 	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol>>
 	{
@@ -38,14 +40,17 @@ namespace aquarius
 		using header = typename protocol::header;
 
 #ifdef AQUARIUS_ENABLE_SSL
-		using impl_type = detail::session_object_impl<detail::basic_ssl_session_service<Server, protocol>, typename socket::executor_type>;
+		using impl_type = detail::session_object_impl<detail::basic_ssl_session_service<Server, protocol>,
+													  typename socket::executor_type>;
 #else
-		using impl_type = detail::session_object_impl<detail::session_service>;
+		using impl_type =
+			detail::session_object_impl<detail::basic_session_service<protocol>, typename socket::executor_type>;
 #endif
 
 	public:
 		explicit basic_session(socket sock)
 			: impl_(std::move(sock))
+			, uuid_(detail::uuid_generator()())
 		{}
 
 		virtual ~basic_session() = default;
@@ -56,9 +61,9 @@ namespace aquarius
 			return impl_.get_executor();
 		}
 
-		std::size_t id() const
+		std::size_t uuid() const
 		{
-			return id_;
+			return uuid_;
 		}
 
 		std::string remote_address() const
@@ -91,11 +96,6 @@ namespace aquarius
 		{
 			error_code ec{};
 			co_await service().async_write_some(implementation(), std::move(buffer), ec);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "async write is failed! maybe " << ec.message();
-			}
 		}
 
 		void shutdown()
@@ -127,7 +127,7 @@ namespace aquarius
 	private:
 		impl_type impl_;
 
-		std::size_t id_;
+		std::size_t uuid_;
 
 		Protocol<Server> proto_;
 	};

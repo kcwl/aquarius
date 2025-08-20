@@ -12,7 +12,7 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template <bool Server, typename Protocol, std::size_t SSLVersion = boost::asio::ssl::context::sslv23>
+		template <bool Server, typename Protocol, auto SSLVersion = boost::asio::ssl::context::sslv23>
 		class basic_ssl_session_service : public boost::asio::detail::execution_context_service_base<
 											  basic_ssl_session_service<Server, Protocol, SSLVersion>>
 		{
@@ -22,7 +22,7 @@ namespace aquarius
 
 			using socket = typename Protocol::socket;
 
-			using ssl_socket_type = boost::asio::ssl::stream<socket&>;
+			using ssl_socket_type = boost::asio::ssl::stream<socket>;
 
 			struct implementation_type
 			{
@@ -44,7 +44,8 @@ namespace aquarius
 
 			void move_copy(implementation_type& impl, socket socket)
 			{
-				impl.ssl_socket = new ssl_socket_type(std::move(socket), ssl_context_factory<Server, SSLVersion>::create());
+				impl.ssl_socket =
+					new ssl_socket_type(std::move(socket), ssl_context_factory<Server, SSLVersion>::create());
 			}
 
 			void destroy(implementation_type& impl)
@@ -82,15 +83,6 @@ namespace aquarius
 
 				impl.ssl_socket->lowest_layer().set_option(boost::asio::socket_base::keep_alive(value), ec);
 
-				if (ec)
-				{
-					XLOG_ERROR() << "set keep alive failed! " << ec.what();
-				}
-				else
-				{
-					XLOG_INFO() << "set keep alive :" << value;
-				}
-
 				return !ec;
 			}
 
@@ -98,15 +90,6 @@ namespace aquarius
 			{
 				error_code ec;
 				impl.ssl_socket->lowest_layer().set_option(typename Protocol::no_delay(enable), ec);
-
-				if (ec)
-				{
-					XLOG_ERROR() << "set nodelay failed! " << ec.what();
-				}
-				else
-				{
-					XLOG_INFO() << "set nodelay :" << enable;
-				}
 
 				return !ec;
 			}
@@ -133,9 +116,6 @@ namespace aquarius
 
 			auto start(implementation_type& impl) -> awaitable<void>
 			{
-				XLOG_INFO() << "start success at " << remote_address(impl) << ":" << remote_port(impl)
-							<< ", async read establish";
-
 				error_code ec;
 
 				if constexpr (Server)
@@ -146,10 +126,11 @@ namespace aquarius
 				else
 				{
 					co_await impl.ssl_socket->async_handshake(boost::asio::ssl::stream_base::client,
-														  redirect_error(use_awaitable, ec));
+															  redirect_error(use_awaitable, ec));
 				}
 			}
 		};
+
 	} // namespace detail
 } // namespace aquarius
 #endif

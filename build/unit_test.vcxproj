@@ -156,6 +156,7 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />

@@ -11,13 +11,12 @@ namespace aquarius
 {
 	namespace detail
 	{
-		template<typename Protocol>
-		class basic_session_service : public aquarius::detail::execution_context_service_base<session_service>
+
+		template <typename Protocol>
+		class basic_session_service : public execution_context_service_base<basic_session_service<Protocol>>
 		{
 		public:
-			using base = session_service_base;
-
-			using execution_base = aquarius::detail::execution_context_service_base<session_service>;
+			using execution_base = execution_context_service_base<basic_session_service>;
 
 			using protocol = boost::asio::ip::tcp;
 
@@ -37,7 +36,7 @@ namespace aquarius
 			};
 
 		public:
-			basic_session_service(aquarius::detail::execution_context& context)
+			basic_session_service(execution_context& context)
 				: execution_base(context)
 			{}
 
@@ -95,15 +94,6 @@ namespace aquarius
 
 				impl.socket_->set_option(boost::asio::socket_base::keep_alive(value), ec);
 
-				if (ec)
-				{
-					XLOG_ERROR() << "set keep alive failed! " << ec.what();
-				}
-				else
-				{
-					XLOG_INFO() << "set keep alive :" << value;
-				}
-
 				return !ec;
 			}
 
@@ -111,15 +101,6 @@ namespace aquarius
 			{
 				error_code ec;
 				impl.socket_->set_option(typename boost::asio::ip::tcp::no_delay(enable), ec);
-
-				if (ec)
-				{
-					XLOG_ERROR() << "set nodelay failed! " << ec.what();
-				}
-				else
-				{
-					XLOG_INFO() << "set nodelay :" << enable;
-				}
 
 				return !ec;
 			}
@@ -155,9 +136,6 @@ namespace aquarius
 
 			auto start(implementation_type& impl) -> awaitable<void>
 			{
-				XLOG_INFO() << "start success at " << this->remote_address(impl) << ":" << this->remote_port(impl)
-							<< ", async read establish";
-
 				this->keep_alive(impl, true);
 
 				this->set_nodelay(impl, true);
