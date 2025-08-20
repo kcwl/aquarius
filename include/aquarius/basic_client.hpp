@@ -38,7 +38,7 @@ namespace aquarius
 
 		virtual ~basic_client()
 		{
-			stop();
+			//stop();
 		}
 
 	public:

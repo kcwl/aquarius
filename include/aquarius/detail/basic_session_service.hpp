@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/detail/execution_context.hpp>
 #include <aquarius/detail/redirect_error.hpp>
-#include <aquarius/detail/session_service_base.hpp>
 #include <aquarius/flex_buffer.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/use_awaitable.hpp>
@@ -57,6 +56,8 @@ namespace aquarius
 				impl.socket_->close(ec);
 
 				delete impl.socket_;
+				
+				impl.socket_ = nullptr;
 			}
 
 			void shutdown(implementation_type& impl)

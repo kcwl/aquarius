@@ -32,7 +32,9 @@ namespace aquarius
 		public:
 			basic_ssl_session_service(boost::asio::execution_context& context)
 				: execution_base_type(context)
-			{}
+			{
+
+			}
 
 			virtual ~basic_ssl_session_service() = default;
 
@@ -46,6 +48,18 @@ namespace aquarius
 			{
 				impl.ssl_socket =
 					new ssl_socket_type(std::move(socket), ssl_context_factory<Server, SSLVersion>::create());
+
+				impl.ssl_socket->set_verify_mode(boost::asio::ssl::verify_peer);
+				
+				impl.ssl_socket->set_verify_callback([] (bool verify, boost::asio::ssl::verify_context& ctx) 
+													{
+														char subject_name[256];
+														X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
+														X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
+														std::cout << "Verifying " << subject_name << "\n";
+
+														return verify;
+													});
 			}
 
 			void destroy(implementation_type& impl)
@@ -55,6 +69,8 @@ namespace aquarius
 				impl.ssl_socket->shutdown(ec);
 
 				delete impl.ssl_socket;
+
+				impl.ssl_socket = nullptr;
 			}
 
 			virtual void shutdown() override
