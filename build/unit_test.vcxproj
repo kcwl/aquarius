@@ -174,13 +174,12 @@
     <ClInclude Include="..\include\aquarius\detached.hpp" />
     <ClInclude Include="..\include\aquarius\async.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\client_router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
     <ClInclude Include="..\include\aquarius\detail\execution_context.hpp" />
     <ClInclude Include="..\include\aquarius\detail\handler.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\handler_router.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\router.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp" />
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp" />
@@ -195,11 +194,10 @@
     <ClInclude Include="..\include\aquarius\executor\tcp_client_session.hpp" />
     <ClInclude Include="..\include\aquarius\executor\tcp_server.hpp" />
     <ClInclude Include="..\include\aquarius\executor\tcp_server_session.hpp" />
-    <ClInclude Include="..\include\aquarius\flow_context.hpp" />
+    <ClInclude Include="..\include\aquarius\handler.hpp" />
     <ClInclude Include="..\include\aquarius\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
-    <ClInclude Include="..\include\aquarius\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\flow\future_flow.hpp" />
     <ClInclude Include="..\include\aquarius\flow\raw_buffer_flow.hpp" />
     <ClInclude Include="..\include\aquarius\flow\stream_flow.hpp" />

@@ -6,7 +6,6 @@
 #include <aquarius/detail/session_object_impl.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/flex_buffer.hpp>
 #include <span>
 
 #ifdef AQUARIUS_ENABLE_SSL

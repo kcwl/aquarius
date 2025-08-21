@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/flow/raw_buffer_flow.hpp>
-#include <aquarius/flow_context.hpp>
+#include <aquarius/handler.hpp>
 #include <virgo.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
@@ -99,7 +99,7 @@ namespace aquarius
 				[buffer = std::move(body_buffer), session_ptr, h = std::move(h),
 				 rpc_id]() mutable -> awaitable<void>
 				{
-					detail::handler_router<Session>::get_mutable_instance().invoke(rpc_id, session_ptr, std::move(buffer),
+					detail::router<Session>::get_mutable_instance().invoke(rpc_id, session_ptr, std::move(buffer),
 																			   h);
 					co_return;
 				},

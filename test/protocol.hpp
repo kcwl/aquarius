@@ -64,7 +64,7 @@ struct rpc_test
 	using response = virgo::tcp::response<person>;
 };
 
-AQUARIUS_CONTEXT(ctx_test, rpc_test)
+AQUARIUS_TCP_HANDLER(ctx_test, rpc_test)
 {
 	response().body() = message()->body();
 

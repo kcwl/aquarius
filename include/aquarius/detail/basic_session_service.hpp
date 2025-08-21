@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/detail/execution_context.hpp>
 #include <aquarius/detail/redirect_error.hpp>
-#include <aquarius/flex_buffer.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <boost/asio/read.hpp>
@@ -117,20 +116,20 @@ namespace aquarius
 			template <typename BufferSequence>
 			auto async_read(implementation_type& impl, BufferSequence& buff, error_code& ec) -> awaitable<void>
 			{
-				co_await boost::asio::async_read(*impl.socket_, buffer(buff), redirect_error(use_awaitable, ec));
+				co_await boost::asio::async_read(*impl.socket_, boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			template <typename BufferSequence>
 			auto async_read_some(implementation_type& impl, BufferSequence& buff, error_code& ec) -> awaitable<void>
 			{
-				co_await impl.socket_->async_read_some(buffer(buff), redirect_error(use_awaitable, ec));
+				co_await impl.socket_->async_read_some(boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			template <typename BufferSequence>
 			auto async_write_some(implementation_type& impl, BufferSequence buff, error_code& ec)
 				-> awaitable<std::size_t>
 			{
-				co_return co_await impl.socket_->async_write_some((buffer)(buff), redirect_error(use_awaitable, ec));
+				co_return co_await impl.socket_->async_write_some(boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			auto start(implementation_type& impl) -> awaitable<void>
