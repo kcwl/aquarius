@@ -1,25 +1,22 @@
 #pragma once
-#include <aquarius/awaitable.hpp>
-#include <aquarius/detached.hpp>
-#include <aquarius/detail/config.hpp>
-#include <aquarius/detail/redirect_error.hpp>
-#include <aquarius/error_code.hpp>
 #include <aquarius/io_context.hpp>
-#include <aquarius/use_awaitable.hpp>
 #include <boost/mysql.hpp>
-#include <boost/pfr.hpp>
-
-using namespace std::chrono_literals;
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
-	class sql_context : public io_context
+	template <bool Server>
+	class sql_adaptor
 	{
 	public:
-		sql_context() = default;
+		explicit sql_adaptor(io_context& ctx)
+			: context_(ctx)
+		{
+			static_assert(!Server, "because of adaptor for client, Server must be false");
+		}
 
 	public:
-		auto sql_execute(std::string_view sql) -> awaitable<bool>
+		auto execute(std::string_view sql) -> awaitable<bool>
 		{
 			if (!connector_pool_ptr_)
 			{
@@ -33,7 +30,7 @@ namespace aquarius
 
 			error_code ec;
 
-			co_await conn->async_execute(sql, result, redirect_error(use_awaitable, ec));
+			co_await conn->async_execute(sql, result, redirect_error(boost::asio::use_awaitable, ec));
 
 			co_return !ec;
 		}
@@ -79,15 +76,13 @@ namespace aquarius
 	private:
 		void create_ssl_context()
 		{
-#ifdef AQUARIUS_ENABLE_SSL
 			conn_params_.ssl_ctx.value().set_verify_mode(boost::asio::ssl::context_base::tls_client);
 
 			conn_params_.ssl_ctx.value().set_verify_mode(boost::asio::ssl::verify_peer);
 
-			// conn_params_.ssl_ctx.value().add_certificate_authority(boost::asio::buffer(CA_PEM));
+			conn_params_.ssl_ctx.value().add_certificate_authority(boost::asio::buffer(CA_PEM));
 
 			conn_params_.ssl_ctx.value().set_verify_callback(boost::asio::ssl::host_name_verification("mysql"));
-#endif
 		}
 
 		template <typename T>
@@ -98,7 +93,7 @@ namespace aquarius
 			if (!result.has_value())
 				return results;
 
-			auto to_struct = []<std::size_t... I>(const boost::mysql::row& row, std::index_sequence<I...>)
+			auto to_struct = [this]<std::size_t... I>(const boost::mysql::row& row, std::index_sequence<I...>)
 			{ return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... }; };
 
 			for (auto column : result.rows())
@@ -109,7 +104,6 @@ namespace aquarius
 			return results;
 		}
 
-	private:
 		template <typename T>
 		auto cast(const boost::mysql::field_view& field)
 		{
@@ -126,6 +120,8 @@ namespace aquarius
 		}
 
 	private:
+		io_context& context_;
+
 		boost::mysql::pool_params conn_params_;
 
 		std::shared_ptr<boost::mysql::connection_pool> connector_pool_ptr_;

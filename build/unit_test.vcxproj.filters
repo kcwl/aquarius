@@ -37,6 +37,9 @@
     <Filter Include="include\aquarius\protocol">
       <UniqueIdentifier>{7f791c88-ebbc-4142-90ae-e1de55bbb8e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\adaptor">
+      <UniqueIdentifier>{653ccca7-45ab-477a-b646-19d2c40403ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -224,6 +227,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\io_context.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp">
+      <Filter>include\aquarius\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp">
+      <Filter>include\aquarius\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\io_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\visit.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>

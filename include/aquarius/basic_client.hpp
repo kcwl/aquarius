@@ -18,7 +18,7 @@
 
 namespace aquarius
 {
-	template <typename Session>
+	template <typename Session, typename... Adaptor>
 	class basic_client
 	{
 		using session = Session;
@@ -178,9 +178,11 @@ namespace aquarius
 		std::string host_;
 
 		std::string port_;
+
+		std::tuple<Adaptor...> adaptors_;
 	};
 
-	template <typename Session>
+	template <typename Session, typename... Adaptor>
 	class basic_exector_client : public basic_client<Session>
 	{
 		using base = basic_client<Session>;
@@ -221,6 +223,8 @@ namespace aquarius
 		io_context io_context_;
 
 		std::shared_ptr<std::thread> thread_ptr_;
+
+		std::tuple<Adaptor...> adaptors_;
 	};
 
 	template <typename Session>
