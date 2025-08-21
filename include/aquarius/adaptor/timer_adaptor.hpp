@@ -22,9 +22,6 @@ namespace aquarius
 
 				co_await timer_.async_wait(use_awaitable);
 
-				if (!f)
-					co_return;
-
 				std::forward<Func>(f)();
 			}
 		}

@@ -80,7 +80,7 @@ namespace aquarius
 
 			conn_params_.ssl_ctx.value().set_verify_mode(boost::asio::ssl::verify_peer);
 
-			conn_params_.ssl_ctx.value().add_certificate_authority(boost::asio::buffer(CA_PEM));
+			//conn_params_.ssl_ctx.value().add_certificate_authority(boost::asio::buffer(CA_PEM));
 
 			conn_params_.ssl_ctx.value().set_verify_callback(boost::asio::ssl::host_name_verification("mysql"));
 		}

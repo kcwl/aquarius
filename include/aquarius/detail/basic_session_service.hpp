@@ -17,15 +17,13 @@ namespace aquarius
 		public:
 			using execution_base = execution_context_service_base<basic_session_service>;
 
-			using protocol = boost::asio::ip::tcp;
+			using socket = typename Protocol::socket;
 
-			using socket = typename protocol::socket;
+			using no_delay = typename Protocol::no_delay;
 
-			using no_delay = typename protocol::no_delay;
+			using acceptor = typename Protocol::acceptor;
 
-			using acceptor = typename protocol::acceptor;
-
-			using resolver = typename protocol::resolver;
+			using resolver = typename Protocol::resolver;
 
 			using endpoint = typename acceptor::endpoint_type;
 
@@ -101,7 +99,7 @@ namespace aquarius
 			bool set_nodelay(implementation_type& impl, bool enable)
 			{
 				error_code ec;
-				impl.socket_->set_option(typename boost::asio::ip::tcp::no_delay(enable), ec);
+				impl.socket_->set_option(typename Protocol::no_delay(enable), ec);
 
 				return !ec;
 			}

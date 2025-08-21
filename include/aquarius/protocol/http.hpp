@@ -3,6 +3,7 @@
 #include <virgo.hpp>
 #include <ranges>
 #include <virgo.hpp>
+#include <aquarius/detail/handler_router.hpp>
 
 namespace aquarius
 {

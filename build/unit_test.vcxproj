@@ -211,6 +211,7 @@
     <ClInclude Include="..\include\aquarius\traits\async.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
+    <ClInclude Include="..\test\adaptor.h" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\session.h" />
     <ClInclude Include="..\test\context.h" />

@@ -3,7 +3,7 @@
 #include "protocol.hpp"
 #include <aquarius.hpp>
 
-
+using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE(session_test)
 
