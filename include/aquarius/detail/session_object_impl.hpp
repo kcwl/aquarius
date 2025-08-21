@@ -1,13 +1,12 @@
 #pragma once
 #include <aquarius/any_io_executor.hpp>
-#include <aquarius/ssl/ssl_context_factory.hpp>
 #include <boost/asio/detail/io_object_impl.hpp>
 
 namespace aquarius
 {
 	namespace detail
 	{
-		template <typename Service, typename Executor = any_io_executor>
+		template <typename Service, typename Executor>
 		class session_object_impl : public boost::asio::detail::io_object_impl<Service, Executor>
 		{
 		public:

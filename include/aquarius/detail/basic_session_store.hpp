@@ -19,12 +19,12 @@ namespace aquarius
 			{
 				std::lock_guard lk(mutex_);
 
-				auto iter = sessions_.find(session->id());
+				auto iter = sessions_.find(session->uuid());
 
 				if (iter != sessions_.end())
 					return;
 
-				sessions_.emplace(session->id(), session);
+				sessions_.emplace(session->uuid(), session);
 			}
 
 			void erase(std::size_t id)
@@ -48,7 +48,7 @@ namespace aquarius
 		private:
 			std::mutex mutex_;
 
-			std::map<std::size_t, std::shared_ptr<Session>> sessions_;
+			std::map<std::size_t, std::weak_ptr<Session>> sessions_;
 		};
 	} // namespace detail
 } // namespace aquarius

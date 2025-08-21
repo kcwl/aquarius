@@ -7,7 +7,6 @@
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/basic_sql_stream.hpp>
-#include <aquarius/basic_tcp_session.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/deadline_timer.hpp>

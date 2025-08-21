@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius.hpp>
-#include <aquarius_protocol.hpp>
+#include <virgo.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -60,8 +60,8 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 struct rpc_test
 {
 	constexpr static auto id = "1001"sv;
-	using request = aquarius::tcp_request<person>;
-	using response = aquarius::tcp_response<person>;
+	using request = virgo::tcp::request<person>;
+	using response = virgo::tcp::response<person>;
 };
 
 AQUARIUS_CONTEXT(ctx_test, rpc_test)

@@ -3,4 +3,8 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0xA00
 #endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #endif
