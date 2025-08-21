@@ -114,9 +114,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\flex_buffer.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\logger.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -162,13 +159,10 @@
     <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\client_router.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\handler.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\handler_router.hpp">
+    <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp">
@@ -183,7 +177,7 @@
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\flow_context.hpp">
+    <ClInclude Include="..\include\aquarius\handler.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\concepts\concepts.hpp">

@@ -1,9 +1,8 @@
 #pragma once
 #include <aquarius/basic_session.hpp>
-#include <virgo.hpp>
+#include <aquarius/detail/router.hpp>
 #include <ranges>
 #include <virgo.hpp>
-#include <aquarius/detail/handler_router.hpp>
 
 namespace aquarius
 {
@@ -11,6 +10,7 @@ namespace aquarius
 	class http
 	{
 		constexpr static std::size_t max_http_length = 8192;
+
 	public:
 		using header = virgo::http::detail::basic_header<Server>;
 
@@ -76,8 +76,7 @@ namespace aquarius
 						[next_span, session_ptr = session_ptr->shared_from_this(),
 						 h = std::move(h)]() mutable -> awaitable<void>
 						{
-							detail::handler_router<Session>::get_mutable_instance().invoke(h.path(), session_ptr,
-																						   next_span, h);
+							detail::router<Session>::get_mutable_instance().invoke(h.path(), session_ptr, next_span, h);
 							co_return;
 						},
 						detached);

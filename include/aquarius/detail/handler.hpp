@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/awaitable.hpp>
 #include <aquarius/basic_sql_stream.hpp>
-#include <aquarius/detail/handler_router.hpp>
-#include <aquarius/detail/session_store.hpp>
+#include <aquarius/detail/router.hpp>
 #include <memory>
 
 namespace aquarius
@@ -71,13 +71,11 @@ namespace aquarius
 			{}
 
 		public:
-			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request) -> awaitable<error_code>
+			auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request) -> awaitable<void>
 			{
 				auto result = co_await base_type::visit(session_ptr, request);
 
-				make_response(result);
-
-				co_return result;
+				co_await make_response(result);
 			}
 
 			Response& response()
@@ -97,13 +95,58 @@ namespace aquarius
 				basic_sql_stream<>(static_cast<io_context&>(this->session()->get_executor().query(context_t{})));
 			}
 
-			void make_response(error_code /*result*/)
-			{
-				// this->response().header()->set_result(static_cast<int64_t>(result));
-			}
+			virtual auto make_response(error_code) -> awaitable<void> = 0;
 
 		private:
 			Response response_;
+		};
+
+		template <typename Session, typename Request, typename Response>
+		class tcp_handler : public basic_positive_handler<Session, Request, Response>
+		{
+		public:
+			tcp_handler(const std::string& name)
+				: basic_positive_handler<Session, Request, Response>(name)
+			{}
+
+		public:
+			virtual auto make_response(error_code ec) -> awaitable<void> override
+			{
+				std::vector<char> body_buff{};
+				this->response().commit(body_buff);
+				this->response().length(body_buff.size());
+				this->response().rpc(this->message()->rpc());
+				std::vector<char> header_buff{};
+				this->response().header().commit(header_buff);
+				header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
+
+				co_await this->session()->async_send(std::move(header_buff));
+			}
+		};
+
+		template <typename Session, typename Request, typename Response>
+		class http_handler : public basic_positive_handler<Session, Request, Response>
+		{
+		public:
+			http_handler()
+				: basic_positive_handler<Session, Request, Response>(name)
+			{}
+
+		public:
+			virtual void make_response(error_code ec) override
+			{
+				this->response().base_header().version(this->message()->base_header().version());
+				this->response().base_header().result(ec.value);
+				this->response().base_header().reason(ec.what());
+				std::vector<char> header_buff{};
+				this->response().base_header().commit(header_buff);
+				header_buff.push_back('\r');
+				header_buff.push_back('\n');
+
+				this->response().commit(header_buff);
+
+				co_await this->session()->async_send(std::move(header_buff));
+			}
 		};
 
 		template <typename Protocol, typename RPC, typename Context>
@@ -111,16 +154,7 @@ namespace aquarius
 		{
 			explicit auto_handler_register(std::string_view proto)
 			{
-				handler_router<Protocol>::get_mutable_instance().template regist_tcp<RPC, Context>(proto);
-			}
-		};
-
-		template <typename Protocol, typename RPC, typename Context>
-		struct auto_http_handler_register
-		{
-			explicit auto_http_handler_register(std::string_view proto)
-			{
-				handler_router<Protocol>::get_mutable_instance().template regist_http<RPC, Context>(proto);
+				router<Protocol>::get_mutable_instance().template regist<RPC, Context>(proto);
 			}
 		};
 	} // namespace detail
@@ -142,11 +176,25 @@ namespace aquarius
 	};                                                                                                                 \
 	inline auto method::handle() -> aquarius::awaitable<aquarius::error_code>
 
-#define AQUARIUS_POSITIVE_HANDLER(__session, method, __request, __response)                                            \
-	class method final : public aquarius::detail::basic_positive_handler<__session, __request, __response>             \
+#define __AQUARIUS_TCP_HANDLER(__session, method, __request, __response)                                               \
+	class method final : public aquarius::detail::tcp_handler<__session, __request, __response>                        \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::detail::basic_positive_handler<__session, __request, __response>;                  \
+		using base_type = aquarius::detail::tcp_handler<__session, __request, __response>;                             \
+                                                                                                                       \
+	public:                                                                                                            \
+		method()                                                                                                       \
+			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##method))                                                    \
+		{}                                                                                                             \
+		virtual auto handle() -> aquarius::awaitable<aquarius::error_code> override;                                   \
+	};                                                                                                                 \
+	inline auto method::handle() -> aquarius::awaitable<aquarius::error_code>
+
+#define __AQUARIUS_HTTP_HANDLER(__session, method, __request, __response)                                              \
+	class method final : public aquarius::detail::http_handler<__session, __request, __response>                       \
+	{                                                                                                                  \
+	public:                                                                                                            \
+		using base_type = aquarius::detail::http_handler<__session, __request, __response>;                            \
                                                                                                                        \
 	public:                                                                                                            \
 		method()                                                                                                       \
