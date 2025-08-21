@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/any_io_executor.hpp>
 #include <aquarius/awaitable.hpp>
 #include <aquarius/basic_attribute.hpp>
 #include <aquarius/basic_client.hpp>

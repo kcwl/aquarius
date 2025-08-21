@@ -151,12 +151,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
+    <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\basic_attribute.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\visit.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
@@ -208,6 +211,7 @@
     <ClInclude Include="..\include\aquarius\traits\async.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
+    <ClInclude Include="..\test\adaptor.h" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\session.h" />
     <ClInclude Include="..\test\context.h" />

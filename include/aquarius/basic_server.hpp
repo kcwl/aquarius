@@ -9,10 +9,11 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/use_awaitable.hpp>
+#include <aquarius/detail/visit.hpp>
 
 namespace aquarius
 {
-	template <typename Session>
+	template <typename Session, typename... Adaptor>
 	class basic_server
 	{
 		using session_type = Session;
@@ -27,6 +28,7 @@ namespace aquarius
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
 			, acceptor_(io_service_pool_.get_io_service(), session_type::protocol::make_v4_endpoint(port))
 			, server_name_(name)
+			, adaptors_()
 		{
 			init_signal();
 
@@ -103,5 +105,7 @@ namespace aquarius
 		acceptor acceptor_;
 
 		std::string server_name_;
+
+		std::tuple<Adaptor...> adaptors_;
 	};
 } // namespace aquarius

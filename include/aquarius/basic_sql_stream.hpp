@@ -3,6 +3,7 @@
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/mysql_keyword.hpp>
 #include <aquarius/io_context.hpp>
+#include <boost/pfr.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -140,7 +141,7 @@ namespace aquarius
 		{
 			ss_ << ";";
 
-			co_return co_await context_.sql_query<T>(ss_.str());
+			co_return co_await context_.template sql_query<T>(ss_.str());
 		}
 
 		template <typename T>

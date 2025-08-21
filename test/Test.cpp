@@ -8,6 +8,7 @@
 #include "detail.h"
 #include "protocol.hpp"
 #include "session.h"
+#include "adaptor.h"
 
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)

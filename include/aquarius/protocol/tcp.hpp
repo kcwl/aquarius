@@ -2,6 +2,7 @@
 #include <aquarius/flow/raw_buffer_flow.hpp>
 #include <aquarius/flow_context.hpp>
 #include <virgo.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
 {
@@ -18,6 +19,8 @@ namespace aquarius
 		using resolver = boost::asio::ip::tcp::resolver;
 
 		using header = virgo::tcp::detail::layer_header;
+
+		using no_delay = boost::asio::ip::tcp::no_delay;
 
 	public:
 		template <typename Session>

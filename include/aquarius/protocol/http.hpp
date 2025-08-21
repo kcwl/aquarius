@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/awaitable.hpp>
-#include <aquarius/detail/handler_router.hpp>
-#include <aquarius/error_code.hpp>
+#include <aquarius/basic_session.hpp>
+#include <virgo.hpp>
 #include <ranges>
 #include <virgo.hpp>
+#include <aquarius/detail/handler_router.hpp>
 
 namespace aquarius
 {
@@ -11,6 +11,8 @@ namespace aquarius
 	class http
 	{
 		constexpr static std::size_t max_http_length = 8192;
+	public:
+		using header = virgo::http::detail::basic_header<Server>;
 
 	public:
 		using header = virgo::http::detail::basic_header<Server>;

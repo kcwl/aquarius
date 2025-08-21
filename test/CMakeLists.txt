@@ -12,7 +12,7 @@ add_executable(unittest ${TEST_SRCS} ${TEST_MAIN})
 
 target_link_libraries(unittest PUBLIC boost)
 
-if (AQUARIUS_ENABLE_SLL)
+if (AQUARIUS_ENABLE_SSL)
 target_link_libraries(unittest PUBLIC openssl)
 endif()
 
