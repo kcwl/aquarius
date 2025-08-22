@@ -159,7 +159,7 @@
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\mysql_keyword.hpp">
+    <ClInclude Include="..\include\aquarius\detail\sql_keyword.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
@@ -239,6 +239,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp">
       <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\sql.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\attribute.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

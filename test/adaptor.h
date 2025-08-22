@@ -29,6 +29,10 @@ BOOST_AUTO_TEST_CASE(timer_adaptor_test)
 	std::this_thread::sleep_for(1s);
 
 	BOOST_CHECK_EQUAL(times,10);
+
+	io.stop();
+
+	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

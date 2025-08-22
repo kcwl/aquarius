@@ -1,8 +1,7 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/config.hpp>
-#include <aquarius/detail/mysql_keyword.hpp>
-#include <aquarius/io_context.hpp>
+#include <aquarius/detail/sql_keyword.hpp>
 #include <boost/pfr.hpp>
 #include <sstream>
 #include <string>
@@ -13,7 +12,7 @@ namespace aquarius
 	namespace detail
 	{
 		template <typename _Ty>
-		inline consteval std::string_view name()
+		inline constexpr std::string_view name()
 		{
 			using namespace std::string_view_literals;
 
@@ -26,7 +25,7 @@ namespace aquarius
 
 			constexpr auto temp_name = name.substr(left_bracket + 1, end_bracket - left_bracket - 1);
 
-			constexpr auto start = name.find_last_of(":");
+			constexpr auto start = name.find_last_of(" ");
 
 			if constexpr (start == std::string_view::npos)
 			{
@@ -66,9 +65,7 @@ namespace aquarius
 	class sql_stream
 	{
 	public:
-		sql_stream(io_context& context)
-			: context_(context)
-		{}
+		sql_stream() = default;
 
 	public:
 		template <typename U>
@@ -79,28 +76,37 @@ namespace aquarius
 		}
 
 		template <typename T>
-		sql_stream insert(T value)
+		sql_stream& insert(T value)
 		{
-			ss_ << "insert into person values(";
+			constexpr static auto struct_name = detail::name<T>();
 
-			auto f = [&]<std::size_t... I>(std::index_sequence<I>...)
+			constexpr auto insert_begin =
+				concat_v<INSERT, SPACE, INTO, SPACE, struct_name, SPACE, VALUES, LEFT_BRACKET>;
+
+			ss_ << insert_begin.data();
+
+			constexpr auto size = boost::pfr::tuple_size_v<T>;
+
+			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{
-				constexpr auto size = sizeof...(I);
-
-				((ss_ << boost::pfr::get<I, T>() << (I == size - 1 ? ")" : ",")), ...);
+				((ss_ << (std::same_as<boost::pfr::tuple_element_t<I, T>, std::string> ? "\"" : "")
+					  << boost::pfr::get<I, T>(value)
+					  << (std::same_as<boost::pfr::tuple_element_t<I, T>, std::string> ? "\"" : "")
+					  << (I == size - 1 ? ")" : ",")),
+				 ...);
 			};
 
-			f(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{});
+			f(std::make_index_sequence<size>{});
 
 			return *this;
 		}
 
 		template <typename T>
-		sql_stream remove(T value)
+		sql_stream& remove(T /*value*/)
 		{
-			constexpr auto struct_name = detail::name<T>();
+			constexpr static auto struct_name = detail::name<T>();
 
-			constexpr auto delete_sql = concat_v<"delete from "sv, struct_name>;
+			constexpr auto delete_sql = concat_v<REMOVE, SPACE, FROM, SPACE, struct_name>;
 
 			ss_ << delete_sql;
 
@@ -108,61 +114,64 @@ namespace aquarius
 		}
 
 		template <typename T>
-		sql_stream update(T value)
+		sql_stream& update(T value)
 		{
-			constexpr auto struct_name = detail::name<T>();
+			constexpr static auto struct_name = detail::name<T>();
 
-			constexpr auto update_sql = concat_v<"update "sv, struct_name, " set "sv>;
+			constexpr auto update_sql = concat_v<UPDATE, SPACE, struct_name, SPACE, SET, SPACE>;
 
 			ss_ << update_sql;
 
-			boost::pfr::for_each_field_with_name(value,
-												 [&](auto name, auto value) { ss_ << name.data() << "=" << value; });
+			constexpr auto size = boost::pfr::tuple_size_v<T>;
+
+			boost::pfr::for_each_field_with_name(value, [&](auto name, auto value, std::size_t index)
+												 { ss_ << name.data() << "=" << add_string_format(value) << (index != size-1 ? " and " :""); });
+
 
 			return *this;
 		}
 
 		template <typename T>
-		sql_stream select()
+		sql_stream& select()
 		{
-			constexpr std::string_view struct_name = detail::name<T>();
+			constexpr static auto struct_name = detail::name<T>();
 
-			constexpr auto complete_sql = concat_v<SELECT, SPACE, ASTERISK, FROM, SPACE>;
+			constexpr static auto complete_sql = concat_v<SELECT, SPACE, ASTERISK, SPACE, FROM, SPACE>;
 
 			constexpr auto sql = concat_v<complete_sql, struct_name>;
 
-			ss_ << complete_sql.data();
+			ss_ << sql.data();
 
 			return *this;
 		}
 
-		template <typename T>
-		auto query() -> awaitable<std::vector<T>>
-		{
-			ss_ << ";";
+		// template <typename T>
+		// auto query() -> awaitable<std::vector<T>>
+		//{
+		//	ss_ << ";";
 
-			co_return co_await context_.template sql_query<T>(ss_.str());
-		}
+		//	co_return co_await context_.template sql_query<T>(ss_.str());
+		//}
 
-		template <typename T>
-		auto query_one() -> awaitable<std::optional<T>>
-		{
-			ss_ << ";";
+		// template <typename T>
+		// auto query_one() -> awaitable<std::optional<T>>
+		//{
+		//	ss_ << ";";
 
-			auto results = co_await query<T>();
+		//	auto results = co_await query<T>();
 
-			if (results.empty())
-				co_return std::nullopt;
+		//	if (results.empty())
+		//		co_return std::nullopt;
 
-			co_return *results.begin();
-		}
+		//	co_return *results.begin();
+		//}
 
-		auto execute() -> awaitable<bool>
-		{
-			ss_ << ";";
+		// auto execute() -> awaitable<bool>
+		//{
+		//	ss_ << ";";
 
-			co_return co_await context_.sql_execute(ss_.str());
-		}
+		//	co_return co_await context_.sql_execute(ss_.str());
+		//}
 
 		std::string sql()
 		{
@@ -172,7 +181,7 @@ namespace aquarius
 		template <typename Attribute>
 		sql_stream& where(const Attribute& attr)
 		{
-			ss_ << " where " << attr.sql();
+			ss_ << " where" << attr.sql();
 
 			return *this;
 		}
@@ -180,7 +189,7 @@ namespace aquarius
 		template <typename Attribute>
 		sql_stream& _and(const Attribute& attr)
 		{
-			ss_ << " and " << attr.sql();
+			ss_ << " and" << attr.sql();
 
 			return *this;
 		}
@@ -188,7 +197,7 @@ namespace aquarius
 		template <typename Attribute>
 		sql_stream& _or(const Attribute& attr)
 		{
-			ss_ << " or " << attr.sql();
+			ss_ << " or" << attr.sql();
 
 			return *this;
 		}
@@ -200,9 +209,7 @@ namespace aquarius
 
 			((ss_ << Column << ","), ...);
 
-			ss_.seekg(-1, std::ios_base::cur);
-
-			ss_ << ' ';
+			ss_.seekp(-1, std::ios_base::cur);
 
 			ss_ << (Increament ? " asc" : " desc");
 
@@ -210,8 +217,18 @@ namespace aquarius
 		}
 
 	private:
-		Stream ss_;
+		template<typename T>
+		T add_string_format(T value)
+		{
+			if constexpr (std::same_as<std::remove_cvref_t<T>, std::string>)
+			{
+				value = "\"" + value + "\"";
+			}
 
-		io_context& context_;
+			return value;
+		}
+
+	private:
+		Stream ss_;
 	};
 } // namespace aquarius

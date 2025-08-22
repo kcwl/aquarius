@@ -2,7 +2,8 @@
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/string_literal.hpp>
-#include <aquarius/detail/mysql_keyword.hpp>
+#include <aquarius/detail/sql_keyword.hpp>
+#include <aquarius/concepts/concepts.hpp>
 
 namespace aquarius
 {
@@ -20,9 +21,9 @@ namespace aquarius
 		template <typename T>
 		attributes& operator==(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, EQUAL, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, EQUAL>;
 
-			attr_str_ += sql;
+			attr_str_ += sql.data();
 			add_value(std::forward<T>(t));
 
 			return *this;
@@ -31,7 +32,7 @@ namespace aquarius
 		template <typename T>
 		attributes& operator!=(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, NOT, EQUAL, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, NOT, EQUAL>;
 
 			attr_str_ += sql;
 			add_value(std::forward<T>(t));
@@ -42,7 +43,7 @@ namespace aquarius
 		template <typename T>
 		attributes& operator<(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, LESS, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, LESS>;
 
 			attr_str_ += sql;
 			add_value(std::forward<T>(t));
@@ -53,7 +54,7 @@ namespace aquarius
 		template <typename T>
 		attributes& operator<=(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, LESS, EQUAL, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, LESS, EQUAL>;
 
 			attr_str_ += sql;
 			add_value(std::forward<T>(t));
@@ -64,7 +65,7 @@ namespace aquarius
 		template <typename T>
 		attributes& operator>(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, GREATER, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, GREATER>;
 
 			attr_str_ += sql;
 			add_value(std::forward<T>(t));
@@ -75,7 +76,7 @@ namespace aquarius
 		template <typename T>
 		attributes& operator>=(T&& t)
 		{
-			constexpr auto sql = concat_v<sql_begin, SPACE, GREATER, EQUAL, SPACE>;
+			constexpr auto sql = concat_v<sql_begin, GREATER, EQUAL>;
 
 			attr_str_ += sql;
 			add_value(std::forward<T>(t));
@@ -83,19 +84,21 @@ namespace aquarius
 			return *this;
 		}
 
-		attributes& operator|(const attributes& other)
+		template<detail::string_literal U>
+		attributes& operator|(const attributes<U>& other)
 		{
 			attr_str_ += concat_v<SPACE, OR>;
-			attr_str_ += other.attr_str_;
+			attr_str_ += other.sql();
 
 			return *this;
 		}
 
-		attributes& operator&(const attributes& other)
+		template<detail::string_literal U>
+		attributes& operator&(const attributes<U>& other)
 		{
 			attr_str_ += concat_v<SPACE, AND>;
 
-			attr_str_ += other.attr_str_;
+			attr_str_ += other.sql();
 
 			return *this;
 		}
@@ -109,15 +112,17 @@ namespace aquarius
 		template <typename T>
 		void add_value(T&& t)
 		{
-			if constexpr (std::same_as<T, std::string>)
+			if constexpr (is_string<std::decay_t<T>>::value)
 			{
-				attr_str_.append("'");
-				attr_str_.append(t);
-				attr_str_.append("'");
+				attr_str_ += "\"";
+				attr_str_ += t;
+				attr_str_ += "\"";
 			}
 			else
 			{
-				attr_str_ += std::to_string(t);
+				std::stringstream ss;
+				ss << t;
+				attr_str_ += ss.str();
 			}
 		}
 
