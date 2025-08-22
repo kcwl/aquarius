@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/basic_sql_stream.hpp>
+#include <aquarius/detail/sql_stream.hpp>
 #include <aquarius/detail/router.hpp>
 #include <memory>
 
@@ -92,7 +92,7 @@ namespace aquarius
 
 			auto sql_engine()
 			{
-				basic_sql_stream<>(static_cast<io_context&>(this->session()->get_executor().query(context_t{})));
+				sql_stream<>(static_cast<io_context&>(this->session()->get_executor().query(context_t{})));
 			}
 
 			virtual auto make_response(error_code) -> awaitable<void> = 0;

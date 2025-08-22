@@ -27,7 +27,11 @@ namespace aquarius
 			using func_trie = detail::trie<function_type>;
 
 		public:
-			router() = default;
+			router()
+				: map_invokes_(new func_trie())
+			{
+
+			}
 
 		public:
 			template <typename RPC, typename Context>

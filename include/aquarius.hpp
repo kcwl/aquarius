@@ -1,10 +1,8 @@
 #pragma once
 #include <aquarius/awaitable.hpp>
-#include <aquarius/basic_attribute.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
-#include <aquarius/basic_sql_stream.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/co_spawn.hpp>
 #include <aquarius/deadline_timer.hpp>
