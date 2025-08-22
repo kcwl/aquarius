@@ -154,8 +154,9 @@
     <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_attribute.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\attribute.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
@@ -164,7 +165,6 @@
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\client_pool.hpp" />
     <ClInclude Include="..\include\aquarius\cmd_options.hpp" />
     <ClInclude Include="..\include\aquarius\concepts\async.hpp" />

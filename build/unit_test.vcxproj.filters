@@ -81,9 +81,6 @@
     <ClInclude Include="..\include\aquarius\awaitable.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_attribute.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -94,9 +91,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_session.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_sql_stream.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\cmd_options.hpp">
@@ -239,6 +233,12 @@
     </ClInclude>
     <ClInclude Include="..\test\adaptor.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\attribute.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

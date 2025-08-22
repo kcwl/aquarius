@@ -63,23 +63,23 @@ namespace aquarius
 	} // namespace detail
 
 	template <typename Stream = std::stringstream>
-	class basic_sql_stream
+	class sql_stream
 	{
 	public:
-		basic_sql_stream(io_context& context)
+		sql_stream(io_context& context)
 			: context_(context)
 		{}
 
 	public:
 		template <typename U>
-		basic_sql_stream& operator<<(U value)
+		sql_stream& operator<<(U value)
 		{
 			ss_ << value;
 			return *this;
 		}
 
 		template <typename T>
-		basic_sql_stream insert(T value)
+		sql_stream insert(T value)
 		{
 			ss_ << "insert into person values(";
 
@@ -96,7 +96,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		basic_sql_stream remove(T value)
+		sql_stream remove(T value)
 		{
 			constexpr auto struct_name = detail::name<T>();
 
@@ -108,7 +108,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		basic_sql_stream update(T value)
+		sql_stream update(T value)
 		{
 			constexpr auto struct_name = detail::name<T>();
 
@@ -123,7 +123,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		basic_sql_stream select()
+		sql_stream select()
 		{
 			constexpr std::string_view struct_name = detail::name<T>();
 
@@ -170,7 +170,7 @@ namespace aquarius
 		}
 
 		template <typename Attribute>
-		basic_sql_stream& where(const Attribute& attr)
+		sql_stream& where(const Attribute& attr)
 		{
 			ss_ << " where " << attr.sql();
 
@@ -178,7 +178,7 @@ namespace aquarius
 		}
 
 		template <typename Attribute>
-		basic_sql_stream& _and(const Attribute& attr)
+		sql_stream& _and(const Attribute& attr)
 		{
 			ss_ << " and " << attr.sql();
 
@@ -186,7 +186,7 @@ namespace aquarius
 		}
 
 		template <typename Attribute>
-		basic_sql_stream& _or(const Attribute& attr)
+		sql_stream& _or(const Attribute& attr)
 		{
 			ss_ << " or " << attr.sql();
 
@@ -194,7 +194,7 @@ namespace aquarius
 		}
 
 		template <bool Increament, const std::string_view&... Column>
-		basic_sql_stream& order_by()
+		sql_stream& order_by()
 		{
 			ss_ << " order by ";
 
