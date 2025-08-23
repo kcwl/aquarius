@@ -139,6 +139,16 @@ namespace aquarius
 			return session_ptr_->remote_port();
 		}
 
+		void close()
+		{
+			return session_ptr_->close();
+		}
+
+		void shutdown()
+		{
+			return session_ptr_->shutdown();
+		}
+
 		template <typename Func>
 		void set_close_func(Func&& f)
 		{

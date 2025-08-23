@@ -78,15 +78,6 @@ namespace aquarius
 				return io_service;
 			}
 
-			template <typename... Args>
-			void sql_set_params(Args&&... args)
-			{
-				for (auto& io_service : io_services_)
-				{
-					io_service->sql_set_param(std::forward_like<Args>(args)...);
-				}
-			}
-
 		private:
 			io_service_pool(const io_service_pool&) = delete;
 
