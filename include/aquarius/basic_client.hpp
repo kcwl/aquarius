@@ -21,8 +21,6 @@ namespace aquarius
 	template <typename Session, typename... Adaptor>
 	class basic_client
 	{
-		using session = Session;
-
 		using socket = typename Session::socket;
 
 		using resolver = typename Session::resolver;
@@ -35,12 +33,11 @@ namespace aquarius
 			, timeout_(timeout)
 			, host_()
 			, port_()
-		{}
-
-		virtual ~basic_client()
 		{
-			//stop();
+			
 		}
+
+		virtual ~basic_client() =default;
 
 	public:
 		auto async_connect(const std::string& ip_addr, const std::string& port) -> awaitable<bool>
@@ -48,23 +45,12 @@ namespace aquarius
 			host_ = ip_addr;
 			port_ = port;
 
-			socket _socket(io_context_);
+			session_ptr_ = std::make_shared<Session>(io_context_);
 
-			resolver resolve(io_context_);
+			auto result = co_await session_ptr_->async_connect(host_, port_);
 
-			auto endpoints = resolve.resolve(host_, port_);
-
-			error_code ec{};
-
-			co_await boost::asio::async_connect(_socket, endpoints, redirect_error(use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "connect " << host_ << " failed! maybe" << ec.what();
-				co_return false;
-			}
-
-			create_session(std::move(_socket));
+			if (!result)
+				co_return result;
 
 			co_spawn(
 				this->io_context_,
@@ -84,8 +70,9 @@ namespace aquarius
 								break;
 						}
 					}
+					co_return;
 				},
-				detached);
+				use_awaitable);
 
 			co_return true;
 		}
@@ -106,9 +93,6 @@ namespace aquarius
 		template <typename RPC>
 		auto async_send(std::shared_ptr<typename RPC::request> req) -> awaitable<void>
 		{
-			std::vector<char> fs{};
-			req->commit(fs);
-
 			std::vector<char> complete_buffer;
 			req->mark(complete_buffer);
 			auto header_size = complete_buffer.size();
@@ -169,15 +153,9 @@ namespace aquarius
 		}
 
 	private:
-		void create_session(socket sock)
-		{
-			session_ptr_ = std::make_shared<session>(std::move(sock));
-		}
-
-	private:
 		io_context& io_context_;
 
-		std::shared_ptr<session> session_ptr_;
+		std::shared_ptr<Session> session_ptr_;
 
 		std::function<void()> close_func_;
 
