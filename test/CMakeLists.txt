@@ -20,6 +20,7 @@ if(USE_WIN7_FOR_BOOST_LOG)
 message(STATUS "Set Config USE_WIN7_FOR_BOOST_LOG")
 target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
 endif()
+endif()
 
 add_test(
 	NAME unittest COMMAND unittest
