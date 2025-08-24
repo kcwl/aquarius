@@ -13,7 +13,7 @@ permissions:
 
 env:
     USERNAME: "aquarius"
-    VCPKG_EXE: ${{ github.workspace }}/vcpkg
+    VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
     FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
     VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/aquarius/index.json,readwrite"
 
