@@ -20,11 +20,7 @@ message(STATUS "Found Boost ${Boost_VERSION}")
 
 add_library(boost INTERFACE)
 
-if(WIN32)
-target_link_directories(boost INTERFACE ${Boost_LIBRARIES})
-else()
 target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system)
-endif()
 
 target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
