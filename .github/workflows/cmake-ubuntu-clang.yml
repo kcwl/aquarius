@@ -51,7 +51,7 @@ jobs:
         chmod u+x llvm.sh
         sudo ./llvm.sh 20
 
-    - name: install boost openssl
+    - name: config vcpkg
       shell: bash
       run: |
         sudo apt-get update

@@ -15,6 +15,7 @@ target_link_libraries(unittest PUBLIC boost openssl)
 
 if(WIN32)
 target_compile_options(unittest PUBLIC /bigobj)
+target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN)
 endif()
 
 add_test(
