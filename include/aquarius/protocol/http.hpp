@@ -15,9 +15,6 @@ namespace aquarius
 		using header = virgo::http::detail::basic_header<Server>;
 
 	public:
-		using header = virgo::http::detail::basic_header<Server>;
-
-	public:
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{

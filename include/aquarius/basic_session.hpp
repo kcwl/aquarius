@@ -331,7 +331,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			ssl_socket_.lowest_layer().set_option(typename Protocol::keep_alive(value), ec);
+			ssl_socket_.lowest_layer().set_option(typename protocol::keep_alive(value), ec);
 
 			return !ec;
 		}
@@ -340,7 +340,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			ssl_socket_.lowest_layer().set_option(typename Protocol::no_delay(enable), ec);
+			ssl_socket_.lowest_layer().set_option(typename protocol::no_delay(enable), ec);
 
 			return !ec;
 		}
