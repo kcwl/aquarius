@@ -1,6 +1,9 @@
 #define BOOST_TEST_MODULE UnitTest
 #ifdef _WIN32
 #include <sdkddkver.h>
+#ifdef USE_WIN7_FOR_BOOST_LOG
+#define BOOST_USE_WINAPI_VERSION BOOST_WINAPI_VERSION_WIN7
+#endif
 #define NOMINMAX
 #endif
 #include <boost/test/included/unit_test.hpp>

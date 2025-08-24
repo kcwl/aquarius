@@ -16,6 +16,9 @@ target_link_libraries(unittest PUBLIC boost openssl)
 if(WIN32)
 target_compile_options(unittest PUBLIC /bigobj)
 target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN)
+if(USE_WIN7_FOR_BOOST_LOG)
+message(STATUS "Set Config USE_WIN7_FOR_BOOST_LOG")
+target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
 endif()
 
 add_test(
