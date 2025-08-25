@@ -51,12 +51,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-            ${{ env.VCPKG_ROOT }}
             ${{ github.workspace }}/vcpkg_installed
-            !${{ env.VCPKG_ROOT }}/.git
-            !${{ env.VCPKG_ROOT }}/buildtrees
-            !${{ env.VCPKG_ROOT }}/packages
-            !${{ env.VCPKG_ROOT }}/downloads
         key: |
             ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-v1
 

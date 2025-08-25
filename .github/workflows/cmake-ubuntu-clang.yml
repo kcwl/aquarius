@@ -44,6 +44,15 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         clang --version
 
+    - name: Rstore Vcpkg
+      id: cache-aquarius
+      uses: actions/cache@v4
+      with:
+        path: |
+            ${{ github.workspace }}/vcpkg_installed
+        key: |
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-v1
+
     - name: install clang 20
       shell: bash
       run: |
