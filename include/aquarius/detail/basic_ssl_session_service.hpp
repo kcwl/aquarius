@@ -26,7 +26,7 @@ namespace aquarius
 
 			struct implementation_type
 			{
-				ssl_socket_type* ssl_socket;
+				std::shared_ptr<ssl_socket_type> ssl_socket;
 			};
 
 		public:
@@ -46,31 +46,11 @@ namespace aquarius
 
 			void move_copy(implementation_type& impl, socket socket)
 			{
-				impl.ssl_socket =
-					new ssl_socket_type(std::move(socket), ssl_context_factory<Server, SSLVersion>::create());
-
-				impl.ssl_socket->set_verify_mode(boost::asio::ssl::verify_peer);
-				
-				impl.ssl_socket->set_verify_callback([] (bool verify, boost::asio::ssl::verify_context& ctx) 
-													{
-														char subject_name[256];
-														X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
-														X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
-														std::cout << "Verifying " << subject_name << "\n";
-
-														return verify;
-													});
+				impl.ssl_socket = std::make_shared<ssl_socket_type>(std::move(socket), ssl_context_factory<Server, SSLVersion>::create());
 			}
 
-			void destroy(implementation_type& impl)
+			void destroy(implementation_type&)
 			{
-				error_code ec{};
-
-				impl.ssl_socket->shutdown(ec);
-
-				delete impl.ssl_socket;
-
-				impl.ssl_socket = nullptr;
 			}
 
 			virtual void shutdown() override
@@ -120,14 +100,14 @@ namespace aquarius
 			template <typename BufferSequence>
 			auto async_read(implementation_type& impl, BufferSequence& buff, error_code& ec) -> awaitable<void>
 			{
-				co_await boost::asio::async_read(*impl.ssl_socket, buffer(buff), redirect_error(use_awaitable, ec));
+				co_await boost::asio::async_read(*impl.ssl_socket, boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			template <typename BufferSequence>
 			auto async_write_some(implementation_type& impl, BufferSequence buff, error_code& ec)
 				-> awaitable<std::size_t>
 			{
-				co_return co_await impl.ssl_socket->async_write_some((buffer)(buff), redirect_error(use_awaitable, ec));
+				co_return co_await impl.ssl_socket->async_write_some(boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
 			}
 
 			auto start(implementation_type& impl) -> awaitable<void>
@@ -136,13 +116,13 @@ namespace aquarius
 
 				if constexpr (Server)
 				{
-					co_await impl.ssl_socket->async_handshake(boost::asio::ssl::stream_base::server,
-															  redirect_error(use_awaitable, ec));
+					
 				}
 				else
 				{
-					co_await impl.ssl_socket->async_handshake(boost::asio::ssl::stream_base::client,
-															  redirect_error(use_awaitable, ec));
+					
+
+					
 				}
 			}
 		};

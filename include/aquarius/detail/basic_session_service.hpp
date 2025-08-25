@@ -86,22 +86,7 @@ namespace aquarius
 				return impl.socket_->remote_endpoint().port();
 			}
 
-			bool keep_alive(implementation_type& impl, bool value)
-			{
-				error_code ec;
-
-				impl.socket_->set_option(boost::asio::socket_base::keep_alive(value), ec);
-
-				return !ec;
-			}
-
-			bool set_nodelay(implementation_type& impl, bool enable)
-			{
-				error_code ec;
-				impl.socket_->set_option(typename Protocol::no_delay(enable), ec);
-
-				return !ec;
-			}
+			
 
 			void construct(implementation_type& /*impl*/)
 			{

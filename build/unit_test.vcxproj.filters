@@ -51,7 +51,7 @@
     <ClInclude Include="..\test\session.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\context.h">
+    <ClInclude Include="..\test\server.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\test\detail.h">

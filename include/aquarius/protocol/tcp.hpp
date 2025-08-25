@@ -22,12 +22,12 @@ namespace aquarius
 
 		using no_delay = boost::asio::ip::tcp::no_delay;
 
+		using keep_alive = boost::asio::socket_base::keep_alive;
+
 	public:
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			co_await session_ptr->service().start(session_ptr->implementation());
-
 			error_code ec;
 
 			for (;;)
@@ -46,8 +46,6 @@ namespace aquarius
 					co_return ec;
 				}
 			}
-
-			std::unreachable();
 		}
 
 	public:

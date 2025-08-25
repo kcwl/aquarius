@@ -213,7 +213,7 @@
     <ClInclude Include="..\test\attribute.h" />
     <ClInclude Include="..\test\client.h" />
     <ClInclude Include="..\test\session.h" />
-    <ClInclude Include="..\test\context.h" />
+    <ClInclude Include="..\test\server.h" />
     <ClInclude Include="..\test\protocol.hpp" />
     <ClInclude Include="..\test\detail.h" />
     <ClInclude Include="..\test\sql.h" />
