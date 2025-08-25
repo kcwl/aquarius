@@ -39,6 +39,7 @@ jobs:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
+            triplet: 'x64-windows'
 
     steps:
     - uses: actions/checkout@v3
@@ -74,6 +75,11 @@ jobs:
           setapikey "${{ secrets.GITHUB_TOKEN }}" `
           -Source "${{ env.FEED_URL }}"
 
+    - name: Install from Vcpkg of NuGet
+      shell: pwsh
+      run: >
+        ${{ github.workspace }}/vcpkg/vcpkg.exe install boost openssl --triplet ${{matrix.triplet}}
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -82,9 +88,9 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DUSE_WIN7_FOR_BOOST_LOG=1
         -S ${{ github.workspace }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        # -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+
         
 
     - name: Build
