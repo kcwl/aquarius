@@ -51,14 +51,20 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
+            ${{ env.VCPKG_ROOT }}
             ${{ github.workspace }}/vcpkg_installed
+            !${{ env.VCPKG_ROOT }}/.git
+            !${{ env.VCPKG_ROOT }}/buildtrees
+            !${{ env.VCPKG_ROOT }}/packages
+            !${{ env.VCPKG_ROOT }}/downloadsd
         key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-vs
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-win
 
     - name: config vcpkg
       shell: bash
       run: |
-        git clone https://github.com/microsoft/vcpkg.git
+        git clone https://github.com/microsoft/vcpkg.git temp
+        mv temp/.git vcpkg/.git
         cd vcpkg
         git pull
         ./bootstrap-vcpkg.bat -disableMetrics

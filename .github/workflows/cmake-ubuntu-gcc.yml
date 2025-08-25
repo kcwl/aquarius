@@ -48,9 +48,14 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
+            ${{ env.VCPKG_ROOT }}
             ${{ github.workspace }}/vcpkg_installed
+            !${{ env.VCPKG_ROOT }}/.git
+            !${{ env.VCPKG_ROOT }}/buildtrees
+            !${{ env.VCPKG_ROOT }}/packages
+            !${{ env.VCPKG_ROOT }}/downloads
         key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-gcc
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-linux
 
     - name: test gcc/g++
       shell: sh
@@ -70,10 +75,11 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y autoconf automake autoconf-archive ninja-build
-        git clone https://github.com/microsoft/vcpkg.git
+        git clone https://github.com/microsoft/vcpkg.git temp
+        mv temp/.git vcpkg/.git
         cd vcpkg
         git pull
-        ./bootstrap-vcpkg.sh -disableMetrics
+        ./bootstrap-vcpkg.bat -disableMetrics
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
