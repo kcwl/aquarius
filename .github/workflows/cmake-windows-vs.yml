@@ -64,7 +64,7 @@ jobs:
       shell: bash
       run: |
         git clone https://github.com/microsoft/vcpkg.git temp
-        mkdir vcpkg -force
+        mkdir -p vcpkg
         mv temp/.git vcpkg/.git
         cd vcpkg
         git pull
