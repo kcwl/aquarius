@@ -75,6 +75,7 @@ jobs:
         mv temp/.git vcpkg/.git
         cd vcpkg
         git pull
+        git checkout .
         ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Configure CMake
