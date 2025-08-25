@@ -43,9 +43,11 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Rstore Vcpkg
+    - name: Cache Vcpkg
       id: cache-aquarius
       uses: actions/cache@v4
+      env:
+        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
       with:
         path: |
             ${{ env.VCPKG_ROOT }}
