@@ -53,7 +53,7 @@ jobs:
         path: |
             ${{ github.workspace }}/vcpkg_installed
         key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-v1
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-vs
 
     - name: config vcpkg
       shell: bash

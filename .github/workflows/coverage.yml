@@ -50,7 +50,7 @@ jobs:
         path: |
             ${{ github.workspace }}/vcpkg_installed
         key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-v11
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-cover
 
     - name: test gcc/g++
       shell: sh
