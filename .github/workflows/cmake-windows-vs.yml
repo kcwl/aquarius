@@ -78,7 +78,7 @@ jobs:
     - name: Install from Vcpkg of NuGet
       shell: pwsh
       run: >
-        ${{ github.workspace }}/vcpkg/vcpkg.exe install boost openssl --triplet ${{matrix.triplet}}
+        ${{ github.workspace }}/vcpkg/vcpkg.exe install --triplet ${{matrix.triplet}}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
