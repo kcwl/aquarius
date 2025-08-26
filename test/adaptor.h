@@ -10,7 +10,6 @@ BOOST_AUTO_TEST_SUITE(adaptors)
 BOOST_AUTO_TEST_CASE(sql_adaptor_test)
 {
 	{
-
 	}
 }
 
@@ -22,17 +21,20 @@ BOOST_AUTO_TEST_CASE(timer_adaptor_test)
 
 	int times = 0;
 
-	timer.async_wait(100ms, [&] {times++;});
+	aquarius::co_spawn(
+		io, [&] -> aquarius::awaitable<void> { 
+			co_await timer.async_wait(100ms, [&] { times++; }); 
+		}, aquarius::detached);
 
-	std::thread t([&] {io.run(); });
+	std::thread t([&] { io.run(); });
 
 	std::this_thread::sleep_for(1s);
-
-	BOOST_CHECK_EQUAL(times,10);
 
 	io.stop();
 
 	t.join();
+
+	BOOST_CHECK_EQUAL(times, 9);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

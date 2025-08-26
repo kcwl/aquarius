@@ -31,6 +31,9 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
 
+    env:
+        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -43,12 +46,31 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install boost openssl
+    - name: Cache Vcpkg
+      id: cache-aquarius
+      uses: actions/cache@v4
+      env:
+        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      with:
+        path: |
+            ${{ env.VCPKG_ROOT }}
+            ${{ github.workspace }}/vcpkg_installed
+            !${{ env.VCPKG_ROOT }}/.git
+            ${{ env.VCPKG_ROOT }}/buildtrees
+            ${{ env.VCPKG_ROOT }}/packages
+            ${{ env.VCPKG_ROOT }}/downloads
+        key: |
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-win
+
+    - name: config vcpkg
       shell: bash
       run: |
-        git clone https://github.com/microsoft/vcpkg.git
+        git clone https://github.com/microsoft/vcpkg.git temp
+        mkdir -p vcpkg
+        mv temp/.git vcpkg/.git
         cd vcpkg
         git pull
+        git checkout .
         ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Configure CMake
@@ -59,12 +81,10 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DBOOST_SHARED_FLAG=true
-        -DAQUARIUS_ENABLE_SSL=true
         -S ${{ github.workspace }}
         -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
         
-
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}

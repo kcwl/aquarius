@@ -9,23 +9,19 @@ set(AQUARIUS_NEED_BOOST
 	system
 )
 
-find_package(Boost CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
+find_package(Boost 1.88 CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
 
-if(Boost_FOUND)
-message(STATUS "Found Boost ${Boost_VERSION}")
+if(NOT Boost_FOUND)
+message(FATAR_ERROR "Found Boost ${Boost_VERSION}")
+return()
 endif()
+
+message(STATUS "Found Boost ${Boost_VERSION}")
 
 add_library(boost INTERFACE)
 
-if(WIN32)
-target_link_directories(boost INTERFACE ${Boost_LIBRARIES})
-else()
-target_link_libraries(boost INTERFACE ${Boost_LIBRARIES})
-endif()
+target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system)
 
-if(BOOST_SHARED_FLAG)
-target_compile_definitions(boost INTERFACE -DBOOST_LOG_DYN_LINK)
-endif()
-
+target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})

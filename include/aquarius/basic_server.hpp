@@ -69,14 +69,16 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto conn_ptr = std::make_shared<session_type>(std::move(sock));
+				auto session_ptr = std::make_shared<session_type>(std::move(sock));
 
-				co_spawn(conn_ptr->get_executor(), [conn_ptr] { return conn_ptr->accept(); }, detached);
+				detail::store<session_type>(session_ptr);
 
-				detail::store<session_type>(conn_ptr);
+				co_spawn(
+					acceptor_.get_executor(), [session_ptr] -> awaitable<error_code>
+					{
+						co_return co_await session_ptr->accept();
+					}, detached);
 			}
-
-			co_return;
 		}
 
 		void init_signal()
