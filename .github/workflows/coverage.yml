@@ -97,6 +97,7 @@ jobs:
         -DCMAKE_COVERAGE=true
         -S ${{ github.workspace }}
         -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
