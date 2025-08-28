@@ -3,23 +3,34 @@
 #include <aquarius/detail/router.hpp>
 #include <ranges>
 #include <virgo.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
 {
 	template <bool Server>
 	class http
 	{
+	public:
 		constexpr static std::size_t max_http_length = 8192;
 
-	public:
+		using socket = boost::asio::ip::tcp::socket;
+
+		using endpoint = boost::asio::ip::tcp::endpoint;
+
+		using acceptor = boost::asio::ip::tcp::acceptor;
+
+		using resolver = boost::asio::ip::tcp::resolver;
+
+		using no_delay = boost::asio::ip::tcp::no_delay;
+
+		using keep_alive = boost::asio::socket_base::keep_alive;
+
 		using header = virgo::http::detail::basic_header<Server>;
 
 	public:
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			co_await session_ptr->service().start(session_ptr->implementation());
-
 			error_code ec;
 
 			for (;;)
@@ -42,13 +53,24 @@ namespace aquarius
 			std::unreachable();
 		}
 
+	public:
+		static endpoint make_v4_endpoint(uint16_t port)
+		{
+			return endpoint(boost::asio::ip::tcp::v4(), port);
+		}
+
+		static endpoint make_v6_endpoint(uint16_t port)
+		{
+			return endpoint(boost::asio::ip::tcp::v6(), port);
+		}
+
 	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
 		{
 			std::vector<char> buffer(max_http_length);
 
-			co_await session_ptr->service().async_read_some(session_ptr->implementation(), buffer, ec);
+			ec = co_await session_ptr->async_read_some(buffer);
 
 			if (ec)
 			{

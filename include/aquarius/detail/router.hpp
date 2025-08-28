@@ -20,7 +20,7 @@ namespace aquarius
 
 			using header = typename Session::header;
 
-			using body_buffer = std::vector<char>;
+			using body_buffer = std::span<char>;
 
 			using function_type = std::function<bool(std::shared_ptr<Session>, body_buffer, typename Session::header)>;
 
