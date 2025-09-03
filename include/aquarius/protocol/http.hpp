@@ -2,7 +2,6 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/router.hpp>
 #include <ranges>
-#include <virgo.hpp>
 
 namespace aquarius
 {

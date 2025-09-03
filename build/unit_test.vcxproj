@@ -198,13 +198,13 @@
     <ClInclude Include="..\include\aquarius\noncopyable.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
-    <ClInclude Include="..\include\aquarius\flow\future_flow.hpp" />
-    <ClInclude Include="..\include\aquarius\flow\raw_buffer_flow.hpp" />
-    <ClInclude Include="..\include\aquarius\flow\stream_flow.hpp" />
     <ClInclude Include="..\include\aquarius\protocol\http.hpp" />
     <ClInclude Include="..\include\aquarius\protocol\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\post.hpp" />
+    <ClInclude Include="..\include\aquarius\router\basic_router.hpp" />
+    <ClInclude Include="..\include\aquarius\router\reverse_router.hpp" />
+    <ClInclude Include="..\include\aquarius\router\type.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\traits\async.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />

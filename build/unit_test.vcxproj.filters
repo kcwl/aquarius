@@ -25,9 +25,6 @@
     <Filter Include="include\aquarius\executor">
       <UniqueIdentifier>{f3091b2d-b1ee-4a0f-a6cb-f3a2f3ad48a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\flow">
-      <UniqueIdentifier>{b532fa9d-76f7-4dc3-b926-e795e769733c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\concepts">
       <UniqueIdentifier>{a39d9acf-9805-4827-bc60-9a28116f83e9}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,9 @@
     </Filter>
     <Filter Include="include\aquarius\virgo\impl">
       <UniqueIdentifier>{9070cef0-8bbc-4fa3-b29f-88db23fc6d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\router">
+      <UniqueIdentifier>{b532fa9d-76f7-4dc3-b926-e795e769733c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,15 +74,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\flow\future_flow.hpp">
-      <Filter>include\aquarius\flow</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\flow\raw_buffer_flow.hpp">
-      <Filter>include\aquarius\flow</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\flow\stream_flow.hpp">
-      <Filter>include\aquarius\flow</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\awaitable.hpp">
       <Filter>include\aquarius</Filter>
@@ -305,6 +296,15 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\basic_protocol_message.hpp">
       <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\basic_router.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\reverse_router.hpp">
+      <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\router\type.hpp">
+      <Filter>include\aquarius\router</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
