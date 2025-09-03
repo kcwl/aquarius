@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;../src;E:\常用软件\Visual Leak Detector\include;E:\openssl-lib\include;$(SolutionDir)../3rd/virgo/include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -209,6 +209,24 @@
     <ClInclude Include="..\include\aquarius\traits\async.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\basic_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\basic_protocol_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\concepts.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_header_fileds.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\impl\tcp_custom_header.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\json.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\reflection.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_status.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\tcp_header.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
     <ClInclude Include="..\test\adaptor.h" />
     <ClInclude Include="..\test\attribute.h" />
     <ClInclude Include="..\test\client.h" />
