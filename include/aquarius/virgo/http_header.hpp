@@ -2,9 +2,9 @@
 #include <iostream>
 #include <ranges>
 #include <vector>
-#include <virgo/http/method.hpp>
-#include <virgo/http/status.hpp>
-#include <virgo/http/version.hpp>
+#include <aquarius/virgo/http_method.hpp>
+#include <aquarius/virgo/http_status.hpp>
+#include <aquarius/virgo/http_version.hpp>
 
 using namespace std::string_view_literals;
 
@@ -13,13 +13,13 @@ namespace aquarius
 	namespace virgo
 	{
 		template <bool Request>
-		class basic_header;
+		class http_header;
 
 		template <>
-		class basic_header<true>
+		class http_header<true>
 		{
 		public:
-			basic_header() = default;
+			http_header() = default;
 
 		public:
 			std::ostream operator<<(std::ostream& os) const
@@ -76,32 +76,32 @@ namespace aquarius
 			}
 
 		public:
-			http::method method() const
+			http_method method() const
 			{
 				return method_;
 			}
 
-			http::method& method()
+			http_method& method()
 			{
 				return method_;
 			}
 
-			void method(http::method m)
+			void method(http_method m)
 			{
 				method_ = m;
 			}
 
-			http::version version() const
+			http_version version() const
 			{
 				return version_;
 			}
 
-			http::version& version()
+			http_version& version()
 			{
 				return version_;
 			}
 
-			void version(http::version v)
+			void version(http_version v)
 			{
 				version_ = v;
 			}
@@ -137,15 +137,15 @@ namespace aquarius
 			}
 
 		private:
-			void parse_method(std::string_view method, http::method& m)
+			void parse_method(std::string_view method, http_method& m)
 			{
 				if (method == "POST"sv)
 				{
-					m = http::method::post;
+					m = http_method::post;
 				}
 				else if (method == "GET"sv)
 				{
-					m = http::method::get;
+					m = http_method::get;
 				}
 			}
 
@@ -178,7 +178,7 @@ namespace aquarius
 				return true;
 			}
 
-			bool parse_version(std::string_view buf, http::version& version)
+			bool parse_version(std::string_view buf, http_version& version)
 			{
 				auto iter = std::find_if(buf.begin(), buf.end(), [](const auto c) { return c == '.'; });
 
@@ -188,11 +188,11 @@ namespace aquarius
 				{
 					if (ver == "HTTP2")
 					{
-						version = http::version::http2;
+						version = http_version::http2;
 					}
 					else if (ver == "HTTP3")
 					{
-						version = http::version::http3;
+						version = http_version::http3;
 					}
 					else
 					{
@@ -205,11 +205,11 @@ namespace aquarius
 
 					if (std::atoi(suffix.data()) == 1)
 					{
-						version = http::version::http1_1;
+						version = http_version::http1_1;
 					}
 					else if (std::atoi(suffix.data()) == 0)
 					{
-						version = http::version::http1_0;
+						version = http_version::http1_0;
 					}
 					else
 					{
@@ -275,9 +275,9 @@ namespace aquarius
 			};
 
 		private:
-			http::method method_;
+			http_method method_;
 
-			http::version version_;
+			http_version version_;
 
 			std::string path_;
 
@@ -285,23 +285,23 @@ namespace aquarius
 		};
 
 		template <>
-		class basic_header<false>
+		class http_header<false>
 		{
 		public:
-			basic_header() = default;
+			http_header() = default;
 
 		public:
-			http::status result() const
+			http_status result() const
 			{
 				return status_;
 			}
 
-			http::status& result()
+			http_status& result()
 			{
 				return status_;
 			}
 
-			void result(http::status s)
+			void result(http_status s)
 			{
 				status_ = s;
 			}
@@ -321,17 +321,17 @@ namespace aquarius
 				reason_ = r;
 			}
 
-			http::version version() const
+			http_version version() const
 			{
 				return version_;
 			}
 
-			http::version& version()
+			http_version& version()
 			{
 				return version_;
 			}
 
-			void version(http::version v)
+			void version(http_version v)
 			{
 				version_ = v;
 			}
@@ -353,11 +353,11 @@ namespace aquarius
 			{}
 
 		private:
-			http::status status_;
+			http_status status_;
 
 			std::string_view reason_;
 
-			http::version version_;
+			http_version version_;
 		};
 	} // namespace virgo
 } // namespace aquarius

@@ -97,7 +97,13 @@ namespace aquarius
 			req->mark(complete_buffer);
 			auto header_size = complete_buffer.size();
 			req->rpc(RPC::id);
-			req->commit(complete_buffer);
+			auto result = req->commit(complete_buffer);
+
+			if (!result.has_value())
+			{
+				co_return;
+			}
+
 			req->length(complete_buffer.size() - header_size);
 			req->header().commit(complete_buffer);
 

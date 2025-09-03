@@ -1,8 +1,7 @@
 #pragma once
-#include <aquarius/flow/raw_buffer_flow.hpp>
 #include <aquarius/handler.hpp>
-#include <virgo.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/virgo/tcp_header.hpp>
 
 namespace aquarius
 {
@@ -18,7 +17,7 @@ namespace aquarius
 
 		using resolver = boost::asio::ip::tcp::resolver;
 
-		using header = virgo::tcp::detail::layer_header;
+		using header = virgo::tcp_header<true>;
 
 		using no_delay = boost::asio::ip::tcp::no_delay;
 
@@ -90,15 +89,11 @@ namespace aquarius
 				co_return;
 			}
 
-			std::string_view rpc_id = h.transfer() ? h.rpc() : rpc_transfer_flow::id;
-
 			co_spawn(
 				session_ptr->get_executor(),
-				[buffer = std::move(body_buffer), session_ptr, h = std::move(h),
-				 rpc_id]() mutable -> awaitable<void>
+				[buffer = std::move(body_buffer), session_ptr, h = std::move(h)]() mutable -> awaitable<void>
 				{
-					detail::router<Session>::get_mutable_instance().invoke(rpc_id, session_ptr, std::move(buffer),
-																			   h);
+					detail::router<Session>::get_mutable_instance().invoke(h.rpc(), session_ptr, std::move(buffer), h);
 					co_return;
 				},
 				detached);

@@ -246,12 +246,6 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_message.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\binary.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\concepts.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
@@ -259,9 +253,6 @@
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_message.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\json.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
@@ -305,6 +296,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\router\type.hpp">
       <Filter>include\aquarius\router</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\binary.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\json.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

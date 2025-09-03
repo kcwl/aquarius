@@ -156,6 +156,8 @@
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\detail\attribute.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\json.hpp" />
     <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
     <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp" />
@@ -211,13 +213,10 @@
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_message.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_protocol_message.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\binary.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header_fileds.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_message.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\impl\tcp_custom_header.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\json.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\reflection.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />

@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/handler.hpp>
-#include <aquarius/flow/raw_buffer_flow.hpp>
 
 #define AQUARIUS_CONTEXT_BY(__session, method, __rpc)                                                                  \
 	class method;                                                                                                      \

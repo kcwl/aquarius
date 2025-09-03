@@ -1,10 +1,12 @@
 #pragma once
 #include <aquarius.hpp>
-#include <virgo.hpp>
+#include <aquarius/virgo/tcp_request.hpp>
+#include <aquarius/virgo/tcp_response.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <string_view>
+#include <aquarius/virgo/impl/tcp_custom_header.hpp>
 
 using namespace std::string_view_literals;
 
@@ -55,13 +57,11 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 	return os;
 }
 
-
-
 struct rpc_test
 {
 	constexpr static auto id = "1001"sv;
-	using request = virgo::tcp::request<person>;
-	using response = virgo::tcp::response<person>;
+	using request = aquarius::virgo::tcp_request<aquarius::virgo::custom_request_header, person>;
+	using response = aquarius::virgo::tcp_response<aquarius::virgo::custom_response_header, person>;
 };
 
 AQUARIUS_TCP_HANDLER(ctx_test, rpc_test)

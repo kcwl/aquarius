@@ -50,7 +50,7 @@ namespace aquarius
 					return result;
 				}
 
-				result = this->body()->commit(buffer);
+				result = this->body().commit(buffer);
 
 				if (!result.has_value())
 				{

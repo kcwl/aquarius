@@ -113,7 +113,13 @@ namespace aquarius
 			virtual auto make_response(error_code ec) -> awaitable<void> override
 			{
 				std::vector<char> body_buff{};
-				this->response().commit(body_buff);
+				auto result = this->response().commit(body_buff);
+
+				if (!result.has_value())
+				{
+					co_return;
+				}
+
 				this->response().length(body_buff.size());
 				this->response().rpc(this->message()->rpc());
 				std::vector<char> header_buff{};

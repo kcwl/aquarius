@@ -1,5 +1,4 @@
 #pragma once
-#include <virgo/detail/config.hpp>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -10,7 +9,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		enum class status : uint32_t
+		enum class http_status : uint32_t
 		{
 			unknown = 0,
 
@@ -82,72 +81,72 @@ namespace aquarius
 			network_authentication_required = 511
 		};
 
-		inline std::string_view get_http_status_string(status s)
+		inline std::string_view get_http_status_string(http_status s)
 		{
-			static const std::map<status, std::string_view> statuses = {
-				{ status::unknown, "unknown" },
-				{ status::continue_, "Continue" },
-				{ status::switching_protocols, "Switching Protocols" },
-				{ status::processing, "Processing" },
-				{ status::early_hints, "Early Hints" },
-				{ status::ok, "OK" },
-				{ status::created, "Created" },
-				{ status::accepted, "Accepted" },
-				{ status::non_authoritative_information, "Non Authoritative Information" },
-				{ status::no_content, "No Content" },
-				{ status::reset_content, "Reset Content" },
-				{ status::partial_content, "Partial Content" },
-				{ status::multi_status, "Multi Status" },
-				{ status::already_reported, "Already Reported" },
-				{ status::im_used, "IM Used" },
-				{ status::multiple_choices, "Multiple Choices" },
-				{ status::moved_permanently, "Moved Permanently" },
-				{ status::found, "Found" },
-				{ status::see_other, "See Other" },
-				{ status::not_modified, "Not Modified" },
-				{ status::use_proxy, "Use Proxy" },
-				{ status::temporary_redirect, "Temporary Redirect" },
-				{ status::permanent_redirect, "Permanent Redirect" },
-				{ status::bad_request, "Bad Request" },
-				{ status::unauthorized, "Unauthorized" },
-				{ status::payment_required, "Payment Required" },
-				{ status::forbidden, "Forbidden" },
-				{ status::not_found, "Not Found" },
-				{ status::method_not_allowed, "Method Not Allowed" },
-				{ status::not_acceptable, "Not Acceptable" },
-				{ status::proxy_authentication_required, "Proxy Authentication Required" },
-				{ status::request_timeout, "Request Timeout" },
-				{ status::conflict, "Conflict" },
-				{ status::gone, "Gone" },
-				{ status::length_required, "Length Required" },
-				{ status::precondition_failed, "Precondition Failed" },
-				{ status::payload_too_large, "Payload Too Large" },
-				{ status::uri_too_long, "Uri Too Long" },
-				{ status::unsupported_media_type, "Unsupported Media Type" },
-				{ status::range_not_satisfiable, "Range Not Satisfiable" },
-				{ status::expectation_failed, "Expectation Failed" },
-				{ status::i_am_a_teapot, "I'm a teapot" },
-				{ status::misdirected_request, "Misdirected Request" },
-				{ status::unprocessable_entity, "Unprocessable Entity" },
-				{ status::locked, "Locked" },
-				{ status::failed_dependency, "Failed Dependency" },
-				{ status::too_early, "too_early" },
-				{ status::upgrade_required, "upgrade_required" },
-				{ status::precondition_required, "precondition_required" },
-				{ status::too_many_requests, "too_many_requests" },
-				{ status::request_header_fields_too_large, "request_header_fields_too_large" },
-				{ status::unavailable_for_legal_reasons, "unavailable_for_legal_reasons" },
-				{ status::internal_server_error, "internal_server_error" },
-				{ status::not_implemented, "not_implemented" },
-				{ status::bad_gateway, "bad_gateway" },
-				{ status::service_unavailable, "service_unavailable" },
-				{ status::gateway_timeout, "gateway_timeout" },
-				{ status::http_version_not_supported, "http_version_not_supported" },
-				{ status::variant_also_negotiates, "variant_also_negotiates" },
-				{ status::insufficient_storage, "insufficient_storage" },
-				{ status::loop_detected, "loop_detected" },
-				{ status::not_extended, "not_extended" },
-				{ status::network_authentication_required, "network_authentication_required" }
+			static const std::map<http_status, std::string_view> statuses = {
+				{ http_status::unknown, "unknown" },
+				{ http_status::continue_, "Continue" },
+				{ http_status::switching_protocols, "Switching Protocols" },
+				{ http_status::processing, "Processing" },
+				{ http_status::early_hints, "Early Hints" },
+				{ http_status::ok, "OK" },
+				{ http_status::created, "Created" },
+				{ http_status::accepted, "Accepted" },
+				{ http_status::non_authoritative_information, "Non Authoritative Information" },
+				{ http_status::no_content, "No Content" },
+				{ http_status::reset_content, "Reset Content" },
+				{ http_status::partial_content, "Partial Content" },
+				{ http_status::multi_status, "Multi Status" },
+				{ http_status::already_reported, "Already Reported" },
+				{ http_status::im_used, "IM Used" },
+				{ http_status::multiple_choices, "Multiple Choices" },
+				{ http_status::moved_permanently, "Moved Permanently" },
+				{ http_status::found, "Found" },
+				{ http_status::see_other, "See Other" },
+				{ http_status::not_modified, "Not Modified" },
+				{ http_status::use_proxy, "Use Proxy" },
+				{ http_status::temporary_redirect, "Temporary Redirect" },
+				{ http_status::permanent_redirect, "Permanent Redirect" },
+				{ http_status::bad_request, "Bad Request" },
+				{ http_status::unauthorized, "Unauthorized" },
+				{ http_status::payment_required, "Payment Required" },
+				{ http_status::forbidden, "Forbidden" },
+				{ http_status::not_found, "Not Found" },
+				{ http_status::method_not_allowed, "Method Not Allowed" },
+				{ http_status::not_acceptable, "Not Acceptable" },
+				{ http_status::proxy_authentication_required, "Proxy Authentication Required" },
+				{ http_status::request_timeout, "Request Timeout" },
+				{ http_status::conflict, "Conflict" },
+				{ http_status::gone, "Gone" },
+				{ http_status::length_required, "Length Required" },
+				{ http_status::precondition_failed, "Precondition Failed" },
+				{ http_status::payload_too_large, "Payload Too Large" },
+				{ http_status::uri_too_long, "Uri Too Long" },
+				{ http_status::unsupported_media_type, "Unsupported Media Type" },
+				{ http_status::range_not_satisfiable, "Range Not Satisfiable" },
+				{ http_status::expectation_failed, "Expectation Failed" },
+				{ http_status::i_am_a_teapot, "I'm a teapot" },
+				{ http_status::misdirected_request, "Misdirected Request" },
+				{ http_status::unprocessable_entity, "Unprocessable Entity" },
+				{ http_status::locked, "Locked" },
+				{ http_status::failed_dependency, "Failed Dependency" },
+				{ http_status::too_early, "too_early" },
+				{ http_status::upgrade_required, "upgrade_required" },
+				{ http_status::precondition_required, "precondition_required" },
+				{ http_status::too_many_requests, "too_many_requests" },
+				{ http_status::request_header_fields_too_large, "request_header_fields_too_large" },
+				{ http_status::unavailable_for_legal_reasons, "unavailable_for_legal_reasons" },
+				{ http_status::internal_server_error, "internal_server_error" },
+				{ http_status::not_implemented, "not_implemented" },
+				{ http_status::bad_gateway, "bad_gateway" },
+				{ http_status::service_unavailable, "service_unavailable" },
+				{ http_status::gateway_timeout, "gateway_timeout" },
+				{ http_status::http_version_not_supported, "http_version_not_supported" },
+				{ http_status::variant_also_negotiates, "variant_also_negotiates" },
+				{ http_status::insufficient_storage, "insufficient_storage" },
+				{ http_status::loop_detected, "loop_detected" },
+				{ http_status::not_extended, "not_extended" },
+				{ http_status::network_authentication_required, "network_authentication_required" }
 			};
 			return statuses.at(s);
 		}
@@ -164,17 +163,17 @@ namespace aquarius
 
 			[[nodiscard]] std::string message(int err_code) const override
 			{
-				return std::string(get_http_status_string(static_cast<status>(err_code)).data());
+				return std::string(get_http_status_string(static_cast<http_status>(err_code)).data());
 			}
 		};
 
 		template <typename ErrorCode>
-		inline ErrorCode make_error_code(status result)
+		inline ErrorCode make_error_code(http_status result)
 		{
 			return ErrorCode(std::error_code(static_cast<int>(result), http_statue_category()));
 		}
 
-		enum class status_class : unsigned
+		enum class http_status_class : unsigned
 		{
 			unknown = 0,
 

@@ -2,6 +2,7 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/router.hpp>
 #include <ranges>
+#include <aquarius/virgo/http_header.hpp>
 
 namespace aquarius
 {
@@ -11,7 +12,7 @@ namespace aquarius
 		constexpr static std::size_t max_http_length = 8192;
 
 	public:
-		using header = virgo::http::detail::basic_header<Server>;
+		using header = virgo::http_header<Server>;
 
 	public:
 		template <typename Session>

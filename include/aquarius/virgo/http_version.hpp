@@ -1,12 +1,11 @@
 #pragma once
 #include <ostream>
-#include <virgo/detail/config.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		enum class version
+		enum class http_version
 		{
 			http1_0,
 			http1_1,
@@ -14,24 +13,24 @@ namespace aquarius
 			http3
 		};
 
-		inline std::ostream& operator<<(std::ostream& os, version v)
+		inline std::ostream& operator<<(std::ostream& os, http_version v)
 		{
 			os << static_cast<int>(v);
 
 			return os;
 		}
 
-		inline std::string version_to_string(version v)
+		inline std::string version_to_string(http_version v)
 		{
 			switch (v)
 			{
-			case version::http1_0:
+			case http_version::http1_0:
 				return "HTTP/1.0";
-			case version::http1_1:
+			case http_version::http1_1:
 				return "HTTP/1.1";
-			case version::http2:
+			case http_version::http2:
 				return "HTTP/2";
-			case version::http3:
+			case http_version::http3:
 				return "HTTP/3";
 			}
 
