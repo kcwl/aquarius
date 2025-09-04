@@ -1,4 +1,0 @@
-
-[submodule "3rd/virgo"]
-	path = 3rd/virgo
-	url = https://github.com/kcwl/virgo.git
