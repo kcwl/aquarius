@@ -20,7 +20,7 @@ namespace aquarius
 			return os;
 		}
 
-		inline std::string version_to_string(http_version v)
+		inline std::string from_version_string(http_version v)
 		{
 			switch (v)
 			{

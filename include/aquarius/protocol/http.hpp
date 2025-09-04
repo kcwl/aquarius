@@ -21,8 +21,6 @@ namespace aquarius
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			co_await session_ptr->start();
-
 			error_code ec;
 
 			for (;;)
@@ -33,7 +31,6 @@ namespace aquarius
 				{
 					if (ec != boost::asio::error::eof)
 					{
-						XLOG_ERROR() << "on read some occur error - " << ec.what();
 					}
 
 					session_ptr->shutdown();
@@ -57,61 +54,25 @@ namespace aquarius
 			{
 				if (ec != boost::asio::error::eof)
 				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 				session_ptr->shutdown();
 				co_return;
 			}
 
-			auto [header_span, next_span] = parse_header_span(buffer);
-
-			header h{};
-
-			if (h.consume(header_span))
-			{
-				if (!h.path().empty())
+			co_spawn(
+				session_ptr->get_executor(),
+				[session_ptr, buffer = std::move(buffer)]() mutable -> awaitable<void>
 				{
-					co_spawn(
-						session_ptr->get_executor(),
-						[next_span, session_ptr = session_ptr->shared_from_this(),
-						 h = std::move(h)]() mutable -> awaitable<void>
-						{
-							detail::router<Session>::get_mutable_instance().invoke(h.path(), session_ptr, next_span, h);
-							co_return;
-						},
-						detached);
-				}
-			}
-		}
+					header h{};
 
-		template <typename BufferSequence>
-		auto parse_header_span(BufferSequence& buffer) -> std::pair<std::span<char>, std::span<char>>
-		{
-			constexpr std::string_view delm = "\r\n";
+					auto result = h.consume(buffer);
 
-			constexpr auto delm_size = delm.size();
+					if (!result.has_value())
+						co_return;
 
-			auto buf_span = std::span<char>(buffer);
-
-			auto buf_view = buf_span | std::views::slide(delm_size);
-
-			auto itor = std::ranges::find_if(buf_view,
-											 [](const auto& v)
-											 {
-												 if (v.size() < delm_size)
-													 return false;
-
-												 return std::string_view(v) == delm;
-											 });
-
-			if (itor == buf_view.end())
-				return {};
-
-			auto header_line_pos = std::distance(buf_view.begin(), itor);
-
-			auto header_line_span = buf_span.subspan(0, header_line_pos);
-
-			return { header_line_span, buf_span.subspan(header_line_pos + 2) };
+					detail::router<Session>::get_mutable_instance().invoke(h.path(), session_ptr, buffer, h);
+				},
+				detached);
 		}
 	};
 } // namespace aquarius

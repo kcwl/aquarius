@@ -18,14 +18,14 @@ namespace aquarius
 			{
 				int32_t version_;
 				int32_t transfer_;
-				std::string_view rpc_;
+				uint32_t rpc_;
 				uint64_t length_;
 				uint32_t crc_;
 				int64_t timestamp_;
 			};
 
 		public:
-			constexpr static std::size_t impl_size = sizeof(implement);
+			constexpr static auto impl_size = sizeof(implement);
 
 		public:
 			tcp_header() = default;
@@ -38,12 +38,6 @@ namespace aquarius
 				os << "version: " << impl_.version_ << " transfer: " << impl_.transfer_ << " rpc: " << impl_.rpc_
 				   << " length: " << impl_.length_ << " crc: " << impl_.crc_ << " timestamp: " << impl_.timestamp_;
 				return os;
-			}
-
-			template <typename BufferSequence>
-			void mark(BufferSequence& buffer)
-			{
-				buffer.resize(impl_size);
 			}
 
 		public:
@@ -67,12 +61,12 @@ namespace aquarius
 				impl_.transfer_ = transfer;
 			}
 
-			std::string_view rpc() const
+			uint32_t rpc() const
 			{
 				return impl_.rpc_;
 			}
 
-			void rpc(std::string_view rpc_id)
+			void rpc(uint32_t rpc_id)
 			{
 				impl_.rpc_ = rpc_id;
 			}
@@ -106,30 +100,42 @@ namespace aquarius
 				impl_.timestamp_ = timestamp;
 			}
 
-			template <typename BuffSequence>
-			void commit(BuffSequence& buffer)
+			template<typename T>
+			void mark(detail::flex_buffer<T>& buffer)
 			{
-				to_binary(impl_.version_, buffer);
-				to_binary(impl_.transfer_, buffer);
-				to_binary(impl_.rpc_, buffer);
-				to_binary(impl_.length_, buffer);
-				to_binary(impl_.crc_, buffer);
-				to_binary(impl_.timestamp_, buffer);
+				buffer.commit(sizeof(implement));
 			}
 
-			template <typename BuffSequence>
-			void consume(BuffSequence& buffer)
+			template <typename T>
+			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
 			{
-				impl_.version_ = from_binary<int32_t>(buffer);
-				impl_.transfer_ = from_binary<int32_t>(buffer);
-				impl_.rpc_ = from_binary<std::string_view>(buffer);
-				impl_.length_ = from_binary<uint64_t>(buffer);
-				impl_.crc_ = from_binary<uint32_t>(buffer);
-				impl_.timestamp_ = from_binary<int64_t>(buffer);
+				parse_.to_datas(impl_.version_, buffer);
+				parse_.to_datas(impl_.transfer_, buffer);
+				parse_.to_datas(impl_.rpc_, buffer);
+				parse_.to_datas(impl_.length_, buffer);
+				parse_.to_datas(impl_.crc_, buffer);
+				parse_.to_datas(impl_.timestamp_, buffer);
+
+				return true;
+			}
+
+			template <typename T>
+			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
+			{
+				impl_.version_ = parse_.from_datas<int32_t>(buffer);
+				impl_.transfer_ = parse_.from_datas<int32_t>(buffer);
+				impl_.rpc_ = parse_.from_datas<uint32_t>(buffer);
+				impl_.length_ = parse_.from_datas<uint64_t>(buffer);
+				impl_.crc_ = parse_.from_datas<uint32_t>(buffer);
+				impl_.timestamp_ = parse_.from_datas<int64_t>(buffer);
+
+				return true;
 			}
 
 		private:
 			implement impl_;
+
+			detail::binary_parse parse_;
 		};
 
 		template<>
@@ -140,7 +146,7 @@ namespace aquarius
 				int32_t result_;
 				int32_t version_;
 				int32_t transfer_;
-				std::string_view rpc_;
+				uint32_t rpc_;
 				uint64_t length_;
 				uint32_t crc_;
 				int64_t timestamp_;
@@ -199,12 +205,12 @@ namespace aquarius
 				impl_.transfer_ = transfer;
 			}
 
-			std::string_view rpc() const
+			uint32_t rpc() const
 			{
 				return impl_.rpc_;
 			}
 
-			void rpc(std::string_view rpc_id)
+			void rpc(uint32_t rpc_id)
 			{
 				impl_.rpc_ = rpc_id;
 			}
@@ -238,32 +244,44 @@ namespace aquarius
 				impl_.timestamp_ = timestamp;
 			}
 
-			template <typename BuffSequence>
-			void commit(BuffSequence& buffer)
+			template<typename T>
+			void mark(detail::flex_buffer<T>& buffer)
 			{
-				to_binary(impl_.result_, buffer);
-				to_binary(impl_.version_, buffer);
-				to_binary(impl_.transfer_, buffer);
-				to_binary(impl_.rpc_, buffer);
-				to_binary(impl_.length_, buffer);
-				to_binary(impl_.crc_, buffer);
-				to_binary(impl_.timestamp_, buffer);
+				buffer.commit(sizeof(implement));
 			}
 
-			template <typename BuffSequence>
-			void consume(BuffSequence& buffer)
+			template <typename T>
+			std::expected<bool,error_code> commit(detail::flex_buffer<T>& buffer)
 			{
-				impl_.result_ = from_binary<int32_t>(buffer);
-				impl_.version_ = from_binary<int32_t>(buffer);
-				impl_.transfer_ = from_binary<int32_t>(buffer);
-				impl_.rpc_ = from_binary<std::string_view>(buffer);
-				impl_.length_ = from_binary<uint64_t>(buffer);
-				impl_.crc_ = from_binary<uint32_t>(buffer);
-				impl_.timestamp_ = from_binary<int64_t>(buffer);
+				parse_.to_datas(impl_.result_, buffer);
+				parse_.to_datas(impl_.version_, buffer);
+				parse_.to_datas(impl_.transfer_, buffer);
+				parse_.to_datas(impl_.rpc_, buffer);
+				parse_.to_datas(impl_.length_, buffer);
+				parse_.to_datas(impl_.crc_, buffer);
+				parse_.to_datas(impl_.timestamp_, buffer);
+
+				return true;
+			}
+
+			template <typename T>
+			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
+			{
+				impl_.result_ = parse_.from_datas<int32_t>(buffer);
+				impl_.version_ = parse_.from_datas<int32_t>(buffer);
+				impl_.transfer_ = parse_.from_datas<int32_t>(buffer);
+				impl_.rpc_ = parse_.from_datas<uint32_t>(buffer);
+				impl_.length_ = parse_.from_datas<uint64_t>(buffer);
+				impl_.crc_ = parse_.from_datas<uint32_t>(buffer);
+				impl_.timestamp_ = parse_.from_datas<int64_t>(buffer);
+
+				return true;
 			}
 
 		private:
 			implement impl_;
+
+			detail::binary_parse parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

@@ -64,8 +64,9 @@ namespace aquarius
 		{
 			constexpr auto header_length = header::impl_size;
 
-			std::vector<char> header_buffer(header_length);
-			ec = co_await session_ptr->async_read(header_buffer);
+			detail::flex_buffer<char> header_buffer;
+
+			ec = co_await session_ptr->async_read(header_buffer, header_length);
 			if (ec)
 			{
 				if (ec != boost::asio::error::eof)
@@ -76,9 +77,13 @@ namespace aquarius
 				co_return;
 			}
 			header h{};
-			h.consume(header_buffer);
-			std::vector<char> body_buffer(h.length());
-			ec = co_await session_ptr->async_read(body_buffer);
+			auto result = h.consume(header_buffer);
+
+			if (!result.has_value())
+				co_return;
+
+			detail::flex_buffer<char> body_buffer{};
+			ec = co_await session_ptr->async_read(body_buffer, h.length());
 			if (ec)
 			{
 				if (ec != boost::asio::error::eof)
@@ -93,7 +98,7 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[buffer = std::move(body_buffer), session_ptr, h = std::move(h)]() mutable -> awaitable<void>
 				{
-					detail::router<Session>::get_mutable_instance().invoke(h.rpc(), session_ptr, std::move(buffer), h);
+					detail::router<Session>::get_mutable_instance().invoke(std::to_string(h.rpc()), session_ptr, std::move(buffer));
 					co_return;
 				},
 				detached);

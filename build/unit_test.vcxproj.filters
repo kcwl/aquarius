@@ -303,6 +303,9 @@
     <ClInclude Include="..\include\aquarius\detail\json.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

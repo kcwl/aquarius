@@ -112,7 +112,7 @@ namespace aquarius
 		public:
 			virtual auto make_response(error_code ec) -> awaitable<void> override
 			{
-				std::vector<char> body_buff{};
+				detail::flex_buffer<char> body_buff{};
 				auto result = this->response().commit(body_buff);
 
 				if (!result.has_value())
@@ -120,11 +120,15 @@ namespace aquarius
 					co_return;
 				}
 
-				this->response().length(body_buff.size());
+				this->response().length(body_buff.active());
 				this->response().rpc(this->message()->rpc());
-				std::vector<char> header_buff{};
-				this->response().header().commit(header_buff);
-				header_buff.insert(header_buff.end(), body_buff.begin(), body_buff.end());
+				detail::flex_buffer<char> header_buff{};
+				result = this->response().header().commit(header_buff);
+
+				if (!result.has_value())
+					co_return;
+
+				header_buff.append(std::move(body_buff));
 
 				co_await this->session()->async_send(std::move(header_buff));
 			}
@@ -158,7 +162,7 @@ namespace aquarius
 		template <typename Protocol, typename RPC, typename Context>
 		struct auto_handler_register
 		{
-			explicit auto_handler_register(std::string_view proto)
+			explicit auto_handler_register(const std::string& proto)
 			{
 				router<Protocol>::get_mutable_instance().template regist<RPC, Context>(proto);
 			}

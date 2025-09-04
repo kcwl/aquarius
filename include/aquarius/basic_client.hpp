@@ -15,6 +15,7 @@
 #include <iostream>
 #include <map>
 #include <boost/asio/connect.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -93,9 +94,9 @@ namespace aquarius
 		template <typename RPC>
 		auto async_send(std::shared_ptr<typename RPC::request> req) -> awaitable<void>
 		{
-			std::vector<char> complete_buffer;
+			detail::flex_buffer<char> complete_buffer;
 			req->mark(complete_buffer);
-			auto header_size = complete_buffer.size();
+			auto header_size = complete_buffer.active();
 			req->rpc(RPC::id);
 			auto result = req->commit(complete_buffer);
 
@@ -104,8 +105,11 @@ namespace aquarius
 				co_return;
 			}
 
-			req->length(complete_buffer.size() - header_size);
-			req->header().commit(complete_buffer);
+			req->length(complete_buffer.active() - header_size);
+			result = req->header().commit(complete_buffer);
+
+			if (!result.has_value())
+				co_return;
 
 			co_return co_await transfer(std::move(complete_buffer));
 		}

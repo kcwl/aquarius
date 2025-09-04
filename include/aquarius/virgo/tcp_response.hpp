@@ -8,6 +8,6 @@ namespace aquarius
 	namespace virgo
 	{
 		template <typename Header, typename Body>
-		using tcp_response = basic_protocol_message<false, Header, tcp_header, Body, binary_parse>;
+		using tcp_response = basic_protocol_message<false, Header, tcp_header, Body, detail::binary_parse>;
 	}
 } // namespace aquarius

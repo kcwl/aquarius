@@ -59,7 +59,7 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 
 struct rpc_test
 {
-	constexpr static auto id = "1001"sv;
+	constexpr static auto id = 1001;
 	using request = aquarius::virgo::tcp_request<aquarius::virgo::custom_request_header, person>;
 	using response = aquarius::virgo::tcp_response<aquarius::virgo::custom_response_header, person>;
 };

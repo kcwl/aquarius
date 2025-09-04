@@ -1,5 +1,6 @@
 #pragma once
 #include <ostream>
+#include <string>
 
 namespace aquarius
 {
@@ -18,5 +19,22 @@ namespace aquarius
 
 			return os;
 		}
+
+		std::string from_method_string(http_method m)
+		{
+			switch (m)
+			{
+				case http_method::get:
+					return "GET";
+				case http_method::post:
+					return "POST";
+				case http_method::unknown:
+				default:
+					break;
+			}
+
+			return "UNKNOWN";
+		}
+
 	} // namespace virgo
 } // namespace aquarius

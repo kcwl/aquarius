@@ -33,8 +33,8 @@ namespace aquarius
 			}
 
 		public:
-			template <typename BufferSequence>
-			std::expected<bool, std::string> commit(BufferSequence& buffer)
+			template <typename T>
+			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
 			{
 				auto result = base_header::commit(buffer);
 
@@ -50,32 +50,22 @@ namespace aquarius
 					return result;
 				}
 
-				result = this->body().commit(buffer);
-
-				if (!result.has_value())
-				{
-					return result;
-				}
+				parse_.to_datas(this->body(), buffer);
 
 				return true;
 			}
 
 			template <typename T>
-			std::expected<bool, std::string> consume(std::span<T> sp)
+			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
 			{
-				auto result = this->header().consume(sp);
+				auto result = this->header().consume(buffer);
 
 				if (!result.has_value())
 				{
 					return result;
 				}
 
-				result = this->body().consume(sp);
-
-				if (!result.has_value())
-				{
-					return result;
-				}
+				this->body() = parse_.from_datas<Body>(buffer);
 
 				return true;
 			}

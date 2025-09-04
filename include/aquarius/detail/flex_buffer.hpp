@@ -13,11 +13,11 @@ namespace aquarius
 		{
 			constexpr static std::size_t capacity = 8192;
 
-			using impl_type = std::vector<T>;
+			using impl_type = std::array<T, capacity>;
 
 		public:
 			flex_buffer()
-				: buffer_(capacity)
+				: buffer_()
 				, wpos_(0)
 				, rpos_(0)
 			{}
@@ -43,6 +43,16 @@ namespace aquarius
 				return buffer_.data() + wpos_;
 			}
 
+			T* data()
+			{
+				return buffer_.data();
+			}
+
+			const T* data() const
+			{
+				return buffer_.data();
+			}
+
 			std::size_t active() const
 			{
 				return wpos_ - rpos_;
@@ -58,6 +68,11 @@ namespace aquarius
 				size < remain() ? wpos_ += size : 0;
 			}
 
+			void consume(std::size_t size)
+			{
+				size < active() ? rpos_ += size : 0;
+			}
+
 			T peek()
 			{
 				return buffer_[rpos_];
@@ -65,11 +80,37 @@ namespace aquarius
 
 			T get()
 			{
-				T result = peek();
+				if (rpos_ >= capacity)
+				{
+					return T{ -1 };
+				}
 
-				rpos_++;
+				return buffer_[rpos_++];
+			}
 
-				return result;
+			void put(T value)
+			{
+				constexpr auto size = sizeof(T);
+
+				if (size < remain())
+					return;
+
+				std::memcpy(wdata(), &value, size);
+
+				commit(size);
+			}
+
+			template<typename V>
+			void append(flex_buffer<V>&& buffer)
+			{
+				if (buffer.active() > remain())
+					return;
+
+				auto buf = flex_buffer<T>(std::move(buffer));
+
+				std::memcpy(wdata(), buf.rdata(), buf.active());
+
+				commit(buf.active());
 			}
 
 		private:

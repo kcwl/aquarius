@@ -89,32 +89,32 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		template <typename BufferSequence>
-		auto async_read(BufferSequence& buff) -> awaitable<error_code>
+		template <typename T>
+		auto async_read(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			boost::asio::async_read(socket_, boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
+			boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		template <typename BufferSequence>
-		auto async_read_some(BufferSequence& buff) -> awaitable<error_code>
+		template <typename T>
+		auto async_read_some(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			co_await socket_.async_read_some(boost::asio::buffer(buff), redirect_error(use_awaitable, ec));
+			co_await socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		template <typename BufferSequence>
-		auto async_send(BufferSequence buffer) -> awaitable<void>
+		template <typename T>
+		auto async_send(detail::flex_buffer<T> buffer) -> awaitable<void>
 		{
 			error_code ec{};
 
-			co_await socket_.async_write_some(boost::asio::buffer(buffer), redirect_error(use_awaitable, ec));
+			co_await socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 		}
 
 		void shutdown()
@@ -268,33 +268,35 @@ namespace aquarius
 			return ssl_socket_.lowest_layer().remote_endpoint().port();
 		}
 
-		template <typename BufferSequence>
-		auto async_read(BufferSequence& buffer) -> awaitable<error_code>
+		template <typename T>
+		auto async_read(detail::flex_buffer<T>& buffer, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(buffer),
+			length > buffer.remain() ? length = buffer.remain() : length;
+
+			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(buffer.rdata(), length),
 											 redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		template <typename BufferSequence>
-		auto async_read_some(BufferSequence& buffer) -> awaitable<error_code>
+		template <typename T>
+		auto async_read_some(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			co_await ssl_socket_.async_read_some(boost::asio::buffer(buffer), redirect_error(use_awaitable, ec));
+			co_await ssl_socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		template <typename BufferSequence>
-		auto async_send(BufferSequence buffer) -> awaitable<error_code>
+		template <typename T>
+		auto async_send(detail::flex_buffer<T> buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 
-			co_await ssl_socket_.async_write_some(boost::asio::buffer(buffer), redirect_error(use_awaitable, ec));
+			co_await ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}

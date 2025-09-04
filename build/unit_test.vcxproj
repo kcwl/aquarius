@@ -157,6 +157,7 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\detail\attribute.hpp" />
     <ClInclude Include="..\include\aquarius\detail\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\json.hpp" />
     <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />

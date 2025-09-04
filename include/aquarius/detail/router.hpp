@@ -20,9 +20,9 @@ namespace aquarius
 
 			using header = typename Session::header;
 
-			using body_buffer = std::vector<char>;
+			using body_buffer = flex_buffer<char>;
 
-			using function_type = std::function<bool(std::shared_ptr<Session>, body_buffer, typename Session::header)>;
+			using function_type = std::function<bool(std::shared_ptr<Session>, body_buffer)>;
 
 			using func_trie = detail::trie<function_type>;
 
@@ -35,30 +35,36 @@ namespace aquarius
 
 		public:
 			template <typename RPC, typename Context>
-			void regist(std::string_view proto)
+			void regist(const std::string& proto)
 			{
-				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer, header h)
+				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer)
 				{
-					auto req = std::make_shared<typename RPC::request>(h);
-					req->consume(buffer);
-					post(session->get_executor(),
-						 [=]
-						 {
-							 co_spawn(
-								 session->get_executor(),
-								 [session, req]() mutable -> awaitable<void>
-								 {
-									 co_await std::make_shared<Context>()->visit(session, req);
-								 },
-								 detached);
-						 });
+					auto req = std::make_shared<typename RPC::request>();
+
+					auto result = req->consume(buffer);
+
+					if (result.has_value())
+					{
+						post(session->get_executor(),
+							 [=]
+							 {
+								 co_spawn(
+									 session->get_executor(),
+									 [session, req] () mutable -> awaitable<void>
+									 {
+										 co_await std::make_shared<Context>()->visit(session, req);
+									 },
+									 detached);
+							 });
+					}
+
 					return true;
 				};
 				this->map_invokes_->add(proto, func);
 			}
 
 			template<typename... Args>
-			bool invoke(std::string_view key, Args... args)
+			bool invoke(const std::string& key, Args... args)
 			{
 				auto func = this->map_invokes_->find(key);
 

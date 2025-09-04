@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <iostream>
+#include <aquarius/detail/binary.hpp>
 
 namespace aquarius
 {
@@ -26,20 +27,26 @@ namespace aquarius
 				return os;
 			}
 
-			template <typename BuffSequence>
-			void commit(BuffSequence& buffer)
+			template <typename T>
+			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
 			{
-				to_binary(uuid_, buffer);
+				parse_.to_datas(uuid_, buffer);
+
+				return true;
 			}
 
-			template <typename BuffSequence>
-			void consume(BuffSequence& buffer)
+			template <typename T>
+			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
 			{
-				uuid_ = from_binary<uint64_t>(buffer);
+				uuid_ = parse_.from_datas<uint64_t>(buffer);
+
+				return true;
 			}
 
 		private:
 			uint64_t uuid_;
+
+			detail::binary_parse parse_;
 		};
 
 		class custom_response_header
@@ -71,24 +78,31 @@ namespace aquarius
 			}
 
 			template <typename BuffSequence>
-			void commit(BuffSequence& buffer)
+			std::expected<bool, error_code> commit(BuffSequence& buffer)
 			{
-				to_binary(uuid_, buffer);
+				parse_.to_datas(uuid_, buffer);
 
-				to_binary(result_, buffer);
+				parse_.to_datas(result_, buffer);
+
+				return true;
 			}
 
 			template <typename BuffSequence>
-			void consume(BuffSequence& buffer)
+			std::expected<bool, error_code> consume(BuffSequence& buffer)
 			{
-				uuid_ = from_binary<uint64_t>(buffer);
+				uuid_ = parse_.from_datas<uint64_t>(buffer);
 
-				result_ = from_binary<int32_t>(buffer);
+				result_ = parse_.from_datas<int32_t>(buffer);
+
+				return true;
 			}
 
 		private:
 			uint64_t uuid_;
+
 			int32_t result_;
+
+			detail::binary_parse parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius
