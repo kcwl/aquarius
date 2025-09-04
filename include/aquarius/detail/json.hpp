@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace virgo
+	namespace detail
 	{
 		struct json_parse
 		{

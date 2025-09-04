@@ -3,6 +3,7 @@
 #include <aquarius/detail/router.hpp>
 #include <ranges>
 #include <aquarius/virgo/http_header.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -11,6 +12,8 @@ namespace aquarius
 	{
 		constexpr static std::size_t max_http_length = 8192;
 
+		using buffer_t = detail::flex_buffer<char>;
+
 	public:
 		using header = virgo::http_header<Server>;
 
@@ -18,7 +21,7 @@ namespace aquarius
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			co_await session_ptr->service().start(session_ptr->implementation());
+			co_await session_ptr->start();
 
 			error_code ec;
 
@@ -35,20 +38,20 @@ namespace aquarius
 
 					session_ptr->shutdown();
 
-					co_return ec;
+					break;
 				}
 			}
 
-			std::unreachable();
+			co_return ec;
 		}
 
 	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
 		{
-			std::vector<char> buffer(max_http_length);
+			buffer_t buffer{};
 
-			co_await session_ptr->service().async_read_some(session_ptr->implementation(), buffer, ec);
+			ec = co_await session_ptr->async_read_some(buffer);
 
 			if (ec)
 			{
