@@ -162,9 +162,6 @@
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_session_service.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -205,9 +202,6 @@
       <Filter>include\aquarius\protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\io_context.hpp">
@@ -304,6 +298,9 @@
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>

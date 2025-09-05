@@ -20,7 +20,7 @@ namespace aquarius
 			return os;
 		}
 
-		std::string from_method_string(http_method m)
+		inline std::string from_method_string(http_method m)
 		{
 			switch (m)
 			{

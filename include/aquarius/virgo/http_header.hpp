@@ -79,7 +79,7 @@ namespace aquarius
 			}
 
 			template <typename T>
-			std::expected<bool, std::string> consume(detail::flex_buffer<T>& buffer)
+			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
 			{
 				auto result = parse_method(buffer);
 
@@ -164,8 +164,8 @@ namespace aquarius
 			template <typename T>
 			std::expected<bool, error_code> parse_method(detail::flex_buffer<T>& buffer)
 			{
-				return read_value<' '>(buffer).and_then(
-					[&](const auto& value)
+				return read_value<T, ' '>(buffer).and_then(
+					[&](const auto& value) -> std::expected<bool, error_code>
 					{
 						if (value == "POST")
 						{
@@ -177,7 +177,7 @@ namespace aquarius
 						}
 						else
 						{
-							return std::unexpected(http_status::bad_request);
+							return std::unexpected(error_code(http_status::bad_request));
 						}
 
 						return true;
@@ -194,15 +194,21 @@ namespace aquarius
 							querys_.push_back({});
 							return parse_querys(buffer, querys_.back());
 						})
-					.and_then([&](char end)
-							  { return end == '#' || end == ' ' ? true : std::unexpected(http_status::bad_request); });
+					.and_then(
+						[&](char end) -> std::expected<bool, error_code>
+						{
+							if (end == '#' || end == ' ')
+								return true;
+
+							return std::unexpected(error_code(http_status::bad_request));
+						});
 			}
 
 			template <typename T>
 			std::expected<bool, error_code> parse_version(detail::flex_buffer<T>& buffer)
 			{
 				return read_value<T, '\r'>(buffer).and_then(
-					[&](const auto& value)
+					[&](const auto& value) -> std::expected<bool, error_code>
 					{
 						auto pos = value.find('.');
 						if (pos == std::string::npos)
@@ -223,7 +229,7 @@ namespace aquarius
 						else
 						{
 							auto suffix = value.substr(pos + 1);
-							if (suffix.data() == 1)
+							if (*suffix.data() == 1)
 							{
 								version_ = http_version::http1_1;
 							}
@@ -271,15 +277,20 @@ namespace aquarius
 
 				while (buffer.peek() != T(-1))
 				{
-					result = read_value<'='>(buffer)
+					result = read_value<T, '='>(buffer)
 								 .and_then(
 									 [&](const auto& value)
 									 {
 										 query.first = value;
 
-										 return read_value<'&', ' '>(buffer);
+										 return read_value<T, '&', ' '>(buffer);
 									 })
-								 .adn_then([&](const auto& value) { query.second = value; });
+								 .and_then(
+									 [&](const auto& value) -> std::expected<bool, error_code>
+									 {
+										 query.second = value;
+										 return true;
+									 });
 
 					if (!result.has_value())
 						break;

@@ -70,7 +70,7 @@ namespace aquarius
 					if (!result.has_value())
 						co_return;
 
-					detail::router<Session>::get_mutable_instance().invoke(h.path(), session_ptr, buffer, h);
+					detail::router<Session>::get_mutable_instance().invoke(h.path(), session_ptr, buffer);
 				},
 				detached);
 		}

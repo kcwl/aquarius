@@ -47,17 +47,6 @@ namespace aquarius
 			}
 		}
 
-	public:
-		static endpoint make_v4_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v4(), port);
-		}
-
-		static endpoint make_v6_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v6(), port);
-		}
-
 	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>

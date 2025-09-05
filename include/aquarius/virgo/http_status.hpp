@@ -167,10 +167,9 @@ namespace aquarius
 			}
 		};
 
-		template <typename ErrorCode>
-		inline ErrorCode make_error_code(http_status result)
+		inline error_code make_error_code(http_status result)
 		{
-			return ErrorCode(std::error_code(static_cast<int>(result), http_statue_category()));
+			return error_code(std::error_code(static_cast<int>(result), http_statue_category()));
 		}
 
 		enum class http_status_class : unsigned
@@ -189,3 +188,12 @@ namespace aquarius
 		};
 	} // namespace virgo
 } // namespace aquarius
+
+namespace std
+{
+	template<>
+	struct is_error_code_enum<aquarius::virgo::http_status> : std::true_type
+	{
+
+	};
+}

@@ -8,6 +8,7 @@
 #include <span>
 #include <aquarius/detail/ssl_context.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
 {
@@ -22,13 +23,13 @@ namespace aquarius
 
 		constexpr static auto is_server = Server;
 
-		using socket = typename protocol::socket;
+		using socket = boost::asio::ip::tcp::socket;
 
-		using endpoint = typename protocol::endpoint;
+		using endpoint = boost::asio::ip::tcp::endpoint;
 
-		using acceptor = typename protocol::acceptor;
+		using acceptor = boost::asio::ip::tcp::acceptor;
 
-		using resolver = typename protocol::resolver;
+		using resolver = boost::asio::ip::tcp::resolver;
 
 		using header = typename protocol::header;
 
@@ -138,7 +139,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol::keep_alive(value), ec);
+			socket_.set_option(typename boost::asio::socket_base::keep_alive(value), ec);
 
 			return !ec;
 		}
@@ -147,7 +148,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol::no_delay(enable), ec);
+			socket_.set_option(typename boost::asio::ip::tcp::no_delay(enable), ec);
 
 			return !ec;
 		}

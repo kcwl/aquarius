@@ -159,9 +159,9 @@
     <ClInclude Include="..\include\aquarius\detail\binary.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\json.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\basic_ssl_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visit.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
@@ -187,7 +187,6 @@
     <ClInclude Include="..\include\aquarius\detail\sql_keyword.hpp" />
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\basic_session_service.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\detail\signal_set.hpp" />
     <ClInclude Include="..\include\aquarius\detail\trie.hpp" />
