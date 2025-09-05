@@ -91,11 +91,11 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_read(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
+		auto async_read(detail::flex_buffer<T>& buffer, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
+			boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), length), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
@@ -105,7 +105,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
+			co_await socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.remain()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}

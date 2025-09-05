@@ -175,6 +175,10 @@ namespace aquarius
 						{
 							method_ = http_method::get;
 						}
+						else if (value == "OPTIONS")
+						{
+							method_ = http_method::options;
+						}
 						else
 						{
 							return std::unexpected(error_code(http_status::bad_request));
@@ -187,21 +191,23 @@ namespace aquarius
 			template <typename T>
 			std::expected<bool, error_code> parse_uri(detail::flex_buffer<T>& buffer)
 			{
-				return parse_path(buffer)
-					.and_then(
-						[&](char end)
-						{
-							querys_.push_back({});
-							return parse_querys(buffer, querys_.back());
-						})
-					.and_then(
-						[&](char end) -> std::expected<bool, error_code>
-						{
-							if (end == '#' || end == ' ')
-								return true;
+				return parse_path(buffer).and_then(
+					[&] (char end) -> std::expected<bool, error_code>
+					{
+						if (end == ' ')
+							return true;
 
-							return std::unexpected(error_code(http_status::bad_request));
-						});
+						querys_.push_back({});
+						return parse_querys(buffer, querys_.back())
+							.and_then(
+								[&] (char end) -> std::expected<bool, error_code>
+								{
+									if (end == '#' || end == ' ')
+										return true;
+
+									return std::unexpected(error_code(http_status::bad_request));
+								});
+					});
 			}
 
 			template <typename T>
@@ -229,7 +235,7 @@ namespace aquarius
 						else
 						{
 							auto suffix = value.substr(pos + 1);
-							if (*suffix.data() == 1)
+							if (*suffix.data() == '1')
 							{
 								version_ = http_version::http1_1;
 							}
@@ -251,13 +257,13 @@ namespace aquarius
 				if (c != '/')
 					return std::unexpected(http_status::bad_request);
 
-				path_.push_back('/');
+				path_.push_back(buffer.get());
 
 				while (buffer.peek() != T(-1))
 				{
 					c = buffer.get();
 
-					if (c == '?' || c == '#')
+					if (c == '?' || c == '#' || c == ' ')
 						break;
 
 					if (!std::isalnum(c) && (c != '_'))

@@ -10,6 +10,7 @@ namespace aquarius
 		{
 			get,
 			post,
+			options,
 			unknown
 		};
 
