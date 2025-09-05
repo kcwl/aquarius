@@ -65,7 +65,7 @@ namespace aquarius
 					return result;
 				}
 
-				this->body() = parse_.from_datas<Body>(buffer);
+				this->body() = parse_.template from_datas<Body>(buffer);
 
 				return true;
 			}

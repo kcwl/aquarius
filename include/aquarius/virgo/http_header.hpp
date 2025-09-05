@@ -191,8 +191,8 @@ namespace aquarius
 					.and_then(
 						[&](char end)
 						{
-							querys.push_back({});
-							return parse_querys(buffer, querys.back());
+							querys_.push_back({});
+							return parse_querys(buffer, querys_.back());
 						})
 					.and_then([&](char end)
 							  { return end == '#' || end == ' ' ? true : std::unexpected(http_status::bad_request); });
@@ -225,11 +225,11 @@ namespace aquarius
 							auto suffix = value.substr(pos + 1);
 							if (suffix.data() == 1)
 							{
-								version = http_version::http1_1;
+								version_ = http_version::http1_1;
 							}
 							else
 							{
-								version = http_version::http1_0;
+								version_ = http_version::http1_0;
 							}
 						}
 
@@ -245,7 +245,7 @@ namespace aquarius
 				if (c != '/')
 					return std::unexpected(http_status::bad_request);
 
-				path.push_back('/');
+				path_.push_back('/');
 
 				while (buffer.peek() != T(-1))
 				{
