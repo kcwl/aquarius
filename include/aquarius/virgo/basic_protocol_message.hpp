@@ -32,45 +32,7 @@ namespace aquarius
 				return header_;
 			}
 
-		public:
-			template <typename T>
-			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
-			{
-				auto result = base_header::commit(buffer);
-
-				if (!result.has_value())
-				{
-					return result;
-				}
-
-				result = this->header().commit(buffer);
-
-				if (!result.has_value())
-				{
-					return result;
-				}
-
-				parse_.to_datas(this->body(), buffer);
-
-				return true;
-			}
-
-			template <typename T>
-			std::expected<bool, error_code> consume(detail::flex_buffer<T>& buffer)
-			{
-				auto result = this->header().consume(buffer);
-
-				if (!result.has_value())
-				{
-					return result;
-				}
-
-				this->body() = parse_.template from_datas<Body>(buffer);
-
-				return true;
-			}
-
-		private:
+		protected:
 			header_t header_;
 
 			Parse parse_;

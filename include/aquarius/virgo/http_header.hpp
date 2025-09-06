@@ -8,6 +8,7 @@
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/virgo/parse_helper.hpp>
 
 using namespace std::string_view_literals;
 
@@ -181,7 +182,7 @@ namespace aquarius
 						}
 						else
 						{
-							return std::unexpected(error_code(http_status::bad_request));
+							return std::unexpected(make_error_code(http_status::bad_request));
 						}
 
 						return true;
@@ -205,7 +206,7 @@ namespace aquarius
 									if (end == '#' || end == ' ')
 										return true;
 
-									return std::unexpected(error_code(http_status::bad_request));
+									return std::unexpected(make_error_code(http_status::bad_request));
 								});
 					});
 			}
@@ -229,7 +230,7 @@ namespace aquarius
 							}
 							else
 							{
-								return std::unexpected(http_status::bad_request);
+								return std::unexpected(make_error_code(http_status::bad_request));
 							}
 						}
 						else
@@ -245,6 +246,8 @@ namespace aquarius
 							}
 						}
 
+						buffer.consume(1);
+
 						return true;
 					});
 			}
@@ -255,7 +258,7 @@ namespace aquarius
 				auto c = buffer.peek();
 
 				if (c != '/')
-					return std::unexpected(http_status::bad_request);
+					return std::unexpected(make_error_code(http_status::bad_request));
 
 				path_.push_back(buffer.get());
 
@@ -267,7 +270,7 @@ namespace aquarius
 						break;
 
 					if (!std::isalnum(c) && (c != '_'))
-						return std::unexpected(http_status::bad_request);
+						return std::unexpected(make_error_code(http_status::bad_request));
 
 					path_.push_back(c);
 				}
@@ -307,22 +310,6 @@ namespace aquarius
 
 				return result;
 			};
-
-			template <typename T, char... SP>
-			std::expected<std::string, error_code> read_value(detail::flex_buffer<T>& buffer)
-			{
-				std::string value{};
-				while (buffer.peek() != T(-1))
-				{
-					auto c = buffer.get();
-					if (((c == SP) || ...))
-						return value;
-
-					value.push_back(c);
-				}
-
-				return std::unexpected(http_status::bad_request);
-			}
 
 		private:
 			http_method method_;
@@ -397,7 +384,7 @@ namespace aquarius
 
 				if (header_str.size() > buffer.remain())
 				{
-					return std::unexpected(http_status::bad_request);
+					return std::unexpected(make_error_code(http_status::bad_request));
 				}
 
 				std::memcpy(buffer.wdata(), header_str.c_str(), header_str.size());
@@ -430,7 +417,7 @@ namespace aquarius
 						{
 							reason_ = value;
 
-							return buffer.peek() == '\n' ? buffer.get() : std::unexpected(http_status::bad_request);
+							return buffer.peek() == '\n' ? buffer.get() : std::unexpected(make_error_code(http_status::bad_request));
 						});
 			}
 

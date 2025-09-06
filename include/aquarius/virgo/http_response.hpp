@@ -1,12 +1,11 @@
 #pragma once
-#include <aquarius/virgo/basic_protocol_message.hpp>
-#include <aquarius/virgo/http_header.hpp>
+#include <aquarius/virgo/basic_http_message.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
 		template <typename Header, typename Body>
-		using response = basic_protocol_message<false, Header, http_header, Body>;
+		using http_response = basic_http_message<false, Header, Body>;
 	}
 } // namespace aquarius

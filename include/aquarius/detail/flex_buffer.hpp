@@ -2,7 +2,6 @@
 #include <vector>
 #include <expected>
 #include <string>
-#include <span>
 
 namespace aquarius
 {
@@ -13,14 +12,32 @@ namespace aquarius
 		{
 			constexpr static std::size_t capacity = 8192;
 
-			using impl_type = std::array<T, capacity>;
+			using impl_type = std::vector<T>;
 
 		public:
 			flex_buffer()
-				: buffer_()
+				: buffer_(capacity)
 				, wpos_(0)
 				, rpos_(0)
 			{}
+
+			flex_buffer(flex_buffer&& other)
+				: buffer_(std::move(other.buffer_))
+				, wpos_(std::exchange(other.wpos_, 0))
+				, rpos_(std::exchange(other.rpos_, 0))
+			{
+
+			}
+
+			flex_buffer(const flex_buffer& other)
+			{
+				if (this != std::addressof(other))
+				{
+					buffer_ = other.buffer_;
+					wpos_ = other.wpos_;
+					rpos_ = other.rpos_;
+				}
+			}
 
 		public:
 			T* rdata()
@@ -111,6 +128,11 @@ namespace aquarius
 				std::memcpy(wdata(), buf.rdata(), buf.active());
 
 				commit(buf.active());
+			}
+
+			bool empty() const
+			{
+				return rpos_ == wpos_;
 			}
 
 		private:

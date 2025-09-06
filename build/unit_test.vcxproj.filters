@@ -243,10 +243,7 @@
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_header_fileds.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_message.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\basic_http_message.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
@@ -302,6 +299,21 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp">
       <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\parse_helper.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\impl\http_options.hpp">
+      <Filter>include\aquarius\virgo\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\basic_tcp_message.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\null_header.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\null_body.hpp">
+      <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

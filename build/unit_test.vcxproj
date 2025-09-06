@@ -213,11 +213,15 @@
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_message.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_protocol_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\basic_tcp_message.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\http_header_fileds.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\http_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\basic_http_message.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\impl\http_options.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\impl\tcp_custom_header.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\null_body.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\null_header.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\parse_helper.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\reflection.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />

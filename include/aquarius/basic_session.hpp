@@ -95,7 +95,9 @@ namespace aquarius
 		{
 			error_code ec;
 
-			boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), length), redirect_error(use_awaitable, ec));
+			auto read_size = co_await boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), length), redirect_error(use_awaitable, ec));
+
+			buffer.commit(read_size);
 
 			co_return ec;
 		}
@@ -105,7 +107,9 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.remain()), redirect_error(use_awaitable, ec));
+			auto read_size = co_await socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.remain()), redirect_error(use_awaitable, ec));
+
+			buffer.commit(read_size);
 
 			co_return ec;
 		}
@@ -116,6 +120,11 @@ namespace aquarius
 			error_code ec{};
 
 			co_await socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
+
+			if (ec)
+			{
+				std::cout << ec.what() << std::endl;
+			}
 		}
 
 		void shutdown()
