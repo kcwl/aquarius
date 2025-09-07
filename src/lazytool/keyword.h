@@ -2,63 +2,66 @@
 #include "scope.h"
 #include <string>
 #include <expected>
+#include "error.hpp"
 
-namespace virgo
+namespace aquarius
 {
-	class keyword
+	namespace virgo
 	{
-	public:
-		virtual void generate(std::fstream& /*ofs_h*/, std::fstream& /*ofs_s*/) {}
-	};
+		class proto_keyword
+		{
+		public:
+			virtual void generate(std::fstream& /*ofs_h*/, std::fstream& /*ofs_s*/)
+			{}
+		};
 
-	class protocol : public keyword
-	{
-	public:
-		std::expected<std::string, std::string> parse(std::fstream& ifs, std::size_t& column, std::size_t& row);
+		class protocol : public proto_keyword
+		{
+		public:
+			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t& column, std::size_t& row);
 
-		void generate(std::fstream& ofs_h, std::fstream& ofs_s);
+			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
 
-	public:
-		std::string name_;
+		public:
+			std::string name_;
 
-		proto request_;
+			proto request_;
 
-		proto response_;
+			proto response_;
 
-		router router_;
-	};
+			router router_;
+		};
 
-	class structure : public keyword
-	{
-	public:
-		structure() = default;
+		class structure : public proto_keyword
+		{
+		public:
+			structure() = default;
 
-	public:
-		std::expected<bool, std::string> parse(std::fstream& ifs, std::size_t column, std::size_t row);
+		public:
+			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
-		void generate(std::fstream& ofs_h, std::fstream& ofs_s);
+			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
 
-	private:
-		std::string name_;
+		private:
+			std::string name_;
 
-		std::vector<std::pair<std::string, std::string>> scopes_;
-	};
+			std::vector<std::pair<std::string, std::string>> scopes_;
+		};
 
-	class enum_struct : public keyword
-	{
-	public:
-		enum_struct() = default;
+		class enum_struct : public proto_keyword
+		{
+		public:
+			enum_struct() = default;
 
-	public:
-		std::expected<std::string, std::string> parse(std::fstream& ifs, std::size_t column, std::size_t row);
+		public:
+			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
-		void generate(std::fstream& ofs_h, std::fstream& ofs_s);
+			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
 
-	private:
-		std::string name_;
+		private:
+			std::string name_;
 
-		std::vector<std::string> scopes_;
-	};
-
-	bool check_keyword_type(const std::string& name);
-} // namespace virgo
+			std::vector<std::string> scopes_;
+		};
+	} // namespace virgo
+} // namespace aquarius

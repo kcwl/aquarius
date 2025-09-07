@@ -1,7 +1,10 @@
 #pragma once
 #include <string>
 
-namespace virgo
+namespace aquarius
 {
-	std::string log(const std::string& func_name, const std::string& str, std::size_t column, std::size_t row);
-} // namespace virgo
+	namespace virgo
+	{
+		std::string log(const std::string& func_name, const std::string& str, std::size_t column, std::size_t row);
+	} // namespace virgo
+} // namespace aquarius

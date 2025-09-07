@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\cpp_generate.h" />
+    <ClInclude Include="..\src\lazytool\error.hpp" />
     <ClInclude Include="..\src\lazytool\keyword.h" />
     <ClInclude Include="..\src\lazytool\keyword_impl.h" />
     <ClInclude Include="..\src\lazytool\log.h" />
