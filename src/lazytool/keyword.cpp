@@ -68,22 +68,18 @@ namespace aquarius
 					});
 		}
 
-		void protocol::generate(std::fstream& ofs_h, std::fstream& ofs_s)
+		void protocol::generate(std::fstream& ofs_h)
 		{
 			ofs_h << "struct " << name_ << "_protocol\n";
 			ofs_h << "{\n";
+			request_.generate(name_, ofs_h);
+			response_.generate(name_, ofs_h);
 			ofs_h << "    static constexpr const char* router() { return \"" << router_.value() << "\"; }\n";
-			ofs_h << "    struct " << request_.name() << ";\n";
-			ofs_h << "    struct " << response_.name() << ";\n";
-			ofs_h << "    using request = aquarius::virgo::" << router_.type() << "_request<" << request_.name()
-				  << ">;\n";
-			ofs_h << "    using response = aquarius::virgo::" << router_.type() << "_response<" << request_.name()
-				  << ">;\n";
+			ofs_h << "    using request = aquarius::virgo::" << router_.type() << "_request<" << request_.name()<<"::header, " << request_.name() <<"::body>;\n";
+			ofs_h << "    using response = aquarius::virgo::" << router_.type() << "_response<" << response_.name() << "::header, " << response_.name() << "::body>;\n";
 			ofs_h << "};\n";
 
-			request_.generate(name_, ofs_s);
 
-			response_.generate(name_, ofs_s);
 		}
 
 		std::expected<std::string, parse_error> structure::parse(std::fstream& ifs, std::size_t column, std::size_t row)

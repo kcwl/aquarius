@@ -86,24 +86,20 @@ namespace aquarius
 
 			std::fstream ofs_h(header_file, std::ios::out);
 
-			std::fstream ofs_s(src_file, std::ios::out);
-
-			if (!ofs_h.is_open() || !ofs_s.is_open())
+			if (!ofs_h.is_open())
 				return false;
 
 			ofs_h << "#pragma once\n";
 
 			for (auto& s : proto_types)
 			{
-				ofs_h << "#include <aquarius/" << s << "_request.hpp>\n";
-				ofs_h << "#include <aquarius/" << s << "_response.hpp>\n\n";
+				ofs_h << "#include <aquarius/virgo/" << s << "_request.hpp>\n";
+				ofs_h << "#include <aquarius/virgo/" << s << "_response.hpp>\n\n";
 			}
-
-			ofs_s << "#include <" << out_path.filename().string() << ".h>\n\n";
 
 			for (auto& p : pros_)
 			{
-				p->generate(ofs_h, ofs_s);
+				p->generate(ofs_h);
 			}
 
 			return true;

@@ -12,7 +12,7 @@ namespace aquarius
 		class proto_keyword
 		{
 		public:
-			virtual void generate(std::fstream& /*ofs_h*/, std::fstream& /*ofs_s*/)
+			virtual void generate(std::fstream& /*ofs_h*/)
 			{}
 		};
 
@@ -21,7 +21,7 @@ namespace aquarius
 		public:
 			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t& column, std::size_t& row, std::set<std::string>& proto_types);
 
-			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
+			void generate(std::fstream& ofs_h);
 
 		public:
 			std::string name_;
