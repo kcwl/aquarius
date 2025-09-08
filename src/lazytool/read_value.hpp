@@ -16,9 +16,8 @@ namespace aquarius
 			path
 		};
 
-		template <char... end>
-		std::expected<std::string, parse_error> read_value(std::fstream& ifs, std::size_t& column, std::size_t& row,
-														   token t = token::value)
+		template <token Token, char... end>
+		std::expected<std::string, parse_error> read_value(std::fstream& ifs, std::size_t& column, std::size_t& row)
 		{
 			std::string value{};
 			auto offset = ifs.tellg();
@@ -27,36 +26,47 @@ namespace aquarius
 
 			while (!ifs.eof())
 			{
-				column++;
-
-				c = ifs.get();
+				c = ifs.peek();
 
 				if (c == -1)
-					return std::unexpected(parse_error::eof);
+					return std::unexpected(parse_error::success);
 
-				if (std::isalnum(c) || (t == token::value && (c == '_' || std::isalnum(c))) ||
-					(t == token::key && c == '-') || (t == token::path && ((c != end) && ...)))
+				column++;
+
+				if (((c == end) || ...))
 				{
-					value += static_cast<char>(c);
+					ifs.get();
+					return value;
+				}
+
+				if (std::isspace(c))
+				{
+					if (c == '\n')
+					{
+						column = 0;
+						row++;
+					}
+
+					ifs.get();
 
 					continue;
 				}
 
-				if (((c == end) || ...))
+				if constexpr (Token == token::value)
 				{
-					return value;
+					if (c != '_' && !std::isalnum(c))
+						break;
+				}
+				else if constexpr (Token == token::key)
+				{
+					if (!std::isalpha(c) && c != '-')
+						break;
+				}
+				else if constexpr (Token == token::path)
+				{
 				}
 
-				if (c != '\t' && c != '\n' && c != '\r' && c != ' ')
-				{
-					break;
-				}
-
-				if (c == '\n')
-				{
-					column = 0;
-					row++;
-				}
+				value += static_cast<char>(ifs.get());
 			}
 
 			auto length = ifs.tellg() - offset;
@@ -80,18 +90,18 @@ namespace aquarius
 					return true;
 				}
 
-				if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
+				if (!std::isspace(c))
 				{
 					break;
 				}
 
 				if (c == '\n')
 				{
-					column++;
-					row = 0;
+					column = 0;
+					row++;
 				}
 
-				row++;
+				column++;
 			}
 
 			auto length = ifs.tellg() - offset;

@@ -1,6 +1,7 @@
 #pragma once
 #include "registor.h"
 #include "keyword.h"
+#include <set>
 
 namespace aquarius
 {
@@ -22,6 +23,8 @@ namespace aquarius
 			std::size_t column_;
 
 			std::size_t row_;
+
+			std::set<std::string> proto_types;
 		};
 	} // namespace virgo
 } // namespace aquarius

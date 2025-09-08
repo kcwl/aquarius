@@ -20,7 +20,7 @@ namespace aquarius
 						   [this](std::fstream& ifs)
 						   {
 							   auto proto_ptr = std::make_shared<protocol>();
-							   proto_ptr->parse(ifs, column_, row_);
+							   proto_ptr->parse(ifs, column_, row_, proto_types);
 							   pros_.push_back(proto_ptr);
 						   });
 
@@ -54,7 +54,7 @@ namespace aquarius
 
 			while (!ifs.eof())
 			{
-				auto result = read_value<' '>(ifs, column_, row_, token::key)
+				auto result = read_value<token::key, ' '>(ifs, column_, row_)
 								  .and_then(
 									  [&](const auto& value) -> std::expected<std::string, parse_error>
 									  {
@@ -67,6 +67,9 @@ namespace aquarius
 
 				if (result.has_value())
 					continue;
+
+				if (result.error() == parse_error::success)
+					break;
 
 				std::cout << result.error() << std::endl;
 
@@ -89,7 +92,13 @@ namespace aquarius
 				return false;
 
 			ofs_h << "#pragma once\n";
-			ofs_h << "#include <virgo.hpp>\n\n";
+
+			for (auto& s : proto_types)
+			{
+				ofs_h << "#include <aquarius/" << s << "_request.hpp>\n";
+				ofs_h << "#include <aquarius/" << s << "_response.hpp>\n\n";
+			}
+
 			ofs_s << "#include <" << out_path.filename().string() << ".h>\n\n";
 
 			for (auto& p : pros_)

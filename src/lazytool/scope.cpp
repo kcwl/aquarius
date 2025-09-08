@@ -23,27 +23,19 @@ namespace aquarius
 
 		std::expected<std::string, parse_error> router::parse(std::fstream& ifs, std::size_t column, std::size_t row)
 		{
-			if (ifs.eof())
-				return std::unexpected(parse_error::eof);
-
-			return read_value<' '>(ifs, column, row, token::key)
+			return read_value<token::key, ':'>(ifs, column, row)
 				.and_then(
-					[&](const auto& key) ->std::expected<std::string, parse_error>
+					[&] (const auto& key) ->std::expected<std::string, parse_error>
 					{
 						key_ = key;
 
 						check_key(column, row);
 
-						return read_value<';'>(ifs, column, row, token::path)
+						return read_value<token::path, '{'>(ifs, column, row)
 							.and_then(
-								[&](const auto& value) ->std::expected<std::string, parse_error>
+								[&] (const auto& value) ->std::expected<std::string, parse_error>
 								{
 									value_ = value;
-
-									auto res = seek<'}'>(ifs, column, row);
-
-									if (res.has_value())
-										return std::unexpected(parse_error::ending);
 
 									return std::string{};
 								});
@@ -58,6 +50,10 @@ namespace aquarius
 		std::string router::type() const
 		{
 			return type_;
+		}
+		std::string router::value() const
+		{
+			return value_;
 		}
 
 		void router::check_key(std::size_t column, std::size_t row)
@@ -85,41 +81,64 @@ namespace aquarius
 			}
 		}
 
-		std::expected<std::string, parse_error> header::parse(std::fstream& ifs, std::size_t column, std::size_t row)
-		{
-			if (ifs.eof())
-				return std::unexpected(parse_error::eof);
 
+		std::expected<std::string, parse_error> domain::read_domain(std::fstream& ifs, std::size_t column, std::size_t row)
+		{
+			std::string value{};
+
+			while (!ifs.eof())
+			{
+				auto c = ifs.get();
+
+				if (std::iscntrl(c))
+					continue;
+
+				value.push_back(static_cast<char>(c));
+
+				if (!std::isalpha(c))
+					return value;
+			}
+
+			return std::unexpected(parse_error::domains);
+		}
+
+		std::expected<std::string, parse_error> domain::parse(std::fstream& ifs, std::size_t column, std::size_t row)
+		{
 			std::expected<std::string, parse_error> result;
 
 			while (!ifs.eof())
 			{
-				auto res = seek<'}'>(ifs, column, row);
+				result = read_domain(ifs, column, row)
+					.and_then(
+						[&] (const auto& key) -> std::expected<std::string, parse_error>
+						{
+							auto ending = *key.rbegin();
 
-				if (res.has_value())
-					return std::unexpected(parse_error::ending);
+							if (ending == ' ')
+							{
+								scopes_.push_back({});
+								scopes_.back().first = key.substr(0, key.size());
 
-				result = read_value<' '>(ifs, column, row)
-							 .and_then(
-								 [&](const auto& key) -> std::expected<std::string, parse_error>
-								 {
-									 scopes_.push_back({});
-									 auto& content = scopes_.back();
-									 content.first = key;
+								return read_value<token::value, ';'>(ifs, column, row)
+									.and_then(
+										[&] (const auto& value) -> std::expected<std::string, parse_error>
+										{
+											scopes_.back().second = value;
 
-									 // if (!check_keyword_type(content.first))
-									 //  return std::unexpected(std::format("not support keyword of {}!",
-									 //  content.first));
+											return std::string{};
+										});
+							}
+							else if (ending == ':' || ending == '}')
+							{
+								int size = static_cast<int>(key.size());
 
-									 return read_value<';'>(ifs, column, row)
-										 .and_then(
-											 [&](const auto& value) -> std::expected<std::string, parse_error>
-											 {
-												 content.second = value;
+								ifs.seekg(-size, std::ios::cur);
 
-												 return std::string{};
-											 });
-								 });
+								return std::unexpected(parse_error::ending);
+							}
+
+							return std::unexpected(parse_error::syntax);
+						});
 
 				if (!result.has_value())
 				{
@@ -130,61 +149,9 @@ namespace aquarius
 			return result;
 		}
 
-		void header::generate(std::fstream& ofs)
+		void domain::generate(const std::string& name, std::fstream& ofs)
 		{
-			ofs << "struct header\n";
-			ofs << "{\n";
-			for (auto& [type, value] : scopes_)
-			{
-				if (type.empty())
-					continue;
-
-				ofs << "  " << type << " " << value << ";\n";
-			}
-			ofs << "};\n";
-		}
-
-		std::expected<std::string, parse_error> body::parse(std::fstream& ifs, std::size_t column, std::size_t row)
-		{
-			if (ifs.eof())
-				return std::unexpected(parse_error::eof);
-
-			std::expected<std::string, parse_error> result;
-
-			while (!ifs.eof())
-			{
-				auto res = seek<'}'>(ifs, column, row);
-
-				if (res.has_value())
-					return std::unexpected(parse_error::ending);
-
-				result = read_value<' '>(ifs, column, row)
-							 .and_then(
-								 [&](const auto& key) -> std::expected<std::string, parse_error>
-								 {
-									 scopes_.push_back({});
-									 auto& content = scopes_.back();
-									 content.first = key;
-
-									 return read_value<';'>(ifs, column, row)
-										 .and_then(
-											 [&](const auto& value) -> std::expected<std::string, parse_error>
-											 {
-												 content.second = value;
-												 return std::string{};
-											 });
-								 });
-
-				if (!result.has_value())
-					break;
-			}
-
-			return result;
-		}
-
-		void body::generate(std::fstream& ofs)
-		{
-			ofs << "struct body\n";
+			ofs << "struct " << name << "\n";
 			ofs << "{\n";
 			for (auto& [type, value] : scopes_)
 			{
@@ -197,7 +164,7 @@ namespace aquarius
 		}
 
 		std::expected<std::string, parse_error> proto::parse(const std::string& parent, std::fstream& ifs,
-															  std::size_t column, std::size_t row)
+															 std::size_t column, std::size_t row)
 		{
 			name_ = parent;
 
@@ -210,34 +177,29 @@ namespace aquarius
 				if (res.has_value())
 					return std::unexpected(parse_error::ending);
 
-				result = read_value<':'>(ifs, column, row, token::key)
-							 .and_then(
-								 [&](const auto& value) -> std::expected<std::string, parse_error>
-								 {
-									 auto tk = from_scope_string(value);
+				result = read_value<token::key, ':'>(ifs, column, row)
+					.and_then(
+						[&] (const auto& value) -> std::expected<std::string, parse_error>
+						{
+							auto tk = from_scope_string(value);
 
-									 switch (tk)
-									 {
-									 case scope::s_header:
-										 result = hr_.parse(ifs, column, row);
-										 break;
-									 case scope::s_body:
-										 result = by_.parse(ifs, column, row);
-										 break;
-									 default:
-										 return std::unexpected(parse_error::keyword);
-									 }
+							switch (tk)
+							{
+								case scope::s_header:
+									result = hr_.parse(ifs, column, row);
+									break;
+								case scope::s_body:
+									result = by_.parse(ifs, column, row);
+									break;
+								default:
+									return std::unexpected(parse_error::keyword);
+							}
 
-									 return result;
-								 });
+							return result;
+						});
 
-				if (!result.has_value())
-				{
-					if (result.error() == parse_error::ending)
-						continue;
-
+				if (!result.has_value() && result.error() != parse_error::ending)
 					break;
-				}
 			}
 
 			return result;
@@ -247,8 +209,8 @@ namespace aquarius
 		{
 			ofs << "struct " << name << "::" << name_ << "\n";
 			ofs << "{\n";
-			hr_.generate(ofs);
-			by_.generate(ofs);
+			hr_.generate("header",ofs);
+			by_.generate("body", ofs);
 			ofs << "};\n";
 		}
 

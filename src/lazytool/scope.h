@@ -17,23 +17,15 @@ namespace aquarius
 
 		scope from_scope_string(const std::string& s);
 
-		class header
+		class domain
 		{
 		public:
 			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
-			void generate(std::fstream& ofs);
+			void generate(const std::string& name, std::fstream& ofs);
 
-		public:
-			std::vector<std::pair<std::string, std::string>> scopes_;
-		};
-
-		class body
-		{
-		public:
-			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
-
-			void generate(std::fstream& ofs);
+		private:
+			std::expected<std::string, parse_error> read_domain(std::fstream& ifs, std::size_t column, std::size_t row);
 
 		public:
 			std::vector<std::pair<std::string, std::string>> scopes_;
@@ -47,6 +39,8 @@ namespace aquarius
 			void generate(std::fstream& ofs);
 
 			std::string type() const;
+
+			std::string value() const;
 
 		private:
 			void check_key(std::size_t column, std::size_t row);
@@ -75,9 +69,9 @@ namespace aquarius
 		private:
 			std::string name_;
 
-			header hr_;
+			domain hr_;
 
-			body by_;
+			domain by_;
 		};
 	} // namespace virgo
 } // namespace aquarius

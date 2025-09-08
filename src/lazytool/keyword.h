@@ -3,6 +3,7 @@
 #include <string>
 #include <expected>
 #include "error.hpp"
+#include <set>
 
 namespace aquarius
 {
@@ -18,7 +19,7 @@ namespace aquarius
 		class protocol : public proto_keyword
 		{
 		public:
-			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t& column, std::size_t& row);
+			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t& column, std::size_t& row, std::set<std::string>& proto_types);
 
 			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
 

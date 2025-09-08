@@ -6,45 +6,62 @@ namespace aquarius
 	namespace virgo
 	{
 		std::expected<std::string, parse_error> protocol::parse(std::fstream& ifs, std::size_t& column,
-																std::size_t& row)
+																std::size_t& row, std::set<std::string>& proto_types)
 		{
-			return read_value<'{'>(ifs, column, row)
+			return read_value<token::value, '-'>(ifs, column, row)
 				.and_then(
 					[&](const auto& value) -> std::expected<std::string, parse_error>
 					{
+						auto r = seek<'>'>(ifs, column, row);
+
+						if (!r.has_value())
+							return std::unexpected(parse_error::routers);
+
 						name_ = value;
 
-						while (!ifs.eof())
-						{
-							auto result = read_value<'{'>(ifs, column, row, token::key)
-											  .and_then(
-												  [&](const auto& value) -> std::expected<std::string, parse_error>
-												  {
-													  std::expected<std::string, parse_error> rest{};
+						auto res =
+							router_.parse(ifs, column, row)
+								.and_then(
+									[&](const auto&) -> std::expected<std::string, parse_error>
+									{
+										proto_types.insert(router_.type());
 
-													  if (value == "request")
-														  rest = request_.parse(name_ + "_req", ifs, column, row);
-													  else if (value == "response")
-														  rest = response_.parse(name_ + "_resp", ifs, column, row);
-													  else if (value == "router")
-														  rest = router_.parse(ifs, column, row);
-													  else
-														  return std::unexpected(parse_error::keyword);
+										std::expected<std::string, parse_error> result;
+										while (!ifs.eof())
+										{
+											auto res = seek<'}'>(ifs, column, row);
+											if (res.has_value())
+												return std::unexpected(parse_error::ending);
 
-													  return rest;
-												  });
+											result =
+												read_value<token::key, '{'>(ifs, column, row)
+													.and_then(
+														[&](const auto& value)
+															-> std::expected<std::string, parse_error>
+														{
+															std::expected<std::string, parse_error> rest{};
 
-							if (!result.has_value())
-							{
-								if (result.error() == parse_error::ending)
-									continue;
+															if (value == "request")
+																rest = request_.parse(name_ + "_req", ifs, column, row);
+															else if (value == "response")
+																rest =
+																	response_.parse(name_ + "_resp", ifs, column, row);
+															else
+																return std::unexpected(parse_error::keyword);
 
-								return result;
-							}
-						}
+															return rest;
+														});
 
-						auto res = seek<'}'>(ifs, column, row);
-						if (!res.has_value())
+											if (!result.has_value() && result.error() != parse_error::ending)
+											{
+												break;
+											}
+										}
+
+										return result;
+									});
+
+						if (!res.has_value() && res.error() != parse_error::ending)
 							return std::unexpected(parse_error::syntax);
 
 						return std::string{};
@@ -55,12 +72,13 @@ namespace aquarius
 		{
 			ofs_h << "struct " << name_ << "_protocol\n";
 			ofs_h << "{\n";
-			ofs_h << "private:\n";
+			ofs_h << "    static constexpr const char* router() { return \"" << router_.value() << "\"; }\n";
 			ofs_h << "    struct " << request_.name() << ";\n";
 			ofs_h << "    struct " << response_.name() << ";\n";
-			ofs_h << "public:\n";
-			ofs_h << "    using request = virgo::" << router_.type() << "::request<" << request_.name() << ">;\n";
-			ofs_h << "    using response = virgo::" << router_.type() << "::request<" << request_.name() << ">;\n";
+			ofs_h << "    using request = aquarius::virgo::" << router_.type() << "_request<" << request_.name()
+				  << ">;\n";
+			ofs_h << "    using response = aquarius::virgo::" << router_.type() << "_response<" << request_.name()
+				  << ">;\n";
 			ofs_h << "};\n";
 
 			request_.generate(name_, ofs_s);
@@ -70,7 +88,7 @@ namespace aquarius
 
 		std::expected<std::string, parse_error> structure::parse(std::fstream& ifs, std::size_t column, std::size_t row)
 		{
-			return read_value<'{'>(ifs, column, row)
+			return read_value<token::value, '{'>(ifs, column, row)
 				.and_then(
 					[&](const auto& value) -> std::expected<std::string, parse_error>
 					{
@@ -85,24 +103,25 @@ namespace aquarius
 							if (res.has_value())
 								return std::unexpected(parse_error::ending);
 
-							scopes_.push_back({});
-							auto& content = scopes_.back();
+							result =
+								read_value<token::key, ' '>(ifs, column, row)
+									.and_then(
+										[&](const auto& key)
+										{
+											scopes_.push_back({});
+											auto& content = scopes_.back();
 
-							result = read_value<' '>(ifs, column, row)
-										 .and_then(
-											 [&](const auto& key)
-											 {
-												 content.first = key;
+											content.first = key;
 
-												 return read_value<';'>(ifs, column, row)
-													 .and_then(
-														 [&](const auto& value) -> std::expected<std::string, parse_error>
-														 {
-															 content.second = value;
+											return read_value<token::value, ';'>(ifs, column, row)
+												.and_then(
+													[&](const auto& value) -> std::expected<std::string, parse_error>
+													{
+														content.second = value;
 
-															 return std::string{};
-														 });
-											 });
+														return std::string{};
+													});
+										});
 
 							if (!result.has_value())
 								break;
@@ -126,7 +145,7 @@ namespace aquarius
 		std::expected<std::string, parse_error> enum_struct::parse(std::fstream& ifs, std::size_t column,
 																   std::size_t row)
 		{
-			return read_value<'{'>(ifs, column, row)
+			return read_value<token::value, '{'>(ifs, column, row)
 				.and_then(
 					[&](const auto& value) -> std::expected<std::string, parse_error>
 					{
@@ -139,18 +158,15 @@ namespace aquarius
 							auto res = seek<'}'>(ifs, column, row);
 
 							if (res.has_value())
-								break;
+								return std::unexpected(parse_error::ending);
 
-							result = read_value<' '>(ifs, column, row)
+							result = read_value<token::value, ' '>(ifs, column, row)
 										 .and_then(
 											 [&](const auto& value) -> std::expected<std::string, parse_error>
 											 {
-												 scopes_.push_back({});
-												 auto& content = scopes_.back();
+												 scopes_.push_back(value);
 
-												 content = value;
-
-												 return content;
+												 return std::string{};
 											 });
 
 							if (!result.has_value())
