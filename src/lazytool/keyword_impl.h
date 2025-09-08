@@ -1,45 +1,82 @@
 #pragma once
 #include <map>
 #include <string>
+#include <set>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		enum inner_type
+		std::string from_type_string(const std::string& target)
 		{
-			error,
-			_int32_t,
-			_uint32_t,
-			_int64_t,
-			_uint64_t,
-			bool_t,
-			float_t,
-			double_t,
-			string_t,
-			bytes_t,
-			repeated_t,
-			struct_t,
-			protocol_t,
-			enum_t
-		};
+			std::string result{};
 
-		inline inner_type from_string(const std::string& str)
+			if (target == "int32")
+			{
+				result = "int32_t";
+			}
+			else if (target == "int64")
+			{
+				result = "int64_t";
+			}
+			else if (target == "uint32")
+			{
+				result = "uint32_t";
+			}
+			else if (target == "uint64")
+			{
+				result = "uint64_t";
+			}
+			else if (target == "float")
+			{
+				result = "float";
+			}
+			else if (target == "double")
+			{
+				result = "double";
+			}
+			else if (target == "string")
+			{
+				result = "std::string";
+			}
+			else if (target == "bool")
+			{
+				result = "bool";
+			}
+			else if (target == "bytes")
+			{
+				result = "std::vector<char>";
+			}
+
+			return result;
+		}
+
+		inline std::set<std::string> custom_type;
+
+		std::string find_custom_type(const std::string& target)
 		{
-			static std::map<std::string, inner_type> types = { { "int32_t", _int32_t }, { "uint32_t", _uint32_t },
-															   { "int64_t", _int64_t }, { "uint64_t", _uint64_t },
-															   { "bool", bool_t },		{ "float", float_t },
-															   { "double", double_t },	{ "string", string_t },
-															   { "bytes", bytes_t },	{ "repeated", repeated_t },
-															   { "struct", struct_t },	{ "protocol", protocol_t },
-															   { "enum", enum_t } };
+			auto iter = custom_type.find(target);
+			if (iter == custom_type.end())
+				return {};
 
-			auto iter = types.find(str);
+			return *iter;
+		}
 
-			if (iter == types.end())
-				return inner_type::error;
+		void put_custom_type(const std::string& target)
+		{
+			custom_type.insert(target);
+		}
 
-			return iter->second;
+		bool check_type(const std::string& target)
+		{
+			return !from_type_string(target).empty() || !find_custom_type(target).empty();
+		}
+
+		constexpr static auto router_list = { "tcp-key", "http-str" };
+
+		bool check_router_string(const std::string& target)
+		{
+			return std::find(router_list.begin(), router_list.end(), target) != router_list.end();
 		}
 	} // namespace virgo
 } // namespace aquarius

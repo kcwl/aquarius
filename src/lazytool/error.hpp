@@ -12,7 +12,8 @@ namespace aquarius
             keyword,
             syntax,
             routers,
-            domains
+            domains,
+            type
         };
 	} // namespace virgo
 } // namespace aquarius

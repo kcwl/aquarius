@@ -1,7 +1,7 @@
 #include "scope.h"
 #include "read_value.hpp"
 #include "log.h"
-#include "keyword.h"
+#include "keyword_impl.h"
 
 namespace aquarius
 {
@@ -117,7 +117,10 @@ namespace aquarius
 							if (ending == ' ')
 							{
 								scopes_.push_back({});
-								scopes_.back().first = key.substr(0, key.size());
+								scopes_.back().first = key.substr(0, key.size() - 1);
+
+								if (!check_type(scopes_.back().first))
+									return std::unexpected(parse_error::type);
 
 								return read_value<token::value, ';'>(ifs, column, row)
 									.and_then(
@@ -158,7 +161,7 @@ namespace aquarius
 				if (type.empty())
 					continue;
 
-				ofs << "  " << type << " " << value << ";\n";
+				ofs << "  " << from_type_string(type) << " " << value << ";\n";
 			}
 			ofs << "};\n";
 		}
