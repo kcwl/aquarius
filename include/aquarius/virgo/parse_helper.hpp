@@ -3,6 +3,7 @@
 #include <string>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/virgo/http_status.hpp>
 
 namespace aquarius
 {

@@ -138,12 +138,12 @@ namespace aquarius
 		class http_handler : public basic_positive_handler<Session, Request, Response>
 		{
 		public:
-			http_handler()
+			http_handler(const std::string& name)
 				: basic_positive_handler<Session, Request, Response>(name)
 			{}
 
 		public:
-			virtual void make_response(error_code ec) override
+			virtual auto make_response(error_code ec) -> awaitable<void> override
 			{
 				this->response().base_header().version(this->message()->base_header().version());
 				this->response().base_header().result(ec.value);
