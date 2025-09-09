@@ -210,11 +210,8 @@ namespace aquarius
 
 		void proto::generate(const std::string& name, std::fstream& ofs)
 		{
-			ofs << "struct " << name << "_protocol::" << name_ << "\n";
-			ofs << "{\n";
-			hr_.generate("header",ofs);
-			by_.generate("body", ofs);
-			ofs << "};\n";
+			hr_.generate(name + "::header", ofs);
+			by_.generate(name + "::body", ofs);
 		}
 
 		std::string proto::name() const
