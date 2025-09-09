@@ -16,7 +16,7 @@ namespace aquarius
 			using base_type = basic_protocol_message<IsRequest, Header, tcp_header, Body, detail::binary_parse>;
 
 		public:
-			using header_t = Logic;
+			using header_t = Header;
 
 			using body_ptr_t = std::add_pointer_t<Body>;
 
@@ -41,7 +41,7 @@ namespace aquarius
 					return result;
 				}
 
-				parse_.to_datas(this->body(), buffer);
+				this->parse_.to_datas(this->body(), buffer);
 
 				return true;
 			}
@@ -56,15 +56,13 @@ namespace aquarius
 					return result;
 				}
 
-				this->body() = parse_.template from_datas<Body>(buffer);
+				this->body() = this->parse_.template from_datas<Body>(buffer);
 
 				return true;
 			}
 
 		protected:
 			header_t header_;
-
-			Parse parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

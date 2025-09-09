@@ -115,7 +115,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_send(detail::flex_buffer<T> buffer) -> awaitable<void>
+		auto async_send(detail::flex_buffer<T> buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 
@@ -125,6 +125,8 @@ namespace aquarius
 			{
 				std::cout << ec.what() << std::endl;
 			}
+
+			co_return ec;
 		}
 
 		void shutdown()

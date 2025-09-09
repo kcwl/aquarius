@@ -18,8 +18,6 @@ namespace aquarius
 		public:
 			using session = Session;
 
-			using header = typename Session::header;
-
 			using body_buffer = flex_buffer<char>;
 
 			using function_type = std::function<bool(std::shared_ptr<Session>, body_buffer)>;
@@ -34,12 +32,12 @@ namespace aquarius
 			}
 
 		public:
-			template <typename RPC, typename Context>
-			void regist(const std::string& proto)
+			template <typename Context>
+			void regist(std::string_view proto)
 			{
 				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer)
 				{
-					auto req = std::make_shared<typename RPC::request>();
+					auto req = std::make_shared<typename Context::request>();
 
 					auto result = req->consume(buffer);
 

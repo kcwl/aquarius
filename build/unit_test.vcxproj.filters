@@ -150,9 +150,6 @@
     <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\handler.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\router.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>

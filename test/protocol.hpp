@@ -57,16 +57,16 @@ inline std::ostream& operator<<(std::ostream& os, const person& p)
 	return os;
 }
 
-struct rpc_test
+namespace rpc_test
 {
-	constexpr static auto id = 1001;
+	constexpr static std::string_view router() { return "1001"sv; };
 	using request = aquarius::virgo::tcp_request<aquarius::virgo::custom_request_header, person>;
 	using response = aquarius::virgo::tcp_response<aquarius::virgo::custom_response_header, person>;
 };
 
 AQUARIUS_TCP_HANDLER(ctx_test, rpc_test)
 {
-	response().body() = message()->body();
+	response().body() = request()->body();
 
 	co_return aquarius::error_code{};
 }

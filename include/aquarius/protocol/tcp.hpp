@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/handler.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <aquarius/virgo/tcp_header.hpp>
 
