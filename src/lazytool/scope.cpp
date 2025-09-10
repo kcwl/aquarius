@@ -152,18 +152,15 @@ namespace aquarius
 			return result;
 		}
 
-		void domain::generate(const std::string& name, std::fstream& ofs)
+		void domain::generate(std::fstream& ofs)
 		{
-			ofs << "struct " << name << "\n";
-			ofs << "{\n";
 			for (auto& [type, value] : scopes_)
 			{
 				if (type.empty())
 					continue;
 
-				ofs << "  " << from_type_string(type) << " " << value << ";\n";
+				ofs << "\t" << from_type_string(type) << " " << value << ";\n";
 			}
-			ofs << "};\n";
 		}
 
 		std::expected<std::string, parse_error> proto::parse(const std::string& parent, std::fstream& ifs,
@@ -208,10 +205,15 @@ namespace aquarius
 			return result;
 		}
 
-		void proto::generate(const std::string& name, std::fstream& ofs)
+
+		void proto::generate_header(std::fstream& ofs)
 		{
-			hr_.generate(name + "::header", ofs);
-			by_.generate(name + "::body", ofs);
+			hr_.generate(ofs);
+		}
+
+		void proto::generate_body(std::fstream& ofs)
+		{
+			by_.generate(ofs);
 		}
 
 		std::string proto::name() const

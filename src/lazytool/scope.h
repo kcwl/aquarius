@@ -22,7 +22,7 @@ namespace aquarius
 		public:
 			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
-			void generate(const std::string& name, std::fstream& ofs);
+			void generate(std::fstream& ofs);
 
 		private:
 			std::expected<std::string, parse_error> read_domain(std::fstream& ifs, std::size_t column, std::size_t row);
@@ -62,7 +62,9 @@ namespace aquarius
 			std::expected<std::string, parse_error> parse(const std::string& parent, std::fstream& ifs,
 														  std::size_t column, std::size_t row);
 
-			void generate(const std::string& name, std::fstream& ofs);
+			void generate_header(std::fstream& ofs);
+
+			void generate_body(std::fstream& ofs);
 
 			std::string name() const;
 

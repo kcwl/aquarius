@@ -23,6 +23,9 @@ namespace aquarius
 		class http_header<true>
 		{
 		public:
+			using result_t = http_status;
+
+		public:
 			http_header() = default;
 
 		public:
@@ -193,7 +196,7 @@ namespace aquarius
 			std::expected<bool, error_code> parse_uri(detail::flex_buffer<T>& buffer)
 			{
 				return parse_path(buffer).and_then(
-					[&] (char end) -> std::expected<bool, error_code>
+					[&](char end) -> std::expected<bool, error_code>
 					{
 						if (end == ' ')
 							return true;
@@ -201,7 +204,7 @@ namespace aquarius
 						querys_.push_back({});
 						return parse_querys(buffer, querys_.back())
 							.and_then(
-								[&] (char end) -> std::expected<bool, error_code>
+								[&](char end) -> std::expected<bool, error_code>
 								{
 									if (end == '#' || end == ' ')
 										return true;
@@ -325,6 +328,9 @@ namespace aquarius
 		class http_header<false>
 		{
 		public:
+			using result_t = http_status;
+
+		public:
 			http_header() = default;
 
 		public:
@@ -417,7 +423,8 @@ namespace aquarius
 						{
 							reason_ = value;
 
-							return buffer.peek() == '\n' ? buffer.get() : std::unexpected(make_error_code(http_status::bad_request));
+							return buffer.peek() == '\n' ? buffer.get()
+														 : std::unexpected(make_error_code(http_status::bad_request));
 						});
 			}
 

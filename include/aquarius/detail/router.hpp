@@ -37,7 +37,7 @@ namespace aquarius
 			{
 				auto func = [&](std::shared_ptr<session> session, body_buffer&& buffer)
 				{
-					auto req = std::make_shared<typename Context::request>();
+					auto req = std::make_shared<typename Context::request_t>();
 
 					auto result = req->consume(buffer);
 

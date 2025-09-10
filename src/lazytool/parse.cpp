@@ -82,12 +82,10 @@ namespace aquarius
 			final_output_path.append(out_path.filename().string());
 
 			auto header_file = std::format("{}.h", final_output_path.string());
-			auto src_file = std::format("{}.cpp", final_output_path.string());
 
 			std::fstream ofs_h(header_file, std::ios::out);
-			std::fstream ofs_s(src_file, std::ios::out);
 
-			if (!ofs_h.is_open() || !ofs_s.is_open())
+			if (!ofs_h.is_open())
 				return false;
 
 			ofs_h << "#pragma once\n";
@@ -98,11 +96,18 @@ namespace aquarius
 				ofs_h << "#include <aquarius/virgo/" << s << "_response.hpp>\n\n";
 			}
 
-			ofs_s << "#include " << std::filesystem::path(header_file).filename() << "\n\n";
+			ofs_h << "namespace detail{\n";
 
 			for (auto& p : pros_)
 			{
-				p->generate(ofs_h, ofs_s);
+				p->generate(ofs_h);
+			}
+
+			ofs_h << "}\n\n";
+
+			for (auto& p : pros_)
+			{
+				p->generate_define(ofs_h);
 			}
 
 			return true;

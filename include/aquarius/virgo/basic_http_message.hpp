@@ -45,7 +45,7 @@ namespace aquarius
 
 				buffer.commit(str.size());
 
-				result = this->header().commit(buffer);
+				this->parse_.to_datas(this->header(), buffer);
 
 				if (!result.has_value())
 				{
@@ -127,26 +127,26 @@ namespace aquarius
 
 			bool has_content_length() const
 			{
-				return find("Content-Length"sv).empty();
+				return find("Content-Length").empty();
 			}
 
 			void content_length(uint64_t len)
 			{
-				fields_["Content-Length"sv] = std::to_string(len);
+				fields_["Content-Length"] = std::to_string(len);
 			}
 
 			uint64_t content_length()
 			{
-				auto iter = fields_.find("Content-Length"sv);
+				auto iter = fields_.find("Content-Length");
 				if (iter == fields_.end())
-					return std::nullopt;
+					return 0;
 
 				return std::atoi(iter->second.data());
 			}
 
 			bool keep_alive()
 			{
-				auto iter = fields_.find("Connection"sv);
+				auto iter = fields_.find("Connection");
 				if (iter == fields_.end())
 					return false;
 
@@ -155,7 +155,7 @@ namespace aquarius
 
 			void keep_alive(bool k)
 			{
-				fields_["Connection"sv] = k ? "keep-alive" : "close";
+				fields_["Connection"] = k ? "keep-alive" : "close";
 			}
 
 		private:

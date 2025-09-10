@@ -88,7 +88,7 @@ namespace aquarius
 
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
-			response_.result(static_cast<int>(ec.value()));
+			response_.result(static_cast<typename response_t::result_t>(ec.value()));
 
 			detail::flex_buffer<char> buffer{};
 
