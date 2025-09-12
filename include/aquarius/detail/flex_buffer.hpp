@@ -135,6 +135,11 @@ namespace aquarius
 				return rpos_ == wpos_;
 			}
 
+			std::size_t tellg() const
+			{
+				return wpos_;
+			}
+
 		private:
 			impl_type buffer_;
 

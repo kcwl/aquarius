@@ -81,7 +81,7 @@ namespace aquarius
 			network_authentication_required = 511
 		};
 
-		inline std::string_view get_http_status_string(http_status s)
+		inline std::string_view from_status_string(http_status s)
 		{
 			static const std::map<http_status, std::string_view> statuses = {
 				{ http_status::unknown, "unknown" },
@@ -163,7 +163,7 @@ namespace aquarius
 
 			[[nodiscard]] std::string message(int err_code) const override
 			{
-				return std::string(get_http_status_string(static_cast<http_status>(err_code)).data());
+				return std::string(from_status_string(static_cast<http_status>(err_code)).data());
 			}
 		};
 

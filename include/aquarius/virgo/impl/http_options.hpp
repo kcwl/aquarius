@@ -10,9 +10,11 @@ namespace aquarius
 	{
 		struct http_options_protocol
 		{
-			using request = http_request<null_header, null_body>;
+			constexpr static std::string_view root = "/"sv;
 
-			using response = http_response<null_header, null_body>;
+			using request = http_request<root, null_header, null_body>;
+
+			using response = http_response<root, null_header, null_body>;
 		};
 	} // namespace virgo
 } // namespace aquarius

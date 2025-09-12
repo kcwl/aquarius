@@ -1,45 +1,46 @@
 #pragma once
 #include <boost/core/empty_value.hpp>
 #include <iostream>
+#include <string_view>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		template <typename Body, typename Allocator>
-		class basic_message : public boost::empty_value<Body>
+		template <const std::string_view& Router, typename Body, typename Allocator>
+		class basic_protocol : public boost::empty_value<Body>
 		{
 			static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
 
 		public:
-			using body_type = std::remove_pointer_t<Body>;
+			using body_t = std::remove_pointer_t<Body>;
 
 			using base_body = boost::empty_value<Body>;
 
-			using base_type = basic_message;
+			constexpr static auto router = Router;
 
 		public:
-			basic_message()
+			basic_protocol()
 				: alloc_()
 			{
 				this->get() = alloc_.allocate(1);
 
-				::new (static_cast<void*>(this->get())) body_type();
+				::new (static_cast<void*>(this->get())) body_t();
 			}
 
-			basic_message(const Allocator& alloc)
+			basic_protocol(const Allocator& alloc)
 				: alloc_(alloc)
 			{}
 
-			basic_message(const basic_message&) = default;
+			basic_protocol(const basic_protocol&) = default;
 
-			basic_message& operator=(const basic_message&) = default;
+			basic_protocol& operator=(const basic_protocol&) = default;
 
-			basic_message(basic_message&& other) noexcept
+			basic_protocol(basic_protocol&& other) noexcept
 				: base_body(boost::empty_init, std::exchange(other.get(), nullptr))
 			{}
 
-			basic_message& operator=(basic_message&& other) noexcept
+			basic_protocol& operator=(basic_protocol&& other) noexcept
 			{
 				if (this != std::addressof(other))
 				{
@@ -51,7 +52,7 @@ namespace aquarius
 				return *this;
 			}
 
-			virtual ~basic_message()
+			virtual ~basic_protocol()
 			{
 				if (this->get())
 				{
@@ -60,7 +61,7 @@ namespace aquarius
 			}
 
 		public:
-			bool operator==(const basic_message& other) const
+			bool operator==(const basic_protocol& other) const
 			{
 				return body() == other.body();
 			}
@@ -73,12 +74,12 @@ namespace aquarius
 			}
 
 		public:
-			body_type& body()
+			body_t& body()
 			{
 				return *this->get();
 			}
 
-			const body_type& body() const
+			const body_t& body() const
 			{
 				return *this->get();
 			}

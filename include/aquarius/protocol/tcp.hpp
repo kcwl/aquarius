@@ -1,6 +1,5 @@
 #pragma once
 #include <boost/asio/ip/tcp.hpp>
-#include <aquarius/virgo/tcp_header.hpp>
 
 namespace aquarius
 {

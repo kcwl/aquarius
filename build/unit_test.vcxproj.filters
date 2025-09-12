@@ -234,13 +234,10 @@
     <ClInclude Include="..\test\attribute.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\basic_message.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\basic_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_header.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\basic_http_message.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
@@ -258,9 +255,6 @@
     <ClInclude Include="..\include\aquarius\virgo\http_status.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\tcp_header.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
@@ -273,7 +267,7 @@
     <ClInclude Include="..\include\aquarius\virgo\impl\tcp_custom_header.hpp">
       <Filter>include\aquarius\virgo\impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\basic_protocol_message.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\router\basic_router.hpp">
@@ -303,7 +297,7 @@
     <ClInclude Include="..\include\aquarius\virgo\impl\http_options.hpp">
       <Filter>include\aquarius\virgo\impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\basic_tcp_message.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\null_header.hpp">
@@ -311,6 +305,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\null_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\pod_parse.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\string_parse.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
