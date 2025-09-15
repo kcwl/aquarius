@@ -91,27 +91,28 @@ namespace aquarius
 			co_return co_await async_connect(host_, port_);
 		}
 
-		template <typename RPC>
-		auto async_send(std::shared_ptr<typename RPC::request> req) -> awaitable<void>
+		template <typename Request>
+		auto async_send(std::shared_ptr<Request> req) -> awaitable<void>
 		{
-			detail::flex_buffer<char> complete_buffer;
-			req->mark(complete_buffer);
-			auto header_size = complete_buffer.active();
-			req->rpc(RPC::id);
-			auto result = req->commit(complete_buffer);
+			//detail::flex_buffer<char> complete_buffer;
+			//req->mark(complete_buffer);
+			//auto header_size = complete_buffer.active();
 
-			if (!result.has_value())
-			{
-				co_return;
-			}
+			//auto result = req->commit(complete_buffer);
 
-			req->length(complete_buffer.active() - header_size);
-			result = req->header().commit(complete_buffer);
+			//if (!result.has_value())
+			//{
+			//	co_return;
+			//}
 
-			if (!result.has_value())
-				co_return;
+			//req->length(complete_buffer.active() - header_size);
+			//result = req->header().commit(complete_buffer);
 
-			co_return co_await transfer(std::move(complete_buffer));
+			//if (!result.has_value())
+			//	co_return;
+
+			//co_return co_await transfer(std::move(complete_buffer));
+			co_return;
 		}
 
 		template <typename BuffSequence>

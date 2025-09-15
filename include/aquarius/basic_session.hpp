@@ -31,8 +31,6 @@ namespace aquarius
 
 		using resolver = boost::asio::ip::tcp::resolver;
 
-		using header = typename protocol::header;
-
 	public:
 		explicit basic_session(socket sock)
 			: socket_(std::move(sock))
@@ -98,6 +96,15 @@ namespace aquarius
 			auto read_size = co_await boost::asio::async_read(socket_, boost::asio::buffer(buffer.rdata(), length), redirect_error(use_awaitable, ec));
 
 			buffer.commit(read_size);
+
+			co_return ec;
+		}
+
+		auto async_read(char* begin, std::size_t length) -> awaitable<error_code>
+		{
+			error_code ec;
+
+			co_await boost::asio::async_read(socket_, boost::asio::buffer(begin, length), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
@@ -181,15 +188,13 @@ namespace aquarius
 
 		constexpr static auto is_server = Server;
 
-		using socket = typename protocol::socket;
+		using socket = boost::asio::ip::tcp::socket;
 
-		using endpoint = typename protocol::endpoint;
+		using endpoint = boost::asio::ip::tcp::endpoint;
 
-		using acceptor = typename protocol::acceptor;
+		using acceptor = boost::asio::ip::tcp::acceptor;
 
-		using resolver = typename protocol::resolver;
-
-		using header = typename protocol::header;
+		using resolver = boost::asio::ip::tcp::resolver;
 
 		using ssl_socket = boost::asio::ssl::stream<socket>;
 
@@ -289,6 +294,15 @@ namespace aquarius
 
 			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(buffer.rdata(), length),
 											 redirect_error(use_awaitable, ec));
+
+			co_return ec;
+		}
+
+		auto async_read(char* begin, std::size_t length) -> awaitable<error_code>
+		{
+			error_code ec;
+
+			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(begin, length), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}

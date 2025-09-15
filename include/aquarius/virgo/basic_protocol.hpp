@@ -2,12 +2,13 @@
 #include <boost/core/empty_value.hpp>
 #include <iostream>
 #include <string_view>
+#include <aquarius/detail/string_literal.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		template <const std::string_view& Router, typename Body, typename Allocator>
+		template <detail::string_literal Router, typename Body, typename Allocator>
 		class basic_protocol : public boost::empty_value<Body>
 		{
 			static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
@@ -17,7 +18,7 @@ namespace aquarius
 
 			using base_body = boost::empty_value<Body>;
 
-			constexpr static auto router = Router;
+			constexpr static auto router = detail::bind_param<Router>::value;
 
 		public:
 			basic_protocol()

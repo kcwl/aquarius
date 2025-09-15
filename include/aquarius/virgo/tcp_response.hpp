@@ -6,10 +6,11 @@ namespace aquarius
 	namespace virgo
 	{
 
-		template <const std::string_view& Router, typename Header, typename Body>
+		template <detail::string_literal Router, typename Header, typename Body>
 		class tcp_response
 			: public basic_tcp_protocol<false, Router, typename Header, typename Body, std::allocator<Body>>
 		{
+		public:
 			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
@@ -34,20 +35,15 @@ namespace aquarius
 
 				buffer.commit(sizeof(uint32_t));
 
-				if (!body_parse_.to_datas(this->result(), buffer))
-					return false;
+				body_parse_.to_datas(this->result(), buffer);
 
-				if (!body_parse_.to_datas(this->timestamp(), buffer))
-					return false;
+				body_parse_.to_datas(this->timestamp(), buffer);
 
-				if (!body_parse_.to_datas(this->version(), buffer))
-					return false;
+				body_parse_.to_datas(this->version(), buffer);
 
-				if (!body_parse_.to_datas(this->header(), buffer))
-					return false;
+				body_parse_.to_datas(this->header(), buffer);
 
-				if (!body_parse_.to_datas(this->body(), buffer))
-					return false;
+				body_parse_.to_datas(this->body(), buffer);
 
 				auto len = buffer.tellg() - pos;
 				std::copy((char*)&len, (char*)(&len + 1), buffer.data() + pos);
@@ -55,7 +51,7 @@ namespace aquarius
 				return true;
 			}
 
-			template<typename T>
+			template <typename T>
 			void consume(detail::flex_buffer<T>& buffer)
 			{
 				this->timestamp(body_parse_.from_datas<int64_t>(buffer));

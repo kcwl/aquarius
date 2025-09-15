@@ -88,14 +88,12 @@ namespace aquarius
 
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
-			response_.result(static_cast<typename response_t::result_t>(ec.value()));
+			response_.result(ec.value());
 
 			detail::flex_buffer<char> buffer{};
 
-			auto result = response_.commit(buffer);
-
-			if (!result.has_value())
-				co_return result.error();
+			if (!response_.commit(buffer))
+				co_return ec;
 
 			co_return co_await session()->async_send(std::move(buffer));
 		}
@@ -136,12 +134,14 @@ namespace aquarius
 	};                                                                                                                 \
 	inline auto __method::handle() -> aquarius::awaitable<aquarius::error_code>
 
-#define AQUARIUS_CONTEXT_BY(__session, __method, __proto)                                                              \
+#define AQUARIUS_CONTEXT_BY(__session, __request, __response, __method)                                                \
 	class __method;                                                                                                    \
 	[[maybe_unused]] static aquarius::auto_handler_register<__session, __method> __auto_register_##__method(           \
-		__proto::router());                                                                                            \
-	__AQUARIUS_HANDLER(__session, __method, __proto::request, __proto::response)
+		__request::router);                                                                                            \
+	__AQUARIUS_HANDLER(__session, __method, __request, __response)
 
-#define AQUARIUS_TCP_HANDLER(__method, __proto) AQUARIUS_CONTEXT_BY(aquarius::tcp_server_session, __method, __proto)
+#define AQUARIUS_TCP_HANDLER(__request, __response, __method)                                                          \
+	AQUARIUS_CONTEXT_BY(aquarius::tcp_server_session, __request, __response, __method)
 
-#define AQUARIUS_HTTP_HANDLER(__method, __proto) AQUARIUS_CONTEXT_BY(aquarius::http_server_session, __method, __proto)
+#define AQUARIUS_HTTP_HANDLER(__request, __response, __method)                                                         \
+	AQUARIUS_CONTEXT_BY(aquarius::http_server_session, __request, __response, __method)

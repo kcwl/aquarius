@@ -1,5 +1,7 @@
 #pragma once
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/detail/binary.hpp>
+#include <string_view>
 
 namespace aquarius
 {
@@ -14,8 +16,6 @@ namespace aquarius
 		using acceptor = boost::asio::ip::tcp::acceptor;
 
 		using resolver = boost::asio::ip::tcp::resolver;
-
-		using header = virgo::tcp_header<true>;
 
 		using no_delay = boost::asio::ip::tcp::no_delay;
 
@@ -49,11 +49,9 @@ namespace aquarius
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
 		{
-			constexpr auto header_length = header::impl_size;
+			uint32_t length = 0;
 
-			detail::flex_buffer<char> header_buffer;
-
-			ec = co_await session_ptr->async_read(header_buffer, header_length);
+			ec = co_await session_ptr->async_read((char*)&length, sizeof(length));
 			if (ec)
 			{
 				if (ec != boost::asio::error::eof)
@@ -63,14 +61,12 @@ namespace aquarius
 				session_ptr->shutdown();
 				co_return;
 			}
-			header h{};
-			auto result = h.consume(header_buffer);
-
-			if (!result.has_value())
-				co_return;
 
 			detail::flex_buffer<char> body_buffer{};
-			ec = co_await session_ptr->async_read(body_buffer, h.length());
+
+			length > body_buffer.remain() ? length = static_cast<uint32_t>(body_buffer.remain()) : 0;
+
+			ec = co_await session_ptr->async_read(body_buffer, length);
 			if (ec)
 			{
 				if (ec != boost::asio::error::eof)
@@ -83,9 +79,12 @@ namespace aquarius
 
 			co_spawn(
 				session_ptr->get_executor(),
-				[buffer = std::move(body_buffer), session_ptr, h = std::move(h)]() mutable -> awaitable<void>
+				[buffer = std::move(body_buffer), session_ptr]() mutable -> awaitable<void>
 				{
-					detail::router<Session>::get_mutable_instance().invoke(std::to_string(h.rpc()), session_ptr, std::move(buffer));
+					detail::binary_parse parse{};
+					auto router = parse.from_datas<std::string_view>(buffer);
+
+					detail::router<Session>::get_mutable_instance().invoke(router, session_ptr, std::move(buffer));
 					co_return;
 				},
 				detached);

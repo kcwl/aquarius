@@ -27,8 +27,8 @@ namespace aquarius
 				buffer.commit(str.size());
 			}
 
-			template <typename T>
-			T from_datas(detail::flex_buffer<T>& buffer)
+			template <typename T, typename U>
+			T from_datas(detail::flex_buffer<U>& buffer)
 			{
 				std::string json(buffer.rdata(), buffer.active());
 

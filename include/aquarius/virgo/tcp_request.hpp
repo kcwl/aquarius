@@ -7,10 +7,11 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <const std::string_view& Router, typename Header, typename Body>
+		template <detail::string_literal Router, typename Header, typename Body>
 		class tcp_request
 			: public basic_tcp_protocol<true, Router, typename Header, typename Body, std::allocator<Body>>
 		{
+		public:
 			using base = basic_tcp_protocol<true, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
@@ -28,7 +29,7 @@ namespace aquarius
 			template <typename T>
 			bool commit(detail::flex_buffer<T>& buffer)
 			{
-				if (!header_parse_.to_datas(Router, buffer))
+				if (!body_parse_.to_datas(Router, buffer))
 					return false;
 
 				auto pos = buffer.tellg();

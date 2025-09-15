@@ -8,14 +8,19 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <const std::string_view& Router, typename Header, typename Body>
+		template <detail::string_literal Router, typename Header, typename Body>
 		class http_request : public basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>
 		{
+		public:
 			using base = basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
 
 			using base::has_request;
+
+			using typename base::body_t;
+
+			using typename base::header_t;
 
 		public:
 			http_request() = default;
@@ -71,7 +76,7 @@ namespace aquarius
 							return read_value<T, '\r'>(buffer).and_then(
 								[&](const auto& value) -> std::expected<bool, error_code>
 								{
-									set_field(key, value);
+									this->set_field(key, value);
 
 									buffer.consume(1);
 
@@ -83,7 +88,7 @@ namespace aquarius
 						break;
 				}
 
-				body_parse_.from_datas(this->body(), buffer);
+				this->body() = body_parse_.from_datas<body_t>(buffer);
 			}
 
 		private:

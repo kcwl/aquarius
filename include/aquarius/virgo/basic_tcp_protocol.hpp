@@ -5,7 +5,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, const std::string_view& Router, typename Header, typename Body, typename Allocator>
+		template <bool Request, detail::string_literal Router, typename Header, typename Body, typename Allocator>
 		class basic_tcp_protocol : public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
@@ -17,7 +17,7 @@ namespace aquarius
 
 			using typename base::body_t;
 
-			constexpr static auto hass_request = Request;
+			constexpr static auto has_request = Request;
 
 		public:
 			basic_tcp_protocol() = default;
@@ -61,7 +61,7 @@ namespace aquarius
 			int32_t version_;
 		};
 
-		template <const std::string_view& Router, typename Header, typename Body, typename Allocator>
+		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
 		class basic_tcp_protocol<false, Router, Header, Body, Allocator> : public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
@@ -71,7 +71,7 @@ namespace aquarius
 
 			using header_t = Header;
 
-			constexpr static auto hass_request = false;
+			constexpr static auto has_request = false;
 
 		public:
 			basic_tcp_protocol() = default;

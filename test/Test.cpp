@@ -84,8 +84,8 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 						   BOOST_CHECK(is_connect);
 
-						   auto req = std::make_shared<rpc_test::request>();
-						   req->header().uuid(1);
+						   auto req = std::make_shared<rpc_test_request>();
+						   req->header().uuid = 1;
 						   req->body().sex = true;
 						   req->body().addr = 2;
 						   req->body().age = 15;
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 						   req->body().name = "John";
 						   req->body().orders = { 1, 2, 3, 4, 5 };
 
-						   co_await cli->async_send<rpc_test>(req);
+						   co_await cli->async_send<rpc_test_request>(req);
 
 						   std::this_thread::sleep_for(5s);
 					   }, aquarius::use_future);

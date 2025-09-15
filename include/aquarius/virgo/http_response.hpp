@@ -11,14 +11,19 @@ namespace aquarius
 	namespace virgo
 	{
 
-		template <const std::string_view& Router, typename Header, typename Body>
+		template <detail::string_literal Router, typename Header, typename Body>
 		class http_response : public basic_http_protocol<false, Router, Header, Body, std::allocator<Body>>
 		{
+		public:
 			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
 
 			using base::has_request;
+
+			using typename base::body_t;
+
+			using typename base::header_t;
 
 		public:
 			http_response() = default;
@@ -27,14 +32,13 @@ namespace aquarius
 			template <typename T>
 			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
 			{
-				std::string str = std::format("{} {} {}\r\n", from_method_string(this->method()), this->path(),
-											  from_version_string(this->version()));
+				std::string str = std::format("{} {} {}\r\n", from_version_string(this->version()),
+											  from_status_string(this->status()), this->reason());
 
 				detail::flex_buffer<T> body_buffer{};
-				if (!this->body_parse_.to_datas(this->body(), body_buffer))
-					return false;
+				this->body_parse_.to_datas(this->body(), body_buffer);
 
-				this->content_length(body_buffer.size());
+				this->content_length(body_buffer.active());
 
 				for (auto& s : this->fields_)
 				{
@@ -56,6 +60,8 @@ namespace aquarius
 				buffer.commit(end_line.size());
 
 				this->body_parse_.to_datas(this->body(), buffer);
+
+				return true;
 			}
 
 			template <typename T>
@@ -84,7 +90,7 @@ namespace aquarius
 						break;
 				}
 
-				body_parse_.from_datas(this->body(), buffer);
+				this->body() = body_parse_.from_datas<body_t>(buffer);
 			}
 
 		private:

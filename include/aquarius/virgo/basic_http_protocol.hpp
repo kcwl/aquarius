@@ -9,7 +9,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, const std::string_view& Router, typename Header, typename Body, typename Allocator>
+		template <bool Request, detail::string_literal Router, typename Header, typename Body, typename Allocator>
 		class basic_http_protocol : public basic_tcp_protocol<Request, Router, Header, Body, Allocator>,
 									public http_fields
 		{
@@ -57,7 +57,7 @@ namespace aquarius
 			std::vector<std::pair<std::string, std::string>> get_params_;
 		};
 
-		template <const std::string_view& Router, typename Header, typename Body, typename Allocator>
+		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
 		class basic_http_protocol<false, Router, Header, Body, Allocator>
 			: public basic_tcp_protocol<false, Router, Header, Body, Allocator>, public http_fields
 		{
@@ -79,7 +79,7 @@ namespace aquarius
 				return status_;
 			}
 
-			void method(http_status status)
+			void status(http_status status)
 			{
 				status_ = status;
 

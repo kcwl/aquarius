@@ -27,9 +27,7 @@ namespace aquarius
 		public:
 			router()
 				: map_invokes_(new func_trie())
-			{
-
-			}
+			{}
 
 		public:
 			template <typename Context>
@@ -39,30 +37,23 @@ namespace aquarius
 				{
 					auto req = std::make_shared<typename Context::request_t>();
 
-					auto result = req->consume(buffer);
+					req->consume(buffer);
 
-					if (result.has_value())
-					{
-						post(session->get_executor(),
-							 [=]
-							 {
-								 co_spawn(
-									 session->get_executor(),
-									 [session, req] () mutable -> awaitable<void>
-									 {
-										 co_await std::make_shared<Context>()->visit(session, req);
-									 },
-									 detached);
-							 });
-					}
+					post(session->get_executor(),
+						 [=]
+						 {
+							 co_spawn(
+								 session->get_executor(), [session, req]() mutable -> awaitable<void>
+								 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
+						 });
 
 					return true;
 				};
 				this->map_invokes_->add(proto, func);
 			}
 
-			template<typename... Args>
-			bool invoke(const std::string& key, Args... args)
+			template <typename... Args>
+			bool invoke(std::string_view key, Args... args)
 			{
 				auto func = this->map_invokes_->find(key);
 
