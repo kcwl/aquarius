@@ -66,9 +66,9 @@ namespace aquarius
 			}
 
 		private:
-			detail::pod_parse header_parse_;
+			virgo::pod_parse header_parse_;
 
-			detail::binary_parse body_parse_;
+			virgo::binary_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

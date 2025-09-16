@@ -25,7 +25,7 @@ namespace aquarius
 		{
 			return read_value<token::key, ':'>(ifs, column, row)
 				.and_then(
-					[&] (const auto& key) ->std::expected<std::string, parse_error>
+					[&](const auto& key) -> std::expected<std::string, parse_error>
 					{
 						key_ = key;
 
@@ -33,7 +33,7 @@ namespace aquarius
 
 						return read_value<token::path, '{'>(ifs, column, row)
 							.and_then(
-								[&] (const auto& value) ->std::expected<std::string, parse_error>
+								[&](const auto& value) -> std::expected<std::string, parse_error>
 								{
 									value_ = value;
 
@@ -81,8 +81,8 @@ namespace aquarius
 			}
 		}
 
-
-		std::expected<std::string, parse_error> domain::read_domain(std::fstream& ifs, std::size_t column, std::size_t row)
+		std::expected<std::string, parse_error> domain::read_domain(std::fstream& ifs, std::size_t column,
+																	std::size_t row)
 		{
 			std::string value{};
 
@@ -109,39 +109,39 @@ namespace aquarius
 			while (!ifs.eof())
 			{
 				result = read_domain(ifs, column, row)
-					.and_then(
-						[&] (const auto& key) -> std::expected<std::string, parse_error>
-						{
-							auto ending = *key.rbegin();
+							 .and_then(
+								 [&](const auto& key) -> std::expected<std::string, parse_error>
+								 {
+									 auto ending = *key.rbegin();
 
-							if (ending == ' ')
-							{
-								scopes_.push_back({});
-								scopes_.back().first = key.substr(0, key.size() - 1);
+									 if (ending == ' ')
+									 {
+										 scopes_.push_back({});
+										 scopes_.back().first = key.substr(0, key.size() - 1);
 
-								if (!check_type(scopes_.back().first))
-									return std::unexpected(parse_error::type);
+										 if (!check_type(scopes_.back().first))
+											 return std::unexpected(parse_error::type);
 
-								return read_value<token::value, ';'>(ifs, column, row)
-									.and_then(
-										[&] (const auto& value) -> std::expected<std::string, parse_error>
-										{
-											scopes_.back().second = value;
+										 return read_value<token::value, ';'>(ifs, column, row)
+											 .and_then(
+												 [&](const auto& value) -> std::expected<std::string, parse_error>
+												 {
+													 scopes_.back().second = value;
 
-											return std::string{};
-										});
-							}
-							else if (ending == ':' || ending == '}')
-							{
-								int size = static_cast<int>(key.size());
+													 return std::string{};
+												 });
+									 }
+									 else if (ending == ':' || ending == '}')
+									 {
+										 int size = static_cast<int>(key.size());
 
-								ifs.seekg(-size, std::ios::cur);
+										 ifs.seekg(-size, std::ios::cur);
 
-								return std::unexpected(parse_error::ending);
-							}
+										 return std::unexpected(parse_error::ending);
+									 }
 
-							return std::unexpected(parse_error::syntax);
-						});
+									 return std::unexpected(parse_error::syntax);
+								 });
 
 				if (!result.has_value())
 				{
@@ -178,25 +178,25 @@ namespace aquarius
 					return std::unexpected(parse_error::ending);
 
 				result = read_value<token::key, ':'>(ifs, column, row)
-					.and_then(
-						[&] (const auto& value) -> std::expected<std::string, parse_error>
-						{
-							auto tk = from_scope_string(value);
+							 .and_then(
+								 [&](const auto& value) -> std::expected<std::string, parse_error>
+								 {
+									 auto tk = from_scope_string(value);
 
-							switch (tk)
-							{
-								case scope::s_header:
-									result = hr_.parse(ifs, column, row);
-									break;
-								case scope::s_body:
-									result = by_.parse(ifs, column, row);
-									break;
-								default:
-									return std::unexpected(parse_error::keyword);
-							}
+									 switch (tk)
+									 {
+									 case scope::s_header:
+										 result = hr_.parse(ifs, column, row);
+										 break;
+									 case scope::s_body:
+										 result = by_.parse(ifs, column, row);
+										 break;
+									 default:
+										 return std::unexpected(parse_error::keyword);
+									 }
 
-							return result;
-						});
+									 return result;
+								 });
 
 				if (!result.has_value() && result.error() != parse_error::ending)
 					break;
@@ -204,7 +204,6 @@ namespace aquarius
 
 			return result;
 		}
-
 
 		void proto::generate_header(std::fstream& ofs)
 		{
@@ -214,6 +213,64 @@ namespace aquarius
 		void proto::generate_body(std::fstream& ofs)
 		{
 			by_.generate(ofs);
+		}
+
+		void proto::generate_src_serialize(std::fstream& ofs, const std::string& type, const std::string& scope)
+		{
+			if (type.empty())
+				return;
+
+			auto s = scope == "header" ? hr_.scopes_ : by_.scopes_;
+
+			if (type == "tcp")
+			{
+				for (auto& [_, value] : s)
+				{
+					if (type.empty())
+						continue;
+
+					ofs << "\t" << "this->parse_" << scope << "(" << value << ", buffer);\n";
+				}
+			}
+			else if (type == "http")
+			{
+				for (auto& [_, value] : s)
+				{
+					if (type.empty())
+						continue;
+
+					ofs << "\t" << "this->parse_" << scope << "(" << value << ", buffer);\n";
+				}
+			}
+		}
+
+		void proto::generate_src_deserialize(std::fstream& ofs, const std::string& type, const std::string& scope)
+		{
+			if (type.empty())
+				return;
+
+			auto s = scope == "header" ? hr_.scopes_ : by_.scopes_;
+
+			if (type == "tcp")
+			{
+				for (auto& [t, value] : s)
+				{
+					if (t.empty())
+						continue;
+
+					ofs << "\t" << value << " = this->parse_" << scope << "<" << from_type_string(t) << ">(buffer);\n";
+				}
+			}
+			else if (type == "http")
+			{
+				for (auto& [t, value] : s)
+				{
+					if (t.empty())
+						continue;
+
+					ofs << "\t" << value << " = this->parse_" << scope << "<" << from_type_string(t) << ">(buffer);\n";
+				}
+			}
 		}
 
 		std::string proto::name() const

@@ -13,26 +13,26 @@ namespace aquarius
 			virtual ~basic_message_serialize() = default;
 
 		public:
-			template <typename T>
-			void parse_header(T&& value, detail::flex_buffer<char>& buffer)
+			template <typename T, typename U>
+			void parse_header(T&& value, detail::flex_buffer<U>& buffer)
 			{
 				return header_parse_.to_datas(std::forward<T>(value), buffer);
 			}
 
-			template <typename T>
-			T parse_header(detail::flex_buffer<char>& buffer)
+			template <typename T, typename U>
+			T parse_header(detail::flex_buffer<U>& buffer)
 			{
 				return header_parse_.from_datas<T>(buffer);
 			}
 
-			template <typename T>
-			void parse_body(T&& value, detail::flex_buffer<char>& buffer)
+			template <typename T, typename U>
+			void parse_body(T&& value, detail::flex_buffer<U>& buffer)
 			{
 				return body_parse_.to_datas(std::forward<T>(value), buffer);
 			}
 
-			template <typename T>
-			T parse_body(detail::flex_buffer<char>& buffer)
+			template <typename T, typename U>
+			T parse_body(detail::flex_buffer<U>& buffer)
 			{
 				return body_parse_.from_datas<T>(buffer);
 			}

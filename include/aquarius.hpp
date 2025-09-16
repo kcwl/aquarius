@@ -19,3 +19,4 @@
 #include <aquarius/singleton.hpp>
 #include <aquarius/use_awaitable.hpp>
 #include <aquarius/use_future.hpp>
+#include <aquarius/virgo.hpp>

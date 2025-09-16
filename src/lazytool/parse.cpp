@@ -91,11 +91,7 @@ namespace aquarius
 				return false;
 
 			ofs_h << "#pragma once\n";
-
-			for (auto& s : proto_types)
-			{
-				ofs_h << "#include <aquarius/virgo.hpp>\n\n";
-			}
+			ofs_h << "#include <aquarius.hpp>\n\n";
 
 			for (auto& p : pros_)
 			{
@@ -109,7 +105,7 @@ namespace aquarius
 				p->generate_define(ofs_h);
 			}
 
-			ofs_s << "#include \"" << final_output_path.string() << "\"\n\n";
+			ofs_s << "#include \"" << final_output_path.filename().string() << ".h\"\n\n";
 
 			for (auto& s : pros_)
 			{

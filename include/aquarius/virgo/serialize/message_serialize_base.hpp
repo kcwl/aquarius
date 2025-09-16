@@ -15,7 +15,7 @@ namespace aquarius
 		public:
 			virtual void serialize(detail::flex_buffer<char>& buffer) = 0;
 
-			virtual bool deserialize(detail::flex_buffer<char>& buffer) = 0;
+			virtual void deserialize(detail::flex_buffer<char>& buffer) = 0;
 		};
 	} // namespace virgo
 } // namespace aquarius

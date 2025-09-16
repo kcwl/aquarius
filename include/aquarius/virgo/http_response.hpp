@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/detail/string_parse.hpp>
-#include <aquarius/detail/json.hpp>
+#include <aquarius/virgo/serialize/string_parse.hpp>
+#include <aquarius/virgo/serialize/json.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>
@@ -52,7 +52,8 @@ namespace aquarius
 
 				buffer.commit(str.size());
 
-				this->header_parse_.to_datas(this->header());
+				//this->header_parse_.to_datas(this->header());
+				this->header().template parse_header<header_t>(buffer);
 
 				std::string end_line = "\r\n";
 
@@ -94,9 +95,9 @@ namespace aquarius
 			}
 
 		private:
-			detail::string_parse header_parse_;
+			virgo::string_parse header_parse_;
 
-			detail::json_parse body_parse_;
+			virgo::json_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

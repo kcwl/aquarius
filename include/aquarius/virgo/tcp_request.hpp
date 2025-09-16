@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
-#include <aquarius/detail/pod_parse.hpp>
-#include <aquarius/detail/binary.hpp>
+#include <aquarius/virgo/serialize/pod_parse.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 
 namespace aquarius
 {
@@ -68,9 +68,9 @@ namespace aquarius
 			}
 
 		private:
-			detail::pod_parse header_parse_;
+			virgo::pod_parse header_parse_;
 
-			detail::binary_parse body_parse_;
+			virgo::binary_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

@@ -121,26 +121,45 @@ namespace aquarius
 
 		void protocol::generate_src(std::fstream& ofs)
 		{
-			ofs << "void serialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "void "<< name_ <<"_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
-			request_.generate_header_src(ofs);
+			request_.generate_src_serialize(ofs, router_.type(), "header");
 			ofs << "}\n\n";
 
-			ofs << "bool deserialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "void "<<name_<<"_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
-			request_.generate_header_src(ofs);
+			request_.generate_src_deserialize(ofs, router_.type(), "header");
 			ofs << "}\n\n";
 
-			ofs << "void serialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "void "<< name_ <<"_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
-			response_.generate_header_src(ofs);
+			request_.generate_src_serialize(ofs, router_.type(), "body");
 			ofs << "}\n\n";
 
-			ofs << "bool deserialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "void "<<name_<<"_req_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
-			response_.generate_header_src(ofs);
+			request_.generate_src_deserialize(ofs, router_.type(), "body");
 			ofs << "}\n\n";
 
+			ofs << "void "<< name_ <<"_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+			ofs << "{\n";
+			response_.generate_src_serialize(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "void "<<name_<<"_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+			ofs << "{\n";
+			response_.generate_src_deserialize(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "void "<< name_ <<"_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+			ofs << "{\n";
+			response_.generate_src_serialize(ofs, router_.type(), "body");
+			ofs << "}\n\n";
+
+			ofs << "void "<<name_<<"_resp_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+			ofs << "{\n";
+			response_.generate_src_deserialize(ofs, router_.type(), "body");
+			ofs << "}\n\n";
 		}
 
 		void protocol::write_class(std::fstream& ofs, const std::string& name, const std::string& type)
@@ -151,8 +170,8 @@ namespace aquarius
 			ofs << "\t" << name << "() = default; \n";
 			ofs << "\tvirtual ~"<< name <<"() = default; \n";
 			ofs << "public:\n";
-			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>&buffer); \n";
-			ofs << "\tvirtual bool deserialize(aquarius::detail::flex_buffer<char>&buffer); \n";
+			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
+			ofs << "\tvirtual void deserialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
 			ofs << "private:\n";
 		}
 

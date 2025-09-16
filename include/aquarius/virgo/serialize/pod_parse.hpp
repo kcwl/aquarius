@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace virgo
 	{
 		struct pod_parse
 		{

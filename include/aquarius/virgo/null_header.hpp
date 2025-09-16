@@ -2,7 +2,7 @@
 #include <expected>
 #include <aquarius/error_code.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/detail/json.hpp>
+#include <aquarius/virgo/serialize/json.hpp>
 
 namespace aquarius
 {

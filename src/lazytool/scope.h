@@ -66,6 +66,10 @@ namespace aquarius
 
 			void generate_body(std::fstream& ofs);
 
+			void generate_src_serialize(std::fstream& ofs, const std::string& type, const std::string& scope);
+
+			void generate_src_deserialize(std::fstream& ofs, const std::string& type, const std::string& scope);
+
 			std::string name() const;
 
 		private:

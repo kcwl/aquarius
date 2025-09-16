@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/asio/ip/tcp.hpp>
-#include <aquarius/detail/binary.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 #include <string_view>
 
 namespace aquarius
@@ -81,7 +81,7 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[buffer = std::move(body_buffer), session_ptr]() mutable -> awaitable<void>
 				{
-					detail::binary_parse parse{};
+					virgo::binary_parse parse{};
 					auto router = parse.from_datas<std::string_view>(buffer);
 
 					detail::router<Session>::get_mutable_instance().invoke(router, session_ptr, std::move(buffer));

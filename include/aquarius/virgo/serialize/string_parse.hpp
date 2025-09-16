@@ -12,29 +12,29 @@ namespace aquarius
 
 		struct string_parse
 		{
-			template <typename T>
-			std::string to_datas(T&& value)
-			{
-				std::stringstream ss{};
-				boost::pfr::for_each_field_with_name(std::forward<T>(value), [&](auto&& name, auto&& field)
-													 { ss << name << ": " << field << "\n"; });
+			//template <typename T>
+			//std::string to_datas(T&& value)
+			//{
+			//	std::stringstream ss{};
+			//	boost::pfr::for_each_field_with_name(std::forward<T>(value), [&](auto&& name, auto&& field)
+			//										 { ss << name << ": " << field << "\n"; });
 
-				return ss.str();
-			}
+			//	return ss.str();
+			//}
 
-			template<typename T>
-			void to_datas(T&& value, detail::flex_buffer<char>& buffer)
-			{
-				std::stringstream ss{};
-				boost::pfr::for_each_field_with_name(std::forward<T>(value), [&] (auto&& name, auto&& field)
-													 {
-														 ss << name << ": " << field << "\n";
-													 });
+			//template<typename T>
+			//void to_datas(T&& value, detail::flex_buffer<char>& buffer)
+			//{
+			//	std::stringstream ss{};
+			//	boost::pfr::for_each_field_with_name(std::forward<T>(value), [&] (auto&& name, auto&& field)
+			//										 {
+			//											 ss << name << ": " << field << "\n";
+			//										 });
 
-				std::copy(ss.str().begin(), ss.str().end(), buffer.wdata());
+			//	std::copy(ss.str().begin(), ss.str().end(), buffer.wdata());
 
-				buffer.commit(ss.str().size());
-			}
+			//	buffer.commit(ss.str().size());
+			//}
 
 			template <typename T>
 			T from_datas(detail::flex_buffer<char>& buffer)
