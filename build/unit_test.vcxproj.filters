@@ -46,6 +46,9 @@
     <Filter Include="include\aquarius\router">
       <UniqueIdentifier>{b532fa9d-76f7-4dc3-b926-e795e769733c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\virgo\serialize">
+      <UniqueIdentifier>{41ca6415-f3ce-493d-a21a-99ed31b13d59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -279,12 +282,6 @@
     <ClInclude Include="..\include\aquarius\router\type.hpp">
       <Filter>include\aquarius\router</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\binary.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\json.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -306,11 +303,32 @@
     <ClInclude Include="..\include\aquarius\virgo\null_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\pod_parse.hpp">
-      <Filter>include\aquarius\detail</Filter>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\binary.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\string_parse.hpp">
-      <Filter>include\aquarius\detail</Filter>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\json.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\pod_parse.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\string_parse.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\message_serialize_base.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\basic_message_serialize.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\tcp_serialize.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_serialize.hpp">
+      <Filter>include\aquarius\virgo\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

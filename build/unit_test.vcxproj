@@ -156,14 +156,10 @@
     <ClInclude Include="..\include\aquarius\awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\detail\attribute.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\binary.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\json.hpp" />
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\pod_parse.hpp" />
     <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\string_parse.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
     <ClInclude Include="..\include\aquarius\detail\visit.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
@@ -212,6 +208,7 @@
     <ClInclude Include="..\include\aquarius\traits\async.hpp" />
     <ClInclude Include="..\include\aquarius\use_awaitable.hpp" />
     <ClInclude Include="..\include\aquarius\use_future.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
@@ -226,6 +223,14 @@
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_status.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\basic_message_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\json.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\message_serialize_base.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\pod_parse.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\string_parse.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\tcp_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />

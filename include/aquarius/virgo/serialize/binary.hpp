@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace virgo
 	{
 		struct binary_parse
 		{

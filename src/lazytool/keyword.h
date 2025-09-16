@@ -12,11 +12,15 @@ namespace aquarius
 		class proto_keyword
 		{
 		public:
-			virtual void generate(std::fstream& /*ofs_h*/)
+			virtual void generate(std::fstream& /*ofs*/)
 			{}
 
-			virtual void generate_define(std::fstream& /*ofs_h*/)
+			virtual void generate_define(std::fstream& /*ofs*/)
 			{}
+
+			virtual void generate_src(std::fstream&  /*ofs*/)
+			{
+			}
 		};
 
 		class protocol : public proto_keyword
@@ -27,6 +31,11 @@ namespace aquarius
 			void generate(std::fstream& ofs);
 
 			void generate_define(std::fstream& ofs);
+
+			void generate_src(std::fstream&  ofs);
+
+		private:
+			void write_class(std::fstream& ofs, const std::string& name, const std::string& type);
 
 		public:
 			std::string name_;

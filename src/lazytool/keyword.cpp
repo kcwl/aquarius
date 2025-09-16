@@ -1,6 +1,15 @@
 #include "keyword.h"
 #include "read_value.hpp"
 #include <filesystem>
+#include <string_view>
+
+using namespace std::string_view_literals;
+
+namespace
+{
+	constexpr std::string_view end = "};\n"sv;
+}
+
 namespace aquarius
 {
 	namespace virgo
@@ -71,32 +80,80 @@ namespace aquarius
 
 		void protocol::generate(std::fstream& ofs)
 		{
-			ofs << "struct " << name_ << "_req_header\n";
-			ofs << "{\n";
+			//ofs << "struct " << name_ << "_req_header\n";
+			//ofs << "{\n";
+			//request_.generate_header(ofs);
+			//ofs << "};\n\n";
+			//ofs << "struct " << name_ << "_req_body\n";
+			//ofs << "{\n";
+			//request_.generate_body(ofs);
+			//ofs << "};\n\n";
+			//ofs << "struct " << name_ << "_resp_header\n";
+			//ofs << "{\n";
+			//response_.generate_header(ofs);
+			//ofs << "};\n\n";
+			//ofs << "struct " << name_ << "_resp_body\n";
+			//ofs << "{\n";
+			//response_.generate_body(ofs);
+			//ofs << "};\n\n";
+			write_class(ofs, name_+"_req_header", this->router_.type());
 			request_.generate_header(ofs);
-			ofs << "};\n\n";
-			ofs << "struct " << name_ << "_req_body\n";
-			ofs << "{\n";
+			ofs << end << std::endl;
+
+			write_class(ofs, name_+"_req_body", this->router_.type());
 			request_.generate_body(ofs);
-			ofs << "};\n\n";
-			ofs << "struct " << name_ << "_resp_header\n";
-			ofs << "{\n";
+			ofs << end << std::endl;
+
+			write_class(ofs, name_+"_resp_header", this->router_.type());
 			response_.generate_header(ofs);
-			ofs << "};\n\n";
-			ofs << "struct " << name_ << "_resp_body\n";
-			ofs << "{\n";
+			ofs << end << std::endl;
+
+			write_class(ofs, name_+"_resp_body", this->router_.type());
 			response_.generate_body(ofs);
-			ofs << "};\n\n";
+			ofs << end << std::endl;
 		}
 
 		void protocol::generate_define(std::fstream& ofs)
 		{
-			ofs << "struct " << name_ << "_protocol\n";
+			ofs << "using " << name_ << "_request = aquarius::virgo::" << router_.type() << "_request<" << "\"" << router_.value() << "\", " << name_ << "_req_header, " << name_ << "_req_body>;\n";
+			ofs << "using " << name_ << "_response = aquarius::virgo::" << router_.type() << "_response<" << "\"" << router_.value() << "\", " << name_ << "_resp_header, " << name_ << "_resp_body>;\n";
+		}
+
+		void protocol::generate_src(std::fstream& ofs)
+		{
+			ofs << "void serialize(aquarius::detail::flex_buffer<char>&buffer)\n";
 			ofs << "{\n";
-			ofs << "  static constexpr std::string_view router() { return \"" << router_.value() << "\"sv; }\n";
-			ofs << "  using request = aquarius::virgo::" << router_.type() << "_request<detail::" << name_ << "_req_header, detail::" << name_ << "_req_body>;\n";
-			ofs << "  using response = aquarius::virgo::" << router_.type() << "_response<detail::" << name_ << "_resp_header, detail::" << name_ << "_resp_body>;\n";
-			ofs << "};\n";
+			request_.generate_header_src(ofs);
+			ofs << "}\n\n";
+
+			ofs << "bool deserialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "{\n";
+			request_.generate_header_src(ofs);
+			ofs << "}\n\n";
+
+			ofs << "void serialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "{\n";
+			response_.generate_header_src(ofs);
+			ofs << "}\n\n";
+
+			ofs << "bool deserialize(aquarius::detail::flex_buffer<char>&buffer)\n";
+			ofs << "{\n";
+			response_.generate_header_src(ofs);
+			ofs << "}\n\n";
+
+		}
+
+		void protocol::write_class(std::fstream& ofs, const std::string& name, const std::string& type)
+		{
+			ofs << "class " << name <<  " final : public aquarius::virgo::" << type << "_serialize\n";
+			ofs << "{\n";
+			ofs << "public:\n";
+			ofs << "\t" << name << "() = default; \n";
+			ofs << "\tvirtual ~"<< name <<"() = default; \n";
+			ofs << "public:\n";
+			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>&buffer); \n";
+			ofs << "\tvirtual bool deserialize(aquarius::detail::flex_buffer<char>&buffer); \n";
+			ofs << "private:\n";
 		}
 
 		std::expected<std::string, parse_error> structure::parse(std::fstream& ifs, std::size_t column, std::size_t row)

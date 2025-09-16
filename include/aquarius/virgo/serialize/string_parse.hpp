@@ -7,7 +7,7 @@
 
 namespace aquarius
 {
-	namespace detail
+	namespace virgo
 	{
 
 		struct string_parse
