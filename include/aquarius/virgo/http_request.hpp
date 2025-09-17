@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/virgo/serialize/string_parse.hpp>
 #include <aquarius/virgo/serialize/json.hpp>
 #include <string_view>
 
@@ -92,8 +91,6 @@ namespace aquarius
 			}
 
 		private:
-			virgo::string_parse header_parse_;
-
 			virgo::json_parse body_parse_;
 		};
 	} // namespace virgo

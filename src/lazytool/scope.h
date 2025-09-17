@@ -70,7 +70,14 @@ namespace aquarius
 
 			void generate_src_deserialize(std::fstream& ofs, const std::string& type, const std::string& scope);
 
+			void generate_tag_invoke_define(std::fstream& ofs, const std::string& scope);
+
+			void generate_tag_invoke_src(std::fstream& ofs, const std::string& scope);
+
 			std::string name() const;
+
+		private:
+			std::string from_json_type_string(const std::string& type);
 
 		private:
 			std::string name_;

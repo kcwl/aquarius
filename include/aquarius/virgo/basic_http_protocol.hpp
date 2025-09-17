@@ -18,7 +18,7 @@ namespace aquarius
 
 			using base::router;
 
-			using header_t = Header;
+			using typename base::header_t;
 
 			constexpr static auto has_request = Request;
 
@@ -66,7 +66,7 @@ namespace aquarius
 
 			using base::router;
 
-			using header_t = Header;
+			using typename base::header_t;
 
 			constexpr static auto has_request = false;
 

@@ -49,6 +49,9 @@
     <Filter Include="include\aquarius\virgo\serialize">
       <UniqueIdentifier>{41ca6415-f3ce-493d-a21a-99ed31b13d59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\json">
+      <UniqueIdentifier>{3e98a3be-ffb2-4805-9df3-d8a2c67e78da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -297,12 +300,6 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\null_header.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\null_body.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\serialize\binary.hpp">
       <Filter>include\aquarius\virgo\serialize</Filter>
     </ClInclude>
@@ -310,9 +307,6 @@
       <Filter>include\aquarius\virgo\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\serialize\pod_parse.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\string_parse.hpp">
       <Filter>include\aquarius\virgo\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\serialize\message_serialize_base.hpp">
@@ -329,6 +323,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\json\json.hpp">
+      <Filter>include\aquarius\json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

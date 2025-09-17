@@ -34,6 +34,7 @@ namespace aquarius
 
 			void generate_src(std::fstream&  ofs);
 
+
 		private:
 			void write_class(std::fstream& ofs, const std::string& name, const std::string& type);
 

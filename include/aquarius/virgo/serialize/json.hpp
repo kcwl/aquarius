@@ -2,6 +2,7 @@
 #include <boost/json.hpp>
 #include <string>
 #include <aquarius/detail/flex_buffer.hpp>
+#include <string>
 
 namespace aquarius
 {

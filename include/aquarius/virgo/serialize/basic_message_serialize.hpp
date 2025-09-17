@@ -14,25 +14,25 @@ namespace aquarius
 
 		public:
 			template <typename T, typename U>
-			void parse_header(T&& value, detail::flex_buffer<U>& buffer)
+			void parse_header_to(T&& value, detail::flex_buffer<U>& buffer)
 			{
 				return header_parse_.to_datas(std::forward<T>(value), buffer);
 			}
 
 			template <typename T, typename U>
-			T parse_header(detail::flex_buffer<U>& buffer)
+			T parse_header_from(detail::flex_buffer<U>& buffer)
 			{
 				return header_parse_.from_datas<T>(buffer);
 			}
 
 			template <typename T, typename U>
-			void parse_body(T&& value, detail::flex_buffer<U>& buffer)
+			void parse_body_to(T&& value, detail::flex_buffer<U>& buffer)
 			{
 				return body_parse_.to_datas(std::forward<T>(value), buffer);
 			}
 
 			template <typename T, typename U>
-			T parse_body(detail::flex_buffer<U>& buffer)
+			T parse_body_from(detail::flex_buffer<U>& buffer)
 			{
 				return body_parse_.from_datas<T>(buffer);
 			}

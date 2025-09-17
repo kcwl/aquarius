@@ -101,7 +101,12 @@ namespace aquarius
 			ofs << end << std::endl;
 
 			write_class(ofs, name_+"_req_body", this->router_.type());
+			if (this->router_.type() == "http")
+			{
+				request_.generate_tag_invoke_define(ofs, "body");
+			}
 			request_.generate_body(ofs);
+			
 			ofs << end << std::endl;
 
 			write_class(ofs, name_+"_resp_header", this->router_.type());
@@ -109,8 +114,14 @@ namespace aquarius
 			ofs << end << std::endl;
 
 			write_class(ofs, name_+"_resp_body", this->router_.type());
+			if (this->router_.type() == "http")
+			{
+				response_.generate_tag_invoke_define(ofs, "body");
+			}
 			response_.generate_body(ofs);
 			ofs << end << std::endl;
+
+			
 		}
 
 		void protocol::generate_define(std::fstream& ofs)
@@ -141,6 +152,11 @@ namespace aquarius
 			request_.generate_src_deserialize(ofs, router_.type(), "body");
 			ofs << "}\n\n";
 
+			if (router_.type() == "http")
+			{
+				request_.generate_tag_invoke_src(ofs, "body");
+			}
+
 			ofs << "void "<< name_ <<"_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
 			response_.generate_src_serialize(ofs, router_.type(), "header");
@@ -160,6 +176,11 @@ namespace aquarius
 			ofs << "{\n";
 			response_.generate_src_deserialize(ofs, router_.type(), "body");
 			ofs << "}\n\n";
+
+			if (router_.type() == "http")
+			{
+				response_.generate_tag_invoke_src(ofs, "body");
+			}
 		}
 
 		void protocol::write_class(std::fstream& ofs, const std::string& name, const std::string& type)
@@ -172,8 +193,8 @@ namespace aquarius
 			ofs << "public:\n";
 			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
 			ofs << "\tvirtual void deserialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
-			ofs << "private:\n";
 		}
+		
 
 		std::expected<std::string, parse_error> structure::parse(std::fstream& ifs, std::size_t column, std::size_t row)
 		{

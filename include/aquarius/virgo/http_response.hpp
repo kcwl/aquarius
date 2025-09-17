@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/virgo/serialize/string_parse.hpp>
 #include <aquarius/virgo/serialize/json.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
@@ -15,7 +14,7 @@ namespace aquarius
 		class http_response : public basic_http_protocol<false, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
-			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
+			using base = basic_http_protocol<false, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
 
@@ -53,7 +52,10 @@ namespace aquarius
 				buffer.commit(str.size());
 
 				//this->header_parse_.to_datas(this->header());
-				this->header().template parse_header<header_t>(buffer);
+				if constexpr (!std::same_as<header_t, int>)
+				{
+					this->header().serialize(buffer);
+				}
 
 				std::string end_line = "\r\n";
 
@@ -91,12 +93,11 @@ namespace aquarius
 						break;
 				}
 
-				this->body() = body_parse_.from_datas<body_t>(buffer);
+				//this->body() = body_parse_.from_datas<body_t>(buffer);
+				this->body().deserialize(buffer);
 			}
 
 		private:
-			virgo::string_parse header_parse_;
-
 			virgo::json_parse body_parse_;
 		};
 	} // namespace virgo

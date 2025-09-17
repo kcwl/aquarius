@@ -229,7 +229,7 @@ namespace aquarius
 					if (type.empty())
 						continue;
 
-					ofs << "\t" << "this->parse_" << scope << "(" << value << ", buffer);\n";
+					ofs << "\t" << "this->parse_"<< scope<<"_to" << "(" << value << ", buffer);\n";
 				}
 			}
 			else if (type == "http")
@@ -239,7 +239,7 @@ namespace aquarius
 					if (type.empty())
 						continue;
 
-					ofs << "\t" << "this->parse_" << scope << "(" << value << ", buffer);\n";
+					ofs << "\t" << "this->parse_"<< scope <<"_to" << "(" << value << ", buffer);\n";
 				}
 			}
 		}
@@ -258,7 +258,7 @@ namespace aquarius
 					if (t.empty())
 						continue;
 
-					ofs << "\t" << value << " = this->parse_" << scope << "<" << from_type_string(t) << ">(buffer);\n";
+					ofs << "\t" << value << " = this->parse_"<< scope<<"_from"  << "<" << from_type_string(t) << ">(buffer);\n";
 				}
 			}
 			else if (type == "http")
@@ -268,14 +268,59 @@ namespace aquarius
 					if (t.empty())
 						continue;
 
-					ofs << "\t" << value << " = this->parse_" << scope << "<" << from_type_string(t) << ">(buffer);\n";
+					ofs << "\t" << value << " = this->parse_" << scope << "_from" <<  "<" << from_type_string(t) << ">(buffer);\n";
 				}
 			}
+		}
+
+		void proto::generate_tag_invoke_define(std::fstream& ofs, const std::string& scope)
+		{
+			ofs << "\tfriend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
+				<< name_ << "_" << scope << "& local);\n\n";
+
+			ofs << "\tfriend "<< name_ << "_" << scope <<" tag_invoke(const aquarius::json::value_to_tag<" << name_ << "_" << scope
+				<< ">&, const aquarius::json::value& jv);\n";
+		}
+
+		void proto::generate_tag_invoke_src(std::fstream& ofs, const std::string& scope)
+		{
+			auto scopes = scope == "header" ? hr_.scopes_ : by_.scopes_;
+
+			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const " << name_ << "_" << scope
+				<< "& local)\n";
+			ofs << "{\n";
+			ofs << "\tauto& jv_obj = jv.emplace_object();\n";
+			for (auto& [key, value] : scopes)
+			{
+				ofs << "\tjv_obj.emplace(\"" << value << "\", local." << value << "); \n";
+			}
+			ofs << "}\n\n";
+
+			ofs << name_ << "_" << scope << " tag_invoke(const aquarius::json::value_to_tag<"
+															<< name_ << "_" << scope << ">&, const aquarius::json::value& jv)\n";
+			ofs << "{\n";
+			ofs << "\t" << name_ << "_" << scope << " result{};\n";
+			ofs << "\tauto obj = jv.try_as_object();\n";
+			ofs << "\tif(obj->empty())\n";
+			ofs << "\t\treturn {};\n\n";
+			for (auto& [key, value] : scopes)
+			{
+				ofs << "\tresult." << value <<" = static_cast<" << from_type_string(key) << ">(obj->at(\"" << value << "\").as_" << from_json_type_string(key)
+					<< "());\n";
+			}
+			ofs << "\treturn result;\n";
+
+			ofs << "}\n\n";
 		}
 
 		std::string proto::name() const
 		{
 			return name_;
+		}
+
+		std::string proto::from_json_type_string(const std::string& type)
+		{
+			return type;
 		}
 	} // namespace virgo
 } // namespace aquarius
