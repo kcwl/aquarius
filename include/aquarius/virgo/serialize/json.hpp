@@ -31,6 +31,9 @@ namespace aquarius
 			template <typename T, typename U>
 			T from_datas(detail::flex_buffer<U>& buffer)
 			{
+				if (buffer.empty())
+					return {};
+
 				std::string json(buffer.rdata(), buffer.active());
 
 				buffer.consume(json.size());

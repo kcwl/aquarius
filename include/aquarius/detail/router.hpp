@@ -37,7 +37,12 @@ namespace aquarius
 				{
 					auto req = std::make_shared<typename Context::request_t>();
 
-					req->consume(buffer);
+					error_code ec{};
+
+					req->consume(buffer, ec);
+
+					if (ec)
+						return false;
 
 					post(session->get_executor(),
 						 [=]

@@ -10,7 +10,7 @@ namespace aquarius
 	namespace virgo
 	{
 		template <typename T, char... SP>
-		std::expected<std::string, error_code> read_value(detail::flex_buffer<T>& buffer)
+		std::string read_value(detail::flex_buffer<T>& buffer, error_code& ec)
 		{
 			std::string value{};
 			while (!buffer.empty())
@@ -19,14 +19,19 @@ namespace aquarius
 				if (((c == SP) || ...))
 					return value;
 
+				if (c == ' ')
+					continue;
+
 				value.push_back(c);
 			}
 
-			return std::unexpected(make_error_code(http_status::bad_request));
+			ec = make_error_code(http_status::bad_request);
+
+			return value;
 		}
 
 		template <typename T, char... SP>
-		std::expected<std::string, error_code> read_key(detail::flex_buffer<T>& buffer)
+		std::string read_key(detail::flex_buffer<T>& buffer, error_code& ec)
 		{
 			std::string value{};
 
@@ -50,7 +55,9 @@ namespace aquarius
 				value.push_back(c);
 			}
 
-			return std::unexpected(make_error_code(http_status::bad_request));
+			ec = make_error_code(http_status::bad_request);
+
+			return {};
 		}
 	} // namespace virgo
 } // namespace aquarius

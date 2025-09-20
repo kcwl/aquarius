@@ -92,7 +92,9 @@ namespace aquarius
 
 			detail::flex_buffer<char> buffer{};
 
-			if (!response_.commit(buffer))
+			response_.commit(buffer, ec);
+
+			if (ec)
 				co_return ec;
 
 			co_return co_await session()->async_send(std::move(buffer));

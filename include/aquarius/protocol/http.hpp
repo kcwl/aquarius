@@ -61,210 +61,223 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[session_ptr, buffer = std::move(buffer), this]() mutable -> awaitable<void>
 				{
+					error_code ec{};
+					virgo::http_method method;
+					virgo::http_version version;
+					std::string path;
+					std::vector<std::pair<std::string, std::string>> querys;
 
-					auto method = parse_method(buffer);
-
-					if (!method.has_value())
+					parse_header_line(buffer, method, version, path, querys, ec);
+					if (ec.value() != static_cast<int>(virgo::http_status::ok))
 						co_return;
 
-					std::vector<std::pair<std::string, std::string>> querys{};
-
-					auto router = parse_uri(buffer, method.value(), querys);
-
-					if (!router.has_value())
-						co_return;
-
-					auto version = parse_version(buffer);
-
-					if (!version.has_value())
-						co_return;
-
-					if (method.value() == virgo::http_method::options)
+					if (method == virgo::http_method::options)
 					{
 						virgo::http_options_protocol::request hop_req{};
-						hop_req.consume(buffer);
+						hop_req.consume(buffer, ec);
+
+						if (ec.value() != static_cast<int>(virgo::http_status::ok))
+							co_return;
 
 						virgo::http_options_protocol::response hop_resp{};
-						hop_resp.result(static_cast<int32_t>(virgo::http_status::no_content));
-						hop_resp.version(hop_req.version());
-						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
+						hop_resp.status(virgo::http_status::no_content);
+						hop_resp.version(version);
+ 						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
 						hop_resp.set_field("Access-Control-Allow-Methods", "POST,GET");
 						hop_resp.set_field("Access-Control-Allow-Headers",
 										   hop_req.find("Access-Control-Request-Headers"));
-						hop_resp.set_field("Access-Control-Max-Age", 86400);
+						hop_resp.set_field("Access-Control-Max-Age", std::to_string(86400));
 
 						detail::flex_buffer<char> buffer{};
-						auto result = hop_resp.commit(buffer);
+						hop_resp.commit(buffer, ec);
 
-						if (!result.has_value())
+						if (ec.value() != static_cast<int>(virgo::http_status::ok))
 							co_return;
 
 						co_await session_ptr->async_send(std::move(buffer));
 					}
 					else
 					{
-						detail::router<Session>::get_mutable_instance().invoke(router.value(), session_ptr, buffer);
+						detail::router<Session>::get_mutable_instance().invoke(path, session_ptr, buffer);
 					}
 				},
 				detached);
 		}
 
 		template <typename T>
-		std::expected<virgo::http_method, error_code> parse_method(detail::flex_buffer<T>& buffer)
+		void parse_header_line(detail::flex_buffer<T>& buffer, virgo::http_method& method, virgo::http_version& version,
+							   std::string& path, std::vector<std::pair<std::string, std::string>>& querys,
+							   error_code& ec)
 		{
-			return virgo::read_value<T, ' '>(buffer).and_then(
-				[&](const auto& value) -> std::expected<virgo::http_method, error_code>
-				{
-					virgo::http_method method{};
+			auto span = std::span<T>(buffer.rdata(), buffer.active());
 
-					if (value == "POST")
-					{
-						method = virgo::http_method::post;
-					}
-					else if (value == "GET")
-					{
-						method = virgo::http_method::get;
-					}
-					else if (value == "OPTIONS")
-					{
-						method = virgo::http_method::options;
-					}
-					else
-					{
-						return std::unexpected(make_error_code(virgo::http_status::bad_request));
-					}
+			auto buf_view = span | std::views::slide(2);
 
-					return method;
-				});
-		}
+			auto iter = std::ranges::find_if(buf_view,
+											 [] (const auto& v)
+											 {
+												 if (v.size() < 2)
+													 return false;
 
-		template <typename T>
-		std::expected<std::string, error_code> parse_uri(detail::flex_buffer<T>& buffer, virgo::http_method method, std::vector<std::pair<std::string, std::string>>& querys)
-		{
-			return parse_path(buffer).and_then(
-				[&](const auto& path) -> std::expected<std::string, error_code>
-				{
-					if (path.empty())
-						return std::unexpected(make_error_code(virgo::http_status::bad_request));
+												 return std::string_view(v) == "\r\n";
+											 });
 
-					if (method != virgo::http_method::get)
-						return path;
-
-					querys.push_back({});
-					return parse_querys(buffer, querys.back())
-						.and_then(
-							[&](char end) -> std::expected<std::string, error_code>
-							{
-								if (end == '#' || end == ' ')
-									return path;
-
-								return std::unexpected(make_error_code(virgo::http_status::bad_request));
-							});
-				});
-		}
-
-		template <typename T>
-		std::expected<virgo::http_version, error_code> parse_version(detail::flex_buffer<T>& buffer)
-		{
-			return virgo::read_value<T, '\r'>(buffer).and_then(
-				[&](const auto& value) -> std::expected<virgo::http_version, error_code>
-				{
-					virgo::http_version version;
-
-					auto pos = value.find('.');
-					if (pos == std::string::npos)
-					{
-						if (value == "HTTP2")
-						{
-							version = virgo::http_version::http2;
-						}
-						else if (value == "HTTP3")
-						{
-							version = virgo::http_version::http3;
-						}
-						else
-						{
-							return std::unexpected(make_error_code(virgo::http_status::bad_request));
-						}
-					}
-					else
-					{
-						auto suffix = value.substr(pos + 1);
-						if (*suffix.data() == '1')
-						{
-							version = virgo::http_version::http1_1;
-						}
-						else
-						{
-							version = virgo::http_version::http1_0;
-						}
-					}
-
-					buffer.consume(1);
-
-					return version;
-				});
-		}
-
-		template <typename T>
-		std::expected<std::string, error_code> parse_path(detail::flex_buffer<T>& buffer)
-		{
-			std::string path{};
-
-			auto c = buffer.peek();
-
-			if (c != '/')
-				return std::unexpected(make_error_code(virgo::http_status::bad_request));
-
-			path.push_back(buffer.get());
-
-			while (buffer.peek() != T(-1))
+			if (iter == buf_view.end())
 			{
-				c = buffer.get();
-
-				if (c == '?' || c == '#' || c == ' ')
-					break;
-
-				if (!std::isalnum(c) && (c != '_'))
-					return std::unexpected(make_error_code(virgo::http_status::bad_request));
-
-				path.push_back(c);
+				ec = make_error_code(virgo::http_status::bad_request);
+				return;
 			}
 
-			return path;
+			auto len = std::distance(buf_view.begin(), iter);
+
+			buffer.consume(len + 2);
+
+			auto header_line = span.subspan(0, len + 2);
+
+			auto headers = header_line | std::views::split(' ');
+
+			auto size = std::distance(headers.begin(), headers.end());
+
+			if (size < 3)
+			{
+				ec = make_error_code(virgo::http_status::bad_request);
+				return;
+			}
+
+			auto header_iter = headers.begin();
+
+			parse_method(std::span<T>(*header_iter++), method, ec);
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				return;
+
+			parse_uri(std::span<T>(*header_iter++), method, path, querys, ec);
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				return;
+
+			parse_version(std::span<T>(*header_iter), version, ec);
 		}
 
 		template <typename T>
-		std::expected<char, error_code> parse_querys(detail::flex_buffer<T>& buffer,
-													 std::pair<std::string, std::string>& query)
+		void parse_method(std::span<T> buffer, virgo::http_method& method, error_code& ec)
 		{
-			std::expected<char, error_code> result{};
+			ec = make_error_code(virgo::http_status::ok);
 
-			while (buffer.peek() != T(-1))
+			std::string_view value(buffer.data(), buffer.size());
+
+			if (value == "POST")
 			{
-				result = virgo::read_value<T, '='>(buffer)
-							 .and_then(
-								 [&](const auto& value)
-								 {
-									 query.first = value;
+				method = virgo::http_method::post;
+			}
+			else if (value == "GET")
+			{
+				method = virgo::http_method::get;
+			}
+			else if (value == "OPTIONS")
+			{
+				method = virgo::http_method::options;
+			}
+			else
+			{
+				ec = make_error_code(virgo::http_status::bad_request);
+			}
+		}
 
-									 return virgo::read_value<T, '&', ' '>(buffer);
-								 })
-							 .and_then(
-								 [&](const auto& value) -> std::expected<bool, error_code>
-								 {
-									 query.second = value;
-									 return true;
-								 });
+		template <typename T>
+		void parse_uri(std::span<T> buffer, virgo::http_method method, std::string& path,
+					   std::vector<std::pair<std::string, std::string>>& querys, error_code& ec)
+		{
+			ec = make_error_code(virgo::http_status::ok);
 
-				if (!result.has_value())
-					break;
-
-				if (result.value() == ' ')
-					break;
+			if (buffer.empty())
+			{
+				ec = make_error_code(virgo::http_status::bad_request);
+				return;
 			}
 
-			return result;
+			if (method != virgo::http_method::get)
+			{
+				path = std::string(buffer.data(), buffer.size());
+				return;
+			}
+
+			auto iter = std::find(buffer.begin(), buffer.end(), '?');
+
+			if (iter == buffer.end())
+			{
+				ec = make_error_code(virgo::http_status::bad_request);
+				return;
+			}
+
+			auto pos = std::distance(buffer.begin(), iter);
+
+			path = std::string(buffer.subspan(0, pos).data());
+
+			parse_querys(buffer.subspan(pos + 1), querys, ec);
+		}
+
+		template <typename T>
+		void parse_version(std::span<T> buffer, virgo::http_version& version, error_code& ec)
+		{
+			ec = make_error_code(virgo::http_status::ok);
+
+			auto value = std::string_view(buffer.data());
+
+			auto pos = value.find('.');
+			if (pos == std::string::npos)
+			{
+				if (value == "HTTP2")
+				{
+					version = virgo::http_version::http2;
+				}
+				else if (value == "HTTP3")
+				{
+					version = virgo::http_version::http3;
+				}
+				else
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+				}
+			}
+			else
+			{
+				auto suffix = value.substr(pos + 1);
+				if (*suffix.data() == '1')
+				{
+					version = virgo::http_version::http1_1;
+				}
+				else if (*suffix.data() == '0')
+				{
+					version = virgo::http_version::http1_0;
+				}
+				else
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+				}
+			}
+
+			
+		}
+
+		template <typename T>
+		void parse_querys(std::span<T> buffer, std::vector<std::pair<std::string, std::string>>& querys, error_code& ec)
+		{
+			ec = make_error_code(virgo::http_status::ok);
+
+			for (const auto& p : buffer | std::views::split('&'))
+			{
+				auto pos = std::string_view(p).find('=');
+				if (pos == std::string_view::npos)
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+					break;
+				}
+
+				querys.emplace_back();
+				auto& query = querys.back();
+
+				query.first = std::string(std::string_view(p).substr(0, pos));
+				query.second = std::string(std::string_view(p).substr(pos + 1));
+			}
 		}
 	};
 } // namespace aquarius

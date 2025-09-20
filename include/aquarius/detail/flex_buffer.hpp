@@ -87,7 +87,7 @@ namespace aquarius
 
 			void consume(std::size_t size)
 			{
-				size < active() ? rpos_ += size : 0;
+				size <= active() ? rpos_ += size : 0;
 			}
 
 			T peek()

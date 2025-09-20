@@ -2,6 +2,8 @@
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/serialize/json.hpp>
 #include <string_view>
+#include <ranges>
+#include <aquarius/virgo/parse_helper.hpp>
 
 namespace aquarius
 {
@@ -26,16 +28,88 @@ namespace aquarius
 
 		public:
 			template <typename T>
-			bool commit(detail::flex_buffer<T>& buffer)
+			void consume(detail::flex_buffer<T>& buffer, error_code& ec)
+			{
+				ec = make_error_code(virgo::http_status::ok);
+
+				auto span = std::span<T>(buffer.rdata(), buffer.active());
+
+				auto buf_view = span | std::views::slide(4);
+
+				auto iter = std::ranges::find_if(buf_view, [] (const auto& value)
+												{
+													if (value.size() < 4)
+														return false;
+
+													return std::string_view(value) == "\r\n\r\n";
+												});
+
+				if (iter == buf_view.end())
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+					return;
+				}
+
+				auto len = std::distance(buf_view.begin(), iter);
+
+				buffer.consume(len + 4);
+
+				auto buf = span.subspan(0, len);
+
+				auto header_view =  std::views::split(buf, '\n');
+
+				for (const auto header : header_view)
+				{
+					auto itor = std::ranges::find_if(header.begin(), header.end(), [] (const auto& value) { return value == ':'; });
+
+					if (itor == header.end()) 
+					{
+						ec = make_error_code(virgo::http_status::bad_request);
+						return;
+					}
+
+					auto len = std::distance(header.begin(), itor);
+
+					auto key = std::string(std::string_view(header).substr(0, len));
+
+					auto value = std::string(std::string_view(header).substr(len + 1));
+
+					if (value.back() == '\r')
+						value = value.substr(0, value.size() - 1);
+					
+					if (value.front() == ' ')
+						value = value.substr(1);
+
+					this->set_field(key, value);
+				}
+
+				if constexpr (!std::same_as<header_t, int>)
+				{
+					this->header().serialize(buffer);
+				}
+
+				if constexpr (!std::same_as<body_t, int>)
+				{
+					this->body().serialize(buffer);
+				}
+			}
+
+			template <typename T>
+			void commit(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
 				std::string str = std::format("{} {} {}\r\n", from_method_string(this->method()), this->path(),
 											  from_version_string(this->version()));
 
-				auto body_str = this->header_parse_.to_datas(this->body());
+				detail::flex_buffer<char> body_buffer{};
 
-				if (!body_str.empty())
+				if constexpr (!std::same_as<body_t, int>)
 				{
-					this->content_length(body_str.size());
+					this->body().deserialize(body_buffer);
+				}
+				
+				if (!body_buffer.empty())
+				{
+					this->content_length(body_buffer.active());
 				}
 
 				for (auto& s : this->fields_)
@@ -44,50 +118,32 @@ namespace aquarius
 				}
 
 				if (str.size() > buffer.remain())
-					return std::unexpected(make_error_code(http_status::bad_request));
+				{
+					ec = make_error_code(http_status::bad_request);
+					return;
+				}
 
 				std::copy(str.begin(), str.end(), buffer.wdata());
-
 				buffer.commit(str.size());
 
-				if (!this->header_parse_.to_datas(this->header(), buffer))
-					return false;
+				if constexpr (!std::same_as<header_t, int>)
+				{
+					this->header().deserialize(buffer);
+				}
 
 				std::string end_line = "\r\n";
-
 				std::copy(end_line.begin(), end_line.end(), buffer.wdata());
 				buffer.commit(end_line.size());
 
-				this->body_parse_.to_datas(this->body(), buffer);
-			}
-
-			template <typename T>
-			void consume(detail::flex_buffer<T>& buffer)
-			{
-				while (!buffer.empty())
+				if (body_buffer.active() > buffer.remain())
 				{
-					auto result = read_key<T, ':'>(buffer).and_then(
-						[&](const auto& key) -> std::expected<bool, error_code>
-						{
-							if (key.empty())
-								return std::unexpected(make_error_code(http_status::ok));
-
-							return read_value<T, '\r'>(buffer).and_then(
-								[&](const auto& value) -> std::expected<bool, error_code>
-								{
-									this->set_field(key, value);
-
-									buffer.consume(1);
-
-									return true;
-								});
-						});
-
-					if (!result.has_value())
-						break;
+					ec = make_error_code(virgo::http_status::bad_request);
+					return;
 				}
 
-				this->body() = body_parse_.from_datas<body_t>(buffer);
+				buffer.append(std::move(body_buffer));
+
+				ec = make_error_code(virgo::http_status::ok);
 			}
 
 		private:

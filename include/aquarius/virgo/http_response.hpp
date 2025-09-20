@@ -29,15 +29,23 @@ namespace aquarius
 
 		public:
 			template <typename T>
-			std::expected<bool, error_code> commit(detail::flex_buffer<T>& buffer)
+			void commit(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
+				ec = make_error_code(virgo::http_status::ok);
+
 				std::string str = std::format("{} {} {}\r\n", from_version_string(this->version()),
-											  from_status_string(this->status()), this->reason());
+											  std::to_string(static_cast<int>(this->status())), this->reason());
+				detail::flex_buffer<char> body_buffer{};
 
-				detail::flex_buffer<T> body_buffer{};
-				this->body_parse_.to_datas(this->body(), body_buffer);
+				if constexpr (!std::same_as<body_t, int>)
+				{
+					this->body().deserialize(body_buffer);
+				}
 
-				this->content_length(body_buffer.active());
+				if (!body_buffer.empty())
+				{
+					this->content_length(body_buffer.active());
+				}
 
 				for (auto& s : this->fields_)
 				{
@@ -45,56 +53,82 @@ namespace aquarius
 				}
 
 				if (str.size() > buffer.remain())
-					return std::unexpected(make_error_code(http_status::bad_request));
+				{
+					ec = make_error_code(http_status::bad_request);
+					return;
+				}
 
 				std::copy(str.begin(), str.end(), buffer.wdata());
-
 				buffer.commit(str.size());
 
-				//this->header_parse_.to_datas(this->header());
 				if constexpr (!std::same_as<header_t, int>)
 				{
 					this->header().serialize(buffer);
 				}
 
 				std::string end_line = "\r\n";
-
 				std::copy(end_line.begin(), end_line.end(), buffer.wdata());
 				buffer.commit(end_line.size());
 
-				this->body_parse_.to_datas(this->body(), buffer);
+				if (body_buffer.active() > buffer.remain())
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+					return;
+				}
 
-				return true;
+				if (!body_buffer.empty())
+				{
+					buffer.append(std::move(body_buffer));
+				}
+				
+				ec = make_error_code(virgo::http_status::ok);
 			}
 
 			template <typename T>
-			void consume(detail::flex_buffer<T>& buffer)
+			void consume(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
-				while (!buffer.empty())
+				ec = make_error_code(virgo::http_status::ok);
+
+				auto span = std::span<T>(buffer.rdata(), buffer.active());
+
+				auto iter = span.find("\r\n\r\n");
+				if (iter == span.end())
 				{
-					auto result = read_key<T, ':'>(buffer).and_then(
-						[&](const auto& key) -> std::expected<bool, error_code>
-						{
-							if (key.empty())
-								return std::unexpected(make_error_code(http_status::ok));
-
-							return read_value<T, '\r'>(buffer).and_then(
-								[&](const auto& value) -> std::expected<bool, error_code>
-								{
-									set_field(key, value);
-
-									buffer.consume(1);
-
-									return true;
-								});
-						});
-
-					if (!result.has_value())
-						break;
+					ec = make_error_code(virgo::http_status::bad_request);
+					return;
 				}
 
-				//this->body() = body_parse_.from_datas<body_t>(buffer);
-				this->body().deserialize(buffer);
+				auto len = std::distance(span.begin(), iter);
+
+				buffer.consume(len);
+
+				for (const auto& p : span.subspan(0, len) | std::views::split("\r\n"))
+				{
+					auto line = p | std::views::split(':');
+					if (line.size() < 2)
+					{
+						ec = make_error_code(virgo::http_status::bad_request);
+						break;
+					}
+
+					set_field(line.front(), line.back());
+				}
+
+				if (this->content_length() > buffer.active())
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+					return;
+				}
+
+				if constexpr (!std::same_as<header_t, int>)
+				{
+					this->header().serialize(buffer);
+				}
+				
+				if constexpr (!std::same_as<body_t, int>)
+				{
+					this->body().serialize(buffer);
+				}
 			}
 
 		private:

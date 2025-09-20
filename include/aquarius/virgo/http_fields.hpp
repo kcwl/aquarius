@@ -1,10 +1,7 @@
 #pragma once
 #include <iostream>
-#include <string_view>
 #include <map>
 #include <string>
-
-using namespace std::string_view_literals;
 
 namespace aquarius
 {
@@ -29,7 +26,7 @@ namespace aquarius
 			}
 
 		public:
-			std::string_view find(std::string_view f) const
+			std::string find(const std::string& f) const
 			{
 				auto iter = fields_.find(f);
 
@@ -39,27 +36,24 @@ namespace aquarius
 				return iter->second;
 			}
 
-			template <typename T>
-			void set_field(std::string_view f, T v)
+			void set_field(const std::string& f, const std::string& v)
 			{
-				std::stringstream ss;
-				ss << v;
-				fields_[f] = std::string_view(ss.str().c_str());
+				fields_[f] = v;
 			}
 
 			bool has_content_length() const
 			{
-				return !find("Content-Length"sv).empty();
+				return !find("Content-Length").empty();
 			}
 
 			void content_length(uint64_t len)
 			{
-				fields_["Content-Length"sv] = std::string_view(std::to_string(len).c_str());
+				fields_["Content-Length"] = std::string_view(std::to_string(len).c_str());
 			}
 
 			uint64_t content_length()
 			{
-				auto iter = fields_.find("Content-Length"sv);
+				auto iter = fields_.find("Content-Length");
 				if (iter == fields_.end())
 					return 0;
 
@@ -68,20 +62,20 @@ namespace aquarius
 
 			bool keep_alive()
 			{
-				auto iter = fields_.find("Connection"sv);
+				auto iter = fields_.find("Connection");
 				if (iter == fields_.end())
 					return false;
 
-				return iter->second == "keep-alive"sv ? true : false;
+				return iter->second == "keep-alive" ? true : false;
 			}
 
 			void keep_alive(bool k)
 			{
-				fields_["Connection"sv] = k ? "keep-alive"sv : "close"sv;
+				fields_["Connection"] = k ? "keep-alive" : "close";
 			}
 
 		protected:
-			std::map<std::string_view, std::string_view> fields_;
+			std::map<std::string, std::string> fields_;
 		};
 	} // namespace virgo
 } // namespace aquarius
