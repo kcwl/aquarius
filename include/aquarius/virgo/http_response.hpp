@@ -61,10 +61,10 @@ namespace aquarius
 				std::copy(str.begin(), str.end(), buffer.wdata());
 				buffer.commit(str.size());
 
-				if constexpr (!std::same_as<header_t, int>)
-				{
-					this->header().serialize(buffer);
-				}
+				//if constexpr (!std::same_as<header_t, int>)
+				//{
+				//	this->header().serialize(buffer);
+				//}
 
 				std::string end_line = "\r\n";
 				std::copy(end_line.begin(), end_line.end(), buffer.wdata());
@@ -120,10 +120,10 @@ namespace aquarius
 					return;
 				}
 
-				if constexpr (!std::same_as<header_t, int>)
-				{
-					this->header().serialize(buffer);
-				}
+				//if constexpr (!std::same_as<header_t, int>)
+				//{
+				//	this->header().serialize(buffer);
+				//}
 				
 				if constexpr (!std::same_as<body_t, int>)
 				{
