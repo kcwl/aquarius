@@ -153,6 +153,11 @@ namespace aquarius
 			return statuses.at(s);
 		}
 
+		inline std::string_view from_status_string(int s)
+		{
+			return from_status_string(static_cast<http_status>(s));
+		}
+
 		class http_statue_category : public boost::system::error_category
 		{
 		public:
@@ -193,9 +198,7 @@ namespace aquarius
 
 namespace std
 {
-	template<>
+	template <>
 	struct is_error_code_enum<aquarius::virgo::http_status> : std::true_type
-	{
-
-	};
-}
+	{};
+} // namespace std

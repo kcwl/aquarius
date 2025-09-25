@@ -74,16 +74,14 @@ namespace aquarius
 			basic_http_protocol() = default;
 
 		public:
-			http_status status() const
+			std::string_view reason() const
 			{
-				return status_;
+				return reason_;
 			}
 
-			void status(http_status status)
+			void reason(std::string_view r)
 			{
-				status_ = status;
-
-				reason_ = from_status_string(status_);
+				reason_ = r;
 			}
 
 			http_version version() const
@@ -94,11 +92,6 @@ namespace aquarius
 			void version(http_version version)
 			{
 				base::version(static_cast<int32_t>(version));
-			}
-
-			std::string_view reason() const
-			{
-				return reason_;
 			}
 
 		private:

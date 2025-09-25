@@ -80,7 +80,7 @@ namespace aquarius
 							co_return;
 
 						virgo::http_options_protocol::response hop_resp{};
-						hop_resp.status(virgo::http_status::no_content);
+						hop_resp.result(static_cast<int>(virgo::http_status::no_content));
 						hop_resp.version(version);
  						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
 						hop_resp.set_field("Access-Control-Allow-Methods", "POST,GET");

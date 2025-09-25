@@ -34,7 +34,7 @@ namespace aquarius
 				ec = make_error_code(virgo::http_status::ok);
 
 				std::string str = std::format("{} {} {}\r\n", from_version_string(this->version()),
-											  std::to_string(static_cast<int>(this->status())), this->reason());
+											  std::to_string(this->result()), this->reason());
 				detail::flex_buffer<char> body_buffer{};
 
 				if constexpr (!std::same_as<body_t, int>)

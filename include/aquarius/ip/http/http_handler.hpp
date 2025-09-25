@@ -19,6 +19,9 @@ namespace aquarius
 			this->session_ptr_ = session_ptr;
 			this->request_ptr_ = request_ptr;
 
+			this->response_.version(this->request_ptr_->version());
+
+
 			this->response_.set_field("Content-Type", this->request_ptr_->find("Content-Type"));
 			this->response_.set_field("Server", "Aquarius 0.10.0");
 			this->response_.set_field("Connection", this->request_ptr_->find("Connection"));
@@ -32,6 +35,8 @@ namespace aquarius
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
 			this->response_.result(ec.value());
+
+			this->response_.reason(virgo::from_status_string(ec.value()));
 
 			detail::flex_buffer<char> buffer{};
 
