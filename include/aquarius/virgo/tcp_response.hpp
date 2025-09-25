@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
+#include <aquarius/serialize/binary.hpp>
 
 namespace aquarius
 {
@@ -28,8 +29,7 @@ namespace aquarius
 			template <typename T>
 			bool commit(detail::flex_buffer<T>& buffer)
 			{
-				if (!header_parse_.to_datas(Router, buffer))
-					return false;
+				body_parse_.to_datas(detail::bind_param<Router>::value, buffer);
 
 				auto pos = buffer.tellg();
 
@@ -66,8 +66,6 @@ namespace aquarius
 			}
 
 		private:
-			virgo::pod_parse header_parse_;
-
 			virgo::binary_parse body_parse_;
 		};
 	} // namespace virgo

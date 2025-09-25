@@ -1,7 +1,5 @@
 #pragma once
-#include <aquarius/awaitable.hpp>
 #include <aquarius/concepts/concepts.hpp>
-#include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
@@ -9,6 +7,7 @@
 #include <aquarius/detail/ssl_context.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {

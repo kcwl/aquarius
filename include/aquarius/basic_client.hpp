@@ -1,21 +1,16 @@
 ﻿#pragma once
-#include <aquarius/awaitable.hpp>
-#include <aquarius/co_spawn.hpp>
-#include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/redirect_error.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_context.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/traits/async.hpp>
-#include <aquarius/use_awaitable.hpp>
-#include <aquarius/use_future.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <boost/asio/connect.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
@@ -225,13 +220,4 @@ namespace aquarius
 
 		std::tuple<Adaptor...> adaptors_;
 	};
-
-	template <typename Session>
-	struct is_client<basic_client<Session>> : std::true_type
-	{};
-
-	template <typename Session>
-	struct is_client<basic_exector_client<Session>> : std::true_type
-	{};
-
 } // namespace aquarius

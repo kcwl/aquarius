@@ -1,9 +1,9 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/virgo/serialize/json.hpp>
+#include <aquarius/serialize/json.hpp>
 #include <string_view>
 #include <ranges>
-#include <aquarius/virgo/parse_helper.hpp>
+#include <aquarius/serialize/parse_helper.hpp>
 
 namespace aquarius
 {

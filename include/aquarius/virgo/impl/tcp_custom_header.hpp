@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <iostream>
-#include <aquarius/detail/binary.hpp>
 
 namespace aquarius
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/virgo/serialize/json.hpp>
+#include <aquarius/serialize/json.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>

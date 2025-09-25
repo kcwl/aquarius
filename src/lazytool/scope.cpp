@@ -220,27 +220,16 @@ namespace aquarius
 			if (type.empty())
 				return;
 
-			auto s = scope == "header" ? hr_.scopes_ : by_.scopes_;
+			if (scope == "header")
+				return;
 
 			if (type == "tcp")
 			{
-				for (auto& [_, value] : s)
-				{
-					if (type.empty())
-						continue;
-
-					ofs << "\t" << "this->parse_"<< scope<<"_to" << "(" << value << ", buffer);\n";
-				}
+				ofs << "\t" << value << " = this->parse_" << scope << "_from" << "<" << name_+ "_" +scope << ">(buffer);\n";
 			}
 			else if (type == "http")
 			{
-				for (auto& [_, value] : s)
-				{
-					if (type.empty())
-						continue;
-
-					ofs << "\t" << "this->parse_"<< scope <<"_to" << "(" << value << ", buffer);\n";
-				}
+				ofs << "\t *this = this->parse_" << scope << "_from" << "<" << name_ + "_" +scope << ">(buffer);\n";
 			}
 		}
 
@@ -249,27 +238,16 @@ namespace aquarius
 			if (type.empty())
 				return;
 
-			auto s = scope == "header" ? hr_.scopes_ : by_.scopes_;
+			if (scope == "header")
+				return;
 
 			if (type == "tcp")
 			{
-				for (auto& [t, value] : s)
-				{
-					if (t.empty())
-						continue;
-
-					ofs << "\t" << value << " = this->parse_"<< scope<<"_from"  << "<" << from_type_string(t) << ">(buffer);\n";
-				}
+				ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
 			}
 			else if (type == "http")
 			{
-				for (auto& [t, value] : s)
-				{
-					if (t.empty())
-						continue;
-
-					ofs << "\t" << value << " = this->parse_" << scope << "_from" <<  "<" << from_type_string(t) << ">(buffer);\n";
-				}
+				ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
 			}
 		}
 
@@ -303,9 +281,13 @@ namespace aquarius
 			ofs << "\tauto obj = jv.try_as_object();\n";
 			ofs << "\tif(obj->empty())\n";
 			ofs << "\t\treturn {};\n\n";
+			ofs << "\tauto param = obj->at(\"params\").as_object();\n";
+			ofs << "\tif(param.empty())\n";
+			ofs << "\t\treturn {};\n";
+;
 			for (auto& [key, value] : scopes)
 			{
-				ofs << "\tresult." << value <<" = static_cast<" << from_type_string(key) << ">(obj->at(\"" << value << "\").as_" << from_json_type_string(key)
+				ofs << "\tresult." << value <<" = static_cast<" << from_type_string(key) << ">(param.at(\"" << value << "\").as_" << from_json_type_string(key)
 					<< "());\n";
 			}
 			ofs << "\treturn result;\n";

@@ -22,17 +22,8 @@
     <Filter Include="include\aquarius\detail">
       <UniqueIdentifier>{a53cce79-7a96-4b05-9ced-8693ca047089}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\executor">
-      <UniqueIdentifier>{f3091b2d-b1ee-4a0f-a6cb-f3a2f3ad48a4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\concepts">
       <UniqueIdentifier>{a39d9acf-9805-4827-bc60-9a28116f83e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\traits">
-      <UniqueIdentifier>{ac53b292-9677-4d2b-86ab-127ae4e3bff0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\protocol">
-      <UniqueIdentifier>{7f791c88-ebbc-4142-90ae-e1de55bbb8e9}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\aquarius\adaptor">
       <UniqueIdentifier>{653ccca7-45ab-477a-b646-19d2c40403ee}</UniqueIdentifier>
@@ -43,14 +34,17 @@
     <Filter Include="include\aquarius\virgo\impl">
       <UniqueIdentifier>{9070cef0-8bbc-4fa3-b29f-88db23fc6d0c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\router">
-      <UniqueIdentifier>{b532fa9d-76f7-4dc3-b926-e795e769733c}</UniqueIdentifier>
+    <Filter Include="include\aquarius\ip">
+      <UniqueIdentifier>{51ab0fcb-e0ef-4aad-aa91-e2390402e374}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\virgo\serialize">
-      <UniqueIdentifier>{41ca6415-f3ce-493d-a21a-99ed31b13d59}</UniqueIdentifier>
+    <Filter Include="include\aquarius\serialize">
+      <UniqueIdentifier>{8f0dbbaa-0d5f-4054-8083-be21d74c883a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\json">
-      <UniqueIdentifier>{3e98a3be-ffb2-4805-9df3-d8a2c67e78da}</UniqueIdentifier>
+    <Filter Include="include\aquarius\ip\tcp">
+      <UniqueIdentifier>{423d520a-ac4f-4333-b7ec-dbb05b66c777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ip\http">
+      <UniqueIdentifier>{b9092472-bc12-4030-a092-3b78e0026498}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,22 +66,10 @@
     <ClInclude Include="..\test\protocol.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\concat.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\execution_context.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\awaitable.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_client.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_router.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_server.hpp">
@@ -99,13 +81,7 @@
     <ClInclude Include="..\include\aquarius\cmd_options.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\co_spawn.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\deadline_timer.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detached.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\error_code.hpp">
@@ -114,16 +90,7 @@
     <ClInclude Include="..\include\aquarius\logger.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\post.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\singleton.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\use_awaitable.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\use_future.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\noncopyable.hpp">
@@ -141,34 +108,10 @@
     <ClInclude Include="..\include\aquarius\detail\config.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\tcp_server.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\tcp_client.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\tcp_client_session.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\tcp_server_session.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\basic_session_store.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\router.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\sql_keyword.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\session_object_impl.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\handler.hpp">
+    <ClInclude Include="..\include\aquarius\basic_handler.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\concepts\concepts.hpp">
@@ -177,32 +120,8 @@
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\concepts\async.hpp">
-      <Filter>include\aquarius\concepts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\traits\async.hpp">
-      <Filter>include\aquarius\traits</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\async.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\client_pool.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\trie.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\http_server_session.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\executor\http_server.hpp">
-      <Filter>include\aquarius\executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\protocol\http.hpp">
-      <Filter>include\aquarius\protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\protocol\tcp.hpp">
-      <Filter>include\aquarius\protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -219,25 +138,13 @@
     <ClInclude Include="..\include\aquarius\io_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\visit.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\test\adaptor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\attribute.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\sql_stream.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\sql.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\attribute.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\basic_protocol.hpp">
@@ -276,23 +183,11 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\router\basic_router.hpp">
-      <Filter>include\aquarius\router</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\router\reverse_router.hpp">
-      <Filter>include\aquarius\router</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\router\type.hpp">
-      <Filter>include\aquarius\router</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\parse_helper.hpp">
-      <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\impl\http_options.hpp">
       <Filter>include\aquarius\virgo\impl</Filter>
@@ -300,32 +195,74 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\binary.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\json.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\pod_parse.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\message_serialize_base.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\basic_message_serialize.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\tcp_serialize.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\serialize\http_serialize.hpp">
-      <Filter>include\aquarius\virgo\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo.hpp">
+    <ClInclude Include="..\include\aquarius\basic_router.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\json\json.hpp">
-      <Filter>include\aquarius\json</Filter>
+    <ClInclude Include="..\include\aquarius\coroutine.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\basic_message_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\binary.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\json.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\message_serialize_base.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\pod_parse.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\parse_helper.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_handler.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_router.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client_session.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_handler.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_router.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server_session.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql.hpp">
+      <Filter>include\aquarius</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
