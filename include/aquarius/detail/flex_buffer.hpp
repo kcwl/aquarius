@@ -26,7 +26,7 @@ namespace aquarius
 				, wpos_(std::exchange(other.wpos_, 0))
 				, rpos_(std::exchange(other.rpos_, 0))
 			{
-
+				other.buffer_.resize(capacity);
 			}
 
 			flex_buffer(const flex_buffer& other)
@@ -109,7 +109,7 @@ namespace aquarius
 			{
 				constexpr auto size = sizeof(T);
 
-				if (size < remain())
+				if (size > remain())
 					return;
 
 				std::memcpy(wdata(), &value, size);

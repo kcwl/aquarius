@@ -28,33 +28,27 @@ namespace aquarius
 			template <typename T>
 			bool commit(detail::flex_buffer<T>& buffer)
 			{
-				if (!body_parse_.to_datas(Router, buffer))
-					return false;
+				constexpr auto pos = sizeof(uint32_t);
 
-				auto pos = buffer.tellg();
+				buffer.commit(pos);
 
-				buffer.commit(sizeof(uint32_t));
+				body_parse_.to_datas(std::string(detail::bind_param<Router>::value), buffer);
 
-				if (!body_parse_.to_datas(this->timestamp(), buffer))
-					return false;
+				body_parse_.to_datas(this->timestamp(), buffer);
 
-				if (!body_parse_.to_datas(this->version(), buffer))
-					return false;
+				body_parse_.to_datas(this->version(), buffer);
 
-				if (!body_parse_.to_datas(this->header(), buffer))
-					return false;
+				body_parse_.to_datas(this->header(), buffer);
 
-				if (!body_parse_.to_datas(this->body(), buffer))
-					return false;
+				body_parse_.to_datas(this->body(), buffer);
 
 				auto len = buffer.tellg() - pos;
-				std::copy((char*)&len, (char*)(&len + 1),
-						  buffer.data() + pos);
+				std::copy((char*)&len, (char*)(&len + 1), buffer.data());
 
 				return true;
 			}
 
-			template<typename T>
+			template <typename T>
 			void consume(detail::flex_buffer<T>& buffer)
 			{
 				this->timestamp(body_parse_.from_datas<int64_t>(buffer));

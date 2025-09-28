@@ -46,9 +46,58 @@ namespace aquarius
 			}
 		}
 
+		template<typename Response, typename Session>
+		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		{
+			error_code ec{};
+
+			detail::flex_buffer<char> buffer{};
+
+			co_await recv_buffer(session_ptr, buffer, ec);
+
+			Response resp{};
+
+			if (!ec)
+			{
+				resp.consume(buffer);
+			}
+
+			co_return resp;
+		}
+
 	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
+		{
+			detail::flex_buffer<char> buffer{};
+
+			co_await recv_buffer(session_ptr, buffer, ec);
+
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
+				}
+				session_ptr->shutdown();
+				co_return;
+			}
+
+			co_spawn(
+				session_ptr->get_executor(),
+				[buffer = std::move(buffer), session_ptr]() mutable -> awaitable<void>
+				{
+					virgo::binary_parse parse{};
+					auto router = parse.from_datas<std::string_view>(buffer);
+
+					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, std::move(buffer));
+					co_return;
+				},
+				detached);
+		}
+
+		template <typename Session>
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
 		{
 			uint32_t length = 0;
 
@@ -68,27 +117,6 @@ namespace aquarius
 			length > body_buffer.remain() ? length = static_cast<uint32_t>(body_buffer.remain()) : 0;
 
 			ec = co_await session_ptr->async_read(body_buffer, length);
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-				session_ptr->shutdown();
-				co_return;
-			}
-
-			co_spawn(
-				session_ptr->get_executor(),
-				[buffer = std::move(body_buffer), session_ptr]() mutable -> awaitable<void>
-				{
-					virgo::binary_parse parse{};
-					auto router = parse.from_datas<std::string_view>(buffer);
-
-					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, std::move(buffer));
-					co_return;
-				},
-				detached);
 		}
 	};
 } // namespace aquarius

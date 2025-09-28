@@ -170,6 +170,11 @@ namespace aquarius
 			return !ec;
 		}
 
+		auto proto()
+		{
+			return proto_;
+		}
+
 	protected:
 		socket socket_;
 
@@ -239,7 +244,7 @@ namespace aquarius
 			return uuid_;
 		}
 
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<bool>
+		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
 		{
 			resolver resolve(ssl_socket_.lowest_layer().get_executor());
 
@@ -256,7 +261,7 @@ namespace aquarius
 			}
 
 			if (ec)
-				co_return !ec;
+				co_return ec;
 
 			co_await ssl_socket_.async_handshake(boost::asio::ssl::stream_base::client,
 												 redirect_error(use_awaitable, ec));
@@ -266,7 +271,7 @@ namespace aquarius
 				XLOG_ERROR() << "connect " << host << " failed! maybe" << ec.what();
 			}
 
-			co_return !ec;
+			co_return ec;
 		}
 
 		std::string remote_address() const
@@ -344,7 +349,7 @@ namespace aquarius
 
 			if constexpr (Server)
 			{
-				co_await ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
+				co_await ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server, 
 													 redirect_error(use_awaitable, ec));
 
 				if (ec)
@@ -370,6 +375,12 @@ namespace aquarius
 			ssl_socket_.lowest_layer().set_option(typename protocol::no_delay(enable), ec);
 
 			return !ec;
+		}
+
+		template<typename Response>
+		auto query()
+		{
+			return proto_.template query<Response>(this->shared_from_this());
 		}
 
 	private:

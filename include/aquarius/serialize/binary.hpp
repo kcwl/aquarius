@@ -63,6 +63,8 @@ namespace aquarius
 					return;
 
 				std::copy(std::begin(value), std::end(value), buff.wdata());
+
+				buff.commit(value.size());
 			}
 
 			template <reflectable T, typename V>
