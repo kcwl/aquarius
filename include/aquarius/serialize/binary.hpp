@@ -11,7 +11,7 @@ namespace aquarius
 		struct binary_parse
 		{
 			template <integer_t T, typename V>
-			void to_datas(const T& value, detail::flex_buffer<V>&buff)
+			void to_datas(const T& value, detail::flex_buffer<V>& buff)
 			{
 				auto temp = value;
 
@@ -77,17 +77,16 @@ namespace aquarius
 			}
 
 			template <integer_t T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff)->T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				T value = static_cast<uint8_t>(buff.get());
 				if (value >= 0x80)
 				{
 					value -= 0x80;
 
-					
 					int8_t temp_bit = 7;
 
-					while(buff.peek() != uint8_t(-1))
+					while (buff.peek() < 0x7f)
 					{
 						auto s = buff.get();
 
@@ -100,6 +99,7 @@ namespace aquarius
 						else
 						{
 							value += (static_cast<T>(s) << temp_bit);
+							break;
 						}
 					}
 				}
@@ -108,13 +108,13 @@ namespace aquarius
 			}
 
 			template <zig_zag T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff) ->T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				return static_cast<T>(from_datas<uint64_t>(buff));
 			}
 
 			template <pod_t T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff) ->T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				constexpr auto size = sizeof(T);
 
@@ -131,7 +131,7 @@ namespace aquarius
 			}
 
 			template <repeated_t T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff)->T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				T value{};
 
@@ -151,7 +151,7 @@ namespace aquarius
 			}
 
 			template <string_t T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff) ->T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				auto size = from_datas<std::size_t>(buff);
 
@@ -163,7 +163,7 @@ namespace aquarius
 			}
 
 			template <reflectable T, typename V>
-			auto from_datas(detail::flex_buffer<V> buff) -> T
+			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				auto from_binary_impl = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{ return T{ from_datas<virgo::reflect::tuple_element_t<I, T>>(buff)... }; };
@@ -171,5 +171,5 @@ namespace aquarius
 				return from_binary_impl(std::make_index_sequence<virgo::reflect::tuple_size_v<T>>{});
 			}
 		};
-	} // namespace detail
+	} // namespace virgo
 } // namespace aquarius

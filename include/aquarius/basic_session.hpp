@@ -296,7 +296,7 @@ namespace aquarius
 
 			length > buffer.remain() ? length = buffer.remain() : length;
 
-			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(buffer.rdata(), length),
+			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(buffer.wdata(), length),
 											 redirect_error(use_awaitable, ec));
 
 			co_return ec;
@@ -316,7 +316,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await ssl_socket_.async_read_some(boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
+			co_await ssl_socket_.async_read_some(boost::asio::buffer(buffer.wdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}

@@ -56,7 +56,7 @@ namespace aquarius
 			co_return co_await connect(host_, port_);
 		}
 
-		template <typename Response, typename Request>
+		template < typename Request, typename Response>
 		auto send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
 			detail::flex_buffer<char> buffer{};

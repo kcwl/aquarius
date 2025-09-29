@@ -82,3 +82,7 @@ namespace aquarius
 #define AQUARIUS_HTTP_POST_HANDLER(__request, __response, __method)                                                    \
 	AQUARIUS_CONTEXT_BY_HTTP(aquarius::http_server_session, __request, __response, __method,                           \
 							 aquarius::http_router<aquarius::http_server_session>, aquarius::virgo::http_method::post)
+
+#define AQUARIUS_HTTP_POST_HANDLER(__request, __response, __method)                                                    \
+	AQUARIUS_CONTEXT_BY_HTTP(aquarius::ssl_http_server_session, __request, __response, __method,                           \
+							 aquarius::http_router<aquarius::ssl_http_server_session>, aquarius::virgo::http_method::post)

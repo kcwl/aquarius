@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 						   req->body().name = "John";
 						   req->body().orders = { 1, 2, 3, 4, 5 };
 
-						   auto resp = co_await cli->send<rpc_test_request>(req);
+						   auto resp = co_await cli->send<rpc_test_request, rpc_test_response>(req);
 
 						   BOOST_CHECK_EQUAL(resp.header().uuid, req->header().uuid);
 						   //BOOST_CHECK_EQUAL(resp.body().sex, req->body().sex);
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 	std::thread t1([&] { io.run(); });
 
-	std::this_thread::sleep_for(5s);
+	std::this_thread::sleep_for(10s);
 
 	io.stop();
 

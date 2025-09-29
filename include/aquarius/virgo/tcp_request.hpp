@@ -42,7 +42,7 @@ namespace aquarius
 
 				body_parse_.to_datas(this->body(), buffer);
 
-				auto len = buffer.tellg() - pos;
+				auto len = static_cast<uint32_t>(buffer.tellg() - pos);
 				std::copy((char*)&len, (char*)(&len + 1), buffer.data());
 
 				return true;

@@ -112,11 +112,9 @@ namespace aquarius
 				co_return;
 			}
 
-			detail::flex_buffer<char> body_buffer{};
+			length > buffer.remain() ? length = static_cast<uint32_t>(buffer.remain()) : 0;
 
-			length > body_buffer.remain() ? length = static_cast<uint32_t>(body_buffer.remain()) : 0;
-
-			ec = co_await session_ptr->async_read(body_buffer, length);
+			ec = co_await session_ptr->async_read(buffer, length);
 		}
 	};
 } // namespace aquarius

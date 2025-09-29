@@ -73,3 +73,7 @@ namespace aquarius
 #define AQUARIUS_TCP_HANDLER(__request, __response, __method)                                                          \
 	AQUARIUS_CONTEXT_BY_TCP(aquarius::tcp_server_session, __request, __response, __method,                             \
 							aquarius::tcp_router<aquarius::tcp_server_session>)
+
+#define AQUARIUS_SSL_TCP_HANDLER(__request, __response, __method)                                                      \
+	AQUARIUS_CONTEXT_BY_TCP(aquarius::ssl_tcp_server_session, __request, __response, __method,                         \
+							aquarius::tcp_router<aquarius::ssl_tcp_server_session>)

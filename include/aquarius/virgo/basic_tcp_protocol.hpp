@@ -20,7 +20,12 @@ namespace aquarius
 			constexpr static auto has_request = Request;
 
 		public:
-			basic_tcp_protocol() = default;
+			basic_tcp_protocol()
+				: header_()
+				, timestamp_()
+				, version_()
+			{
+			}
 
 		public:
 			header_t& header()
@@ -74,7 +79,14 @@ namespace aquarius
 			constexpr static auto has_request = false;
 
 		public:
-			basic_tcp_protocol() = default;
+			basic_tcp_protocol()
+				: header_()
+				, timestamp_()
+				, version_()
+				, result_()
+			{
+
+			}
 
 		public:
 			header_t& header()
