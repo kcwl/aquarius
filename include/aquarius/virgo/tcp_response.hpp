@@ -41,9 +41,9 @@ namespace aquarius
 
 				body_parse_.to_datas(this->version(), buffer);
 
-				body_parse_.to_datas(this->header(), buffer);
+				this->header().serialize(buffer);
 
-				body_parse_.to_datas(this->body(), buffer);
+				this->body().serialize(buffer);
 
 				auto len = static_cast<uint32_t>(buffer.tellg() - pos);
 				std::copy((char*)&len, (char*)(&len + 1), buffer.data());
@@ -60,9 +60,9 @@ namespace aquarius
 
 				this->version(body_parse_.from_datas<int32_t>(buffer));
 
-				this->header() = body_parse_.from_datas<header_t>(buffer);
+				this->header().deserialize(buffer);
 
-				this->body() = body_parse_.from_datas<body_t>(buffer);
+				this->body().deserialize(buffer);
 			}
 
 		private:

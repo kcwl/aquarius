@@ -1,0 +1,28 @@
+struct person
+{
+	bool sex;
+	uint32 addr;
+	int32 age;
+	uint64 telephone;
+	int64 score;
+	float hp;
+	double mana;
+	string name;
+	bytes orders;
+}
+
+protocol login -> tcp-key:10001
+{
+	request {
+	header:
+		int32 uuid;
+	body:
+		person per_req;
+	}
+	response {
+	header:
+		int32 uuid;
+	body:
+		person per_resp;
+	}
+}

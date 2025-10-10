@@ -3,6 +3,7 @@
 #include <vector>
 #include <expected>
 #include "error.hpp"
+#include "test_base.h"
 
 namespace aquarius
 {
@@ -23,6 +24,14 @@ namespace aquarius
 			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
 			void generate(std::fstream& ofs);
+
+			void generate_equal(std::fstream& ofs, const std::string& scope);
+
+			void generate_stream(std::fstream& ofs, const std::string& scope);
+
+			void generate_src_serialize(std::fstream& ofs, const std::string& scope);
+
+			void generate_src_deserialize(std::fstream& ofs, const std::string& scope);
 
 		private:
 			std::expected<std::string, parse_error> read_domain(std::fstream& ifs, std::size_t column, std::size_t row);
@@ -53,7 +62,7 @@ namespace aquarius
 			std::string type_;
 		};
 
-		class proto
+		class proto : public test_base
 		{
 		public:
 			proto() = default;
@@ -66,6 +75,10 @@ namespace aquarius
 
 			void generate_body(std::fstream& ofs);
 
+			void generate_equal(std::fstream& ofs, const std::string& type, const std::string& scope);
+
+			void generate_stream(std::fstream& ofs, const std::string& type, const std::string& scope);
+
 			void generate_src_serialize(std::fstream& ofs, const std::string& type, const std::string& scope);
 
 			void generate_src_deserialize(std::fstream& ofs, const std::string& type, const std::string& scope);
@@ -75,6 +88,10 @@ namespace aquarius
 			void generate_tag_invoke_src(std::fstream& ofs, const std::string& scope);
 
 			std::string name() const;
+
+			virtual void equal_impl(std::fstream& ofs) override;
+
+			virtual void stream_impl(std::fstream& ofs) override;
 
 		private:
 			std::string from_json_type_string(const std::string& type);

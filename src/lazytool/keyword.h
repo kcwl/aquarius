@@ -4,6 +4,7 @@
 #include <expected>
 #include "error.hpp"
 #include <set>
+#include "test_base.h"
 
 namespace aquarius
 {
@@ -33,7 +34,7 @@ namespace aquarius
 			void generate_define(std::fstream& ofs);
 
 			void generate_src(std::fstream&  ofs);
-
+		
 
 		private:
 			void write_class(std::fstream& ofs, const std::string& name, const std::string& type);
@@ -56,7 +57,7 @@ namespace aquarius
 		public:
 			std::expected<std::string, parse_error> parse(std::fstream& ifs, std::size_t column, std::size_t row);
 
-			void generate(std::fstream& ofs_h, std::fstream& ofs_s);
+			void generate(std::fstream& ofs_h);
 
 		private:
 			std::string name_;

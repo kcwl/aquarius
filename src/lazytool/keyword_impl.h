@@ -7,7 +7,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		std::string from_type_string(const std::string& target)
+		inline std::string from_type_string(const std::string& target)
 		{
 			std::string result{};
 
@@ -27,25 +27,17 @@ namespace aquarius
 			{
 				result = "uint64_t";
 			}
-			else if (target == "float")
-			{
-				result = "float";
-			}
-			else if (target == "double")
-			{
-				result = "double";
-			}
 			else if (target == "string")
 			{
 				result = "std::string";
 			}
-			else if (target == "bool")
-			{
-				result = "bool";
-			}
 			else if (target == "bytes")
 			{
 				result = "std::vector<char>";
+			}
+			else
+			{
+				result = target;
 			}
 
 			return result;
@@ -53,7 +45,7 @@ namespace aquarius
 
 		inline std::set<std::string> custom_type;
 
-		std::string find_custom_type(const std::string& target)
+		inline std::string find_custom_type(const std::string& target)
 		{
 			auto iter = custom_type.find(target);
 			if (iter == custom_type.end())
@@ -62,19 +54,19 @@ namespace aquarius
 			return *iter;
 		}
 
-		void put_custom_type(const std::string& target)
+		inline void put_custom_type(const std::string& target)
 		{
 			custom_type.insert(target);
 		}
 
-		bool check_type(const std::string& target)
+		inline bool check_type(const std::string& target)
 		{
 			return !from_type_string(target).empty() || !find_custom_type(target).empty();
 		}
 
 		constexpr static auto router_list = { "tcp-key", "http-str" };
 
-		bool check_router_string(const std::string& target)
+		inline bool check_router_string(const std::string& target)
 		{
 			return std::find(router_list.begin(), router_list.end(), target) != router_list.end();
 		}

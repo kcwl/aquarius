@@ -59,7 +59,7 @@ namespace aquarius
 				}
 				else if constexpr (Token == token::key)
 				{
-					if (!std::isalpha(c) && c != '-')
+					if (!std::isalnum(c) && c != '-')
 						break;
 				}
 				else if constexpr (Token == token::path)

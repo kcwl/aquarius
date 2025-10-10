@@ -221,9 +221,11 @@
     <ClInclude Include="..\test\protocol.hpp" />
     <ClInclude Include="..\test\detail.h" />
     <ClInclude Include="..\test\sql.h" />
+    <ClInclude Include="..\test\test.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp" />
+    <ClCompile Include="..\test\test.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />

@@ -2,6 +2,7 @@
 #include "read_value.hpp"
 #include <filesystem>
 #include <string_view>
+#include "keyword_impl.h"
 
 using namespace std::string_view_literals;
 
@@ -120,8 +121,6 @@ namespace aquarius
 			}
 			response_.generate_body(ofs);
 			ofs << end << std::endl;
-
-			
 		}
 
 		void protocol::generate_define(std::fstream& ofs)
@@ -132,6 +131,16 @@ namespace aquarius
 
 		void protocol::generate_src(std::fstream& ofs)
 		{
+			ofs << "bool operator==(const " << name_ << "_req_header& lhs, const " << name_ << "_req_header& rhs)\n";
+			ofs << "{\n";
+			request_.generate_equal(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "std::ostream& operator<<(std::ostream& os, const " << name_ << "_req_header& other)\n";
+			ofs << "{\n";
+			request_.generate_stream(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
 			ofs << "void "<< name_ <<"_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
 			request_.generate_src_serialize(ofs, router_.type(), "header");
@@ -140,6 +149,16 @@ namespace aquarius
 			ofs << "void "<<name_<<"_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
 			request_.generate_src_deserialize(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "bool operator==(const " << name_ << "_req_body& lhs, const " << name_ << "_req_body& rhs)\n";
+			ofs << "{\n";
+			request_.generate_equal(ofs, router_.type(), "body");
+			ofs << "}\n\n";
+
+			ofs << "std::ostream& operator<<(std::ostream& os, const " << name_ << "_req_body& other)\n";
+			ofs << "{\n";
+			request_.generate_stream(ofs, router_.type(), "body");
 			ofs << "}\n\n";
 
 			ofs << "void "<< name_ <<"_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
@@ -157,6 +176,16 @@ namespace aquarius
 				request_.generate_tag_invoke_src(ofs, "body");
 			}
 
+			ofs << "bool operator==(const " << name_ << "_resp_header& lhs, const " << name_ << "_resp_header& rhs)\n";
+			ofs << "{\n";
+			response_.generate_equal(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "std::ostream& operator<<(std::ostream& os, const " << name_ << "_resp_header& other)\n";
+			ofs << "{\n";
+			response_.generate_stream(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
 			ofs << "void "<< name_ <<"_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
 			response_.generate_src_serialize(ofs, router_.type(), "header");
@@ -165,6 +194,16 @@ namespace aquarius
 			ofs << "void "<<name_<<"_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
 			ofs << "{\n";
 			response_.generate_src_deserialize(ofs, router_.type(), "header");
+			ofs << "}\n\n";
+
+			ofs << "bool operator==(const " << name_ << "_resp_body& lhs, const " << name_ << "_resp_body& rhs)\n";
+			ofs << "{\n";
+			response_.generate_equal(ofs, router_.type(), "body");
+			ofs << "}\n\n";
+
+			ofs << "std::ostream& operator<<(std::ostream& os, const " << name_ << "_resp_body& other)\n";
+			ofs << "{\n";
+			response_.generate_stream(ofs, router_.type(), "body");
 			ofs << "}\n\n";
 
 			ofs << "void "<< name_ <<"_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
@@ -189,12 +228,11 @@ namespace aquarius
 			ofs << "{\n";
 			ofs << "public:\n";
 			ofs << "\t" << name << "() = default; \n";
-			ofs << "\tvirtual ~"<< name <<"() = default; \n";
+			ofs << "\tvirtual ~"<< name <<"() = default; \n\n";
 			ofs << "public:\n";
-			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
-			ofs << "\tvirtual void deserialize(aquarius::detail::flex_buffer<char>&buffer) override; \n";
+			ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>& buffer) override; \n\n";
+			ofs << "\tvirtual void deserialize(aquarius::detail::flex_buffer<char>& buffer) override; \n";
 		}
-		
 
 		std::expected<std::string, parse_error> structure::parse(std::fstream& ifs, std::size_t column, std::size_t row)
 		{
@@ -203,6 +241,8 @@ namespace aquarius
 					[&](const auto& value) -> std::expected<std::string, parse_error>
 					{
 						name_ = value;
+
+						put_custom_type(name_);
 
 						std::expected<std::string, parse_error> result;
 
@@ -241,15 +281,55 @@ namespace aquarius
 					});
 		}
 
-		void structure::generate(std::fstream& ofs_h, std::fstream& /*ofs_s*/)
+		void structure::generate(std::fstream& ofs_h)
 		{
 			ofs_h << "struct " << name_ << "\n";
 			ofs_h << "{\n";
 			for (auto& [type, name] : scopes_)
 			{
-				ofs_h << "    " << type << " " << name << ";\n";
+				ofs_h << "    " << from_type_string(type) << " " << name << ";\n";
 			}
+			ofs_h << "\n";
 			ofs_h << "};\n";
+
+			ofs_h << "inline bool operator==(const " << name_ << "& lhs, const " << name_ << "& rhs)\n";
+			ofs_h << "\t{\n";
+			ofs_h << "\t\treturn ";
+			for (auto& [_, name] : scopes_)
+			{
+				ofs_h << "lhs." << name << " == rhs." << name << " && ";
+			}
+
+			ofs_h.seekg(-4, std::ios::cur);
+			ofs_h << ";\n";
+			ofs_h << "\t}\n\n";
+
+			ofs_h << "\tinline std::ostream& operator<<(std::ostream& os, const " << name_ << "& other)\n";
+			ofs_h << "\t{\n";
+			ofs_h << "\t\tos << ";
+
+			for (auto& [type, name] : scopes_)
+			{
+				if (type.contains("bytes"))
+				{
+					ofs_h << "\"[\";\n";
+					ofs_h << "\t\tfor (auto& s : other." << name << ")\n";
+					ofs_h << "\t\t{\n";
+					ofs_h << "\t\t\tos << s << \", \";\n";
+					ofs_h << "\t\t}\n";
+
+					ofs_h << "\t\tos.seekp(-2, std::ios::cur);\n";
+					ofs_h << "\t\tos << \"]\";\n";
+				}
+				else
+				{
+					ofs_h << "other." << name << " << ";
+				}
+			}
+
+			ofs_h << "\t\treturn os;\n";
+
+			ofs_h << "\t}\n";
 		}
 
 		std::expected<std::string, parse_error> enum_struct::parse(std::fstream& ifs, std::size_t column,
@@ -260,6 +340,8 @@ namespace aquarius
 					[&](const auto& value) -> std::expected<std::string, parse_error>
 					{
 						name_ = value;
+
+						put_custom_type(name_);
 
 						std::expected<std::string, parse_error> result;
 

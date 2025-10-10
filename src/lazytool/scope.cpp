@@ -95,7 +95,7 @@ namespace aquarius
 
 				value.push_back(static_cast<char>(c));
 
-				if (!std::isalpha(c))
+				if (!std::isalnum(c))
 					return value;
 			}
 
@@ -163,6 +163,57 @@ namespace aquarius
 			}
 		}
 
+		void domain::generate_equal(std::fstream& ofs, const std::string& scope)
+		{
+			ofs << "\treturn ";
+
+			for (auto& [_, value] : scopes_)
+			{
+				ofs << "lhs." << value << " == " << "rhs." << value;
+				ofs << " && ";
+			}
+
+			ofs.seekg(-4, std::ios::cur);
+
+			ofs << ";\n";
+		}
+
+		void domain::generate_stream(std::fstream& ofs, const std::string& scope)
+		{
+			ofs << "\treturn os << ";
+
+			for (auto& [_, value] : scopes_)
+			{
+				ofs << "other." << value;
+				ofs << ", ";
+			}
+
+			ofs.seekg(-2, std::ios::cur);
+
+			ofs << ";\n";
+		}
+
+		void domain::generate_src_serialize(std::fstream& ofs, const std::string& scope)
+		{
+			for (auto& [type, value] : scopes_)
+			{
+				if (type.empty())
+					continue;
+
+				ofs << "\t" << "this->parse_" << scope << "_to" << "(" << value << ", buffer);\n";
+			}
+		}
+		void domain::generate_src_deserialize(std::fstream& ofs, const std::string& scope)
+		{
+			for (auto& [type, value] : scopes_)
+			{
+				if (type.empty())
+					continue;
+
+				ofs << "\t" << value<< " = this->parse_" << scope << "_from<" << from_type_string(type) << ">(buffer);\n";
+			}
+		}
+
 		std::expected<std::string, parse_error> proto::parse(const std::string& parent, std::fstream& ifs,
 															 std::size_t column, std::size_t row)
 		{
@@ -215,22 +266,46 @@ namespace aquarius
 			by_.generate(ofs);
 		}
 
+		void proto::generate_equal(std::fstream& ofs, const std::string& type, const std::string& scope)
+		{
+			scope == "header" ? hr_.generate_equal(ofs, scope) : by_.generate_equal(ofs, scope);
+		}
+
+		void proto::generate_stream(std::fstream& ofs, const std::string& type, const std::string& scope)
+		{
+			scope == "header" ? hr_.generate_stream(ofs, scope) : by_.generate_stream(ofs, scope);
+		}
+
 		void proto::generate_src_serialize(std::fstream& ofs, const std::string& type, const std::string& scope)
 		{
 			if (type.empty())
 				return;
 
 			if (scope == "header")
-				return;
+			{
+				if (type == "tcp")
+				{
+					hr_.generate_src_serialize(ofs, scope);
 
-			if (type == "tcp")
-			{
-				ofs << "\t" << value << " = this->parse_" << scope << "_from" << "<" << name_+ "_" +scope << ">(buffer);\n";
+				}
+				else if (type == "http")
+				{
+					ofs << "\t*this = this->parse_" << scope << "_from" << "<" << name_ + "_" + scope << ">(buffer);\n";
+				}
 			}
-			else if (type == "http")
+			else
 			{
-				ofs << "\t *this = this->parse_" << scope << "_from" << "<" << name_ + "_" +scope << ">(buffer);\n";
+				if (type == "tcp")
+				{
+					by_.generate_src_serialize(ofs, scope);
+
+				}
+				else if (type == "http")
+				{
+					ofs << "\t*this = this->parse_" << scope << "_from" << "<" << name_ + "_" + scope << ">(buffer);\n";
+				}
 			}
+			
 		}
 
 		void proto::generate_src_deserialize(std::fstream& ofs, const std::string& type, const std::string& scope)
@@ -239,15 +314,27 @@ namespace aquarius
 				return;
 
 			if (scope == "header")
-				return;
+			{
+				if (type == "tcp")
+				{
+					hr_.generate_src_deserialize(ofs, scope);
 
-			if (type == "tcp")
-			{
-				ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
+				}
+				else if (type == "http")
+				{
+					ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
+				}
 			}
-			else if (type == "http")
+			else
 			{
-				ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
+				if (type == "tcp")
+				{
+					by_.generate_src_deserialize(ofs, scope);
+				}
+				else if (type == "http")
+				{
+					ofs << "\t" << "this->parse_" << scope << "_to" << "(*this, buffer);\n";
+				}
 			}
 		}
 
@@ -256,16 +343,16 @@ namespace aquarius
 			ofs << "\tfriend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
 				<< name_ << "_" << scope << "& local);\n\n";
 
-			ofs << "\tfriend "<< name_ << "_" << scope <<" tag_invoke(const aquarius::json::value_to_tag<" << name_ << "_" << scope
-				<< ">&, const aquarius::json::value& jv);\n";
+			ofs << "\tfriend " << name_ << "_" << scope << " tag_invoke(const aquarius::json::value_to_tag<" << name_
+				<< "_" << scope << ">&, const aquarius::json::value& jv);\n";
 		}
 
 		void proto::generate_tag_invoke_src(std::fstream& ofs, const std::string& scope)
 		{
 			auto scopes = scope == "header" ? hr_.scopes_ : by_.scopes_;
 
-			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const " << name_ << "_" << scope
-				<< "& local)\n";
+			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const " << name_
+				<< "_" << scope << "& local)\n";
 			ofs << "{\n";
 			ofs << "\tauto& jv_obj = jv.emplace_object();\n";
 			for (auto& [key, value] : scopes)
@@ -274,8 +361,8 @@ namespace aquarius
 			}
 			ofs << "}\n\n";
 
-			ofs << name_ << "_" << scope << " tag_invoke(const aquarius::json::value_to_tag<"
-															<< name_ << "_" << scope << ">&, const aquarius::json::value& jv)\n";
+			ofs << name_ << "_" << scope << " tag_invoke(const aquarius::json::value_to_tag<" << name_ << "_" << scope
+				<< ">&, const aquarius::json::value& jv)\n";
 			ofs << "{\n";
 			ofs << "\t" << name_ << "_" << scope << " result{};\n";
 			ofs << "\tauto obj = jv.try_as_object();\n";
@@ -284,11 +371,11 @@ namespace aquarius
 			ofs << "\tauto param = obj->at(\"params\").as_object();\n";
 			ofs << "\tif(param.empty())\n";
 			ofs << "\t\treturn {};\n";
-;
+			;
 			for (auto& [key, value] : scopes)
 			{
-				ofs << "\tresult." << value <<" = static_cast<" << from_type_string(key) << ">(param.at(\"" << value << "\").as_" << from_json_type_string(key)
-					<< "());\n";
+				ofs << "\tresult." << value << " = static_cast<" << from_type_string(key) << ">(param.at(\"" << value
+					<< "\").as_" << from_json_type_string(key) << "());\n";
 			}
 			ofs << "\treturn result;\n";
 
@@ -298,6 +385,16 @@ namespace aquarius
 		std::string proto::name() const
 		{
 			return name_;
+		}
+
+		void proto::equal_impl(std::fstream& ofs)
+		{
+
+		}
+
+		void proto::stream_impl(std::fstream& ofs)
+		{
+
 		}
 
 		std::string proto::from_json_type_string(const std::string& type)

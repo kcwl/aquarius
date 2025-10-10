@@ -26,6 +26,7 @@
     <ClCompile Include="..\src\lazytool\log.cpp" />
     <ClCompile Include="..\src\lazytool\registor.cpp" />
     <ClCompile Include="..\src\lazytool\scope.cpp" />
+    <ClCompile Include="..\src\lazytool\test_base.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\cpp_generate.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\src\lazytool\scope.h" />
     <ClInclude Include="..\src\lazytool\statement.hpp" />
     <ClInclude Include="..\src\lazytool\read_value.hpp" />
+    <ClInclude Include="..\src\lazytool\test_base.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

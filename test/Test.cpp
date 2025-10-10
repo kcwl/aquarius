@@ -85,20 +85,19 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 						   BOOST_CHECK(!is_connect);
 
-						   auto req = std::make_shared<rpc_test_request>();
+						   auto req = std::make_shared<login_request>();
 						   req->header().uuid = 1;
-						   req->body().sex = true;
-						   req->body().addr = 2;
-						   req->body().age = 15;
-						   req->body().telephone = 15230214856;
-						   req->body().score = 100;
-						   req->body().hp = 200;
-						   req->body().mana = 300;
-						   req->body().info = { 1, 1, 1, 1, 1, 1 };
-						   req->body().name = "John";
-						   req->body().orders = { 1, 2, 3, 4, 5 };
+						   req->body().per_req.sex = true;
+						   req->body().per_req.addr = 2;
+						   req->body().per_req.age = 15;
+						   req->body().per_req.telephone = 15230214856;
+						   req->body().per_req.score = 100;
+						   req->body().per_req.hp = 200;
+						   req->body().per_req.mana = 300;
+						   req->body().per_req.name = "John";
+						   req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-						   auto resp = co_await cli->send<rpc_test_request, rpc_test_response>(req);
+						   auto resp = co_await cli->send<login_request, login_response>(req);
 
 						   BOOST_CHECK_EQUAL(resp.header().uuid, req->header().uuid);
 						   //BOOST_CHECK_EQUAL(resp.body().sex, req->body().sex);
@@ -111,7 +110,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 						   //BOOST_CHECK_EQUAL(resp.body().info, req->body().info);
 						   //BOOST_CHECK_EQUAL(resp.body().name, req->body().name);
 						   //BOOST_CHECK_EQUAL(resp.body().orders, req->body().orders);
-						   BOOST_CHECK_EQUAL(resp.body(), req->body());
+						   BOOST_CHECK_EQUAL(resp.body().per_resp, req->body().per_req); 
 
 						   std::this_thread::sleep_for(5s);
 					   }, aquarius::use_future);
