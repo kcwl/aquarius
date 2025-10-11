@@ -41,6 +41,8 @@ namespace aquarius
 					return;
 
 				std::copy((char*)&value, (char*)&value + size, buff.wdata());
+
+				buff.commit(size);
 			}
 
 			template <repeated_t T, typename V>
@@ -110,7 +112,9 @@ namespace aquarius
 			template <zig_zag T, typename V>
 			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
-				return static_cast<T>(from_datas<uint64_t>(buff));
+				auto temp = static_cast<T>(from_datas<uint64_t>(buff));
+
+				return static_cast<T>(static_cast<int64_t>((temp >> 1) ^ (-(temp & 0x1))));
 			}
 
 			template <pod_t T, typename V>

@@ -64,5 +64,9 @@ using namespace std::string_view_literals;
 
 AQUARIUS_SSL_TCP_HANDLER(login_request, login_response, ctx_test)
 {
+	response().header().uuid = request_ptr_->header().uuid;
+
+	response().body().per_resp = request_ptr_->body().per_req;
+
 	co_return aquarius::error_code{};
 }

@@ -30,7 +30,7 @@ namespace aquarius
 
 		public:
 			trie()
-				: root(new node())
+				: root(new node('/',nullptr))
 			{}
 
 			~trie()
@@ -49,13 +49,6 @@ namespace aquarius
 
 				for (auto c : key)
 				{
-					if (cur_node->key == 0)
-					{
-						cur_node->key = c;
-						cur_node->next++;
-						continue;
-					}
-
 					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
 										   [&](auto node) { return node->key == c; });
 
@@ -85,23 +78,17 @@ namespace aquarius
 
 				while (iter != key.end())
 				{
-					if (*iter == cur_node->key)
+					
+					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
+						[&](auto node) { return node->key == *iter++; });
+
+					if (it == cur_node->children.end())
 					{
-						iter++;
+						return nullptr;
 					}
 					else
 					{
-						auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
-							[&](auto node) { return node->key == *iter; });
-
-						if (it == cur_node->children.end())
-						{
-							return nullptr;
-						}
-						else
-						{
-							cur_node = *it;
-						}
+						cur_node = *it;
 					}
 				}
 
