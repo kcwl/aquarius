@@ -53,7 +53,7 @@ namespace aquarius
 	{
 		explicit auto_http_handler_register(virgo::http_method method, std::string_view proto)
 		{
-			Router::get_mutable_instance().regist<Handler>(method, proto);
+			Router::get_mutable_instance().template regist<Handler>(method, proto);
 		}
 	};
 } // namespace aquarius

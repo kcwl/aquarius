@@ -340,7 +340,9 @@ namespace aquarius
 
 		void close()
 		{
-			ssl_socket_.close();
+			error_code ec;
+
+			ssl_socket_.lowest_layer().close(ec);
 		}
 
 		auto accept() -> awaitable<error_code>

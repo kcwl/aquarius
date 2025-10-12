@@ -4,12 +4,15 @@
 #define NOMINMAX
 #endif
 #include <boost/test/included/unit_test.hpp>
-#include "server.h"
-#include "detail.h"
+//#include "server.h"
+//#include "detail.h"
 #include "protocol.hpp"
-#include "session.h"
-#include "adaptor.h"
-#include "sql.h"
+//#include "session.h"
+//#include "adaptor.h"
+//#include "sql.h"
+#ifdef _DEBUG
+#include <vld.h>
+#endif
 
 
 //BOOST_AUTO_TEST_CASE(tcp_flow_with_no_ssl)
@@ -66,6 +69,8 @@
 //	cli->stop();
 //	tc.join();
 //}
+
+using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 {

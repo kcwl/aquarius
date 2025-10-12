@@ -18,7 +18,7 @@ namespace aquarius
 
 			std::size_t end;
 
-			std::vector<tri_node*> children;
+			std::vector<std::shared_ptr<tri_node>> children;
 		};
 
 		template<typename Func>
@@ -33,14 +33,7 @@ namespace aquarius
 				: root(new node('/',nullptr))
 			{}
 
-			~trie()
-			{
-				if (root)
-				{
-					delete root;
-					root = nullptr;
-				}
-			}
+			~trie() = default;
 
 		public:
 			void add(std::string_view key, const node_func& func)
@@ -54,7 +47,7 @@ namespace aquarius
 
 					if (it == cur_node->children.end())
 					{
-						auto n = new node{ c, nullptr };
+						auto n = std::make_shared<node>(c, nullptr);
 						cur_node->children.push_back(n);
 						cur_node = n;
 					}
@@ -118,6 +111,8 @@ namespace aquarius
 				{
 					delete cur_node;
 					cur_node = nullptr;
+
+					std::shared_ptr<node>().swap(cur_node);
 				}
 				else
 				{
@@ -126,7 +121,7 @@ namespace aquarius
 			}
 
 		private:
-			node* root;
+			std::shared_ptr<node> root;
 		};
 	}
 }

@@ -69,7 +69,7 @@ namespace aquarius
 			if (ec)
 				co_return Response{};
 
-			auto response = co_await session_ptr_->query<Response>();
+			auto response = co_await session_ptr_->template query<Response>();
 
 			if (ec)
 			{

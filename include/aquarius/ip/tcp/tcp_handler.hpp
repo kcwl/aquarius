@@ -45,7 +45,7 @@ namespace aquarius
 	{
 		explicit auto_tcp_handler_register(std::string_view proto)
 		{
-			Router::get_mutable_instance().regist<Handler>(proto);
+			Router::get_mutable_instance().template regist<Handler>(proto);
 		}
 	};
 } // namespace aquarius

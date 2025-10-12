@@ -22,6 +22,13 @@ target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
 endif()
 endif()
 
+if(COVERAGE)
+message(STATUS "gcov")
+target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
+target_link_libraries(unittest PUBLIC gcov)
+endif()
+
+
 add_test(
 	NAME unittest COMMAND unittest
 )

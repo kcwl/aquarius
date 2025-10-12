@@ -47,8 +47,6 @@ namespace aquarius
 					threads.push_back(std::make_shared<std::thread>(
 						[&]
 						{
-							BOOST_LOG_SCOPED_THREAD_TAG("ThreadID", std::this_thread::get_id());
-
 							io_service->run();
 						}));
 				}

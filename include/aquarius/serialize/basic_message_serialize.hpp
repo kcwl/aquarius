@@ -22,7 +22,7 @@ namespace aquarius
 			template <typename T, typename U>
 			T parse_header_from(detail::flex_buffer<U>& buffer)
 			{
-				return header_parse_.from_datas<T>(buffer);
+				return header_parse_.template from_datas<T>(buffer);
 			}
 
 			template <typename T, typename U>
@@ -34,7 +34,7 @@ namespace aquarius
 			template <typename T, typename U>
 			T parse_body_from(detail::flex_buffer<U>& buffer)
 			{
-				return body_parse_.from_datas<T>(buffer);
+				return body_parse_.template from_datas<T>(buffer);
 			}
 
 		private:

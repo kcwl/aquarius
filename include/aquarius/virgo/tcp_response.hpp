@@ -9,7 +9,7 @@ namespace aquarius
 
 		template <detail::string_literal Router, typename Header, typename Body>
 		class tcp_response
-			: public basic_tcp_protocol<false, Router, typename Header, typename Body, std::allocator<Body>>
+			: public basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
 			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
