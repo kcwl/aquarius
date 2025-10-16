@@ -30,7 +30,7 @@ inline bool operator==(const person& lhs, const person& rhs)
 		os << "]";
 		return os;
 	}
-class login_req_header final : public aquarius::virgo::tcp_serialize
+class login_req_header final : public aquarius::serialize::tcp_serialize
 {
 public:
 	login_req_header() = default; 
@@ -43,7 +43,7 @@ public:
 	int32_t uuid;
 };
 
-class login_req_body final : public aquarius::virgo::tcp_serialize
+class login_req_body final : public aquarius::serialize::tcp_serialize
 {
 public:
 	login_req_body() = default; 
@@ -56,7 +56,7 @@ public:
 	person per_req;
 };
 
-class login_resp_header final : public aquarius::virgo::tcp_serialize
+class login_resp_header final : public aquarius::serialize::tcp_serialize
 {
 public:
 	login_resp_header() = default; 
@@ -69,7 +69,7 @@ public:
 	int32_t uuid;
 };
 
-class login_resp_body final : public aquarius::virgo::tcp_serialize
+class login_resp_body final : public aquarius::serialize::tcp_serialize
 {
 public:
 	login_resp_body() = default; 
@@ -82,7 +82,7 @@ public:
 	person per_resp;
 };
 
-class http_login_req_header final : public aquarius::virgo::http_serialize
+class http_login_req_header final : public aquarius::serialize::http_serialize
 {
 public:
 	http_login_req_header() = default; 
@@ -95,7 +95,7 @@ public:
 	int32_t uuid;
 };
 
-class http_login_req_body final : public aquarius::virgo::http_serialize
+class http_login_req_body final : public aquarius::serialize::http_serialize
 {
 public:
 	http_login_req_body() = default; 
@@ -111,7 +111,7 @@ public:
 	person per_req;
 };
 
-class http_login_resp_header final : public aquarius::virgo::http_serialize
+class http_login_resp_header final : public aquarius::serialize::http_serialize
 {
 public:
 	http_login_resp_header() = default; 
@@ -124,7 +124,7 @@ public:
 	int32_t uuid;
 };
 
-class http_login_resp_body final : public aquarius::virgo::http_serialize
+class http_login_resp_body final : public aquarius::serialize::http_serialize
 {
 public:
 	http_login_resp_body() = default; 

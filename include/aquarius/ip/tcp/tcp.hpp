@@ -87,7 +87,7 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[buffer = std::move(buffer), session_ptr]() mutable -> awaitable<void>
 				{
-					virgo::binary_parse parse{};
+					serialize::binary_parse parse{};
 					auto router = parse.from_datas<std::string_view>(buffer);
 
 					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);

@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	namespace virgo
+	namespace serialize
 	{
 		struct binary_parse
 		{

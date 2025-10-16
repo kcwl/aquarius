@@ -7,8 +7,7 @@ namespace aquarius
 	namespace virgo
 	{
 		template <detail::string_literal Router, typename Header, typename Body>
-		class tcp_request
-			: public basic_tcp_protocol<true, Router, Header, Body, std::allocator<Body>>
+		class tcp_request : public basic_tcp_protocol<true, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
 			using base = basic_tcp_protocol<true, Router, Header, Body, std::allocator<Body>>;
@@ -67,7 +66,7 @@ namespace aquarius
 			}
 
 		private:
-			virgo::binary_parse body_parse_;
+			serialize::binary_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

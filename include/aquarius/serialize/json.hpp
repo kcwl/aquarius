@@ -8,7 +8,7 @@ namespace aquarius
 {
 	namespace json =  boost::json;
 
-	namespace virgo
+	namespace serialize
 	{
 		struct json_parse
 		{

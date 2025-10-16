@@ -24,3 +24,4 @@
 #include <aquarius/serialize/http_serialize.hpp>
 #include <aquarius/serialize/tcp_serialize.hpp>
 #include <aquarius/sql.hpp>
+#include <aquarius/basic_message_serialize.hpp>

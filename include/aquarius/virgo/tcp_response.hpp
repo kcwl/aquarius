@@ -72,7 +72,7 @@ namespace aquarius
 			}
 
 		private:
-			virgo::binary_parse body_parse_;
+			serialize::binary_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

@@ -12,12 +12,12 @@ std::ostream& operator<<(std::ostream& os, const login_req_header& other)
 
 void login_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_header_to(uuid, buffer);
+	this->parse_to(uuid, buffer);
 }
 
 void login_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	uuid = this->parse_header_from<int32_t>(buffer);
+	uuid = this->parse_from<int32_t>(buffer);
 }
 
 bool operator==(const login_req_body& lhs, const login_req_body& rhs)
@@ -32,12 +32,12 @@ std::ostream& operator<<(std::ostream& os, const login_req_body& other)
 
 void login_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_body_to(per_req, buffer);
+	this->parse_to(per_req, buffer);
 }
 
 void login_req_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	per_req = this->parse_body_from<person>(buffer);
+	per_req = this->parse_from<person>(buffer);
 }
 
 bool operator==(const login_resp_header& lhs, const login_resp_header& rhs)
@@ -52,12 +52,12 @@ std::ostream& operator<<(std::ostream& os, const login_resp_header& other)
 
 void login_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_header_to(uuid, buffer);
+	this->parse_to(uuid, buffer);
 }
 
 void login_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	uuid = this->parse_header_from<int32_t>(buffer);
+	uuid = this->parse_from<int32_t>(buffer);
 }
 
 bool operator==(const login_resp_body& lhs, const login_resp_body& rhs)
@@ -72,12 +72,12 @@ std::ostream& operator<<(std::ostream& os, const login_resp_body& other)
 
 void login_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_body_to(per_resp, buffer);
+	this->parse_to(per_resp, buffer);
 }
 
 void login_resp_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	per_resp = this->parse_body_from<person>(buffer);
+	per_resp = this->parse_from<person>(buffer);
 }
 
 bool operator==(const http_login_req_header& lhs, const http_login_req_header& rhs)
@@ -92,7 +92,7 @@ std::ostream& operator<<(std::ostream& os, const http_login_req_header& other)
 
 void http_login_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	*this = this->parse_header_from<http_login_req_header>(buffer);
+	*this = this->parse_from<http_login_req_header>(buffer);
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_req_header& local)
@@ -118,7 +118,7 @@ http_login_req_header tag_invoke(const aquarius::json::value_to_tag<http_login_r
 
 void http_login_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_header_to(*this, buffer);
+	this->parse_to(*this, buffer);
 }
 
 bool operator==(const http_login_req_body& lhs, const http_login_req_body& rhs)
@@ -133,12 +133,12 @@ std::ostream& operator<<(std::ostream& os, const http_login_req_body& other)
 
 void http_login_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	*this = this->parse_body_from<http_login_req_body>(buffer);
+	*this = this->parse_from<http_login_req_body>(buffer);
 }
 
 void http_login_req_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_body_to(*this, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_req_body& local)
@@ -175,12 +175,12 @@ std::ostream& operator<<(std::ostream& os, const http_login_resp_header& other)
 
 void http_login_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	*this = this->parse_header_from<http_login_resp_header>(buffer);
+	*this = this->parse_from<http_login_resp_header>(buffer);
 }
 
 void http_login_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_header_to(*this, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_resp_header& local)
@@ -216,12 +216,12 @@ std::ostream& operator<<(std::ostream& os, const http_login_resp_body& other)
 
 void http_login_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	*this = this->parse_body_from<http_login_resp_body>(buffer);
+	*this = this->parse_from<http_login_resp_body>(buffer);
 }
 
 void http_login_resp_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
 {
-	this->parse_body_to(*this, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_resp_body& local)

@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(binary)
 {
     person p{};
 
-    binary_parse bp{};
+    aquarius::serialize::binary_parse bp{};
 
     aquarius::detail::flex_buffer<char> buffer{};
 
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(binary)
 
 BOOST_AUTO_TEST_CASE(integer_limit)
 {
-    binary_parse bp{};
+    aquarius::serialize::binary_parse bp{};
 
     aquarius::detail::flex_buffer<char> buffer{};
 
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(integer_limit)
 
 BOOST_AUTO_TEST_CASE(json)
 {
-    json_parse jp{};
+    aquarius::serialize::json_parse jp{};
 
     person p{};
 

@@ -138,7 +138,7 @@ namespace aquarius
 			}
 
 		private:
-			virgo::json_parse body_parse_;
+			serialize::json_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

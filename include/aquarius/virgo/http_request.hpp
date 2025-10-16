@@ -1,9 +1,6 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/serialize/json.hpp>
-#include <string_view>
-#include <ranges>
-#include <aquarius/serialize/parse_helper.hpp>
 
 namespace aquarius
 {
@@ -98,7 +95,7 @@ namespace aquarius
 			}
 
 		private:
-			virgo::json_parse body_parse_;
+			serialize::json_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

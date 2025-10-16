@@ -154,6 +154,7 @@
     <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_message_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\coroutine.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
@@ -194,12 +195,9 @@
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\basic_message_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\message_serialize_base.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\parse_helper.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\sql.hpp" />
