@@ -62,7 +62,7 @@ using namespace std::string_view_literals;
 //using rpc_test_response = aquarius::virgo::tcp_response<"rpc_test", aquarius::virgo::custom_response_header, person>;
 
 
-AQUARIUS_SSL_TCP_HANDLER(login_request, login_response, ctx_test)
+AQUARIUS_TCP_HANDLER(login_request, login_response, ctx_test)
 {
 	response().header().uuid = request_ptr_->header().uuid;
 

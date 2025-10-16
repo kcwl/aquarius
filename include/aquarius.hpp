@@ -4,7 +4,6 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/coroutine.hpp>
-#include <aquarius/deadline_timer.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
@@ -20,5 +19,8 @@
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/ip/tcp/tcp_handler.hpp>
 #include <aquarius/ip/http/http_handler.hpp>
+#include <aquarius/ip/tcp/tcp_client.hpp>
+#include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/serialize/http_serialize.hpp>
 #include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/sql.hpp>

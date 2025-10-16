@@ -2,17 +2,23 @@
 #include <aquarius/basic_router.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
+#include <aquarius/virgo/http_fields.hpp>
 
 namespace aquarius
 {
 
 	template <typename Session>
-	class http_router : public basic_router<Session>, public singleton<http_router<Session>>
+	class http_router
+		: public basic_router<
+			  Session, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, detail::flex_buffer<char>)>>,
+		  public singleton<http_router<Session>>
 	{
-		using base = basic_router<Session>;
+		using base =
+			basic_router<Session,
+						 std::function<bool(std::shared_ptr<Session>, virgo::http_fields, detail::flex_buffer<char>)>>;
 
 	public:
-		using typename base::buffer_t;
+		using buffer_t = detail::flex_buffer<char>;
 
 		using typename base::function_type;
 
@@ -27,10 +33,11 @@ namespace aquarius
 		template <typename Context>
 		void regist(virgo::http_method method, std::string_view proto)
 		{
-			auto func = [&](std::shared_ptr<Session> session, buffer_t&& buffer)
+			auto func = [&](std::shared_ptr<Session> session, virgo::http_fields hf, buffer_t buffer)
 			{
 				auto req = std::make_shared<typename Context::request_t>();
 				error_code ec{};
+				req->move_copy(hf);
 				req->consume(buffer, ec);
 				if (ec.value() != static_cast<int>(virgo::http_status::ok))
 					return false;

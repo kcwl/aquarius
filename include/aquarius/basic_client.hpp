@@ -59,12 +59,16 @@ namespace aquarius
 		template < typename Request, typename Response>
 		auto send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
+			error_code ec{};
+
 			detail::flex_buffer<char> buffer{};
 
-			if (!req->commit(buffer))
+			req->commit(buffer, ec);
+
+			if (ec)
 				co_return Response{};
 
-			auto ec = co_await send(std::move(buffer));
+			ec = co_await send(buffer);
 
 			if (ec)
 				co_return Response{};
@@ -88,9 +92,9 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto send(detail::flex_buffer<T> buffer) -> awaitable<error_code>
+		auto send(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
-			co_return co_await session_ptr_->async_send(std::move(buffer));
+			co_return co_await session_ptr_->async_send(buffer);
 		}
 
 		template <typename T>

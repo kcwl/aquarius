@@ -88,7 +88,7 @@ namespace aquarius
 				return cur_node->func;
 			}
 
-			void remove(const std::string& word)
+			void remove(std::string_view word)
 			{
 				auto cur_node = root;
 
@@ -109,9 +109,6 @@ namespace aquarius
 
 				if (--cur_node->end == 0 && --cur_node->next == 0)
 				{
-					delete cur_node;
-					cur_node = nullptr;
-
 					std::shared_ptr<node>().swap(cur_node);
 				}
 				else

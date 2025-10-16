@@ -34,7 +34,7 @@ namespace aquarius
 				auto iter = sessions_.find(id);
 				if (iter == sessions_.end())
 					return nullptr;
-				return iter->second->lock();
+				return iter->second.lock();
 			}
 
 		private:

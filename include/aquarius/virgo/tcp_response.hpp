@@ -26,8 +26,14 @@ namespace aquarius
 			tcp_response() = default;
 
 		public:
+			bool operator==(const tcp_response& other)
+			{
+				return base::operator==(other);
+			}
+
+		public:
 			template <typename T>
-			bool commit(detail::flex_buffer<T>& buffer)
+			bool commit(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
 				constexpr auto pos = sizeof(uint32_t);
 
@@ -52,7 +58,7 @@ namespace aquarius
 			}
 
 			template <typename T>
-			void consume(detail::flex_buffer<T>& buffer)
+			void consume(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
 				this->result(body_parse_.from_datas<int32_t>(buffer));
 

@@ -59,7 +59,7 @@ namespace aquarius
 
 			if (!ec)
 			{
-				resp.consume(buffer);
+				resp.consume(buffer, ec);
 			}
 
 			co_return resp;
@@ -90,7 +90,7 @@ namespace aquarius
 					virgo::binary_parse parse{};
 					auto router = parse.from_datas<std::string_view>(buffer);
 
-					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, std::move(buffer));
+					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
 					co_return;
 				},
 				detached);
@@ -111,8 +111,6 @@ namespace aquarius
 				session_ptr->shutdown();
 				co_return;
 			}
-
-			length > buffer.remain() ? length = static_cast<uint32_t>(buffer.remain()) : 0;
 
 			ec = co_await session_ptr->async_read(buffer, length);
 		}

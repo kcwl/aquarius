@@ -40,13 +40,37 @@ namespace aquarius
 			co_return ec;
 		}
 
+		template <typename Response, typename Session>
+		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		{
+			error_code ec{};
+
+			detail::flex_buffer<char> buffer{};
+
+			virgo::http_fields hf;
+
+			co_await recv_buffer(session_ptr, buffer, hf, ec);
+
+			Response resp{};
+
+			if (!ec)
+			{
+				resp.move_copy(hf);
+				resp.consume(buffer, ec);
+			}
+
+			co_return resp;
+		}
+
 	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
 		{
 			buffer_t buffer{};
 
-			ec = co_await session_ptr->async_read_some(buffer);
+			virgo::http_fields hf;
+
+			recv_buffer(session_ptr, buffer, hf, ec);
 
 			if (ec)
 			{
@@ -59,18 +83,8 @@ namespace aquarius
 
 			co_spawn(
 				session_ptr->get_executor(),
-				[session_ptr, buffer = std::move(buffer), this]() mutable -> awaitable<void>
+				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf), ec]() mutable -> awaitable<void>
 				{
-					error_code ec{};
-					virgo::http_method method;
-					virgo::http_version version;
-					std::string path;
-					std::vector<std::pair<std::string, std::string>> querys;
-
-					parse_header_line(buffer, method, version, path, querys, ec);
-					if (ec.value() != static_cast<int>(virgo::http_status::ok))
-						co_return;
-
 					if (method == virgo::http_method::options)
 					{
 						virgo::http_options_protocol::request hop_req{};
@@ -82,23 +96,23 @@ namespace aquarius
 						virgo::http_options_protocol::response hop_resp{};
 						hop_resp.result(static_cast<int>(virgo::http_status::no_content));
 						hop_resp.version(version);
- 						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
+						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
 						hop_resp.set_field("Access-Control-Allow-Methods", "POST,GET");
 						hop_resp.set_field("Access-Control-Allow-Headers",
 										   hop_req.find("Access-Control-Request-Headers"));
 						hop_resp.set_field("Access-Control-Max-Age", std::to_string(86400));
 
-						detail::flex_buffer<char> buffer{};
-						hop_resp.commit(buffer, ec);
+						detail::flex_buffer<char> temp_buffer{};
+						hop_resp.commit(temp_buffer, ec);
 
 						if (ec.value() != static_cast<int>(virgo::http_status::ok))
 							co_return;
 
-						co_await session_ptr->async_send(std::move(buffer));
+						co_await session_ptr->async_send(std::move(temp_buffer));
 					}
 					else
 					{
-						http_router<Session>::get_mutable_instance().invoke(method, path, session_ptr, buffer);
+						http_router<Session>::get_mutable_instance().invoke(method, path, session_ptr, hf, buffer);
 					}
 				},
 				detached);
@@ -114,7 +128,7 @@ namespace aquarius
 			auto buf_view = span | std::views::slide(2);
 
 			auto iter = std::ranges::find_if(buf_view,
-											 [] (const auto& v)
+											 [](const auto& v)
 											 {
 												 if (v.size() < 2)
 													 return false;
@@ -254,8 +268,6 @@ namespace aquarius
 					ec = make_error_code(virgo::http_status::bad_request);
 				}
 			}
-
-			
 		}
 
 		template <typename T>
@@ -279,5 +291,88 @@ namespace aquarius
 				query.second = std::string(std::string_view(p).substr(pos + 1));
 			}
 		}
+
+		template <typename Session>
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer,
+						 virgo::http_fields& hf, error_code& ec) -> awaitable<void>
+		{
+			constexpr auto two_crlf = std::string_view("\r\n\r\n");
+
+			ec = co_await session_ptr->async_read_util(buffer, two_crlf);
+
+			if (ec)
+				co_return;
+
+			parse_header_line(buffer, method, version, path, querys, ec);
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				co_return;
+
+			auto span = std::span<char>(buffer.rdata(), buffer.active());
+
+			auto buf_view = span | std::views::slide(4);
+
+			auto iter = std::ranges::find_if(buf_view,
+											 [](const auto& value)
+											 {
+												 if (value.size() < 4)
+													 return false;
+
+												 return std::string_view(value) == "\r\n\r\n";
+											 });
+
+			if (iter == buf_view.end())
+			{
+				ec = make_error_code(virgo::http_status::bad_request);
+				co_return;
+			}
+
+			auto len = std::distance(buf_view.begin(), iter);
+
+			buffer.consume(len + 4);
+
+			auto buf = span.subspan(0, len);
+
+			auto header_view = std::views::split(buf, '\n');
+
+			for (const auto header : header_view)
+			{
+				auto itor =
+					std::ranges::find_if(header.begin(), header.end(), [](const auto& value) { return value == ':'; });
+
+				if (itor == header.end())
+				{
+					ec = make_error_code(virgo::http_status::bad_request);
+					co_return;
+				}
+
+				len = std::distance(header.begin(), itor);
+
+				auto key = std::string(std::string_view(header).substr(0, len));
+
+				auto value = std::string(std::string_view(header).substr(len + 1));
+
+				if (value.back() == '\r')
+					value = value.substr(0, value.size() - 1);
+
+				if (value.front() == ' ')
+					value = value.substr(1);
+
+				hf.set_field(key, value);
+			}
+
+			if (hf.content_length() == 0)
+				co_return;
+
+			ec = co_await session_ptr->async_read(buffer, hf.content_length());
+		}
+
+	private:
+		virgo::http_method method;
+
+		virgo::http_version version;
+
+		std::string path;
+
+		std::vector<std::pair<std::string, std::string>> querys;
 	};
 } // namespace aquarius

@@ -89,36 +89,42 @@ namespace aquarius
 			{
 				ec = make_error_code(virgo::http_status::ok);
 
-				auto span = std::span<T>(buffer.rdata(), buffer.active());
+				//const auto sp = std::span<char>(buffer.rdata(), buffer.active());
 
-				auto iter = span.find("\r\n\r\n");
-				if (iter == span.end())
-				{
-					ec = make_error_code(virgo::http_status::bad_request);
-					return;
-				}
+				//auto parts = sp | std::views::slide(4);
 
-				auto len = std::distance(span.begin(), iter);
+				//auto iter = std::ranges::find_if(parts, [] (auto value)
+				//								 {
+				//									 if (value.size() < 4)
+				//										 return false;
 
-				buffer.consume(len);
+				//									 return std::string_view(value) == "\r\n\r\n";
+				//								 });
 
-				for (const auto& p : span.subspan(0, len) | std::views::split("\r\n"))
-				{
-					auto line = p | std::views::split(':');
-					if (line.size() < 2)
-					{
-						ec = make_error_code(virgo::http_status::bad_request);
-						break;
-					}
+				//auto len = std::distance(parts.begin(), iter);
 
-					set_field(line.front(), line.back());
-				}
+				//buffer.consume(len + 4);
 
-				if (this->content_length() > buffer.active())
-				{
-					ec = make_error_code(virgo::http_status::bad_request);
-					return;
-				}
+				//for (const auto& p : std::views::split(sp.subspan(0, len), "\r\n"))
+				//{
+				//	auto line = p | std::views::split(':');
+				//	if (std::distance(line.begin(),line.end()) < 2)
+				//	{
+				//		ec = make_error_code(virgo::http_status::bad_request);
+				//		break;
+				//	}
+				//	auto next = line.begin();
+
+				//	std::advance(next, 1);
+
+				//	this->set_field(std::string(std::string_view(*line.begin())), std::string(std::string_view(*next)));
+				//}
+
+				//if (this->content_length() > buffer.active())
+				//{
+				//	ec = make_error_code(virgo::http_status::bad_request);
+				//	return;
+				//}
 
 				//if constexpr (!std::same_as<header_t, int>)
 				//{

@@ -32,56 +32,7 @@ namespace aquarius
 			{
 				ec = make_error_code(virgo::http_status::ok);
 
-				auto span = std::span<T>(buffer.rdata(), buffer.active());
-
-				auto buf_view = span | std::views::slide(4);
-
-				auto iter = std::ranges::find_if(buf_view, [] (const auto& value)
-												{
-													if (value.size() < 4)
-														return false;
-
-													return std::string_view(value) == "\r\n\r\n";
-												});
-
-				if (iter == buf_view.end())
-				{
-					ec = make_error_code(virgo::http_status::bad_request);
-					return;
-				}
-
-				auto len = std::distance(buf_view.begin(), iter);
-
-				buffer.consume(len + 4);
-
-				auto buf = span.subspan(0, len);
-
-				auto header_view =  std::views::split(buf, '\n');
-
-				for (const auto header : header_view)
-				{
-					auto itor = std::ranges::find_if(header.begin(), header.end(), [] (const auto& value) { return value == ':'; });
-
-					if (itor == header.end()) 
-					{
-						ec = make_error_code(virgo::http_status::bad_request);
-						return;
-					}
-
-					auto len = std::distance(header.begin(), itor);
-
-					auto key = std::string(std::string_view(header).substr(0, len));
-
-					auto value = std::string(std::string_view(header).substr(len + 1));
-
-					if (value.back() == '\r')
-						value = value.substr(0, value.size() - 1);
-					
-					if (value.front() == ' ')
-						value = value.substr(1);
-
-					this->set_field(key, value);
-				}
+				
 
 				//if constexpr (!std::same_as<header_t, int>)
 				//{
@@ -97,7 +48,7 @@ namespace aquarius
 			template <typename T>
 			void commit(detail::flex_buffer<T>& buffer, error_code& ec)
 			{
-				std::string str = std::format("{} {} {}\r\n", from_method_string(this->method()), this->path(),
+				std::string str = std::format("{} {} {}\r\n", from_method_string(this->method()), http_request::router,
 											  from_version_string(this->version()));
 
 				detail::flex_buffer<char> body_buffer{};

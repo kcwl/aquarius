@@ -1,435 +1,263 @@
 #pragma once
 #include <string_view>
 #include <format>
+#include <aquarius/sql/select_view.hpp>
+#include <aquarius/sql/insert_view.hpp>
+#include <aquarius/sql/remove_view.hpp>
+#include <aquarius/sql/update_view.hpp>
+#include <aquarius/sql/where_view.hpp>
+#include <aquarius/sql/and_view.hpp>
+#include <aquarius/sql/or_view.hpp>
+#include <aquarius/sql/order_view.hpp>
+#include <aquarius/sql/limit_view.hpp>
+#include <aquarius/sql/condition_view.hpp>
+#include <aquarius/detail/string_literal.hpp>
 
 namespace aquarius
 {
 	namespace sql
 	{
-		namespace detail
+
+		template <typename T, auto Member>
+		constexpr bool member_find()
 		{
-			template <typename _Ty>
-			inline constexpr std::string_view name()
+			constexpr std::string_view table_name = Member;
+
+			constexpr auto size = boost::pfr::tuple_size_v<std::remove_cvref_t<T>>;
+
+			auto f = []<std::size_t... I>(std::index_sequence<I...>)
+			{ return ((table_name.compare(boost::pfr::get_name<I, T>()) == 0) || ...); };
+
+			return f();
+		}
+
+		constexpr bool isalpha(char c)
+		{
+			return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+		}
+
+		constexpr bool isdigit(char c)
+		{
+			return c >= '0' && c <= '9';
+		}
+
+		constexpr bool isalnum(char c)
+		{
+			return isalpha(c) || isdigit(c);
+		}
+
+		constexpr bool isspace(char c)
+		{
+			return c == ' ';
+		}
+
+		template <const std::string_view& Name>
+		inline constexpr bool check_table_name()
+		{
+			if (Name.empty())
+				return false;
+
+			constexpr auto iter = Name.begin();
+
+			if (isdigit(*iter))
+				return false;
+
+			for (const auto& c : Name)
 			{
-				using namespace std::string_view_literals;
+				if (isalpha(c) || isdigit(c) || c == '_')
+					continue;
 
-#ifndef __linux
-				constexpr std::string_view name = __FUNCSIG__ ""sv;
+				return false;
+			}
 
-				constexpr auto left_bracket = name.find_last_of("<");
+			return true;
+		}
 
-				constexpr auto end_bracket = name.find_last_of(">");
+		template <const std::string_view& Name>
+		constexpr auto trip()
+		{
+			auto begin_pos = Name.find_first_not_of(' ');
 
-				constexpr auto temp_name = name.substr(left_bracket + 1, end_bracket - left_bracket - 1);
+			auto end_pos = Name.find_last_not_of(' ');
 
-				constexpr auto start = name.find_last_of(" ");
+			return Name.substr(begin_pos, end_pos - begin_pos + 1);
+		}
 
-				if constexpr (start == std::string_view::npos)
+		template <const std::string_view& Value>
+		constexpr auto filter_condition() -> std::string_view
+		{
+			constexpr auto begin_pos = Value.find_first_not_of(' ');
+
+			if constexpr (Value[begin_pos] == '>')
+			{
+				if constexpr (Value[begin_pos + 1] == '=')
 				{
-					return temp_name;
+					return ">="sv;
 				}
 				else
 				{
-					return name.substr(start + 1, end_bracket - start - 1);
+					return ">"sv;
 				}
-#else
-				constexpr std::string_view name = __PRETTY_FUNCTION__;
-
-				constexpr auto left_bracket = name.find_last_of("[");
-				constexpr auto right_bracket = name.find_last_of("]");
-				constexpr auto name_in_bracket = name.substr(left_bracket + 1, right_bracket - left_bracket - 1);
-
-				constexpr auto left_equ = name_in_bracket.find_first_of("=");
-				constexpr auto right_f = name_in_bracket.find_first_of(";");
-
-				constexpr auto first_name = name_in_bracket.substr(left_equ + 2, right_f - left_equ - 2);
-
-				constexpr auto sp = first_name.find_last_of(":");
-
-				if constexpr (sp == std::string_view::npos)
+			}
+			else if constexpr (Value[begin_pos] == '<')
+			{
+				if constexpr (Value[begin_pos + 1] == '=')
 				{
-					return first_name;
+					return "<="sv;
 				}
 				else
 				{
-					return first_name.substr(sp + 1);
+					return "<"sv;
 				}
-#endif
 			}
-
-			template <typename Adaptor, typename... Args>
-			struct sql_partial
+			else if constexpr (Value[begin_pos] == '!')
 			{
-				std::tuple<Args...> args;
-
-				sql_partial(Args... args)
-					: args(std::move(args)...)
-				{}
-
-				template <typename T>
-				constexpr auto operator()(T&& t) const
+				if constexpr (Value[begin_pos + 1] == '=')
 				{
-					auto forwarder = [&t](const auto&... _args) { return Adaptor{}(std::forward<T>(t), _args...); };
-
-					return std::apply(forwarder, args);
+					return "!="sv;
 				}
-			};
-
-			struct sql_adaptor_closure
-			{
-				template <typename Self, typename T>
-				friend constexpr auto operator|(T&& t, Self&& self)
+				else
 				{
-					return std::forward<Self>(self)(std::forward<T>(t));
+					static_assert(false, "! not support");
 				}
-			};
-
-			template <typename T>
-			struct sql_adaptor : public sql_adaptor_closure
+			}
+			else if constexpr (Value[begin_pos] == '=')
 			{
-				template <typename... Args>
-				constexpr auto operator()(Args&&... args) const
-				{
-					return sql_partial<T, std::decay_t<Args>...>{ std::forward<Args>(args)... };
-				}
-			};
-		} // namespace detail
+				return "="sv;
+			}
+			else
+			{
+				static_assert(false, "syntax error");
+			}
+		}
 
-		template <typename T>
-		class select_view
+		template <auto Value>
+		constexpr decltype(auto) parse_condition()
 		{
-		public:
-			constexpr select_view() = default;
+			constexpr std::string_view content = aquarius::detail::bind_param<Value>::value;
 
-		public:
-			constexpr auto result() -> std::string
+			constexpr auto pos = content.find('.');
+
+			constexpr static auto table_name = content.substr(0, pos);
+
+			static_assert(check_table_name<table_name>(), "table name error");
+
+			constexpr auto next_part = content.substr(pos + 1);
+
+			constexpr auto iter = std::find_if(next_part.begin(), next_part.end(),
+											   [](auto c) { return !isalnum(c) && c != '_' && !isspace(c); });
+
+			static_assert(iter != next_part.end(), "syntax error");
+
+			constexpr auto len = std::distance(next_part.begin(), iter);
+
+			constexpr static auto member = next_part.substr(0, len);
+
+			constexpr static auto trip_member = trip<member>();
+
+			static_assert(check_table_name<trip_member>(), "member name error");
+
+			constexpr static auto value = next_part.substr(len);
+
+			constexpr auto symbol = filter_condition<value>();
+
+			constexpr static auto cond_value = value.substr(symbol.size());
+
+			constexpr static auto trip_cond_value = trip<cond_value>();
+
+			if constexpr (symbol == aquarius::sql::less::value)
 			{
-				constexpr static auto struct_name = detail::name<T>();
-
-				return std::format("select * from {}", struct_name.data());
+				return aquarius::sql::cond_less<table_name, trip_member, trip_cond_value>();
 			}
-		};
+			else if constexpr (symbol == aquarius::sql::less_equal::value)
+			{
+				return aquarius::sql::cond_less_equal<table_name, trip_member, trip_cond_value>();
+			}
+			else if constexpr (symbol == aquarius::sql::greater::value)
+			{
+				return aquarius::sql::cond_greater<table_name, trip_member, trip_cond_value>();
+			}
+			else if constexpr (symbol == aquarius::sql::greater_equal::value)
+			{
+				return aquarius::sql::cond_greater_equal<table_name, trip_member, trip_cond_value>();
+			}
+			else if constexpr (symbol == aquarius::sql::not_equal::value)
+			{
+				return aquarius::sql::cond_not_equal<table_name, trip_member, trip_cond_value>();
+			}
+			else if constexpr (symbol == aquarius::sql::equal::value)
+			{
+				return aquarius::sql::cond_equal<table_name, trip_member, trip_cond_value>();
+			}
+			else
+			{
+				static_assert(false, "symbol error");
+			}
+		}
 
-		template <typename T>
-		class insert_view
+		template <std::size_t I, auto Value>
+		constexpr auto get_pos_n()
 		{
-		public:
-			insert_view(T value)
+			constexpr std::string_view content = aquarius::detail::bind_param<Value>::value;
+
+			int i = 0;
+			std::size_t pos = 0;
+			while (i++ < I)
 			{
-				constexpr static auto struct_name = detail::name<T>();
-
-				constexpr auto size = boost::pfr::tuple_size_v<T>;
-
-				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
-				{ return std::make_tuple((boost::pfr::get<I, T>(value), ...)); };
-
-				complete_sql_ =
-					std::format("insert into {} values {}", struct_name, f(std::make_index_sequence<size>{}));
+				pos = content.find(',', pos + 1);
 			}
 
-		public:
-			auto result() -> std::string
-			{
-				return complete_sql_;
-			}
+			return pos;
+		}
 
-		private:
-			std::string complete_sql_;
-		};
-
-		template <typename T>
-		class remove_view
-		{
-		public:
-			constexpr remove_view() = default;
-
-		public:
-			constexpr auto result() -> std::string
-			{
-				constexpr static auto struct_name = detail::name<T>();
-
-				return std::format("delete from {}", struct_name);
-			}
-		};
-
-		template <typename T>
-		class update_view
-		{
-		public:
-			update_view(T value)
-			{
-				constexpr static auto struct_name = detail::name<T>();
-
-				constexpr auto update_sql = std::format("update {} set ", struct_name);
-
-				ss_ << update_sql;
-
-				constexpr auto size = boost::pfr::tuple_size_v<T>;
-
-				boost::pfr::for_each_field_with_name(
-					value, [&](auto name, auto value, std::size_t index)
-					{ ss_ << name.data() << "=" << add_string_format(value) << (index != size - 1 ? " and " : ""); });
-			}
-
-		public:
-			auto result() -> std::string
-			{
-				return ss_.str();
-			}
-
-		private:
-			std::stringstream ss_;
-		};
-
-		template <typename T>
-		struct _select
+		template <const std::string_view& V, const std::string_view& member>
+		struct order_param
 		{
 			constexpr auto operator()() const
 			{
-				return select_view<T>();
+				return concat_v<V, member>;
 			}
 		};
 
-		template <typename T>
-		inline constexpr _select<T> select;
-
-		struct _insert
+		template <std::size_t I, auto Value>
+		constexpr auto get_n()
 		{
-			template <typename Ranges>
-			constexpr auto operator()(Ranges&& ranges) const
-			{
-				return insert_view<Ranges>(std::forward<Ranges>(ranges));
-			}
-		};
+			constexpr std::string_view content = aquarius::detail::bind_param<Value>::value;
 
-		inline constexpr _insert insert;
+			constexpr auto begin = I == 0 ? 0 : get_pos_n<I, Value>() + 1;
 
-		struct _remove
+			constexpr auto end = get_pos_n<I + 1, Value>();
+
+			constexpr auto single = content.substr(begin, end - begin);
+
+			constexpr auto pos = single.find('.');
+
+			static_assert(pos != std::string_view::npos, "syntax error");
+
+			constexpr static auto V = single.substr(0, pos);
+
+			constexpr static auto member = single.substr(pos + 1);
+
+			return order_param<V, member>();
+		}
+
+		template <auto Value>
+		constexpr auto parse_args()
 		{
-			template <typename Ranges>
-			constexpr auto operator()(Ranges&& ranges) const
-			{
-				return remove_view<Ranges>(std::forward<Ranges>(ranges));
-			}
-		};
+			constexpr static std::string_view content = aquarius::detail::bind_param<Value>::value;
 
-		inline constexpr _remove remove;
-
-		struct _update
-		{
-			template <typename Ranges>
-			constexpr auto operator()(Ranges&& ranges) const
-			{
-				return update_view<Ranges>(std::forward<Ranges>(ranges));
-			}
-		};
-
-		inline constexpr _update update;
-
-		template <typename T>
-		class distinct_view
-		{
-		public:
-			distinct_view(T view)
-			{
-				auto sql = view.result();
-
-				auto pos = sql.find_first_of(" ");
-
-				if (pos != std::string_view::npos)
-				{
-					sql_ = sql.substr(0, pos) + " distinct " + sql.substr(pos + 1);
-				}
-			}
-
-		public:
-			constexpr auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _distinct : detail::sql_adaptor<_distinct>
-		{
-			template <typename T>
-			constexpr auto operator()(T&& v) const
-			{
-				return distinct_view<T>(std::forward<T>(v));
-			}
-
-			using detail::sql_adaptor<_distinct>::operator();
-		};
-
-		inline constexpr _distinct distinct;
-
-		template <typename T>
-		class where_view
-		{
-		public:
-			where_view(T ranges, const std::string& sql)
-				: sql_(ranges.result() + " where " + sql)
-			{}
-
-			template <typename Attr>
-			where_view(Attr&& attr)
-				: sql_(attr)
-			{}
-
-		public:
-			auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _where : detail::sql_adaptor<_where>
-		{
-			template <typename T, typename Attr>
-			constexpr auto operator()(T&& v, Attr&& attr) const
-			{
-				return where_view<T>(std::forward<T>(v), std::forward<Attr>(attr));
-			}
-
-			using detail::sql_adaptor<_where>::operator();
-		};
-
-		inline constexpr _where where;
-
-		template <typename T>
-		class order_view
-		{
-		public:
-			template <typename Attr>
-			order_view(T v, Attr&&)
-			{
-				sql_ = v.result() + " order by " + detail::name<Attr>();
-			}
-
-		public:
-			auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _order
-		{
-			template <typename T, typename Attr>
-			constexpr auto operator()(T&& v, Attr&& attr) const
-			{
-				return order_view<T>(std::forward<T>(v), std::forward<Attr>(attr));
-			}
-		};
-
-		inline constexpr _order order;
-
-		template <typename T>
-		class limit_view
-		{
-		public:
-			limit_view(T ranges, const std::string& limit)
-			{
-				sql_ = ranges.result() + " limit " + limit;
-			}
-
-		public:
-			auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _limit : detail::sql_adaptor<_limit>
-		{
-			template <typename Ranges>
-			constexpr auto operator()(Ranges&& ranges, int limit) const
-			{
-				return limit_view<Ranges>(std::forward<Ranges>(ranges), std::to_string(limit));
-			}
-
-			using detail::sql_adaptor<_limit>::operator();
-		};
-
-		inline constexpr _limit limit;
-
-		template <typename T, typename Attr>
-		class and_view
-		{
-			and_view(T ranges, Attr attr)
-				: sql_(ranges.result() + " and " + attr)
-			{}
-
-		public:
-			auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _and : detail::sql_adaptor<_where>
-		{
-			template <typename T, typename Attr>
-			constexpr auto operator()(T&& v, Attr attr) const
-			{
-				return and_view<T, Attr>(std::forward<T>(v), std::move(attr));
-			}
-
-			using detail::sql_adaptor<_where>::operator();
-		};
-
-		inline constexpr _and and_;
-
-		template <typename T, typename Attr>
-		class or_view
-		{
-			or_view(T ranges, Attr attr)
-			{
-				auto name = detail::name<Attr>();
-
-				sql_ = " or " + name;
-			}
-
-		public:
-			auto result() -> std::string
-			{
-				return sql_;
-			}
-
-		private:
-			std::string sql_;
-		};
-
-		struct _or : detail::sql_adaptor<_where>
-		{
-			template <typename T, typename Attr>
-			constexpr auto operator()(T&& v, Attr attr) const
-			{
-				return or_view<T, Attr>(std::forward<T>(v), std::move(attr));
-			}
-		};
-
-		inline constexpr _or or_;
+			return aquarius::sql::_tp_condition<content>();
+		}
 	} // namespace sql
-
-
-
 } // namespace aquarius
 
-#define sql_where(content) aquarius::sql::where(#content) 
-#define sql_and(content) aquarius::sql::and_(#content) 
-#define sql_or(content) aquarius::sql::or_(#content) 
+#define sql_select(content) aquarius::sql::select<content>()
+#define sql_insert(content) aquarius::sql::insert(content)
+#define sql_update(content) aquarius::sql::update(content)
+#define sql_delete(content) aquarius::sql::remove<content>()
+#define sql_where(content) aquarius::sql::where(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_and(content) aquarius::sql::and_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_or(content) aquarius::sql::or_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_desc(...) aquarius::sql::desc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
+#define sql_asc(...) aquarius::sql::asc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
+#define sql_limit(n) aquarius::sql::limit(aquarius::sql::_single_number<n>())

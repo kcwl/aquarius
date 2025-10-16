@@ -74,6 +74,11 @@ namespace aquarius
 				fields_["Connection"] = k ? "keep-alive" : "close";
 			}
 
+			void move_copy(http_fields hf)
+			{
+				*this = std::move(hf);
+			}
+
 		protected:
 			std::map<std::string, std::string> fields_;
 		};

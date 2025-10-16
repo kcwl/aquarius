@@ -26,3 +26,19 @@ protocol login -> tcp-key:10001
 		person per_resp;
 	}
 }
+
+protocol http_login -> http-str:/login
+{
+	request {
+	header:
+		int32 uuid;
+	body:
+		person per_req;
+	}
+	response {
+	header:
+		int32 uuid;
+	body:
+		person per_resp;
+	}
+}

@@ -46,6 +46,9 @@
     <Filter Include="include\aquarius\ip\http">
       <UniqueIdentifier>{b9092472-bc12-4030-a092-3b78e0026498}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\sql">
+      <UniqueIdentifier>{8b00fb3a-7488-4423-ae02-0d96221c5544}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -57,13 +60,10 @@
     <ClInclude Include="..\test\session.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\server.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\detail.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\protocol.hpp">
+    <ClInclude Include="..\test\handle_impl.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
@@ -79,9 +79,6 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\cmd_options.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\deadline_timer.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\error_code.hpp">
@@ -141,7 +138,7 @@
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\adaptor.h">
+    <ClInclude Include="..\test\serialize.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\test\sql.h">
@@ -216,9 +213,6 @@
     <ClInclude Include="..\include\aquarius\serialize\message_serialize_base.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\pod_parse.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
@@ -266,6 +260,69 @@
     </ClInclude>
     <ClInclude Include="..\test\test.virgo.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\cmd_options.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\protocol.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\concepts.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\select_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\concat.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\insert_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\remove_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\update_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\select_distinct_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\where_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\and_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\or_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\order_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\limit_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\condition_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\closure.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\add_string.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\struct_name.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_client_session.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

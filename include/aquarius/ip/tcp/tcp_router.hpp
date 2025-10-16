@@ -4,11 +4,11 @@
 namespace aquarius
 {
 	template <typename Session>
-	class tcp_router : public basic_router<Session>,  public  singleton<tcp_router<Session>>
+	class tcp_router : public basic_router<Session, std::function<bool(std::shared_ptr<Session>, detail::flex_buffer<char>)>>,  public  singleton<tcp_router<Session>>
 	{
-		using base = basic_router<Session>;
+		using base = basic_router<Session, std::function<bool(std::shared_ptr<Session>, detail::flex_buffer<char>)>>;
 
-		using typename base::buffer_t;
+		using buffer_t = detail::flex_buffer<char>;
 
 	public:
 		tcp_router() = default;
@@ -23,7 +23,9 @@ namespace aquarius
 			{
 				auto req = std::make_shared<typename Context::request_t>();
 
-				req->consume(buffer);
+				error_code ec{};
+
+				req->consume(buffer, ec);
 
 				post(session->get_executor(),
 					 [=]

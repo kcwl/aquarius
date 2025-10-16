@@ -21,7 +21,7 @@ namespace aquarius
 				, rpos_(0)
 			{}
 
-			flex_buffer(flex_buffer&& other)
+			flex_buffer(flex_buffer&& other) noexcept
 				: buffer_(std::move(other.buffer_))
 				, wpos_(std::exchange(other.wpos_, 0))
 				, rpos_(std::exchange(other.rpos_, 0))
@@ -29,7 +29,7 @@ namespace aquarius
 				other.buffer_.resize(capacity);
 			}
 
-			flex_buffer(const flex_buffer& other)
+			flex_buffer(const flex_buffer& other) noexcept
 			{
 				if (this != std::addressof(other))
 				{
@@ -38,6 +38,8 @@ namespace aquarius
 					rpos_ = other.rpos_;
 				}
 			}
+
+			virtual ~flex_buffer() = default;
 
 		public:
 			T* rdata()
@@ -105,16 +107,28 @@ namespace aquarius
 				return buffer_[rpos_++];
 			}
 
-			void put(T value)
+			bool put(T value)
 			{
 				constexpr auto size = sizeof(T);
 
 				if (size > remain())
-					return;
+					return false;
 
 				std::memcpy(wdata(), &value, size);
 
 				commit(size);
+
+				return true;
+			}
+
+			bool empty() const
+			{
+				return rpos_ == wpos_;
+			}
+
+			std::size_t tellg() const
+			{
+				return wpos_;
 			}
 
 			template<typename V>
@@ -128,16 +142,6 @@ namespace aquarius
 				std::memcpy(wdata(), buf.rdata(), buf.active());
 
 				commit(buf.active());
-			}
-
-			bool empty() const
-			{
-				return rpos_ == wpos_;
-			}
-
-			std::size_t tellg() const
-			{
-				return wpos_;
 			}
 
 		private:

@@ -2,16 +2,16 @@
 #include <aquarius/detail/trie.hpp>
 #include <memory>
 #include <functional>
+#include <aquarius/virgo/http_fields.hpp>
 
 namespace aquarius
 {
-	template <typename Session>
+	template <typename Session, typename Func>
 	class basic_router
 	{
 	public:
 		using session = Session;
-		using buffer_t = detail::flex_buffer<char>;
-		using function_type = std::function<bool(std::shared_ptr<Session>, buffer_t)>;
+		using function_type = Func;
 		using func_trie = detail::trie<function_type>;
 
 	public:

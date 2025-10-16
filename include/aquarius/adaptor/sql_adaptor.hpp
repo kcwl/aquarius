@@ -2,17 +2,26 @@
 #include <aquarius/io_context.hpp>
 #include <boost/mysql.hpp>
 #include <aquarius/error_code.hpp>
+#include <boost/pfr.hpp>
+
+using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <bool Server>
+	template <bool Server, typename Executor = boost::asio::any_io_executor>
 	class sql_adaptor
 	{
 	public:
 		explicit sql_adaptor(io_context& ctx)
-			: context_(ctx)
+			: sql_adaptor(ctx.get_executor())
 		{
 			static_assert(!Server, "because of adaptor for client, Server must be false");
+		}
+
+		sql_adaptor(const Executor& ex)
+			: executor_(ex)
+		{
+
 		}
 
 	public:
@@ -68,7 +77,7 @@ namespace aquarius
 
 			create_ssl_context();
 
-			connector_pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(*this, std::move(conn_params_));
+			connector_pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(executor_, std::move(conn_params_));
 
 			connector_pool_ptr_->async_run(detached);
 		}
@@ -120,7 +129,7 @@ namespace aquarius
 		}
 
 	private:
-		io_context& context_;
+		Executor executor_;
 
 		boost::mysql::pool_params conn_params_;
 
