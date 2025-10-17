@@ -69,7 +69,7 @@ namespace aquarius
 
 			virgo::http_fields hf;
 
-			recv_buffer(session_ptr, buffer, hf, ec);
+			co_await recv_buffer(session_ptr, buffer, hf, ec);
 
 			if (ec)
 			{
