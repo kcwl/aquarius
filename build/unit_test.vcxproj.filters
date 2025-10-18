@@ -168,9 +168,6 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -305,6 +302,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\error.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

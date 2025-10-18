@@ -37,7 +37,7 @@ namespace aquarius
 
 			this->response_.reason(virgo::from_status_string(ec.value()));
 
-			detail::flex_buffer<char> buffer{};
+			flex_buffer<char> buffer{};
 
 			this->response_.commit(buffer, ec);
 
@@ -81,6 +81,9 @@ namespace aquarius
 #define AQUARIUS_HTTP_GET_HANDLER(__request, __response, __method)                                                     \
 	AQUARIUS_CONTEXT_BY_HTTP(aquarius::http_server_session, __request, __response, __method,                           \
 							 aquarius::http_router<aquarius::http_server_session>, aquarius::virgo::http_method::get)
+
+#define AQUARIUS_HTTP_HANDLER(__request, __response, __method)                                                         \
+	AQUARIUS_HTTP_GET_HANDLER(__request, __response, __method)
 
 #define AQUARIUS_HTTP_POST_HANDLER(__request, __response, __method)                                                    \
 	AQUARIUS_CONTEXT_BY_HTTP(aquarius::http_server_session, __request, __response, __method,                           \

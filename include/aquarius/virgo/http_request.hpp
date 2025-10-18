@@ -25,36 +25,26 @@ namespace aquarius
 
 		public:
 			template <typename T>
-			void consume(detail::flex_buffer<T>& buffer, error_code& ec)
+			void consume(flex_buffer<T>& buffer)
 			{
-				ec = make_error_code(virgo::http_status::ok);
+				this->header().serialize(buffer);
 
-				
-
-				//if constexpr (!std::same_as<header_t, int>)
-				//{
-				//	this->header().serialize(buffer);
-				//}
-
-				if constexpr (!std::same_as<body_t, int>)
-				{
-					this->body().serialize(buffer);
-				}
+				this->body().serialize(buffer);
 			}
 
 			template <typename T>
-			void commit(detail::flex_buffer<T>& buffer, error_code& ec)
+			void commit(flex_buffer<T>& buffer)
 			{
 				std::string str = std::format("{} {} {}\r\n", from_method_string(this->method()), http_request::router,
 											  from_version_string(this->version()));
 
-				detail::flex_buffer<char> body_buffer{};
+				flex_buffer<char> body_buffer{};
 
 				if constexpr (!std::same_as<body_t, int>)
 				{
 					this->body().deserialize(body_buffer);
 				}
-				
+
 				if (!body_buffer.empty())
 				{
 					this->content_length(body_buffer.active());
@@ -65,33 +55,15 @@ namespace aquarius
 					str += std::format("{}: {}\r\n", s.first, s.second);
 				}
 
-				if (str.size() > buffer.remain())
-				{
-					ec = make_error_code(http_status::bad_request);
-					return;
-				}
+				buffer.put(str.begin(), str.end());
 
-				std::copy(str.begin(), str.end(), buffer.wdata());
-				buffer.commit(str.size());
-
-				//if constexpr (!std::same_as<header_t, int>)
-				//{
-				//	this->header().deserialize(buffer);
-				//}
+				this->header().deserialize(buffer);
 
 				std::string end_line = "\r\n";
 				std::copy(end_line.begin(), end_line.end(), buffer.wdata());
 				buffer.commit(end_line.size());
 
-				if (body_buffer.active() > buffer.remain())
-				{
-					ec = make_error_code(virgo::http_status::bad_request);
-					return;
-				}
-
 				buffer.append(std::move(body_buffer));
-
-				ec = make_error_code(virgo::http_status::ok);
 			}
 
 		private:

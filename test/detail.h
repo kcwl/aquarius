@@ -5,7 +5,7 @@
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/detail/session_store.hpp>
 #include <aquarius/detail/trie.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/ip/tcp/tcp_server_session.hpp>
 #include <string_view>
 
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(crc)
 
 BOOST_AUTO_TEST_CASE(flex_buffer)
 {
-	aquarius::detail::flex_buffer<char> buffer{};
+	aquarius::flex_buffer<char> buffer{};
 
 	auto begin = buffer.get();
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(flex_buffer)
 
 	BOOST_CHECK_EQUAL(buffer.get(), static_cast<char>(-1));
 
-	BOOST_CHECK(!buffer.put(1));
+	BOOST_CHECK_THROW(buffer.put(1), aquarius::error_code);
 
 	BOOST_CHECK(!buffer.empty());
 }

@@ -125,7 +125,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_read(detail::flex_buffer<T>& buffer, std::size_t length) -> awaitable<error_code>
+		auto async_read(flex_buffer<T>& buffer, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
@@ -148,7 +148,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_read_util(detail::flex_buffer<T>& buffer, std::string_view delm) -> awaitable<error_code>
+		auto async_read_util(flex_buffer<T>& buffer, std::string_view delm) -> awaitable<error_code>
 		{
 			error_code ec;
 
@@ -166,7 +166,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_send(detail::flex_buffer<T> buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer<T> buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 

@@ -52,12 +52,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void login_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_req_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void login_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_req_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
@@ -91,12 +91,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void login_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_req_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(per_req, buffer);
 }
 
-void login_req_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_req_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	per_req = this->parse_from<person>(buffer);
 }
@@ -130,12 +130,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void login_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_resp_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void login_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_resp_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
@@ -169,12 +169,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void login_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_resp_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(per_resp, buffer);
 }
 
-void login_resp_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void login_resp_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	per_resp = this->parse_from<person>(buffer);
 }
@@ -208,12 +208,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void http_login_req_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_req_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void http_login_req_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_req_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
@@ -247,12 +247,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void http_login_req_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_req_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(per_req, buffer);
 }
 
-void http_login_req_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_req_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	per_req = this->parse_from<person>(buffer);
 }
@@ -286,12 +286,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void http_login_resp_header::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_resp_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void http_login_resp_header::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_resp_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
@@ -325,12 +325,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 }
 
 
-void http_login_resp_body::serialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_resp_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
 	this->parse_to(per_resp, buffer);
 }
 
-void http_login_resp_body::deserialize(aquarius::detail::flex_buffer<char>& buffer)
+void http_login_resp_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
 	per_resp = this->parse_from<person>(buffer);
 }

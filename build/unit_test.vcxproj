@@ -159,7 +159,6 @@
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\coroutine.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />
@@ -197,6 +196,8 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />

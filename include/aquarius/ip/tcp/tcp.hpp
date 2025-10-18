@@ -28,7 +28,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			detail::flex_buffer<char> buffer{};
+			flex_buffer<char> buffer{};
 
 			for (;;)
 			{
@@ -53,7 +53,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			detail::flex_buffer<char> buffer{};
+			flex_buffer<char> buffer{};
 
 			co_await recv_buffer(session_ptr, buffer, ec);
 
@@ -61,7 +61,7 @@ namespace aquarius
 
 			if (!ec)
 			{
-				resp.consume(buffer, ec);
+				resp.consume(buffer);
 			}
 
 			co_return resp;
@@ -69,7 +69,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
 		{
 			co_await recv_buffer(session_ptr, buffer, ec);
 
@@ -87,7 +87,7 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[buffer = std::move(buffer), session_ptr]() mutable -> awaitable<void>
 				{
-					serialize::binary_parse parse{};
+					binary_parse parse{};
 					auto router = parse.from_datas<std::string_view>(buffer);
 					
 					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
@@ -98,7 +98,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto recv_buffer(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
 		{
 			uint32_t length = 0;
 

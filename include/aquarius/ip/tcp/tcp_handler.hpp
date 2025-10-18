@@ -32,9 +32,9 @@ namespace aquarius
 		{
 			this->response_.result(ec.value());
 
-			detail::flex_buffer<char> buffer{};
+			flex_buffer<char> buffer{};
 
-			this->response_.commit(buffer, ec);
+			this->response_.commit(buffer);
 
 			co_return co_await this->session()->async_send(buffer);
 		}

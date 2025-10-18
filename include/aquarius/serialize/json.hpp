@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/json.hpp>
 #include <string>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 #include <string>
 
 namespace aquarius
@@ -13,7 +13,7 @@ namespace aquarius
 		struct json_parse
 		{
 			template <typename T, typename U>
-			void to_datas(const T& v, detail::flex_buffer<U>& buffer)
+			void to_datas(const T& v, flex_buffer<U>& buffer)
 			{
 				auto value = boost::json::value_from(v);
 
@@ -22,23 +22,18 @@ namespace aquarius
 				if (str == "null")
 					return;
 
-				if (str.size() > buffer.remain())
-					return;
-
-				std::copy(str.begin(), str.end(), buffer.wdata());
-
-				buffer.commit(str.size());
+				buffer.put(str.begin(), str.end());
 			}
 
 			template <typename T, typename U>
-			T from_datas(detail::flex_buffer<U>& buffer)
+			T from_datas(flex_buffer<U>& buffer)
 			{
 				if (buffer.empty())
 					return {};
 
-				std::string json(buffer.rdata(), buffer.active());
+				std::string json;
 
-				buffer.consume(json.size());
+				buffer.get(json);
 
 				auto value = boost::json::parse(json);
 

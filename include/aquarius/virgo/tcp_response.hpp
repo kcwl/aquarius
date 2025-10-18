@@ -33,7 +33,7 @@ namespace aquarius
 
 		public:
 			template <typename T>
-			bool commit(detail::flex_buffer<T>& buffer, error_code& ec)
+			bool commit(flex_buffer<T>& buffer)
 			{
 				constexpr auto pos = sizeof(uint32_t);
 
@@ -58,7 +58,7 @@ namespace aquarius
 			}
 
 			template <typename T>
-			void consume(detail::flex_buffer<T>& buffer, error_code& ec)
+			void consume(flex_buffer<T>& buffer)
 			{
 				this->result(body_parse_.from_datas<int32_t>(buffer));
 
@@ -72,7 +72,7 @@ namespace aquarius
 			}
 
 		private:
-			serialize::binary_parse body_parse_;
+			binary_parse body_parse_;
 		};
 	} // namespace virgo
 } // namespace aquarius

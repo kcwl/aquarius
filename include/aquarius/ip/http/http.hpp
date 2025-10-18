@@ -2,7 +2,7 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/ip/http/http_router.hpp>
 #include <ranges>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
@@ -12,7 +12,7 @@ namespace aquarius
 	{
 		constexpr static std::size_t max_http_length = 8192;
 
-		using buffer_t = detail::flex_buffer<char>;
+		using buffer_t = flex_buffer<char>;
 
 	public:
 		template <typename Session>
@@ -20,9 +20,11 @@ namespace aquarius
 		{
 			error_code ec;
 
+			flex_buffer<char> buffer;
+
 			for (;;)
 			{
-				co_await recv(session_ptr, ec);
+				co_await recv(session_ptr, buffer, ec);
 
 				if (ec)
 				{
@@ -44,7 +46,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			detail::flex_buffer<char> buffer{};
+			flex_buffer<char> buffer{};
 
 			virgo::http_fields hf;
 
@@ -55,7 +57,7 @@ namespace aquarius
 			if (!ec)
 			{
 				resp.move_copy(hf);
-				resp.consume(buffer, ec);
+				resp.consume(buffer);
 			}
 
 			co_return resp;
@@ -63,10 +65,9 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec)
+			-> awaitable<void>
 		{
-			buffer_t buffer{};
-
 			virgo::http_fields hf;
 
 			co_await recv_buffer(session_ptr, buffer, hf, ec);
@@ -82,16 +83,17 @@ namespace aquarius
 
 			co_spawn(
 				session_ptr->get_executor(),
-				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)] () mutable -> awaitable<void>
+				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
 				{
 					http_router<Session>::get_mutable_instance().invoke(method, path, session_ptr, hf, buffer);
+
 					co_return;
 				},
 				detached);
 		}
 
 		template <typename T>
-		void parse_header_line(detail::flex_buffer<T>& buffer, virgo::http_method& method, virgo::http_version& version,
+		void parse_header_line(flex_buffer<T>& buffer, virgo::http_method& method, virgo::http_version& version,
 							   std::string& path, std::vector<std::pair<std::string, std::string>>& querys,
 							   error_code& ec)
 		{
@@ -265,7 +267,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto recv_buffer(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer,
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer,
 						 virgo::http_fields& hf, error_code& ec) -> awaitable<void>
 		{
 			constexpr auto two_crlf = std::string_view("\r\n\r\n");

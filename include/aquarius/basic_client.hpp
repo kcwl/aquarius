@@ -9,7 +9,7 @@
 #include <iostream>
 #include <map>
 #include <boost/asio/connect.hpp>
-#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/coroutine.hpp>
 
 namespace aquarius
@@ -59,16 +59,11 @@ namespace aquarius
 		template < typename Request, typename Response>
 		auto send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
-			error_code ec{};
+			flex_buffer<char> buffer{};
 
-			detail::flex_buffer<char> buffer{};
+			req->commit(buffer);
 
-			req->commit(buffer, ec);
-
-			if (ec)
-				co_return Response{};
-
-			ec = co_await send(buffer);
+			auto ec = co_await send(buffer);
 
 			if (ec)
 				co_return Response{};
@@ -92,13 +87,13 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto send(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
+		auto send(flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
 			co_return co_await session_ptr_->async_send(buffer);
 		}
 
 		template <typename T>
-		auto read(detail::flex_buffer<T>& buffer) -> awaitable<error_code>
+		auto read(flex_buffer<T>& buffer) -> awaitable<error_code>
 		{
 			co_return co_await session_ptr_->async_read_some(buffer);
 		}

@@ -9,16 +9,15 @@ namespace aquarius
 
 	template <typename Session>
 	class http_router
-		: public basic_router<
-			  Session, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, detail::flex_buffer<char>)>>,
+		: public basic_router<Session,
+							  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer<char>)>>,
 		  public singleton<http_router<Session>>
 	{
 		using base =
-			basic_router<Session,
-						 std::function<bool(std::shared_ptr<Session>, virgo::http_fields, detail::flex_buffer<char>)>>;
+			basic_router<Session, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer<char>)>>;
 
 	public:
-		using buffer_t = detail::flex_buffer<char>;
+		using buffer_t = flex_buffer<char>;
 
 		using typename base::function_type;
 
@@ -35,19 +34,27 @@ namespace aquarius
 		{
 			auto func = [&](std::shared_ptr<Session> session, virgo::http_fields hf, buffer_t buffer)
 			{
-				auto req = std::make_shared<typename Context::request_t>();
-				error_code ec{};
-				req->move_copy(hf);
-				req->consume(buffer, ec);
-				if (ec.value() != static_cast<int>(virgo::http_status::ok))
-					return false;
-				post(session->get_executor(),
-					 [=]
-					 {
-						 co_spawn(
-							 session->get_executor(), [session, req]() mutable -> awaitable<void>
-							 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
-					 });
+				try
+				{
+					auto req = std::make_shared<typename Context::request_t>();
+					error_code ec{};
+					req->move_copy(hf);
+					req->consume(buffer, ec);
+					if (ec.value() != static_cast<int>(virgo::http_status::ok))
+						return false;
+					post(session->get_executor(),
+						 [=]
+						 {
+							 co_spawn(
+								 session->get_executor(), [session, req]() mutable -> awaitable<void>
+								 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
+						 });
+				}
+				catch (error_code& ec)
+				{
+					std::make_shared<Context>().send_response(virgo::http_status::bad_request);
+				}
+
 				return true;
 			};
 

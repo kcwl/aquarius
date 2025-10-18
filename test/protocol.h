@@ -9,9 +9,7 @@
 BOOST_AUTO_TEST_CASE(tcp_protocol)
 {
 	{
-		aquarius::detail::flex_buffer<char> buffer;
-
-		aquarius::error_code ec{};
+		aquarius::flex_buffer<char> buffer;
 
 		auto req = std::make_shared<login_request>();
 		req->header().uuid = 1;
@@ -25,18 +23,16 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		req->body().per_req.name = "John";
 		req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-		req->commit(buffer, ec);
+		req->commit(buffer);
 
 		auto req_back = std::make_shared<login_request>();
-		req_back->consume(buffer, ec);
+		req_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(req, req_back);
 	}
 
 	{
-		aquarius::error_code ec{};
-
-		aquarius::detail::flex_buffer<char> buffer;
+		aquarius::flex_buffer<char> buffer;
 
 		auto resp = std::make_shared<login_response>();
 		resp->header().uuid = 1;
@@ -50,10 +46,10 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		resp->body().per_resp.name = "John";
 		resp->body().per_resp.orders = { 1, 2, 3, 4, 5 };
 
-		resp->commit(buffer, ec);
+		resp->commit(buffer);
 
 		auto resp_back = std::make_shared<login_response>();
-		resp_back->consume(buffer, ec);
+		resp_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(resp, resp_back);
 	}
@@ -61,7 +57,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 BOOST_AUTO_TEST_CASE(http_protocol)
 {
 	{
-		aquarius::detail::flex_buffer<char> buffer;
+		aquarius::flex_buffer<char> buffer;
 
 		auto req = std::make_shared<http_login_request>();
 		req->header().uuid = 1;
@@ -75,18 +71,16 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		req->body().per_req.name = "John";
 		req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-		aquarius::error_code ec;
-
-		req->commit(buffer, ec);
+		req->commit(buffer);
 
 		auto req_back = std::make_shared<http_login_request>();
-		req_back->consume(buffer, ec);
+		req_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(req, req_back);
 	}
 
 	{
-		aquarius::detail::flex_buffer<char> buffer;
+		aquarius::flex_buffer<char> buffer;
 
 		auto resp = std::make_shared<http_login_response>();
 		resp->header().uuid = 1;
@@ -100,12 +94,10 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		resp->body().per_resp.name = "John";
 		resp->body().per_resp.orders = { 1, 2, 3, 4, 5 };
 
-		aquarius::error_code ec;
-
-		resp->commit(buffer, ec);
+		resp->commit(buffer);
 
 		auto resp_back = std::make_shared<http_login_response>();
-		resp_back->consume(buffer, ec);
+		resp_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(resp, resp_back);
 	}
