@@ -28,9 +28,11 @@ namespace aquarius
 		{
 			error_code ec;
 
+			detail::flex_buffer<char> buffer{};
+
 			for (;;)
 			{
-				co_await recv(session_ptr, ec);
+				co_await recv(session_ptr, buffer, ec);
 
 				if (ec)
 				{
@@ -67,10 +69,8 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<void>
+		auto recv(std::shared_ptr<Session> session_ptr, detail::flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
 		{
-			detail::flex_buffer<char> buffer{};
-
 			co_await recv_buffer(session_ptr, buffer, ec);
 
 			if (ec)
@@ -89,8 +89,9 @@ namespace aquarius
 				{
 					serialize::binary_parse parse{};
 					auto router = parse.from_datas<std::string_view>(buffer);
-
+					
 					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
+					
 					co_return;
 				},
 				detached);
@@ -101,7 +102,10 @@ namespace aquarius
 		{
 			uint32_t length = 0;
 
-			ec = co_await session_ptr->async_read((char*)&length, sizeof(length));
+			constexpr auto len = sizeof(length);
+
+			ec = co_await session_ptr->async_read((char*)&length, len);
+
 			if (ec)
 			{
 				if (ec != boost::asio::error::eof)
