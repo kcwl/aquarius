@@ -3,8 +3,8 @@
 
 namespace aquarius
 {
-	namespace virgo
+	namespace lazytool
 	{
 		std::string log(const std::string& func_name, const std::string& str, std::size_t column, std::size_t row);
-	} // namespace virgo
+	} // namespace lazytool
 } // namespace aquarius

@@ -25,3 +25,6 @@
 #include <aquarius/serialize/tcp_serialize.hpp>
 #include <aquarius/sql.hpp>
 #include <aquarius/basic_message_serialize.hpp>
+#include <aquarius/virgo/cpp_type.hpp>
+#include <aquarius/serialize/binary.hpp>
+#include <aquarius/serialize/json.hpp>

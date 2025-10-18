@@ -1,11 +1,15 @@
 ﻿// aquarius_protocol.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include "cpp_generate.h"
-#include "parse.h"
+#include "file_parse.h"
 #include <iomanip>
 #include <iostream>
 #include <filesystem>
+#include "enumture_generater.h"
+#include "message_generater.h"
+#include "structure_generater.h"
+
+using namespace aquarius::lazytool;
 
 void help()
 {
@@ -109,14 +113,14 @@ int main(int argc, char** args)
 
 	std::vector<std::string> input_files{};
 
-	std::string output_file{};
+	std::string output_path{};
 	std::string output_type{};
 	std::string standard{};
 
-	if (!parse_command(argc, args, input_files, output_file, output_type, standard))
+	if (!parse_command(argc, args, input_files, output_path, output_type, standard))
 		return 0;
 
-	if (output_file.empty())
+	if (output_path.empty())
 	{
 		std::cout << "No output file path, that will be explicit output type!\n";
 		return 0;
@@ -124,9 +128,54 @@ int main(int argc, char** args)
 
 	for (auto& file : input_files)
 	{
-		aquarius::virgo::parse parser{};
+		file_parser pr{};
 
- 		parser.read_file(file, output_file);
+		if (!pr.read_file(file))
+			return 0;
+
+		std::filesystem::path ofs_path(output_path);
+
+		std::filesystem::path files(file);
+
+		ofs_path = ofs_path.append(files.filename().string());
+
+		
+
+		if (output_type == "cpp")
+		{
+			std::ofstream ofs_h(ofs_path.string() + ".h");
+
+			std::ofstream ofs_cpp(ofs_path.string() + ".cpp");
+
+			ofs_h << "#pragma once\n";
+			ofs_h << "#include <aquarius.hpp>\n";
+
+			ofs_cpp << "#include \"" << files.filename().string() + ".h\"\n";
+
+			for (auto& k : pr.keywords_)
+			{
+				if (k->struct_type_ == struct_type::enumture)
+				{
+					cpp::enumture_generate().visit(k, ofs_h, ofs_cpp);
+				}
+				else if (k->struct_type_ == struct_type::structure)
+				{
+					cpp::structure_generate().visit(k, ofs_h, ofs_cpp);
+				}
+				else if (k->struct_type_ == struct_type::message)
+				{
+					cpp::message_generate().visit(k, ofs_h, ofs_cpp);
+				}
+			}
+
+			for (auto& k : pr.keywords_)
+			{
+				if (k->struct_type_ != struct_type::message)
+					continue;
+
+				cpp::message_generate().defined(k, ofs_h);
+			}
+		}
 	}
 
 	return 0;

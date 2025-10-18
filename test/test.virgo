@@ -27,7 +27,7 @@ protocol login -> tcp-key:10001
 	}
 }
 
-protocol http_login -> http-str:/login
+protocol http_login -> http-key:/login
 {
 	request {
 	header:

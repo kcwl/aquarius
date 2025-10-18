@@ -19,27 +19,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\lazytool\cpp_generate.cpp" />
-    <ClCompile Include="..\src\lazytool\keyword.cpp" />
+    <ClCompile Include="..\src\lazytool\cpp_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\custom_type.cpp" />
+    <ClCompile Include="..\src\lazytool\domin_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\domin_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\enumture_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\enumture_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\file_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\json_tag.cpp" />
     <ClCompile Include="..\src\lazytool\lazytool.cpp" />
-    <ClCompile Include="..\src\lazytool\parse.cpp" />
     <ClCompile Include="..\src\lazytool\log.cpp" />
+    <ClCompile Include="..\src\lazytool\message_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\message_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\parser.cpp" />
+    <ClCompile Include="..\src\lazytool\protocol_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\protocol_parse.cpp" />
     <ClCompile Include="..\src\lazytool\registor.cpp" />
-    <ClCompile Include="..\src\lazytool\scope.cpp" />
-    <ClCompile Include="..\src\lazytool\test_base.cpp" />
+    <ClCompile Include="..\src\lazytool\router_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\structure_generater.cpp" />
+    <ClCompile Include="..\src\lazytool\structure_parse.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\lazytool\cpp_generate.h" />
-    <ClInclude Include="..\src\lazytool\error.hpp" />
-    <ClInclude Include="..\src\lazytool\keyword.h" />
-    <ClInclude Include="..\src\lazytool\keyword_impl.h" />
+    <ClInclude Include="..\src\lazytool\cpp_generater.h" />
+    <ClInclude Include="..\src\lazytool\cpp_type.hpp" />
+    <ClInclude Include="..\src\lazytool\domin_generater.h" />
+    <ClInclude Include="..\src\lazytool\domin_parse.h" />
+    <ClInclude Include="..\src\lazytool\enumture_generater.h" />
+    <ClInclude Include="..\src\lazytool\enumture_parse.h" />
+    <ClInclude Include="..\src\lazytool\generator.hpp" />
+    <ClInclude Include="..\src\lazytool\json_tag.h" />
+    <ClInclude Include="..\src\lazytool\custom_type.h" />
     <ClInclude Include="..\src\lazytool\log.h" />
-    <ClInclude Include="..\src\lazytool\parse.h" />
+    <ClInclude Include="..\src\lazytool\file_parse.h" />
+    <ClInclude Include="..\src\lazytool\message_generater.h" />
+    <ClInclude Include="..\src\lazytool\message_parse.h" />
+    <ClInclude Include="..\src\lazytool\parser.h" />
+    <ClInclude Include="..\src\lazytool\parse_base.h" />
+    <ClInclude Include="..\src\lazytool\protocol_generater.h" />
+    <ClInclude Include="..\src\lazytool\protocol_parse.h" />
     <ClInclude Include="..\src\lazytool\registor.h" />
-    <ClInclude Include="..\src\lazytool\scope.h" />
-    <ClInclude Include="..\src\lazytool\statement.hpp" />
-    <ClInclude Include="..\src\lazytool\read_value.hpp" />
-    <ClInclude Include="..\src\lazytool\test_base.h" />
+    <ClInclude Include="..\src\lazytool\router_parse.h" />
+    <ClInclude Include="..\src\lazytool\structure_generater.h" />
+    <ClInclude Include="..\src\lazytool\structure_parse.h" />
+    <ClInclude Include="..\src\lazytool\struct_type.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
