@@ -306,9 +306,6 @@
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_custom_header.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

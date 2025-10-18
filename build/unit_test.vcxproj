@@ -188,7 +188,6 @@
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client_session.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_custom_header.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_router.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp" />
