@@ -1,6 +1,8 @@
 #pragma once
 #include <ostream>
-#include <string>
+#include <string_view>
+
+using namespace std::string_view_literals;
 
 namespace aquarius
 {
@@ -11,7 +13,9 @@ namespace aquarius
 			get,
 			post,
 			options,
-			unknown
+			head,
+			put,
+			delete_
 		};
 
 		inline std::ostream& operator<<(std::ostream& os, http_method m)
@@ -21,20 +25,27 @@ namespace aquarius
 			return os;
 		}
 
-		inline std::string from_method_string(http_method m)
+		inline std::string_view from_method_string(http_method m)
 		{
 			switch (m)
 			{
-				case http_method::get:
-					return "GET";
-				case http_method::post:
-					return "POST";
-				case http_method::unknown:
-				default:
-					break;
+			case http_method::get:
+				return "GET"sv;
+			case http_method::post:
+				return "POST"sv;
+			case http_method::options:
+				return "OPTIONS"sv;
+			case http_method::head:
+				return "HEAD"sv;
+			case http_method::put:
+				return "PUT"sv;
+			case http_method::delete_:
+				return "DELETE"sv;
+			default:
+				break;
 			}
 
-			return "UNKNOWN";
+			return "UNKNOWN"sv;
 		}
 
 	} // namespace virgo

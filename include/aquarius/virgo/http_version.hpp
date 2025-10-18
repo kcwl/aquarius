@@ -1,5 +1,8 @@
 #pragma once
 #include <ostream>
+#include <string_view>
+
+using namespace std::string_view_literals;
 
 namespace aquarius
 {
@@ -20,18 +23,20 @@ namespace aquarius
 			return os;
 		}
 
-		inline std::string from_version_string(http_version v)
+		inline std::string_view from_version_string(http_version v)
 		{
 			switch (v)
 			{
 			case http_version::http1_0:
-				return "HTTP/1.0";
+				return "HTTP/1.0"sv;
 			case http_version::http1_1:
-				return "HTTP/1.1";
+				return "HTTP/1.1"sv;
 			case http_version::http2:
-				return "HTTP/2";
+				return "HTTP/2"sv;
 			case http_version::http3:
-				return "HTTP/3";
+				return "HTTP/3"sv;
+			default:
+				break;
 			}
 
 			return {};

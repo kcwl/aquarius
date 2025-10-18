@@ -158,10 +158,10 @@ namespace aquarius
 			return from_status_string(static_cast<http_status>(s));
 		}
 
-		class http_statue_category : public boost::system::error_category
+		class http_status_category : public boost::system::error_category
 		{
 		public:
-			constexpr http_statue_category() = default;
+			constexpr http_status_category() = default;
 
 			[[nodiscard]] const char* name() const noexcept override
 			{
@@ -176,7 +176,7 @@ namespace aquarius
 
 		inline error_code make_error_code(http_status result)
 		{
-			return error_code(static_cast<int>(result), http_statue_category());
+			return error_code(static_cast<int>(result), http_status_category());
 		}
 
 		enum class http_status_class : unsigned
