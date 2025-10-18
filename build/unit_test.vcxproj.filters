@@ -31,9 +31,6 @@
     <Filter Include="include\aquarius\virgo">
       <UniqueIdentifier>{3c82f861-2c64-440a-99fe-25fd587a73cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\virgo\impl">
-      <UniqueIdentifier>{9070cef0-8bbc-4fa3-b29f-88db23fc6d0c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\ip">
       <UniqueIdentifier>{51ab0fcb-e0ef-4aad-aa91-e2390402e374}</UniqueIdentifier>
     </Filter>
@@ -144,16 +141,10 @@
     <ClInclude Include="..\test\sql.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\basic_protocol.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\reflection.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp">
@@ -174,9 +165,6 @@
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\impl\tcp_custom_header.hpp">
-      <Filter>include\aquarius\virgo\impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
@@ -185,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\impl\http_options.hpp">
-      <Filter>include\aquarius\virgo\impl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
@@ -317,6 +302,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_message_serialize.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_custom_header.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

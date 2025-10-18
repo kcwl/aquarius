@@ -3,7 +3,7 @@
 #include <aquarius/ip/http/http_router.hpp>
 #include <ranges>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/virgo/impl/http_options.hpp>
+#include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
 {
@@ -82,37 +82,10 @@ namespace aquarius
 
 			co_spawn(
 				session_ptr->get_executor(),
-				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf), ec]() mutable -> awaitable<void>
+				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)] () mutable -> awaitable<void>
 				{
-					if (method == virgo::http_method::options)
-					{
-						virgo::http_options_protocol::request hop_req{};
-						hop_req.consume(buffer, ec);
-
-						if (ec.value() != static_cast<int>(virgo::http_status::ok))
-							co_return;
-
-						virgo::http_options_protocol::response hop_resp{};
-						hop_resp.result(static_cast<int>(virgo::http_status::no_content));
-						hop_resp.version(version);
-						hop_resp.set_field("Access-Control-Allow-Origin", hop_req.find("Origin"));
-						hop_resp.set_field("Access-Control-Allow-Methods", "POST,GET");
-						hop_resp.set_field("Access-Control-Allow-Headers",
-										   hop_req.find("Access-Control-Request-Headers"));
-						hop_resp.set_field("Access-Control-Max-Age", std::to_string(86400));
-
-						detail::flex_buffer<char> temp_buffer{};
-						hop_resp.commit(temp_buffer, ec);
-
-						if (ec.value() != static_cast<int>(virgo::http_status::ok))
-							co_return;
-
-						co_await session_ptr->async_send(std::move(temp_buffer));
-					}
-					else
-					{
-						http_router<Session>::get_mutable_instance().invoke(method, path, session_ptr, hf, buffer);
-					}
+					http_router<Session>::get_mutable_instance().invoke(method, path, session_ptr, hf, buffer);
+					co_return;
 				},
 				detached);
 		}

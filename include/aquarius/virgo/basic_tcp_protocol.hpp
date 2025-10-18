@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/virgo/basic_protocol.hpp>
+#include <aquarius/basic_protocol.hpp>
 
 namespace aquarius
 {
@@ -24,13 +24,13 @@ namespace aquarius
 				: header_()
 				, timestamp_()
 				, version_()
-			{
-			}
+			{}
 
 		public:
 			bool operator==(const basic_tcp_protocol& other)
 			{
-				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ && version_ == other.version_;
+				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ &&
+					   version_ == other.version_;
 			}
 
 		public:
@@ -73,7 +73,8 @@ namespace aquarius
 		};
 
 		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
-		class basic_tcp_protocol<false, Router, Header, Body, Allocator> : public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
+		class basic_tcp_protocol<false, Router, Header, Body, Allocator>
+			: public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
 			using base = basic_protocol<Router, std::add_pointer_t<Body>, Allocator>;
@@ -90,14 +91,13 @@ namespace aquarius
 				, timestamp_()
 				, version_()
 				, result_()
-			{
-
-			}
+			{}
 
 		public:
 			bool operator==(const basic_tcp_protocol& other)
 			{
-				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ && version_ == other.version_ && result_ = other.result_;
+				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ &&
+						   version_ == other.version_ && result_ = other.result_;
 			}
 
 		public:

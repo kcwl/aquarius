@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <string_view>
-#include <aquarius/virgo/impl/tcp_custom_header.hpp>
 #include "test.virgo.h"
 
 using namespace std::string_view_literals;

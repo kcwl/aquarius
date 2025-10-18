@@ -1,8 +1,8 @@
 #pragma once
 #include <span>
 #include <aquarius/concepts/concepts.hpp>
-#include <aquarius/virgo/reflection.hpp>
 #include <boost/asio/buffer.hpp>
+#include <boost/pfr.hpp>
 
 namespace aquarius
 {
@@ -73,9 +73,9 @@ namespace aquarius
 			void to_datas(const T& value, detail::flex_buffer<V>& buff)
 			{
 				auto to_binary_impl = [&]<std::size_t... I>(std::index_sequence<I...>)
-				{ (to_datas(virgo::reflect::get<I, T>(value), buff), ...); };
+				{ (to_datas(boost::pfr::get<I, T>(value), buff), ...); };
 
-				to_binary_impl(std::make_index_sequence<virgo::reflect::tuple_size_v<T>>{});
+				to_binary_impl(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{});
 			}
 
 			template <integer_t T, typename V>
@@ -170,9 +170,9 @@ namespace aquarius
 			auto from_datas(detail::flex_buffer<V>& buff) -> T
 			{
 				auto from_binary_impl = [&]<std::size_t... I>(std::index_sequence<I...>)
-				{ return T{ from_datas<virgo::reflect::tuple_element_t<I, T>>(buff)... }; };
+				{ return T{ from_datas<boost::pfr::tuple_element_t<I, T>>(buff)... }; };
 
-				return from_binary_impl(std::make_index_sequence<virgo::reflect::tuple_size_v<T>>{});
+				return from_binary_impl(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{});
 			}
 		};
 	} // namespace virgo
