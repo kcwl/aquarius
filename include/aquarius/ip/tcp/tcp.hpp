@@ -132,7 +132,7 @@ namespace aquarius
 					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 				session_ptr->shutdown();
-				co_return;
+				co_return ec;
 			}
 
 			co_return co_await session_ptr->async_read(buffer, length);

@@ -80,8 +80,8 @@ namespace aquarius
 
 			return os;
 		}
-
-		template<detail::string_literal Router, typename Header, typename Body>
-		struct is_message_type<tcp_response<Router, Header, Body>> : std::true_type {};
 	} // namespace virgo
+
+	template<detail::string_literal Router, typename Header, typename Body>
+	struct is_message_type<virgo::tcp_response<Router, Header, Body>> : std::true_type {};
 } // namespace aquarius

@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/asio/ssl.hpp>
 #include <filesystem>
+#include <aquarius/ip/concept.hpp>
 
 namespace aquarius
 {

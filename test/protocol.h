@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		req->body().per_req.hp = 200;
 		req->body().per_req.mana = 300;
 		req->body().per_req.name = "John";
-		req->body().per_req.orders = { 1, 2, 3, 4, 5 };
+		req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
 
 		req->commit(buffer);
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		resp->body().per_resp.hp = 200;
 		resp->body().per_resp.mana = 300;
 		resp->body().per_resp.name = "John";
-		resp->body().per_resp.orders = { 1, 2, 3, 4, 5 };
+		resp->body().per_resp.orders = std::vector < char>{ 1, 2, 3, 4, 5 };
 
 		resp->commit(buffer);
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		req->body().per_req.hp = 200;
 		req->body().per_req.mana = 300;
 		req->body().per_req.name = "John";
-		req->body().per_req.orders = { 1, 2, 3, 4, 5 };
+		req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
 
 		req->commit(buffer);
 
