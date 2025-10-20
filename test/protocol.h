@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		auto req_back = std::make_shared<login_request>();
 		req_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(req, req_back);
+		BOOST_CHECK_EQUAL(*req, *req_back);
 	}
 
 	{
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		auto resp_back = std::make_shared<login_response>();
 		resp_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(resp, resp_back);
+		BOOST_CHECK_EQUAL(*resp, *resp_back);
 	}
 }
 BOOST_AUTO_TEST_CASE(http_protocol)
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		auto req_back = std::make_shared<http_login_request>();
 		req_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(req, req_back);
+		BOOST_CHECK_EQUAL(*req, *req_back);
 	}
 
 	{
@@ -99,6 +99,6 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		auto resp_back = std::make_shared<http_login_response>();
 		resp_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(resp, resp_back);
+		BOOST_CHECK_EQUAL(*resp, *resp_back);
 	}
 }

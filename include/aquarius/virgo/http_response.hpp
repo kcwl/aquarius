@@ -4,6 +4,7 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>
+#include <aquarius/ip/concept.hpp>
 
 namespace aquarius
 {
@@ -28,35 +29,31 @@ namespace aquarius
 			http_response() = default;
 
 		public:
+			bool operator==(const http_response& other) const
+			{
+				return base::operator==(other);
+			}
+
+			std::ostream& operator<<(std::ostream& os) const
+			{
+				return base::operator<<(os);
+			}
+
+		public:
 			template <typename T>
 			void commit(flex_buffer<T>& buffer)
 			{
-				std::string str = std::format("{} {} {}\r\n", from_version_string(this->version()),
-											  std::to_string(this->result()), this->reason());
 				flex_buffer<char> body_buffer{};
 
-				if constexpr (!std::same_as<body_t, int>)
-				{
-					this->body().deserialize(body_buffer);
-				}
+				this->header().serialize(body_buffer);
 
-				if (!body_buffer.empty())
-				{
-					this->content_length(body_buffer.active());
-				}
+				constexpr auto sp = "\r\n\r\n"sv;
 
-				for (auto& s : this->fields_)
-				{
-					str += std::format("{}: {}\r\n", s.first, s.second);
-				}
+				body_buffer.put(sp.begin(), sp.end());
 
-				buffer.put(str.begin(), str.end());
+				this->body().serialize(body_buffer);
 
-				this->header().serialize(buffer);
-
-				constexpr std::string_view end_line = "\r\n\r\n"sv;
-
-				buffer.put(end_line.begin(), end_line.end());
+				this->content_length(body_buffer.active());
 
 				buffer.append(std::move(body_buffer));
 			}
@@ -64,13 +61,47 @@ namespace aquarius
 			template <typename T>
 			void consume(flex_buffer<T>& buffer)
 			{
-				this->header().serialize(buffer);
-				
-				this->body().serialize(buffer);
+				auto sp = std::span<T>(buffer.rdata(), buffer.active());
+
+				auto fourth_view = sp | std::views::slide(4);
+
+				auto iter = std::ranges::find_if(fourth_view, [] (const auto& value)
+												 {
+													 if (value.size() < 4)
+														 return false;
+
+													 return std::string_view(value) == "\r\n\r\n";
+												 });
+
+				if (iter == fourth_view.end())
+					return;
+
+				auto len = std::distance(fourth_view.begin(), iter);
+
+				flex_buffer<T> header_buffer(buffer.rdata(), len);
+
+				this->header().deserialize(header_buffer);
+
+				buffer.consume(4 + len);
+
+				flex_buffer<T> body_buffer(buffer.rdata(), buffer.active());
+
+				this->body().deserialize(body_buffer);
 			}
 
 		private:
 			serialize::json_parse body_parse_;
 		};
+
+		template <detail::string_literal Router, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const http_response<Router, Header, Body>& req)
+		{
+			req << os;
+
+			return os;
+		}
+
+		template<detail::string_literal Router, typename Header, typename Body>
+		struct is_message_type<http_response<Router, Header, Body>> : std::true_type {};
 	} // namespace virgo
 } // namespace aquarius

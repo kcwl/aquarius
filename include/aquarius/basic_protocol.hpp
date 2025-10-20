@@ -5,12 +5,14 @@
 
 namespace aquarius
 {
-	template <detail::string_literal Router, typename Body, typename Allocator>
+	template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
 	class basic_protocol : public boost::empty_value<Body>
 	{
 		static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
 
 	public:
+		using header_t = Header;
+
 		using body_t = std::remove_pointer_t<Body>;
 
 		using base_body = boost::empty_value<Body>;
@@ -19,16 +21,17 @@ namespace aquarius
 
 	public:
 		basic_protocol()
-			: alloc_()
+			: basic_protocol(Allocator())
+		{}
+
+		basic_protocol(const Allocator& alloc)
+			: header_()
+			, alloc_(alloc)
 		{
 			this->get() = alloc_.allocate(1);
 
 			::new (static_cast<void*>(this->get())) body_t();
 		}
-
-		basic_protocol(const Allocator& alloc)
-			: alloc_(alloc)
-		{}
 
 		basic_protocol(const basic_protocol&) = default;
 
@@ -61,17 +64,27 @@ namespace aquarius
 	public:
 		bool operator==(const basic_protocol& other) const
 		{
-			return body() == other.body();
+			return header() == other.header() && body() == other.body();
 		}
 
 		std::ostream& operator<<(std::ostream& os) const
 		{
-			os << body();
+			os << header_ << body();
 
 			return os;
 		}
 
 	public:
+		header_t& header()
+		{
+			return header_;
+		}
+
+		const header_t& header() const
+		{
+			return header_;
+		}
+
 		body_t& body()
 		{
 			return *this->get();
@@ -83,6 +96,8 @@ namespace aquarius
 		}
 
 	private:
+		header_t header_;
+
 		Allocator alloc_;
 	};
 } // namespace aquarius

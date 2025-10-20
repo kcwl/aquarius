@@ -8,6 +8,7 @@
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/ip/tcp/tcp_server_session.hpp>
 #include <string_view>
+#include <csignal>
 
 using namespace std::string_view_literals;
 
@@ -46,13 +47,15 @@ BOOST_AUTO_TEST_CASE(flex_buffer)
 
 	BOOST_CHECK_EQUAL(begin, '\0');
 
-	buffer.consume(4095);
+	buffer.consume(8191);
 
-	BOOST_CHECK_EQUAL(buffer.get(), static_cast<char>(-1));
+	BOOST_CHECK_THROW(buffer.get(), aquarius::error_code);
+
+	buffer.commit(8192);
 
 	BOOST_CHECK_THROW(buffer.put(1), aquarius::error_code);
 
-	BOOST_CHECK(!buffer.empty());
+	BOOST_CHECK(buffer.empty());
 }
 
 BOOST_AUTO_TEST_CASE(endpoint)
@@ -88,7 +91,7 @@ BOOST_AUTO_TEST_CASE(tri)
 {
 	aquarius::detail::trie<std::function<void()>> normal_tre{};
 
-	std::function<void()> leaf{};
+	std::function<void()> leaf = [] () { std::cout << "hello leaf;"; };
 
 	normal_tre.add("11001"sv, leaf);
 
@@ -102,6 +105,21 @@ BOOST_AUTO_TEST_CASE(tri)
 	auto cur = normal_tre.find("11001"sv);
 
 	BOOST_CHECK(!cur);
+}
+
+BOOST_AUTO_TEST_CASE(server_signal)
+{
+	aquarius::tcp_server srv(8100, 10, "async tcp server");
+
+	std::thread t([&] { srv.run(); });
+
+	std::this_thread::sleep_for(2s);
+
+	std::raise(SIGTERM);
+
+	t.join();
+
+	BOOST_CHECK(!srv.enable());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

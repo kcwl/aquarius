@@ -14,9 +14,10 @@ namespace aquarius
 
 	inline std::string_view from_error_string(serialize_error e)
 	{
-		static const std::map<serialize_error, std::string_view> desc = {
-
-		};
+		static const std::map<serialize_error, std::string_view> desc = { { serialize_error::success, "success" },
+																		  { serialize_error::overflow, "overflow" },
+																		  { serialize_error::not_enough_space,
+																			"no enough space" } };
 
 		return desc.at(e);
 	}

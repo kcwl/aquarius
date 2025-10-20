@@ -309,6 +309,12 @@
     <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\concept.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_error.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

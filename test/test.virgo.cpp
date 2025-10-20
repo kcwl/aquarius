@@ -1,10 +1,10 @@
 #include "test.virgo.h"
 
-
 bool operator==(const person& lhs, const person& rhs)
 {
 	return lhs.sex == rhs.sex && lhs.addr == rhs.addr && lhs.age == rhs.age && lhs.telephone == rhs.telephone && lhs.score == rhs.score && lhs.hp == rhs.hp && lhs.mana == rhs.mana && lhs.name == rhs.name && lhs.orders == rhs.orders;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const person& other)
 {
@@ -25,13 +25,13 @@ person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::j
 	if(obj->empty())
 		return {};
 
-	result.sex = static_cast<bool>(obj->at("sex").as_uint64());
-	result.addr = static_cast<uint32>(obj->at("addr").as_uint64());
-	result.age = static_cast<int32>(obj->at("age").as_uint64());
-	result.telephone = static_cast<uint64>(obj->at("telephone").as_uint64());
-	result.score = static_cast<int64>(obj->at("score").as_uint64());
-	result.hp = static_cast<float>(obj->at("hp").as_uint64());
-	result.mana = static_cast<double>(obj->at("mana").as_uint64());
+	result.sex = obj->at("sex").as_bool();
+	result.addr = static_cast<uint32>(obj->at("addr").as_int64());
+	result.age = static_cast<int32>(obj->at("age").as_int64());
+	result.telephone = obj->at("telephone").as_int64();
+	result.score = obj->at("score").as_int64();
+	result.hp = static_cast<float>(obj->at("hp").as_double());
+	result.mana = obj->at("mana").as_double();
 	result.name = static_cast<string>(obj->at("name").as_string());
 	result.orders = aquarius::serialize::json_value_to_array(obj->at("orders"));
 	return result;
@@ -62,11 +62,11 @@ void login_req_header::deserialize(aquarius::flex_buffer<char>& buffer)
 	uuid = this->parse_from<int32>(buffer);
 }
 
-
 bool operator==(const login_req_header& lhs, const login_req_header& rhs)
 {
 	return lhs.uuid == rhs.uuid;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const login_req_header& other)
 {
@@ -80,7 +80,7 @@ login_req_header tag_invoke(const aquarius::json::value_to_tag<login_req_header>
 	if(obj->empty())
 		return {};
 
-	result.uuid = static_cast<int32>(obj->at("uuid").as_uint64());
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	return result;
 }
 
@@ -101,11 +101,11 @@ void login_req_body::deserialize(aquarius::flex_buffer<char>& buffer)
 	per_req = this->parse_from<person>(buffer);
 }
 
-
 bool operator==(const login_req_body& lhs, const login_req_body& rhs)
 {
 	return lhs.per_req == rhs.per_req;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const login_req_body& other)
 {
@@ -140,11 +140,11 @@ void login_resp_header::deserialize(aquarius::flex_buffer<char>& buffer)
 	uuid = this->parse_from<int32>(buffer);
 }
 
-
 bool operator==(const login_resp_header& lhs, const login_resp_header& rhs)
 {
 	return lhs.uuid == rhs.uuid;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const login_resp_header& other)
 {
@@ -158,7 +158,7 @@ login_resp_header tag_invoke(const aquarius::json::value_to_tag<login_resp_heade
 	if(obj->empty())
 		return {};
 
-	result.uuid = static_cast<int32>(obj->at("uuid").as_uint64());
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	return result;
 }
 
@@ -179,11 +179,11 @@ void login_resp_body::deserialize(aquarius::flex_buffer<char>& buffer)
 	per_resp = this->parse_from<person>(buffer);
 }
 
-
 bool operator==(const login_resp_body& lhs, const login_resp_body& rhs)
 {
 	return lhs.per_resp == rhs.per_resp;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const login_resp_body& other)
 {
@@ -210,19 +210,19 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 
 void http_login_req_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
-	this->parse_to(uuid, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_login_req_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
-	uuid = this->parse_from<int32>(buffer);
+	*this = this->parse_from<http_login_req_header>(buffer);
 }
-
 
 bool operator==(const http_login_req_header& lhs, const http_login_req_header& rhs)
 {
 	return lhs.uuid == rhs.uuid;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const http_login_req_header& other)
 {
@@ -236,7 +236,7 @@ http_login_req_header tag_invoke(const aquarius::json::value_to_tag<http_login_r
 	if(obj->empty())
 		return {};
 
-	result.uuid = static_cast<int32>(obj->at("uuid").as_uint64());
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	return result;
 }
 
@@ -249,19 +249,19 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 
 void http_login_req_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
-	this->parse_to(per_req, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_login_req_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
-	per_req = this->parse_from<person>(buffer);
+	*this = this->parse_from<http_login_req_body>(buffer);
 }
-
 
 bool operator==(const http_login_req_body& lhs, const http_login_req_body& rhs)
 {
 	return lhs.per_req == rhs.per_req;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const http_login_req_body& other)
 {
@@ -288,19 +288,19 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 
 void http_login_resp_header::serialize(aquarius::flex_buffer<char>& buffer)
 {
-	this->parse_to(uuid, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_login_resp_header::deserialize(aquarius::flex_buffer<char>& buffer)
 {
-	uuid = this->parse_from<int32>(buffer);
+	*this = this->parse_from<http_login_resp_header>(buffer);
 }
-
 
 bool operator==(const http_login_resp_header& lhs, const http_login_resp_header& rhs)
 {
 	return lhs.uuid == rhs.uuid;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const http_login_resp_header& other)
 {
@@ -314,7 +314,7 @@ http_login_resp_header tag_invoke(const aquarius::json::value_to_tag<http_login_
 	if(obj->empty())
 		return {};
 
-	result.uuid = static_cast<int32>(obj->at("uuid").as_uint64());
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	return result;
 }
 
@@ -327,19 +327,19 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 
 void http_login_resp_body::serialize(aquarius::flex_buffer<char>& buffer)
 {
-	this->parse_to(per_resp, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_login_resp_body::deserialize(aquarius::flex_buffer<char>& buffer)
 {
-	per_resp = this->parse_from<person>(buffer);
+	*this = this->parse_from<http_login_resp_body>(buffer);
 }
-
 
 bool operator==(const http_login_resp_body& lhs, const http_login_resp_body& rhs)
 {
 	return lhs.per_resp == rhs.per_resp;
 }
+
 
 std::ostream& operator<<(std::ostream& os, const http_login_resp_body& other)
 {

@@ -3,55 +3,46 @@
 
 BOOST_AUTO_TEST_SUITE(client_test)
 
-BOOST_AUTO_TEST_CASE(success)
+BOOST_AUTO_TEST_CASE(client_tcp)
 {
-	const char* ip_addr = "127.0.0.1";
-	aquarius::async_tcp_server srv(8100, 5);
-	std::thread srv_t([&] {srv.run(); });
+	aquarius::tcp_server srv(8100, 10, "async tcp server");
 
-	aquarius::async_tcp_client cli(ip_addr, "8100");
+	std::thread t([&] { srv.run(); });
 
-	std::thread client_t([&] {cli.run(); });
+	std::this_thread::sleep_for(2s);
 
-	std::this_thread::sleep_for(1s);
+	aquarius::io_context io;
 
-	BOOST_CHECK(cli.remote_address() == ip_addr);
+	auto cli = std::make_shared<aquarius::tcp_client>(io, "127.0.0.1", "8100");
 
-	BOOST_CHECK(cli.remote_address_u() == aquarius::asio::ip::make_address(ip_addr).to_v4().to_uint());
+	auto future = aquarius::co_spawn(
+		io,
+		[cli] -> aquarius::awaitable<void>
+		{
+			auto is_connect = co_await cli->async_connect();
 
-	BOOST_CHECK(cli.remote_port() == 8100);
+			BOOST_CHECK(!is_connect);
 
-	//test_connect_success_request req{};
-	//req.body().age = 1;
-	//req.body().name = "person";
+			cli->close();
 
-	//cli.send_request(std::move(req), [&](std::shared_ptr<test_connect_success_response> resp_ptr)
-	//				 {
-	//					 BOOST_CHECK(resp_ptr);
-	//				 });
+			is_connect = co_await cli->reconnect();
 
-	std::this_thread::sleep_for(3s);
+			BOOST_CHECK(!is_connect);
+		},
+		aquarius::use_future);
+
+	std::thread t1([&] { io.run(); });
+
+	auto status = future.wait_for(5s);
+
+	BOOST_CHECK(status == std::future_status::ready);
+
+	io.stop();
 
 	srv.stop();
-	cli.stop();
 
-	srv_t.join();
-	client_t.join();
-}
-
-BOOST_AUTO_TEST_CASE(failed)
-{
-	const char* ip_addr = "127.0.0.1";
-
-	std::promise<bool> conn_result{};
-
-	aquarius::async_tcp_client cli(ip_addr, "8100");
-
-	std::thread client_t([&] {cli.run(); });
-
-	cli.stop();
-
-	client_t.join();
+	t.join();
+	t1.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

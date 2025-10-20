@@ -107,7 +107,7 @@ namespace aquarius
 		template <pod_t T, typename V>
 		auto from_datas(flex_buffer<V>& buff) -> T
 		{
-			return buff.get<T>();
+			return buff.template get<T>();
 		}
 
 		template <repeated_t T, typename V>

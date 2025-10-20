@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(json)
     {
         auto p1 = jp.from_datas<person>(buffer);
 
-        BOOST_CHECK_EQUAL(p1, person{});
+        BOOST_CHECK_EQUAL(p1, p);
     }
 
     {

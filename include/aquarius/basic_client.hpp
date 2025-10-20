@@ -14,120 +14,123 @@
 
 namespace aquarius
 {
+    using namespace std::chrono_literals;
 
-	template <typename Session>
-	class basic_client
-	{
-		using socket_t = Session::socket;
+    template <typename Session>
+    class basic_client : public std::enable_shared_from_this<basic_client<Session>>
+    {
+        using socket = Session::socket;
 
-		using resolver = Session::resolver;
+        using resolver = Session::resolver;
 
-	public:
-		basic_client(io_context& context, std::chrono::steady_clock::duration timeout)
-			: io_context_(context)
-			, session_ptr_(nullptr)
-			, timeout_(timeout)
-			, host_()
-			, port_()
-		{}
+    public:
+        explicit basic_client(io_context& context, const std::string& host, const std::string& port, std::chrono::steady_clock::duration timeout = 1s)
+            : io_context_(context)
+            , host_(host)
+            , port_(port)
+            , session_ptr_(nullptr)
+            , close_func_()
+            , timeout_(timeout)
+        {
 
-		virtual ~basic_client() = default;
+        }
 
-	public:
-		auto connect(const std::string& host, const std::string& port) -> awaitable<error_code>
-		{
-			host_ = host;
-			port_ = port;
+        basic_client(io_context& context, std::chrono::steady_clock::duration timeout = 1s)
+            : basic_client(context, {}, {}, timeout)
+        {
 
-			auto socket = socket_t(io_context_);
+        }
 
-			session_ptr_ = std::make_shared<Session>(std::move(socket));
+        virtual ~basic_client() = default;
 
-			auto ec = co_await session_ptr_->async_connect(host, port);
+    public:
+        auto async_connect() -> awaitable<error_code>
+        {
+            co_return co_await async_connect(host_, port_);
+        }
 
-			if (ec)
-				co_return ec;
+        auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
+        {
+            host_ = host;
+            port_ = port;
 
-			co_return ec;
-		}
+            session_ptr_ = std::make_shared<Session>(io_context_);
 
-		auto reconnect() -> awaitable<error_code>
-		{
-			co_return co_await connect(host_, port_);
-		}
+            co_return co_await session_ptr_->async_connect(host_, port_);
+        }
 
-		template < typename Request, typename Response>
-		auto send(std::shared_ptr<Request> req) -> awaitable<Response>
-		{
-			flex_buffer<char> buffer{};
+        auto reconnect() -> awaitable<error_code>
+        {
+            co_return co_await async_connect();
+        }
 
-			req->commit(buffer);
+        template <typename Response, typename Request>
+        auto query(std::shared_ptr<Request> req) -> awaitable<Response>
+        {
+            flex_buffer<char> buffer{};
 
-			auto ec = co_await send(buffer);
+            try
+            {
+                session_ptr_->make_request_buffer(req, buffer);
+            }
+            catch (error_code& ec)
+            {
+                XLOG_ERROR() << "make_request_buffer error - " << ec.what();
+                co_return Response{};
+            }
 
-			if (ec)
-				co_return Response{};
+            auto ec = co_await session_ptr_->async_send(std::move(buffer));
 
-			auto response = co_await session_ptr_->template query<Response>();
+            if (ec)
+            {
+                if (ec != boost::asio::error::eof)
+                {
+                    XLOG_ERROR() << "on read some occur error - " << ec.what();
+                }
+                session_ptr_->shutdown();
+                if (close_func_)
+                    close_func_();
 
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.what();
-				}
-				session_ptr_->shutdown();
-				if (close_func_)
-					close_func_();
+                co_return Response{};
+            }
 
-				co_return Response{};
-			}
+            co_return co_await session_ptr_->template query<Response>();
+        }
 
-			co_return response;
-		}
+        std::string remote_address() const
+        {
+            return session_ptr_->remote_address();
+        }
 
-		template <typename T>
-		auto send(flex_buffer<T>& buffer) -> awaitable<error_code>
-		{
-			co_return co_await session_ptr_->async_send(buffer);
-		}
+        int remote_port() const
+        {
+            return session_ptr_->remote_port();
+        }
 
-		template <typename T>
-		auto read(flex_buffer<T>& buffer) -> awaitable<error_code>
-		{
-			co_return co_await session_ptr_->async_read_some(buffer);
-		}
+        template <typename Func>
+        void set_close_func(Func&& f)
+        {
+            close_func_ = std::forward<Func>(f);
+        }
 
-		std::string remote_address()
-		{
-			return session_ptr_->remote_address();
-		}
-		uint32_t remote_address_u()
-		{
-			return session_ptr_->remote_address_u();
-		}
-		int remote_port()
-		{
-			return session_ptr_->remote_port();
-		}
+        void close()
+        {
+            session_ptr_->close();
 
-		template <typename Func>
-		void set_close_func(Func&& f)
-		{
-			close_func_ = std::forward<Func>(f);
-		}
+            std::shared_ptr<Session>().swap(session_ptr_);
+        }
 
-	private:
-		io_context& io_context_;
+    private:
+        io_context& io_context_;
 
-		std::shared_ptr<Session> session_ptr_;
+        std::string host_;
 
-		std::function<void()> close_func_;
+        std::string port_;
 
-		std::chrono::steady_clock::duration timeout_;
+        std::shared_ptr<Session> session_ptr_;
 
-		std::string host_;
+        std::function<void()> close_func_;
 
-		std::string port_;
-	};
+        std::chrono::steady_clock::duration timeout_;
+    };
 } // namespace aquarius

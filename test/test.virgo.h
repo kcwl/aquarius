@@ -31,6 +31,10 @@ public:
 	int32 uuid;
 };
 
+bool operator==(const login_req_header& lhs, const login_req_header& rhs);
+
+std::ostream& operator<<(std::ostream& os, const login_req_header& other);
+
 class login_req_body : public aquarius::serialize::tcp_serialize
 {
 public:
@@ -44,6 +48,10 @@ public:
 public:
 	person per_req;
 };
+
+bool operator==(const login_req_body& lhs, const login_req_body& rhs);
+
+std::ostream& operator<<(std::ostream& os, const login_req_body& other);
 
 class login_resp_header : public aquarius::serialize::tcp_serialize
 {
@@ -59,6 +67,10 @@ public:
 	int32 uuid;
 };
 
+bool operator==(const login_resp_header& lhs, const login_resp_header& rhs);
+
+std::ostream& operator<<(std::ostream& os, const login_resp_header& other);
+
 class login_resp_body : public aquarius::serialize::tcp_serialize
 {
 public:
@@ -72,6 +84,10 @@ public:
 public:
 	person per_resp;
 };
+
+bool operator==(const login_resp_body& lhs, const login_resp_body& rhs);
+
+std::ostream& operator<<(std::ostream& os, const login_resp_body& other);
 
 class http_login_req_header : public aquarius::serialize::http_serialize
 {
@@ -87,6 +103,10 @@ public:
 	int32 uuid;
 };
 
+bool operator==(const http_login_req_header& lhs, const http_login_req_header& rhs);
+
+std::ostream& operator<<(std::ostream& os, const http_login_req_header& other);
+
 class http_login_req_body : public aquarius::serialize::http_serialize
 {
 public:
@@ -100,6 +120,10 @@ public:
 public:
 	person per_req;
 };
+
+bool operator==(const http_login_req_body& lhs, const http_login_req_body& rhs);
+
+std::ostream& operator<<(std::ostream& os, const http_login_req_body& other);
 
 class http_login_resp_header : public aquarius::serialize::http_serialize
 {
@@ -115,6 +139,10 @@ public:
 	int32 uuid;
 };
 
+bool operator==(const http_login_resp_header& lhs, const http_login_resp_header& rhs);
+
+std::ostream& operator<<(std::ostream& os, const http_login_resp_header& other);
+
 class http_login_resp_body : public aquarius::serialize::http_serialize
 {
 public:
@@ -128,6 +156,10 @@ public:
 public:
 	person per_resp;
 };
+
+bool operator==(const http_login_resp_body& lhs, const http_login_resp_body& rhs);
+
+std::ostream& operator<<(std::ostream& os, const http_login_resp_body& other);
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_header, login_req_body>;
 using login_response = aquarius::virgo::tcp_response<"10001", login_resp_header, login_resp_body>;
 using http_login_request = aquarius::virgo::http_request<"/login", http_login_req_header, http_login_req_body>;

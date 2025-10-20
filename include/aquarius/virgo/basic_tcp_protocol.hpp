@@ -6,14 +6,14 @@ namespace aquarius
 	namespace virgo
 	{
 		template <bool Request, detail::string_literal Router, typename Header, typename Body, typename Allocator>
-		class basic_tcp_protocol : public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
+		class basic_tcp_protocol : public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
-			using base = basic_protocol<Router, std::add_pointer_t<Body>, Allocator>;
+			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
 
-			using header_t = Header;
+			using typename base::header_t;
 
 			using typename base::body_t;
 
@@ -21,29 +21,27 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
-				: header_()
-				, timestamp_()
+				: timestamp_()
 				, version_()
 			{}
 
 		public:
-			bool operator==(const basic_tcp_protocol& other)
+			bool operator==(const basic_tcp_protocol& other) const
 			{
-				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ &&
+				return base::operator==(other) && timestamp_ == other.timestamp_ &&
 					   version_ == other.version_;
 			}
 
+			std::ostream& operator<<(std::ostream& os) const
+			{
+				base::operator<<(os);
+
+				os << timestamp_ << version_;
+
+				return os;
+			}
+
 		public:
-			header_t& header()
-			{
-				return header_;
-			}
-
-			const header_t& header() const
-			{
-				return header_;
-			}
-
 			int64_t timestamp() const
 			{
 				return timestamp_;
@@ -65,8 +63,6 @@ namespace aquarius
 			}
 
 		private:
-			header_t header_;
-
 			int64_t timestamp_;
 
 			int32_t version_;
@@ -74,43 +70,41 @@ namespace aquarius
 
 		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
 		class basic_tcp_protocol<false, Router, Header, Body, Allocator>
-			: public basic_protocol<Router, std::add_pointer_t<Body>, Allocator>
+			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
-			using base = basic_protocol<Router, std::add_pointer_t<Body>, Allocator>;
+			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
 
-			using header_t = Header;
+			using typename base::header_t;
 
 			constexpr static auto has_request = false;
 
 		public:
 			basic_tcp_protocol()
-				: header_()
-				, timestamp_()
+				: timestamp_()
 				, version_()
 				, result_()
 			{}
 
 		public:
-			bool operator==(const basic_tcp_protocol& other)
+			bool operator==(const basic_tcp_protocol& other) const
 			{
-				return base::operator==(other) && header_ == other.header_ && timestamp_ == other.timestamp_ &&
-						   version_ == other.version_ && result_ = other.result_;
+				return base::operator==(other) && timestamp_ == other.timestamp_ &&
+						   version_ == other.version_ && result_ == other.result_;
+			}
+
+			std::ostream& operator<<(std::ostream& os) const
+			{
+				base::operator<<(os);
+
+				os << timestamp_ << version_ << result_;
+
+				return os;
 			}
 
 		public:
-			header_t& header()
-			{
-				return header_;
-			}
-
-			const header_t& header() const
-			{
-				return header_;
-			}
-
 			int64_t timestamp() const
 			{
 				return timestamp_;
@@ -142,8 +136,6 @@ namespace aquarius
 			}
 
 		private:
-			header_t header_;
-
 			int64_t timestamp_;
 
 			int32_t version_;

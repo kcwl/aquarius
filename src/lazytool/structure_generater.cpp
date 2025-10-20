@@ -11,6 +11,10 @@ namespace aquarius
 			{
 				generate_main_define(ofs_h, parser);
 
+				generate_operator_equal_define(ofs_h, parser);
+
+				generate_operator_stream_define(ofs_h, parser);
+
 				generate_operator_equal_src(ofs_cpp, parser);
 
 				generate_operator_stream_src(ofs_cpp, parser);

@@ -19,11 +19,19 @@ namespace aquarius
 
 				void generator_normal_stream(std::ofstream& ofs, const std::string& name);
 
+				template<typename T>
+					requires std::is_base_of_v<parser, T>
+				void generate_operator_equal_define(std::ofstream& ofs, std::shared_ptr<T> parser)
+				{
+					ofs << "\n";
+					ofs << "bool operator==(const " << parser->name_ << "& lhs, const " << parser->name_ << "& rhs);\n";
+				}
+
 				template <typename T>
 				requires std::is_base_of_v<parser, T>
 				void generate_operator_equal_src(std::ofstream& ofs, std::shared_ptr<T> parser)
 				{
-					ofs << "\n\n";
+					ofs << "\n";
 					ofs << "bool operator==(const " << parser->name_ << "& lhs, const " << parser->name_ << "& rhs)\n";
 					ofs << "{\n";
 					ofs << "\treturn ";
@@ -39,8 +47,18 @@ namespace aquarius
 
 				template <typename T>
 				requires std::is_base_of_v<parser, T>
+				void generate_operator_stream_define(std::ofstream& ofs, std::shared_ptr<T> parser)
+				{
+					ofs << "\n";
+
+					ofs << "std::ostream& operator<<(std::ostream& os, const " << parser->name_ << "& other);\n";
+				}
+				template <typename T>
+				requires std::is_base_of_v<parser, T>
 				void generate_operator_stream_src(std::ofstream& ofs, std::shared_ptr<T> parser)
 				{
+					ofs << "\n";
+
 					ofs << "std::ostream& operator<<(std::ostream& os, const " << parser->name_ << "& other)\n";
 					ofs << "{\n";
 					ofs << "\tos ";

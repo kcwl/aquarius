@@ -20,6 +20,15 @@ namespace aquarius
 			, rpos_(0)
 		{}
 
+		flex_buffer(T* data, std::size_t len)
+			: buffer_(len)
+			, wpos_(0)
+			, rpos_(0)
+		{
+			std::copy(data, data + len, wdata());
+			commit(len);
+		}
+
 		flex_buffer(flex_buffer&& other) noexcept
 			: buffer_(std::move(other.buffer_))
 			, wpos_(std::exchange(other.wpos_, 0))
@@ -68,7 +77,7 @@ namespace aquarius
 
 		void commit(std::size_t size)
 		{
-			size < remain() ? wpos_ += size : 0;
+			size <= remain() ? wpos_ += size : 0;
 		}
 
 		void consume(std::size_t size)

@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
 #include <aquarius/serialize/binary.hpp>
+#include <aquarius/ip/concept.hpp>
 
 namespace aquarius
 {
@@ -24,21 +25,20 @@ namespace aquarius
 			tcp_request() = default;
 
 		public:
-			bool operator==(const tcp_request& other)
+			bool operator==(const tcp_request& other) const
 			{
 				return base::operator==(other);
+			}
+
+			std::ostream& operator<<(std::ostream& os) const
+			{
+				return base::operator<<(os);
 			}
 
 		public:
 			template <typename T>
 			bool commit(flex_buffer<T>& buffer)
 			{
-				constexpr auto pos = sizeof(uint32_t);
-
-				buffer.commit(pos);
-
-				body_parse_.to_datas(std::string(detail::bind_param<Router>::value), buffer);
-
 				body_parse_.to_datas(this->timestamp(), buffer);
 
 				body_parse_.to_datas(this->version(), buffer);
@@ -46,9 +46,6 @@ namespace aquarius
 				this->header().serialize(buffer);
 
 				this->body().serialize(buffer);
-
-				auto len = static_cast<uint32_t>(buffer.tellg() - pos);
-				std::copy((char*)&len, (char*)(&len + 1), buffer.data());
 
 				return true;
 			}
@@ -68,5 +65,16 @@ namespace aquarius
 		private:
 			binary_parse body_parse_;
 		};
+
+		template <detail::string_literal Router, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const tcp_request<Router, Header, Body>& req)
+		{
+			req << os;
+
+			return os;
+		}
+
+		template<detail::string_literal Router, typename Header, typename Body>
+		struct is_message_type<tcp_request<Router, Header, Body>> : std::true_type {};
 	} // namespace virgo
 } // namespace aquarius

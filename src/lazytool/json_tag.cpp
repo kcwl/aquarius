@@ -66,8 +66,23 @@ namespace aquarius
 				if (ty != json_type::integer)
 					return false;
 
-				ofs << "\tresult." << value << " = static_cast<" << type << ">(obj->at(\"" << value
-					<< "\").as_uint64());\n";
+				if (type == "int32" || type == "uint32" || type == "float" || type == "uint64")
+				{
+					ofs << "\tresult." << value << " = static_cast<" << type << ">(obj->at(\"" << value
+						<< "\").as_";
+
+					if (type == "int32" || type == "uint32" || type == "uint64")
+						ofs << "int64";
+					else if (type == "float")
+						ofs << "double";
+
+					ofs << "());\n";
+				}
+				else if (type == "int64" || type == "double" || type == "bool")
+				{
+					ofs << "\tresult." << value << " = obj->at(\"" << value
+						<< "\").as_" << type << "();\n";
+				}
 
 				return true;
 			}

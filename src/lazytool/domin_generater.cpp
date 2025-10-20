@@ -19,6 +19,10 @@ namespace aquarius
 
 				generate_main_src(ofs_cpp, ptr);
 
+				generate_operator_equal_define(ofs_h, ptr);
+
+				generate_operator_stream_define(ofs_h, ptr);
+
 				generate_operator_equal_src(ofs_cpp, ptr);
 
 				generate_operator_stream_src(ofs_cpp, ptr);
@@ -40,8 +44,8 @@ namespace aquarius
 				ofs << "\t" << parser->name_ << "() = default;\n";
 				ofs << "\tvirtual ~" << parser->name_ << "() = default;\n";
 				ofs << "\n";
-				ofs << "\tvirtual void serialize(aquarius::detail::flex_buffer<char>& buffer) override;\n\n";
-				ofs << "\tvirtual void deserialize(aquarius::detail::flex_buffer<char>& buffer) override;\n\n";
+				ofs << "\tvirtual void serialize(aquarius::flex_buffer<char>& buffer) override;\n\n";
+				ofs << "\tvirtual void deserialize(aquarius::flex_buffer<char>& buffer) override;\n\n";
 				ofs << "public:\n";
 				for (auto& [type, name] : parser->values_)
 				{
@@ -53,21 +57,39 @@ namespace aquarius
 			void domin_generate::generate_main_src(std::ofstream& ofs, std::shared_ptr<domin_parse> parser)
 			{
 				ofs << "\n";
-				ofs << "void " << parser->name_ << "::serialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+				ofs << "void " << parser->name_ << "::serialize(aquarius::flex_buffer<char>& buffer)\n";
 				ofs << "{\n";
-				for (auto& [type, name] : parser->values_)
+
+				if (parser->protocol_type_ == "tcp")
 				{
-					ofs << "\tthis->parse_to(" << name << ", buffer);\n";
+					for (auto& [type, name] : parser->values_)
+					{
+						ofs << "\tthis->parse_to(" << name << ", buffer);\n";
+					}
 				}
+				else
+				{
+					ofs << "\tthis->parse_to(*this, buffer);\n";
+				}
+				
 				ofs << "}\n";
 
 				ofs << "\n";
-				ofs << "void " << parser->name_ << "::deserialize(aquarius::detail::flex_buffer<char>& buffer)\n";
+				ofs << "void " << parser->name_ << "::deserialize(aquarius::flex_buffer<char>& buffer)\n";
 				ofs << "{\n";
-				for (auto& [type, name] : parser->values_)
+
+				if (parser->protocol_type_ == "tcp")
 				{
-					ofs << "\t" << name << " = this->parse_from<"<<type<<">(buffer);\n";
+					for (auto& [type, name] : parser->values_)
+					{
+						ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer);\n";
+					}
 				}
+				else
+				{
+					ofs << "\t*this = this->parse_from<" << parser->name_ << ">(buffer);\n";
+				}
+				
 				ofs << "}\n";
 			}
 		}

@@ -52,6 +52,8 @@ namespace aquarius
 
 			auto& arr_val = arr.value();
 
+			result.resize(arr_val.size());
+
 			std::transform(arr_val.begin(), arr_val.end(), result.begin(), [] (const auto& v)
 						   {
 							   return static_cast<char>(*v.try_as_int64());
@@ -71,14 +73,11 @@ namespace aquarius
 		}
 
 		template<typename T>
-		inline boost::json::value json_value_from_object(T t)
+		inline boost::json::value json_value_from_object(const T& t)
 		{
-			boost::json::value v{};
-			auto& obj = v.emplace_object();
+			auto value = t;
 
-			boost::json::value_from<T>(std::move(t), obj);
-
-			return v;
+			return boost::json::value_from<T>(std::move(value));
 		}
 	} // namespace virgo
 } // namespace aquarius

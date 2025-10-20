@@ -48,6 +48,11 @@ namespace aquarius
 			io_service_pool_.stop();
 		}
 
+		bool enable() const
+		{
+			return acceptor_.is_open() && io_service_pool_.enable();
+		}
+
 	private:
 		auto start_accept() -> awaitable<void>
 		{
@@ -70,10 +75,8 @@ namespace aquarius
 				detail::regist_session(session_ptr);
 
 				co_spawn(
-					acceptor_.get_executor(), [session_ptr] -> awaitable<error_code>
-					{
-						co_return co_await session_ptr->accept();
-					}, detached);
+					acceptor_.get_executor(),
+					[session_ptr] -> awaitable<error_code> { co_return co_await session_ptr->accept(); }, detached);
 			}
 		}
 
