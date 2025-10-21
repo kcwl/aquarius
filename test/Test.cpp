@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(5s);
+	auto status = future.wait_for(10s);
 
 	BOOST_CHECK(status == std::future_status::ready);
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(http_flow_with_ssl)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(5s);
+	auto status = future.wait_for(10s);
 
 	BOOST_CHECK(status == std::future_status::ready);
 

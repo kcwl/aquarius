@@ -45,6 +45,7 @@ namespace aquarius
 		{
 			if (this != std::addressof(other))
 			{
+				header_ = std::move(other.header_);
 				this->get() = std::move(other.get());
 				other.get() = nullptr;
 				alloc_ = std::move(other.alloc_);

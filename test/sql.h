@@ -16,36 +16,35 @@ BOOST_AUTO_TEST_CASE(sql_)
 
     auto sql1 = sql_insert(p);
 
-    BOOST_CHECK_EQUAL(sql1(), "insert into person values(1,1)");
+    BOOST_CHECK_EQUAL(sql1(), "insert into personal values(1,1)");
 
-    constexpr auto sql3 = sql_delete(person);
+    constexpr auto sql3 = sql_delete(personal);
 
-    static_assert(sql3() == "delete from person");
+    static_assert(sql3() == "delete from personal");
 
     auto sql2 = sql_update(p);
 
-    std::cout << sql2() << std::endl;
+    assert(sql2() != "update personal set age = 1 and sex = 1");
 
-    assert(sql2() != "update person set age=1 and sex=1");
+    constexpr auto sql = sql_select(personal);
 
-    constexpr auto sql = sql_select(person);
+    static_assert(sql() == "select * from personal");
 
-    static_assert(sql() == "select * from person");
+    constexpr auto res1 = sql_select(personal) | sql_where(personal.age > 10) | sql_and(personal.sex = true);
 
-    constexpr auto res1 = sql_select(person) | sql_where(person.age > 10) | sql_and(person.sex = true) | sql_or(person.sex = false);
+    static_assert(res1() == "select * from personal where age > 10 and sex=true");
 
-    std::cout << res1() << std::endl;
+    auto res2 = sql_select(personal) | sql_desc(personal.age, personal.sex);
 
-    auto res2 = sql_select(person) | sql_desc(person.age, person.sex);
-    auto res3 = sql_select(person) | sql_asc(person.age, person.sex);
+    static_assert(res2() == "select * from personal order by personal.age, personal.sex desc");
 
-    std::cout << res2() << std::endl;
-    std::cout << res3() << std::endl;
+    auto res3 = sql_select(personal) | sql_asc(personal.age, personal.sex);
 
-    constexpr auto res4 = sql_select(person) | sql_limit(10);
+    static_assert(res3() == "select * from personal order by personal.age, personal.sex asc");
 
-    std::cout << res4() << std::endl;
+    constexpr auto res4 = sql_select(personal) | sql_limit(10);
 
+    static_assert(res4() == "select * from personal limit 10");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

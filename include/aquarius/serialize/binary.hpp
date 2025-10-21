@@ -5,6 +5,7 @@
 
 namespace aquarius
 {
+
 	struct binary_parse
 	{
 		template <integer_t T, typename V>
@@ -14,17 +15,17 @@ namespace aquarius
 
 			while (temp >= 0x80)
 			{
-				buff.put(static_cast<char>(temp | 0x80));
+				buff.put(static_cast<uint8_t>(temp | 0x80));
 
 				temp >>= 7;
 			}
-			buff.put(static_cast<char>(temp));
+			buff.put(static_cast<uint8_t>(temp));
 		}
 
 		template <zig_zag T, typename V>
 		void to_datas(const T& value, flex_buffer<V>& buff)
 		{
-			auto temp = (value << 1) ^ (value >> (sizeof(T) * 8 - 1));
+			uint64_t temp = (value << 1) ^ (value >> (sizeof(T) * 8 - 1));
 
 			return to_datas<uint64_t>(temp, buff);
 		}
@@ -75,22 +76,16 @@ namespace aquarius
 
 				int8_t temp_bit = 7;
 
-				while (buff.peek() < 0x7f)
+				while (static_cast<uint8_t>(buff.peek()) > 0x7f)
 				{
-					auto s = buff.get();
+					auto s = static_cast<uint8_t>(buff.get());
 
-					if ((s & 0x80) != 0)
-					{
-						value += static_cast<T>(s & 0x7f) << temp_bit;
+					value += static_cast<T>(s & 0x7f) << temp_bit;
 
-						temp_bit += 7;
-					}
-					else
-					{
-						value += (static_cast<T>(s) << temp_bit);
-						break;
-					}
+					temp_bit += 7;
 				}
+
+				value += (static_cast<T>(buff.get()) << temp_bit);
 			}
 
 			return value;
@@ -99,9 +94,9 @@ namespace aquarius
 		template <zig_zag T, typename V>
 		auto from_datas(flex_buffer<V>& buff) -> T
 		{
-			auto temp = static_cast<T>(from_datas<uint64_t>(buff));
+			uint64_t temp = from_datas<uint64_t>(buff);
 
-			return static_cast<T>(static_cast<int64_t>((temp >> 1) ^ (-(temp & 0x1))));
+			return static_cast<T>((temp >> 1) ^ (-static_cast<int64_t>(temp & 0x1)));
 		}
 
 		template <pod_t T, typename V>
@@ -151,4 +146,5 @@ namespace aquarius
 			return from_binary_impl(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{});
 		}
 	};
+
 } // namespace aquarius

@@ -28,3 +28,4 @@
 #include <aquarius/virgo/cpp_type.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/json.hpp>
+#include <aquarius/detail/float.hpp>

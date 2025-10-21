@@ -315,6 +315,9 @@
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_error.hpp">
       <Filter>include\aquarius\ip\tcp</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\float.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

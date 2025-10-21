@@ -159,6 +159,7 @@
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\coroutine.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />

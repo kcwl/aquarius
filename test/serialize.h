@@ -25,7 +25,7 @@ struct person
 inline bool operator==(const person& lhs, const person& rhs)
 {
 	return lhs.sex == rhs.sex && lhs.addr == rhs.addr && lhs.age == rhs.age && lhs.telephone == rhs.telephone &&
-		   lhs.score == rhs.score && lhs.hp == rhs.hp && lhs.mana && rhs.mana &&
+		   lhs.score == rhs.score && aquarius::check_equal(lhs.hp,rhs.hp) && aquarius::check_equal(lhs.mana, rhs.mana) &&
 		   lhs.name == rhs.name && lhs.orders == rhs.orders;
 }
 
@@ -80,8 +80,8 @@ person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::j
 
     result.sex = (*obj).at("sex").as_bool();
     result.addr = static_cast<uint32_t>((*obj).at("addr").as_int64());
-    result.age = static_cast<int32_t>((*obj).at("age").as_bool());
-    result.telephone = (*obj).at("telephone").as_uint64();
+    result.age = static_cast<int32_t>((*obj).at("age").as_int64());
+    result.telephone = (*obj).at("telephone").as_int64();
     result.score = (*obj).at("score").as_int64();
     result.hp = static_cast<float>((*obj).at("hp").as_double());
     result.mana = (*obj).at("mana").as_double();
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(integer_limit)
 {
     aquarius::binary_parse bp{};
 
-    aquarius::flex_buffer<char> buffer{};
+    aquarius::flex_buffer<uint8_t> buffer{};
 
     {
         int64_t i = std::numeric_limits<int64_t>::max();
@@ -140,7 +140,27 @@ BOOST_AUTO_TEST_CASE(integer_limit)
     }
 
     {
+        int64_t i = std::numeric_limits<int64_t>::min();
+
+        bp.to_datas(i, buffer);
+
+        int64_t i1 = bp.from_datas<int64_t>(buffer);
+
+        BOOST_CHECK_EQUAL(i, i1);
+    }
+
+    {
         uint64_t i = std::numeric_limits<uint64_t>::min();
+
+        bp.to_datas(i, buffer);
+
+        uint64_t i1 = bp.from_datas<uint64_t>(buffer);
+
+        BOOST_CHECK_EQUAL(i, i1);
+    }
+
+    {
+        uint64_t i = std::numeric_limits<uint64_t>::max();
 
         bp.to_datas(i, buffer);
 
