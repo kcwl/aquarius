@@ -162,5 +162,5 @@ bool operator==(const http_login_resp_body& lhs, const http_login_resp_body& rhs
 std::ostream& operator<<(std::ostream& os, const http_login_resp_body& other);
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_header, login_req_body>;
 using login_response = aquarius::virgo::tcp_response<"10001", login_resp_header, login_resp_body>;
-using http_login_request = aquarius::virgo::http_request<"/login", http_login_req_header, http_login_req_body>;
-using http_login_response = aquarius::virgo::http_response<"/login", http_login_resp_header, http_login_resp_body>;
+using http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post, "/login", http_login_req_header, http_login_req_body>;
+using http_login_response = aquarius::virgo::http_response< aquarius::virgo::http_method::post, "/login", http_login_resp_header, http_login_resp_body>;

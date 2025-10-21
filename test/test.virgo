@@ -11,6 +11,26 @@ struct person
 	bytes orders;
 }
 
+message new_login -> tcp-key:10001
+{
+	request{
+		int32 uuid;
+	}
+	response{
+		person per_resp;
+	}
+}
+
+message new_http_login -> http-post:/login
+{
+	request{
+		int32 uuid;
+	}
+	response{
+		person per_resp;
+	}
+}
+
 protocol login -> tcp-key:10001
 {
 	request {
@@ -27,7 +47,7 @@ protocol login -> tcp-key:10001
 	}
 }
 
-protocol http_login -> http-key:/login
+protocol http_login -> http-post:/login
 {
 	request {
 	header:

@@ -7,11 +7,11 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <detail::string_literal Router, typename Header, typename Body>
-		class http_request : public basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>
+		template <http_method Method, detail::string_literal Router, typename Header, typename Body >
+		class http_request : public basic_http_protocol<true, Method, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
-			using base = basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>;
+			using base = basic_http_protocol<true, Method, Router, Header, Body, std::allocator<Body>>;
 
 			using base::router;
 
@@ -89,8 +89,8 @@ namespace aquarius
 			serialize::json_parse body_parse_;
 		};
 
-		template <detail::string_literal Router, typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const http_request<Router, Header, Body>& req)
+		template <http_method Method, detail::string_literal Router, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const http_request<Method, Router, Header, Body>& req)
 		{
 			req << os;
 
@@ -98,6 +98,6 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template<detail::string_literal Router, typename Header, typename Body>
-	struct is_message_type<virgo::http_request<Router, Header, Body>> : std::true_type {};
+	template<virgo::http_method Method, detail::string_literal Router, typename Header, typename Body>
+	struct is_message_type<virgo::http_request<Method, Router, Header, Body>> : std::true_type {};
 } // namespace aquarius

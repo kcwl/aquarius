@@ -13,6 +13,11 @@ namespace aquarius
 
 		public:
 			virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+
+			void set_anonymous(bool value = true);
+
+		private:
+			bool anonymous_;
 		};
 	} // namespace lazytool
 } // namespace aquarius

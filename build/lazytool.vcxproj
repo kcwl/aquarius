@@ -31,6 +31,8 @@
     <ClCompile Include="..\src\lazytool\log.cpp" />
     <ClCompile Include="..\src\lazytool\message_generater.cpp" />
     <ClCompile Include="..\src\lazytool\message_parse.cpp" />
+    <ClCompile Include="..\src\lazytool\normal_message_generate.cpp" />
+    <ClCompile Include="..\src\lazytool\normal_message_parse.cpp" />
     <ClCompile Include="..\src\lazytool\parser.cpp" />
     <ClCompile Include="..\src\lazytool\protocol_generater.cpp" />
     <ClCompile Include="..\src\lazytool\protocol_parse.cpp" />
@@ -53,6 +55,8 @@
     <ClInclude Include="..\src\lazytool\file_parse.h" />
     <ClInclude Include="..\src\lazytool\message_generater.h" />
     <ClInclude Include="..\src\lazytool\message_parse.h" />
+    <ClInclude Include="..\src\lazytool\normal_message_generate.h" />
+    <ClInclude Include="..\src\lazytool\normal_message_parse.h" />
     <ClInclude Include="..\src\lazytool\parser.h" />
     <ClInclude Include="..\src\lazytool\parse_base.h" />
     <ClInclude Include="..\src\lazytool\protocol_generater.h" />

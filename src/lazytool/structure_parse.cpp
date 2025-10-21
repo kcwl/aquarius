@@ -6,16 +6,20 @@ namespace aquarius
 	{
 		structure_parse::structure_parse()
 			: parser(struct_type::structure)
+			, anonymous_(false)
 		{}
 
 		parser::parse_error structure_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
 		{
-			name_ = read_value<token::value, '{'>(ifs, column, row);
+			if (anonymous_)
+			{
+				name_ = read_value<token::value, '{'>(ifs, column, row);
 
-			if (name_.empty())
-				return parse_error::syntax;
+				if (name_.empty())
+					return parse_error::syntax;
 
-			// put_custom_type(name_);
+				// put_custom_type(name_);
+			}
 
 			while (!ifs.eof())
 			{
@@ -36,6 +40,11 @@ namespace aquarius
 			}
 
 			return ifs.eof() ? parse_error::eof : parse_error::syntax;
+		}
+
+		void structure_parse::set_anonymous(bool value)
+		{
+			anonymous_ = value;
 		}
 	} // namespace lazytool
 } // namespace aquarius

@@ -72,6 +72,12 @@
     <ClCompile Include="..\src\lazytool\custom_type.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lazytool\normal_message_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\normal_message_generate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\file_parse.h">
@@ -138,6 +144,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\cpp_type.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\normal_message_parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\normal_message_generate.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

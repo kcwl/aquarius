@@ -41,11 +41,11 @@ namespace aquarius
 					return;
 
 				ofs << "using " << ptr->name_ << "_request = aquarius::virgo::" << ptr->router_ptr_->name_
-					<< "_request<" << "\"" << ptr->router_ptr_->value_ << "\", " << ptr->name_ << "_req_header, "
-					<< ptr->name_ << "_req_body>;\n";
+					<< "_request<" << ptr->router_ptr_->mode_ << ",\"" << ptr->router_ptr_->value_ << "\", "
+					<< ptr->name_ << "_req_header, " << ptr->name_ << "_req_body>;\n";
 				ofs << "using " << ptr->name_ << "_response = aquarius::virgo::" << ptr->router_ptr_->name_
-					<< "_response<" << "\"" << ptr->router_ptr_->value_ << "\", " << ptr->name_ << "_resp_header, "
-					<< ptr->name_ << "_resp_body>;\n";
+					<< "_response<" << ptr->router_ptr_->mode_ << ",\"" << ptr->router_ptr_->value_ << "\", "
+					<< ptr->name_ << "_resp_header, " << ptr->name_ << "_resp_body>;\n";
 			}
 		} // namespace cpp
 	} // namespace lazytool

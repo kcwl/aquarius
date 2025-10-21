@@ -51,7 +51,7 @@ namespace aquarius
 		template <typename Request, typename T>
 		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer<T>& buffer)
 		{
-			std::string str = std::format("{} {} {}\r\n", from_method_string(request->method()), Request::router,
+			std::string str = std::format("{} {} {}\r\n", from_method_string(Request::method), Request::router,
 										  from_version_string(request->version()));
 
 			for (auto& s : request->fields())

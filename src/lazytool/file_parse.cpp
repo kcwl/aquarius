@@ -7,6 +7,7 @@
 #include "struct_type.hpp"
 #include "router_parse.h"
 #include "protocol_parse.h"
+#include "normal_message_parse.h"
 
 
 namespace
@@ -51,6 +52,17 @@ namespace aquarius
 							 [this](std::ifstream& ifs)
 							 {
 								 auto proto_ptr = std::make_shared<message_parse>();
+								 auto res = proto_ptr->visit(ifs, column_, row_);
+								 if (res != parser::parse_error::success)
+									 throw std::runtime_error(std::format("protocol parse error! row: {}, column: {}",
+																		  row_ + 1, column_ + 1));
+								 keywords_.push_back(proto_ptr);
+							 });
+
+			registor_.regist("message",
+							 [this](std::ifstream& ifs)
+							 {
+								 auto proto_ptr = std::make_shared<normal_message_parse>();
 								 auto res = proto_ptr->visit(ifs, column_, row_);
 								 if (res != parser::parse_error::success)
 									 throw std::runtime_error(std::format("protocol parse error! row: {}, column: {}",

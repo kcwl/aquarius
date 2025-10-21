@@ -9,7 +9,8 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, detail::string_literal Router, typename Header, typename Body, typename Allocator>
+		template <bool Request, virgo::http_method Method, detail::string_literal Router, typename Header,
+				  typename Body, typename Allocator>
 		class basic_http_protocol : public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>,
 									public http_fields
 		{
@@ -18,21 +19,22 @@ namespace aquarius
 
 			using base::router;
 
+			constexpr static auto method = Method;
+
 			using typename base::header_t;
 
 			constexpr static auto has_request = Request;
 
 		public:
 			basic_http_protocol()
-				: method_()
-				, version_(http_version::http1_1)
+				: version_(http_version::http1_1)
 				, get_params_()
 			{}
 
 		public:
 			bool operator==(const basic_http_protocol& other) const
 			{
-				return base::operator==(other) && method_ == other.method_ && version_ == other.version_ &&
+				return base::operator==(other) && version_ == other.version_ &&
 					   get_params_ == other.get_params_;
 			}
 
@@ -40,7 +42,7 @@ namespace aquarius
 			{
 				base::operator<<(os);
 
-				os << method_ << version_;
+				os << method << version_;
 
 				for (auto& p : get_params_)
 				{
@@ -51,16 +53,6 @@ namespace aquarius
 			}
 
 		public:
-			http_method method() const
-			{
-				return method_;
-			}
-
-			void method(http_method method)
-			{
-				method_ = method;
-			}
-
 			http_version version() const
 			{
 				return version_;
@@ -82,21 +74,22 @@ namespace aquarius
 			}
 
 		private:
-			http_method method_;
-
 			http_version version_;
 
 			std::vector<std::pair<std::string, std::string>> get_params_;
 		};
 
-		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
-		class basic_http_protocol<false, Router, Header, Body, Allocator>
+		template <virgo::http_method Method, detail::string_literal Router, typename Header, typename Body,
+				  typename Allocator>
+		class basic_http_protocol<false, Method, Router, Header, Body, Allocator>
 			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>, public http_fields
 		{
 		public:
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
+
+			constexpr static auto method = Method;
 
 			using typename base::header_t;
 

@@ -21,7 +21,7 @@ namespace aquarius
 		private:
 			bool check_protocol_type(const std::string& protocol_type);
 
-			bool check_mode(const std::string& mode);
+			bool check_mode(const std::string& protocol, const std::string& mode);
 
 		public:
 			std::string value_;

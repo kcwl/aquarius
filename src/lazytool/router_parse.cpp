@@ -1,4 +1,17 @@
 #include "router_parse.h"
+#include <set>
+#include <map>
+
+namespace
+{
+	static const std::set<std::string> router_protocol = { "tcp", "http" };
+
+	static const std::map<std::string, std::vector<std::string>> router_mode =
+	{
+		{"tcp", {"key"}},
+		{"http", {"post", "get", "options", "put", "delete", "head"}}
+	};
+}
 
 namespace aquarius
 {
@@ -23,7 +36,7 @@ namespace aquarius
 
 			mode_ = read_value<token::key, ':'>(ifs, column, row);
 
-			if (!check_mode(mode_))
+			if (!check_mode(name_, mode_))
 				return parse_error::routers_mode;
 
 			value_ = read_value<token::path, '{'>(ifs, column, row);
@@ -36,12 +49,21 @@ namespace aquarius
 
 		bool router_parse::check_protocol_type(const std::string& protocol_type)
 		{
-			return protocol_type == "tcp" || protocol_type == "http";
+			return router_protocol.find(protocol_type) != router_protocol.end();
 		}
 
-		bool router_parse::check_mode(const std::string& mode)
+		bool router_parse::check_mode(const std::string& protocol, const std::string& mode)
 		{
-			return mode == "key" || mode == "regex";
+			auto iter = router_mode.find(protocol);
+
+			if (iter == router_mode.end())
+			{
+				return false;
+			}
+
+			auto& modes = iter->second;
+
+			return std::find(modes.begin(), modes.end(), mode) != modes.end();
 		}
 
 		std::ostream& operator<<(std::ostream& os, const router_parse& r)
