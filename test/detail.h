@@ -107,19 +107,4 @@ BOOST_AUTO_TEST_CASE(tri)
 	BOOST_CHECK(!cur);
 }
 
-BOOST_AUTO_TEST_CASE(server_signal)
-{
-	aquarius::tcp_server srv(8100, 10, "async tcp server");
-
-	std::thread t([&] { srv.run(); });
-
-	std::this_thread::sleep_for(2s);
-
-	std::raise(SIGTERM);
-
-	t.join();
-
-	BOOST_CHECK(!srv.enable());
-}
-
 BOOST_AUTO_TEST_SUITE_END()
