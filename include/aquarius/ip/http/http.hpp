@@ -180,7 +180,7 @@ namespace aquarius
 					co_return;
 				}
 
-				auto len = std::distance(header.begin(), itor);
+				len = std::distance(header.begin(), itor);
 
 				auto key = std::string(std::string_view(header).substr(0, len));
 
@@ -304,7 +304,13 @@ namespace aquarius
 
 			status = static_cast<virgo::http_status>(std::atoi(std::string_view(*header_iter++).data()));
 
-			reason = std::string(std::string_view(*header_iter).data());
+			auto reason_string_view = std::string_view(*header_iter);
+
+			std::size_t view_size = reason_string_view.size();
+
+			view_size >= 2 ? reason_string_view.size() - 2 : 0;
+
+			reason = std::string(reason_string_view.data(), view_size);
 
 			ec = virgo::http_status::ok;
 		}
