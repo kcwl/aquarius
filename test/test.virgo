@@ -21,7 +21,7 @@ message new_login -> tcp-key:10001
 	}
 }
 
-message new_http_login -> http-post:/login
+message new_http_login -> http-post:login
 {
 	request{
 		int32 uuid;

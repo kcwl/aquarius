@@ -37,11 +37,11 @@ namespace aquarius
 				try
 				{
 					auto req = std::make_shared<typename Context::request_t>();
-					error_code ec{};
+
 					req->move_copy(hf);
-					req->consume(buffer, ec);
-					if (ec.value() != static_cast<int>(virgo::http_status::ok))
-						return false;
+
+					req->consume(buffer);
+
 					post(session->get_executor(),
 						 [=]
 						 {
@@ -52,7 +52,9 @@ namespace aquarius
 				}
 				catch (error_code& ec)
 				{
-					std::make_shared<Context>().send_response(virgo::http_status::bad_request);
+					co_spawn(
+						session->get_executor(), [ec]() mutable -> awaitable<void>
+						{ ec = co_await std::make_shared<Context>()->send_response(virgo::http_status::bad_request); });
 				}
 
 				return true;

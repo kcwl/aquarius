@@ -212,19 +212,14 @@ namespace aquarius
 		}
 
 		template <typename Response>
-		auto query()
+		auto query() -> awaitable<Response>
 		{
-			return proto_.template query<Response>(this->shared_from_this());
+			co_return co_await proto_.template query<Response>(this->shared_from_this());
 		}
 
 		auto sql()
 		{
 			return sql_;
-		}
-
-		auto timer()
-		{
-			return timer_;
 		}
 
 		template <typename Request, typename T>

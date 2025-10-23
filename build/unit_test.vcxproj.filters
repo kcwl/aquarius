@@ -318,6 +318,12 @@
     <ClInclude Include="..\include\aquarius\detail\float.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_header.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

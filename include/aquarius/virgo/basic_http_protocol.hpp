@@ -129,14 +129,14 @@ namespace aquarius
 				reason_ = r;
 			}
 
-			http_status status() const
+			http_status result() const
 			{
 				return status_;
 			}
 
-			void status(http_status s)
+			void result(int s)
 			{
-				status_ = s;
+				status_ = static_cast<http_status>(s);
 			}
 
 			http_version version() const
@@ -147,6 +147,11 @@ namespace aquarius
 			void version(http_version version)
 			{
 				version_ = version;
+			}
+
+			auto fields() const
+			{
+				return this->fields_;
 			}
 
 		private:

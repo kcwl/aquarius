@@ -8,6 +8,8 @@
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/tcp/tcp_server.hpp>
+#include <aquarius/ip/tcp/tcp_header.hpp>
+#include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/io_context.hpp>
 #include <aquarius/logger.hpp>

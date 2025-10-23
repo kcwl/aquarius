@@ -39,10 +39,18 @@ namespace aquarius
 
 			flex_buffer<char> buffer{};
 
-			this->response_.commit(buffer, ec);
+			std::string str = std::format("{} {} {}\r\n", from_version_string(this->response_.version()), static_cast<int>(this->response_.result()), this->response_.reason().data());
 
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
-				co_return ec;
+			for (auto& s : this->response_.fields())
+			{
+				str += std::format("{}: {}\r\n", s.first, s.second);
+			}
+
+			str += "\r\n";
+
+			buffer.put(str.begin(), str.end());
+
+			this->response_.commit(buffer);
 
 			co_return co_await this->session()->async_send(std::move(buffer));
 		}

@@ -18,6 +18,8 @@ namespace aquarius
 				virtual generate_error visit(std::shared_ptr<parser> parser, std::ofstream& ofs_h,
 											 std::ofstream& ofs_cpp) override;
 
+				void defined(std::shared_ptr<parser> parser, std::ofstream& ofs);
+
 			private:
 				void generate_main_define(std::ofstream& ofs, std::shared_ptr<parser> parser);
 			};

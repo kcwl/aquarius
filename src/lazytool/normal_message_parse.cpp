@@ -14,6 +14,32 @@ namespace aquarius
 			, response_ptr_(std::make_shared<structure_parse>())
 		{}
 
+		std::ostream& normal_message_parse::operator<<(std::ostream& os) const
+		{
+			os << "message: " << name_ << std::endl;
+			os << "{\n";
+			os << "router:" << this->router_ptr_->name_ << ",mode:" << this->router_ptr_->mode_
+			   << ",value:" << this->router_ptr_->value_ << std::endl;
+			os << "request:" << std::endl;
+			for (auto& v : this->request_ptr_->values_)
+			{
+				os << "\t" << v.first << ":" << v.second << std::endl;
+			}
+			os << "response:" << std::endl;
+			for (auto& v : this->response_ptr_->values_)
+			{
+				os << "\t" << v.first << ":" << v.second << std::endl;
+			}
+			os << "}\n";
+			return os;
+		};
+
+		std::ostream& operator<<(std::ostream& os, const normal_message_parse& m)
+		{
+			m << os;
+			return os;
+		}
+
 		parser::parse_error normal_message_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
 		{
 			name_ = read_value<token::value, '-'>(ifs, column, row);
@@ -31,13 +57,40 @@ namespace aquarius
 			if (result != parse_error::success)
 				return result;
 
-			request_ptr_->set_anonymous();
+			while (!ifs.eof())
+			{
+				result = seek<'}'>(ifs, column, row);
 
-			request_ptr_->visit(ifs, column, row);
+				if (result == parse_error::success)
+					return result;
 
-			response_ptr_->set_anonymous();
+				auto sub_key = read_value<token::key, '{'>(ifs, column, row);
 
-			response_ptr_->visit(ifs, column, row);
+				if (sub_key == "request")
+				{
+					request_ptr_->set_anonymous();
+
+					result = request_ptr_->visit(ifs, column, row);
+
+					if (result == parse_error::success)
+					{
+						request_ptr_->name_ = name_;
+					}
+				}
+				else if (sub_key == "response")
+				{
+					response_ptr_->set_anonymous();
+
+					result = response_ptr_->visit(ifs, column, row);
+
+					if (result == parse_error::success)
+					{
+						response_ptr_->name_ = name_;
+					}
+				}
+				else
+					return parse_error::keyword;
+			}
 
 			return parse_error::success;
 		}

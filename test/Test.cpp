@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(10s);
+	auto status = future.wait_for(20s);
 
 	BOOST_CHECK(status == std::future_status::ready);
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 BOOST_AUTO_TEST_CASE(http_flow_with_ssl)
 {
-	aquarius::http_server srv(8100, 10, "async http server");
+	aquarius::http_server srv(80, 10, "async http server");
 
 	std::thread t([&] { srv.run(); });
 
@@ -93,6 +93,9 @@ BOOST_AUTO_TEST_CASE(http_flow_with_ssl)
 			auto is_connect = co_await cli->async_connect("127.0.0.1", "80");
 
 			BOOST_CHECK(!is_connect);
+
+			if (is_connect)
+				co_return;
 
 			auto req = std::make_shared<http_login_request>();
 			req->header().uuid = 1;

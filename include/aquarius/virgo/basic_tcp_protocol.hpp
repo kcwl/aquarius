@@ -25,6 +25,8 @@ namespace aquarius
 				, version_()
 			{}
 
+			virtual ~basic_tcp_protocol() = default;
+
 		public:
 			bool operator==(const basic_tcp_protocol& other) const
 			{

@@ -4,28 +4,54 @@
 #include <ranges>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_version.hpp>
-#include <aquarius/ip/tcp/tcp.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace aquarius
 {
-	class http : public tcp
+	class http
 	{
-		using base = tcp;
+		using base = boost::asio::ip::tcp;
 
 		constexpr static std::size_t max_http_length = 8192;
 
 	public:
-		using typename base::socket;
+		using socket = base::socket;
 
-		using typename base::endpoint;
+		using endpoint = base::endpoint;
 
-		using typename base::acceptor;
+		using acceptor = base::acceptor;
 
-		using typename base::resolver;
+		using resolver = base::resolver;
 
-		using typename base::no_delay;
+		using no_delay = base::no_delay;
 
 	public:
+		template <typename Session>
+		requires(is_session<Session>)
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		{
+			flex_buffer<char> buffer{};
+
+			error_code ec{};
+
+			for (;;)
+			{
+				co_await recv(session_ptr, buffer, ec);
+
+				if (ec.value() == static_cast<int>(virgo::http_status::ok))
+					continue;
+
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.what();
+				}
+
+				session_ptr->shutdown();
+
+				co_return ec;
+			}
+		}
+
 		template <typename Response, typename Session>
 		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
 		{
@@ -35,11 +61,11 @@ namespace aquarius
 
 			virgo::http_fields hf;
 
-			co_await recv_buffer(session_ptr, buffer, hf, ec);
+			co_await recv_buffer(session_ptr, buffer, hf, ec, false);
 
 			Response resp{};
 
-			if (!ec)
+			if (ec.value() == static_cast<int>(virgo::http_status::ok))
 			{
 				resp.move_copy(hf);
 				resp.consume(buffer);
@@ -53,6 +79,11 @@ namespace aquarius
 		{
 			std::string str = std::format("{} {} {}\r\n", from_method_string(Request::method), Request::router,
 										  from_version_string(request->version()));
+
+			request->set_field("Content-Type", "aquarius");
+			request->set_field("Server", "Aquarius 0.10.0");
+			request->set_field("Connection", "keep-alive");
+			request->set_field("Access-Control-Allow-Origin", "*");
 
 			for (auto& s : request->fields())
 			{
@@ -68,17 +99,17 @@ namespace aquarius
 
 	protected:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec)
-			-> awaitable<void>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
 		{
 			virgo::http_fields hf;
 
 			co_await recv_buffer(session_ptr, buffer, hf, ec);
 
-			if (ec)
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 			{
 				if (ec != boost::asio::error::eof)
 				{
+					XLOG_ERROR() << "on read some occur error - " << ec.message();
 				}
 				session_ptr->shutdown();
 				co_return;
@@ -98,7 +129,7 @@ namespace aquarius
 	private:
 		template <typename Session>
 		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, virgo::http_fields& hf,
-						 error_code& ec) -> awaitable<void>
+						 error_code& ec, bool request = true) -> awaitable<void>
 		{
 			constexpr auto two_crlf = std::string_view("\r\n\r\n");
 
@@ -107,7 +138,7 @@ namespace aquarius
 			if (ec)
 				co_return;
 
-			parse_header_line(buffer, method_, version_, path_, querys_, ec);
+			request ? parse_request_header_line(buffer, method_, version_, path_, querys_, ec) : parse_response_header_line(buffer, version_, status_, reason_, ec);
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 				co_return;
 
@@ -132,24 +163,24 @@ namespace aquarius
 
 			auto len = std::distance(buf_view.begin(), iter);
 
+			auto head_buf = std::span<char>(buffer.rdata(), len);
+
 			buffer.consume(len + 4);
 
-			auto buf = span.subspan(0, len);
-
-			auto header_view = std::views::split(buf, '\n');
+			auto header_view = std::views::split(head_buf, '\n');
 
 			for (const auto header : header_view)
 			{
 				auto itor =
-					std::ranges::find_if(header.begin(), header.end(), [](const auto& value) { return value == ':'; });
+					std::ranges::find_if(header.begin(), header.end(), [] (const auto& value) { return value == ':'; });
 
 				if (itor == header.end())
 				{
-					ec = make_error_code(virgo::http_status::bad_request);
+					ec = virgo::http_status::bad_request;
 					co_return;
 				}
 
-				len = std::distance(header.begin(), itor);
+				auto len = std::distance(header.begin(), itor);
 
 				auto key = std::string(std::string_view(header).substr(0, len));
 
@@ -164,14 +195,14 @@ namespace aquarius
 				hf.set_field(key, value);
 			}
 
-			if (hf.content_length() == 0)
-				co_return;
+			auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.active());
 
-			ec = co_await session_ptr->async_read(buffer, hf.content_length());
+			if(remain_size > 0)
+				ec = co_await session_ptr->async_read(buffer, remain_size);
 		}
 
 		template <typename T>
-		void parse_header_line(flex_buffer<T>& buffer, virgo::http_method& method_, virgo::http_version& version_,
+		void parse_request_header_line(flex_buffer<T>& buffer, virgo::http_method& method_, virgo::http_version& version_,
 							   std::string& path_, std::vector<std::pair<std::string, std::string>>& querys_,
 							   error_code& ec)
 		{
@@ -190,7 +221,7 @@ namespace aquarius
 
 			if (iter == buf_view.end())
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				ec = virgo::http_status::bad_request;
 				return;
 			}
 
@@ -206,7 +237,7 @@ namespace aquarius
 
 			if (size < 3)
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				ec = virgo::http_status::bad_request;
 				return;
 			}
 
@@ -224,9 +255,64 @@ namespace aquarius
 		}
 
 		template <typename T>
+		void parse_response_header_line(flex_buffer<T>& buffer, virgo::http_version& version,
+										virgo::http_status& status, std::string& reason,
+										error_code& ec)
+		{
+			auto span = std::span<T>(buffer.rdata(), buffer.active());
+
+			auto buf_view = span | std::views::slide(2);
+
+			auto iter = std::ranges::find_if(buf_view,
+											 [] (const auto& v)
+											 {
+												 if (v.size() < 2)
+													 return false;
+
+												 return std::string_view(v) == "\r\n";
+											 });
+
+			if (iter == buf_view.end())
+			{
+				ec = virgo::http_status::bad_request;
+				return;
+			}
+
+			auto len = std::distance(buf_view.begin(), iter);
+
+			//auto header_line = span.subspan(0, len + 2);
+			auto header_line = std::span<T>(buffer.rdata(), len + 2);
+
+			buffer.consume(len + 2);
+
+			auto headers = header_line | std::views::split(' ');
+
+			auto size = std::distance(headers.begin(), headers.end());
+
+			if (size < 3)
+			{
+				ec = virgo::http_status::bad_request;
+				return;
+			}
+
+			auto header_iter = headers.begin();
+
+			parse_version(std::span<T>(*header_iter++), version, ec);
+
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				return;
+
+			status = static_cast<virgo::http_status>(std::atoi(std::string_view(*header_iter++).data()));
+
+			reason = std::string(std::string_view(*header_iter).data());
+
+			ec = virgo::http_status::ok;
+		}
+
+		template <typename T>
 		void parse_method(std::span<T> buffer, virgo::http_method& method_, error_code& ec)
 		{
-			ec = make_error_code(virgo::http_status::ok);
+			ec = virgo::http_status::ok;
 
 			std::string_view value(buffer.data(), buffer.size());
 
@@ -244,7 +330,7 @@ namespace aquarius
 			}
 			else
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				ec = virgo::http_status::bad_request;
 			}
 		}
 
@@ -252,11 +338,11 @@ namespace aquarius
 		void parse_uri(std::span<T> buffer, virgo::http_method method_, std::string& path_,
 					   std::vector<std::pair<std::string, std::string>>& querys_, error_code& ec)
 		{
-			ec = make_error_code(virgo::http_status::ok);
+			ec = virgo::http_status::ok;
 
 			if (buffer.empty())
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				ec = virgo::http_status::bad_request;
 				return;
 			}
 
@@ -270,7 +356,7 @@ namespace aquarius
 
 			if (iter == buffer.end())
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				ec = virgo::http_status::bad_request;
 				return;
 			}
 
@@ -351,6 +437,10 @@ namespace aquarius
 		virgo::http_version version_;
 
 		std::string path_;
+
+		virgo::http_status status_;
+
+		std::string reason_;
 
 		std::vector<std::pair<std::string, std::string>> querys_;
 	};

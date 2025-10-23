@@ -8,6 +8,7 @@
 #include "enumture_generater.h"
 #include "message_generater.h"
 #include "structure_generater.h"
+#include "normal_message_generate.h"
 
 using namespace aquarius::lazytool;
 
@@ -166,14 +167,23 @@ int main(int argc, char** args)
 				{
 					cpp::message_generate().visit(k, ofs_h, ofs_cpp);
 				}
+				else if (k->struct_type_ == struct_type::normal_message)
+				{
+					cpp::normal_message_generate().visit(k, ofs_h, ofs_cpp);
+				}
 			}
 
 			for (auto& k : pr.keywords_)
 			{
-				if (k->struct_type_ != struct_type::message)
-					continue;
-
-				cpp::message_generate().defined(k, ofs_h);
+				if (k->struct_type_ == struct_type::message)
+				{
+					cpp::message_generate().defined(k, ofs_h);
+				}
+				else if (k->struct_type_ == struct_type::normal_message)
+				{
+					cpp::normal_message_generate().defined(k, ofs_h);
+				}
+				
 			}
 		}
 	}

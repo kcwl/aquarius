@@ -67,34 +67,33 @@ namespace aquarius
         template <typename Response, typename Request>
         auto query(std::shared_ptr<Request> req) -> awaitable<Response>
         {
-            flex_buffer<char> buffer{};
-
             try
             {
+                flex_buffer<char> buffer{};
+
                 session_ptr_->make_request_buffer(req, buffer);
+
+                auto ec = co_await session_ptr_->async_send(std::move(buffer));
+
+                if (ec)
+                {
+                    if (ec != boost::asio::error::eof)
+                    {
+                        XLOG_ERROR() << "on read some occur error - " << ec.what();
+                    }
+                    session_ptr_->shutdown();
+                    if (close_func_)
+                        close_func_();
+
+                    co_return Response{};
+                }
+
+                co_return co_await session_ptr_->template query<Response>();
             }
             catch (error_code& ec)
             {
                 XLOG_ERROR() << "make_request_buffer error - " << ec.what();
-                co_return Response{};
             }
-
-            auto ec = co_await session_ptr_->async_send(std::move(buffer));
-
-            if (ec)
-            {
-                if (ec != boost::asio::error::eof)
-                {
-                    XLOG_ERROR() << "on read some occur error - " << ec.what();
-                }
-                session_ptr_->shutdown();
-                if (close_func_)
-                    close_func_();
-
-                co_return Response{};
-            }
-
-            co_return co_await session_ptr_->template query<Response>();
         }
 
         std::string remote_address() const

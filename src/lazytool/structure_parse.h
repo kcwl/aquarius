@@ -12,6 +12,9 @@ namespace aquarius
 			virtual ~structure_parse() = default;
 
 		public:
+			std::ostream& operator<<(std::ostream& os) const;
+
+		public:
 			virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
 
 			void set_anonymous(bool value = true);
@@ -19,5 +22,7 @@ namespace aquarius
 		private:
 			bool anonymous_;
 		};
+
+		std::ostream& operator<<(std::ostream& os, const structure_parse& pr);
 	} // namespace lazytool
 } // namespace aquarius

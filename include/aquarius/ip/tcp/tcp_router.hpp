@@ -4,9 +4,8 @@
 namespace aquarius
 {
 	template <typename Session>
-	class tcp_router
-		: public basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer<char>&)>>,
-		  public singleton<tcp_router<Session>>
+	class tcp_router : public basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer<char>&)>>,
+					   public singleton<tcp_router<Session>>
 	{
 		using base = basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer<char>&)>>;
 
@@ -23,27 +22,25 @@ namespace aquarius
 		{
 			auto func = [&](std::shared_ptr<Session> session, buffer_t& buffer)
 			{
-					try
-					{
-						auto req = std::make_shared<typename Context::request_t>();
+				try
+				{
+					auto req = std::make_shared<typename Context::request_t>();
 
-						req->consume(buffer);
+					req->consume(buffer);
 
-						post(session->get_executor(),
-							 [=]
-							 {
-								 co_spawn(
-									 session->get_executor(), [session, req] () mutable -> awaitable<void>
-									 {
-										 co_await std::make_shared<Context>()->visit(session, req);
-									 }, detached);
-							 });
-					}
-					catch (error_code& ec)
-					{
-						std::make_shared<Context>()->send_response(ec);
-					}
-				
+					post(session->get_executor(),
+						 [=]
+						 {
+							 co_spawn(
+								 session->get_executor(), [session, req]() mutable -> awaitable<void>
+								 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
+						 });
+				}
+				catch (error_code& ec)
+				{
+					co_spawn(session->get_executor(), [ec]() mutable -> awaitable<void>
+							 { ec = co_await std::make_shared<Context>()->send_response(ec); });
+				}
 
 				return true;
 			};

@@ -9,9 +9,22 @@ namespace aquarius
 			, anonymous_(false)
 		{}
 
+		std::ostream& structure_parse::operator<<(std::ostream& os) const
+		{
+			os << "class " << name_ << std::endl;
+			os << "{\n";
+			for (auto& v : values_)
+			{
+				os << "\t" << v.first << " " << v.second << std::endl;
+			}
+
+			os << "};\n";
+			return os;
+		}
+
 		parser::parse_error structure_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
 		{
-			if (anonymous_)
+			if (!anonymous_)
 			{
 				name_ = read_value<token::value, '{'>(ifs, column, row);
 
@@ -45,6 +58,13 @@ namespace aquarius
 		void structure_parse::set_anonymous(bool value)
 		{
 			anonymous_ = value;
+		}
+
+		std::ostream& operator<<(std::ostream& os, const structure_parse& pr)
+		{
+			pr << os;
+
+			return os;
 		}
 	} // namespace lazytool
 } // namespace aquarius

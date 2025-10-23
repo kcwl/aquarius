@@ -154,6 +154,12 @@ namespace aquarius
 
 					os << *msg_ptr->router_ptr_ << *msg_ptr->request_ptr_ << *msg_ptr->response_ptr_;
 				}
+				else if (s->struct_type_ == struct_type::normal_message)
+				{
+					auto msg_ptr = std::dynamic_pointer_cast<normal_message_parse>(s);
+
+					os << *msg_ptr->router_ptr_ << *msg_ptr->request_ptr_ << *msg_ptr->response_ptr_;
+				}
 
 				os << "};" << std::endl;
 			}

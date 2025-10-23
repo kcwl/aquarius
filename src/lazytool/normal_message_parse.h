@@ -1,7 +1,6 @@
 #pragma once
 #include "parser.h"
 
-
 namespace aquarius
 {
 	namespace lazytool

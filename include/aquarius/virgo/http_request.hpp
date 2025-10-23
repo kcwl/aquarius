@@ -41,14 +41,14 @@ namespace aquarius
 			{
 				auto sp = std::span<T>(buffer.rdata(), buffer.active());
 
-				auto fourth_view = sp | std::views::slide(4);
+				auto fourth_view = sp | std::views::slide(3);
 
 				auto iter = std::ranges::find_if(fourth_view, [] (const auto& value)
 									 {
-										 if (value.size() < 4)
+										 if (value.size() < 3)
 											 return false;
 
-										 return std::string_view(value) == "\r\n\r\n";
+										 return std::string_view(value) == "<->"sv;
 									 });
 
 				if (iter == fourth_view.end())
@@ -60,7 +60,7 @@ namespace aquarius
 
 				this->header().deserialize(header_buffer);
 
-				buffer.consume(4 + len);
+				buffer.consume(3 + len);
 
 				flex_buffer<T> body_buffer(buffer.rdata(), buffer.active());
 
@@ -74,7 +74,7 @@ namespace aquarius
 
 				this->header().serialize(body_buffer);
 
-				constexpr auto sp = "\r\n\r\n"sv;
+				constexpr auto sp = "<->"sv;
 
 				body_buffer.put(sp.begin(), sp.end());
 

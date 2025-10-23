@@ -39,6 +39,7 @@ namespace aquarius
 
 		basic_protocol(basic_protocol&& other) noexcept
 			: base_body(boost::empty_init, std::exchange(other.get(), nullptr))
+			, header_(std::exchange(other.header_, {}))
 		{}
 
 		basic_protocol& operator=(basic_protocol&& other) noexcept
