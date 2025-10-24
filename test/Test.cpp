@@ -12,7 +12,7 @@
 #include "sql.h"
 #include "cmd_options.h"
 #include "client.h"
-#ifdef _DEBUG
+#ifdef VLD_DEBUG
 #include <vld.h>
 #endif
 
