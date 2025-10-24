@@ -105,7 +105,7 @@ jobs:
     - name: Copy CRT
       shell: bash
       run: >
-        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }} 
+        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
