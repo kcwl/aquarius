@@ -28,6 +28,8 @@ target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
 target_link_libraries(unittest PUBLIC gcov)
 endif()
 
+set_target_properties(unittest PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK")
+
 
 add_test(
 	NAME unittest COMMAND unittest
