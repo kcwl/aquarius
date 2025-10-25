@@ -49,7 +49,7 @@ jobs:
         sudo add-apt-repository ppa:kcwl-ppa/boost
         sudo apt update
         apt list | grep boost
-        sudo apt-get install -y boost-1.89
+        sudo apt-get install -y libboost1.83-dev
 
     - name: test gcc/g++
       shell: sh
