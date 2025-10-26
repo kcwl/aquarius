@@ -65,13 +65,14 @@ jobs:
         gcc --version
         g++ --version
         gcov --version
+        lcov --version
 
-    - name: install boost-1.89
-      shell: bash
-      run: |
-        sudo add-apt-repository ppa:kcwl-ppa/libboost1.89-dev
-        sudo apt update
-        sudo apt-get install -y boost
+    # - name: install boost-1.89
+    #   shell: bash
+    #   run: |
+    #     sudo add-apt-repository ppa:kcwl-ppa/libboost1.89-dev
+    #     sudo apt update
+    #     sudo apt-get install -y boost
 
     # - name: install gcovr
     #   shell: bash
@@ -79,18 +80,18 @@ jobs:
     #      sudo apt-get install -y pip
     #      pip install gcovr
 
-    # - name: config vcpkg
-    #   shell: bash
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y autoconf automake autoconf-archive ninja-build
-    #     git clone https://github.com/microsoft/vcpkg.git temp
-    #     mkdir -p vcpkg
-    #     mv temp/.git vcpkg/.git
-    #     cd vcpkg
-    #     git pull
-    #     git checkout .
-    #     ./bootstrap-vcpkg.sh -disableMetrics
+    - name: config vcpkg
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
+        git clone https://github.com/microsoft/vcpkg.git temp
+        mkdir -p vcpkg
+        mv temp/.git vcpkg/.git
+        cd vcpkg
+        git pull
+        git checkout .
+        ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -103,12 +104,17 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=true
         -S ${{ github.workspace }}
-        # -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        # -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Copy CRT
+      shell: bash
+      run: >
+        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
