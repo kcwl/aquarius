@@ -48,7 +48,6 @@ jobs:
       run: |
         sudo add-apt-repository ppa:kcwl-ppa/boost-1.89
         sudo apt update
-        apt list | grep boost
         sudo apt-get install -y boost
 
     - name: test gcc/g++
@@ -57,12 +56,13 @@ jobs:
         gcc --version
         g++ --version
         gcov --version
+        cmake --version
 
-    - name: install gcovr
-      shell: bash
-      run: |
-         sudo apt-get install -y pip
-         pip install gcovr
+    # - name: install gcovr
+    #   shell: bash
+    #   run: |
+    #      sudo apt-get install -y pip
+    #      pip install gcovr
 
     # - name: configure vcpkg
     #   shell: bash
