@@ -65,7 +65,12 @@ jobs:
         gcc --version
         g++ --version
         gcov --version
-        lcov --version
+
+
+    - name: install lcov
+      shell: sh
+      run: |
+         sudo apt install -y lcov
 
     # - name: install boost-1.89
     #   shell: bash
