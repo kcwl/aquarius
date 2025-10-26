@@ -46,7 +46,7 @@ jobs:
     - name: install boost-1.89
       shell: bash
       run: |
-        sudo add-apt-repository ppa:kcwl-ppa/boost
+        sudo add-apt-repository ppa:kcwl-ppa/boost-1.89
         sudo apt update
         apt list | grep boost
         sudo apt-get install -y boost-1.89
