@@ -8,7 +8,6 @@
 
 namespace aquarius
 {
-
 	class tcp
 	{
 		using impl_type = boost::asio::ip::tcp;

@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;VLD_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;VLD_DEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -232,14 +232,14 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
-    <ClInclude Include="..\test\protocol.h" />
-    <ClInclude Include="..\test\serialize.h" />
-    <ClInclude Include="..\test\client.h" />
-    <ClInclude Include="..\test\cmd_options.h" />
+    <ClInclude Include="..\test\protocol.cpp" />
+    <ClInclude Include="..\test\serialize.cpp" />
+    <ClInclude Include="..\test\client.cpp" />
+    <ClInclude Include="..\test\cmd_options.cpp" />
     <ClInclude Include="..\test\session.h" />
-    <ClInclude Include="..\test\handle_impl.hpp" />
-    <ClInclude Include="..\test\detail.h" />
-    <ClInclude Include="..\test\sql.h" />
+    <ClInclude Include="..\test\ctx_handler.hpp" />
+    <ClInclude Include="..\test\detail.cpp" />
+    <ClInclude Include="..\test\sql.cpp" />
     <ClInclude Include="..\test\test.virgo.h" />
   </ItemGroup>
   <ItemGroup>

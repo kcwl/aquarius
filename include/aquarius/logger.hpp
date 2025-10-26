@@ -35,46 +35,35 @@ namespace aquarius
 			init_logger();
 		}
 
-		~logger()
-		{
-			logging::core::get()->remove_sink(sink_ptr_);
-
-			sink_ptr_->stop();
-
-			sink_ptr_->flush();
-		}
-
 		void init_logger()
 		{
-			logging::add_console_log(std::clog,
+			auto console_sink_ptr = logging::add_console_log(std::clog,
 									 keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
 
-			sink_ptr_ = boost::make_shared<file_sink>(
+			auto file_sink_ptr = boost::make_shared<file_sink>(
 				keywords::file_name = "file.log", keywords::target_file_name = "%Y%m%d_%H%M%S.%5N.log",
 				keywords::registration = 16384,
 				keywords::order = logging::make_attr_ordering<uint32_t>("RecordID", std::less<uint32_t>()));
 
-			sink_ptr_->locked_backend()->set_file_collector(
+			file_sink_ptr->locked_backend()->set_file_collector(
 				sinks::file::make_collector(keywords::target = "logs/", keywords::max_size = 16 * 1024 * 1024,
 											keywords::max_files = 512, keywords::min_free_space = 100 * 1024 * 1024));
 
-			sink_ptr_->set_formatter(expr::format("[%1%][%2%:%3%]<%4%> %5%") %
+			file_sink_ptr->set_formatter(expr::format("[%1%][%2%:%3%]<%4%> %5%") %
 									 expr::attr<trivial::severity_level>("Severity") % expr::attr<std::string>("File") %
 									 expr::attr<uint32_t>("Line") % expr::attr<boost::posix_time::ptime>("TimeStamp") %
 									 expr::smessage);
 
-			sink_ptr_->set_filter(trivial::severity >= trivial::info);
+			file_sink_ptr->set_filter(trivial::severity >= trivial::info);
 
-			logging::core::get()->add_sink(sink_ptr_);
+			logging::core::get()->add_sink(console_sink_ptr);
+			logging::core::get()->add_sink(file_sink_ptr);
 
 			logging::core::get()->add_global_attribute("TimeStamp", attrs::local_clock());
 			logging::core::get()->add_global_attribute("RecordID", attrs::counter<uint32_t>());
 			logging::core::get()->add_global_attribute("File", attrs::mutable_constant<std::string>(""));
 			logging::core::get()->add_global_attribute("Line", attrs::mutable_constant<uint32_t>(0));
 		}
-
-	private:
-		boost::shared_ptr<file_sink> sink_ptr_;
 	};
 
 	template <typename T>

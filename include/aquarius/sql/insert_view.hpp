@@ -4,6 +4,7 @@
 #include <sstream>
 #include <aquarius/detail/struct_name.hpp>
 #include <aquarius/sql/add_string.hpp>
+#include <boost/pfr.hpp>
 
 namespace aquarius
 {

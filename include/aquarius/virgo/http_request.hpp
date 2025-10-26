@@ -2,6 +2,7 @@
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <ranges>
 
 namespace aquarius
 {

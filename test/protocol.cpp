@@ -1,12 +1,14 @@
-#pragma once
-#include <boost/test/unit_test_suite.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 #include <aquarius/virgo/tcp_response.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
 #include "test.virgo.h"
 
-BOOST_AUTO_TEST_CASE(tcp_protocol)
+BOOST_AUTO_TEST_SUITE(protocol)
+
+BOOST_AUTO_TEST_CASE(tcp)
 {
 	{
 		aquarius::flex_buffer<char> buffer;
@@ -44,7 +46,7 @@ BOOST_AUTO_TEST_CASE(tcp_protocol)
 		resp->body().per_resp.hp = 200;
 		resp->body().per_resp.mana = 300;
 		resp->body().per_resp.name = "John";
-		resp->body().per_resp.orders = std::vector < char>{ 1, 2, 3, 4, 5 };
+		resp->body().per_resp.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
 
 		resp->commit(buffer);
 
@@ -102,3 +104,5 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		BOOST_CHECK_EQUAL(*resp, *resp_back);
 	}
 }
+
+BOOST_AUTO_TEST_SUITE_END()

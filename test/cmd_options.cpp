@@ -1,5 +1,5 @@
-#pragma once
-#include <boost/test/unit_test_suite.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <string>
 

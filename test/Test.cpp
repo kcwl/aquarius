@@ -1,22 +1,15 @@
 #define BOOST_TEST_MODULE UnitTest
-#ifdef _WIN32
-#include <sdkddkver.h>
-#define NOMINMAX
-#endif
-#include <boost/test/included/unit_test.hpp>
-#include <aquarius.hpp>
-#include "detail.h"
-#include "handle_impl.hpp"
-#include "protocol.h"
-#include "serialize.h"
-#include "sql.h"
-#include "cmd_options.h"
-#include "client.h"
+#include <boost/test/unit_test.hpp>
+//#include <aquarius.hpp>
+#include "ctx_handler.hpp"
 #ifdef VLD_DEBUG
 #include <vld.h>
 #endif
 
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
+
+BOOST_AUTO_TEST_SUITE(framework)
+
 
 BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 {
@@ -134,3 +127,5 @@ BOOST_AUTO_TEST_CASE(http_flow_with_ssl)
 
 	t.join();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

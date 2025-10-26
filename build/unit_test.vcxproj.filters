@@ -51,16 +51,10 @@
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\client.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\session.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\detail.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\handle_impl.hpp">
+    <ClInclude Include="..\test\ctx_handler.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
@@ -134,12 +128,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\serialize.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\sql.h">
-      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp">
       <Filter>include\aquarius\virgo</Filter>
@@ -234,12 +222,6 @@
     <ClInclude Include="..\test\test.virgo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\cmd_options.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\protocol.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\sql\concepts.hpp">
       <Filter>include\aquarius\sql</Filter>
     </ClInclude>
@@ -323,6 +305,24 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp">
       <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\sql.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\protocol.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\cmd_options.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\client.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\detail.cpp">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

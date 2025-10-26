@@ -6,7 +6,6 @@
 #include <span>
 #include <aquarius/detail/ssl_context.hpp>
 #include <boost/asio/read.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <aquarius/coroutine.hpp>
 #include <boost/asio/connect.hpp>
 #include <aquarius/detail/redirect_error.hpp>
