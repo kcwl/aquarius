@@ -37,6 +37,7 @@
 Debug/
 Release/
 centos_build/
+build_coverage/
 
 # log
 logs/*

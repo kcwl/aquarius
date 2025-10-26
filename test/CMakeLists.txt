@@ -28,15 +28,15 @@ target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
 target_link_libraries(unittest PUBLIC gcov)
 endif()
 
-set_target_properties(unittest PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK")
-
 
 add_test(
 	NAME unittest COMMAND unittest
 )
 
-if(CMAKE_COVERAGE)
-setup_target_for_coverage_gcovr_xml(
-	${PROJECT_NAME}_cover NAME coverage
+add_custom_target(coverage 
+	COMMAND rm -rf test-aquarius
+	COMMAND lcov --ignore-errors inconsistent,negative -c -d . -o "coverage.info" -b .
+	COMMAND lcov --ignore-errors inconsistent,negative -e coverage.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND genhtml --ignore-errors inconsistent,negative coverage-aquarius.info -o test-aquarius
 )
-endif()
+
