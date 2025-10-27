@@ -19,11 +19,11 @@ namespace aquarius
 			this->session_ptr_ = session_ptr;
 			this->request_ptr_ = request_ptr;
 
-			this->response_.version(this->request_ptr_->version());
+			this->response_.version(this->request()->version());
 
-			this->response_.set_field("Content-Type", this->request_ptr_->find("Content-Type"));
+			this->response_.set_field("Content-Type", this->request()->find("Content-Type"));
 			this->response_.set_field("Server", "Aquarius 0.10.0");
-			this->response_.set_field("Connection", this->request_ptr_->find("Connection"));
+			this->response_.set_field("Connection", this->request()->find("Connection"));
 			this->response_.set_field("Access-Control-Allow-Origin", "*");
 
 			auto ec = co_await this->handle();
@@ -37,9 +37,10 @@ namespace aquarius
 
 			this->response_.reason(virgo::from_status_string(ec.value()));
 
-			flex_buffer<char> buffer{};
+			flex_buffer buffer{};
 
-			std::string str = std::format("{} {} {}\r\n", from_version_string(this->response_.version()), static_cast<int>(this->response_.result()), this->response_.reason().data());
+			std::string str = std::format("{} {} {}\r\n", from_version_string(this->response_.version()),
+										  static_cast<int>(this->response_.result()), this->response_.reason().data());
 
 			for (auto& s : this->response_.fields())
 			{
@@ -56,12 +57,12 @@ namespace aquarius
 		}
 	};
 
-	template <typename Session, typename Handler, typename Router>
+	template <typename Session, typename Handler, typename Router, virgo::http_method Method>
 	struct auto_http_handler_register
 	{
-		explicit auto_http_handler_register(virgo::http_method method, std::string_view proto)
+		explicit auto_http_handler_register(std::string_view proto)
 		{
-			Router::get_mutable_instance().template regist<Handler>(method, proto);
+			Router::get_mutable_instance().template regist<Method, Handler>(proto);
 		}
 	};
 } // namespace aquarius
@@ -82,8 +83,8 @@ namespace aquarius
 
 #define AQUARIUS_CONTEXT_BY_HTTP(__session, __request, __response, __method, __router, __http_method)                  \
 	class __method;                                                                                                    \
-	[[maybe_unused]] static aquarius::auto_http_handler_register<__session, __method, __router>                        \
-		__auto_register_##__method(__http_method, __request::router);                                                  \
+	[[maybe_unused]] static aquarius::auto_http_handler_register<__session, __method, __router, __http_method>         \
+		__auto_register_##__method(__request::router);                                                                 \
 	__AQUARIUS_HTTP_HANDLER(__session, __method, __request, __response)
 
 #define AQUARIUS_HTTP_HANDLER(__request, __response, __method)                                                         \

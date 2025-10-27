@@ -8,7 +8,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <http_method Method, detail::string_literal Router, typename Header, typename Body >
+		template <http_method Method, detail::string_literal Router, typename Header, typename Body>
 		class http_request : public basic_http_protocol<true, Method, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
@@ -17,6 +17,10 @@ namespace aquarius
 			using base::router;
 
 			using base::has_request;
+
+			using base::json_type;
+
+			using base::splitor;
 
 			using typename base::body_t;
 
@@ -37,57 +41,61 @@ namespace aquarius
 			}
 
 		public:
-			template <typename T>
-			void consume(flex_buffer<T>& buffer)
+			void consume(flex_buffer& buffer)
 			{
-				auto sp = std::span<T>(buffer.rdata(), buffer.active());
+				auto type = this->find("Content-Type");
 
-				auto fourth_view = sp | std::views::slide(3);
+				if (type == json_type)
+				{
+					auto sp = std::span<char>((char*)buffer.rdata(), buffer.active());
 
-				auto iter = std::ranges::find_if(fourth_view, [] (const auto& value)
-									 {
-										 if (value.size() < 3)
-											 return false;
+					auto third_view = sp | std::views::slide(3);
 
-										 return std::string_view(value) == "<->"sv;
-									 });
+					auto iter = std::ranges::find_if(third_view,
+													 [] (const auto& value)
+													 {
+														 if (value.size() < 3)
+															 return false;
 
-				if (iter == fourth_view.end())
-					return;
+														 return std::string_view(value) == "<->"sv;
+													 });
 
-				auto len = std::distance(fourth_view.begin(), iter);
+					if (iter == third_view.end())
+						return;
 
-				flex_buffer<T> header_buffer(buffer.rdata(), len);
+					auto len = std::distance(third_view.begin(), iter);
 
-				this->header().deserialize(header_buffer);
+					flex_buffer header_buffer(buffer.rdata(), len);
 
-				buffer.consume(3 + len);
+					this->header().deserialize(header_buffer);
 
-				flex_buffer<T> body_buffer(buffer.rdata(), buffer.active());
+					buffer.consume(3 + len);
+				}
+
+				flex_buffer body_buffer(buffer.rdata(), buffer.active());
 
 				this->body().deserialize(body_buffer);
 			}
 
-			template <typename T>
-			void commit(flex_buffer<T>& buffer)
+			void commit(flex_buffer& buffer)
 			{
-				flex_buffer<char> body_buffer{};
-
-				this->header().serialize(body_buffer);
-
-				constexpr auto sp = "<->"sv;
-
-				body_buffer.put(sp.begin(), sp.end());
+				flex_buffer body_buffer{};
 
 				this->body().serialize(body_buffer);
 
 				this->content_length(body_buffer.active());
 
+				auto type = this->find("Content-Type");
+
+				if (type == json_type)
+				{
+					this->header().serialize(buffer);
+
+					buffer.put(splitor.begin(), splitor.end());
+				}
+
 				buffer.append(std::move(body_buffer));
 			}
-
-		private:
-			serialize::json_parse body_parse_;
 		};
 
 		template <http_method Method, detail::string_literal Router, typename Header, typename Body>
@@ -99,6 +107,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template<virgo::http_method Method, detail::string_literal Router, typename Header, typename Body>
-	struct is_message_type<virgo::http_request<Method, Router, Header, Body>> : std::true_type {};
+	template <virgo::http_method Method, detail::string_literal Router, typename Header, typename Body>
+	struct is_message_type<virgo::http_request<Method, Router, Header, Body>> : std::true_type
+	{};
 } // namespace aquarius

@@ -23,9 +23,9 @@ public:
 	new_login_req_body() = default;
 	virtual ~new_login_req_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -41,9 +41,9 @@ public:
 	new_login_resp_body() = default;
 	virtual ~new_login_resp_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_resp;
@@ -59,9 +59,9 @@ public:
 	new_http_login_req_body() = default;
 	virtual ~new_http_login_req_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -77,9 +77,9 @@ public:
 	new_http_login_resp_body() = default;
 	virtual ~new_http_login_resp_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_resp;
@@ -95,9 +95,9 @@ public:
 	login_req_header() = default;
 	virtual ~login_req_header() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -113,9 +113,9 @@ public:
 	login_req_body() = default;
 	virtual ~login_req_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_req;
@@ -131,9 +131,9 @@ public:
 	login_resp_header() = default;
 	virtual ~login_resp_header() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -149,9 +149,9 @@ public:
 	login_resp_body() = default;
 	virtual ~login_resp_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_resp;
@@ -167,9 +167,9 @@ public:
 	http_login_req_header() = default;
 	virtual ~http_login_req_header() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -185,9 +185,9 @@ public:
 	http_login_req_body() = default;
 	virtual ~http_login_req_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_req;
@@ -203,9 +203,9 @@ public:
 	http_login_resp_header() = default;
 	virtual ~http_login_resp_header() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	int32 uuid;
@@ -221,9 +221,9 @@ public:
 	http_login_resp_body() = default;
 	virtual ~http_login_resp_body() = default;
 
-	virtual void serialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer<char>& buffer) override;
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
 	person per_resp;
@@ -238,5 +238,5 @@ using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::ht
 using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login", aquarius::http_response_header, new_http_login_resp_body>;
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_header, login_req_body>;
 using login_response = aquarius::virgo::tcp_response<"10001", login_resp_header, login_resp_body>;
-using http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login", http_login_req_header, http_login_req_body>;
-using http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login", http_login_resp_header, http_login_resp_body>;
+using http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"/login", http_login_req_header, http_login_req_body>;
+using http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"/login", http_login_resp_header, http_login_resp_body>;

@@ -11,19 +11,19 @@ namespace aquarius
 		virtual ~basic_message_serialize() = default;
 
 	public:
-		virtual void serialize(flex_buffer<char>& buffer) = 0;
+		virtual void serialize(flex_buffer& buffer) = 0;
 
-		virtual void deserialize(flex_buffer<char>& buffer) = 0;
+		virtual void deserialize(flex_buffer& buffer) = 0;
 
 	public:
-		template <typename T, typename U>
-		void parse_to(T&& value, flex_buffer<U>& buffer)
+		template <typename T>
+		void parse_to(T&& value, flex_buffer& buffer)
 		{
 			return parse_.to_datas(std::forward<T>(value), buffer);
 		}
 
-		template <typename T, typename U>
-		T parse_from(flex_buffer<U>& buffer)
+		template <typename T>
+		T parse_from(flex_buffer& buffer)
 		{
 			return parse_.template from_datas<T>(buffer);
 		}

@@ -15,6 +15,10 @@ namespace aquarius
 									public http_fields
 		{
 		public:
+			constexpr static auto json_type = "aquarius-json"sv;
+
+			constexpr static auto splitor = "<->"sv;
+
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
@@ -85,6 +89,10 @@ namespace aquarius
 			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>, public http_fields
 		{
 		public:
+			constexpr static auto json_type = "aquarius-json"sv;
+
+			constexpr static auto splitor = "<->"sv;
+
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;

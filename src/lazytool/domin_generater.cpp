@@ -44,8 +44,8 @@ namespace aquarius
 				ofs << "\t" << parser->name_ << "() = default;\n";
 				ofs << "\tvirtual ~" << parser->name_ << "() = default;\n";
 				ofs << "\n";
-				ofs << "\tvirtual void serialize(aquarius::flex_buffer<char>& buffer) override;\n\n";
-				ofs << "\tvirtual void deserialize(aquarius::flex_buffer<char>& buffer) override;\n\n";
+				ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;\n\n";
+				ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;\n\n";
 				ofs << "public:\n";
 				for (auto& [type, name] : parser->values_)
 				{
@@ -57,7 +57,7 @@ namespace aquarius
 			void domin_generate::generate_main_src(std::ofstream& ofs, std::shared_ptr<domin_parse> parser)
 			{
 				ofs << "\n";
-				ofs << "void " << parser->name_ << "::serialize(aquarius::flex_buffer<char>& buffer)\n";
+				ofs << "void " << parser->name_ << "::serialize(aquarius::flex_buffer& buffer)\n";
 				ofs << "{\n";
 
 				if (parser->protocol_type_ == "tcp")
@@ -75,7 +75,7 @@ namespace aquarius
 				ofs << "}\n";
 
 				ofs << "\n";
-				ofs << "void " << parser->name_ << "::deserialize(aquarius::flex_buffer<char>& buffer)\n";
+				ofs << "void " << parser->name_ << "::deserialize(aquarius::flex_buffer& buffer)\n";
 				ofs << "{\n";
 
 				if (parser->protocol_type_ == "tcp")

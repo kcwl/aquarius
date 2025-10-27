@@ -28,7 +28,7 @@ namespace aquarius
 		requires(is_session<Session>)
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
-			flex_buffer<char> buffer{};
+			flex_buffer buffer{};
 
 			for (;;)
 			{
@@ -52,7 +52,7 @@ namespace aquarius
 		requires(is_session<Session> && is_message<Response>)
 		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
 		{
-			flex_buffer<char> buffer{};
+			flex_buffer buffer{};
 
 			auto ec = co_await recv_buffer(session_ptr, buffer);
 
@@ -66,8 +66,8 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template <typename Request, typename T>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer<T>& buffer)
+		template <typename Request>
+		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
 		{
 			constexpr auto pos = sizeof(uint32_t);
 
@@ -85,7 +85,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer) -> awaitable<error_code>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
 		{
 			auto ec = co_await recv_buffer(session_ptr, buffer);
 
@@ -116,13 +116,13 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer) -> awaitable<error_code>
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
 		{
 			uint32_t length = 0;
 
 			constexpr auto len = sizeof(length);
 
-			auto ec = co_await session_ptr->async_read((char*)&length, len);
+			auto ec = co_await session_ptr->async_read((uint8_t*)&length, len);
 
 			if (ec)
 			{
@@ -137,4 +137,7 @@ namespace aquarius
 			co_return co_await session_ptr->async_read(buffer, length);
 		}
 	};
+
+	template<>
+	struct is_socket_type<boost::asio::ip::tcp::socket> : std::true_type {};
 } // namespace aquarius

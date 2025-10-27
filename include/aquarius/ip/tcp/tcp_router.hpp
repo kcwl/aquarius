@@ -5,12 +5,10 @@
 namespace aquarius
 {
 	template <typename Session>
-	class tcp_router : public basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer<char>&)>>,
+	class tcp_router : public basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>,
 					   public singleton<tcp_router<Session>>
 	{
-		using base = basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer<char>&)>>;
-
-		using buffer_t = flex_buffer<char>;
+		using base = basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>;
 
 	public:
 		tcp_router() = default;
@@ -21,7 +19,7 @@ namespace aquarius
 		template <typename Context>
 		void regist(std::string_view proto)
 		{
-			auto func = [&](std::shared_ptr<Session> session, buffer_t& buffer)
+			auto func = [&](std::shared_ptr<Session> session, flex_buffer& buffer)
 			{
 				try
 				{

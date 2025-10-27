@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(binary)
 
 	aquarius::binary_parse bp{};
 
-	aquarius::flex_buffer<char> buffer{};
+	aquarius::flex_buffer buffer{};
 
 	p.sex = true;
 	p.addr = 2;
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(integer_limit)
 {
 	aquarius::binary_parse bp{};
 
-	aquarius::flex_buffer<uint8_t> buffer{};
+	aquarius::flex_buffer buffer{};
 
 	{
 		constexpr int64_t i = std::numeric_limits<int64_t>::max();
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(json)
 
 	person p{};
 
-	aquarius::flex_buffer<char> buffer{};
+	aquarius::flex_buffer buffer{};
 
 	{
 		auto p1 = jp.from_datas<person>(buffer);

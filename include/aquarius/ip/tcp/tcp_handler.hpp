@@ -32,20 +32,18 @@ namespace aquarius
 		{
 			this->response_.result(ec.value());
 
-			flex_buffer<char> buffer{};
+			flex_buffer buffer{};
 
 			constexpr auto pos = sizeof(uint32_t);
 
 			buffer.commit(pos);
-
-			//body_parse_.to_datas(detail::bind_param<Router>::value, buffer);
 
 			this->response_.commit(buffer);
 
 			auto len = static_cast<uint32_t>(buffer.tellg() - pos);
 			std::copy((char*)&len, (char*)(&len + 1), buffer.data());
 
-			co_return co_await this->session()->async_send(buffer);
+			co_return co_await this->session()->async_send(std::move(buffer));
 		}
 	};
 

@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(protocol)
 BOOST_AUTO_TEST_CASE(tcp)
 {
 	{
-		aquarius::flex_buffer<char> buffer;
+		aquarius::flex_buffer buffer;
 
 		auto req = std::make_shared<login_request>();
 		req->header().uuid = 1;
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 	}
 
 	{
-		aquarius::flex_buffer<char> buffer;
+		aquarius::flex_buffer buffer;
 
 		auto resp = std::make_shared<login_response>();
 		resp->header().uuid = 1;
@@ -59,9 +59,10 @@ BOOST_AUTO_TEST_CASE(tcp)
 BOOST_AUTO_TEST_CASE(http_protocol)
 {
 	{
-		aquarius::flex_buffer<char> buffer;
+		aquarius::flex_buffer buffer;
 
 		auto req = std::make_shared<http_login_request>();
+		req->set_field("Content-Type", "aquarius-json");
 		req->header().uuid = 1;
 		req->body().per_req.sex = true;
 		req->body().per_req.addr = 2;
@@ -76,15 +77,17 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		req->commit(buffer);
 
 		auto req_back = std::make_shared<http_login_request>();
+		req_back->set_field("Content-Type", "aquarius-json");
 		req_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(*req, *req_back);
 	}
 
 	{
-		aquarius::flex_buffer<char> buffer;
+		aquarius::flex_buffer buffer;
 
 		auto resp = std::make_shared<http_login_response>();
+		resp->set_field("Content-Type", "aquarius-json");
 		resp->header().uuid = 1;
 		resp->body().per_resp.sex = true;
 		resp->body().per_resp.addr = 2;
@@ -99,6 +102,7 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		resp->commit(buffer);
 
 		auto resp_back = std::make_shared<http_login_response>();
+		resp_back->set_field("Content-Type", "aquarius-json");
 		resp_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(*resp, *resp_back);

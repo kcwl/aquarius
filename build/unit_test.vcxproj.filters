@@ -324,6 +324,9 @@
     <ClInclude Include="..\test\detail.cpp">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

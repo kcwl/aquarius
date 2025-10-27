@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(crc)
 
 BOOST_AUTO_TEST_CASE(flex_buffer)
 {
-	aquarius::flex_buffer<char> buffer{};
+	aquarius::flex_buffer buffer{};
 
 	auto begin = buffer.get();
 

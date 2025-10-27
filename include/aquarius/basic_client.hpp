@@ -69,7 +69,7 @@ namespace aquarius
         {
             try
             {
-                flex_buffer<char> buffer{};
+                flex_buffer buffer{};
 
                 session_ptr_->make_request_buffer(req, buffer);
 

@@ -39,8 +39,7 @@ namespace aquarius
 			}
 
 		public:
-			template <typename T>
-			bool commit(flex_buffer<T>& buffer)
+			bool commit(flex_buffer& buffer)
 			{
 				body_parse_.to_datas(this->result(), buffer);
 
@@ -55,8 +54,7 @@ namespace aquarius
 				return true;
 			}
 
-			template <typename T>
-			void consume(flex_buffer<T>& buffer)
+			void consume(flex_buffer& buffer)
 			{
 				this->result(body_parse_.from_datas<int32_t>(buffer));
 

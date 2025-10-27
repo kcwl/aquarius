@@ -12,8 +12,8 @@ namespace aquarius
 	{
 		struct json_parse
 		{
-			template <typename T, typename U>
-			void to_datas(const T& v, flex_buffer<U>& buffer)
+			template <typename T>
+			void to_datas(const T& v, flex_buffer& buffer)
 			{
 				auto value = boost::json::value_from(v);
 
@@ -25,8 +25,8 @@ namespace aquarius
 				buffer.put(str.begin(), str.end());
 			}
 
-			template <typename T, typename U>
-			T from_datas(flex_buffer<U>& buffer)
+			template <typename T>
+			T from_datas(flex_buffer& buffer)
 			{
 				if (buffer.empty())
 					return {};
