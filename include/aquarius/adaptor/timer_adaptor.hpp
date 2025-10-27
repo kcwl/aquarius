@@ -3,14 +3,20 @@
 
 namespace aquarius
 {
-	template <typename Timer>
+	template <typename Timer, typename Executor = boost::asio::any_io_executor>
 	class timer_adaptor
 	{
 	public:
 		explicit timer_adaptor(io_context& ctx)
-			: context_(ctx)
-			, timer_(context_)
+			: timer_adaptor(ctx.get_executor())
 		{}
+
+		timer_adaptor(const Executor& ex)
+			: executor_(ex)
+			, timer_(executor_)
+		{
+
+		}
 
 	public:
 		template <typename Rep, typename Ratio, typename Func>
@@ -34,7 +40,7 @@ namespace aquarius
 		}
 
 	private:
-		io_context& context_;
+		Executor executor_;
 
 		Timer timer_;
 	};

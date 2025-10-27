@@ -1,226 +1,135 @@
 ﻿#pragma once
-#include <aquarius/awaitable.hpp>
-#include <aquarius/co_spawn.hpp>
-#include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/redirect_error.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_context.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/traits/async.hpp>
-#include <aquarius/use_awaitable.hpp>
-#include <aquarius/use_future.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <boost/asio/connect.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
-	template <typename Session, typename... Adaptor>
-	class basic_client
-	{
-		using socket = typename Session::socket;
+    using namespace std::chrono_literals;
 
-		using resolver = typename Session::resolver;
+    template <typename Session>
+    class basic_client : public std::enable_shared_from_this<basic_client<Session>>
+    {
+        using socket = Session::socket;
 
-	public:
-		basic_client(io_context& context, int reconnect_times, std::chrono::steady_clock::duration timeout)
-			: io_context_(context)
-			, session_ptr_(nullptr)
-			, reconnect_times_(reconnect_times)
-			, timeout_(timeout)
-			, host_()
-			, port_()
-		{
-			
-		}
+        using resolver = Session::resolver;
 
-		virtual ~basic_client() =default;
+    public:
+        explicit basic_client(io_context& context, const std::string& host, const std::string& port, std::chrono::steady_clock::duration timeout = 1s)
+            : io_context_(context)
+            , host_(host)
+            , port_(port)
+            , session_ptr_(nullptr)
+            , close_func_()
+            , timeout_(timeout)
+        {
 
-	public:
-		auto async_connect(const std::string& ip_addr, const std::string& port) -> awaitable<bool>
-		{
-			host_ = ip_addr;
-			port_ = port;
+        }
 
-			session_ptr_ = std::make_shared<Session>(io_context_);
+        basic_client(io_context& context, std::chrono::steady_clock::duration timeout = 1s)
+            : basic_client(context, {}, {}, timeout)
+        {
 
-			auto result = co_await session_ptr_->async_connect(host_, port_);
+        }
 
-			if (!result)
-				co_return result;
+        virtual ~basic_client() = default;
 
-			co_spawn(
-				this->io_context_,
-				[this]() mutable -> awaitable<void>
-				{
-					auto ec = co_await session_ptr_->accept();
-					if (ec)
-					{
-						if (close_func_)
-							this->close_func_();
+    public:
+        auto async_connect() -> awaitable<error_code>
+        {
+            co_return co_await async_connect(host_, port_);
+        }
 
-						auto reconnect_times = this->reconnect_times_;
+        auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
+        {
+            host_ = host;
+            port_ = port;
 
-						while (reconnect_times--)
-						{
-							if (co_await reconnect())
-								break;
-						}
-					}
-					co_return;
-				},
-				use_awaitable);
+            session_ptr_ = std::make_shared<Session>(io_context_);
 
-			co_return true;
-		}
+            co_return co_await session_ptr_->async_connect(host_, port_);
+        }
 
-		auto reconnect() -> awaitable<bool>
-		{
-			if (host_.empty() || port_.empty())
-				co_return false;
+        auto reconnect() -> awaitable<error_code>
+        {
+            co_return co_await async_connect();
+        }
 
-			if (io_context_.stopped()) [[likely]]
-			{
-				io_context_.restart();
-			}
+        template <typename Response, typename Request>
+        auto query(std::shared_ptr<Request> req) -> awaitable<Response>
+        {
+            try
+            {
+                flex_buffer<char> buffer{};
 
-			co_return co_await async_connect(host_, port_);
-		}
+                session_ptr_->make_request_buffer(req, buffer);
 
-		template <typename RPC>
-		auto async_send(std::shared_ptr<typename RPC::request> req) -> awaitable<void>
-		{
-			std::vector<char> complete_buffer;
-			req->mark(complete_buffer);
-			auto header_size = complete_buffer.size();
-			req->rpc(RPC::id);
-			req->commit(complete_buffer);
-			req->length(complete_buffer.size() - header_size);
-			req->header().commit(complete_buffer);
+                auto ec = co_await session_ptr_->async_send(std::move(buffer));
 
-			co_return co_await transfer(std::move(complete_buffer));
-		}
+                if (ec)
+                {
+                    if (ec != boost::asio::error::eof)
+                    {
+                        XLOG_ERROR() << "on read some occur error - " << ec.what();
+                    }
+                    session_ptr_->shutdown();
+                    if (close_func_)
+                        close_func_();
 
-		template <typename BuffSequence>
-		auto transfer(BuffSequence buffer) -> awaitable<void>
-		{
-			co_await session_ptr_->async_send(std::move(buffer));
-		}
+                    co_return Response{};
+                }
 
-		std::string remote_address()
-		{
-			return session_ptr_->remote_address();
-		}
-		uint32_t remote_address_u()
-		{
-			return session_ptr_->remote_address_u();
-		}
-		int remote_port()
-		{
-			return session_ptr_->remote_port();
-		}
+                co_return co_await session_ptr_->template query<Response>();
+            }
+            catch (error_code& ec)
+            {
+                XLOG_ERROR() << "make_request_buffer error - " << ec.what();
+            }
+        }
 
-		void close()
-		{
-			return session_ptr_->close();
-		}
+        std::string remote_address() const
+        {
+            return session_ptr_->remote_address();
+        }
 
-		void shutdown()
-		{
-			return session_ptr_->shutdown();
-		}
+        int remote_port() const
+        {
+            return session_ptr_->remote_port();
+        }
 
-		template <typename Func>
-		void set_close_func(Func&& f)
-		{
-			close_func_ = std::forward<Func>(f);
-		}
+        template <typename Func>
+        void set_close_func(Func&& f)
+        {
+            close_func_ = std::forward<Func>(f);
+        }
 
-		virtual void stop()
-		{
-			if (session_ptr_)
-			{
-				session_ptr_->shutdown();
-			}
-		}
+        void close()
+        {
+            session_ptr_->close();
 
-		auto& get_context()
-		{
-			return io_context_;
-		}
+            std::shared_ptr<Session>().swap(session_ptr_);
+        }
 
-	private:
-		io_context& io_context_;
+    private:
+        io_context& io_context_;
 
-		std::shared_ptr<Session> session_ptr_;
+        std::string host_;
 
-		std::function<void()> close_func_;
+        std::string port_;
 
-		int reconnect_times_;
+        std::shared_ptr<Session> session_ptr_;
 
-		std::chrono::steady_clock::duration timeout_;
+        std::function<void()> close_func_;
 
-		std::string host_;
-
-		std::string port_;
-
-		std::tuple<Adaptor...> adaptors_;
-	};
-
-	template <typename Session, typename... Adaptor>
-	class basic_exector_client : public basic_client<Session>
-	{
-		using base = basic_client<Session>;
-
-	public:
-		basic_exector_client(int reconnect_times, std::chrono::steady_clock::duration timeout)
-			: base(io_context_, reconnect_times, timeout)
-			, thread_ptr_(nullptr)
-		{}
-
-		virtual ~basic_exector_client() = default;
-
-	public:
-		void async_run()
-		{
-			if (!thread_ptr_ || !thread_ptr_->joinable())
-			{
-				thread_ptr_ = std::make_shared<std::thread>([&] { this->io_context_.run(); });
-			}
-		}
-
-		virtual void stop()
-		{
-			base::stop();
-
-			if (!io_context_.stopped())
-			{
-				io_context_.stop();
-			}
-
-			if (thread_ptr_ && thread_ptr_->joinable())
-			{
-				thread_ptr_->join();
-			}
-		}
-
-	private:
-		io_context io_context_;
-
-		std::shared_ptr<std::thread> thread_ptr_;
-
-		std::tuple<Adaptor...> adaptors_;
-	};
-
-	template <typename Session>
-	struct is_client<basic_client<Session>> : std::true_type
-	{};
-
-	template <typename Session>
-	struct is_client<basic_exector_client<Session>> : std::true_type
-	{};
-
+        std::chrono::steady_clock::duration timeout_;
+    };
 } // namespace aquarius

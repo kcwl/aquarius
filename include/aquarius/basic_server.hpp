@@ -1,19 +1,16 @@
 #pragma once
-#include <aquarius/awaitable.hpp>
-#include <aquarius/co_spawn.hpp>
-#include <aquarius/detached.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
 #include <aquarius/detail/signal_set.hpp>
 #include <aquarius/detail/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/use_awaitable.hpp>
-#include <aquarius/detail/visit.hpp>
+#include <aquarius/detail/make_endpoint.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
-	template <typename Session, typename... Adaptor>
+	template <typename Session>
 	class basic_server
 	{
 		using session_type = Session;
@@ -26,9 +23,8 @@ namespace aquarius
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
 			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), session_type::protocol::make_v4_endpoint(port))
+			, acceptor_(io_service_pool_.get_io_service(), detail::make_v4_endpoint(port))
 			, server_name_(name)
-			, adaptors_()
 		{
 			init_signal();
 
@@ -52,6 +48,11 @@ namespace aquarius
 			io_service_pool_.stop();
 		}
 
+		bool enable() const
+		{
+			return acceptor_.is_open() && io_service_pool_.enable();
+		}
+
 	private:
 		auto start_accept() -> awaitable<void>
 		{
@@ -71,13 +72,11 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock));
 
-				detail::store<session_type>(session_ptr);
+				detail::regist_session(session_ptr);
 
 				co_spawn(
-					acceptor_.get_executor(), [session_ptr] -> awaitable<error_code>
-					{
-						co_return co_await session_ptr->accept();
-					}, detached);
+					acceptor_.get_executor(),
+					[session_ptr] -> awaitable<error_code> { co_return co_await session_ptr->accept(); }, detached);
 			}
 		}
 
@@ -107,7 +106,5 @@ namespace aquarius
 		acceptor acceptor_;
 
 		std::string server_name_;
-
-		std::tuple<Adaptor...> adaptors_;
 	};
 } // namespace aquarius

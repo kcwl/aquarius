@@ -23,6 +23,7 @@ namespace aquarius
 				, pool_size_(pool_size)
 				, next_to_service_(0)
 				, works_()
+				, enable_(false)
 			{
 				if (pool_size == 0)
 					throw std::runtime_error("io_service_pool size is 0");
@@ -47,11 +48,11 @@ namespace aquarius
 					threads.push_back(std::make_shared<std::thread>(
 						[&]
 						{
-							BOOST_LOG_SCOPED_THREAD_TAG("ThreadID", std::this_thread::get_id());
-
 							io_service->run();
 						}));
 				}
+
+				enable_ = true;
 
 				for (auto& thread : threads)
 				{
@@ -65,6 +66,13 @@ namespace aquarius
 				{
 					io_service->stop();
 				}
+
+				enable_ = false;
+			}
+
+			bool enable() const
+			{
+				return enable_;
 			}
 
 			io_context& get_io_service()
@@ -91,6 +99,8 @@ namespace aquarius
 			std::size_t next_to_service_;
 
 			std::list<work_guard> works_;
+
+			bool enable_;
 		};
 	} // namespace detail
 } // namespace aquarius

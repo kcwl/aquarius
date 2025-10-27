@@ -14,14 +14,14 @@ namespace aquarius
 
 			Func func;
 
-			std::size_t next;
+			int32_t next;
 
-			std::size_t end;
+			int32_t end;
 
-			std::vector<tri_node*> children;
+			std::vector<std::shared_ptr<tri_node>> children;
 		};
 
-		template<typename Func>
+		template <typename Func>
 		class trie
 		{
 			using node_func = Func;
@@ -30,17 +30,10 @@ namespace aquarius
 
 		public:
 			trie()
-				: root(new node())
+				: root(new node('/', nullptr))
 			{}
 
-			~trie()
-			{
-				if (root)
-				{
-					delete root;
-					root = nullptr;
-				}
-			}
+			~trie() = default;
 
 		public:
 			void add(std::string_view key, const node_func& func)
@@ -49,19 +42,12 @@ namespace aquarius
 
 				for (auto c : key)
 				{
-					if (cur_node->key == 0)
-					{
-						cur_node->key = c;
-						cur_node->next++;
-						continue;
-					}
-
 					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
 										   [&](auto node) { return node->key == c; });
 
 					if (it == cur_node->children.end())
 					{
-						auto n = new node{ c, nullptr };
+						auto n = std::make_shared<node>(c, nullptr);
 						cur_node->children.push_back(n);
 						cur_node = n;
 					}
@@ -85,41 +71,12 @@ namespace aquarius
 
 				while (iter != key.end())
 				{
-					if (*iter == cur_node->key)
-					{
-						iter++;
-					}
-					else
-					{
-						auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
-							[&](auto node) { return node->key == *iter; });
-
-						if (it == cur_node->children.end())
-						{
-							return nullptr;
-						}
-						else
-						{
-							cur_node = *it;
-						}
-					}
-				}
-
-				return cur_node->func;
-			}
-
-			void remove(const std::string& word)
-			{
-				auto cur_node = root;
-
-				for (auto c : word)
-				{
 					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
-										   [&](auto node) { return node->key == c; });
+										   [&](auto node) { return node->key == *iter++; });
 
 					if (it == cur_node->children.end())
 					{
-						return;
+						return nullptr;
 					}
 					else
 					{
@@ -127,19 +84,42 @@ namespace aquarius
 					}
 				}
 
-				if (--cur_node->end == 0 && --cur_node->next == 0)
+				return cur_node->func;
+			}
+
+			void remove(std::string_view word)
+			{
+				auto slow_ptr = root;
+				auto fast_ptr = root;
+
+				for (auto c : word)
 				{
-					delete cur_node;
-					cur_node = nullptr;
+					auto it = std::find_if(fast_ptr->children.begin(), fast_ptr->children.end(),
+										   [&](auto node) { return node->key == c; });
+
+					if (it == fast_ptr->children.end())
+					{
+						return;
+					}
+					else
+					{
+						slow_ptr = fast_ptr;
+						fast_ptr = *it;
+					}
+
+					if (--fast_ptr->end <= 0 && --fast_ptr->next <= 0)
+						break;
 				}
-				else
-				{
-					cur_node->func = nullptr;
-				}
+
+				slow_ptr->children.erase(std::remove_if(slow_ptr->children.begin(), slow_ptr->children.end(),
+													 [=](auto node) { return node->key == fast_ptr->key; }),
+										 slow_ptr->children.end());
+
+				std::shared_ptr<node>().swap(fast_ptr);
 			}
 
 		private:
-			node* root;
+			std::shared_ptr<node> root;
 		};
-	}
-}
+	} // namespace detail
+} // namespace aquarius

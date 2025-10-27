@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http_server", "http_server.vcxproj", "{FE7226A4-A53C-46FC-9BFA-F89CFDADF07C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lazytool", "lazytool.vcxproj", "{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,14 @@ Global
 		{FE7226A4-A53C-46FC-9BFA-F89CFDADF07C}.Release|x64.Build.0 = Release|x64
 		{FE7226A4-A53C-46FC-9BFA-F89CFDADF07C}.Release|x86.ActiveCfg = Release|Win32
 		{FE7226A4-A53C-46FC-9BFA-F89CFDADF07C}.Release|x86.Build.0 = Release|Win32
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Debug|x64.ActiveCfg = Debug|x64
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Debug|x64.Build.0 = Debug|x64
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Debug|x86.ActiveCfg = Debug|Win32
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Debug|x86.Build.0 = Debug|Win32
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Release|x64.ActiveCfg = Release|x64
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Release|x64.Build.0 = Release|x64
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Release|x86.ActiveCfg = Release|Win32
+		{0CEA2305-EC77-4BC7-A6EF-DCD2B1A4B160}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,16 +17,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-set(AQUARIUS_PROTOCOL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/3rd/virgo/include)
-
-if(CMAKE_COVERAGE)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CodeCoverage.cmake)
-APPEND_COVERAGE_COMPILER_FLAGS()
-endif()
-
 enable_testing()
 
 add_subdirectory(deps)
 
 add_subdirectory(test)
-
