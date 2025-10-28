@@ -169,7 +169,6 @@
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
     <ClInclude Include="..\include\aquarius\basic_session.hpp" />
     <ClInclude Include="..\include\aquarius\cmd_options.hpp" />
-    <ClInclude Include="..\include\aquarius\concepts\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
@@ -187,6 +186,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_router.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
@@ -202,8 +202,10 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\get_method.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />
@@ -233,19 +235,21 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
-    <ClInclude Include="..\test\protocol.cpp" />
-    <ClInclude Include="..\test\serialize.cpp" />
-    <ClInclude Include="..\test\client.cpp" />
-    <ClInclude Include="..\test\cmd_options.cpp" />
+    <ClCompile Include="..\test\protocol.cpp" />
+    <ClCompile Include="..\test\serialize.cpp" />
+    <ClCompile Include="..\test\client.cpp" />
+    <ClCompile Include="..\test\cmd_options.cpp" />
     <ClInclude Include="..\test\session.h" />
     <ClInclude Include="..\test\ctx_handler.hpp" />
-    <ClInclude Include="..\test\detail.cpp" />
-    <ClInclude Include="..\test\sql.cpp" />
+    <ClCompile Include="..\test\detail.cpp" />
+    <ClCompile Include="..\test\server.cpp" />
+    <ClCompile Include="..\test\sql.cpp" />
     <ClInclude Include="..\test\test.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp" />
     <ClCompile Include="..\test\test.virgo.cpp" />
+    <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />

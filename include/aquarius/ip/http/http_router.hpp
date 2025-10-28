@@ -8,11 +8,12 @@ namespace aquarius
 {
 	template <typename Session>
 	class http_router
-		: public basic_router<Session, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>,
+		: public basic_router<Session, virgo::http_method,
+							  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>,
 		  public singleton<http_router<Session>>
 	{
 		using base =
-			basic_router<Session, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>;
+			basic_router<Session, virgo::http_method, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>;
 
 	public:
 		using typename base::function_type;
@@ -56,12 +57,20 @@ namespace aquarius
 				return true;
 			};
 
-			this->map_invokes_->add(proto, func);
+			this->push(Method, proto, func);
 		}
 		template <typename... Args>
-		bool invoke(std::string_view key, Args&&... args)
+		bool invoke(virgo::http_method method, std::string_view key, Args&&... args)
 		{
-			auto func = this->map_invokes_->find(key);
+			auto iter = this->map_invokes_.find(method);
+			if (iter == this->map_invokes_.end())
+				return false;
+
+			auto tree = iter->second;
+			if (tree == nullptr)
+				return false;
+
+			auto func = tree->find(key);
 
 			return func == nullptr ? false : func(std::forward<Args>(args)...);
 		}

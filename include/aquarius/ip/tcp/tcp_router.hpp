@@ -5,10 +5,12 @@
 namespace aquarius
 {
 	template <typename Session>
-	class tcp_router : public basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>,
+	class tcp_router : public basic_router<Session,int, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>,
 					   public singleton<tcp_router<Session>>
 	{
-		using base = basic_router<Session, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>;
+		using base = basic_router<Session, int, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>;
+
+		constexpr static int router_key = 0;
 
 	public:
 		tcp_router() = default;
@@ -43,14 +45,23 @@ namespace aquarius
 
 				return true;
 			};
-			this->map_invokes_->add(proto, func);
+
+			this->push(router_key, proto, func);
 		}
 		template <typename... Args>
 		bool invoke(std::string_view key, Args&&... args)
 		{
-			auto func = this->map_invokes_->find(key);
+			auto iter = this->map_invokes_.find(router_key);
+			if (iter == this->map_invokes_.end())
+				return false;
 
-			return func == nullptr ? false : func(args...);
+			auto tree = iter->second;
+			if (tree == nullptr)
+				return false;
+
+			auto func = tree->find(key);
+
+			return func == nullptr ? false : func(std::forward<Args>(args)...);
 		}
 	};
 } // namespace aquarius

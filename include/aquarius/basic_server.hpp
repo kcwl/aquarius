@@ -7,6 +7,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/coroutine.hpp>
+#include <aquarius/detail/redirect_error.hpp>
 
 namespace aquarius
 {

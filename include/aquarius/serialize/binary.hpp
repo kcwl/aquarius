@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/concepts/concepts.hpp>
+#include <aquarius/serialize/concept.hpp>
 #include <boost/pfr.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 

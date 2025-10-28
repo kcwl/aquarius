@@ -1,12 +1,11 @@
 #pragma once
 #include <aquarius/detail/trie.hpp>
 #include <memory>
-#include <functional>
-#include <aquarius/virgo/http_fields.hpp>
+#include <map>
 
 namespace aquarius
 {
-	template <typename Session, typename Func>
+	template <typename Session, typename Key, typename Func>
 	class basic_router
 	{
 	public:
@@ -16,12 +15,22 @@ namespace aquarius
 
 	public:
 		basic_router()
-			: map_invokes_(new func_trie())
+			: map_invokes_()
 		{}
 
 		virtual ~basic_router() = default;
 
+	public:
+		void push(Key k, std::string_view proto, Func&& f)
+		{
+			auto& ptr = this->map_invokes_[k];
+			if (!ptr)
+				ptr = std::make_shared<func_trie>();
+
+			ptr->add(proto, f);
+		}
+
 	protected:
-		std::shared_ptr<func_trie> map_invokes_;
+		std::map<Key, std::shared_ptr<func_trie>> map_invokes_;
 	};
 } // namespace aquarius

@@ -50,6 +50,9 @@ namespace aquarius
 	};
 
 	template <typename T>
+	concept boolean = std::same_as<T, bool>;
+
+	template <typename T>
 	concept string_t = is_string<std::remove_cvref_t<T>>::value;
 
 	template <typename T>

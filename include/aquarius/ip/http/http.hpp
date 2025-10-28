@@ -126,7 +126,7 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
 				{
-					http_router<Session>::get_mutable_instance().invoke(path_, session_ptr, hf, std::move(buffer));
+					http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf, std::move(buffer));
 
 					co_return;
 				},
