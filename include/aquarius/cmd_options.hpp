@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
 #include <boost/program_options.hpp>
-#include <iostream>
+#include <aquarius/logger.hpp>
 #include <string>
 
 namespace aquarius
@@ -12,47 +12,31 @@ namespace aquarius
 		cmd_options(const std::string& desc)
 			: desc_str_(desc)
 			, desc_(desc)
-		{
-
-		}
+		{}
 
 	public:
 		void load_options(int argc, char* argv[])
 		{
-			try
-			{
-				boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc_), vm_);
+			boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc_), vm_);
 
-				boost::program_options::notify(vm_);
-			}
-			catch (const std::exception& e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			boost::program_options::notify(vm_);
 		}
-
 
 		void load_options(const std::vector<std::string>& argvs)
 		{
-			try
-			{
-				boost::program_options::store(boost::program_options::command_line_parser(argvs).options(desc_).style(0).extra_parser({}).run(), vm_);
+			boost::program_options::store(
+				boost::program_options::command_line_parser(argvs).options(desc_).style(0).extra_parser({}).run(), vm_);
 
-				boost::program_options::notify(vm_);
-			}
-			catch (const std::exception& e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			boost::program_options::notify(vm_);
 		}
 
-		template<typename T>
+		template <typename T>
 		void add_option(const std::string& option, const std::string& desc)
 		{
 			desc_.add_options()(option.c_str(), boost::program_options::value<T>(), desc.c_str());
 		}
 
-		template<typename T>
+		template <typename T>
 		T option(const std::string& op)
 		{
 			if (!vm_.count(op))
