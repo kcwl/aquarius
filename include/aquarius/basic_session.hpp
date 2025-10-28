@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/concepts/concepts.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
@@ -16,6 +15,7 @@
 #include <aquarius/ip/tcp/tcp_error.hpp>
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/socket_adaptor.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
