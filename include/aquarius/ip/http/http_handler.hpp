@@ -19,12 +19,12 @@ namespace aquarius
 			this->session_ptr_ = session_ptr;
 			this->request_ptr_ = request_ptr;
 
-			this->response_.version(this->request()->version());
+			this->response_ptr_.version(this->request()->version());
 
-			this->response_.set_field("Content-Type", this->request()->find("Content-Type"));
-			this->response_.set_field("Server", "Aquarius 0.10.0");
-			this->response_.set_field("Connection", this->request()->find("Connection"));
-			this->response_.set_field("Access-Control-Allow-Origin", "*");
+			this->response_ptr_.set_field("Content-Type", this->request()->find("Content-Type"));
+			this->response_ptr_.set_field("Server", "Aquarius 0.10.0");
+			this->response_ptr_.set_field("Connection", this->request()->find("Connection"));
+			this->response_ptr_.set_field("Access-Control-Allow-Origin", "*");
 
 			auto ec = co_await this->handle();
 
@@ -33,16 +33,16 @@ namespace aquarius
 
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
-			this->response_.result(ec.value());
+			this->response_ptr_.result(ec.value());
 
-			this->response_.reason(virgo::from_status_string(ec.value()));
+			this->response_ptr_.reason(virgo::from_status_string(ec.value()));
 
 			flex_buffer buffer{};
 
-			std::string str = std::format("{} {} {}\r\n", from_version_string(this->response_.version()),
-										  static_cast<int>(this->response_.result()), this->response_.reason().data());
+			std::string str = std::format("{} {} {}\r\n", from_version_string(this->response_ptr_.version()),
+										  static_cast<int>(this->response_ptr_.result()), this->response_ptr_.reason().data());
 
-			for (auto& s : this->response_.fields())
+			for (auto& s : this->response_ptr_.fields())
 			{
 				str += std::format("{}: {}\r\n", s.first, s.second);
 			}
@@ -51,7 +51,7 @@ namespace aquarius
 
 			buffer.put(str.begin(), str.end());
 
-			this->response_.commit(buffer);
+			this->response_ptr_.commit(buffer);
 
 			co_return co_await this->session()->async_send(std::move(buffer));
 		}

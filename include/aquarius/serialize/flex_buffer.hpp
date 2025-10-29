@@ -8,7 +8,10 @@ namespace aquarius
 {
 	class flex_buffer
 	{
+	public:
 		constexpr static std::size_t capacity = 8192;
+
+		constexpr static std::size_t npos = static_cast<std::size_t>(-1);
 
 		using value_type = uint8_t;
 
@@ -294,6 +297,18 @@ namespace aquarius
 			std::swap(buffer_, fb.buffer_);
 			std::swap(wpos_, fb.wpos_);
 			std::swap(rpos_, fb.rpos_);
+		}
+
+		pos_type find_first(char sp)
+		{
+			auto iter = std::find_if(buffer_.begin() + rpos_, buffer_.end(), [&] (const auto c) { return c == sp; });
+
+			if (iter == buffer_.end())
+				return npos;
+
+			auto len = std::distance(buffer_.begin() + rpos_, iter);
+
+			return len + rpos_;
 		}
 
 	private:

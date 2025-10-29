@@ -13,7 +13,7 @@ namespace aquarius
 			router,
 			protocol,
 			domin,
-			normal_message
+			service,
 		};
 	} // namespace lazytool
 } // namespace aquarius

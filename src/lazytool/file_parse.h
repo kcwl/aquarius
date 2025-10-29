@@ -1,11 +1,14 @@
 #pragma once
 #include "registor.h"
-#include "parser.h"
+#include <memory>
+#include <vector>
 
 namespace aquarius
 {
 	namespace lazytool
 	{
+		class parser;
+
 		class file_parser
 		{
 		public:

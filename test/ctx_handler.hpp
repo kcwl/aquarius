@@ -7,7 +7,7 @@
 
 using namespace std::string_view_literals;
 
-AQUARIUS_TCP_HANDLER(login_request, login_response, ctx_test)
+AQUARIUS_TCP_HANDLER(tcp_login_request, tcp_login_response, ctx_tcp_test)
 {
 	response().header().uuid = request_ptr_->header().uuid;
 

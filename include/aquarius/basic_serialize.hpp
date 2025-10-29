@@ -4,11 +4,11 @@
 namespace aquarius
 {
 	template <typename Parse>
-	class basic_message_serialize
+	class basic_serialize
 	{
 	public:
-		basic_message_serialize() = default;
-		virtual ~basic_message_serialize() = default;
+		basic_serialize() = default;
+		virtual ~basic_serialize() = default;
 
 	public:
 		virtual void serialize(flex_buffer& buffer) = 0;
@@ -16,10 +16,10 @@ namespace aquarius
 		virtual void deserialize(flex_buffer& buffer) = 0;
 
 	public:
-		template <typename T>
-		void parse_to(T&& value, flex_buffer& buffer)
+		template <typename T, typename... Args>
+		void parse_to(T&& value, flex_buffer& buffer, Args&&... args)
 		{
-			return parse_.to_datas(std::forward<T>(value), buffer);
+			return parse_.to_datas(std::forward<T>(value), buffer, std::forward<Args>(args)...);
 		}
 
 		template <typename T>

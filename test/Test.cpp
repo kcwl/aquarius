@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 
 			BOOST_CHECK(!is_connect);
 
-			auto req = std::make_shared<login_request>();
+			auto req = std::make_shared<tcp_login_request>();
 			req->header().uuid = 1;
 			req->body().per_req.sex = true;
 			req->body().per_req.addr = 2;
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow_with_ssl)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->query<login_response>(req);
+			auto resp = co_await cli->query<tcp_login_response>(req);
 
 			BOOST_CHECK_EQUAL(resp.header().uuid, req->header().uuid);
 			BOOST_CHECK_EQUAL(resp.body().per_resp, req->body().per_req);

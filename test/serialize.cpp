@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(integer_limit)
 
 BOOST_AUTO_TEST_CASE(json)
 {
-	aquarius::serialize::json_parse jp{};
+	aquarius::json_parse jp{};
 
 	person p{};
 

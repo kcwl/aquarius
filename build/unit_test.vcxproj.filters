@@ -165,13 +165,13 @@
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\http_post_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\json.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http.hpp">
@@ -273,7 +273,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_client_session.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_message_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\basic_serialize.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
@@ -310,6 +310,9 @@
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\http_get_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
   </ItemGroup>

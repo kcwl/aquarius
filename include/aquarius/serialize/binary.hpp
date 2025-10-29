@@ -5,7 +5,6 @@
 
 namespace aquarius
 {
-
 	struct binary_parse
 	{
 		template <integer_t T>

@@ -11,7 +11,11 @@ namespace aquarius
 
 		parser::parser(struct_type t)
 			: struct_type_(t)
-			, name_()
 		{}
+
+		struct_type parser::structtype()const
+		{
+			return struct_type_;
+		}
 	} // namespace lazytool
 } // namespace aquarius

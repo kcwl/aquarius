@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 	{
 		aquarius::flex_buffer buffer;
 
-		auto req = std::make_shared<login_request>();
+		auto req = std::make_shared<tcp_login_request>();
 		req->header().uuid = 1;
 		req->body().per_req.sex = true;
 		req->body().per_req.addr = 2;
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 
 		req->commit(buffer);
 
-		auto req_back = std::make_shared<login_request>();
+		auto req_back = std::make_shared<tcp_login_request>();
 		req_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(*req, *req_back);
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 	{
 		aquarius::flex_buffer buffer;
 
-		auto resp = std::make_shared<login_response>();
+		auto resp = std::make_shared<tcp_login_response>();
 		resp->header().uuid = 1;
 		resp->body().per_resp.sex = true;
 		resp->body().per_resp.addr = 2;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 
 		resp->commit(buffer);
 
-		auto resp_back = std::make_shared<login_response>();
+		auto resp_back = std::make_shared<tcp_login_response>();
 		resp_back->consume(buffer);
 
 		BOOST_CHECK_EQUAL(*resp, *resp_back);

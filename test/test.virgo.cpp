@@ -33,7 +33,7 @@ person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::j
 	result.hp = static_cast<float>(obj->at("hp").as_double());
 	result.mana = obj->at("mana").as_double();
 	result.name = static_cast<string>(obj->at("name").as_string());
-	result.orders = aquarius::serialize::json_value_to_array(obj->at("orders"));
+	result.orders = aquarius::json_value_to_array(obj->at("orders"));
 	return result;
 }
 
@@ -48,385 +48,371 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 	jv_obj.emplace("hp", local.hp); 
 	jv_obj.emplace("mana", local.mana); 
 	jv_obj.emplace("name", local.name); 
-	jv_obj.emplace("orders", aquarius::serialize::json_value_from_array(local.orders)); 
+	jv_obj.emplace("orders", aquarius::json_value_from_array(local.orders)); 
 }
 
 
-void new_login_req_body::serialize(aquarius::flex_buffer& buffer)
+void login_request_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(uuid, buffer);
-}
-
-void new_login_req_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	uuid = this->parse_from<int32>(buffer);
-}
-
-bool operator==(const new_login_req_body& lhs, const new_login_req_body& rhs)
-{
-	return lhs.uuid == rhs.uuid;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const new_login_req_body& other)
-{
-	os << other.uuid;
-	return os;
-}
-new_login_req_body tag_invoke(const aquarius::json::value_to_tag<new_login_req_body>&, const aquarius::json::value& jv)
-{
-	new_login_req_body result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_login_req_body& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-}
-
-
-void new_login_resp_body::serialize(aquarius::flex_buffer& buffer)
-{
 	this->parse_to(per_resp, buffer);
 }
 
-void new_login_resp_body::deserialize(aquarius::flex_buffer& buffer)
+void login_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
+	uuid = this->parse_from<int32>(buffer);
 	per_resp = this->parse_from<person>(buffer);
 }
 
-bool operator==(const new_login_resp_body& lhs, const new_login_resp_body& rhs)
+bool operator==(const login_request_body& lhs, const login_request_body& rhs)
 {
-	return lhs.per_resp == rhs.per_resp;
+	return lhs.uuid == rhs.uuid && lhs.per_resp == rhs.per_resp;
 }
 
 
-std::ostream& operator<<(std::ostream& os, const new_login_resp_body& other)
+std::ostream& operator<<(std::ostream& os, const login_request_body& other)
 {
-	os << other.per_resp;
+	os << other.uuid<< other.per_resp;
 	return os;
 }
-new_login_resp_body tag_invoke(const aquarius::json::value_to_tag<new_login_resp_body>&, const aquarius::json::value& jv)
+login_request_body tag_invoke(const aquarius::json::value_to_tag<login_request_body>&, const aquarius::json::value& jv)
 {
-	new_login_resp_body result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_login_resp_body& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::serialize::json_value_from_object<person>(local.per_resp)); 
-}
-
-
-void new_http_login_req_body::serialize(aquarius::flex_buffer& buffer)
-{
-	this->parse_to(*this, buffer);
-}
-
-void new_http_login_req_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<new_http_login_req_body>(buffer);
-}
-
-bool operator==(const new_http_login_req_body& lhs, const new_http_login_req_body& rhs)
-{
-	return lhs.uuid == rhs.uuid;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const new_http_login_req_body& other)
-{
-	os << other.uuid;
-	return os;
-}
-new_http_login_req_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_req_body>&, const aquarius::json::value& jv)
-{
-	new_http_login_req_body result{};
+	login_request_body result{};
 	auto obj = jv.try_as_object();
 	if(obj->empty())
 		return {};
 
 	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_req_body& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-}
-
-
-void new_http_login_resp_body::serialize(aquarius::flex_buffer& buffer)
-{
-	this->parse_to(*this, buffer);
-}
-
-void new_http_login_resp_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<new_http_login_resp_body>(buffer);
-}
-
-bool operator==(const new_http_login_resp_body& lhs, const new_http_login_resp_body& rhs)
-{
-	return lhs.per_resp == rhs.per_resp;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const new_http_login_resp_body& other)
-{
-	os << other.per_resp;
-	return os;
-}
-new_http_login_resp_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_resp_body>&, const aquarius::json::value& jv)
-{
-	new_http_login_resp_body result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
 	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
 	return result;
 }
 
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_resp_body& local)
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::serialize::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
 }
 
 
-void login_req_header::serialize(aquarius::flex_buffer& buffer)
+void login_response_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(uuid, buffer);
+	this->parse_to(per_resp, buffer);
+}
+
+void login_response_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	uuid = this->parse_from<int32>(buffer);
+	per_resp = this->parse_from<person>(buffer);
+}
+
+bool operator==(const login_response_body& lhs, const login_response_body& rhs)
+{
+	return lhs.uuid == rhs.uuid && lhs.per_resp == rhs.per_resp;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const login_response_body& other)
+{
+	os << other.uuid<< other.per_resp;
+	return os;
+}
+login_response_body tag_invoke(const aquarius::json::value_to_tag<login_response_body>&, const aquarius::json::value& jv)
+{
+	login_response_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_response_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+}
+
+
+void new_http_login_request_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void new_http_login_request_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<new_http_login_request_body>(buffer);
+}
+
+bool operator==(const new_http_login_request_body& lhs, const new_http_login_request_body& rhs)
+{
+	return lhs.uuid == rhs.uuid && lhs.per_resp == rhs.per_resp;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const new_http_login_request_body& other)
+{
+	os << other.uuid<< other.per_resp;
+	return os;
+}
+new_http_login_request_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_request_body>&, const aquarius::json::value& jv)
+{
+	new_http_login_request_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_request_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+}
+
+
+void new_http_login_response_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void new_http_login_response_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<new_http_login_response_body>(buffer);
+}
+
+bool operator==(const new_http_login_response_body& lhs, const new_http_login_response_body& rhs)
+{
+	return lhs.uuid == rhs.uuid && lhs.per_resp == rhs.per_resp;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const new_http_login_response_body& other)
+{
+	os << other.uuid<< other.per_resp;
+	return os;
+}
+new_http_login_response_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_response_body>&, const aquarius::json::value& jv)
+{
+	new_http_login_response_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_response_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+}
+
+
+void http_test_get_request_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(user, buffer, "user");
+	this->parse_to(passwd, buffer, "passwd");
+}
+
+void http_test_get_request_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	user = this->parse_from<int32>(buffer);
+	passwd = this->parse_from<string>(buffer);
+}
+
+bool operator==(const http_test_get_request_body& lhs, const http_test_get_request_body& rhs)
+{
+	return lhs.user == rhs.user && lhs.passwd == rhs.passwd;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_test_get_request_body& other)
+{
+	os << other.user<< other.passwd;
+	return os;
+}
+http_test_get_request_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_request_body>&, const aquarius::json::value& jv)
+{
+	http_test_get_request_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.user = static_cast<int32>(obj->at("user").as_int64());
+	result.passwd = static_cast<string>(obj->at("passwd").as_string());
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_request_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("user", local.user); 
+	jv_obj.emplace("passwd", local.passwd); 
+}
+
+
+void http_test_get_response_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(user, buffer, "user");
+	this->parse_to(passwd, buffer, "passwd");
+}
+
+void http_test_get_response_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	user = this->parse_from<int32>(buffer);
+	passwd = this->parse_from<string>(buffer);
+}
+
+bool operator==(const http_test_get_response_body& lhs, const http_test_get_response_body& rhs)
+{
+	return lhs.user == rhs.user && lhs.passwd == rhs.passwd;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_test_get_response_body& other)
+{
+	os << other.user<< other.passwd;
+	return os;
+}
+http_test_get_response_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_response_body>&, const aquarius::json::value& jv)
+{
+	http_test_get_response_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.user = static_cast<int32>(obj->at("user").as_int64());
+	result.passwd = static_cast<string>(obj->at("passwd").as_string());
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_response_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("user", local.user); 
+	jv_obj.emplace("passwd", local.passwd); 
+}
+
+
+void tcp_login_request_header::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void login_req_header::deserialize(aquarius::flex_buffer& buffer)
+void tcp_login_request_header::deserialize(aquarius::flex_buffer& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
 
-bool operator==(const login_req_header& lhs, const login_req_header& rhs)
-{
-	return lhs.uuid == rhs.uuid;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const login_req_header& other)
-{
-	os << other.uuid;
-	return os;
-}
-login_req_header tag_invoke(const aquarius::json::value_to_tag<login_req_header>&, const aquarius::json::value& jv)
-{
-	login_req_header result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_req_header& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-}
-
-
-void login_req_body::serialize(aquarius::flex_buffer& buffer)
+void tcp_login_request_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(per_req, buffer);
 }
 
-void login_req_body::deserialize(aquarius::flex_buffer& buffer)
+void tcp_login_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	per_req = this->parse_from<person>(buffer);
 }
 
-bool operator==(const login_req_body& lhs, const login_req_body& rhs)
-{
-	return lhs.per_req == rhs.per_req;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const login_req_body& other)
-{
-	os << other.per_req;
-	return os;
-}
-login_req_body tag_invoke(const aquarius::json::value_to_tag<login_req_body>&, const aquarius::json::value& jv)
-{
-	login_req_body result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.per_req = aquarius::json::value_to<person>(obj->at("per_req"));
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_req_body& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_req", aquarius::serialize::json_value_from_object<person>(local.per_req)); 
-}
-
-
-void login_resp_header::serialize(aquarius::flex_buffer& buffer)
+void tcp_login_response_header::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(uuid, buffer);
 }
 
-void login_resp_header::deserialize(aquarius::flex_buffer& buffer)
+void tcp_login_response_header::deserialize(aquarius::flex_buffer& buffer)
 {
 	uuid = this->parse_from<int32>(buffer);
 }
 
-bool operator==(const login_resp_header& lhs, const login_resp_header& rhs)
-{
-	return lhs.uuid == rhs.uuid;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const login_resp_header& other)
-{
-	os << other.uuid;
-	return os;
-}
-login_resp_header tag_invoke(const aquarius::json::value_to_tag<login_resp_header>&, const aquarius::json::value& jv)
-{
-	login_resp_header result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_resp_header& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-}
-
-
-void login_resp_body::serialize(aquarius::flex_buffer& buffer)
+void tcp_login_response_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(per_resp, buffer);
 }
 
-void login_resp_body::deserialize(aquarius::flex_buffer& buffer)
+void tcp_login_response_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	per_resp = this->parse_from<person>(buffer);
 }
 
-bool operator==(const login_resp_body& lhs, const login_resp_body& rhs)
-{
-	return lhs.per_resp == rhs.per_resp;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const login_resp_body& other)
-{
-	os << other.per_resp;
-	return os;
-}
-login_resp_body tag_invoke(const aquarius::json::value_to_tag<login_resp_body>&, const aquarius::json::value& jv)
-{
-	login_resp_body result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
-
-	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_resp_body& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::serialize::json_value_from_object<person>(local.per_resp)); 
-}
-
-
-void http_login_req_header::serialize(aquarius::flex_buffer& buffer)
-{
-	this->parse_to(*this, buffer);
-}
-
-void http_login_req_header::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<http_login_req_header>(buffer);
-}
-
-bool operator==(const http_login_req_header& lhs, const http_login_req_header& rhs)
+bool operator==(const tcp_login_request_header& lhs, const tcp_login_request_header& rhs)
 {
 	return lhs.uuid == rhs.uuid;
 }
 
 
-std::ostream& operator<<(std::ostream& os, const http_login_req_header& other)
+std::ostream& operator<<(std::ostream& os, const tcp_login_request_header& other)
 {
 	os << other.uuid;
 	return os;
 }
-http_login_req_header tag_invoke(const aquarius::json::value_to_tag<http_login_req_header>&, const aquarius::json::value& jv)
-{
-	http_login_req_header result{};
-	auto obj = jv.try_as_object();
-	if(obj->empty())
-		return {};
 
-	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
-	return result;
-}
-
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_req_header& local)
-{
-	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-}
-
-
-void http_login_req_body::serialize(aquarius::flex_buffer& buffer)
-{
-	this->parse_to(*this, buffer);
-}
-
-void http_login_req_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<http_login_req_body>(buffer);
-}
-
-bool operator==(const http_login_req_body& lhs, const http_login_req_body& rhs)
+bool operator==(const tcp_login_request_body& lhs, const tcp_login_request_body& rhs)
 {
 	return lhs.per_req == rhs.per_req;
 }
 
 
-std::ostream& operator<<(std::ostream& os, const http_login_req_body& other)
+std::ostream& operator<<(std::ostream& os, const tcp_login_request_body& other)
 {
 	os << other.per_req;
 	return os;
 }
-http_login_req_body tag_invoke(const aquarius::json::value_to_tag<http_login_req_body>&, const aquarius::json::value& jv)
+
+bool operator==(const tcp_login_response_header& lhs, const tcp_login_response_header& rhs)
 {
-	http_login_req_body result{};
+	return lhs.uuid == rhs.uuid;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const tcp_login_response_header& other)
+{
+	os << other.uuid;
+	return os;
+}
+
+bool operator==(const tcp_login_response_body& lhs, const tcp_login_response_body& rhs)
+{
+	return lhs.per_resp == rhs.per_resp;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const tcp_login_response_body& other)
+{
+	os << other.per_resp;
+	return os;
+}
+tcp_login_request_header tag_invoke(const aquarius::json::value_to_tag<tcp_login_request_header>&, const aquarius::json::value& jv)
+{
+	tcp_login_request_header result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_header& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+}
+
+tcp_login_request_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_request_body>&, const aquarius::json::value& jv)
+{
+	tcp_login_request_body result{};
 	auto obj = jv.try_as_object();
 	if(obj->empty())
 		return {};
@@ -435,37 +421,15 @@ http_login_req_body tag_invoke(const aquarius::json::value_to_tag<http_login_req
 	return result;
 }
 
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_req_body& local)
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_req", aquarius::serialize::json_value_from_object<person>(local.per_req)); 
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
 }
 
-
-void http_login_resp_header::serialize(aquarius::flex_buffer& buffer)
+tcp_login_response_header tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_header>&, const aquarius::json::value& jv)
 {
-	this->parse_to(*this, buffer);
-}
-
-void http_login_resp_header::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<http_login_resp_header>(buffer);
-}
-
-bool operator==(const http_login_resp_header& lhs, const http_login_resp_header& rhs)
-{
-	return lhs.uuid == rhs.uuid;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const http_login_resp_header& other)
-{
-	os << other.uuid;
-	return os;
-}
-http_login_resp_header tag_invoke(const aquarius::json::value_to_tag<http_login_resp_header>&, const aquarius::json::value& jv)
-{
-	http_login_resp_header result{};
+	tcp_login_response_header result{};
 	auto obj = jv.try_as_object();
 	if(obj->empty())
 		return {};
@@ -474,37 +438,15 @@ http_login_resp_header tag_invoke(const aquarius::json::value_to_tag<http_login_
 	return result;
 }
 
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_resp_header& local)
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_header& local)
 {
 	auto& jv_obj = jv.emplace_object();
 	jv_obj.emplace("uuid", local.uuid); 
 }
 
-
-void http_login_resp_body::serialize(aquarius::flex_buffer& buffer)
+tcp_login_response_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_body>&, const aquarius::json::value& jv)
 {
-	this->parse_to(*this, buffer);
-}
-
-void http_login_resp_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<http_login_resp_body>(buffer);
-}
-
-bool operator==(const http_login_resp_body& lhs, const http_login_resp_body& rhs)
-{
-	return lhs.per_resp == rhs.per_resp;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const http_login_resp_body& other)
-{
-	os << other.per_resp;
-	return os;
-}
-http_login_resp_body tag_invoke(const aquarius::json::value_to_tag<http_login_resp_body>&, const aquarius::json::value& jv)
-{
-	http_login_resp_body result{};
+	tcp_login_response_body result{};
 	auto obj = jv.try_as_object();
 	if(obj->empty())
 		return {};
@@ -513,9 +455,165 @@ http_login_resp_body tag_invoke(const aquarius::json::value_to_tag<http_login_re
 	return result;
 }
 
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_resp_body& local)
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::serialize::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+}
+
+
+void http_login_request_header::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void http_login_request_header::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<http_login_request_header>(buffer);
+}
+
+void http_login_request_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void http_login_request_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<http_login_request_body>(buffer);
+}
+
+void http_login_response_header::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void http_login_response_header::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<http_login_response_header>(buffer);
+}
+
+void http_login_response_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void http_login_response_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<http_login_response_body>(buffer);
+}
+
+bool operator==(const http_login_request_header& lhs, const http_login_request_header& rhs)
+{
+	return lhs.uuid == rhs.uuid;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_login_request_header& other)
+{
+	os << other.uuid;
+	return os;
+}
+
+bool operator==(const http_login_request_body& lhs, const http_login_request_body& rhs)
+{
+	return lhs.per_req == rhs.per_req;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_login_request_body& other)
+{
+	os << other.per_req;
+	return os;
+}
+
+bool operator==(const http_login_response_header& lhs, const http_login_response_header& rhs)
+{
+	return lhs.uuid == rhs.uuid;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_login_response_header& other)
+{
+	os << other.uuid;
+	return os;
+}
+
+bool operator==(const http_login_response_body& lhs, const http_login_response_body& rhs)
+{
+	return lhs.per_resp == rhs.per_resp;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const http_login_response_body& other)
+{
+	os << other.per_resp;
+	return os;
+}
+http_login_request_header tag_invoke(const aquarius::json::value_to_tag<http_login_request_header>&, const aquarius::json::value& jv)
+{
+	http_login_request_header result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_header& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+}
+
+http_login_request_body tag_invoke(const aquarius::json::value_to_tag<http_login_request_body>&, const aquarius::json::value& jv)
+{
+	http_login_request_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.per_req = aquarius::json::value_to<person>(obj->at("per_req"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
+}
+
+http_login_response_header tag_invoke(const aquarius::json::value_to_tag<http_login_response_header>&, const aquarius::json::value& jv)
+{
+	http_login_response_header result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_header& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid); 
+}
+
+http_login_response_body tag_invoke(const aquarius::json::value_to_tag<http_login_response_body>&, const aquarius::json::value& jv)
+{
+	http_login_response_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
 }
 

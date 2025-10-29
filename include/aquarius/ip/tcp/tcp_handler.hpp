@@ -30,7 +30,7 @@ namespace aquarius
 
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
-			this->response_.result(ec.value());
+			this->response_ptr_.result(ec.value());
 
 			flex_buffer buffer{};
 
@@ -38,7 +38,7 @@ namespace aquarius
 
 			buffer.commit(pos);
 
-			this->response_.commit(buffer);
+			this->response_ptr_.commit(buffer);
 
 			auto len = static_cast<uint32_t>(buffer.tellg() - pos);
 			std::copy((char*)&len, (char*)(&len + 1), buffer.data());

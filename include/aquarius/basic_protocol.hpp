@@ -25,7 +25,7 @@ namespace aquarius
 		{}
 
 		basic_protocol(const Allocator& alloc)
-			: header_()
+			: header_ptr_()
 			, alloc_(alloc)
 		{
 			this->get() = alloc_.allocate(1);
@@ -39,14 +39,14 @@ namespace aquarius
 
 		basic_protocol(basic_protocol&& other) noexcept
 			: base_body(boost::empty_init, std::exchange(other.get(), nullptr))
-			, header_(std::exchange(other.header_, {}))
+			, header_ptr_(std::exchange(other.header_ptr_, {}))
 		{}
 
 		basic_protocol& operator=(basic_protocol&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				header_ = std::move(other.header_);
+				header_ptr_ = std::move(other.header_ptr_);
 				this->get() = std::move(other.get());
 				other.get() = nullptr;
 				alloc_ = std::move(other.alloc_);
@@ -71,7 +71,7 @@ namespace aquarius
 
 		std::ostream& operator<<(std::ostream& os) const
 		{
-			os << header_ << body();
+			os << header_ptr_ << body();
 
 			return os;
 		}
@@ -79,12 +79,12 @@ namespace aquarius
 	public:
 		header_t& header()
 		{
-			return header_;
+			return header_ptr_;
 		}
 
 		const header_t& header() const
 		{
-			return header_;
+			return header_ptr_;
 		}
 
 		body_t& body()
@@ -98,7 +98,7 @@ namespace aquarius
 		}
 
 	private:
-		header_t header_;
+		header_t header_ptr_;
 
 		Allocator alloc_;
 	};

@@ -4,12 +4,11 @@
 
 namespace aquarius
 {
-
 	struct get_parse
 	{
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
-		void to_datas(const T& value, const std::string& name, flex_buffer& buffer)
+		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + std::to_string(value);
 
@@ -17,7 +16,7 @@ namespace aquarius
 		}
 
 		template <boolean T>
-		void to_datas(const T& value, const std::string& name, flex_buffer& buffer)
+		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + value ? "true" : "false";
 
@@ -25,7 +24,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		void to_datas(const T& value, const std::string& name, flex_buffer& buffer)
+		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + value;
 
@@ -44,7 +43,7 @@ namespace aquarius
 				return {};
 			}
 
-			ss.read(buffer.rdata(), pos - buffer.tellg());
+			ss.read((char*)buffer.rdata(), pos - buffer.tellg());
 
 			T result{};
 
@@ -68,7 +67,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		T from_datas(flex_buffer& buff)
+		T from_datas(flex_buffer& buffer)
 		{
 			auto pos = buffer.find_first('&');
 			if (pos == flex_buffer::npos)
@@ -76,9 +75,10 @@ namespace aquarius
 				return {};
 			}
 
-			std::string f(buffer.rdata(), pos - buffer.tellg());
+			std::string f((char*)buffer.rdata(), pos - buffer.tellg());
 
 			return f;
 		}
 	};
+
 } // namespace aquarius

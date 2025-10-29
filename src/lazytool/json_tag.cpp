@@ -1,5 +1,5 @@
 #include "json_tag.h"
-#include "parser.h"
+#include "data_field.h"
 
 namespace aquarius
 {
@@ -7,17 +7,17 @@ namespace aquarius
 	{
 		namespace cpp
 		{
-			void json_tag::generate_to_tag(std::ofstream& ofs, std::shared_ptr<parser> parser)
+			void json_tag::generate_to_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser)
 			{
-				ofs << parser->name_ << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name_
+				ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
 					<< ">&, const aquarius::json::value& jv)\n";
 				ofs << "{\n";
-				ofs << "\t" << parser->name_ << " result{};\n";
+				ofs << "\t" << parser->name() << " result{};\n";
 				ofs << "\tauto obj = jv.try_as_object();\n";
 				ofs << "\tif(obj->empty())\n";
 				ofs << "\t\treturn {};\n\n";
 
-				for (auto& [key, value] : parser->values_)
+				for (auto& [key, value] : parser->fields())
 				{
 					if (generate_to_int(ofs, key, value))
 						continue;
@@ -36,14 +36,14 @@ namespace aquarius
 				ofs << "}\n\n";
 			}
 
-			void json_tag::generate_from_tag(std::ofstream& ofs, std::shared_ptr<parser> parser)
+			void json_tag::generate_from_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser)
 			{
 				ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
-					<< parser->name_ << "& local)\n";
+					<< parser->name() << "& local)\n";
 				ofs << "{\n";
 				ofs << "\tauto& jv_obj = jv.emplace_object();\n";
 
-				for (auto& [key, value] : parser->values_)
+				for (auto& [key, value] : parser->fields())
 				{
 					if (generate_from_int(ofs, key, value))
 						continue;
@@ -107,7 +107,7 @@ namespace aquarius
 				if (ty != json_type::array)
 					return false;
 
-				ofs << "\tresult." << value << " = aquarius::serialize::json_value_to_array(obj->at(\""
+				ofs << "\tresult." << value << " = aquarius::json_value_to_array(obj->at(\""
 					<< value << "\"));\n";
 
 				return true;
@@ -157,7 +157,7 @@ namespace aquarius
 				if (ty != json_type::array)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::serialize::json_value_from_array(local." << value
+				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_array(local." << value
 					<< ")); \n";
 
 				return true;
@@ -170,7 +170,7 @@ namespace aquarius
 				if (ty != json_type::object)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::serialize::json_value_from_object<" << type << ">(local."
+				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_object<" << type << ">(local."
 					<< value << ")); \n";
 
 				return true;

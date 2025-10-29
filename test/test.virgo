@@ -11,27 +11,42 @@ struct person
 	bytes orders;
 }
 
-message new_login -> tcp-key:10001
+message login_request -> tcp-binary:10001
 {
-	request{
-		int32 uuid;
-	}
-	response{
-		person per_resp;
-	}
+	int32 uuid;
+	person per_resp;
 }
 
-message new_http_login -> http-post:login
+message login_response -> tcp-binary:10001
 {
-	request{
-		int32 uuid;
-	}
-	response{
-		person per_resp;
-	}
+	int32 uuid;
+	person per_resp;
 }
 
-protocol login -> tcp-key:10001
+message new_http_login_request -> http-post:login
+{
+	int32 uuid;
+	person per_resp;
+}
+message new_http_login_response -> http-post:login
+{
+	int32 uuid;
+	person per_resp;
+}
+
+message http_test_get_request -> http-get:login
+{
+	int32 user;
+	string passwd;
+}
+
+message http_test_get_response -> http-get:login
+{
+	int32 user;
+	string passwd;
+}
+
+protocol tcp_login -> tcp-binary:10001
 {
 	request {
 	header:
@@ -47,7 +62,7 @@ protocol login -> tcp-key:10001
 	}
 }
 
-protocol http_login -> http-post:/login
+protocol http_login -> http-post:login
 {
 	request {
 	header:
