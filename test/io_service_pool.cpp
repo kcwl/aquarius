@@ -23,7 +23,9 @@ BOOST_AUTO_TEST_CASE(ctor)
 	aquarius::timer_adaptor<boost::asio::steady_timer> timer(io1);
 	timer.async_wait(1s, [&] { std::cout << "timers\n"; });
 
-	std::thread t([&] { io1.run(); });
+	std::thread t([&] { pool.run(); });
+	
+	std::this_thread::sleep_for(2s);
 
 	BOOST_TEST(pool.enable());
 

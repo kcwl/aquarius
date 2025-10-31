@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(sql_)
 
     auto sql2 = sql_update(p);
 
-    BOOST_TEST(sql2() == "update personal set age = 1 and sex = 1");
+    BOOST_TEST(sql2() == "update personal set age=1 and sex=1");
 
     constexpr auto sql = sql_select(personal);
 

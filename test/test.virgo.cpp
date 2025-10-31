@@ -228,8 +228,8 @@ void http_test_get_request_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<int32>(buffer);
-	passwd = this->parse_from<string>(buffer);
+	user = this->parse_from<int32>(buffer, "user");
+	passwd = this->parse_from<string>(buffer, "passwd");
 }
 
 bool operator==(const http_test_get_request_body& lhs, const http_test_get_request_body& rhs)
@@ -271,8 +271,8 @@ void http_test_get_response_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_response_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<int32>(buffer);
-	passwd = this->parse_from<string>(buffer);
+	user = this->parse_from<int32>(buffer, "user");
+	passwd = this->parse_from<string>(buffer, "passwd");
 }
 
 bool operator==(const http_test_get_response_body& lhs, const http_test_get_response_body& rhs)

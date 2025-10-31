@@ -33,17 +33,21 @@ namespace aquarius
 
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
-		T from_datas(flex_buffer& buffer)
+		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
 			std::stringstream ss{};
 
-			auto pos = buffer.find_first('&');
-			if (pos == flex_buffer::npos)
-			{
-				return {};
-			}
+			auto key = buffer.get_first_range<'='>();
 
-			ss.read((char*)buffer.rdata(), pos - buffer.tellg());
+			if (key.empty())
+				return T{};
+
+			if (key != ("\"" + name + "\""))
+				return T{};
+
+			auto value = buffer.get_first_range<'&', '#'>();
+
+			ss << value;
 
 			T result{};
 
@@ -52,32 +56,40 @@ namespace aquarius
 			return result;
 		}
 
-		template <boolean T>
-		T from_datas(flex_buffer& buffer)
+		template <typename T>
+		requires(boolean<T>)
+		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
-			auto pos = buffer.find_first('&');
-			if (pos == flex_buffer::npos)
-			{
-				return {};
-			}
+			auto key = buffer.get_first_range<'='>();
 
-			std::string f((char*)buffer.rdata(), pos - buffer.tellg());
+			if (key.empty())
+				return T{};
 
-			return f == "true";
+			if (key != ("\"" + name + "\""))
+				return T{};
+
+			auto value = buffer.get_first_range<'&', '#'>();
+
+			return "true" ? true : false;
 		}
 
 		template <string_t T>
-		T from_datas(flex_buffer& buffer)
+		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
-			auto pos = buffer.find_first('=');
-			if (pos == flex_buffer::npos)
-			{
-				return {};
-			}
+			auto key = buffer.get_first_range<'='>();
 
-			std::string f((char*)buffer.rdata(), pos - buffer.tellg());
+			if (key.empty())
+				return T{};
 
-			return f;
+			if (key != ("\"" + name + "\""))
+				return T{};
+			
+			auto value = buffer.get_first_range<'&', '#'>();
+
+			if (value.size() < 2)
+				return T{};
+
+			return value.substr(1, value.size() -2);
 		}
 	};
 

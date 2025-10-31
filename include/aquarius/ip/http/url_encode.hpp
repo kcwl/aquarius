@@ -13,9 +13,9 @@ namespace aquarius
 
 		for (const auto& s : str)
 		{
-			if (std::isalnum(s) || s == '-' || s == '_' || s == '.' || s == '~' || s == '&' || s == '?' || s == '=')
+			if (std::isalnum((uint8_t)s) || s == '-' || s == '_' || s == '.' || s == '~' || s == '&' || s == '?' || s == '=')
 			{
-				ss << s;
+				result.push_back(s);
 			}
 			else
 			{
@@ -79,9 +79,9 @@ namespace aquarius
 	{
 		std::stringstream ss{};
 
-		for (const auto& s : str)
+		for (const auto s : str)
 		{
-			ss << (char)(uint8_t)(char)s;
+			ss << (char)(int)s;
 		}
 
 		return url_encode(ss.str());

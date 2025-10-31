@@ -6,13 +6,14 @@ BOOST_AUTO_TEST_SUITE(serialize)
 
 BOOST_AUTO_TEST_CASE(error)
 {
-	aquarius::error_code ec = aquarius::serialize_error::success;
+	aquarius::error_code ec{};
+	ec = aquarius::serialize_error::success;
 
 	BOOST_TEST(ec.message() == "success");
 
 	ec = aquarius::serialize_error::not_enough_space;
 
-	BOOST_TEST(ec.message() == "not enough space");
+	BOOST_TEST(ec.message() == "no enough space");
 
 	ec = aquarius::serialize_error::overflow;
 

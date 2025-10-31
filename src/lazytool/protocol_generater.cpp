@@ -189,9 +189,20 @@ namespace aquarius
 					ofs << "void " << cla_name << "::deserialize(aquarius::flex_buffer& buffer)\n";
 					ofs << "{\n";
 
-					if (protocol == "http" && router_key == "post")
+					if (protocol == "http")
 					{
-						ofs << "\t*this = this->parse_from<" << cla_name << ">(buffer);\n";
+						if (router_key == "get")
+						{
+							for (auto& [type, name] : fields)
+							{
+								ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name << "\");\n";
+							}
+						}
+						else
+						{
+							ofs << "\t*this = this->parse_from<" << cla_name << ">(buffer);\n";
+						}
+						
 					}
 					else
 					{

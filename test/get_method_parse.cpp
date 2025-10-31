@@ -44,21 +44,21 @@ BOOST_AUTO_TEST_CASE(get_method)
 	{
 		std::string result = "\"name\"=\"hello\"";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
-		auto res = pr.from_datas<std::string>(buffer);
+		auto res = pr.from_datas<std::string>(buffer, "name");
 
 		BOOST_TEST(res == "hello");
 	}
 	{
 		std::string result = "\"sex\"=true";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
-		auto res = pr.from_datas<bool>(buffer);
+		auto res = pr.from_datas<bool>(buffer, "sex");
 
 		BOOST_TEST(res);
 	}
 	{
 		std::string result = "\"id\"=123";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
-		auto res = pr.from_datas<int>(buffer);
+		auto res = pr.from_datas<int>(buffer,"id");
 
 		BOOST_TEST(res == 123);
 	}

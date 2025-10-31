@@ -103,13 +103,13 @@ namespace aquarius
 				ofs << "void " << class_name << "::serialize(aquarius::flex_buffer& buffer)\n";
 				ofs << "{\n";
 
-				if (parser->protocol() == "http" )
+				if (parser->protocol() == "http")
 				{
 					if (parser->method() == "get")
 					{
 						for (auto& [type, name] : parser->fields())
 						{
-							ofs << "\tthis->parse_to(" << name << ", buffer, \"" << name <<"\");\n";
+							ofs << "\tthis->parse_to(" << name << ", buffer, \"" << name << "\");\n";
 						}
 					}
 					else
@@ -131,9 +131,20 @@ namespace aquarius
 				ofs << "void " << class_name << "::deserialize(aquarius::flex_buffer& buffer)\n";
 				ofs << "{\n";
 
-				if (parser->protocol() == "http" && parser->method() == "post")
+				if (parser->protocol() == "http")
 				{
-					ofs << "\t*this = this->parse_from<" << class_name << ">(buffer);\n";
+					if (parser->method() == "get")
+					{
+						for (auto& [type, name] : parser->fields())
+						{
+							ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name
+								<< "\");\n";
+						}
+					}
+					else
+					{
+						ofs << "\t*this = this->parse_from<" << class_name << ">(buffer);\n";
+					}
 				}
 				else
 				{

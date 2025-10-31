@@ -27,4 +27,16 @@ BOOST_AUTO_TEST_CASE(store)
 	BOOST_TEST(!new_session_ptr_1);
 }
 
+BOOST_AUTO_TEST_CASE(multi_regist)
+{
+	aquarius::io_context io;
+	auto session_ptr = std::make_shared<aquarius::tcp_server_session>(io);
+
+	auto uid = session_ptr->uuid();
+
+	BOOST_TEST(aquarius::detail::regist_session(session_ptr));
+
+	BOOST_TEST(!aquarius::detail::regist_session(session_ptr));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

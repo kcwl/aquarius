@@ -302,16 +302,23 @@ namespace aquarius
 			std::swap(rpos_, fb.rpos_);
 		}
 
-		pos_type find_first(char sp)
+		template<char... args>
+		std::string get_first_range()
 		{
-			auto iter = std::find_if(buffer_.begin() + rpos_, buffer_.end(), [&] (const auto c) { return c == sp; });
+			auto iter = std::find_if(buffer_.begin() + rpos_, buffer_.end(), [&] (const auto c) { return ((c == args) || ...); });
 
 			if (iter == buffer_.end())
-				return npos;
+			{
+				return std::string((char*)rdata(), active());
+			}
 
 			auto len = std::distance(buffer_.begin() + rpos_, iter);
 
-			return len + rpos_;
+			auto value = std::string((char*)rdata(), len);
+
+			consume(len + 1);
+
+			return value;
 		}
 
 	private:

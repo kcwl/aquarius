@@ -16,6 +16,8 @@ BOOST_AUTO_TEST_CASE(signals)
 
 		std::raise(SIGINT);
 
+		std::this_thread::sleep_for(2s);
+
 		BOOST_TEST(!srv.enable());
 
 		t.join();
@@ -29,6 +31,8 @@ BOOST_AUTO_TEST_CASE(signals)
 		std::this_thread::sleep_for(2s);
 
 		std::raise(SIGTERM);
+
+		std::this_thread::sleep_for(2s);
 
 		BOOST_TEST(!srv.enable());
 

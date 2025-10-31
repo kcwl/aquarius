@@ -22,10 +22,10 @@ namespace aquarius
 			return parse_.to_datas(std::forward<T>(value), buffer, std::forward<Args>(args)...);
 		}
 
-		template <typename T>
-		T parse_from(flex_buffer& buffer)
+		template <typename T, typename... Args>
+		T parse_from(flex_buffer& buffer, Args&&... args)
 		{
-			return parse_.template from_datas<T>(buffer);
+			return parse_.template from_datas<T>(buffer, std::forward<Args>(args)...);
 		}
 
 	private:
