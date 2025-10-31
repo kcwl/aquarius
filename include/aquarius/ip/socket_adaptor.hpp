@@ -3,6 +3,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
@@ -45,7 +46,7 @@ namespace aquarius
 
 		template <typename Func>
 		requires(is_awaitable_func<Func>)
-		auto accept(Func&& f) -> awaitable<error_code>
+		auto accept(Func&& f) -> awaitable<void>
 		{
 			co_return co_await f();
 		}

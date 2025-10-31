@@ -26,25 +26,37 @@ namespace aquarius
 	public:
 		template <typename Session>
 		requires(is_session<Session>)
-		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
 			flex_buffer buffer{};
 
 			for (;;)
 			{
-				auto ec = co_await recv(session_ptr, buffer);
+				auto ec = co_await recv_buffer(session_ptr, buffer);
 
-				if (!ec)
-					continue;
-
-				if (ec != boost::asio::error::eof)
+				if (ec)
 				{
-					XLOG_ERROR() << "on read some occur error - " << ec.what();
+					if (ec != boost::asio::error::eof)
+					{
+						XLOG_ERROR() << "on read some occur error - " << ec.message();
+					}
+
+					session_ptr->shutdown();
+
+					break;
 				}
 
-				session_ptr->shutdown();
+				co_spawn(
+					session_ptr->get_executor(),
+					[buffer = std::move(buffer), session_ptr]() mutable -> awaitable<void>
+					{
+						auto router = binary_parse{}.from_datas<std::string_view>(buffer);
 
-				co_return ec;
+						tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
+
+						co_return;
+					},
+					detached);
 			}
 		}
 
@@ -66,55 +78,7 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template <typename Request>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
-		{
-			constexpr auto pos = sizeof(uint32_t);
-
-			buffer.commit(pos);
-
-			binary_parse parse{};
-			parse.to_datas(Request::router, buffer);
-
-			request->commit(buffer);
-
-			auto len = static_cast<uint32_t>(buffer.tellg() - pos);
-
-			std::copy((char*)&len, (char*)(&len + 1), buffer.data());
-		}
-
 	private:
-		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
-		{
-			auto ec = co_await recv_buffer(session_ptr, buffer);
-
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-				session_ptr->shutdown();
-				co_return ec;
-			}
-
-			co_spawn(
-				session_ptr->get_executor(),
-				[buffer = std::move(buffer), session_ptr]() mutable -> awaitable<void>
-				{
-					binary_parse parse{};
-					auto router = parse.from_datas<std::string_view>(buffer);
-
-					tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
-
-					co_return;
-				},
-				detached);
-
-			co_return ec;
-		}
-
 		template <typename Session>
 		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
 		{
@@ -126,11 +90,6 @@ namespace aquarius
 
 			if (ec)
 			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-				session_ptr->shutdown();
 				co_return ec;
 			}
 
@@ -138,6 +97,7 @@ namespace aquarius
 		}
 	};
 
-	template<>
-	struct is_socket_type<boost::asio::ip::tcp::socket> : std::true_type {};
+	template <>
+	struct is_socket_type<boost::asio::ip::tcp::socket> : std::true_type
+	{};
 } // namespace aquarius

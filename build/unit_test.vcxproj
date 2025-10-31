@@ -187,6 +187,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
@@ -246,6 +247,7 @@
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\get_method_parse.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
+    <ClCompile Include="..\test\make_protocol.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />

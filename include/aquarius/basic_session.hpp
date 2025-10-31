@@ -145,9 +145,10 @@ namespace aquarius
 			socket_.close(ec);
 		}
 
-		auto accept() -> awaitable<error_code>
+		auto accept() -> awaitable<void>
 		{
-			co_return co_await socket_adaptor_.accept([this] -> awaitable<error_code> { co_return co_await proto_.accept(this->shared_from_this()); });
+			co_return co_await socket_adaptor_.accept([this] -> awaitable<void>
+													  { co_return co_await proto_.accept(this->shared_from_this()); });
 		}
 
 		bool keep_alive(bool value)

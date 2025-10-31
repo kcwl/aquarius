@@ -29,7 +29,7 @@ namespace aquarius
 	public:
 		template <typename Session>
 		requires(is_session<Session>)
-		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
 			error_code ec{};
 
@@ -37,20 +37,38 @@ namespace aquarius
 
 			for (;;)
 			{
-				co_await recv(session_ptr, buffer, ec);
+				virgo::http_fields hf;
 
-				if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				co_await recv_buffer(session_ptr, buffer, hf, ec);
+
+				if (ec)
+				{
+					if (ec != boost::asio::error::eof)
+					{
+						XLOG_ERROR() << "on read some occur error - " << ec.message();
+					}
+					session_ptr->shutdown();
 					break;
+				}
+
+				if (method_ == virgo::http_method::get)
+				{
+					flex_buffer get_buffer((uint8_t*)this->get_body_span_.data(), this->get_body_span_.size());
+
+					buffer.swap(get_buffer);
+				}
+
+				co_spawn(
+					session_ptr->get_executor(),
+					[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
+					{
+						http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf,
+																			std::move(buffer));
+
+						co_return;
+					},
+					detached);
 			}
-
-			if (ec != boost::asio::error::eof)
-			{
-				XLOG_ERROR() << "on read some occur error - " << ec.what();
-			}
-
-			session_ptr->shutdown();
-
-			co_return ec;
 		}
 
 		template <typename Response, typename Session>
@@ -81,11 +99,10 @@ namespace aquarius
 			std::string str = std::format("{} {} {}\r\n", from_method_string(Request::method), Request::router,
 										  from_version_string(request->version()));
 
-			request->set_field("Content-Type", "aquarius");
+			request->set_field("Content-Type", "aquarius-json");
 			request->set_field("Server", "Aquarius 0.10.0");
 			request->set_field("Connection", "keep-alive");
 			request->set_field("Access-Control-Allow-Origin", "*");
-			request->set_field("Content-Type", "aquarius-json");
 
 			for (auto& s : request->fields())
 			{
@@ -99,38 +116,25 @@ namespace aquarius
 			request->commit(buffer);
 		}
 
-	protected:
-		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, error_code& ec) -> awaitable<void>
+		template <typename Session, typename Request>
+		void make_error_response_buffer(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request,
+										virgo::http_status status)
 		{
-			virgo::http_fields hf;
+			flex_buffer buffer{};
 
-			co_await recv_buffer(session_ptr, buffer, hf, ec);
+			auto headline = make_http_headline(from_version_string(request->version()), static_cast<int>(status),
+											   virgo::from_status_string(status));
 
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+			for (auto& s : request.fields())
 			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-				session_ptr->shutdown();
-				co_return;
+				headline += std::format("{}: {}\r\n", s.first, s.second);
 			}
 
-			if (method_ == virgo::http_method::get)
-			{
-				flex_buffer((uint8_t*)this->get_body_span_.data(), this->get_body_span_.size()).swap(buffer);
-			}
+			headline += "\r\n";
 
-			co_spawn(
-				session_ptr->get_executor(),
-				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
-				{
-					http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf, std::move(buffer));
+			buffer.put(headline.begin(), headline.end());
 
-					co_return;
-				},
-				detached);
+			session_ptr->async_send(std::move(buffer));
 		}
 
 	private:
@@ -148,7 +152,11 @@ namespace aquarius
 			request ? parse_request_header_line(buffer, ec) : parse_response_header_line(buffer, ec);
 
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
-				co_return;
+			{
+				make_error_response_buffer(session_ptr, request, ec.value());
+
+				co_return aquarius::error_code{};
+			}
 
 			auto span = std::span<char>((char*)buffer.rdata(), buffer.active());
 
@@ -165,8 +173,9 @@ namespace aquarius
 
 			if (iter == buf_view.end())
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
-				co_return;
+				make_error_response_buffer(session_ptr, request, virgo::http_status::bad_request);
+
+				co_return aquarius::error_code{};
 			}
 
 			auto len = std::distance(buf_view.begin(), iter);
@@ -184,8 +193,9 @@ namespace aquarius
 
 				if (itor == header.end())
 				{
-					ec = virgo::http_status::bad_request;
-					co_return;
+					make_error_response_buffer(session_ptr, request, virgo::http_status::bad_request);
+
+					co_return aquarius::error_code{};
 				}
 
 				len = std::distance(header.begin(), itor);
@@ -203,9 +213,30 @@ namespace aquarius
 				hf.set_field(key, value);
 			}
 
-			auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.active());
+			ec = aquarius::error_code{};
 
-			ec = virgo::http_status::ok;
+			if (hf.content_length() == 0)
+			{
+				make_error_response_buffer(session_ptr, request, virgo::http_status::length_required);
+
+				co_return;
+			}
+
+			if (hf.content_length() > max_http_length)
+			{
+				make_error_response_buffer(session_ptr, request, virgo::http_status::payload_too_large);
+
+				co_return;
+			}
+
+			if (!hf.find("Expect").empty())
+			{
+				make_error_response_buffer(session_ptr, request, virgo::http_status::expectation_failed);
+
+				co_return;
+			}
+
+			auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.active());
 
 			if (remain_size > 0)
 				ec = co_await session_ptr->async_read(buffer, remain_size);
@@ -374,6 +405,11 @@ namespace aquarius
 			auto body_span = buffer.subspan(pos + 1);
 
 			get_body_span_ = std::string(body_span.data(), body_span.size());
+
+			if (get_body_span_.size() > max_http_length)
+			{
+				ec = virgo::http_status::uri_too_long;
+			}
 		}
 
 		template <typename T>

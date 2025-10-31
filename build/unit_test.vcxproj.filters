@@ -315,6 +315,9 @@
     <ClInclude Include="..\include\aquarius\serialize\http_get_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
@@ -393,6 +396,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\router.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\make_protocol.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
