@@ -29,7 +29,11 @@ namespace aquarius
 			using typename base::header_t;
 
 		public:
-			http_response() = default;
+			http_response()
+				: base()
+			{
+
+			}
 
 		public:
 			bool operator==(const http_response& other) const

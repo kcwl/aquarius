@@ -41,6 +41,8 @@ namespace aquarius
 				{
 					co_spawn(session->get_executor(), [ec]() mutable -> awaitable<void>
 							 { ec = co_await std::make_shared<Context>()->send_response(ec); });
+
+					return false;
 				}
 
 				return true;

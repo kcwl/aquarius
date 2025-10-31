@@ -3,6 +3,9 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/singleton.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
@@ -52,6 +55,7 @@ namespace aquarius
 					co_spawn(
 						session->get_executor(), [ec]() mutable -> awaitable<void>
 						{ ec = co_await std::make_shared<Context>()->send_response(virgo::http_status::bad_request); });
+					return false;
 				}
 
 				return true;

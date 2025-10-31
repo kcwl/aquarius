@@ -31,7 +31,8 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
-				: version_(http_version::http1_1)
+				: base()
+				, version_(http_version::http1_1)
 				, get_params_()
 			{}
 
@@ -105,7 +106,8 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
-				: status_()
+				: base()
+				, status_()
 				, version_()
 				, reason_()
 			{}

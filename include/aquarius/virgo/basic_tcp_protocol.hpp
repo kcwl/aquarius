@@ -21,7 +21,8 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
-				: timestamp_()
+				: base()
+				, timestamp_()
 				, version_()
 			{}
 
@@ -85,7 +86,8 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
-				: timestamp_()
+				: base()
+				, timestamp_()
 				, version_()
 				, result_()
 			{}

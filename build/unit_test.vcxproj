@@ -241,6 +241,7 @@
     <ClCompile Include="..\test\crc.cpp" />
     <ClCompile Include="..\test\flex_buffer.cpp" />
     <ClCompile Include="..\test\float.cpp" />
+    <ClCompile Include="..\test\handler.cpp" />
     <ClCompile Include="..\test\int_to_string.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\get_method_parse.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="..\test\session.h" />
     <ClInclude Include="..\test\ctx_handler.hpp" />
     <ClCompile Include="..\test\detail.cpp" />
+    <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
     <ClCompile Include="..\test\session_store.cpp" />
