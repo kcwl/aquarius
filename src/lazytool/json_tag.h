@@ -24,6 +24,10 @@ namespace aquarius
 				virtual ~json_tag() = default;
 
 			public:
+				void generate_to_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser);
+
+				void generate_from_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser);
+
 				void generate_to_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser);
 
 				void generate_from_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser);

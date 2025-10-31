@@ -33,9 +33,7 @@ namespace aquarius
 			, wpos_(0)
 			, rpos_(0)
 		{
-			std::copy(data, data + len, wdata());
-
-			commit(len);
+			put(data, data + len);
 		}
 
 		flex_buffer(flex_buffer&& other) noexcept
@@ -285,6 +283,11 @@ namespace aquarius
 		bool empty() const
 		{
 			return rpos_ == wpos_;
+		}
+
+		std::size_t tellp() const
+		{
+			return rpos_;
 		}
 
 		std::size_t tellg() const

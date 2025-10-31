@@ -9,6 +9,7 @@ namespace aquarius
 	inline std::string url_encode(const std::string& str)
 	{
 		std::stringstream ss{};
+		std::string result{};
 
 		for (const auto& s : str)
 		{
@@ -18,10 +19,14 @@ namespace aquarius
 			}
 			else
 			{
-				ss << '%' << std::hex << std::setw(2) << std::uppercase << static_cast<int>(s);
+				ss << std::hex << std::setw(2) << std::uppercase << (int)s;
+				result.push_back('%');
+
+				result.append(ss.str().substr(ss.str().size() - 2));
+				ss.clear();
 			}
 		}
-		return ss.str();
+		return result;
 	}
 
 	inline std::string url_decode(const std::string& str)
@@ -35,7 +40,7 @@ namespace aquarius
 		{
 			if (str[i] == '%')
 			{
-				ss << std::hex<<str.substr(i + 1, 2);
+				ss << std::hex << str.substr(i + 1, 2);
 
 				int tmp{};
 				ss >> std::hex >> tmp;
@@ -62,29 +67,9 @@ namespace aquarius
 
 		std::u8string result{};
 
-		
-
-		for (auto iter = decode_seq.begin(); iter != decode_seq.end();)
+		for (const auto& s : decode_seq)
 		{
-			int s = *iter;
-
-			if ((s & 0x80) != 0)
-			{
-				int s1 = *(++iter);
-
-				char8_t temp{};
-
-				temp = (0xe0 | (s & 0xf0)) | ((0x80 | ((s & 0x0f) << 2) | (s1 >> 6)) | (s1 & 0x3f));
-
-				result.push_back(temp);
-
-				iter++;
-			}
-			else
-			{
-				result.push_back(s);
-				++iter;
-			}
+			result.push_back(s);
 		}
 
 		return result;
@@ -94,31 +79,12 @@ namespace aquarius
 	{
 		std::stringstream ss{};
 
-		char front{};
-		char back{};
-
-		for (auto iter = str.begin(); iter != str.end();)
+		for (const auto& s : str)
 		{
-			int s = *iter;
-
-			if ((s & 0x80) != 0)
-			{
-				int s1 = *(++iter);
-				int s2 = *(++iter);
-				front = char((s << 4) | ((s1 & 0x3f) >> 2));
-
-				back = char((s1 & 0x3f) << 6) | char(s2 & 0x3f);
-
-				ss << front << back;
-				iter++;
-			}
-			else
-			{
-				ss << (char)(*iter);
-				iter++;
-			}
+			ss << (char)(uint8_t)(char)s;
 		}
 
 		return url_encode(ss.str());
 	}
+
 } // namespace aquarius

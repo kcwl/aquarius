@@ -32,6 +32,10 @@ namespace aquarius
 
 				generate_operator_stream_src(ofs_cpp, ptr);
 
+				generate_to_tag_define(ofs_h, ptr);
+
+				generate_from_tag_define(ofs_h, ptr);
+
 				generate_to_tag(ofs_cpp, ptr);
 
 				generate_from_tag(ofs_cpp, ptr);

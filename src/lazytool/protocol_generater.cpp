@@ -68,6 +68,23 @@ namespace aquarius
 				generate_operator_stream_src(ofs_cpp, ptr->response()->body());
 
 
+				generate_to_tag_define(ofs_h, ptr->request()->header());
+
+				generate_from_tag_define(ofs_h, ptr->request()->header());
+
+				generate_to_tag_define(ofs_h, ptr->request()->body());
+
+				generate_from_tag_define(ofs_h, ptr->request()->body());
+
+				generate_to_tag_define(ofs_h, ptr->response()->header());
+
+				generate_from_tag_define(ofs_h, ptr->response()->header());
+
+				generate_to_tag_define(ofs_h, ptr->response()->body());
+
+				generate_from_tag_define(ofs_h, ptr->response()->body());
+
+
 				generate_to_tag(ofs_cpp, ptr->request()->header());
 
 				generate_from_tag(ofs_cpp, ptr->request()->header());

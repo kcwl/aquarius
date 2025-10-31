@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(tcp)
 		auto resp_back = std::make_shared<tcp_login_response>();
 		resp_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(*resp, *resp_back);
+		BOOST_TEST(*resp == *resp_back);
 	}
 }
 BOOST_AUTO_TEST_CASE(http_protocol)
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		req_back->set_field("Content-Type", "aquarius-json");
 		req_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(*req, *req_back);
+		BOOST_TEST(*req == *req_back);
 	}
 
 	{
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 		resp_back->set_field("Content-Type", "aquarius-json");
 		resp_back->consume(buffer);
 
-		BOOST_CHECK_EQUAL(*resp, *resp_back);
+		BOOST_TEST(*resp == *resp_back);
 	}
 }
 

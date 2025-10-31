@@ -2,6 +2,7 @@
 #include <boost/asio/ssl.hpp>
 #include <filesystem>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/logger.hpp>
 
 namespace aquarius
 {

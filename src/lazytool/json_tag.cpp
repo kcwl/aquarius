@@ -7,6 +7,17 @@ namespace aquarius
 	{
 		namespace cpp
 		{
+			void json_tag::generate_to_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser)
+			{
+				ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
+					<< ">&, const aquarius::json::value& jv);\n";
+			}
+
+			void json_tag::generate_from_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser)
+			{
+				ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
+					<< parser->name() << "& local);\n";
+			}
 			void json_tag::generate_to_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser)
 			{
 				ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()

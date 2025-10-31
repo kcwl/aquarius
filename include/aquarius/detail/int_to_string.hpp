@@ -6,7 +6,6 @@ namespace aquarius
 {
 	namespace detail
 	{
-
 		template <char... args>
 		struct to_string
 		{

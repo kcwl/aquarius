@@ -236,20 +236,34 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
+    <ClCompile Include="..\test\binary_serialize.cpp" />
+    <ClCompile Include="..\test\concat.cpp" />
+    <ClCompile Include="..\test\crc.cpp" />
+    <ClCompile Include="..\test\flex_buffer.cpp" />
+    <ClCompile Include="..\test\float.cpp" />
+    <ClCompile Include="..\test\int_to_string.cpp" />
+    <ClCompile Include="..\test\io_service_pool.cpp" />
+    <ClCompile Include="..\test\get_method_parse.cpp" />
+    <ClCompile Include="..\test\make_endpoint.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />
-    <ClCompile Include="..\test\serialize.cpp" />
+    <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\cmd_options.cpp" />
     <ClInclude Include="..\test\session.h" />
     <ClInclude Include="..\test\ctx_handler.hpp" />
     <ClCompile Include="..\test\detail.cpp" />
+    <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
+    <ClCompile Include="..\test\session_store.cpp" />
     <ClCompile Include="..\test\sql.cpp" />
     <ClInclude Include="..\test\test.virgo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\string_literal.cpp" />
+    <ClCompile Include="..\test\struct_name.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
     <ClCompile Include="..\test\test.virgo.cpp" />
+    <ClCompile Include="..\test\trie.cpp" />
     <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>

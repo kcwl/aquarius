@@ -16,6 +16,8 @@ struct person
 bool operator==(const person& lhs, const person& rhs);
 
 std::ostream& operator<<(std::ostream& os, const person& other);
+person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const person& local);
 class login_request_body : public aquarius::tcp_binary_serialize
 {
 public:
@@ -35,6 +37,8 @@ using login_request = aquarius::virgo::tcp_request<"10001", aquarius::tcp_reques
 bool operator==(const login_request_body& lhs, const login_request_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const login_request_body& other);
+login_request_body tag_invoke(const aquarius::json::value_to_tag<login_request_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_request_body& local);
 class login_response_body : public aquarius::tcp_binary_serialize
 {
 public:
@@ -54,6 +58,8 @@ using login_response = aquarius::virgo::tcp_response<"10001", aquarius::tcp_resp
 bool operator==(const login_response_body& lhs, const login_response_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const login_response_body& other);
+login_response_body tag_invoke(const aquarius::json::value_to_tag<login_response_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_response_body& local);
 class new_http_login_request_body : public aquarius::http_post_serialize
 {
 public:
@@ -73,6 +79,8 @@ using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::ht
 bool operator==(const new_http_login_request_body& lhs, const new_http_login_request_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const new_http_login_request_body& other);
+new_http_login_request_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_request_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_request_body& local);
 class new_http_login_response_body : public aquarius::http_post_serialize
 {
 public:
@@ -92,6 +100,8 @@ using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::
 bool operator==(const new_http_login_response_body& lhs, const new_http_login_response_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const new_http_login_response_body& other);
+new_http_login_response_body tag_invoke(const aquarius::json::value_to_tag<new_http_login_response_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_response_body& local);
 class http_test_get_request_body : public aquarius::http_get_serialize
 {
 public:
@@ -111,6 +121,8 @@ using http_test_get_request = aquarius::virgo::http_request<aquarius::virgo::htt
 bool operator==(const http_test_get_request_body& lhs, const http_test_get_request_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const http_test_get_request_body& other);
+http_test_get_request_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_request_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_request_body& local);
 class http_test_get_response_body : public aquarius::http_get_serialize
 {
 public:
@@ -130,6 +142,8 @@ using http_test_get_response = aquarius::virgo::http_response<aquarius::virgo::h
 bool operator==(const http_test_get_response_body& lhs, const http_test_get_response_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const http_test_get_response_body& other);
+http_test_get_response_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_response_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_response_body& local);
 class tcp_login_request_header : public aquarius::tcp_binary_serialize
 {
 public:
@@ -198,6 +212,14 @@ std::ostream& operator<<(std::ostream& os, const tcp_login_response_header& othe
 bool operator==(const tcp_login_response_body& lhs, const tcp_login_response_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const tcp_login_response_body& other);
+tcp_login_request_header tag_invoke(const aquarius::json::value_to_tag<tcp_login_request_header>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_header& local);
+tcp_login_request_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_request_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_body& local);
+tcp_login_response_header tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_header>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_header& local);
+tcp_login_response_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_body& local);
 class http_login_request_header : public aquarius::http_post_serialize
 {
 public:
@@ -266,6 +288,14 @@ std::ostream& operator<<(std::ostream& os, const http_login_response_header& oth
 bool operator==(const http_login_response_body& lhs, const http_login_response_body& rhs);
 
 std::ostream& operator<<(std::ostream& os, const http_login_response_body& other);
+http_login_request_header tag_invoke(const aquarius::json::value_to_tag<http_login_request_header>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_header& local);
+http_login_request_body tag_invoke(const aquarius::json::value_to_tag<http_login_request_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_body& local);
+http_login_response_header tag_invoke(const aquarius::json::value_to_tag<http_login_response_header>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_header& local);
+http_login_response_body tag_invoke(const aquarius::json::value_to_tag<http_login_response_body>&, const aquarius::json::value& jv);
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_body& local);
 using login_request = aquarius::virgo::tcp_request<"10001", aquarius::tcp_request_header, login_request_body>;
 using login_response = aquarius::virgo::tcp_response<"10001", aquarius::tcp_response_header, login_response_body>;
 using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login", aquarius::http_request_header, new_http_login_request_body>;

@@ -37,6 +37,11 @@ namespace aquarius
 				return iter->second.lock();
 			}
 
+			std::size_t size() const
+			{
+				return sessions_.size();
+			}
+
 		private:
 			std::mutex mutex_;
 
@@ -60,5 +65,12 @@ namespace aquarius
 		{
 			return session_store<Session>::get_mutable_instance().insert(session);
 		}
+
+		template<typename Session>
+		std::size_t session_storage()
+		{
+			return session_store<Session>::get_mutable_instance().size();
+		}
+
 	} // namespace detail
 } // namespace aquarius
