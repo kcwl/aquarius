@@ -35,7 +35,7 @@ namespace aquarius
         private:
             std::shared_ptr<router_field> router_ptr_;
             std::shared_ptr<service_struct> request_ptr_;
-            std::shared_ptr<service_struct> response_ptr_;
+            std::shared_ptr<service_struct> response_;
         };
 
 	} // namespace lazytool

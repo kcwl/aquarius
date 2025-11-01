@@ -13,22 +13,20 @@ struct person
 
 message login_request -> tcp-binary:10001
 {
-	int32 uuid;
-	person per_resp;
+	person per_req;
 }
 
 message login_response -> tcp-binary:10001
 {
-	int32 uuid;
 	person per_resp;
 }
 
-message new_http_login_request -> http-post:login
+message new_http_login_request -> http-post:login/new
 {
 	int32 uuid;
-	person per_resp;
+	person per_req;
 }
-message new_http_login_response -> http-post:login
+message new_http_login_response -> http-post:login/new
 {
 	int32 uuid;
 	person per_resp;
@@ -46,7 +44,7 @@ message http_test_get_response -> http-get:login
 	string passwd;
 }
 
-protocol tcp_login -> tcp-binary:10001
+protocol tcp_login -> tcp-binary:10002
 {
 	request {
 	header:

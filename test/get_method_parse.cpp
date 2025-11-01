@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(get_method)
 		std::string tmp{};
 		buffer.get(tmp);
 
-		BOOST_TEST(tmp == "\"id\"=123");
+		BOOST_TEST(tmp == "id=123");
 	}
 
 	{
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(get_method)
 		std::string tmp{};
 		buffer.get(tmp);
 
-		BOOST_TEST(tmp == "\"sex\"=true");
+		BOOST_TEST(tmp == "sex=true");
 	}
 
 	{
@@ -38,25 +38,25 @@ BOOST_AUTO_TEST_CASE(get_method)
 		std::string tmp{};
 		buffer.get(tmp);
 
-		BOOST_TEST(tmp == "\"name\"=\"hello\"");
+		BOOST_TEST(tmp == "name=hello");
 	}
 
 	{
-		std::string result = "\"name\"=\"hello\"";
+		std::string result = "name=hello";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
 		auto res = pr.from_datas<std::string>(buffer, "name");
 
 		BOOST_TEST(res == "hello");
 	}
 	{
-		std::string result = "\"sex\"=true";
+		std::string result = "sex=true";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
 		auto res = pr.from_datas<bool>(buffer, "sex");
 
 		BOOST_TEST(res);
 	}
 	{
-		std::string result = "\"id\"=123";
+		std::string result = "id=123";
 		aquarius::flex_buffer buffer((uint8_t*)result.data(), result.size());
 		auto res = pr.from_datas<int>(buffer,"id");
 

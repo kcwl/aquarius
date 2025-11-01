@@ -3,15 +3,13 @@
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/ip/concept.hpp>
 
-
 namespace aquarius
 {
 	namespace virgo
 	{
 
 		template <detail::string_literal Router, typename Header, typename Body>
-		class tcp_response
-			: public basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>
+		class tcp_response : public basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
 			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
@@ -80,6 +78,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template<detail::string_literal Router, typename Header, typename Body>
-	struct is_message_type<virgo::tcp_response<Router, Header, Body>> : std::true_type {};
+	template <detail::string_literal Router, typename Header, typename Body>
+	struct is_message_type<virgo::tcp_response<Router, Header, Body>> : std::true_type
+	{};
 } // namespace aquarius

@@ -28,6 +28,27 @@ namespace aquarius
 
 			virtual ~basic_tcp_protocol() = default;
 
+			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
+				: base(std::move(other))
+				, timestamp_(std::exchange(timestamp_, 0))
+				, version_(std::exchange(version_, 0))
+			{
+
+			}
+
+			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+
+					timestamp_ = std::exchange(timestamp_, 0);
+					version_ = std::exchange(version_, 0);
+				}
+
+				return *this;
+			}
+
 		public:
 			bool operator==(const basic_tcp_protocol& other) const
 			{
@@ -37,9 +58,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << timestamp_ << version_;
+				os << timestamp() << " " << version();
 
 				return os;
 			}
@@ -92,6 +113,29 @@ namespace aquarius
 				, result_()
 			{}
 
+			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
+				: base(std::move(other))
+				, timestamp_(std::exchange(other.timestamp_, 0))
+				, version_(std::exchange(other.version_, 0))
+				, result_(std::exchange(other.result_, 0))
+			{
+
+			}
+
+			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+
+					timestamp_ = std::exchange(other.timestamp_, 0);
+					version_ = std::exchange(other.version_, 0);
+					result_ = std::exchange(other.result_, 0);
+				}
+
+				return *this;
+			}
+
 		public:
 			bool operator==(const basic_tcp_protocol& other) const
 			{
@@ -101,9 +145,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << timestamp_ << version_ << result_;
+				os << timestamp() << " " << version() << " " << result();
 
 				return os;
 			}

@@ -10,7 +10,7 @@ namespace aquarius
 		requires(integer_t<T> || zig_zag<T>)
 		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
-			auto str = "\"" + name + "\"=" + std::to_string(value);
+			auto str = name + "=" + std::to_string(value);
 
 			buffer.put(str.begin(), str.end());
 		}
@@ -18,7 +18,7 @@ namespace aquarius
 		template <boolean T>
 		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
-			auto str = "\"" + name + "\"=" + (value ? "true" : "false");
+			auto str = name + "=" + (value ? "true" : "false");
 
 			buffer.put(str.begin(), str.end());
 		}
@@ -26,7 +26,7 @@ namespace aquarius
 		template <string_t T>
 		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
-			auto str = "\"" + name + "\"=\"" + value+"\"";
+			auto str = name + "=" + value;
 
 			buffer.put(str.begin(), str.end());
 		}
@@ -42,7 +42,7 @@ namespace aquarius
 			if (key.empty())
 				return T{};
 
-			if (key != ("\"" + name + "\""))
+			if (key != name)
 				return T{};
 
 			auto value = buffer.get_first_range<'&', '#'>();
@@ -65,7 +65,7 @@ namespace aquarius
 			if (key.empty())
 				return T{};
 
-			if (key != ("\"" + name + "\""))
+			if (key != name)
 				return T{};
 
 			auto value = buffer.get_first_range<'&', '#'>();
@@ -81,7 +81,7 @@ namespace aquarius
 			if (key.empty())
 				return T{};
 
-			if (key != ("\"" + name + "\""))
+			if (key != name)
 				return T{};
 			
 			auto value = buffer.get_first_range<'&', '#'>();
@@ -89,7 +89,7 @@ namespace aquarius
 			if (value.size() < 2)
 				return T{};
 
-			return value.substr(1, value.size() -2);
+			return value;
 		}
 	};
 

@@ -5,6 +5,7 @@
 #include <aquarius/ip/tcp/tcp_router.hpp>
 #include <aquarius/detail/string_literal.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
@@ -78,6 +79,12 @@ namespace aquarius
 			co_return resp;
 		}
 
+		template <typename Request>
+		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
+		{
+			make_tcp_buffer<true>(*request, buffer);
+		}
+
 	private:
 		template <typename Session>
 		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
@@ -93,7 +100,11 @@ namespace aquarius
 				co_return ec;
 			}
 
-			co_return co_await session_ptr->async_read(buffer, length);
+			ec = co_await session_ptr->async_read(buffer, length);
+
+			buffer.commit(length);
+
+			co_return ec;
 		}
 	};
 

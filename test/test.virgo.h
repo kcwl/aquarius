@@ -29,8 +29,7 @@ public:
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
-	int32 uuid;
-	person per_resp;
+	person per_req;
 };
 using login_request = aquarius::virgo::tcp_request<"10001", aquarius::tcp_request_header, login_request_body>;
 
@@ -50,7 +49,6 @@ public:
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
-	int32 uuid;
 	person per_resp;
 };
 using login_response = aquarius::virgo::tcp_response<"10001", aquarius::tcp_response_header, login_response_body>;
@@ -72,9 +70,9 @@ public:
 
 public:
 	int32 uuid;
-	person per_resp;
+	person per_req;
 };
-using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login", aquarius::http_request_header, new_http_login_request_body>;
+using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login/new", aquarius::http_request_header, new_http_login_request_body>;
 
 bool operator==(const new_http_login_request_body& lhs, const new_http_login_request_body& rhs);
 
@@ -95,7 +93,7 @@ public:
 	int32 uuid;
 	person per_resp;
 };
-using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login", aquarius::http_response_header, new_http_login_response_body>;
+using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login/new", aquarius::http_response_header, new_http_login_response_body>;
 
 bool operator==(const new_http_login_response_body& lhs, const new_http_login_response_body& rhs);
 
@@ -298,11 +296,11 @@ http_login_response_body tag_invoke(const aquarius::json::value_to_tag<http_logi
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_body& local);
 using login_request = aquarius::virgo::tcp_request<"10001", aquarius::tcp_request_header, login_request_body>;
 using login_response = aquarius::virgo::tcp_response<"10001", aquarius::tcp_response_header, login_response_body>;
-using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login", aquarius::http_request_header, new_http_login_request_body>;
-using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login", aquarius::http_response_header, new_http_login_response_body>;
+using new_http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login/new", aquarius::http_request_header, new_http_login_request_body>;
+using new_http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login/new", aquarius::http_response_header, new_http_login_response_body>;
 using http_test_get_request = aquarius::virgo::http_request<aquarius::virgo::http_method::get,"login", aquarius::http_request_header, http_test_get_request_body>;
 using http_test_get_response = aquarius::virgo::http_response<aquarius::virgo::http_method::get,"login", aquarius::http_response_header, http_test_get_response_body>;
-using tcp_login_request = aquarius::virgo::tcp_request<"10001", tcp_login_request_header, tcp_login_request_body>;
-using tcp_login_response = aquarius::virgo::tcp_response<"10001", tcp_login_response_header, tcp_login_response_body>;
+using tcp_login_request = aquarius::virgo::tcp_request<"10002", tcp_login_request_header, tcp_login_request_body>;
+using tcp_login_response = aquarius::virgo::tcp_response<"10002", tcp_login_response_header, tcp_login_response_body>;
 using http_login_request = aquarius::virgo::http_request<aquarius::virgo::http_method::post,"login", http_login_request_header, http_login_request_body>;
 using http_login_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post,"login", http_login_response_header, http_login_response_body>;

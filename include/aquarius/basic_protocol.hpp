@@ -69,13 +69,6 @@ namespace aquarius
 			return header() == other.header() && body() == other.body();
 		}
 
-		std::ostream& operator<<(std::ostream& os) const
-		{
-			os << header_ptr_ << body();
-
-			return os;
-		}
-
 	public:
 		header_t& header()
 		{

@@ -5,6 +5,7 @@
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
@@ -84,7 +85,7 @@ namespace aquarius
 
 			Response resp{};
 
-			if (ec.value() == static_cast<int>(virgo::http_status::ok))
+			if (!ec)
 			{
 				resp.move_copy(std::move(hf));
 				resp.consume(buffer);
@@ -96,36 +97,25 @@ namespace aquarius
 		template <typename Request>
 		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
 		{
-			std::string str = std::format("{} {} {}\r\n", from_method_string(Request::method), Request::router,
-										  from_version_string(request->version()));
-
 			request->set_field("Content-Type", "aquarius-json");
 			request->set_field("Server", "Aquarius 0.10.0");
 			request->set_field("Connection", "keep-alive");
 			request->set_field("Access-Control-Allow-Origin", "*");
 
-			for (auto& s : request->fields())
-			{
-				str += std::format("{}: {}\r\n", s.first, s.second);
-			}
 
-			str += "\r\n";
-
-			buffer.put(str.begin(), str.end());
-
-			request->commit(buffer);
+			make_http_buffer<true>(*request, buffer);
 		}
 
-		template <typename Session, typename Request>
-		void make_error_response_buffer(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request,
-										virgo::http_status status)
+		template <typename Session>
+		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_version version, const virgo::http_fields& hf,
+										virgo::http_status status) -> awaitable<void>
 		{
 			flex_buffer buffer{};
 
-			auto headline = make_http_headline(from_version_string(request->version()), static_cast<int>(status),
+			auto headline = make_http_headline(from_version_string(version), static_cast<int>(status),
 											   virgo::from_status_string(status));
 
-			for (auto& s : request.fields())
+			for (const auto& s : hf.fields())
 			{
 				headline += std::format("{}: {}\r\n", s.first, s.second);
 			}
@@ -134,7 +124,7 @@ namespace aquarius
 
 			buffer.put(headline.begin(), headline.end());
 
-			session_ptr->async_send(std::move(buffer));
+			co_await session_ptr->async_send(std::move(buffer));
 		}
 
 	private:
@@ -153,9 +143,9 @@ namespace aquarius
 
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 			{
-				make_error_response_buffer(session_ptr, request, ec.value());
+				make_error_response(session_ptr, version_, hf, static_cast<virgo::http_status>(ec.value()));
 
-				co_return aquarius::error_code{};
+				co_return;
 			}
 
 			auto span = std::span<char>((char*)buffer.rdata(), buffer.active());
@@ -173,9 +163,9 @@ namespace aquarius
 
 			if (iter == buf_view.end())
 			{
-				make_error_response_buffer(session_ptr, request, virgo::http_status::bad_request);
+				make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
 
-				co_return aquarius::error_code{};
+				co_return;
 			}
 
 			auto len = std::distance(buf_view.begin(), iter);
@@ -186,16 +176,16 @@ namespace aquarius
 
 			auto header_view = std::views::split(head_buf, '\n');
 
-			for (const auto header : header_view)
+			for (const auto& header : header_view)
 			{
 				auto itor =
 					std::ranges::find_if(header.begin(), header.end(), [](const auto& value) { return value == ':'; });
 
 				if (itor == header.end())
 				{
-					make_error_response_buffer(session_ptr, request, virgo::http_status::bad_request);
+					make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
 
-					co_return aquarius::error_code{};
+					co_return;
 				}
 
 				len = std::distance(header.begin(), itor);
@@ -215,25 +205,19 @@ namespace aquarius
 
 			ec = aquarius::error_code{};
 
-			if (hf.content_length() == 0)
+			if (hf.content_length() == 0 && method_ != virgo::http_method::get)
 			{
-				make_error_response_buffer(session_ptr, request, virgo::http_status::length_required);
-
-				co_return;
+				co_return co_await make_error_response(session_ptr, version_,hf, virgo::http_status::length_required);
 			}
 
 			if (hf.content_length() > max_http_length)
 			{
-				make_error_response_buffer(session_ptr, request, virgo::http_status::payload_too_large);
-
-				co_return;
+				co_return co_await make_error_response(session_ptr, version_,hf, virgo::http_status::payload_too_large);
 			}
 
 			if (!hf.find("Expect").empty())
 			{
-				make_error_response_buffer(session_ptr, request, virgo::http_status::expectation_failed);
-
-				co_return;
+				co_return co_await make_error_response(session_ptr, version_, hf, virgo::http_status::expectation_failed);
 			}
 
 			auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.active());
@@ -396,11 +380,17 @@ namespace aquarius
 
 			if (iter == buffer.end())
 			{
-				virgo::http_status::bad_request;
+				ec = virgo::http_status::bad_request;
 				return;
 			}
 
 			auto pos = std::distance(buffer.begin(), iter);
+
+			auto path_sp = buffer.subspan(0, pos);
+
+			std::string(path_sp.data(), path_sp.size()).swap(path_);
+
+			path_ = path_.substr(1);
 
 			auto body_span = buffer.subspan(pos + 1);
 

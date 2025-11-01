@@ -2,6 +2,7 @@
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/ip/tcp/tcp_router.hpp>
 #include <aquarius/ip/tcp/tcp_server_session.hpp>
+#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
@@ -30,18 +31,11 @@ namespace aquarius
 
 		virtual auto send_response(error_code ec) -> awaitable<error_code>
 		{
-			this->response_ptr_.result(ec.value());
+			this->response_.result(ec.value());
 
 			flex_buffer buffer{};
 
-			constexpr auto pos = sizeof(uint32_t);
-
-			buffer.commit(pos);
-
-			this->response_ptr_.commit(buffer);
-
-			auto len = static_cast<uint32_t>(buffer.tellg() - pos);
-			std::copy((char*)&len, (char*)(&len + 1), buffer.data());
+			make_tcp_buffer<false>(this->response(), buffer);
 
 			co_return co_await this->session()->async_send(std::move(buffer));
 		}

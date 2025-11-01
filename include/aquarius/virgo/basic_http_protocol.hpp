@@ -36,6 +36,26 @@ namespace aquarius
 				, get_params_()
 			{}
 
+			basic_http_protocol(basic_http_protocol&& other) noexcept
+				: base(std::move(other))
+				, version_(std::exchange(other.version_, 0))
+				, get_params_(std::move(other.get_params_))
+			{
+
+			}
+
+			basic_http_protocol& operator=(basic_http_protocol&& other)noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+					version_ = std::exchange(other.version_, 0);
+					get_params_ = std::move(other.get_params_);
+				}
+
+				return *this;
+			}
+
 		public:
 			bool operator==(const basic_http_protocol& other) const
 			{
@@ -45,9 +65,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << method << version_;
+				os << method << " " << version() << " ";
 
 				for (auto& p : get_params_)
 				{
@@ -112,6 +132,26 @@ namespace aquarius
 				, reason_()
 			{}
 
+			basic_http_protocol(basic_http_protocol&& other) noexcept
+				: base(std::move(other))
+				, version_(std::exchange(other.version_, virgo::http_version::http1_1))
+				, reason_(std::move(other.reason_))
+			{
+
+			}
+
+			basic_http_protocol& operator=(basic_http_protocol&& other)noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+					version_ = std::exchange(other.version_, 0);
+					reason_ = std::move(other.reason_);
+				}
+
+				return *this;
+			}
+
 		public:
 			bool operator==(const basic_http_protocol& other) const
 			{
@@ -121,9 +161,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << status_ << version_ << reason_;
+				os << result() << " " << version() << " " << reason();
 
 				return os;
 			}

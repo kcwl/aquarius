@@ -7,10 +7,10 @@ BOOST_AUTO_TEST_SUITE(make_proto)
 
 BOOST_AUTO_TEST_CASE(make_tcp_buffers)
 {
-    auto response = std::make_shared<login_response>();
+    login_response response{};
 
     aquarius::flex_buffer buffer{};
-    aquarius::make_tcp_buffer(response, buffer);
+    aquarius::make_tcp_buffer<false>(response, buffer);
 
     uint32_t value{};
     std::memcpy((void*)&value, buffer.data(), sizeof(value));

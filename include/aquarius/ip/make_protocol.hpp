@@ -2,45 +2,58 @@
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_version.hpp>
+#include <aquarius/serialize/binary.hpp>
 
 namespace aquarius
 {
 
-	template <typename Request>
-	void make_http_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
+	template <bool Request, typename Message>
+	void make_http_buffer(Message& msg, flex_buffer& buffer)
 	{
+		flex_buffer temp{};
+
+		if constexpr (Message::method != virgo::http_method::get)
+		{
+			msg.commit(temp);
+		}
+
 		std::string headline{};
 
-		if constexpr (Request::method == virgo::http_method::get)
+		if constexpr (Request)
 		{
-			flex_buffer temp;
-			request->body().serialize(temp);
-			std::string temp_str;
-			temp.get(temp_str);
-			headline = std::format("{} {} {}\r\n", virgo::from_method_string(Request::method), Request::router + temp_str,
-								   virgo::from_version_string(request->version()));
+			if constexpr (Message::method == virgo::http_method::get)
+			{
+				flex_buffer tempget;
+				msg.body().serialize(tempget);
+				std::string temp_str;
+				tempget.get(temp_str);
+				headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Message::method), Message::router,
+									   temp_str, virgo::from_version_string(msg.version()));
+			}
+			else
+			{
+				headline = std::format("{} {} {}\r\n", virgo::from_method_string(Message::method), Message::router,
+									   virgo::from_version_string(msg.version()));
+			}
 		}
 		else
 		{
-			headline = std::format("{} {} {}\r\n", virgo::from_method_string(Request::method), Request::router,
-								   virgo::from_version_string(request->version()));
+			headline = std::format("{} {} {}\r\n", from_version_string(msg.version()), static_cast<int>(msg.result()),
+								   msg.reason().data());
 		}
 
-		request->set_field("Content-Type", "aquarius");
-		request->set_field("Server", "Aquarius 0.10.0");
-		request->set_field("Connection", "keep-alive");
-		request->set_field("Access-Control-Allow-Origin", "*");
-		request->set_field("Content-Type", "aquarius-json");
-		for (auto& s : request->fields())
+		for (auto& s : msg.fields())
 		{
 			headline += std::format("{}: {}\r\n", s.first, s.second);
 		}
-		headline += "\r\n";
-		buffer.put(headline.begin(), headline.end());
 
-		if constexpr (Request::method != virgo::http_method::get)
+		headline += "\r\n";
+
+		buffer.put(headline.begin(), headline.end());
+		
+		if constexpr (Message::method != virgo::http_method::get)
 		{
-			request->commit(buffer);
+			buffer.append(std::move(temp));
 		}
 	}
 
@@ -57,14 +70,19 @@ namespace aquarius
 		return ss.str();
 	}
 
-	template <typename Response>
-	void make_tcp_buffer(std::shared_ptr<Response> response, flex_buffer& buffer)
+	template <bool Request, typename Message>
+	void make_tcp_buffer(Message& msg, flex_buffer& buffer)
 	{
 		constexpr auto pos = sizeof(uint32_t);
 
 		buffer.commit(pos);
 
-		response->commit(buffer);
+		if constexpr (Request)
+		{
+			binary_parse{}.to_datas(Message::router, buffer);
+		}
+
+		msg.commit(buffer);
 
 		auto len = static_cast<uint32_t>(buffer.tellg() - pos);
 		std::copy((char*)&len, (char*)(&len + 1), buffer.data());

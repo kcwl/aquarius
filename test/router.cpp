@@ -22,19 +22,19 @@ BOOST_AUTO_TEST_CASE(http_router)
 		BOOST_TEST(res);
 	}
 
-	//{
-	//	aquarius::io_context io{};
-	//	auto session = std::make_shared<aquarius::http_server_session>(io);
+	{
+		aquarius::io_context io{};
+		auto session = std::make_shared<aquarius::http_server_session>(io);
 
-	//	aquarius::virgo::http_fields hf;
+		aquarius::virgo::http_fields hf;
 
-	//	aquarius::flex_buffer buffer;
+		aquarius::flex_buffer buffer;
 
-	//	auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
-	//		http_login_request::method, http_login_request::router, session, hf, std::move(buffer));
+		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
+			aquarius::virgo::http_method::none, http_login_request::router, session, hf, std::move(buffer));
 
-	//	BOOST_TEST(!res);
-	//}
+		BOOST_TEST(!res);
+	}
 
 	{
 		aquarius::io_context io{};

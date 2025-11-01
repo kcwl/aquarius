@@ -243,6 +243,9 @@
     <ClCompile Include="..\test\flex_buffer.cpp" />
     <ClCompile Include="..\test\float.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
+    <ClCompile Include="..\test\http_method.cpp" />
+    <ClCompile Include="..\test\http_status.cpp" />
+    <ClCompile Include="..\test\http_version.cpp" />
     <ClCompile Include="..\test\int_to_string.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\get_method_parse.cpp" />
@@ -265,6 +268,7 @@
   <ItemGroup>
     <ClCompile Include="..\test\string_literal.cpp" />
     <ClCompile Include="..\test\struct_name.cpp" />
+    <ClCompile Include="..\test\tcp_error.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
     <ClCompile Include="..\test\test.virgo.cpp" />
     <ClCompile Include="..\test\trie.cpp" />

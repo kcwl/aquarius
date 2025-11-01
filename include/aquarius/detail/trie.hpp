@@ -72,7 +72,7 @@ namespace aquarius
 				while (iter != key.end())
 				{
 					auto it = std::find_if(cur_node->children.begin(), cur_node->children.end(),
-										   [&](auto node) { return node->key == *iter++; });
+										   [&](auto node) { return node->key == *iter; });
 
 					if (it == cur_node->children.end())
 					{
@@ -82,7 +82,11 @@ namespace aquarius
 					{
 						cur_node = *it;
 					}
+
+					iter++;
 				}
+
+				
 
 				return cur_node->func;
 			}

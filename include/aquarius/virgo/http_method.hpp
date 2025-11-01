@@ -10,6 +10,7 @@ namespace aquarius
 	{
 		enum class http_method
 		{
+			none,
 			get,
 			post,
 			options,

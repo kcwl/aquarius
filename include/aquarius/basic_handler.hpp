@@ -37,7 +37,7 @@ namespace aquarius
 
 		Response& response()
 		{
-			return response_ptr_;
+			return response_;
 		}
 
 	protected:
@@ -51,7 +51,7 @@ namespace aquarius
 	protected:
 		std::shared_ptr<request_t> request_ptr_;
 
-		response_t response_ptr_;
+		response_t response_;
 
 		std::shared_ptr<Session> session_ptr_;
 

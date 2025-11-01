@@ -11,7 +11,7 @@ namespace aquarius
 			: parser(struct_type::protocol)
 			, router_ptr_(new router_field())
 			, request_ptr_(new service_struct())
-			, response_ptr_(new service_struct())
+			, response_(new service_struct())
 		{}
 
 		std::ostream& operator<<(std::ostream& os, const protocol_struct& field)
@@ -83,8 +83,8 @@ namespace aquarius
 				}
 				else if (sub_key == "response")
 				{
-					result = response_ptr_->visit(ifs, column, row);
-					response_ptr_->set_name(this->name());
+					result = response_->visit(ifs, column, row);
+					response_->set_name(this->name());
 				}
 				else
 					return parse_error::keyword;
@@ -99,7 +99,7 @@ namespace aquarius
 
 		std::shared_ptr<service_struct> protocol_struct::response() const
 		{
-			return response_ptr_;
+			return response_;
 		}
 
 		std::string protocol_struct::protocol() const
