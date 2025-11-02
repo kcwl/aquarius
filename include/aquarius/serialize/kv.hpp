@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	struct get_parse
+	struct kv_parse
 	{
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)

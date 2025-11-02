@@ -79,12 +79,6 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template <typename Request>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
-		{
-			make_tcp_buffer<true>(*request, buffer);
-		}
-
 	private:
 		template <typename Session>
 		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>

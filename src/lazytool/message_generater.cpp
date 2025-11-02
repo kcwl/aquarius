@@ -8,7 +8,6 @@ namespace aquarius
 	{
 		namespace cpp
 		{
-
 			generator::generate_error message_generate::visit(std::shared_ptr<parser> parser, std::ofstream& ofs_h,
 															  std::ofstream& ofs_cpp)
 			{
@@ -59,13 +58,13 @@ namespace aquarius
 					ofs << "using " << ptr->name() << " = aquarius::virgo::" << ptr->protocol()
 
 						<< service << "<\"" << ptr->router_key() << "\", aquarius::tcp" << service << "_header, "
-						<< ptr->name() << "_body>;\n";
+						<< ptr->name() << "_body>;" << CRLF;
 				}
 				else if (ptr->protocol() == "http")
 				{
-					ofs << "using " << ptr->name() << " = aquarius::virgo::http" << service
-						<< "<aquarius::virgo::http_method::" << ptr->method() << ",\"" << ptr->router_key()
-						<< "\", aquarius::http" << service << "_header, " << ptr->name() << "_body>;\n";
+					ofs << "using " << ptr->name() << " = aquarius::virgo::http" << service << "<\""
+						<< ptr->router_key() << "\", aquarius::http" << service << "_header, " << ptr->name()
+						<< "_body>;" << CRLF;
 				}
 			}
 
@@ -76,20 +75,20 @@ namespace aquarius
 
 				auto parent_name = std::format("{}_{}_serialize", parser->protocol(), parser->method());
 
-				ofs << "class " << class_name << " : public aquarius::" << parent_name << "\n";
-				ofs << "{\n";
-				ofs << "public:\n";
-				ofs << "\t" << class_name << "() = default;\n";
-				ofs << "\tvirtual ~" << class_name << "() = default;\n";
-				ofs << "\n";
-				ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;\n\n";
-				ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;\n\n";
-				ofs << "public:\n";
+				ofs << "class " << class_name << " : public aquarius::" << parent_name << CRLF;
+				ofs << "{" << CRLF;
+				ofs << "public:" << CRLF;
+				ofs << "\t" << class_name << "() = default;" << CRLF;
+				ofs << "\tvirtual ~" << class_name << "() = default;" << CRLF;
+				ofs << CRLF;
+				ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;" << TWO_CRLF;
+				ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;" << TWO_CRLF;
+				ofs << "public:" << CRLF;
 				for (auto& [type, name] : parser->fields())
 				{
-					ofs << "\t" << type << " " << name << ";\n";
+					ofs << "\t" << type << " " << name << ";" << CRLF;
 				}
-				ofs << "};\n";
+				ofs << "};" << CRLF;
 
 				return generate_error::success;
 			}
@@ -99,74 +98,85 @@ namespace aquarius
 			{
 				auto class_name = std::format("{}_body", parser->name());
 
-				ofs << "\n";
-				ofs << "void " << class_name << "::serialize(aquarius::flex_buffer& buffer)\n";
-				ofs << "{\n";
+				ofs << CRLF;
+				ofs << "void " << class_name << "::serialize(aquarius::flex_buffer& buffer)" << CRLF;
+				ofs << "{" << CRLF;
 
-				if (parser->protocol() == "http")
+				auto f = [&](const std::string& method, const std::string& direction, bool has_type = false)
 				{
-					if (parser->method() == "get")
+					if (method == "binary")
+					{
+						for (auto& [type, name] : parser->fields())
+						{
+							if (has_type)
+							{
+								ofs << "\t" << name << " = this->parse_" << direction << "<" << type << ">(buffer);"
+									<< CRLF;
+							}
+							else
+							{
+								ofs << "\tthis->parse_" << direction << "(" << name << ", buffer);" << CRLF;
+							}
+						}
+					}
+					else if (method == "kv")
 					{
 						bool start = true;
 						for (auto& [type, name] : parser->fields())
 						{
-							if (start)
+							if (!has_type)
 							{
-								start = !start;
-								ofs << "\tbuffer.put('?');\n";
+								if (start)
+								{
+									start = !start;
+									ofs << "\tbuffer.put('?');" << CRLF;
+								}
+								else
+									ofs << "\tbuffer.put('&');" << CRLF;
+							}
+
+							if (has_type)
+							{
+								ofs << "\t" <<name << " = this->parse_" << direction << "<" << type << ">(buffer, \"" << name << "\");"
+									<< CRLF;
 							}
 							else
-								ofs << "\tbuffer.put('&');\n";
-
-							ofs << "\tthis->parse_to(" << name << ", buffer, \"" << name << "\");\n";
+							{
+								ofs << "\tthis->parse_" << direction << "(" << name << ", buffer, \"" << name << "\");"
+									<< CRLF;
+							}
 						}
 
 						ofs.seekp(-1, std::ios::cur);
 						ofs << " ";
 					}
-					else
+					else if (method == "json")
 					{
-						ofs << "\tthis->parse_to(*this, buffer);\n";
-					}
-				}
-				else
-				{
-					for (auto& [type, name] : parser->fields())
-					{
-						ofs << "\tthis->parse_to(" << name << ", buffer);\n";
-					}
-				}
-
-				ofs << "}\n";
-
-				ofs << "\n";
-				ofs << "void " << class_name << "::deserialize(aquarius::flex_buffer& buffer)\n";
-				ofs << "{\n";
-
-				if (parser->protocol() == "http")
-				{
-					if (parser->method() == "get")
-					{
-						for (auto& [type, name] : parser->fields())
+						if (has_type)
 						{
-							ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name
-								<< "\");\n";
+							ofs << "\t*this = this->parse_" << direction <<"<" << class_name << ">(buffer); " << CRLF;
+						}
+						else
+						{
+							ofs << "\tthis->parse_" << direction << "(*this, buffer);" << CRLF;
 						}
 					}
 					else
 					{
-						ofs << "\t*this = this->parse_from<" << class_name << ">(buffer);\n";
 					}
-				}
-				else
-				{
-					for (auto& [type, name] : parser->fields())
-					{
-						ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer);\n";
-					}
-				}
+				};
 
-				ofs << "}\n";
+				f(parser->method(), "to");
+
+				ofs << "}" << CRLF;
+
+				ofs << CRLF;
+				ofs << "void " << class_name << "::deserialize(aquarius::flex_buffer& buffer)" << CRLF;
+				ofs << "{" << CRLF;
+
+				f(parser->method(), "from", true);
+
+				ofs << "}" << CRLF;
 
 				return generate_error::success;
 			}

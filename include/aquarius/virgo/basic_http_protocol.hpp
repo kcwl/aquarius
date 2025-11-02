@@ -2,14 +2,13 @@
 #include <aquarius/basic_protocol.hpp>
 #include <aquarius/virgo/http_fields.hpp>
 #include <aquarius/virgo/http_version.hpp>
-#include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, virgo::http_method Method, detail::string_literal Router, typename Header,
+		template <bool Request, detail::string_literal Router, typename Header,
 				  typename Body, typename Allocator>
 		class basic_http_protocol : public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>,
 									public http_fields
@@ -22,8 +21,6 @@ namespace aquarius
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
-
-			constexpr static auto method = Method;
 
 			using typename base::header_t;
 
@@ -67,7 +64,7 @@ namespace aquarius
 			{
 				os << this->header() << " " << this->body() << " ";
 
-				os << method << " " << version() << " ";
+				os << version() << " ";
 
 				for (auto& p : get_params_)
 				{
@@ -104,9 +101,9 @@ namespace aquarius
 			std::vector<std::pair<std::string, std::string>> get_params_;
 		};
 
-		template <virgo::http_method Method, detail::string_literal Router, typename Header, typename Body,
+		template <detail::string_literal Router, typename Header, typename Body,
 				  typename Allocator>
-		class basic_http_protocol<false, Method, Router, Header, Body, Allocator>
+		class basic_http_protocol<false, Router, Header, Body, Allocator>
 			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>, public http_fields
 		{
 		public:
@@ -117,8 +114,6 @@ namespace aquarius
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
-
-			constexpr static auto method = Method;
 
 			using typename base::header_t;
 

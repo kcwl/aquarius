@@ -4,10 +4,10 @@
 
 namespace aquarius
 {
-	class http_post_serialize : public basic_serialize<json_parse>
+	class http_json_serialize : public basic_serialize<json_parse>
 	{
 	public:
-		http_post_serialize() = default;
-		virtual ~http_post_serialize() = default;
+		http_json_serialize() = default;
+		virtual ~http_json_serialize() = default;
 	};
 } // namespace aquarius

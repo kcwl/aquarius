@@ -180,12 +180,6 @@ namespace aquarius
 			return sql_;
 		}
 
-		template <typename Request>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
-		{
-			return proto_.template make_request_buffer<Request>(request, buffer);
-		}
-
 	private:
 		socket socket_;
 

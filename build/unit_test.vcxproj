@@ -187,6 +187,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\http_handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp" />
@@ -206,9 +207,9 @@
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\get_method.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_get_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_post_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
@@ -248,7 +249,7 @@
     <ClCompile Include="..\test\http_version.cpp" />
     <ClCompile Include="..\test\int_to_string.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
-    <ClCompile Include="..\test\get_method_parse.cpp" />
+    <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
     <ClCompile Include="..\test\make_protocol.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />

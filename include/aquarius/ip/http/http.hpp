@@ -95,26 +95,6 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template <typename Request>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
-		{
-			if constexpr (Request::method == virgo::http_method::get)
-			{
-				request->set_field("Content-Type", "json");
-			}
-			else
-			{
-				request->set_field("Content-Type", "aquarius-json");
-			}
-			
-			request->set_field("Server", "Aquarius 0.10.0");
-			request->set_field("Connection", "keep-alive");
-			request->set_field("Access-Control-Allow-Origin", "*");
-
-
-			make_http_buffer<true>(*request, buffer);
-		}
-
 		template <typename Session>
 		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_version version, const virgo::http_fields& hf,
 										virgo::http_status status) -> awaitable<void>

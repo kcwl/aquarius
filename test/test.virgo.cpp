@@ -40,15 +40,15 @@ person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::j
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const person& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("sex", local.sex); 
-	jv_obj.emplace("addr", local.addr); 
-	jv_obj.emplace("age", local.age); 
-	jv_obj.emplace("telephone", local.telephone); 
-	jv_obj.emplace("score", local.score); 
-	jv_obj.emplace("hp", local.hp); 
-	jv_obj.emplace("mana", local.mana); 
-	jv_obj.emplace("name", local.name); 
-	jv_obj.emplace("orders", aquarius::json_value_from_array(local.orders)); 
+	jv_obj.emplace("sex", local.sex);
+	jv_obj.emplace("addr", local.addr);
+	jv_obj.emplace("age", local.age);
+	jv_obj.emplace("telephone", local.telephone);
+	jv_obj.emplace("score", local.score);
+	jv_obj.emplace("hp", local.hp);
+	jv_obj.emplace("mana", local.mana);
+	jv_obj.emplace("name", local.name);
+	jv_obj.emplace("orders", aquarius::json_value_from_array(local.orders));
 }
 
 
@@ -87,7 +87,7 @@ login_request_body tag_invoke(const aquarius::json::value_to_tag<login_request_b
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
 }
 
 
@@ -126,7 +126,7 @@ login_response_body tag_invoke(const aquarius::json::value_to_tag<login_response
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
 }
 
 
@@ -137,7 +137,7 @@ void new_http_login_request_body::serialize(aquarius::flex_buffer& buffer)
 
 void new_http_login_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<new_http_login_request_body>(buffer);
+	*this = this->parse_from<new_http_login_request_body>(buffer); 
 }
 
 bool operator==(const new_http_login_request_body& lhs, const new_http_login_request_body& rhs)
@@ -166,8 +166,8 @@ new_http_login_request_body tag_invoke(const aquarius::json::value_to_tag<new_ht
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
+	jv_obj.emplace("uuid", local.uuid);
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
 }
 
 
@@ -178,7 +178,7 @@ void new_http_login_response_body::serialize(aquarius::flex_buffer& buffer)
 
 void new_http_login_response_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<new_http_login_response_body>(buffer);
+	*this = this->parse_from<new_http_login_response_body>(buffer); 
 }
 
 bool operator==(const new_http_login_response_body& lhs, const new_http_login_response_body& rhs)
@@ -207,8 +207,8 @@ new_http_login_response_body tag_invoke(const aquarius::json::value_to_tag<new_h
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const new_http_login_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
-	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("uuid", local.uuid);
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
 }
 
 
@@ -224,7 +224,7 @@ void http_test_get_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	user = this->parse_from<int32>(buffer, "user");
 	passwd = this->parse_from<string>(buffer, "passwd");
-}
+ }
 
 bool operator==(const http_test_get_request_body& lhs, const http_test_get_request_body& rhs)
 {
@@ -252,23 +252,19 @@ http_test_get_request_body tag_invoke(const aquarius::json::value_to_tag<http_te
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("user", local.user); 
-	jv_obj.emplace("passwd", local.passwd); 
+	jv_obj.emplace("user", local.user);
+	jv_obj.emplace("passwd", local.passwd);
 }
 
 
 void http_test_get_response_body::serialize(aquarius::flex_buffer& buffer)
 {
-	buffer.put('?');
-	this->parse_to(user, buffer, "user");
-	buffer.put('&');
-	this->parse_to(passwd, buffer, "passwd");
- }
+	this->parse_to(*this, buffer);
+}
 
 void http_test_get_response_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<int32>(buffer, "user");
-	passwd = this->parse_from<string>(buffer, "passwd");
+	*this = this->parse_from<http_test_get_response_body>(buffer); 
 }
 
 bool operator==(const http_test_get_response_body& lhs, const http_test_get_response_body& rhs)
@@ -297,8 +293,8 @@ http_test_get_response_body tag_invoke(const aquarius::json::value_to_tag<http_t
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("user", local.user); 
-	jv_obj.emplace("passwd", local.passwd); 
+	jv_obj.emplace("user", local.user);
+	jv_obj.emplace("passwd", local.passwd);
 }
 
 
@@ -403,7 +399,7 @@ tcp_login_request_header tag_invoke(const aquarius::json::value_to_tag<tcp_login
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_header& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("uuid", local.uuid);
 }
 
 tcp_login_request_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_request_body>&, const aquarius::json::value& jv)
@@ -420,7 +416,7 @@ tcp_login_request_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_r
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
 }
 
 tcp_login_response_header tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_header>&, const aquarius::json::value& jv)
@@ -437,7 +433,7 @@ tcp_login_response_header tag_invoke(const aquarius::json::value_to_tag<tcp_logi
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_header& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("uuid", local.uuid);
 }
 
 tcp_login_response_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_response_body>&, const aquarius::json::value& jv)
@@ -454,7 +450,7 @@ tcp_login_response_body tag_invoke(const aquarius::json::value_to_tag<tcp_login_
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const tcp_login_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
 }
 
 
@@ -559,7 +555,7 @@ http_login_request_header tag_invoke(const aquarius::json::value_to_tag<http_log
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_header& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("uuid", local.uuid);
 }
 
 http_login_request_body tag_invoke(const aquarius::json::value_to_tag<http_login_request_body>&, const aquarius::json::value& jv)
@@ -576,7 +572,7 @@ http_login_request_body tag_invoke(const aquarius::json::value_to_tag<http_login
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_request_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req)); 
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
 }
 
 http_login_response_header tag_invoke(const aquarius::json::value_to_tag<http_login_response_header>&, const aquarius::json::value& jv)
@@ -593,7 +589,7 @@ http_login_response_header tag_invoke(const aquarius::json::value_to_tag<http_lo
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_header& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("uuid", local.uuid); 
+	jv_obj.emplace("uuid", local.uuid);
 }
 
 http_login_response_body tag_invoke(const aquarius::json::value_to_tag<http_login_response_body>&, const aquarius::json::value& jv)
@@ -610,6 +606,6 @@ http_login_response_body tag_invoke(const aquarius::json::value_to_tag<http_logi
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_login_response_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
-	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp)); 
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
 }
 

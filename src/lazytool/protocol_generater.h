@@ -13,6 +13,8 @@ namespace aquarius
 		{
 			class protocol_generate : public generater, public json_tag
 			{
+				using generater::CRLF;
+				using generater::TWO_CRLF;
 			public:
 				protocol_generate() = default;
 				virtual ~protocol_generate() = default;

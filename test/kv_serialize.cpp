@@ -1,12 +1,12 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include <aquarius/serialize/get_method.hpp>
+#include <aquarius/serialize/kv.hpp>
 
 BOOST_AUTO_TEST_SUITE(serialize)
 
 BOOST_AUTO_TEST_CASE(get_method)
 {
-	aquarius::get_parse pr{};
+	aquarius::kv_parse pr{};
 
 	{
 		aquarius::flex_buffer buffer{};

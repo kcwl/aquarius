@@ -11,6 +11,10 @@ namespace aquarius
 		{
 			class json_tag
 			{
+				constexpr static auto CRLF = "\n";
+
+				constexpr static auto TWO_CRLF = "\n\n";
+
 				enum json_type
 				{
 					integer,

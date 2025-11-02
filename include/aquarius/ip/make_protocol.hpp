@@ -8,31 +8,28 @@ namespace aquarius
 {
 
 	template <bool Request, typename Message>
-	void make_http_buffer(Message& msg, flex_buffer& buffer)
+	void make_http_buffer(Message& msg, flex_buffer& buffer, virgo::http_method method)
 	{
 		flex_buffer temp{};
-
-
-		
 
 		std::string headline{};
 
 		if constexpr (Request)
 		{
-			if constexpr (Message::method == virgo::http_method::get)
+			if (method == virgo::http_method::get)
 			{
 				flex_buffer tempget;
 				msg.body().serialize(tempget);
 				std::string temp_str;
 				tempget.get(temp_str);
-				headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Message::method), Message::router,
+				headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
 									   temp_str, virgo::from_version_string(msg.version()));
 			}
 			else
 			{
 				msg.commit(temp);
 
-				headline = std::format("{} {} {}\r\n", virgo::from_method_string(Message::method), Message::router,
+				headline = std::format("{} {} {}\r\n", virgo::from_method_string(method), Message::router,
 									   virgo::from_version_string(msg.version()));
 			}
 		}

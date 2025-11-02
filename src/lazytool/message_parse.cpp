@@ -57,6 +57,11 @@ namespace aquarius
             return router_ptr_->method();
         }
 
+        void message_struct::method(const std::string& m)
+        {
+            router_ptr_->set_method(m);
+        }
+
         std::string message_struct::router_key() const
         {
             return router_ptr_->key();

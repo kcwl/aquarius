@@ -114,20 +114,18 @@ namespace aquarius
 				if (ptr->protocol() == "tcp")
 				{
 					ofs << "using " << ptr->name() << "_request = aquarius::virgo::tcp_request<\"" << ptr->router_key()
-						<< "\", " << ptr->name() << "_request_header, " << ptr->name() << "_request_body>;\n";
+						<< "\", " << ptr->name() << "_request_header, " << ptr->name() << "_request_body>;" << CRLF;
 					ofs << "using " << ptr->name() << "_response = aquarius::virgo::tcp_response<\"" << ptr->router_key() << "\", " << ptr->name() << "_response_header, "
-						<< ptr->name() << "_response_body>;\n";
+						<< ptr->name() << "_response_body>;" << CRLF;
 				}
 				else if (ptr->protocol() == "http")
 				{
 					ofs << "using " << ptr->name()
-						<< "_request = aquarius::virgo::http_request<aquarius::virgo::http_method::" << ptr->method()
-						<< ",\"" << ptr->router_key() << "\", " << ptr->name() << "_request_header, " << ptr->name()
-						<< "_request_body>;\n";
+						<< "_request = aquarius::virgo::http_request<" << "\"" << ptr->router_key() << "\", " << ptr->name() << "_request_header, " << ptr->name()
+						<< "_request_body>;" << CRLF;
 					ofs << "using " << ptr->name()
-						<< "_response = aquarius::virgo::http_response<aquarius::virgo::http_method::" << ptr->method()
-						<< ",\"" << ptr->router_key() << "\", " << ptr->name() << "_response_header, " << ptr->name()
-						<< "_response_body>;\n";
+						<< "_response = aquarius::virgo::http_response<" << "\"" << ptr->router_key() << "\", " << ptr->name() << "_response_header, " << ptr->name()
+						<< "_response_body>;" << CRLF;
 				}
 			}
 
@@ -138,21 +136,21 @@ namespace aquarius
 				auto f = [&](const std::string& cla_name, const auto& fields)
 				{
 					ofs << "class " << cla_name << " : public aquarius::" << protocol_router_key
-						<< "_serialize\n";
-					ofs << "{\n";
-					ofs << "public:\n";
-					ofs << "\t" << cla_name << "() = default;\n";
-					ofs << "\tvirtual ~" << cla_name << "() = default;\n";
-					ofs << "\n";
-					ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;\n\n";
-					ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;\n\n";
-					ofs << "public:\n";
+						<< "_serialize" << CRLF;
+					ofs << "{" << CRLF;
+					ofs << "public:" << CRLF;
+					ofs << "\t" << cla_name << "() = default;" << CRLF;
+					ofs << "\tvirtual ~" << cla_name << "() = default;" << CRLF;
+					ofs << CRLF;
+					ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;" << TWO_CRLF;
+					ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;" << TWO_CRLF;
+					ofs << "public:" << CRLF;
 					for (auto& [type, name] : fields)
 					{
-						ofs << "\t" << type << " " << name << ";\n";
+						ofs << "\t" << type << " " << name << ";" << CRLF;
 					}
 
-					ofs << "};\n";
+					ofs << "};" << CRLF;
 				};
 
 				f(std::format("{}_{}_header", parser->name(), service), parser->header()->fields());
@@ -165,29 +163,30 @@ namespace aquarius
 				std::ofstream& ofs, const std::string& service, const std::string& domin, std::shared_ptr<service_struct> parser,
 				const std::string& protocol, const std::string& router_key)
 			{
+		
 				auto f = [&](const std::string& cla_name, const auto& fields)
 				{
-					ofs << "\n";
-					ofs << "void " << cla_name << "::serialize(aquarius::flex_buffer& buffer)\n";
-					ofs << "{\n";
+					ofs << CRLF;
+					ofs << "void " << cla_name << "::serialize(aquarius::flex_buffer& buffer)" << CRLF;
+					ofs << "{" << CRLF;
 
 					if (protocol == "tcp")
 					{
 						for (auto& [type, name] : fields)
 						{
-							ofs << "\tthis->parse_to(" << name << ", buffer);\n";
+							ofs << "\tthis->parse_to(" << name << ", buffer);" << CRLF;
 						}
 					}
 					else
 					{
-						ofs << "\tthis->parse_to(*this, buffer);\n";
+						ofs << "\tthis->parse_to(*this, buffer);" << CRLF;
 					}
 
-					ofs << "}\n";
+					ofs << "}" << CRLF;
 
-					ofs << "\n";
-					ofs << "void " << cla_name << "::deserialize(aquarius::flex_buffer& buffer)\n";
-					ofs << "{\n";
+					ofs << CRLF;
+					ofs << "void " << cla_name << "::deserialize(aquarius::flex_buffer& buffer)" << CRLF;
+					ofs << "{" << CRLF;
 
 					if (protocol == "http")
 					{
@@ -195,12 +194,12 @@ namespace aquarius
 						{
 							for (auto& [type, name] : fields)
 							{
-								ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name << "\");\n";
+								ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name << "\");" << CRLF;
 							}
 						}
 						else
 						{
-							ofs << "\t*this = this->parse_from<" << cla_name << ">(buffer);\n";
+							ofs << "\t*this = this->parse_from<" << cla_name << ">(buffer);" << CRLF;
 						}
 						
 					}
@@ -208,11 +207,11 @@ namespace aquarius
 					{
 						for (auto& [type, name] : fields)
 						{
-							ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer);\n";
+							ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer);" << CRLF;
 						}
 					}
 
-					ofs << "}\n";
+					ofs << "}" << CRLF;
 				};
 
 				f(std::format("{}_{}_header", parser->name(), service), parser->header()->fields());

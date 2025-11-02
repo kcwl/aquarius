@@ -21,24 +21,24 @@ message login_response -> tcp-binary:10001
 	person per_resp;
 }
 
-message new_http_login_request -> http-post:login/new
+message new_http_login_request -> http-json:login/new
 {
 	int32 uuid;
 	person per_req;
 }
-message new_http_login_response -> http-post:login/new
+message new_http_login_response -> http-json:login/new
 {
 	int32 uuid;
 	person per_resp;
 }
 
-message http_test_get_request -> http-get:login
+message http_test_get_request -> http-kv:login
 {
 	int32 user;
 	string passwd;
 }
 
-message http_test_get_response -> http-get:login
+message http_test_get_response -> http-json:login
 {
 	int32 user;
 	string passwd;
@@ -60,7 +60,7 @@ protocol tcp_login -> tcp-binary:10002
 	}
 }
 
-protocol http_login -> http-post:login
+protocol http_login -> http-json:login
 {
 	request {
 	header:

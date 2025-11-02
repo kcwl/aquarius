@@ -36,6 +36,8 @@ namespace aquarius
 
             std::string method() const;
 
+            void method(const std::string& m);
+
             std::string router_key() const;
 
         private:

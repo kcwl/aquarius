@@ -165,7 +165,7 @@
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_post_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\json.hpp">
@@ -306,16 +306,19 @@
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\get_method.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\kv.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_get_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http_handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
@@ -383,7 +386,7 @@
     <ClCompile Include="..\test\binary_serialize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\get_method_parse.cpp">
+    <ClCompile Include="..\test\kv_serialize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\serialize_error.cpp">

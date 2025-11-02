@@ -4,7 +4,7 @@
 namespace aquarius
 {
 
-	template <typename Session, typename Request, typename Response>
+	template <virgo::http_method Method, typename Session, typename Request, typename Response>
 	class basic_http_hander : public basic_handler<Session, Request, Response>
 	{
 	public:
@@ -39,7 +39,7 @@ namespace aquarius
 
 			flex_buffer buffer{};
 
-			make_http_buffer<false>(this->response(), buffer);
+			make_http_buffer<false>(this->response(), buffer, Method);
 
 			co_return co_await this->session()->async_send(std::move(buffer));
 		}
@@ -55,11 +55,11 @@ namespace aquarius
 	};
 } // namespace aquarius
 
-#define __AQUARIUS_HTTP_HANDLER(__session, __method, __request, __response)                                            \
-	class __method final : public aquarius::basic_http_hander<__session, __request, __response>                        \
+#define __AQUARIUS_HTTP_HANDLER(__session, __method, __request, __response, __http_method)                             \
+	class __method final : public aquarius::basic_http_hander<__http_method, __session, __request, __response>         \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::basic_http_hander<__session, __request, __response>;                               \
+		using base_type = aquarius::basic_http_hander<__http_method, __session, __request, __response>;                \
                                                                                                                        \
 	public:                                                                                                            \
 		__method()                                                                                                     \
@@ -73,8 +73,4 @@ namespace aquarius
 	class __method;                                                                                                    \
 	[[maybe_unused]] static aquarius::auto_http_handler_register<__session, __method, __router, __http_method>         \
 		__auto_register_##__method(__request::router);                                                                 \
-	__AQUARIUS_HTTP_HANDLER(__session, __method, __request, __response)
-
-#define AQUARIUS_HTTP_HANDLER(__request, __response, __method)                                                         \
-	AQUARIUS_CONTEXT_BY_HTTP(aquarius::http_server_session, __request, __response, __method,                           \
-							 aquarius::http_router<aquarius::http_server_session>, __request::method)
+	__AQUARIUS_HTTP_HANDLER(__session, __method, __request, __response, __http_method)

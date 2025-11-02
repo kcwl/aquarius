@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/serialize/http_post_serialize.hpp>
+#include <aquarius/serialize/http_json_serialize.hpp>
 
 namespace aquarius
 {
-	class http_request_header : public http_post_serialize
+	class http_request_header : public http_json_serialize
 	{
 	public:
 		http_request_header() = default;
@@ -27,7 +27,7 @@ namespace aquarius
 		}
 	};
 
-	class http_response_header : public http_post_serialize
+	class http_response_header : public http_json_serialize
 	{
 	public:
 		http_response_header() = default;

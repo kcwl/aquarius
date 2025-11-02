@@ -10,6 +10,10 @@ namespace aquarius
 			class generater : public generator
 			{
 			public:
+				constexpr static auto CRLF = "\n";
+
+				constexpr static auto TWO_CRLF = "\n\n";
+			public:
 				explicit generater() = default;
 				~generater() = default;
 

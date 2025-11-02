@@ -13,6 +13,8 @@ namespace aquarius
 		{
 			class message_generate : public generater, public json_tag
 			{
+				using generater::CRLF;
+				using generater::TWO_CRLF;
 			public:
 				message_generate() = default;
 				virtual ~message_generate() = default;
