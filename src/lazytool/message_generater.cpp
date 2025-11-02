@@ -147,17 +147,8 @@ namespace aquarius
 				{
 					if (parser->method() == "get")
 					{
-						bool start = true;
 						for (auto& [type, name] : parser->fields())
 						{
-							if (start)
-							{
-								start = !start;
-								ofs << "\tbuffer.put('?');\n";
-							}
-							else
-								ofs << "\tbuffer.put('&');\n";
-
 							ofs << "\t" << name << " = this->parse_from<" << type << ">(buffer, \"" << name
 								<< "\");\n";
 						}

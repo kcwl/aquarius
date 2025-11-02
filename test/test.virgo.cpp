@@ -222,9 +222,7 @@ void http_test_get_request_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_request_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	buffer.put('?');
 	user = this->parse_from<int32>(buffer, "user");
-	buffer.put('&');
 	passwd = this->parse_from<string>(buffer, "passwd");
 }
 
@@ -269,9 +267,7 @@ void http_test_get_response_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_response_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	buffer.put('?');
 	user = this->parse_from<int32>(buffer, "user");
-	buffer.put('&');
 	passwd = this->parse_from<string>(buffer, "passwd");
 }
 

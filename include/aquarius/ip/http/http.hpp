@@ -54,7 +54,8 @@ namespace aquarius
 
 				if (method_ == virgo::http_method::get)
 				{
-					flex_buffer get_buffer((uint8_t*)this->get_body_span_.data(), this->get_body_span_.size());
+					flex_buffer get_buffer;
+					get_buffer.put(this->get_body_span_.begin(), this->get_body_span_.end());
 
 					buffer.swap(get_buffer);
 				}
@@ -97,7 +98,15 @@ namespace aquarius
 		template <typename Request>
 		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
 		{
-			request->set_field("Content-Type", "aquarius-json");
+			if constexpr (Request::method == virgo::http_method::get)
+			{
+				request->set_field("Content-Type", "json");
+			}
+			else
+			{
+				request->set_field("Content-Type", "aquarius-json");
+			}
+			
 			request->set_field("Server", "Aquarius 0.10.0");
 			request->set_field("Connection", "keep-alive");
 			request->set_field("Access-Control-Allow-Origin", "*");

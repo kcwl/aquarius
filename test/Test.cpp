@@ -2,9 +2,6 @@
 #include <boost/test/unit_test.hpp>
 //#include <aquarius.hpp>
 #include "ctx_handler.hpp"
-#ifdef VLD_DEBUG
-#include <vld.h>
-#endif
 
 using namespace std::chrono_literals;
 

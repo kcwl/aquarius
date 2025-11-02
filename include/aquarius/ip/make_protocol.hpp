@@ -12,10 +12,8 @@ namespace aquarius
 	{
 		flex_buffer temp{};
 
-		if constexpr (Message::method != virgo::http_method::get)
-		{
-			msg.commit(temp);
-		}
+
+		
 
 		std::string headline{};
 
@@ -32,12 +30,16 @@ namespace aquarius
 			}
 			else
 			{
+				msg.commit(temp);
+
 				headline = std::format("{} {} {}\r\n", virgo::from_method_string(Message::method), Message::router,
 									   virgo::from_version_string(msg.version()));
 			}
 		}
 		else
 		{
+			msg.commit(temp);
+
 			headline = std::format("{} {} {}\r\n", from_version_string(msg.version()), static_cast<int>(msg.result()),
 								   msg.reason().data());
 		}
@@ -51,10 +53,7 @@ namespace aquarius
 
 		buffer.put(headline.begin(), headline.end());
 		
-		if constexpr (Message::method != virgo::http_method::get)
-		{
-			buffer.append(std::move(temp));
-		}
+		buffer.append(std::move(temp));
 	}
 
 	template <typename... Args>
