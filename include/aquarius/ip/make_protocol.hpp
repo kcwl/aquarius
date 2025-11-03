@@ -3,6 +3,7 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <aquarius/serialize/binary.hpp>
+#include <format>
 
 namespace aquarius
 {
