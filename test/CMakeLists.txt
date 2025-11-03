@@ -35,8 +35,8 @@ add_test(
 
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius
-	COMMAND lcov --ignore-errors inconsistent,negative -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative -e coverage.info "*/include/aquarius/*" -o coverage-aquarius.info
-	COMMAND genhtml --ignore-errors inconsistent,negative coverage-aquarius.info -o test-aquarius
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -c -d . -o "coverage.info" -b .
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch coverage-aquarius.info -o test-aquarius
 )
 
