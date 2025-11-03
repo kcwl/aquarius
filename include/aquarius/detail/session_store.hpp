@@ -15,13 +15,15 @@ namespace aquarius
 			using value_type = Session;
 
 		public:
-			void insert(std::shared_ptr<Session> session)
+			bool insert(std::shared_ptr<Session> session)
 			{
 				std::lock_guard lk(mutex_);
 				auto iter = sessions_.find(session->uuid());
 				if (iter != sessions_.end())
-					return;
+					return false;
 				sessions_.emplace(session->uuid(), session);
+
+				return true;
 			}
 			void erase(std::size_t id)
 			{
@@ -35,6 +37,11 @@ namespace aquarius
 				if (iter == sessions_.end())
 					return nullptr;
 				return iter->second.lock();
+			}
+
+			std::size_t size() const
+			{
+				return sessions_.size();
 			}
 
 		private:
@@ -56,9 +63,16 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		void regist_session(std::shared_ptr<Session> session)
+		bool regist_session(std::shared_ptr<Session> session)
 		{
 			return session_store<Session>::get_mutable_instance().insert(session);
 		}
+
+		template <typename Session>
+		std::size_t session_storage()
+		{
+			return session_store<Session>::get_mutable_instance().size();
+		}
+
 	} // namespace detail
 } // namespace aquarius

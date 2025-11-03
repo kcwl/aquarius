@@ -30,9 +30,6 @@ namespace aquarius
 			return name_;
 		}
 
-	protected:
-		virtual auto handle() -> awaitable<error_code> = 0;
-
 		std::shared_ptr<Request> request() const
 		{
 			return request_ptr_;
@@ -42,6 +39,9 @@ namespace aquarius
 		{
 			return response_;
 		}
+
+	protected:
+		virtual auto handle() -> awaitable<error_code> = 0;
 
 		auto session()
 		{

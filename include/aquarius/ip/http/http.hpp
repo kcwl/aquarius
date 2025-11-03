@@ -5,9 +5,11 @@
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
+
 	class http
 	{
 		using base = boost::asio::ip::tcp;
@@ -28,27 +30,46 @@ namespace aquarius
 	public:
 		template <typename Session>
 		requires(is_session<Session>)
-		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
-			flex_buffer<char> buffer{};
-
 			error_code ec{};
+
+			flex_buffer buffer{};
 
 			for (;;)
 			{
-				co_await recv(session_ptr, buffer, ec);
+				virgo::http_fields hf;
 
-				if (ec.value() == static_cast<int>(virgo::http_status::ok))
-					continue;
+				co_await recv_buffer(session_ptr, buffer, hf, ec);
 
-				if (ec != boost::asio::error::eof)
+				if (ec)
 				{
-					XLOG_ERROR() << "on read some occur error - " << ec.what();
+					if (ec != boost::asio::error::eof)
+					{
+						XLOG_ERROR() << "on read some occur error - " << ec.message();
+					}
+					session_ptr->shutdown();
+					break;
 				}
 
-				session_ptr->shutdown();
+				if (method_ == virgo::http_method::get)
+				{
+					flex_buffer get_buffer;
+					get_buffer.put(this->get_body_span_.begin(), this->get_body_span_.end());
 
-				co_return ec;
+					buffer.swap(get_buffer);
+				}
+
+				co_spawn(
+					session_ptr->get_executor(),
+					[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
+					{
+						http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf,
+																			std::move(buffer));
+
+						co_return;
+					},
+					detached);
 			}
 		}
 
@@ -57,7 +78,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			flex_buffer<char> buffer{};
+			flex_buffer buffer{};
 
 			virgo::http_fields hf;
 
@@ -65,84 +86,58 @@ namespace aquarius
 
 			Response resp{};
 
-			if (ec.value() == static_cast<int>(virgo::http_status::ok))
+			if (!ec)
 			{
-				resp.move_copy(hf);
+				resp.move_copy(std::move(hf));
 				resp.consume(buffer);
 			}
 
 			co_return resp;
 		}
 
-		template <typename Request, typename T>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer<T>& buffer)
-		{
-			std::string str = std::format("{} {} {}\r\n", from_method_string(Request::method), Request::router,
-										  from_version_string(request->version()));
-
-			request->set_field("Content-Type", "aquarius");
-			request->set_field("Server", "Aquarius 0.10.0");
-			request->set_field("Connection", "keep-alive");
-			request->set_field("Access-Control-Allow-Origin", "*");
-
-			for (auto& s : request->fields())
-			{
-				str += std::format("{}: {}\r\n", s.first, s.second);
-			}
-
-			str += "\r\n";
-
-			buffer.put(str.begin(), str.end());
-
-			request->commit(buffer);
-		}
-
-	protected:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, error_code& ec) -> awaitable<void>
+		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_version version, const virgo::http_fields& hf,
+										virgo::http_status status) -> awaitable<void>
 		{
-			virgo::http_fields hf;
+			flex_buffer buffer{};
 
-			co_await recv_buffer(session_ptr, buffer, hf, ec);
+			auto headline = make_http_headline(from_version_string(version), static_cast<int>(status),
+											   virgo::from_status_string(status));
 
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+			for (const auto& s : hf.fields())
 			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.message();
-				}
-				session_ptr->shutdown();
-				co_return;
+				headline += std::format("{}: {}\r\n", s.first, s.second);
 			}
 
-			co_spawn(
-				session_ptr->get_executor(),
-				[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
-				{
-					http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf, buffer);
+			headline += "\r\n";
 
-					co_return;
-				},
-				detached);
+			buffer.put(headline.begin(), headline.end());
+
+			co_await session_ptr->async_send(std::move(buffer));
 		}
 
 	private:
 		template <typename Session>
-		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer<char>& buffer, virgo::http_fields& hf,
+		auto recv_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, virgo::http_fields& hf,
 						 error_code& ec, bool request = true) -> awaitable<void>
 		{
-			constexpr auto two_crlf = std::string_view("\r\n\r\n");
+			constexpr auto two_crlf = "\r\n\r\n"sv;
 
 			ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 			if (ec)
 				co_return;
 
-			request ? parse_request_header_line(buffer, method_, version_, path_, querys_, ec) : parse_response_header_line(buffer, version_, status_, reason_, ec);
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
-				co_return;
+			request ? parse_request_header_line(buffer, ec) : parse_response_header_line(buffer, ec);
 
-			auto span = std::span<char>(buffer.rdata(), buffer.active());
+			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+			{
+				make_error_response(session_ptr, version_, hf, static_cast<virgo::http_status>(ec.value()));
+
+				co_return;
+			}
+
+			auto span = std::span<char>((char*)buffer.rdata(), buffer.active());
 
 			auto buf_view = span | std::views::slide(4);
 
@@ -152,31 +147,33 @@ namespace aquarius
 												 if (value.size() < 4)
 													 return false;
 
-												 return std::string_view(value) == "\r\n\r\n";
+												 return std::string_view(value) == two_crlf;
 											 });
 
 			if (iter == buf_view.end())
 			{
-				ec = make_error_code(virgo::http_status::bad_request);
+				make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
+
 				co_return;
 			}
 
 			auto len = std::distance(buf_view.begin(), iter);
 
-			auto head_buf = std::span<char>(buffer.rdata(), len);
+			auto head_buf = std::span<char>((char*)buffer.rdata(), len);
 
 			buffer.consume(len + 4);
 
 			auto header_view = std::views::split(head_buf, '\n');
 
-			for (const auto header : header_view)
+			for (const auto& header : header_view)
 			{
 				auto itor =
-					std::ranges::find_if(header.begin(), header.end(), [] (const auto& value) { return value == ':'; });
+					std::ranges::find_if(header.begin(), header.end(), [](const auto& value) { return value == ':'; });
 
 				if (itor == header.end())
 				{
-					ec = virgo::http_status::bad_request;
+					make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
+
 					co_return;
 				}
 
@@ -195,18 +192,32 @@ namespace aquarius
 				hf.set_field(key, value);
 			}
 
+			ec = aquarius::error_code{};
+
+			if (hf.content_length() == 0 && method_ != virgo::http_method::get)
+			{
+				co_return co_await make_error_response(session_ptr, version_,hf, virgo::http_status::length_required);
+			}
+
+			if (hf.content_length() > max_http_length)
+			{
+				co_return co_await make_error_response(session_ptr, version_,hf, virgo::http_status::payload_too_large);
+			}
+
+			if (!hf.find("Expect").empty())
+			{
+				co_return co_await make_error_response(session_ptr, version_, hf, virgo::http_status::expectation_failed);
+			}
+
 			auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.active());
 
-			if(remain_size > 0)
+			if (remain_size > 0)
 				ec = co_await session_ptr->async_read(buffer, remain_size);
 		}
 
-		template <typename T>
-		void parse_request_header_line(flex_buffer<T>& buffer, virgo::http_method& method_, virgo::http_version& version_,
-							   std::string& path_, std::vector<std::pair<std::string, std::string>>& querys_,
-							   error_code& ec)
+		void parse_request_header_line(flex_buffer& buffer, error_code& ec)
 		{
-			auto span = std::span<T>(buffer.rdata(), buffer.active());
+			auto span = std::span<char>((char*)buffer.rdata(), buffer.active());
 
 			auto buf_view = span | std::views::slide(2);
 
@@ -243,28 +254,25 @@ namespace aquarius
 
 			auto header_iter = headers.begin();
 
-			parse_method(std::span<T>(*header_iter++), method_, ec);
+			parse_method(std::span(*header_iter++), method_, ec);
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 				return;
 
-			parse_uri(std::span<T>(*header_iter++), method_, path_, querys_, ec);
+			parse_uri(std::span<char>(*header_iter++), ec);
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 				return;
 
-			parse_version(std::span<T>(*header_iter), version_, ec);
+			parse_version(std::span(*header_iter), version_, ec);
 		}
 
-		template <typename T>
-		void parse_response_header_line(flex_buffer<T>& buffer, virgo::http_version& version,
-										virgo::http_status& status, std::string& reason,
-										error_code& ec)
+		void parse_response_header_line(flex_buffer& buffer, error_code& ec)
 		{
-			auto span = std::span<T>(buffer.rdata(), buffer.active());
+			auto span = std::span<char>((char*)buffer.rdata(), buffer.active());
 
 			auto buf_view = span | std::views::slide(2);
 
 			auto iter = std::ranges::find_if(buf_view,
-											 [] (const auto& v)
+											 [](const auto& v)
 											 {
 												 if (v.size() < 2)
 													 return false;
@@ -280,8 +288,8 @@ namespace aquarius
 
 			auto len = std::distance(buf_view.begin(), iter);
 
-			//auto header_line = span.subspan(0, len + 2);
-			auto header_line = std::span<T>(buffer.rdata(), len + 2);
+			// auto header_line = span.subspan(0, len + 2);
+			auto header_line = std::span<char>((char*)buffer.rdata(), len + 2);
 
 			buffer.consume(len + 2);
 
@@ -297,12 +305,12 @@ namespace aquarius
 
 			auto header_iter = headers.begin();
 
-			parse_version(std::span<T>(*header_iter++), version, ec);
+			parse_version(std::span<char>(*header_iter++), version_, ec);
 
 			if (ec.value() != static_cast<int>(virgo::http_status::ok))
 				return;
 
-			status = static_cast<virgo::http_status>(std::atoi(std::string_view(*header_iter++).data()));
+			status_ = static_cast<virgo::http_status>(std::atoi(std::string_view(*header_iter++).data()));
 
 			auto reason_string_view = std::string_view(*header_iter);
 
@@ -310,7 +318,7 @@ namespace aquarius
 
 			view_size >= 2 ? reason_string_view.size() - 2 : 0;
 
-			reason = std::string(reason_string_view.data(), view_size);
+			reason_ = std::string(reason_string_view.data(), view_size);
 
 			ec = virgo::http_status::ok;
 		}
@@ -341,8 +349,7 @@ namespace aquarius
 		}
 
 		template <typename T>
-		void parse_uri(std::span<T> buffer, virgo::http_method method_, std::string& path_,
-					   std::vector<std::pair<std::string, std::string>>& querys_, error_code& ec)
+		void parse_uri(std::span<T> buffer, error_code& ec)
 		{
 			ec = virgo::http_status::ok;
 
@@ -368,9 +375,20 @@ namespace aquarius
 
 			auto pos = std::distance(buffer.begin(), iter);
 
-			path_ = std::string(buffer.subspan(0, pos).data());
+			auto path_sp = buffer.subspan(0, pos);
 
-			parse_querys(buffer.subspan(pos + 1), querys_, ec);
+			std::string(path_sp.data(), path_sp.size()).swap(path_);
+
+			path_ = path_.substr(1);
+
+			auto body_span = buffer.subspan(pos + 1);
+
+			get_body_span_ = std::string(body_span.data(), body_span.size());
+
+			if (get_body_span_.size() > max_http_length)
+			{
+				ec = virgo::http_status::uri_too_long;
+			}
 		}
 
 		template <typename T>
@@ -448,6 +466,6 @@ namespace aquarius
 
 		std::string reason_;
 
-		std::vector<std::pair<std::string, std::string>> querys_;
+		std::string get_body_span_;
 	};
 } // namespace aquarius

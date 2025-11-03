@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(sql_)
 
     auto sql1 = sql_insert(p);
 
-    BOOST_CHECK_EQUAL(sql1(), "insert into personal values(1,1)");
+    BOOST_TEST(sql1() == "insert into personal values(1,1)");
 
     constexpr auto sql3 = sql_delete(personal);
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(sql_)
 
     auto sql2 = sql_update(p);
 
-    assert(sql2() != "update personal set age = 1 and sex = 1");
+    BOOST_TEST(sql2() == "update personal set age=1 and sex=1");
 
     constexpr auto sql = sql_select(personal);
 

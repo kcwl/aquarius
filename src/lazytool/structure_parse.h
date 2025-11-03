@@ -1,28 +1,39 @@
 #pragma once
 #include "parser.h"
+#include "data_field.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
-		class structure_parse : public parser
-		{
-		public:
-			structure_parse();
-			virtual ~structure_parse() = default;
 
-		public:
-			std::ostream& operator<<(std::ostream& os) const;
+        class structure : public data_field, public parser
+        {
+        public:
+            structure()
+                : parser(struct_type::structure)
+            {
 
-		public:
-			virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+            }
+            ~structure() = default;
+        public:
+            friend std::ostream& operator<<(std::ostream& os, const structure& field)
+            {
+                os << "struct " << field.name() << std::endl;
+                os << "{" << std::endl;
 
-			void set_anonymous(bool value = true);
+                for (auto& s : field.fields())
+                {
+                    os << "\t" << s.first << " " << s.second << ";" << std::endl;
+                }
 
-		private:
-			bool anonymous_;
-		};
+                os << "};" << std::endl;
 
-		std::ostream& operator<<(std::ostream& os, const structure_parse& pr);
+                return os;
+            }
+
+        public:
+            virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+        };
 	} // namespace lazytool
 } // namespace aquarius

@@ -12,6 +12,7 @@
 #include <boost/log/utility/record_ordering.hpp>
 #include <source_location>
 #include <string>
+#include <filesystem>
 
 namespace aquarius
 {

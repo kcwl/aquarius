@@ -2,12 +2,11 @@
 #include "message_parse.h"
 #include <format>
 #include "structure_parse.h"
-#include "enumture_parse.h"
+#include "enumture_struct.h"
 #include <iostream>
 #include "struct_type.hpp"
-#include "router_parse.h"
+#include "router_field.h"
 #include "protocol_parse.h"
-#include "normal_message_parse.h"
 
 
 namespace
@@ -51,7 +50,7 @@ namespace aquarius
 			registor_.regist("protocol",
 							 [this](std::ifstream& ifs)
 							 {
-								 auto proto_ptr = std::make_shared<message_parse>();
+								 auto proto_ptr = std::make_shared<protocol_struct>();
 								 auto res = proto_ptr->visit(ifs, column_, row_);
 								 if (res != parser::parse_error::success)
 									 throw std::runtime_error(std::format("protocol parse error! row: {}, column: {}",
@@ -62,7 +61,7 @@ namespace aquarius
 			registor_.regist("message",
 							 [this](std::ifstream& ifs)
 							 {
-								 auto proto_ptr = std::make_shared<normal_message_parse>();
+								 auto proto_ptr = std::make_shared<message_struct>();
 								 auto res = proto_ptr->visit(ifs, column_, row_);
 								 if (res != parser::parse_error::success)
 									 throw std::runtime_error(std::format("protocol parse error! row: {}, column: {}",
@@ -73,7 +72,7 @@ namespace aquarius
 			registor_.regist("struct",
 							 [&](std::ifstream& ifs)
 							 {
-								 auto struct_ptr = std::make_shared<structure_parse>();
+								 auto struct_ptr = std::make_shared<structure>();
 
 								 auto res = struct_ptr->visit(ifs, column_, row_);
 
@@ -86,7 +85,7 @@ namespace aquarius
 			registor_.regist("enum",
 							 [&](std::ifstream& ifs)
 							 {
-								 auto enum_ptr = std::make_shared<enumture_parse>();
+								 auto enum_ptr = std::make_shared<enum_struct>();
 
 								 auto res = enum_ptr->visit(ifs, column_, row_);
 
@@ -131,37 +130,22 @@ namespace aquarius
 		{
 			for (auto& s : pr.keywords_)
 			{
-				os << from_struct_type_string(s->struct_type_) << " " << s->name_ << std::endl;
-				os << "{\n";
-
-				if (s->struct_type_ == struct_type::enumture)
+				if (s->structtype() == struct_type::enumture)
 				{
-					for (auto& m : std::dynamic_pointer_cast<enumture_parse>(s)->values_)
-					{
-						os << "\t" << m.first << "," << std::endl;
-					}
+					os << *std::dynamic_pointer_cast<enum_struct>(s);
 				}
-				else if (s->struct_type_ == struct_type::structure)
+				else if (s->structtype() == struct_type::structure)
 				{
-					for (auto& m : std::dynamic_pointer_cast<structure_parse>(s)->values_)
-					{
-						os << "\t" << m.first << " " << m.second << ";" << std::endl;
-					}
+					os << *std::dynamic_pointer_cast<structure>(s);
 				}
-				else if (s->struct_type_ == struct_type::message)
+				else if (s->structtype() == struct_type::message)
 				{
-					auto msg_ptr = std::dynamic_pointer_cast<message_parse>(s);
-
-					os << *msg_ptr->router_ptr_ << *msg_ptr->request_ptr_ << *msg_ptr->response_ptr_;
+					os << *std::dynamic_pointer_cast<message_struct>(s);
 				}
-				else if (s->struct_type_ == struct_type::normal_message)
+				else if (s->structtype() == struct_type::protocol)
 				{
-					auto msg_ptr = std::dynamic_pointer_cast<normal_message_parse>(s);
-
-					os << *msg_ptr->router_ptr_ << *msg_ptr->request_ptr_ << *msg_ptr->response_ptr_;
+					os << *std::dynamic_pointer_cast<protocol_struct>(s);
 				}
-
-				os << "};" << std::endl;
 			}
 
 			return os;

@@ -1,5 +1,5 @@
 #include "json_tag.h"
-#include "parser.h"
+#include "data_field.h"
 
 namespace aquarius
 {
@@ -7,17 +7,28 @@ namespace aquarius
 	{
 		namespace cpp
 		{
-			void json_tag::generate_to_tag(std::ofstream& ofs, std::shared_ptr<parser> parser)
+			void json_tag::generate_to_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser)
 			{
-				ofs << parser->name_ << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name_
-					<< ">&, const aquarius::json::value& jv)\n";
-				ofs << "{\n";
-				ofs << "\t" << parser->name_ << " result{};\n";
-				ofs << "\tauto obj = jv.try_as_object();\n";
-				ofs << "\tif(obj->empty())\n";
-				ofs << "\t\treturn {};\n\n";
+				ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
+					<< ">&, const aquarius::json::value& jv);" << CRLF;
+			}
 
-				for (auto& [key, value] : parser->values_)
+			void json_tag::generate_from_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser)
+			{
+				ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
+					<< parser->name() << "& local);" << CRLF;
+			}
+			void json_tag::generate_to_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser)
+			{
+				ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
+					<< ">&, const aquarius::json::value& jv)" << CRLF;
+				ofs << "{" << CRLF;
+				ofs << "\t" << parser->name() << " result{};" << CRLF;
+				ofs << "\tauto obj = jv.try_as_object();" << CRLF;
+				ofs << "\tif(obj->empty())" << CRLF;
+				ofs << "\t\treturn {};" << TWO_CRLF;
+
+				for (auto& [key, value] : parser->fields())
 				{
 					if (generate_to_int(ofs, key, value))
 						continue;
@@ -31,19 +42,19 @@ namespace aquarius
 					generate_to_object(ofs, key, value);
 				}
 
-				ofs << "\treturn result;\n";
+				ofs << "\treturn result;" << CRLF;
 
-				ofs << "}\n\n";
+				ofs << "}" << TWO_CRLF;
 			}
 
-			void json_tag::generate_from_tag(std::ofstream& ofs, std::shared_ptr<parser> parser)
+			void json_tag::generate_from_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser)
 			{
 				ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
-					<< parser->name_ << "& local)\n";
-				ofs << "{\n";
-				ofs << "\tauto& jv_obj = jv.emplace_object();\n";
+					<< parser->name() << "& local)" << CRLF;
+				ofs << "{" << CRLF;
+				ofs << "\tauto& jv_obj = jv.emplace_object();" << CRLF;
 
-				for (auto& [key, value] : parser->values_)
+				for (auto& [key, value] : parser->fields())
 				{
 					if (generate_from_int(ofs, key, value))
 						continue;
@@ -56,7 +67,7 @@ namespace aquarius
 
 					generate_from_object(ofs, key, value);
 				}
-				ofs << "}\n\n";
+				ofs << "}" << TWO_CRLF;
 			}
 
 			bool json_tag::generate_to_int(std::ofstream& ofs, const std::string& type, const std::string& value)
@@ -76,12 +87,12 @@ namespace aquarius
 					else if (type == "float")
 						ofs << "double";
 
-					ofs << "());\n";
+					ofs << "());" << CRLF;
 				}
 				else if (type == "int64" || type == "double" || type == "bool")
 				{
 					ofs << "\tresult." << value << " = obj->at(\"" << value
-						<< "\").as_" << type << "();\n";
+						<< "\").as_" << type << "();" << CRLF;
 				}
 
 				return true;
@@ -95,7 +106,7 @@ namespace aquarius
 					return false;
 
 				ofs << "\tresult." << value << " = static_cast<" << type << ">(obj->at(\"" << value
-					<< "\").as_string());\n";
+					<< "\").as_string());" << CRLF;
 
 				return true;
 			}
@@ -107,8 +118,8 @@ namespace aquarius
 				if (ty != json_type::array)
 					return false;
 
-				ofs << "\tresult." << value << " = aquarius::serialize::json_value_to_array(obj->at(\""
-					<< value << "\"));\n";
+				ofs << "\tresult." << value << " = aquarius::json_value_to_array(obj->at(\""
+					<< value << "\"));" << CRLF;
 
 				return true;
 			}
@@ -121,7 +132,7 @@ namespace aquarius
 					return false;
 
 				ofs << "\tresult." << value << " = aquarius::json::value_to<" << type << ">(obj->at(\"" << value
-					<< "\"));\n";
+					<< "\"));" << CRLF;
 
 				return true;
 			}
@@ -133,7 +144,7 @@ namespace aquarius
 				if (ty != json_type::integer)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", local." << value << "); \n";
+				ofs << "\tjv_obj.emplace(\"" << value << "\", local." << value << ");" << CRLF;
 
 				return true;
 			}
@@ -145,7 +156,7 @@ namespace aquarius
 				if (ty != json_type::string)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", local." << value << "); \n";
+				ofs << "\tjv_obj.emplace(\"" << value << "\", local." << value << ");" << CRLF;
 
 				return true;
 			}
@@ -157,8 +168,8 @@ namespace aquarius
 				if (ty != json_type::array)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::serialize::json_value_from_array(local." << value
-					<< ")); \n";
+				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_array(local." << value
+					<< "));" << CRLF;
 
 				return true;
 			}
@@ -170,8 +181,8 @@ namespace aquarius
 				if (ty != json_type::object)
 					return false;
 
-				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::serialize::json_value_from_object<" << type << ">(local."
-					<< value << ")); \n";
+				ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_object<" << type << ">(local."
+					<< value << "));" << CRLF;
 
 				return true;
 			}

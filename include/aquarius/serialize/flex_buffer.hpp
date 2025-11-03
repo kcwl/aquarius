@@ -6,12 +6,20 @@
 
 namespace aquarius
 {
-	template <typename T>
 	class flex_buffer
 	{
+	public:
 		constexpr static std::size_t capacity = 8192;
 
-		using impl_type = std::vector<T>;
+		constexpr static std::size_t npos = static_cast<std::size_t>(-1);
+
+		using value_type = uint8_t;
+
+		using impl_type = std::vector<value_type>;
+
+		using size_type = std::size_t;
+
+		using pos_type = std::size_t;
 
 	public:
 		flex_buffer()
@@ -20,52 +28,63 @@ namespace aquarius
 			, rpos_(0)
 		{}
 
-		flex_buffer(T* data, std::size_t len)
+		flex_buffer(value_type* data, std::size_t len)
 			: buffer_(len)
 			, wpos_(0)
 			, rpos_(0)
 		{
-			std::copy(data, data + len, wdata());
-			commit(len);
+			put(data, data + len);
 		}
 
 		flex_buffer(flex_buffer&& other) noexcept
 			: buffer_(std::move(other.buffer_))
 			, wpos_(std::exchange(other.wpos_, 0))
 			, rpos_(std::exchange(other.rpos_, 0))
-		{
-			other.buffer_.resize(capacity);
-		}
+		{}
 
-		flex_buffer(const flex_buffer& other) noexcept
+		flex_buffer& operator=(flex_buffer&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				buffer_ = other.buffer_;
-				wpos_ = other.wpos_;
-				rpos_ = other.rpos_;
+				buffer_ = std::move(other.buffer_);
+				wpos_ = std::exchange(other.wpos_, 0);
+				rpos_ = std::exchange(other.rpos_, 0);
 			}
+
+			return *this;
 		}
+
+		flex_buffer(const flex_buffer& other) = delete;
+		flex_buffer& operator=(const flex_buffer& other) = delete;
 
 		virtual ~flex_buffer() = default;
 
 	public:
-		T* rdata()
+		value_type* rdata()
+		{
+			return buffer_.data() + rpos_;
+		}
+		const value_type* rdata() const
 		{
 			return buffer_.data() + rpos_;
 		}
 
-		T* wdata()
+		value_type* wdata()
 		{
 			return buffer_.data() + wpos_;
 		}
 
-		T* data()
+		value_type* data()
 		{
 			return buffer_.data();
 		}
 
-		std::size_t active() const
+		const value_type* data() const
+		{
+			return buffer_.data();
+		}
+
+		size_type active() const
 		{
 			return wpos_ - rpos_;
 		}
@@ -75,22 +94,22 @@ namespace aquarius
 			return buffer_.size() - wpos_;
 		}
 
-		void commit(std::size_t size)
+		void commit(size_type size)
 		{
 			size <= remain() ? wpos_ += size : 0;
 		}
 
-		void consume(std::size_t size)
+		void consume(size_type size)
 		{
 			size <= active() ? rpos_ += size : 0;
 		}
 
-		T peek()
+		value_type peek()
 		{
 			return buffer_[rpos_];
 		}
 
-		T get(error_code& ec)
+		value_type get(error_code& ec)
 		{
 			if (rpos_ >= capacity)
 			{
@@ -101,20 +120,20 @@ namespace aquarius
 			return buffer_[rpos_++];
 		}
 
-		T get()
+		value_type get()
 		{
 			error_code ec;
 
-			T value = get(ec);
+			value_type value = get(ec);
 
-			if(ec)
+			if (ec)
 				throw ec;
 
 			return value;
 		}
 
-		template<typename Pod>
-		requires(std::is_trivial_v<Pod>&& std::is_standard_layout_v<Pod>)
+		template <typename Pod>
+		requires(std::is_trivial_v<Pod> && std::is_standard_layout_v<Pod>)
 		Pod get(error_code& ec)
 		{
 			Pod value{};
@@ -128,7 +147,7 @@ namespace aquarius
 				return value;
 			}
 
-			std::memcpy((char*)&value, rdata(), size);
+			std::copy(rdata(), rdata() + size, (char*)&value);
 
 			consume(size);
 
@@ -137,7 +156,7 @@ namespace aquarius
 			return value;
 		}
 
-		template<typename Pod>
+		template <typename Pod>
 		requires(std::is_trivial_v<Pod> && std::is_standard_layout_v<Pod>)
 		Pod get()
 		{
@@ -153,30 +172,30 @@ namespace aquarius
 
 		void get(std::string& json)
 		{
-			json = std::string(rdata(), active());
+			json = std::string((char*)rdata(), active());
 
-			consume(json.size());
+			consume(active());
 		}
 
-		error_code put(T value, error_code& ec)
+		error_code put(value_type value, error_code& ec)
 		{
 			ec = serialize_error::success;
 
-			constexpr auto size = sizeof(T);
+			constexpr auto size = sizeof(value_type);
 
 			if (size > remain())
 			{
 				return ec = serialize_error::not_enough_space;
 			}
 
-			std::memcpy(wdata(), &value, size);
+			std::copy(&value, (value_type*)&value + size, wdata());
 
 			commit(size);
 
 			return ec;
 		}
 
-		void put(T value)
+		void put(value_type value)
 		{
 			error_code ec{};
 
@@ -213,7 +232,7 @@ namespace aquarius
 				throw ec;
 		}
 
-		error_code put(T* data, std::size_t len, error_code& ec)
+		error_code put(value_type* data, std::size_t len, error_code& ec)
 		{
 			if (len > remain())
 			{
@@ -223,7 +242,7 @@ namespace aquarius
 			return put(data, data + len, ec);
 		}
 
-		void put(T* data, std::size_t len)
+		void put(value_type* data, std::size_t len)
 		{
 			error_code ec{};
 
@@ -233,9 +252,42 @@ namespace aquarius
 				throw ec;
 		}
 
+		error_code append(flex_buffer&& buffer, error_code& ec)
+		{
+			if (buffer.active() > remain())
+			{
+				return ec = serialize_error::not_enough_space;
+			}
+
+			auto buf = flex_buffer(std::move(buffer));
+
+			std::copy(buf.rdata(), buf.rdata() + buf.active(), wdata());
+
+			commit(buf.active());
+
+			return ec = serialize_error::success;
+		}
+
+		error_code append(flex_buffer&& buffer)
+		{
+			error_code ec{};
+
+			append(std::move(buffer), ec);
+
+			if (ec)
+				throw ec;
+
+			return ec;
+		}
+
 		bool empty() const
 		{
 			return rpos_ == wpos_;
+		}
+
+		std::size_t tellp() const
+		{
+			return rpos_;
 		}
 
 		std::size_t tellg() const
@@ -243,34 +295,30 @@ namespace aquarius
 			return wpos_;
 		}
 
-		template <typename V>
-		error_code append(flex_buffer<V>&& buffer, error_code& ec)
+		void swap(flex_buffer& fb)
 		{
-			if (buffer.active() > remain())
-			{
-				return ec = serialize_error::not_enough_space;
-			}
-
-			auto buf = flex_buffer<T>(std::move(buffer));
-
-			std::memcpy(wdata(), buf.rdata(), buf.active());
-
-			commit(buf.active());
-
-			return ec = serialize_error::success;
+			std::swap(buffer_, fb.buffer_);
+			std::swap(wpos_, fb.wpos_);
+			std::swap(rpos_, fb.rpos_);
 		}
 
-		template <typename V>
-		error_code append(flex_buffer<V>&& buffer)
+		template<char... args>
+		std::string get_first_range()
 		{
-			error_code ec{};
-			
-			append(std::move(buffer), ec);
+			auto iter = std::find_if(buffer_.begin() + rpos_, buffer_.end(), [&] (const auto c) { return ((c == args) || ...); });
 
-			if (ec)
-				throw ec;
+			if (iter == buffer_.end())
+			{
+				return std::string((char*)rdata(), active());
+			}
 
-			return ec;
+			auto len = std::distance(buffer_.begin() + rpos_, iter);
+
+			auto value = std::string((char*)rdata(), len);
+
+			consume(len + 1);
+
+			return value;
 		}
 
 	private:

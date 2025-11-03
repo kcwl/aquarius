@@ -58,6 +58,13 @@ namespace aquarius
 				{
 					thread->join();
 				}
+
+				enable_ = false;
+			}
+
+			std::size_t pool_size() const
+			{
+				return pool_size_;
 			}
 
 			void stop()

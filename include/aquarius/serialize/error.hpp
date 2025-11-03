@@ -38,9 +38,16 @@ namespace aquarius
 		}
 	};
 
+	static serialize_error_category& get_serialize_error_category()
+	{
+		static serialize_error_category category{};
+
+		return category;
+	}
+
 	inline error_code make_error_code(serialize_error ec)
 	{
-		return error_code(static_cast<int>(ec), serialize_error_category());
+		return error_code(static_cast<int>(ec), get_serialize_error_category());
 	}
 } // namespace aquarius
 

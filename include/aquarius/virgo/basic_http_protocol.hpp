@@ -2,24 +2,25 @@
 #include <aquarius/basic_protocol.hpp>
 #include <aquarius/virgo/http_fields.hpp>
 #include <aquarius/virgo/http_version.hpp>
-#include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, virgo::http_method Method, detail::string_literal Router, typename Header,
+		template <bool Request, detail::string_literal Router, typename Header,
 				  typename Body, typename Allocator>
 		class basic_http_protocol : public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>,
 									public http_fields
 		{
 		public:
+			constexpr static auto json_type = "aquarius-json"sv;
+
+			constexpr static auto splitor = "<->"sv;
+
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
-
-			constexpr static auto method = Method;
 
 			using typename base::header_t;
 
@@ -27,9 +28,30 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
-				: version_(http_version::http1_1)
+				: base()
+				, version_(http_version::http1_1)
 				, get_params_()
 			{}
+
+			basic_http_protocol(basic_http_protocol&& other) noexcept
+				: base(std::move(other))
+				, version_(std::exchange(other.version_, 0))
+				, get_params_(std::move(other.get_params_))
+			{
+
+			}
+
+			basic_http_protocol& operator=(basic_http_protocol&& other)noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+					version_ = std::exchange(other.version_, 0);
+					get_params_ = std::move(other.get_params_);
+				}
+
+				return *this;
+			}
 
 		public:
 			bool operator==(const basic_http_protocol& other) const
@@ -40,9 +62,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << method << version_;
+				os << version() << " ";
 
 				for (auto& p : get_params_)
 				{
@@ -79,17 +101,19 @@ namespace aquarius
 			std::vector<std::pair<std::string, std::string>> get_params_;
 		};
 
-		template <virgo::http_method Method, detail::string_literal Router, typename Header, typename Body,
+		template <detail::string_literal Router, typename Header, typename Body,
 				  typename Allocator>
-		class basic_http_protocol<false, Method, Router, Header, Body, Allocator>
+		class basic_http_protocol<false, Router, Header, Body, Allocator>
 			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>, public http_fields
 		{
 		public:
+			constexpr static auto json_type = "aquarius-json"sv;
+
+			constexpr static auto splitor = "<->"sv;
+
 			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
 
 			using base::router;
-
-			constexpr static auto method = Method;
 
 			using typename base::header_t;
 
@@ -97,10 +121,31 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
-				: status_()
+				: base()
+				, status_()
 				, version_()
 				, reason_()
 			{}
+
+			basic_http_protocol(basic_http_protocol&& other) noexcept
+				: base(std::move(other))
+				, version_(std::exchange(other.version_, virgo::http_version::http1_1))
+				, reason_(std::move(other.reason_))
+			{
+
+			}
+
+			basic_http_protocol& operator=(basic_http_protocol&& other)noexcept
+			{
+				if (std::addressof(other) != this)
+				{
+					base::operator=(std::move(other));
+					version_ = std::exchange(other.version_, 0);
+					reason_ = std::move(other.reason_);
+				}
+
+				return *this;
+			}
 
 		public:
 			bool operator==(const basic_http_protocol& other) const
@@ -111,9 +156,9 @@ namespace aquarius
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				base::operator<<(os);
+				os << this->header() << " " << this->body() << " ";
 
-				os << status_ << version_ << reason_;
+				os << result() << " " << version() << " " << reason();
 
 				return os;
 			}

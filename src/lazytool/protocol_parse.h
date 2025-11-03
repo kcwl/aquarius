@@ -1,40 +1,42 @@
 #pragma once
 #include "parser.h"
+#include "data_field.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
-		class domin_parse;
+        class router_field;
+        class service_struct;
 
-		class protocol_parse : public parser
-		{
-			enum class scope
-			{
-				s_header,
-				s_body,
-				s_error
-			};
+        class protocol_struct : public data_field, public parser
+        {
 
-		public:
-			protocol_parse();
-			virtual ~protocol_parse() = default;
+        public:
+            protocol_struct();
+            ~protocol_struct() = default;
 
-		public:
-			std::ostream& operator<<(std::ostream& os) const;
+        public:
+            friend std::ostream& operator<<(std::ostream& os, const protocol_struct& field);
 
-		public:
-			virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+        public:
+            virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
 
-		private:
-			scope from_scope_string(const std::string& s);
+            std::shared_ptr<service_struct> request() const;
 
-		public:
-			std::shared_ptr<domin_parse> header_ptr_;
+            std::shared_ptr<service_struct> response() const;
 
-			std::shared_ptr<domin_parse> body_ptr_;
-		};
+            std::string protocol() const;
 
-		std::ostream& operator<<(std::ostream& os, const protocol_parse& pp);
+            std::string method() const;
+
+            std::string router_key() const;
+
+        private:
+            std::shared_ptr<router_field> router_ptr_;
+            std::shared_ptr<service_struct> request_ptr_;
+            std::shared_ptr<service_struct> response_;
+        };
+
 	} // namespace lazytool
 } // namespace aquarius

@@ -1,28 +1,47 @@
 #pragma once
 #include "parser.h"
+#include "data_field.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
-		class protocol_parse;
-		class router_parse;
+        class router_field;
 
-		class message_parse : public parser
-		{
-		public:
-			message_parse();
-			virtual ~message_parse() = default;
+        class message_struct : public data_field, public parser
+        {
+        public:
+            message_struct();
+            ~message_struct() = default;
 
-		public:
-			virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+            friend std::ostream& operator<<(std::ostream& os, const message_struct& field)
+            {
+                os << "class " << field.name() << std::endl;
+                os << "{" << std::endl;
 
-		public:
-			std::shared_ptr<router_parse> router_ptr_;
+                for (auto& s : field.fields())
+                {
+                    os << "\t" << s.first << " " << s.second << ";" << std::endl;
+                }
 
-			std::shared_ptr<protocol_parse> request_ptr_;
+                os << "};" << std::endl;
 
-			std::shared_ptr<protocol_parse> response_ptr_;
-		};
+                return os;
+            }
+
+        public:
+            virtual parse_error visit(std::ifstream& ifs, std::size_t& column, std::size_t& row) override;
+
+            std::string protocol() const;
+
+            std::string method() const;
+
+            void method(const std::string& m);
+
+            std::string router_key() const;
+
+        private:
+            std::shared_ptr<router_field> router_ptr_;
+        };
 	} // namespace lazytool
 } // namespace aquarius

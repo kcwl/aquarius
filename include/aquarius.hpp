@@ -23,11 +23,13 @@
 #include <aquarius/ip/http/http_handler.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/http/http_client.hpp>
-#include <aquarius/serialize/http_serialize.hpp>
-#include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/serialize/http_json_serialize.hpp>
+#include <aquarius/serialize/http_kv_serialize.hpp>
+#include <aquarius/serialize/tcp_binary_serialize.hpp>
 #include <aquarius/sql.hpp>
-#include <aquarius/basic_message_serialize.hpp>
+#include <aquarius/basic_serialize.hpp>
 #include <aquarius/virgo/cpp_type.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/detail/float.hpp>
+#include <aquarius/ip/http_handler.hpp>

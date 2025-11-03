@@ -1,70 +1,120 @@
 #include "protocol_parse.h"
 #include "domin_parse.h"
+#include "router_field.h"
+#include "service_struct.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
-        protocol_parse::protocol_parse()
-            : header_ptr_(new domin_parse())
-            , body_ptr_(new domin_parse())
-        {
+		protocol_struct::protocol_struct()
+			: parser(struct_type::protocol)
+			, router_ptr_(new router_field())
+			, request_ptr_(new service_struct())
+			, response_(new service_struct())
+		{}
 
-        }
+		std::ostream& operator<<(std::ostream& os, const protocol_struct& field)
+		{
+			os << "class " << field.name() << "_protocol" << std::endl;
+			os << "{" << std::endl;
 
-        std::ostream& protocol_parse::operator<<(std::ostream& os) const
-        {
-            return os << *header_ptr_ << *body_ptr_;
-        }
+			os << "\t" << "struct request_service" << std::endl;
+			os << "\t{" << std::endl;
 
-        parser::parse_error protocol_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
-        {
-            while (!ifs.eof())
-            {
-                auto result = seek<'}'>(ifs, column, row);
-                if (result == parse_error::success)
-                    return result;
+			os << "\t\t" << "struct header_domin" << std::endl;
+			for (auto& s : field.request_ptr_->header()->fields())
+			{
+				os << "\t\t" << s.first << " " << s.second << ";" << std::endl;
+			}
+			os << "\t\t" << "struct body_domin" << std::endl;
+			for (auto& s : field.request_ptr_->body()->fields())
+			{
+				os << "\t\t" << s.first << " " << s.second << ";" << std::endl;
+			}
 
-                name_ = read_value<token::key, ':'>(ifs, column, row);
+			os << "\t};" << std::endl;
 
-                if (name_.empty())
-                    return parse_error::syntax;
+			os << "\t" << "struct response_service" << std::endl;
+			os << "\t{" << std::endl;
+			os << "\t\t" << "struct header_domin" << std::endl;
+			for (auto& s : field.request_ptr_->header()->fields())
+			{
+				os << "\t\t" << s.first << " " << s.second << ";" << std::endl;
+			}
+			os << "\t\t" << "struct body_domin" << std::endl;
+			for (auto& s : field.request_ptr_->body()->fields())
+			{
+				os << "\t\t" << s.first << " " << s.second << ";" << std::endl;
+			}
+			os << "\t};" << std::endl;
 
-                switch (from_scope_string(name_))
-                {
-                    case scope::s_header:
-                        result = header_ptr_->visit(ifs, column, row);
-                        break;
-                    case scope::s_body:
-                        result = body_ptr_->visit(ifs, column, row);
-                        break;
-                    default:
-                        return parse_error::keyword;
-                }
-            }
+			os << "};" << std::endl;
 
-            return parse_error::eof;
-        }
+			return os;
+		}
 
-        protocol_parse::scope protocol_parse::from_scope_string(const std::string& s)
-        {
-            if (s == "header")
-            {
-                return scope::s_header;
-            }
-            else if (s == "body")
-            {
-                return scope::s_body;
-            }
+		protocol_struct::parse_error protocol_struct::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
+		{
+			auto value = read_value<token::value, '-'>(ifs, column, row);
 
-            return scope::s_error;
-        }
+			if (value.empty())
+				return parse_error::syntax;
 
-        std::ostream& operator<<(std::ostream& os, const protocol_parse& pp)
-        {
-            pp << os;
+			this->set_name(value);
 
-            return os;
-        }
-	}
-}
+			auto result = seek<'>'>(ifs, column, row);
+			if (result != parse_error::success)
+				return result;
+			result = router_ptr_->visit(ifs, column, row);
+			if (result != parse_error::success)
+				return result;
+
+			while (!ifs.eof())
+			{
+				result = seek<'}'>(ifs, column, row);
+				if (result == parse_error::success)
+					return result;
+				auto sub_key = read_value<token::key, '{'>(ifs, column, row);
+				if (sub_key == "request")
+				{
+					result = request_ptr_->visit(ifs, column, row);
+					request_ptr_->set_name(this->name());
+				}
+				else if (sub_key == "response")
+				{
+					result = response_->visit(ifs, column, row);
+					response_->set_name(this->name());
+				}
+				else
+					return parse_error::keyword;
+			}
+			return parse_error::eof;
+		}
+
+		std::shared_ptr<service_struct> protocol_struct::request() const
+		{
+			return request_ptr_;
+		}
+
+		std::shared_ptr<service_struct> protocol_struct::response() const
+		{
+			return response_;
+		}
+
+		std::string protocol_struct::protocol() const
+		{
+			return router_ptr_->protocol();
+		}
+
+		std::string protocol_struct::method() const
+		{
+			return router_ptr_->method();
+		}
+
+		std::string protocol_struct::router_key() const
+		{
+			return router_ptr_->key();
+		}
+	} // namespace lazytool
+} // namespace aquarius

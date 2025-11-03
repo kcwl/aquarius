@@ -1,5 +1,7 @@
 #pragma once
 #include <aquarius/io_context.hpp>
+#include <aquarius/coroutine.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {

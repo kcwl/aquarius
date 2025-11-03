@@ -79,6 +79,11 @@ namespace aquarius
 				*this = std::move(hf);
 			}
 
+			std::map<std::string, std::string> fields() const
+			{
+				return fields_;
+			}
+
 		protected:
 			std::map<std::string, std::string> fields_;
 		};

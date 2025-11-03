@@ -5,12 +5,16 @@ namespace aquarius
 {
 	namespace lazytool
 	{
-		class parser;
+		class data_field;
 
 		namespace cpp
 		{
 			class json_tag
 			{
+				constexpr static auto CRLF = "\n";
+
+				constexpr static auto TWO_CRLF = "\n\n";
+
 				enum json_type
 				{
 					integer,
@@ -24,9 +28,13 @@ namespace aquarius
 				virtual ~json_tag() = default;
 
 			public:
-				void generate_to_tag(std::ofstream& ofs, std::shared_ptr<parser> parser);
+				void generate_to_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser);
 
-				void generate_from_tag(std::ofstream& ofs, std::shared_ptr<parser> parser);
+				void generate_from_tag_define(std::ofstream& ofs, std::shared_ptr<data_field> parser);
+
+				void generate_to_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser);
+
+				void generate_from_tag(std::ofstream& ofs, std::shared_ptr<data_field> parser);
 
 			private:
 				bool generate_to_int(std::ofstream& ofs, const std::string& type, const std::string& value);

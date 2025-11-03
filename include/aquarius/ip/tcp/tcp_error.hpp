@@ -38,9 +38,16 @@ namespace aquarius
 		}
 	};
 
+	static tcp_error_category& get_tcp_error_category()
+	{
+		static tcp_error_category category{};
+
+		return category;
+	}
+
 	inline error_code make_error_code(tcp_error ec)
 	{
-		return error_code(static_cast<int>(ec), tcp_error_category());
+		return error_code(static_cast<int>(ec), get_tcp_error_category());
 	}
 }
 

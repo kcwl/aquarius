@@ -1,68 +1,70 @@
 #include "message_parse.h"
-#include "protocol_parse.h"
-#include "router_parse.h"
+#include "router_field.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
+        message_struct::message_struct()
+            : parser(struct_type::message)
+            , router_ptr_(new router_field())
+        {
 
-		message_parse::message_parse()
-			: parser(struct_type::message)
-			, router_ptr_(new router_parse())
-			, request_ptr_(new protocol_parse())
-			, response_ptr_(new protocol_parse())
-		{}
+        }
 
-		parser::parse_error message_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
-		{
-			name_ = read_value<token::value, '-'>(ifs, column, row);
+        message_struct::parse_error message_struct::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
+        {
+            auto name = read_value<token::value, '-'>(ifs, column, row);
 
-			if (name_.empty())
-				return parse_error::syntax;
+            if (name.empty())
+                return parse_error::syntax;
 
-			auto result = seek<'>'>(ifs, column, row);
+            this->set_name(name);
 
-			if (result != parse_error::success)
-				return result;
+            auto result = seek<'>'>(ifs, column, row);
+            if (result != parse_error::success)
+                return result;
 
-			result = router_ptr_->visit(ifs, column, row);
+            result = router_ptr_->visit(ifs, column, row);
 
-			if (result != parse_error::success)
-				return result;
+            if (result != parse_error::success)
+                return result;
 
-			while (!ifs.eof())
-			{
-				result = seek<'}'>(ifs, column, row);
+            while (!ifs.eof())
+            {
+                auto res = seek<'}'>(ifs, column, row);
+                if (res == parse_error::success)
+                    return res;
+                auto k = read_value<token::key, ' '>(ifs, column, row);
+                if (k.empty())
+                    return parse_error::syntax;
+                auto v = read_value<token::value, ';'>(ifs, column, row);
+                if (v.empty())
+                    return parse_error::syntax;
 
-				if (result == parse_error::success)
-					return result;
+                this->add_field(k, v);
+            }
+            return ifs.eof() ? parse_error::eof : parse_error::syntax;
+        }
 
-				auto sub_key = read_value<token::key, '{'>(ifs, column, row);
+        std::string message_struct::protocol() const
+        {
+            return router_ptr_->protocol();
+        }
 
-				if (sub_key == "request")
-				{
-					result = request_ptr_->visit(ifs, column, row);
+        std::string message_struct::method() const
+        {
+            return router_ptr_->method();
+        }
 
-					if (result == parse_error::success)
-					{
-						request_ptr_->name_ = name_;
-					}
-				}
-				else if (sub_key == "response")
-				{
-					result = response_ptr_->visit(ifs, column, row);
+        void message_struct::method(const std::string& m)
+        {
+            router_ptr_->set_method(m);
+        }
 
-					if (result == parse_error::success)
-					{
-						response_ptr_->name_ = name_;
-					}
-				}
-				else
-					return parse_error::keyword;
-			}
-
-			return parse_error::eof;
-		}
+        std::string message_struct::router_key() const
+        {
+            return router_ptr_->key();
+        }
 	} // namespace lazytool
 } // namespace aquarius

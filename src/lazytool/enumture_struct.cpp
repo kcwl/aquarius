@@ -1,21 +1,23 @@
-#include "enumture_parse.h"
+#include "enumture_struct.h"
 
 namespace aquarius
 {
 	namespace lazytool
 	{
-		enumture_parse::enumture_parse()
+		enum_struct::enum_struct()
 			: parser(struct_type::enumture)
 		{}
 
-		parser::parse_error enumture_parse::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
+		enum_struct::parse_error enum_struct::visit(std::ifstream& ifs, std::size_t& column, std::size_t& row)
 		{
-			name_ = read_value<token::value, '{'>(ifs, column, row);
+			auto name = read_value<token::value, '{'>(ifs, column, row);
 
-			if (name_.empty())
+			if (name.empty())
 				return parse_error::syntax;
 
-			// put_custom_type(name_);
+			this->set_name(name);
+
+			// put_custom_type(name);
 
 			parse_error result{};
 
@@ -30,7 +32,7 @@ namespace aquarius
 				if (v.empty())
 					return parse_error::syntax;
 
-				values_.emplace_back(v, "");
+				this->add_field("", v);
 
 				result = parse_error::success;
 			}

@@ -43,6 +43,8 @@ BOOST_AUTO_TEST_CASE(command_argv_vector)
 	BOOST_CHECK_EQUAL(cmd.option<std::string>("hello"), "x");
 	BOOST_CHECK_EQUAL(cmd.option<int>("world"), 24);
 
+	BOOST_TEST(cmd.option<int>("error") == 0);
+
 	BOOST_CHECK_EQUAL(cmd.desc(), "test_command");
 
 	auto ops = cmd.options();
@@ -52,6 +54,5 @@ BOOST_AUTO_TEST_CASE(command_argv_vector)
 	BOOST_CHECK_EQUAL(ops.front()->description(), "test first param");
 	BOOST_CHECK_EQUAL(ops.back()->description(), "test second param");
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

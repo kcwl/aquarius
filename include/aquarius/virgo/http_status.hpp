@@ -85,8 +85,8 @@ namespace aquarius
 
 		inline std::string_view from_status_string(http_status s)
 		{
-			static const std::map<http_status, std::string_view> statuses = {
-				{ http_status::unknown, "unknown" },
+			static std::map<http_status, std::string_view> statuses = {
+				{ http_status::unknown, "Unknown" },
 				{ http_status::continue_, "Continue" },
 				{ http_status::switching_protocols, "Switching Protocols" },
 				{ http_status::processing, "Processing" },
@@ -132,23 +132,23 @@ namespace aquarius
 				{ http_status::unprocessable_entity, "Unprocessable Entity" },
 				{ http_status::locked, "Locked" },
 				{ http_status::failed_dependency, "Failed Dependency" },
-				{ http_status::too_early, "too_early" },
-				{ http_status::upgrade_required, "upgrade_required" },
-				{ http_status::precondition_required, "precondition_required" },
-				{ http_status::too_many_requests, "too_many_requests" },
-				{ http_status::request_header_fields_too_large, "request_header_fields_too_large" },
-				{ http_status::unavailable_for_legal_reasons, "unavailable_for_legal_reasons" },
-				{ http_status::internal_server_error, "internal_server_error" },
-				{ http_status::not_implemented, "not_implemented" },
-				{ http_status::bad_gateway, "bad_gateway" },
-				{ http_status::service_unavailable, "service_unavailable" },
-				{ http_status::gateway_timeout, "gateway_timeout" },
-				{ http_status::http_version_not_supported, "http_version_not_supported" },
-				{ http_status::variant_also_negotiates, "variant_also_negotiates" },
-				{ http_status::insufficient_storage, "insufficient_storage" },
-				{ http_status::loop_detected, "loop_detected" },
-				{ http_status::not_extended, "not_extended" },
-				{ http_status::network_authentication_required, "network_authentication_required" }
+				{ http_status::too_early, "Too Early" },
+				{ http_status::upgrade_required, "Upgrade Required" },
+				{ http_status::precondition_required, "Precondition Required" },
+				{ http_status::too_many_requests, "Too Many Requests" },
+				{ http_status::request_header_fields_too_large, "Request Header Fields Too Large" },
+				{ http_status::unavailable_for_legal_reasons, "Unavailable For Legal Reasons" },
+				{ http_status::internal_server_error, "Internal Server Error" },
+				{ http_status::not_implemented, "Not Implemented" },
+				{ http_status::bad_gateway, "Bad Gateway" },
+				{ http_status::service_unavailable, "Service Unavailable" },
+				{ http_status::gateway_timeout, "Gateway Timeout" },
+				{ http_status::http_version_not_supported, "Http Version Not Supported" },
+				{ http_status::variant_also_negotiates, "Variant Also Negotiates" },
+				{ http_status::insufficient_storage, "Insufficient Storage" },
+				{ http_status::loop_detected, "Loop Detected" },
+				{ http_status::not_extended, "Not Extended" },
+				{ http_status::network_authentication_required, "Network Authentication Required" }
 			};
 			return statuses.at(s);
 		}
@@ -174,9 +174,16 @@ namespace aquarius
 			}
 		};
 
+		static http_status_category& get_http_status_category()
+		{
+			static http_status_category category{};
+
+			return category;
+		}
+
 		inline error_code make_error_code(http_status result)
 		{
-			return error_code(static_cast<int>(result), http_status_category());
+			return error_code(static_cast<int>(result), get_http_status_category());
 		}
 
 		enum class http_status_class : unsigned

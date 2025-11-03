@@ -22,9 +22,6 @@
     <Filter Include="include\aquarius\detail">
       <UniqueIdentifier>{a53cce79-7a96-4b05-9ced-8693ca047089}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\concepts">
-      <UniqueIdentifier>{a39d9acf-9805-4827-bc60-9a28116f83e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\adaptor">
       <UniqueIdentifier>{653ccca7-45ab-477a-b646-19d2c40403ee}</UniqueIdentifier>
     </Filter>
@@ -102,9 +99,6 @@
     <ClInclude Include="..\include\aquarius\basic_handler.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\concepts\concepts.hpp">
-      <Filter>include\aquarius\concepts</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -171,13 +165,13 @@
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\json.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http.hpp">
@@ -279,7 +273,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_client_session.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_message_serialize.hpp">
+    <ClInclude Include="..\include\aquarius\basic_serialize.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
@@ -306,23 +300,26 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\serialize.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\sql.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\protocol.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\serialize\kv.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\cmd_options.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\serialize\concept.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\client.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\detail.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http_handler.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +327,93 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\test.virgo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\url.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\client.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\cmd_options.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\protocol.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\json_serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\sql.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\server.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\concat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\crc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\float.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\int_to_string.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\io_service_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\make_endpoint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\session_store.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\string_literal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\struct_name.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\trie.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\binary_serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\kv_serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize_error.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\flex_buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\handler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\router.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\make_protocol.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tcp_error.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\http_method.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\http_status.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\http_version.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

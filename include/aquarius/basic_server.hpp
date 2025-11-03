@@ -7,6 +7,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/coroutine.hpp>
+#include <aquarius/detail/redirect_error.hpp>
 
 namespace aquarius
 {
@@ -76,7 +77,7 @@ namespace aquarius
 
 				co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr] -> awaitable<error_code> { co_return co_await session_ptr->accept(); }, detached);
+					[session_ptr] -> awaitable<void> { co_return co_await session_ptr->accept(); }, detached);
 			}
 		}
 

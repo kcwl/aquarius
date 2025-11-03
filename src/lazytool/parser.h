@@ -1,7 +1,6 @@
 #pragma once
 #include "parse_base.h"
 #include "struct_type.hpp"
-#include <vector>
 
 namespace aquarius
 {
@@ -106,14 +105,10 @@ namespace aquarius
 				return ifs.eof() ? parse_error::eof : parse_error::syntax;
 			}
 
+			struct_type structtype() const;
+
 		public:
-			std::string name_;
-
 			struct_type struct_type_;
-
-			std::string protocol_type_;
-
-			std::vector<std::pair<std::string, std::string>> values_;
 		};
 	} // namespace lazytool
 } // namespace aquarius

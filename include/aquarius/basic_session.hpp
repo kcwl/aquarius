@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/concepts/concepts.hpp>
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
@@ -15,6 +14,8 @@
 #include <boost/asio/streambuf.hpp>
 #include <aquarius/ip/tcp/tcp_error.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/socket_adaptor.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -34,23 +35,18 @@ namespace aquarius
 
 		using resolver = protocol::resolver;
 
-		using ssl_socket = boost::asio::ssl::stream<socket>;
-
-		using ssl_context = detail::ssl_context_factory<Server>;
-
 	public:
 		explicit basic_session(socket sock)
-			: ssl_socket_(ssl_socket(std::move(sock), ssl_context::create()))
+			: socket_(std::move(sock))
+			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
 			, proto_()
-			, sql_(ssl_socket_.get_executor())
-			, timer_(ssl_socket_.get_executor())
-		{
-			ssl_context::init(ssl_socket_);
-		}
+			, sql_(socket_.get_executor())
+			, timer_(socket_.get_executor())
+		{}
 
 		basic_session(io_context& io)
-			: basic_session(socket(io))
+			: basic_session(std::move(socket(io)))
 		{}
 
 		virtual ~basic_session() = default;
@@ -58,7 +54,7 @@ namespace aquarius
 	public:
 		auto get_executor()
 		{
-			return ssl_socket_.get_executor();
+			return socket_.get_executor();
 		}
 
 		std::size_t uuid() const
@@ -68,51 +64,25 @@ namespace aquarius
 
 		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
 		{
-			resolver resolve(ssl_socket_.lowest_layer().get_executor());
-
-			auto endpoints = resolve.resolve(host, port);
-
-			error_code ec;
-
-			co_await boost::asio::async_connect(ssl_socket_.lowest_layer(), endpoints,
-												redirect_error(use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "connect " << host << " failed! maybe" << ec.what();
-			}
-
-			if (ec)
-				co_return ec;
-
-			co_await ssl_socket_.async_handshake(boost::asio::ssl::stream_base::client,
-												 redirect_error(use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "connect " << host << " failed! maybe" << ec.what();
-			}
-
-			co_return ec;
+			co_return co_await socket_adaptor_.async_connect(host, port);
 		}
 
 		std::string remote_address() const
 		{
-			return ssl_socket_.lowest_layer().remote_endpoint().address().to_string();
+			return socket_.remote_endpoint().address().to_string();
 		}
 
 		uint32_t remote_address_u() const
 		{
-			return ssl_socket_.lowest_layer().remote_endpoint().address().to_v4().to_uint();
+			return socket_.remote_endpoint().address().to_v4().to_uint();
 		}
 
 		uint16_t remote_port() const
 		{
-			return ssl_socket_.lowest_layer().remote_endpoint().port();
+			return socket_.remote_endpoint().port();
 		}
 
-		template <typename T>
-		auto async_read(flex_buffer<T>& buffer, std::size_t length) -> awaitable<error_code>
+		auto async_read(flex_buffer& buffer, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
@@ -124,40 +94,39 @@ namespace aquarius
 			co_return co_await async_read(buffer.wdata(), length);
 		}
 
-		auto async_read(char* begin, std::size_t length) -> awaitable<error_code>
+		auto async_read(uint8_t* begin, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read(ssl_socket_, boost::asio::buffer(begin, length),
+			co_await boost::asio::async_read(socket_adaptor_.get_implement(), boost::asio::buffer(begin, length),
 											 redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		template <typename T>
-		auto async_read_util(flex_buffer<T>& buffer, std::string_view delm) -> awaitable<error_code>
+		auto async_read_util(flex_buffer& buffer, std::string_view delm) -> awaitable<error_code>
 		{
 			error_code ec;
 
 			boost::asio::streambuf buf{};
 
-			co_await boost::asio::async_read_until(ssl_socket_, buf, delm, redirect_error(use_awaitable, ec));
+			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buf, delm,
+												   redirect_error(use_awaitable, ec));
 
 			if (!ec)
 			{
-				buffer.put((char*)buf.data().data(), buf.size());
+				buffer.put((uint8_t*)buf.data().data(), buf.size());
 			}
 
 			co_return ec;
 		}
 
-		template <typename T>
-		auto async_send(flex_buffer<T> buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 
-			co_await ssl_socket_.async_write_some(boost::asio::buffer(buffer.rdata(), buffer.active()),
-												  redirect_error(use_awaitable, ec));
+			co_await socket_adaptor_.get_implement().async_write_some(
+				boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
@@ -166,37 +135,27 @@ namespace aquarius
 		{
 			error_code ec;
 
-			ssl_socket_.shutdown(ec);
+			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
 		}
 
 		void close()
 		{
 			error_code ec;
 
-			ssl_socket_.lowest_layer().close(ec);
+			socket_.close(ec);
 		}
 
-		auto accept() -> awaitable<error_code>
+		auto accept() -> awaitable<void>
 		{
-			error_code ec;
-
-			if constexpr (Server)
-			{
-				co_await ssl_socket_.async_handshake(boost::asio::ssl::stream_base::server,
-													 redirect_error(use_awaitable, ec));
-
-				if (ec)
-					co_return ec;
-			}
-
-			co_return co_await proto_.accept(this->shared_from_this());
+			co_return co_await socket_adaptor_.accept([this] -> awaitable<void>
+													  { co_return co_await proto_.accept(this->shared_from_this()); });
 		}
 
 		bool keep_alive(bool value)
 		{
 			error_code ec;
 
-			ssl_socket_.lowest_layer().set_option(typename protocol::keep_alive(value), ec);
+			socket_.set_option(typename protocol::keep_alive(value), ec);
 
 			return !ec;
 		}
@@ -205,7 +164,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			ssl_socket_.lowest_layer().set_option(typename protocol::no_delay(enable), ec);
+			socket_.set_option(typename protocol::no_delay(enable), ec);
 
 			return !ec;
 		}
@@ -221,14 +180,10 @@ namespace aquarius
 			return sql_;
 		}
 
-		template <typename Request, typename T>
-		void make_request_buffer(std::shared_ptr<Request> request, flex_buffer<T>& buffer)
-		{
-			return proto_.template make_request_buffer<Request, T>(request, buffer);
-		}
-
 	private:
-		ssl_socket ssl_socket_;
+		socket socket_;
+
+		socket_adaptor<Server, Protocol> socket_adaptor_;
 
 		std::size_t uuid_;
 
@@ -242,7 +197,4 @@ namespace aquarius
 	template <bool Server, typename Protocol>
 	struct is_session_type<basic_session<Server, Protocol>> : std::true_type
 	{};
-
-	template<typename T>
-	struct is_ssl_socket_type<boost::asio::ssl::stream<T>> : std::true_type {};
 } // namespace aquarius

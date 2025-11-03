@@ -19,9 +19,8 @@ namespace aquarius
 											 std::ofstream& ofs_cpp) override;
 
 			private:
-				void generate_main_define(std::ofstream& ofs, std::shared_ptr<parser> parser);
+				generate_error generate_main_define(std::ofstream& ofs, std::shared_ptr<parser> parser);
 			};
-		}
-		
+		} // namespace cpp
 	} // namespace lazytool
 } // namespace aquarius

@@ -6,78 +6,73 @@
 
 namespace aquarius
 {
-	namespace json =  boost::json;
+	namespace json = boost::json;
 
-	namespace serialize
+	struct json_parse
 	{
-		struct json_parse
+		template <typename T>
+		void to_datas(const T& v, flex_buffer& buffer)
 		{
-			template <typename T, typename U>
-			void to_datas(const T& v, flex_buffer<U>& buffer)
-			{
-				auto value = boost::json::value_from(v);
+			auto value = boost::json::value_from(v);
 
-				auto str = boost::json::serialize(value);
+			auto str = boost::json::serialize(value);
 
-				if (str == "null")
-					return;
+			if (str == "null")
+				return;
 
-				buffer.put(str.begin(), str.end());
-			}
+			buffer.put(str.begin(), str.end());
+		}
 
-			template <typename T, typename U>
-			T from_datas(flex_buffer<U>& buffer)
-			{
-				if (buffer.empty())
-					return {};
-
-				std::string json;
-
-				buffer.get(json);
-
-				auto value = boost::json::parse(json);
-
-				return boost::json::value_to<T>(value);
-			}
-		};
-
-		inline std::vector<char> json_value_to_array(const boost::json::value& v)
+		template <typename T>
+		T from_datas(flex_buffer& buffer)
 		{
-			std::vector<char> result{};
+			if (buffer.empty())
+				return {};
 
-			const auto& arr = v.try_as_array();
+			std::string json;
 
-			if (arr.has_error())
-				return result;
+			buffer.get(json);
 
-			auto& arr_val = arr.value();
+			auto value = boost::json::parse(json);
 
-			result.resize(arr_val.size());
+			return boost::json::value_to<T>(value);
+		}
+	};
 
-			std::transform(arr_val.begin(), arr_val.end(), result.begin(), [] (const auto& v)
-						   {
-							   return static_cast<char>(*v.try_as_int64());
-						   });
+	inline std::vector<char> json_value_to_array(const boost::json::value& v)
+	{
+		std::vector<char> result{};
 
+		const auto& arr = v.try_as_array();
+
+		if (arr.has_error())
 			return result;
-		}
 
-		inline boost::json::value json_value_from_array(const std::vector<char>& vec)
-		{
-			boost::json::value v{};
-			auto& arr = v.emplace_array();
+		auto& arr_val = arr.value();
 
-			std::copy(vec.begin(), vec.end(), std::back_inserter(arr));
+		result.resize(arr_val.size());
 
-			return v;
-		}
+		std::transform(arr_val.begin(), arr_val.end(), result.begin(),
+					   [](const auto& v) { return static_cast<char>(*v.try_as_int64()); });
 
-		template<typename T>
-		inline boost::json::value json_value_from_object(const T& t)
-		{
-			auto value = t;
+		return result;
+	}
 
-			return boost::json::value_from<T>(std::move(value));
-		}
-	} // namespace virgo
+	inline boost::json::value json_value_from_array(const std::vector<char>& vec)
+	{
+		boost::json::value v{};
+		auto& arr = v.emplace_array();
+
+		std::copy(vec.begin(), vec.end(), std::back_inserter(arr));
+
+		return v;
+	}
+
+	template <typename T>
+	inline boost::json::value json_value_from_object(const T& t)
+	{
+		auto value = t;
+
+		return boost::json::value_from<T>(std::move(value));
+	}
 } // namespace aquarius
