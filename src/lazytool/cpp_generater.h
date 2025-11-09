@@ -34,6 +34,9 @@ namespace aquarius
 					//requires std::is_base_of_v<parser, T>
 				void generate_operator_equal_src(std::ofstream& ofs, std::shared_ptr<T> parser)
 				{
+					if (parser->fields().empty())
+						return;
+
 					ofs << "\n";
 					ofs << "bool operator==(const " << parser->name() << "& lhs, const " << parser->name() << "& rhs)\n";
 					ofs << "{\n";
