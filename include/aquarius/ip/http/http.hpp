@@ -64,8 +64,18 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[session_ptr, buffer = std::move(buffer), this, hf = std::move(hf)]() mutable -> awaitable<void>
 					{
-						http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf,
+						auto result = http_router<Session>::get_mutable_instance().invoke(method_, path_, session_ptr, hf,
 																			std::move(buffer));
+
+						if (!result)
+						{
+							 if (path_ == "/")
+								 path_ = "root";
+
+							http_router<Session>::get_mutable_instance().invoke(virgo::http_method::redirect, path_, session_ptr, hf,
+																				std::move(buffer));
+						}
+
 
 						co_return;
 					},
@@ -128,11 +138,12 @@ namespace aquarius
 			if (ec)
 				co_return;
 
-			request ? parse_request_header_line(buffer, ec) : parse_response_header_line(buffer, ec);
+			error_code req_ec{};
+			request ? parse_request_header_line(buffer, req_ec) : parse_response_header_line(buffer, req_ec);
 
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+			if (req_ec.value() != static_cast<int>(virgo::http_status::ok))
 			{
-				make_error_response(session_ptr, version_, hf, static_cast<virgo::http_status>(ec.value()));
+				make_error_response(session_ptr, version_, hf, static_cast<virgo::http_status>(req_ec.value()));
 
 				co_return;
 			}
@@ -152,9 +163,7 @@ namespace aquarius
 
 			if (iter == buf_view.end())
 			{
-				make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
-
-				co_return;
+				co_return co_await make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
 			}
 
 			auto len = std::distance(buf_view.begin(), iter);
@@ -172,9 +181,7 @@ namespace aquarius
 
 				if (itor == header.end())
 				{
-					make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
-
-					co_return;
+					co_return co_await make_error_response(session_ptr, version_, hf, virgo::http_status::bad_request);
 				}
 
 				len = std::distance(header.begin(), itor);
@@ -369,7 +376,7 @@ namespace aquarius
 
 			if (iter == buffer.end())
 			{
-				ec = virgo::http_status::bad_request;
+				path_ = std::string(buffer.data(), buffer.size());
 				return;
 			}
 

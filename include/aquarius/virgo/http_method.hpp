@@ -16,7 +16,8 @@ namespace aquarius
 			options,
 			head,
 			put,
-			delete_
+			delete_,
+			redirect
 		};
 
 		inline std::ostream& operator<<(std::ostream& os, http_method m)
@@ -42,6 +43,8 @@ namespace aquarius
 				return "PUT"sv;
 			case http_method::delete_:
 				return "DELETE"sv;
+			case http_method::redirect:
+				return "REDIRECT"sv;
 			default:
 				break;
 			}

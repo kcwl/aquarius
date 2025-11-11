@@ -179,6 +179,11 @@ namespace aquarius
 				return status_;
 			}
 
+			void result(http_status s)
+			{
+				status_ = s;
+			}
+
 			void result(int s)
 			{
 				status_ = static_cast<http_status>(s);

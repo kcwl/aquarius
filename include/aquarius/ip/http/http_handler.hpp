@@ -1,9 +1,11 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
+#include <aquarius/virgo/http_method.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/virgo/http_status.hpp>
 
 namespace aquarius
 {
-
 	template <virgo::http_method Method, typename Session, typename Request, typename Response>
 	class basic_http_hander : public basic_handler<Session, Request, Response>
 	{
