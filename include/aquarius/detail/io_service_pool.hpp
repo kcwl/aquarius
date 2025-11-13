@@ -5,11 +5,17 @@
 #include <list>
 #include <thread>
 #include <vector>
+#include <aquarius/tag_invoke.hpp>
 
 namespace aquarius
 {
 	namespace detail
 	{
+		struct io_context_param
+		{
+			std::size_t number;
+		};
+
 		class io_service_pool
 		{
 		private:
@@ -110,6 +116,19 @@ namespace aquarius
 			bool enable_;
 		};
 	} // namespace detail
+
+	inline auto& attach_io_context()
+	{
+		detail::io_context_param param{};
+
+		static std::once_flag flag{};
+
+		std::call_once(flag, [&param] { tag_invoke(value_to<io_context_param_tag>{}, param); });
+
+		static detail::io_service_pool pool(param.number);
+
+		return pool.get_io_service();
+	}
 } // namespace aquarius
 
 #define IO_POOL aquarius::detail::io_service_pool::get_mutable_instance()

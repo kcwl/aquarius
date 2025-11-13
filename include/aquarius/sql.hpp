@@ -12,6 +12,7 @@
 #include <aquarius/sql/limit_view.hpp>
 #include <aquarius/sql/condition_view.hpp>
 #include <aquarius/detail/string_literal.hpp>
+#include <aquarius/sql/sql_pool_core.hpp>
 
 namespace aquarius
 {
@@ -249,6 +250,18 @@ namespace aquarius
 			return aquarius::sql::_tp_condition<content>();
 		}
 	} // namespace sql
+	template<typename T>
+	inline auto sql_query(std::string_view sql) -> awaitable<std::vector<T>>
+	{
+		error_code ec;
+		co_return co_await sql_pool().get_sql_adaptor()->async_query<T>(sql, ec);
+	}
+
+	inline auto sql_execute(std::string_view sql) -> awaitable<bool>
+	{
+		error_code ec;
+		co_return co_await sql_pool().get_sql_adaptor()->async_execute(sql, ec);
+	}
 } // namespace aquarius
 
 #define sql_select(content) aquarius::sql::select<content>()

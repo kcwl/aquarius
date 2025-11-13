@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;E:\下载\mysql-connector-c-6.1.11-winx64\mysql-connector-c-6.1.11-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -164,6 +164,7 @@
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\tag.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\include\aquarius\sql\closure.hpp" />
     <ClInclude Include="..\include\aquarius\sql\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\sql\condition_view.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\database_param.hpp" />
     <ClInclude Include="..\include\aquarius\sql\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\insert_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\limit_view.hpp" />
@@ -226,8 +228,12 @@
     <ClInclude Include="..\include\aquarius\sql\or_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\select_distinct_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\select_view.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\sql_core.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\sql_error.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\sql_pool_core.hpp" />
     <ClInclude Include="..\include\aquarius\sql\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\where_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tag_invoke.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />
