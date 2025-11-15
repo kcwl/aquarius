@@ -4,7 +4,6 @@
 #include <aquarius/virgo/http_null_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/ip/http/http_header.hpp>
-#include <aquarius/ip/http/http_handler.hpp>
 
 #define STRING(value) #value
 
@@ -34,19 +33,17 @@
 		aquarius::virgo::http_response<AQUAIRUS_REDIRECT_CAT(src), aquarius::http_response_header,                     \
 									   aquarius::virgo::http_null_body>;
 
-#define AQUARIUS_CONTEXT_BY_REDIRECT(__session, __router, __http_method, __src, __dest)                                \
+#define AQUARIUS_CONTEXT_BY_REDIRECT(__router, __http_method, __src, __dest)                                           \
 	AQUARIUS_REDIRECT_MESSAGE(__src, __dest)                                                                           \
 	class __method_to_##__src;                                                                                         \
-	[[maybe_unused]] static aquarius::auto_http_handler_register<                                                      \
-		__session, __method_to_##__src, __router, __http_method> __auto_register_##__method(STRING(__src));            \
+	[[maybe_unused]] static aquarius::auto_http_handler_register<__method_to_##__src, __router, __http_method>         \
+		__auto_register_##__method(STRING(__src));                                                                     \
 	class __method_to_##__src final                                                                                    \
-		: public aquarius::basic_http_hander<aquarius::virgo::http_method::redirect, __session,                        \
-											 REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>      \
+		: public aquarius::basic_handler<REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>          \
 	{                                                                                                                  \
 	public:                                                                                                            \
 		using base_type =                                                                                              \
-			aquarius::basic_http_hander<aquarius::virgo::http_method::redirect, __session,                             \
-										REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>;          \
+			aquarius::basic_handler<REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>;              \
                                                                                                                        \
 	public:                                                                                                            \
 		__method_to_##__src()                                                                                          \
@@ -68,19 +65,18 @@
 			response().set_field("Location", location);                                                                \
 			co_return aquarius::virgo::http_status::moved_permanently;                                                 \
 		}                                                                                                              \
-	};
-
-// private \
-	: //template <aquarius::detail::string_literal Redirect>                                                           \
-		//constexpr auto parse_router()                                                                                  \
-		//{                                                                                                              \
-		//	constexpr std::string_view redirect_value = aquarius::detail::bind_param<Redirect>::value;                 \
-		//	constexpr auto sp = redirect_value | std::views::split('_');                                               \
-		//	constexpr auto begin = sp.begin();                                                                         \
-		//	constexpr auto end = sp.end();                                                                             \
-		//	constexpr std::size_t sp_size = std::ranges::distance(begin, end);                                         \
-		//	auto f = [&]<std::size_t... I>(std::index_sequence<I...>)                                                  \
-		//	{ return aquarius::concat_v<((*(begin + I)), ...)>; };                                                     \
-		//	return f(std::make_index_sequence<sp_size>());                                                             \
-		//}                                                                                                              \
+                                                                                                                       \
+	private:                                                                                                           \
+		template <aquarius::detail::string_literal Redirect>                                                           \
+		constexpr auto parse_router()                                                                                  \
+		{                                                                                                              \
+			constexpr std::string_view redirect_value = aquarius::detail::bind_param<Redirect>::value;                 \
+			constexpr auto sp = redirect_value | std::views::split('_');                                               \
+			constexpr auto begin = sp.begin();                                                                         \
+			constexpr auto end = sp.end();                                                                             \
+			constexpr std::size_t sp_size = std::ranges::distance(begin, end);                                         \
+			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)                                                  \
+			{ return aquarius::concat_v<((*(begin + I)), ...)>; };                                                     \
+			return f(std::make_index_sequence<sp_size>());                                                             \
+		}                                                                                                              \
 	};

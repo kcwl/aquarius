@@ -161,8 +161,16 @@ namespace aquarius
 							ofs << "\tthis->parse_" << direction << "(*this, buffer);" << CRLF;
 						}
 					}
-					else
+					else if(method == "html")
 					{
+						if (has_type)
+						{
+							ofs << "\tthis->parse_" << direction << "(buffer); " << CRLF;
+						}
+						else
+						{
+							ofs << "\tthis->parse_" << direction << "(buffer);" << CRLF;
+						}
 					}
 				};
 

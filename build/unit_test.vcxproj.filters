@@ -174,7 +174,7 @@
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http.hpp">
+    <ClInclude Include="..\include\aquarius\ip\http\http_proc.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_handler.hpp">
@@ -189,7 +189,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp">
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_proc.hpp">
       <Filter>include\aquarius\ip\tcp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp">
@@ -320,6 +320,24 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http_handler.hpp">
       <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_param.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tag_invoke.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_redirect.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\html.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\http_html_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

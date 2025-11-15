@@ -28,7 +28,7 @@ namespace aquarius
 			return parse_.template from_datas<T>(buffer, std::forward<Args>(args)...);
 		}
 
-	private:
+	protected:
 		Parse parse_;
 	};
 } // namespace aquarius

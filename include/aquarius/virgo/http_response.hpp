@@ -11,12 +11,10 @@ namespace aquarius
 	namespace virgo
 	{
 		template <detail::string_literal Router, typename Header, typename Body>
-		class http_response : public basic_http_protocol<false, Router, Header, Body, std::allocator<Body>>
+		class http_response : public basic_http_protocol<false, Header, Body>
 		{
 		public:
-			using base = basic_http_protocol<false, Router, Header, Body, std::allocator<Body>>;
-
-			using base::router;
+			using base = basic_http_protocol<false, Header, Body>;
 
 			using base::has_request;
 
@@ -24,16 +22,15 @@ namespace aquarius
 
 			using base::splitor;
 
-			using typename base::body_t;
-
-			using typename base::header_t;
-
 		public:
-			http_response()
-				: base()
-			{
+			http_response() = default;
+			virtual ~http_response() = default;
 
-			}
+			http_response(const http_response&) = default;
+			http_response& operator=(const http_response&) = default;
+
+			http_response(http_response&&) noexcept = default;
+			http_response& operator=(http_response&&) noexcept = default;
 
 		public:
 			bool operator==(const http_response& other) const
@@ -53,7 +50,7 @@ namespace aquarius
 
 				this->body().serialize(body_buffer);
 
-				this->content_length(body_buffer.active());
+				this->content_length(body_buffer.size());
 
 				auto type = this->find("Content-Type");
 
@@ -61,10 +58,10 @@ namespace aquarius
 				{
 					this->header().serialize(buffer);
 
-					buffer.put(splitor.begin(), splitor.end());
+					buffer.sputn(splitor.data(), splitor.size());
 				}
 
-				buffer.append(std::move(body_buffer));
+				buffer.sputn((char*)body_buffer.data().data(), body_buffer.data().size());
 			}
 
 			void consume(flex_buffer& buffer)
@@ -73,17 +70,17 @@ namespace aquarius
 
 				if (type == json_type)
 				{
-					auto sp = std::span<char>((char*)buffer.rdata(), buffer.active());
+					auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
-					auto third_view = sp | std::views::slide(3);
+					auto third_view = sp | std::views::slide(splitor.size());
 
 					auto iter = std::ranges::find_if(third_view,
-													 [] (const auto& value)
+													 [](const auto& value)
 													 {
-														 if (value.size() < 3)
+														 if (value.size() < splitor.size())
 															 return false;
 
-														 return std::string_view(value) == "<->"sv;
+														 return std::string_view(value) == splitor;
 													 });
 
 					if (iter == third_view.end())
@@ -91,14 +88,14 @@ namespace aquarius
 
 					auto len = std::distance(third_view.begin(), iter);
 
-					flex_buffer header_buffer(buffer.rdata(), len);
+					flex_buffer header_buffer(buffer.data().data(), len);
 
 					this->header().deserialize(header_buffer);
 
-					buffer.consume(3 + len);
+					buffer.consume(splitor.size() + len);
 				}
 
-				flex_buffer body_buffer(buffer.rdata(), buffer.active());
+				flex_buffer body_buffer(buffer.data().data(), buffer.data().size());
 
 				this->body().deserialize(body_buffer);
 			}

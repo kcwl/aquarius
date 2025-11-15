@@ -9,21 +9,50 @@ namespace aquarius
 	{
 
 		template <detail::string_literal Router, typename Header, typename Body>
-		class tcp_response : public basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>
+		class tcp_response : public basic_tcp_protocol<false, Header, Body>
 		{
 		public:
-			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
-
-			using base::router;
+			using base = basic_tcp_protocol<false, Header, Body>;
 
 			using base::has_request;
 
-			using typename base::header_t;
-
-			using typename base::body_t;
-
 		public:
-			tcp_response() = default;
+			tcp_response()
+				: base()
+				, parse_()
+			{}
+
+			virtual ~tcp_response() = default;
+
+			tcp_response(const tcp_response& other)
+				: base(other)
+				, parse_(other.parse_)
+			{}
+
+			tcp_response& operator=(const tcp_response& other)
+			{
+				if (this != std::addressof(other))
+				{
+					base::operator=(other);
+					parse_ = other.parse_;
+				}
+				return *this;
+			}
+
+			tcp_response(tcp_response&& other) noexcept
+				: base(std::move(other))
+				, parse_(std::exchange(other.parse_, {}))
+			{}
+
+			tcp_response& operator=(tcp_response&& other) noexcept
+			{
+				if (this != std::addressof(other))
+				{
+					base::operator=(std::move(other));
+					parse_ = std::exchange(other.parse_, {});
+				}
+				return *this;
+			}
 
 		public:
 			bool operator==(const tcp_response& other) const
@@ -39,11 +68,11 @@ namespace aquarius
 		public:
 			bool commit(flex_buffer& buffer)
 			{
-				body_parse_.to_datas(this->result(), buffer);
+				parse_.to_datas(this->result(), buffer);
 
-				body_parse_.to_datas(this->timestamp(), buffer);
+				parse_.to_datas(this->timestamp(), buffer);
 
-				body_parse_.to_datas(this->version(), buffer);
+				parse_.to_datas(this->version(), buffer);
 
 				this->header().serialize(buffer);
 
@@ -54,11 +83,11 @@ namespace aquarius
 
 			void consume(flex_buffer& buffer)
 			{
-				this->result(body_parse_.from_datas<int32_t>(buffer));
+				this->result(parse_.from_datas<int32_t>(buffer));
 
-				this->timestamp(body_parse_.from_datas<int64_t>(buffer));
+				this->timestamp(parse_.from_datas<int64_t>(buffer));
 
-				this->version(body_parse_.from_datas<int32_t>(buffer));
+				this->version(parse_.from_datas<int32_t>(buffer));
 
 				this->header().deserialize(buffer);
 
@@ -66,7 +95,7 @@ namespace aquarius
 			}
 
 		private:
-			binary_parse body_parse_;
+			binary_parse parse_;
 		};
 
 		template <detail::string_literal Router, typename Header, typename Body>

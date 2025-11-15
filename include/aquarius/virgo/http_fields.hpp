@@ -36,9 +36,13 @@ namespace aquarius
 				return iter->second;
 			}
 
-			void set_field(const std::string& f, const std::string& v)
+			//void set_field(const std::string& f, const std::string& v)
+			//{
+			//	fields_[f] = v;
+			//}
+			void set_field(std::string_view f, std::string_view v)
 			{
-				fields_[f] = v;
+				fields_[std::string(f.data())] = std::string(v.data());
 			}
 
 			bool has_content_length() const

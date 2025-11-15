@@ -9,12 +9,10 @@ namespace aquarius
 	namespace virgo
 	{
 		template <detail::string_literal Router, typename Header, typename Body>
-		class http_request : public basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>
+		class http_request : public basic_http_protocol<true, Header, Body>
 		{
 		public:
-			using base = basic_http_protocol<true, Router, Header, Body, std::allocator<Body>>;
-
-			using base::router;
+			using base = basic_http_protocol<true, Header, Body>;
 
 			using base::has_request;
 
@@ -22,15 +20,17 @@ namespace aquarius
 
 			using base::splitor;
 
-			using typename base::body_t;
-
-			using typename base::header_t;
+			constexpr static auto router = detail::bind_param<Router>::value;
 
 		public:
-			http_request()
-				: base()
-			{
-			}
+			http_request() = default;
+			virtual ~http_request() = default;
+
+			http_request(const http_request&) = default;
+			http_request& operator=(const http_request&) = default;
+
+			http_request(http_request&&) noexcept = default;
+			http_request& operator=(http_request&&) noexcept = default;
 
 		public:
 			bool operator==(const http_request& other) const
@@ -50,17 +50,17 @@ namespace aquarius
 
 				if (type == json_type)
 				{
-					auto sp = std::span<char>((char*)buffer.rdata(), buffer.active());
+					auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
 					auto third_view = sp | std::views::slide(3);
 
 					auto iter = std::ranges::find_if(third_view,
-													 [] (const auto& value)
+													 [](const auto& value)
 													 {
 														 if (value.size() < 3)
 															 return false;
 
-														 return std::string_view(value) == "<->"sv;
+														 return std::string_view(value) == splitor;
 													 });
 
 					if (iter == third_view.end())
@@ -68,16 +68,10 @@ namespace aquarius
 
 					auto len = std::distance(third_view.begin(), iter);
 
-					flex_buffer header_buffer(buffer.rdata(), len);
-
-					this->header().deserialize(header_buffer);
-
-					buffer.consume(3 + len);
+					this->header().deserialize(buffer);
 				}
 
-				flex_buffer body_buffer(buffer.rdata(), buffer.active());
-
-				this->body().deserialize(body_buffer);
+				this->body().deserialize(buffer);
 			}
 
 			void commit(flex_buffer& buffer)
@@ -86,7 +80,7 @@ namespace aquarius
 
 				this->body().serialize(body_buffer);
 
-				this->content_length(body_buffer.active());
+				this->content_length(body_buffer.size());
 
 				auto type = this->find("Content-Type");
 
@@ -94,10 +88,10 @@ namespace aquarius
 				{
 					this->header().serialize(buffer);
 
-					buffer.put(splitor.begin(), splitor.end());
+					buffer.sputn(splitor.data(), splitor.size());
 				}
 
-				buffer.append(std::move(body_buffer));
+				buffer.sputn(body_buffer.data().data(), body_buffer.data().size());
 			}
 		};
 

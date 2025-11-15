@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename Session>
-	class tcp_router : public basic_router<Session,int, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>,
+	class tcp_router : public basic_router<Session, int, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>,
 					   public singleton<tcp_router<Session>>
 	{
 		using base = basic_router<Session, int, std::function<bool(std::shared_ptr<Session>, flex_buffer&)>>;
@@ -33,14 +33,25 @@ namespace aquarius
 						 [=]
 						 {
 							 co_spawn(
-								 session->get_executor(), [session, req]() mutable -> awaitable<void>
-								 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
+								 session->get_executor(),
+								 [session, req, this]() mutable -> awaitable<void>
+								 {
+									 auto resp = co_await std::make_shared<Context>()->visit(req);
+
+									 send_response(session, resp);
+								 },
+								 detached);
 						 });
 				}
 				catch (error_code& ec)
 				{
-					co_spawn(session->get_executor(), [ec]() mutable -> awaitable<void>
-							 { ec = co_await std::make_shared<Context>()->send_response(ec); });
+					co_spawn(session->get_executor(),
+							 [&ec, session, this]() mutable -> awaitable<void>
+							 {
+								 typename Context::response_t resp{};
+								 resp.result(ec.value());
+								 co_await send_response(session, resp);
+							 });
 
 					return false;
 				}
@@ -50,6 +61,7 @@ namespace aquarius
 
 			this->push(router_key, proto, func);
 		}
+
 		template <typename... Args>
 		bool invoke(std::string_view key, Args&&... args)
 		{
@@ -64,6 +76,28 @@ namespace aquarius
 			auto func = tree->find(key);
 
 			return func == nullptr ? false : func(std::forward<Args>(args)...);
+		}
+
+	private:
+		template<typename Session, typename Response>
+		auto send_response(std::shared_ptr<Session> session_ptr, Response& resp) -> awaitable<void>
+		{
+			if (!session_ptr)
+				co_return;
+
+			flex_buffer buf{};
+			constexpr auto pos = sizeof(uint32_t);
+
+			buf.commit(pos);
+
+			resp.commit(buf);
+
+			auto len = static_cast<uint32_t>(buf.size() - pos);
+
+			buf.pubseekpos(0, std::ios::beg);
+			buf.sputn((char*)&len, pos);
+
+			co_await session_ptr->async_send(buf);
 		}
 	};
 } // namespace aquarius

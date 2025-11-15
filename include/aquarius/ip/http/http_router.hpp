@@ -3,6 +3,7 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/virgo/http_version.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/coroutine.hpp>
@@ -12,11 +13,11 @@ namespace aquarius
 	template <typename Session>
 	class http_router
 		: public basic_router<Session, virgo::http_method,
-							  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>,
+							  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer&)>>,
 		  public singleton<http_router<Session>>
 	{
-		using base =
-			basic_router<Session, virgo::http_method, std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer)>>;
+		using base = basic_router<Session, virgo::http_method,
+								  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer&)>>;
 
 	public:
 		using typename base::function_type;
@@ -32,7 +33,7 @@ namespace aquarius
 		template <virgo::http_method Method, typename Context>
 		void regist(std::string_view proto)
 		{
-			auto func = [&](std::shared_ptr<Session> session, virgo::http_fields hf, flex_buffer buffer)
+			auto func = [&](std::shared_ptr<Session> session, virgo::http_fields hf, flex_buffer& buffer)
 			{
 				try
 				{
@@ -46,15 +47,25 @@ namespace aquarius
 						 [=]
 						 {
 							 co_spawn(
-								 session->get_executor(), [session, req]() mutable -> awaitable<void>
-								 { co_await std::make_shared<Context>()->visit(session, req); }, detached);
+								 session->get_executor(),
+								 [session, req, this]() mutable -> awaitable<void>
+								 {
+									 auto resp = co_await std::make_shared<Context>()->visit(req);
+
+									 send_response(session, resp);
+								 },
+								 detached);
 						 });
 				}
 				catch (error_code& ec)
 				{
-					co_spawn(
-						session->get_executor(), [ec]() mutable -> awaitable<void>
-						{ ec = co_await std::make_shared<Context>()->send_response(virgo::http_status::bad_request); });
+					co_spawn(session->get_executor(),
+							 [&ec, this, session]() mutable -> awaitable<void>
+							 {
+								 typename Context::response_t resp{};
+								 resp.result(ec.value());
+								 co_await send_response(session, resp);
+							 });
 					return false;
 				}
 
@@ -63,6 +74,7 @@ namespace aquarius
 
 			this->push(Method, proto, func);
 		}
+
 		template <typename... Args>
 		bool invoke(virgo::http_method method, std::string_view key, Args&&... args)
 		{
@@ -77,6 +89,32 @@ namespace aquarius
 			auto func = tree->find(key);
 
 			return func == nullptr ? false : func(std::forward<Args>(args)...);
+		}
+
+	private:
+		template <typename Session, typename Response>
+		auto send_response(std::shared_ptr<Session> session_ptr, Response& resp) -> awaitable<void>
+		{
+			flex_buffer buffer{};
+			flex_buffer temp{};
+			resp.commit(temp);
+
+			auto headline =
+				std::format("{} {} {}\r\n", virgo::from_string_version(resp.version()), static_cast<int>(resp.result()),
+							virgo::from_status_string(resp.result()).data());
+
+			for (auto& s : resp.fields())
+			{
+				headline += std::format("{}: {}\r\n", s.first, s.second);
+			}
+
+			headline += "\r\n";
+
+			buffer.sputn(headline.c_str(), headline.size());
+
+			buffer.sputn((char*)temp.data().data(), temp.data().size());
+
+			co_await session_ptr->async_send(buffer);
 		}
 	};
 } // namespace aquarius

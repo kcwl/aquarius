@@ -9,7 +9,7 @@ namespace
 	static const std::map<std::string, std::vector<std::string>> router_mode =
 	{
 		{"tcp", {"binary"}},
-		{"http", {"kv", "json"}}
+		{"http", {"kv", "json", "html"}}
 	};
 }
 

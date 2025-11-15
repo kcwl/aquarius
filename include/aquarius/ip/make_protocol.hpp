@@ -8,51 +8,51 @@
 namespace aquarius
 {
 
-	template <bool Request, typename Message>
-	void make_http_buffer(Message& msg, flex_buffer& buffer, virgo::http_method method)
-	{
-		flex_buffer temp{};
+	//template <bool Request, typename Message>
+	//void make_http_buffer(Message& msg, flex_buffer& buffer, virgo::http_method method)
+	//{
+	//	flex_buffer temp{};
 
-		std::string headline{};
+	//	std::string headline{};
 
-		if constexpr (Request)
-		{
-			if (method == virgo::http_method::get)
-			{
-				flex_buffer tempget;
-				msg.body().serialize(tempget);
-				std::string temp_str;
-				tempget.get(temp_str);
-				headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
-									   temp_str, virgo::from_version_string(msg.version()));
-			}
-			else
-			{
-				msg.commit(temp);
+	//	if constexpr (Request)
+	//	{
+	//		if (method == virgo::http_method::get)
+	//		{
+	//			flex_buffer tempget;
+	//			msg.body().serialize(tempget);
+	//			std::string temp_str;
+	//			tempget.get(temp_str);
+	//			headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
+	//								   temp_str, virgo::from_string_version(msg.version()));
+	//		}
+	//		else
+	//		{
+	//			msg.commit(temp);
 
-				headline = std::format("{} {} {}\r\n", virgo::from_method_string(method), Message::router,
-									   virgo::from_version_string(msg.version()));
-			}
-		}
-		else
-		{
-			msg.commit(temp);
+	//			headline = std::format("{} {} {}\r\n", virgo::from_method_string(method), Message::router,
+	//								   virgo::from_string_version(msg.version()));
+	//		}
+	//	}
+	//	else
+	//	{
+	//		msg.commit(temp);
 
-			headline = std::format("{} {} {}\r\n", from_version_string(msg.version()), static_cast<int>(msg.result()),
-								   msg.reason().data());
-		}
+	//		headline = std::format("{} {} {}\r\n", from_version_string(msg.version()), static_cast<int>(msg.result()),
+	//							   msg.reason().data());
+	//	}
 
-		for (auto& s : msg.fields())
-		{
-			headline += std::format("{}: {}\r\n", s.first, s.second);
-		}
+	//	for (auto& s : msg.fields())
+	//	{
+	//		headline += std::format("{}: {}\r\n", s.first, s.second);
+	//	}
 
-		headline += "\r\n";
+	//	headline += "\r\n";
 
-		buffer.put(headline.begin(), headline.end());
-		
-		buffer.append(std::move(temp));
-	}
+	//	buffer.put(headline.begin(), headline.end());
+	//	
+	//	buffer.append(std::move(temp));
+	//}
 
 	template <typename... Args>
 	std::string make_http_headline(Args&&... args)
@@ -81,7 +81,10 @@ namespace aquarius
 
 		msg.commit(buffer);
 
-		auto len = static_cast<uint32_t>(buffer.tellg() - pos);
-		std::copy((char*)&len, (char*)(&len + 1), buffer.data());
+		buffer.pubseekpos(0, std::ios::beg);
+
+		uint32_t len = buffer.size() - pos;
+
+		buffer.sputn((char*)&len, pos);
 	}
 } // namespace aquarius
