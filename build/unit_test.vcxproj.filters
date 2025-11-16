@@ -339,6 +339,9 @@
     <ClInclude Include="..\include\aquarius\serialize\http_html_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

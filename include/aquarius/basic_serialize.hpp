@@ -7,8 +7,44 @@ namespace aquarius
 	class basic_serialize
 	{
 	public:
-		basic_serialize() = default;
+		basic_serialize()
+			: parse_()
+		{
+
+		}
 		virtual ~basic_serialize() = default;
+
+		basic_serialize(const basic_serialize& other)
+			: parse_(other.parse_)
+		{
+
+		}
+
+		basic_serialize& operator=(const basic_serialize& other)
+		{
+			if (this != std::addressof(other))
+			{
+				parse_ = other.parse_;
+			}
+
+			return *this;
+		}
+
+		basic_serialize(basic_serialize&& other) noexcept
+			: parse_(std::move(other.parse_))
+		{
+
+		}
+
+		basic_serialize& operator=(basic_serialize&& other) noexcept
+		{
+			if (this != std::addressof(other))
+			{
+				parse_ = std::exchange(other.parse_, {});
+			}
+
+			return *this;
+		}
 
 	public:
 		virtual void serialize(flex_buffer& buffer) = 0;

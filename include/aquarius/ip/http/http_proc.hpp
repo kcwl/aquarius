@@ -7,6 +7,11 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <aquarius/ip/make_protocol.hpp>
 #include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/virgo/http_get_body.hpp>
+#include <aquarius/ip/http/http_param.hpp>
+#include <aquarius/virgo/http_response.hpp>
+#include <aquarius/ip/http/http_header.hpp>
+#include <fstream>
 
 namespace aquarius
 {
@@ -36,28 +41,35 @@ namespace aquarius
 
 			virgo::http_fields field;
 
-			auto data_pos = buffer.data().data();
+			char* data_pos = (char*)buffer.data().data();
 
-			auto read_key = [&] -> std::string_view
+			auto read_key = [&] -> std::string
 			{
-				data_pos = buffer.data().data();
+				data_pos = (char*)buffer.data().data();
 
 				while (buffer.size() != 0)
 				{
+					auto_commit ac(buffer);
+
+					if (check_end(buffer))
+						return std::string((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos);
+
 					auto c = buffer.sgetc();
 
 					if (c == flex_buffer::traits_type::eof())
 					{
 						break;
 					}
-						
+
 					if (std::isspace(c))
 					{
 						break;
 					}
 
 					if (c == ':')
-						return std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos);
+					{
+						return std::string((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos);
+					}
 				}
 
 				ec = virgo::http_status::bad_request;
@@ -65,26 +77,22 @@ namespace aquarius
 				return {};
 			};
 
-			auto read_value = [&] -> std::string_view
+			auto read_value = [&] -> std::string
 			{
-				data_pos = buffer.data().data();
+				data_pos = (char*)buffer.data().data();
 
 				while (buffer.size() != 0)
 				{
+					auto_consume ac(buffer);
+
 					auto c = buffer.sgetc();
 
 					if (c == flex_buffer::traits_type::eof())
 						return {};
 
-					if (c == '\r')
+					if (check_end(buffer))
 					{
-						c = buffer.sgetc();
-						if (c == '\n')
-						{
-							return std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos);
-						}
-
-						break;
+						return std::string((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos);
 					}
 				}
 
@@ -100,20 +108,50 @@ namespace aquarius
 					return {};
 				}
 
+				if (key == "\r")
+				{
+					auto_consume ac(buffer);
+					break;
+				}
+
 				auto value = read_value();
 				if (ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
 					return {};
 				}
 
-				value.remove_prefix(value.find_first_not_of(' '));
-
-				value.remove_suffix(value.size() - value.find_last_not_of(' ') - 1);
+				value = value.substr(0, value.size() - 1);
 
 				field.set_field(key, value);
 			}
 
 			return field;
+		}
+
+	protected:
+		bool check_end(flex_buffer& buffer)
+		{
+			bool result = false;
+
+			auto c = buffer.sgetc();
+
+			if (c != '\r')
+				return result;
+
+			buffer.consume(1);
+
+			c = buffer.sgetc();
+
+			if (c == '\n')
+			{
+				result = true;
+			}
+			else
+			{
+				buffer.pubseekoff(-1, std::ios::cur, std::ios::cur);
+			}
+
+			return result;
 		}
 	};
 
@@ -138,20 +176,21 @@ namespace aquarius
 
 				virgo::http_fields hf{};
 
-				auto [method, router, path, version] = parse_request_line(buffer, ec);
+				error_code http_ec{};
+				auto [method, router, path, version] = parse_request_line(buffer, http_ec);
 
-				if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
 					co_return co_await make_error_response(session_ptr, version, hf,
-														   static_cast<virgo::http_status>(ec.value()));
+														   static_cast<virgo::http_status>(http_ec.value()));
 				}
 
-				hf = parse_field(buffer, ec);
+				hf = parse_field(buffer, http_ec);
 
-				if (ec.value() != static_cast<int>(virgo::http_status::ok))
+				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
 					co_return co_await make_error_response(session_ptr, version, hf,
-														   static_cast<virgo::http_status>(ec.value()));
+														   static_cast<virgo::http_status>(http_ec.value()));
 				}
 
 				// if (hf.content_length() == 0 && method_ != virgo::http_method::get)
@@ -186,23 +225,29 @@ namespace aquarius
 					}
 				}
 
-				if (ec)
-					break;
-
-				if (method == virgo::http_method::get && !path.empty())
+				if (check_redirect(session_ptr, router, hf, buffer))
 				{
-					buffer.sputn(path.data(), path.size());
+					continue;
 				}
 
-				co_spawn(
-					session_ptr->get_executor(),
-					[&, this, hf = std::move(hf)]() mutable -> awaitable<void>
+				if (!co_await check_get_search(session_ptr, router == "/" ? "/index.html" : router, path, method, ec))
+				{
+					if (method == virgo::http_method::get && !path.empty())
 					{
-						http_router<Session>::get_mutable_instance().invoke(method, router, session_ptr, hf, buffer);
+						buffer.sputn(path.data(), path.size());
+					}
 
-						co_return;
-					},
-					detached);
+					co_spawn(
+						session_ptr->get_executor(),
+						[&, this, hf = std::move(hf)]() mutable -> awaitable<void>
+						{
+							http_router<Session>::get_mutable_instance().invoke(method, router, session_ptr, hf,
+																				buffer);
+
+							co_return;
+						},
+						detached);
+				}
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -244,9 +289,11 @@ namespace aquarius
 				auto data_pos = buffer.data().data();
 				while (buffer.size() != 0)
 				{
+					auto_consume ac(buffer);
 					auto c = buffer.sgetc();
 					if (std::isspace(c))
-						return virgo::from_string_method(std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos));
+						return virgo::from_string_method(
+							std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos));
 					if (!std::isalpha(c))
 					{
 						break;
@@ -270,6 +317,8 @@ namespace aquarius
 				char* data_pos = (char*)buffer.data().data();
 				while (buffer.size() != 0)
 				{
+					auto_consume ac(buffer);
+
 					auto c = buffer.sgetc();
 
 					if (c == ' ')
@@ -309,20 +358,16 @@ namespace aquarius
 				char* data_pos = (char*)buffer.data().data();
 				while (buffer.size() != 0)
 				{
+					auto_consume ac(buffer);
 					auto c = buffer.sgetc();
 
-					if (c == '\r')
+					if (check_end(buffer))
 					{
-						c = buffer.sgetc();
-						if (c == '\n')
-						{
-							return virgo::from_version_string(std::string_view(data_pos, (char*)buffer.data().data() - data_pos));
-						}
-						ec = virgo::http_status::bad_request;
-						break;
+						return virgo::from_version_string(
+							std::string_view(data_pos, (char*)buffer.data().data() - data_pos));
 					}
 
-					if (!std::isalnum(c) || c != '/' || c != '.')
+					if (!std::isalnum(c) && c != '/' && c != '.')
 					{
 						ec = virgo::http_status::http_version_not_supported;
 						break;
@@ -338,6 +383,74 @@ namespace aquarius
 				return {};
 
 			return { method, router, path, version };
+		}
+
+		template <typename Session>
+		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, virgo::http_fields hf,
+							flex_buffer& buffer)
+		{
+			return http_router<Session>::get_mutable_instance().invoke(virgo::http_method::redirect, router == "/" ? "root" : router, session_ptr, hf,
+																	   buffer);
+		}
+
+		template<typename Session>
+		auto check_get_search(std::shared_ptr<Session> session_ptr, std::string_view router, std::string_view path , virgo::http_method method, error_code& ec) -> awaitable<bool>
+		{
+			if (method != virgo::http_method::get || !path.empty())
+				co_return false;
+
+			using http_get_response = virgo::http_response<"get", http_response_header, virgo::http_get_body>;
+
+			http_get_response get_resp{};
+			get_resp.version(virgo::http_version::http1_1);
+			get_resp.set_field("Server", "Aqarius 1.00.0");
+			get_resp.set_field("Connection", "keep-alive");
+			get_resp.set_field("Access-Control-Allow-Origin", get_http_param().control_allow_origin);
+
+			auto file_path = get_http_param().root_dir + std::string(router.data(), router.size());
+
+			std::fstream ifs(file_path, std::ios::in | std::ios::binary);
+			if (!ifs.is_open())
+			{
+				ec = virgo::http_status::not_found;
+			}
+			else
+			{
+				auto file_size = std::filesystem::file_size(file_path);
+
+				get_resp.set_field("Content-Length", std::to_string(file_size));
+
+				auto ext = std::filesystem::path(file_path).extension();
+
+				std::string content_type = "text/html";
+
+				if (ext == ".js")
+				{
+					content_type = "application/javascript";
+				}
+				else if (ext == ".css")
+				{
+					content_type = "text/css";
+				}
+				else if (ext == ".ico")
+				{
+					content_type = "image/*";
+				}
+
+				//content_type += "; charset=utf-8";
+
+				get_resp.set_field("Content-Type", content_type);
+
+				ec = virgo::http_status::ok;
+
+				auto& stream = get_resp.body().stream_;
+				stream.resize(file_size);
+				ifs.read(stream.data(), stream.size());
+			}
+
+			co_await http_router<Session>::get_mutable_instance().send_response(session_ptr, get_resp);
+
+			co_return true;
 		}
 	};
 
@@ -399,6 +512,8 @@ namespace aquarius
 
 				while (bit--)
 				{
+					auto_consume ac(buffer);
+
 					auto c = buffer.sgetc();
 					if (!std::isdigit(c))
 					{
@@ -407,15 +522,20 @@ namespace aquarius
 					}
 				}
 
-				auto c = buffer.sgetc();
-
-				if (!std::isspace(c))
 				{
-					ec = virgo::http_status::bad_request;
-					return {};
+					auto_consume ac(buffer);
+
+					auto c = buffer.sgetc();
+
+					if (!std::isspace(c))
+					{
+						ec = virgo::http_status::bad_request;
+						return {};
+					}
 				}
 
-				auto status = std::stoi(std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos).data());
+				auto status =
+					std::stoi(std::string_view((char*)data_pos, (char*)buffer.data().data() - (char*)data_pos).data());
 
 				return static_cast<virgo::http_status>(status);
 			};
@@ -427,16 +547,11 @@ namespace aquarius
 
 			while (buffer.size() != 0)
 			{
-				auto c = buffer.sgetc();
-				if (c == '\r')
-				{
-					c = buffer.sgetc();
-					if (c == '\n')
-					{
-						return { version, status };
-					}
+				auto_consume ac(buffer);
 
-					break;
+				if (check_end(buffer))
+				{
+					return { version, status };
 				}
 			}
 

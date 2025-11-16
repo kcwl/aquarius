@@ -33,17 +33,17 @@
 		aquarius::virgo::http_response<AQUAIRUS_REDIRECT_CAT(src), aquarius::http_response_header,                     \
 									   aquarius::virgo::http_null_body>;
 
-#define AQUARIUS_CONTEXT_BY_REDIRECT(__router, __http_method, __src, __dest)                                           \
+#define AQUARIUS_CONTEXT_BY_REDIRECT(__session, __router, __http_method, __src, __dest)                                \
 	AQUARIUS_REDIRECT_MESSAGE(__src, __dest)                                                                           \
 	class __method_to_##__src;                                                                                         \
-	[[maybe_unused]] static aquarius::auto_http_handler_register<__method_to_##__src, __router, __http_method>         \
-		__auto_register_##__method(STRING(__src));                                                                     \
-	class __method_to_##__src final                                                                                    \
-		: public aquarius::basic_handler<REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>          \
+	[[maybe_unused]] static aquarius::auto_http_handler_register<                                                      \
+		__session, __method_to_##__src, __router, __http_method> __auto_register_##__method(STRING(__src));            \
+	class __method_to_##__src final : public aquarius::basic_http_handler<__session, REDIRECT_MESSAGE(__src, request), \
+																		  REDIRECT_MESSAGE(__src, response)>           \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type =                                                                                              \
-			aquarius::basic_handler<REDIRECT_MESSAGE(__src, request), REDIRECT_MESSAGE(__src, response)>;              \
+		using base_type = aquarius::basic_http_handler<__session, REDIRECT_MESSAGE(__src, request),                    \
+													   REDIRECT_MESSAGE(__src, response)>;                             \
                                                                                                                        \
 	public:                                                                                                            \
 		__method_to_##__src()                                                                                          \

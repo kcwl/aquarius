@@ -20,20 +20,23 @@ namespace aquarius
 			: basic_protocol(Allocator())
 		{}
 		basic_protocol(const Allocator& alloc)
-			: header_()
+			: base_body()
+			, header_()
 			, alloc_(alloc)
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
 		}
 		basic_protocol(const basic_protocol& other)
-			: header_(other.header_)
+			: base_body(other)
+			, header_(other.header_)
 			, alloc_(other.alloc_)
 		{}
 		basic_protocol& operator=(const basic_protocol& other)
 		{
 			if (this != std::addressof(other))
 			{
+				this->get() = other.get();
 				header_ = other.header_;
 				alloc_ = other.alloc_;
 			}
@@ -41,16 +44,17 @@ namespace aquarius
 			return *this;
 		}
 		basic_protocol(basic_protocol&& other) noexcept
-			: base_body(boost::empty_init, std::exchange(other.get(), nullptr))
-			, header_(std::exchange(other.header_, {}))
-		{}
+			: header_(std::exchange(other.header_, {}))
+			, alloc_(std::move(other.alloc_))
+		{
+			this->get() = std::exchange(other.get(), nullptr);
+		}
 		basic_protocol& operator=(basic_protocol&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
 				header_ = std::move(other.header_);
-				this->get() = std::move(other.get());
-				other.get() = nullptr;
+				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
 			}
 			return *this;
@@ -60,6 +64,7 @@ namespace aquarius
 			if (this->get())
 			{
 				alloc_.deallocate(this->get(), 1);
+				this->get() = nullptr;
 			}
 		}
 

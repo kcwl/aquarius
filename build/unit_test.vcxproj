@@ -236,6 +236,7 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />

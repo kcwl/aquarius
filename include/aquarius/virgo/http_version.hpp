@@ -45,6 +45,9 @@ namespace aquarius
 
 		inline http_version from_version_string(std::string_view s)
 		{
+			if (s.back() == '\n')
+				s.remove_suffix(2);
+
 			if (s == "HTTP/1.0")
 				return http_version::http1_0;
 			else if (s == "HTTP/1.1")

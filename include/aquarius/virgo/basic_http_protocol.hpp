@@ -142,9 +142,10 @@ namespace aquarius
 
 			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept
 			{
-				if (std::addressof(other) != this)
+				if (this != std::addressof(other))
 				{
 					base::operator=(std::move(other));
+					status_ = std::exchange(other.status_, virgo::http_status::ok);
 					version_ = std::exchange(other.version_, 0);
 				}
 

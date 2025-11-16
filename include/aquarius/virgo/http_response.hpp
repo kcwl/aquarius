@@ -22,6 +22,8 @@ namespace aquarius
 
 			using base::splitor;
 
+			constexpr static auto router = Router;
+
 		public:
 			http_response() = default;
 			virtual ~http_response() = default;

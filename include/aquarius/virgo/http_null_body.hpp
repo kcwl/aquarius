@@ -11,6 +11,10 @@ namespace aquarius
 			http_null_body() = default;
 			virtual ~http_null_body() = default;
 
+			http_null_body(http_null_body&&) = default;
+
+			http_null_body& operator=(http_null_body&&) = default;
+
 			virtual void serialize(aquarius::flex_buffer&) override
 			{
 				return;

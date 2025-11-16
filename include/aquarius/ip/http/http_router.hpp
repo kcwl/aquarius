@@ -50,9 +50,12 @@ namespace aquarius
 								 session->get_executor(),
 								 [session, req, this]() mutable -> awaitable<void>
 								 {
-									 auto resp = co_await std::make_shared<Context>()->visit(req);
+									 auto ec = co_await std::make_shared<Context>()->visit(session, req);
 
-									 send_response(session, resp);
+									 if (ec)
+									 {
+
+									 }
 								 },
 								 detached);
 						 });
@@ -91,14 +94,14 @@ namespace aquarius
 			return func == nullptr ? false : func(std::forward<Args>(args)...);
 		}
 
-	private:
 		template <typename Session, typename Response>
 		auto send_response(std::shared_ptr<Session> session_ptr, Response& resp) -> awaitable<void>
 		{
 			flex_buffer buffer{};
 			flex_buffer temp{};
-			resp.commit(temp);
 
+			resp.commit(temp);
+			
 			auto headline =
 				std::format("{} {} {}\r\n", virgo::from_string_version(resp.version()), static_cast<int>(resp.result()),
 							virgo::from_status_string(resp.result()).data());
@@ -112,8 +115,11 @@ namespace aquarius
 
 			buffer.sputn(headline.c_str(), headline.size());
 
-			buffer.sputn((char*)temp.data().data(), temp.data().size());
-
+			if (temp.size() != 0)
+			{
+				buffer.sputn((char*)temp.data().data(), temp.data().size());
+			}
+			
 			co_await session_ptr->async_send(buffer);
 		}
 	};

@@ -36,9 +36,12 @@ namespace aquarius
 								 session->get_executor(),
 								 [session, req, this]() mutable -> awaitable<void>
 								 {
-									 auto resp = co_await std::make_shared<Context>()->visit(req);
+									 auto ec = co_await std::make_shared<Context>()->visit(req);
 
-									 send_response(session, resp);
+									 if (ec)
+									 {
+
+									 }
 								 },
 								 detached);
 						 });
