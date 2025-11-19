@@ -1,70 +1,48 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
-#include <aquarius/ip/tcp/tcp_router.hpp>
 #include <aquarius/ip/tcp/tcp_server_session.hpp>
-#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
 	template <typename Session, typename Request, typename Response>
-	class basic_tcp_hander : public basic_handler<Session, Request, Response>
-	{
-	public:
-		basic_tcp_hander(const std::string& name)
-			: basic_handler<Session, Request, Response>(name)
-		{}
+	using tcp_handler = basic_handler<Session, Request, Response>;
 
-		virtual ~basic_tcp_hander() = default;
-
-	public:
-		virtual auto visit(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request_ptr)
-			-> awaitable<error_code> override
-		{
-			this->request_ptr_ = request_ptr;
-
-			this->session_ptr_ = session_ptr;
-
-			auto ec = co_await this->handle();
-
-			co_return co_await this->send_response(ec);
-		}
-
-		auto send_response(error_code ec) -> awaitable<error_code>
-		{
-			if (!session_ptr)
-				co_return;
-
-			flex_buffer buf{};
-			constexpr auto pos = sizeof(uint32_t);
-
-			buf.commit(pos);
-
-			resp.commit(buf);
-
-			auto len = static_cast<uint32_t>(buf.size() - pos);
-
-			buf.pubseekpos(0, std::ios::beg);
-			buf.sputn((char*)&len, pos);
-
-			co_await session_ptr->async_send(buf);
-		}
-	};
-
-	template <typename Session, typename Handler, typename Router>
+	template <typename Session, typename Context, typename Router>
 	struct auto_tcp_handler_register
 	{
 		explicit auto_tcp_handler_register(std::string_view proto)
 		{
-			Router::get_mutable_instance().template regist<Handler>(proto);
+			auto func = [&](std::shared_ptr<Session> session, flex_buffer& buffer)
+			{
+				error_code ec{};
+
+				auto req = std::make_shared<typename Context::request_t>();
+
+				try
+				{
+					req->consume(buffer);
+				}
+				catch (error_code& ex)
+				{
+					ec = ex;
+				}
+
+				co_spawn(
+					session->get_executor(), [session, &ec, request = std::move(req)]() mutable -> awaitable<void>
+					{ co_await std::make_shared<Context>()->visit(session, req, ec); }, detached);
+			};
+
+			Router::get_mutable_instance().regist(proto, func);
 		}
 	};
+
 } // namespace aquarius
 
 #define __AQUARIUS_TCP_HANDLER(__session, __method, __request, __response)                                             \
-	class __method final : public aquarius::basic_tcp_hander<__session, __request, __response>                         \
+	class __method final : public aquarius::tcp_hander<__session, __request, __response>                               \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::basic_tcp_hander<__session, __request, __response>;                                \
+		using base_type = aquarius::tcp_hander<__session, __request, __response>;                                      \
                                                                                                                        \
 	public:                                                                                                            \
 		__method()                                                                                                     \
