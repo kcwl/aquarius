@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(http_router)
 		aquarius::flex_buffer buffer;
 
 		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
-			aquarius::virgo::http_method::post, http_login_request::router, session, hf, std::move(buffer));
+			http_login_request::router, session, hf, buffer);
 
 		BOOST_TEST(res);
 	}
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(http_router)
 		aquarius::flex_buffer buffer;
 
 		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
-			aquarius::virgo::http_method::none, http_login_request::router, session, hf, std::move(buffer));
+			http_login_request::router, session, hf, buffer);
 
 		BOOST_TEST(!res);
 	}
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(http_router)
 		aquarius::flex_buffer buffer;
 
 		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
-			aquarius::virgo::http_method::head, http_login_request::router, session, hf, std::move(buffer));
+			http_login_request::router, session, hf, buffer);
 
 		BOOST_TEST(!res);
 	}
@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE(http_router)
 
 		aquarius::flex_buffer buffer;
 
-		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke(
-			aquarius::virgo::http_method::post, "hello", session, hf, std::move(buffer));
+		auto res = aquarius::http_router<aquarius::http_server_session>::get_mutable_instance().invoke("hello", session,
+																									   hf, buffer);
 
 		BOOST_TEST(!res);
 	}

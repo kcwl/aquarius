@@ -2,6 +2,7 @@
 #include <vector>
 #include <expected>
 #include <string>
+#include <span>
 #include <aquarius/serialize/error.hpp>
 #include <boost/asio/streambuf.hpp>
 

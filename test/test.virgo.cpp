@@ -214,9 +214,9 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 
 void http_test_get_request_body::serialize(aquarius::flex_buffer& buffer)
 {
-	buffer.put('?');
+	buffer.sputc('?');
 	this->parse_to(user, buffer, "user");
-	buffer.put('&');
+	buffer.sputc('&');
 	this->parse_to(passwd, buffer, "passwd");
  }
 

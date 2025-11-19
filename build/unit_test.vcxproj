@@ -175,7 +175,6 @@
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\detail\signal_set.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\trie.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\concept.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_proc.hpp" />
@@ -190,7 +189,6 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_proc.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
@@ -248,7 +246,6 @@
     <ClCompile Include="..\test\binary_serialize.cpp" />
     <ClCompile Include="..\test\concat.cpp" />
     <ClCompile Include="..\test\crc.cpp" />
-    <ClCompile Include="..\test\flex_buffer.cpp" />
     <ClCompile Include="..\test\float.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
     <ClCompile Include="..\test\http_method.cpp" />
@@ -258,7 +255,6 @@
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
-    <ClCompile Include="..\test\make_protocol.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
@@ -279,7 +275,6 @@
     <ClCompile Include="..\test\tcp_error.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
     <ClCompile Include="..\test\test.virgo.cpp" />
-    <ClCompile Include="..\test\trie.cpp" />
     <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>

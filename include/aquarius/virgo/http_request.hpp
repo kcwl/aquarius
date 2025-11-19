@@ -1,8 +1,6 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
-#include <aquarius/serialize/json.hpp>
-#include <aquarius/ip/concept.hpp>
-#include <ranges>
+#include <aquarius/virgo/http_method.hpp>
 
 namespace aquarius
 {
@@ -55,14 +53,14 @@ namespace aquarius
 
 				std::string headline{};
 
-				if (Method == virgo::http_method::get)
+				if constexpr (Method == virgo::http_method::get)
 				{
 					flex_buffer tempget;
 					this->body().serialize(tempget);
-					std::string temp_str;
-					tempget.get(temp_str);
-					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
-										   temp_str, virgo::from_string_version(msg.version()));
+					std::string temp_str((char*)tempget.data().data(), tempget.data().size());
+
+					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Method), router,
+										   temp_str, virgo::from_string_version(this->version()));
 				}
 				else
 				{
@@ -71,11 +69,10 @@ namespace aquarius
 					this->content_length(body_buffer.size());
 
 					headline =
-						std::format("{} {} {}\r\n", virgo::from_string_version(resp.version()),
-									static_cast<int>(resp.result()), virgo::from_status_string(resp.result()).data());
+						std::format("{} {} {}\r\n", virgo::from_method_string(Method),router, virgo::from_string_version(this->version()));
 				}
 
-				for (auto& s : resp.fields())
+				for (auto& s : this->fields())
 				{
 					headline += std::format("{}: {}\r\n", s.first, s.second);
 				}
@@ -84,9 +81,9 @@ namespace aquarius
 
 				buffer.sputn(headline.c_str(), headline.size());
 
-				if (temp.size() != 0)
+				if (body_buffer.size() != 0)
 				{
-					buffer.sputn((char*)temp.data().data(), temp.data().size());
+					buffer.sputn((char*)body_buffer.data().data(), body_buffer.data().size());
 				}
 			}
 		};

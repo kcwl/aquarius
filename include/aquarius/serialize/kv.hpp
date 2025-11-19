@@ -96,20 +96,20 @@ namespace aquarius
 		template<char... args>
 		std::string get_first_range(flex_buffer& buffer)
 		{
-			auto start_pos = buffer.data().data();
+			auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
-			auto c = buffer.sgetc();
+			auto iter = std::ranges::find_if(sp, [&] (const auto c) { return ((c == args), ...); });
 
-			while (buffer.size() != 0)
-			{
-				if (c == flex_buffer::traits_type::eof())
-					return {};
+			if (iter == sp.end())
+				return {};
 
-				if (((c == args) || ...))
-					return std::string(buffer.data().data(), buffer.data().size());
-			}
+			auto len = std::ranges::distance(sp.begin(), iter);
 
-			return {};
+			std::string result((char*)buffer.data().data(), len);
+
+			buffer.consume(len);
+				
+			return result;
 		}
 	};
 

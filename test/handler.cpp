@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(http_handler)
 
 	aquarius::co_spawn(io, [&]->aquarius::awaitable<void>
 					   {
-						   co_await h->visit(req_ptr);
+						   co_await h->visit(session, req_ptr);
 
 						   BOOST_TEST(*req_ptr == *h->request());
 
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(tcp_handler)
 
 	aquarius::co_spawn(io, [&]->aquarius::awaitable<void> 
 					   {
-						   co_await h->visit(req_ptr);
+						   co_await h->visit(session, req_ptr);
 
 						   BOOST_TEST(h->name() == "__handler_ctx_test_tcp_hander");
 

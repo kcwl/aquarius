@@ -29,7 +29,9 @@ namespace aquarius
 
 				co_spawn(
 					session->get_executor(), [session, &ec, request = std::move(req)]() mutable -> awaitable<void>
-					{ co_await std::make_shared<Context>()->visit(session, req, ec); }, detached);
+					{ co_await std::make_shared<Context>()->visit(session, request, !!ec); }, detached);
+
+				return !ec;
 			};
 
 			Router::get_mutable_instance().regist(proto, func);
@@ -39,10 +41,10 @@ namespace aquarius
 } // namespace aquarius
 
 #define __AQUARIUS_TCP_HANDLER(__session, __method, __request, __response)                                             \
-	class __method final : public aquarius::tcp_hander<__session, __request, __response>                               \
+	class __method final : public aquarius::tcp_handler<__session, __request, __response>                               \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::tcp_hander<__session, __request, __response>;                                      \
+		using base_type = aquarius::tcp_handler<__session, __request, __response>;                                      \
                                                                                                                        \
 	public:                                                                                                            \
 		__method()                                                                                                     \

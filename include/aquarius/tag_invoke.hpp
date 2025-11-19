@@ -7,7 +7,7 @@ namespace aquarius
 	struct value_to_tag {};
 
 
-	void tag_invoke(value_to_tag<std::nullopt_t>, std::nullopt_t)
+	inline void tag_invoke(value_to_tag<std::nullopt_t>, std::nullopt_t)
 	{
 		return;
 	}
@@ -20,7 +20,7 @@ namespace aquarius
 	struct has_tag_invokable<T, P, decltype(tag_invoke(value_to_tag<T>(), std::declval<P&>()))> : std::true_type {};
 
 	template<typename T, typename P>
-	void value_to(P& t)
+	inline void value_to(P& t)
 	{
 		constexpr bool b = has_tag_invokable<T, P>::value;
 

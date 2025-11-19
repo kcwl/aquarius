@@ -56,14 +56,14 @@ namespace aquarius
 				flex_buffer body_buffer{};
 
 				std::string headline{};
-				if (Method == virgo::http_method::get)
+				if constexpr (Method == virgo::http_method::get)
 				{
 					flex_buffer tempget;
 					this->body().serialize(tempget);
-					std::string temp_str;
-					tempget.get(temp_str);
-					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
-										   temp_str, virgo::from_string_version(msg.version()));
+					std::string temp_str((char*)tempget.data().data(), tempget.data().size());
+
+					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Method), router,
+										   temp_str, virgo::from_string_version(this->version()));
 				}
 				else
 				{
@@ -72,11 +72,11 @@ namespace aquarius
 					this->content_length(body_buffer.size());
 
 					headline =
-						std::format("{} {} {}\r\n", virgo::from_string_version(resp.version()),
-									static_cast<int>(resp.result()), virgo::from_status_string(resp.result()).data());
+						std::format("{} {} {}\r\n", virgo::from_string_version(this->version()),
+									static_cast<int>(this->result()), virgo::from_status_string(this->result()).data());
 				}
 
-				for (auto& s : resp.fields())
+				for (auto& s : this->fields())
 				{
 					headline += std::format("{}: {}\r\n", s.first, s.second);
 				}

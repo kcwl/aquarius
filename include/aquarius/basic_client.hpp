@@ -11,7 +11,7 @@
 #include <boost/asio/connect.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/coroutine.hpp>
-#include <aquarius/ip/make_protocol.hpp>
+#include <aquarius/virgo/http_method.hpp>
 
 namespace aquarius
 {
@@ -72,7 +72,7 @@ namespace aquarius
             {
                 flex_buffer buffer{};
 
-                make_json_buffer(req, buffer, virgo::http_method::get);
+                make_json_buffer(req, buffer);
 
                 auto ec = co_await session_ptr_->async_send(std::move(buffer));
 
@@ -130,45 +130,13 @@ namespace aquarius
         }
 
         template<typename Response, typename Request>
-        auto lazy_post(std::shared_ptr<Request> req) -> awaitable<Response>
-        {
-            try
-            {
-                flex_buffer buffer{};
-
-                make_lazy_json_buffer(req, buffer, virgo::http_method::post);
-
-                auto ec = co_await session_ptr_->async_send(std::move(buffer));
-
-                if (ec)
-                {
-                    if (ec != boost::asio::error::eof)
-                    {
-                        XLOG_ERROR() << "on read some occur error - " << ec.what();
-                    }
-                    session_ptr_->shutdown();
-                    if (close_func_)
-                        close_func_();
-
-                    co_return Response{};
-                }
-
-                co_return co_await session_ptr_->template query<Response>();
-            }
-            catch (error_code& ec)
-            {
-                XLOG_ERROR() << "make_request_buffer error - " << ec.what();
-            }
-        }
-
-        template<typename Response, typename Request>
         auto post(std::shared_ptr<Request> req) -> awaitable<Response>
         {
             try
             {
                 flex_buffer buffer{};
 
-                make_json_buffer(req, buffer, virgo::http_method::post);
+                make_json_buffer(req, buffer);
 
                 auto ec = co_await session_ptr_->async_send(std::move(buffer));
 
@@ -200,9 +168,9 @@ namespace aquarius
             {
                 flex_buffer buffer{};
 
-                make_tcp_buffer<true>(*req, buffer);
+                req->commit(buffer);
 
-                auto ec = co_await session_ptr_->async_send(std::move(buffer));
+                auto ec = co_await session_ptr_->async_send(buffer);
 
                 if (ec)
                 {
@@ -250,25 +218,14 @@ namespace aquarius
 
     private:
         template<typename Request>
-        void make_json_buffer(std::shared_ptr<Request> request, flex_buffer& buffer, virgo::http_method method)
+        void make_json_buffer(std::shared_ptr<Request> request, flex_buffer& buffer)
         {
             request->set_field("Content-Type", "json");
             request->set_field("Server", "Aquarius 0.10.0");
             request->set_field("Connection", "keep-alive");
             request->set_field("Access-Control-Allow-Origin", "*");
 
-            make_http_buffer<true>(*request, buffer, method);
-        }
-
-        template<typename Request>
-        void make_lazy_json_buffer(std::shared_ptr<Request> request, flex_buffer& buffer, virgo::http_method method)
-        {
-            request->set_field("Content-Type", "aquarius-json");
-            request->set_field("Server", "Aquarius 0.10.0");
-            request->set_field("Connection", "keep-alive");
-            request->set_field("Access-Control-Allow-Origin", "*");
-
-            make_http_buffer<true>(*request, buffer, method);
+            request->commit(buffer);
         }
 
     private:

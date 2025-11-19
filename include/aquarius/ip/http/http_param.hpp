@@ -22,7 +22,7 @@ namespace aquarius
 
 		std::call_once(once, [&]
 					   {
-						   tag_invoke(value_to<http_param_tag>{}, param);
+						   value_to<http_param_tag>(param);
 					   });
 
 		return param;

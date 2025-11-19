@@ -16,7 +16,7 @@ AQUARIUS_TCP_HANDLER(tcp_login_request, tcp_login_response, ctx_tcp_test)
 	co_return aquarius::error_code{};
 }
 
-AQUARIUS_HTTP_POST_HANDLER(http_login_request, http_login_response, ctx_http_test)
+AQUARIUS_HTTP_HANDLER(http_login_request, http_login_response, ctx_http_test)
 {
 	response().header().uuid = request()->header().uuid;
 
@@ -25,7 +25,7 @@ AQUARIUS_HTTP_POST_HANDLER(http_login_request, http_login_response, ctx_http_tes
 	co_return aquarius::virgo::http_status::ok;
 }
 
-AQUARIUS_HTTP_POST_HANDLER(new_http_login_request, new_http_login_response, ctx_test_http_hander)
+AQUARIUS_HTTP_HANDLER(new_http_login_request, new_http_login_response, ctx_test_http_hander)
 {
 	response().body().uuid = request()->body().uuid;
 	response().body().per_resp = request()->body().per_req;
@@ -47,7 +47,7 @@ AQUARIUS_TCP_HANDLER(login_request, login_response, ctx_test_tcp_hander)
 	co_return aquarius::error_code{};
 }
 
-AQUARIUS_HTTP_GET_HANDLER(http_test_get_request, http_test_get_response, ctx_http_test_get_request)
+AQUARIUS_HTTP_HANDLER(http_test_get_request, http_test_get_response, ctx_http_test_get_request)
 {
 	if (!request())
 	{

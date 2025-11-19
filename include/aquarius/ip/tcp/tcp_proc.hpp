@@ -5,7 +5,6 @@
 #include <aquarius/ip/tcp/tcp_router.hpp>
 #include <aquarius/detail/string_literal.hpp>
 #include <aquarius/ip/concept.hpp>
-#include <aquarius/ip/make_protocol.hpp>
 
 namespace aquarius
 {
@@ -40,14 +39,20 @@ namespace aquarius
 
                 constexpr auto len = sizeof(length);
 
-                ec = co_await session_ptr->async_read((uint8_t*)&length, len);
+                buffer.prepare(len);
+
+                ec = co_await session_ptr->async_read(buffer);
 
                 if (ec)
                 {
                     break;
                 }
 
-                ec = co_await session_ptr->async_read(buffer, length);
+                buffer.sgetn((char*)&length, len);
+
+                buffer.prepare(length);
+
+                ec = co_await session_ptr->async_read(buffer);
 
                 buffer.commit(length);
 
@@ -56,17 +61,9 @@ namespace aquarius
                     break;
                 }
 
-                co_spawn(
-                    session_ptr->get_executor(),
-                    [buffer = std::move(buffer), session_ptr] () mutable -> awaitable<void>
-                    {
-                        auto router = binary_parse{}.from_datas<std::string_view>(buffer);
+                auto router = binary_parse{}.from_datas<std::string_view>(buffer);
 
-                        tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
-
-                        co_return;
-                    },
-                    detached);
+                tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
             }
 
             if (ec != boost::asio::error::eof)
@@ -105,16 +102,20 @@ namespace aquarius
 
             constexpr auto len = sizeof(length);
 
-            auto ec = co_await session_ptr->async_read((uint8_t*)&length, len);
+            buffer.prepare(len);
+
+            auto ec = co_await session_ptr->async_read(buffer);
 
             if (ec)
             {
                 co_return Response{};
             }
 
-            ec = co_await session_ptr->async_read(buffer, length);
+            buffer.sgetn((char*)&length, len);
 
-            buffer.commit(length);
+            buffer.prepare(length);
+
+            ec = co_await session_ptr->async_read(buffer);
 
             if (ec)
             {

@@ -102,9 +102,6 @@
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\trie.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -315,9 +312,6 @@
     <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http_handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
@@ -401,9 +395,6 @@
     <ClCompile Include="..\test\struct_name.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\trie.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\binary_serialize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -413,16 +404,10 @@
     <ClCompile Include="..\test\serialize_error.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\flex_buffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\handler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\router.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\make_protocol.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tcp_error.cpp">

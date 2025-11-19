@@ -34,7 +34,7 @@ namespace aquarius
 		{
 			constexpr auto size = sizeof(T);
 
-			buff.sputc((char*)&value, size);
+			buff.sputn((char*)&value, size);
 		}
 
 		template <repeated_t T>
@@ -70,7 +70,7 @@ namespace aquarius
 		{
 			T value = static_cast<uint8_t>(buff.sgetc());
 
-			if (value == flex_buffer::traits_type::eof())
+			if (value == static_cast<T>(flex_buffer::traits_type::eof()))
 				throw serialize_error::not_enough_space;
 
 			if (value >= 0x80)
@@ -79,14 +79,14 @@ namespace aquarius
 
 				int8_t temp_bit = 7;
 
-				uint8_t c = buff.sgetc();
+				uint8_t c = static_cast<uint8_t>(buff.sgetc());
 
 				while (c > 0x7f)
 				{
 					value += static_cast<T>(c & 0x7f) << temp_bit;
 
 					temp_bit += 7;
-					c = buff.sgetc();
+					c = static_cast<uint8_t>(buff.sgetc());
 				}
 
 				if (c == flex_buffer::traits_type::eof())
@@ -146,15 +146,24 @@ namespace aquarius
 		{
 			auto size = from_datas<std::size_t>(buff);
 
-			T value{};
+			
+
+			std::string value{};
 			value.resize(size);
 
-			auto sz = buff.sgetn(value.data(), value.size());
+			std::size_t sz = buff.sgetn(value.data(), value.size());
 
 			if (sz != size)
 				throw serialize_error::not_enough_space;
 
-			return value;
+			if constexpr (std::same_as<T, std::string_view>)
+			{
+				return std::string_view(value.data(), value.size());
+			}
+			else
+			{
+				return value;
+			}
 		}
 
 		template <reflectable T>

@@ -44,18 +44,18 @@ namespace aquarius
             return func == nullptr ? false : func(std::forward<Args>(args)...);
         }
 
-        void regist(Key key, function_type&& func)
+        void regist(Key key, const function_type& func)
         {
             auto f = find(key);
 
             if (f)
                 return;
 
-            add(key, std::forward<function_type>(func));
+            add(key, func);
         }
 
     private:
-        void add(Key key, function_type&& func)
+        void add(Key key, const function_type& func)
         {
             auto cur_node = root_ptr_;
 
