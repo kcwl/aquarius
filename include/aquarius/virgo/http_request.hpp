@@ -8,7 +8,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <detail::string_literal Router, typename Header, typename Body>
+		template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
 		class http_request : public basic_http_protocol<true, Header, Body>
 		{
 		public:
@@ -46,31 +46,6 @@ namespace aquarius
 		public:
 			void consume(flex_buffer& buffer)
 			{
-				auto type = this->find("Content-Type");
-
-				if (type == json_type)
-				{
-					auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
-
-					auto third_view = sp | std::views::slide(3);
-
-					auto iter = std::ranges::find_if(third_view,
-													 [](const auto& value)
-													 {
-														 if (value.size() < 3)
-															 return false;
-
-														 return std::string_view(value) == splitor;
-													 });
-
-					if (iter == third_view.end())
-						return;
-
-					auto len = std::distance(third_view.begin(), iter);
-
-					this->header().deserialize(buffer);
-				}
-
 				this->body().deserialize(buffer);
 			}
 
@@ -78,25 +53,46 @@ namespace aquarius
 			{
 				flex_buffer body_buffer{};
 
-				this->body().serialize(body_buffer);
+				std::string headline{};
 
-				this->content_length(body_buffer.size());
-
-				auto type = this->find("Content-Type");
-
-				if (type == json_type)
+				if (Method == virgo::http_method::get)
 				{
-					this->header().serialize(buffer);
+					flex_buffer tempget;
+					this->body().serialize(tempget);
+					std::string temp_str;
+					tempget.get(temp_str);
+					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(method), Message::router,
+										   temp_str, virgo::from_string_version(msg.version()));
+				}
+				else
+				{
+					this->body().serialize(body_buffer);
 
-					buffer.sputn(splitor.data(), splitor.size());
+					this->content_length(body_buffer.size());
+
+					headline =
+						std::format("{} {} {}\r\n", virgo::from_string_version(resp.version()),
+									static_cast<int>(resp.result()), virgo::from_status_string(resp.result()).data());
 				}
 
-				buffer.sputn(body_buffer.data().data(), body_buffer.data().size());
+				for (auto& s : resp.fields())
+				{
+					headline += std::format("{}: {}\r\n", s.first, s.second);
+				}
+
+				headline += "\r\n";
+
+				buffer.sputn(headline.c_str(), headline.size());
+
+				if (temp.size() != 0)
+				{
+					buffer.sputn((char*)temp.data().data(), temp.data().size());
+				}
 			}
 		};
 
-		template <detail::string_literal Router, typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const http_request<Router, Header, Body>& req)
+		template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const http_request<Router, Method, Header, Body>& req)
 		{
 			req << os;
 
@@ -104,7 +100,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <detail::string_literal Router, typename Header, typename Body>
-	struct is_message_type<virgo::http_request<Router, Header, Body>> : std::true_type
+	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
+	struct is_message_type<virgo::http_request<Router, Method, Header, Body>> : std::true_type
 	{};
 } // namespace aquarius
