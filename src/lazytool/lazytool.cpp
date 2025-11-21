@@ -5,10 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <filesystem>
-#include "enumture_generater.h"
-#include "message_generater.h"
-#include "structure_generater.h"
-#include "protocol_generater.h"
+#include "cpp_generater.h"
 
 using namespace aquarius::lazytool;
 
@@ -140,8 +137,6 @@ int main(int argc, char** args)
 
 		ofs_path = ofs_path.append(files.filename().string());
 
-		
-
 		if (output_type == "cpp")
 		{
 			std::ofstream ofs_h(ofs_path.string() + ".h");
@@ -153,38 +148,30 @@ int main(int argc, char** args)
 
 			ofs_cpp << "#include \"" << files.filename().string() + ".h\"\n";
 
-			for (auto& k : pr.keywords_)
+			for (auto& k : pr.fields_)
 			{
-				if (k->struct_type_ == struct_type::enumture)
+				if (k->type() == struct_type::message)
 				{
-					cpp::enumture_generate().visit(k, ofs_h, ofs_cpp);
+					cpp::message_field_generator(ofs_h, std::static_pointer_cast<message_field>(k)).generate();
 				}
-				else if (k->struct_type_ == struct_type::structure)
+				else
 				{
-					cpp::structure_generate().visit(k, ofs_h, ofs_cpp);
-				}
-				else if (k->struct_type_ == struct_type::message)
-				{
-					cpp::message_generate().visit(k, ofs_h, ofs_cpp);
-				}
-				else if (k->struct_type_ == struct_type::protocol)
-				{
-					cpp::protocol_generate().visit(k, ofs_h, ofs_cpp);
+					cpp::data_field_generator(ofs_h, k).generate();
 				}
 			}
 
-			for (auto& k : pr.keywords_)
-			{
-				if (k->struct_type_ == struct_type::message)
-				{
-					cpp::message_generate().defined(k, ofs_h);
-				}
-				else if (k->struct_type_ == struct_type::protocol)
-				{
-					cpp::protocol_generate().defined(k, ofs_h);
-				}
-				
-			}
+			//for (auto& k : pr.keywords_)
+			//{
+			//	if (k->struct_type_ == struct_type::message)
+			//	{
+			//		cpp::message_generate().defined(k, ofs_h);
+			//	}
+			//	else if (k->struct_type_ == struct_type::protocol)
+			//	{
+			//		cpp::protocol_generate().defined(k, ofs_h);
+			//	}
+			//	
+			//}
 		}
 	}
 
