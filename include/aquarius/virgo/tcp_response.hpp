@@ -8,7 +8,7 @@ namespace aquarius
 	namespace virgo
 	{
 
-		template <detail::string_literal Router, typename Header, typename Body>
+		template <typename Header, typename Body>
 		class tcp_response : public basic_tcp_protocol<false, Header, Body>
 		{
 		public:
@@ -98,8 +98,8 @@ namespace aquarius
 			binary_parse parse_;
 		};
 
-		template <detail::string_literal Router, typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const tcp_response<Router, Header, Body>& req)
+		template <typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const tcp_response<Header, Body>& req)
 		{
 			req << os;
 
@@ -107,7 +107,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <detail::string_literal Router, typename Header, typename Body>
-	struct is_message_type<virgo::tcp_response<Router, Header, Body>> : std::true_type
+	template <typename Header, typename Body>
+	struct is_message_type<virgo::tcp_response<Header, Body>> : std::true_type
 	{};
 } // namespace aquarius

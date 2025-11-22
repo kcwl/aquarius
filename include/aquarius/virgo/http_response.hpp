@@ -10,7 +10,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
+		template <virgo::http_method Method, typename Header, typename Body>
 		class http_response : public basic_http_protocol<false, Header, Body>
 		{
 		public:
@@ -21,8 +21,6 @@ namespace aquarius
 			using base::json_type;
 
 			using base::splitor;
-
-			constexpr static auto router = Router;
 
 		public:
 			http_response() = default;
@@ -56,25 +54,14 @@ namespace aquarius
 				flex_buffer body_buffer{};
 
 				std::string headline{};
-				if constexpr (Method == virgo::http_method::get)
-				{
-					flex_buffer tempget;
-					this->body().serialize(tempget);
-					std::string temp_str((char*)tempget.data().data(), tempget.data().size());
 
-					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Method), router,
-										   temp_str, virgo::from_string_version(this->version()));
-				}
-				else
-				{
-					this->body().serialize(body_buffer);
+				this->body().serialize(body_buffer);
 
-					this->content_length(body_buffer.size());
+				this->content_length(body_buffer.size());
 
-					headline =
-						std::format("{} {} {}\r\n", virgo::from_string_version(this->version()),
-									static_cast<int>(this->result()), virgo::from_status_string(this->result()).data());
-				}
+				headline =
+					std::format("{} {} {}\r\n", virgo::from_string_version(this->version()),
+								static_cast<int>(this->result()), virgo::from_status_string(this->result()).data());
 
 				for (auto& s : this->fields())
 				{
@@ -92,8 +79,8 @@ namespace aquarius
 			}
 		};
 
-		template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const http_response<Router, Method, Header, Body>& req)
+		template <virgo::http_method Method, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const http_response<Method, Header, Body>& req)
 		{
 			req << os;
 
@@ -101,7 +88,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
-	struct is_message_type<virgo::http_response<Router, Method, Header, Body>> : std::true_type
+	template <virgo::http_method Method, typename Header, typename Body>
+	struct is_message_type<virgo::http_response<Method, Header, Body>> : std::true_type
 	{};
 } // namespace aquarius

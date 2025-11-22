@@ -22,15 +22,12 @@
     <ClCompile Include="..\src\lazytool\cpp_generater.cpp" />
     <ClCompile Include="..\src\lazytool\custom_type.cpp" />
     <ClCompile Include="..\src\lazytool\file_parse.cpp" />
-    <ClCompile Include="..\src\lazytool\json_tag.cpp" />
     <ClCompile Include="..\src\lazytool\lazytool.cpp" />
     <ClCompile Include="..\src\lazytool\log.cpp" />
     <ClCompile Include="..\src\lazytool\registor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\cpp_generater.h" />
-    <ClInclude Include="..\src\lazytool\generator.hpp" />
-    <ClInclude Include="..\src\lazytool\json_tag.h" />
     <ClInclude Include="..\src\lazytool\custom_type.h" />
     <ClInclude Include="..\src\lazytool\log.h" />
     <ClInclude Include="..\src\lazytool\file_parse.h" />

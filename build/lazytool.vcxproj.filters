@@ -27,9 +27,6 @@
     <ClCompile Include="..\src\lazytool\file_parse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\json_tag.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lazytool\custom_type.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -51,12 +48,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\struct_type.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\generator.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\json_tag.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\cpp_generater.h">

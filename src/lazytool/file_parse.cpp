@@ -3,6 +3,7 @@
 #include <iostream>
 #include "parse_helper.hpp"
 #include <set>
+#include "custom_type.h"
 
 
 namespace
@@ -26,19 +27,7 @@ namespace
 	}
 
 
-	static std::set<std::string> custom_type;
-	void put_custom_type(const std::string& type)
-	{
-		if (custom_type.find(type) != custom_type.end())
-			return;
-
-		custom_type.insert(type);
-	}
-
-	bool get_custom_type(const std::string& type)
-	{
-		return custom_type.find(type) != custom_type.end();
-	}
+	
 
 	static const std::set<std::string> router_protocol = { "tcp", "http" };
 
@@ -61,8 +50,6 @@ namespace
 			{
 				return parse_error::multi_define;
 			}
-
-			put_custom_type(name);
 
 			field.set_name(name);
 		}
@@ -105,6 +92,13 @@ namespace
 			value = read_value<token::key, ']'>(ifs, column, row, end);
 			if (!field.set_method(value))
 				return parse_error::routers_mode;
+
+			auto result = seek<'-'>(ifs, column, row);
+			if (result != parse_error::success)
+				return parse_error::syntax;
+			result = seek<'>'>(ifs, column, row);
+			if (result != parse_error::success)
+				return parse_error::syntax;
 		}
 		else
 		{
@@ -209,12 +203,12 @@ namespace aquarius
 
 		std::ostream& operator<<(std::ostream& os, const data_field& field)
 		{
-			os << from_struct_type_string(field.type()) << ": " << field.name() << "\n{\n";
+			os << from_struct_type_string(field.type()) << ": " << field.name() << std::endl << "{" << std::endl;
 			for (const auto& ff : field.fields())
 			{
-				os << "\t" << ff.first << " " << ff.second << "\n";
+				os << "\t" << ff.first << " " << ff.second << std::endl;
 			}
-			os << "}\n";
+			os << "}" << std::endl;
 
 			return os;
 		}
@@ -305,20 +299,20 @@ namespace aquarius
 
 		std::ostream& operator<<(std::ostream& os, message_field& field)
 		{
-			os << "message: router->" << field.router() << " " << field.protocol() << " " << field.method() << "\n{\n";
-			os << "\trequest:\n" << field.request()->name() << "\n{\n";
+			os << "message: router->" << field.router() << " " << field.protocol() << " " << field.method() << std::endl << "{" << std::endl;
+			os << "\trequest:" << std::endl << field.request()->name() << std::endl << "{" << std::endl;
 			for (const auto& ff : field.request()->fields())
 			{
-				os << "\t\t" << ff.first << " " << ff.second << "\n";
+				os << "\t\t" << ff.first << " " << ff.second << std::endl;
 			}
-			os << "\t}\n";
-			os << "\tresponse:\n" << field.response()->name() << "\n{\n";
+			os << "\t}" << std::endl;
+			os << "\tresponse:" << std::endl << field.response()->name() << std::endl << "{" << std::endl;
 			for (const auto& ff : field.response()->fields())
 			{
-				os << "\t\t" << ff.first << " " << ff.second << "\n";
+				os << "\t\t" << ff.first << " " << ff.second << std::endl;
 			}
-			os << "\t}\n";
-			os << "}\n";
+			os << "\t}"<<std::endl;
+			os << "}" << std::endl;
 			return os;
 		}
 
@@ -352,7 +346,10 @@ namespace aquarius
 								 if (res != parse_error::success)
 									 throw std::runtime_error(
 										 std::format("struct parse error! row: {}, column: {}", row_ + 1, column_ + 1));
+
 								 fields_.push_back(field);
+
+								 put_custom_type(field->name(), field);
 							 });
 
 			registor_.regist("enum",

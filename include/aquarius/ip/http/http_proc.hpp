@@ -172,7 +172,7 @@ namespace aquarius
 						session_ptr->get_executor(),
 						[&] -> awaitable<void>
 						{
-							using http_get_response = virgo::http_response<"get", virgo::http_method::get,
+							using http_get_response = virgo::http_response<virgo::http_method::get,
 																		   http_response_header, virgo::http_get_body>;
 
 							http_get_response get_resp{};
