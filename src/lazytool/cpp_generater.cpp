@@ -40,12 +40,12 @@ namespace aquarius
 				generate_header();
 				ofs_ << std::endl << "{" << std::endl;
 
-				if (data_field_ptr_->type() == struct_type::structure || data_field_ptr_->type() == struct_type::message)
+				if (data_field_ptr_->type() == struct_type::structure)
 				{
-					scope_public();
-
 					generate_equal_define();
 				}
+
+				ofs_ << std::endl;
 
 				char end = ';';
 				if (data_field_ptr_->type() == struct_type::enumture)
@@ -103,6 +103,8 @@ namespace aquarius
 
 			void data_field_generator::generate_equal_src()
 			{
+				ofs_ << std::endl;
+
 				ofs_ << "bool " << data_field_ptr_->name() << "::operator==(const " << data_field_ptr_->name() << "& other) const" << std::endl;
 				ofs_ << "{" << std::endl;
 
@@ -134,6 +136,7 @@ namespace aquarius
 
 			void data_field_generator::generate_stream_src()
 			{
+				ofs_ << std::endl;
 				ofs_ << "std::ostream& operator<<(std::ostream& os, const " << data_field_ptr_->name() << "& other)\n";
 				ofs_ << "{\n";
 				ofs_ << "\tos ";
@@ -159,6 +162,8 @@ namespace aquarius
 
 			void data_field_generator::generate_to_tag(std::shared_ptr<data_field> parser)
 			{
+				ofs_ << std::endl;
+
 				ofs_ << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
 					<< ">&, const aquarius::json::value& jv)" << std::endl;
 				ofs_ << "{" << std::endl;
@@ -188,6 +193,7 @@ namespace aquarius
 
 			void data_field_generator::generate_from_tag(std::shared_ptr<data_field> parser)
 			{
+				ofs_ << std::endl;
 				ofs_ << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
 					<< parser->name() << "& local)" << std::endl;
 				ofs_ << "{" << std::endl;
@@ -421,6 +427,8 @@ namespace aquarius
 
 				generate_protocol_define(message_field_ptr_->request(), message_field_ptr_->method());
 
+				ofs_ << std::endl;
+
 				generate_protocol_define(message_field_ptr_->response(), message_field_ptr_->method());
 			}
 
@@ -441,6 +449,8 @@ namespace aquarius
 				gen.scope_public();
 				gen.generate_equal_define();
 
+				ofs_ << std::endl;
+
 				gen.scope_public();
 				generate_serialize_method_define();
 
@@ -450,8 +460,6 @@ namespace aquarius
 
 			void message_field_generator::generate_protocol_alias_define()
 			{
-				ofs_ << std::endl;
-
 				generate_proto_request_define();
 
 				generate_proto_response_define();

@@ -150,6 +150,8 @@ int main(int argc, char** args)
 
 			for (auto& k : pr.fields_)
 			{
+				ofs_h << std::endl;
+
 				if (k->type() == struct_type::message)
 				{
 					cpp::message_field_generator(ofs_h, std::static_pointer_cast<message_field>(k)).generate();
@@ -160,9 +162,11 @@ int main(int argc, char** args)
 				}
 			}
 
+			ofs_h << std::endl;
+
 			for (auto& k : pr.fields_)
 			{
-				if (k->type() == struct_type::structure )
+				if (k->type() == struct_type::structure)
 				{
 					cpp::data_field_generator(ofs_h, k, false).generate_stream_define();
 				}
@@ -172,13 +176,13 @@ int main(int argc, char** args)
 					if (!msg)
 						continue;
 
-					cpp::data_field_generator(ofs_h, msg->request(), false)
-						.generate_stream_define();
+					cpp::data_field_generator(ofs_h, msg->request(), false).generate_stream_define();
 
-					cpp::data_field_generator(ofs_h, msg->response(), false)
-						.generate_stream_define();
+					cpp::data_field_generator(ofs_h, msg->response(), false).generate_stream_define();
 				}
 			}
+
+			ofs_h << std::endl;
 
 			for (auto& k : pr.fields_)
 			{
@@ -204,6 +208,8 @@ int main(int argc, char** args)
 				}
 			}
 
+			ofs_h << std::endl;
+
 			for (auto& k : pr.fields_)
 			{
 				if (k->type() == struct_type::message)
@@ -215,6 +221,8 @@ int main(int argc, char** args)
 
 			for (auto& k : pr.fields_)
 			{
+				ofs_cpp << std::endl;
+
 				if (k->type() == struct_type::message)
 				{
 					cpp::message_field_generator(ofs_cpp, std::static_pointer_cast<message_field>(k))
@@ -236,7 +244,7 @@ int main(int argc, char** args)
 					if (!msg)
 						continue;
 
-					cpp::data_field_generator(ofs_cpp,k,false).generate_from_tag(msg->request());
+					cpp::data_field_generator(ofs_cpp, k, false).generate_from_tag(msg->request());
 
 					cpp::data_field_generator(ofs_cpp, k, false).generate_to_tag(msg->request());
 
@@ -247,6 +255,7 @@ int main(int argc, char** args)
 				else if (k->type() == struct_type::structure)
 				{
 					cpp::data_field_generator(ofs_cpp, k, false).generate_from_tag(k);
+
 					cpp::data_field_generator(ofs_cpp, k, false).generate_to_tag(k);
 				}
 			}
@@ -263,26 +272,11 @@ int main(int argc, char** args)
 					if (!msg)
 						continue;
 
-					cpp::data_field_generator(ofs_cpp, msg->request(), false)
-						.generate_stream_src();
+					cpp::data_field_generator(ofs_cpp, msg->request(), false).generate_stream_src();
 
-					cpp::data_field_generator(ofs_cpp, msg->response(), false)
-						.generate_stream_src();
+					cpp::data_field_generator(ofs_cpp, msg->response(), false).generate_stream_src();
 				}
 			}
-
-			// for (auto& k : pr.keywords_)
-			//{
-			//	if (k->struct_type_ == struct_type::message)
-			//	{
-			//		cpp::message_generate().defined(k, ofs_h);
-			//	}
-			//	else if (k->struct_type_ == struct_type::protocol)
-			//	{
-			//		cpp::protocol_generate().defined(k, ofs_h);
-			//	}
-			//
-			// }
 		}
 	}
 
