@@ -429,17 +429,17 @@ namespace aquarius
 
 				ofs_ << std::endl;
 
-				generate_protocol_define(message_field_ptr_->response(), message_field_ptr_->method());
+				generate_protocol_define(message_field_ptr_->response(), message_field_ptr_->method(), true);
 			}
 
 			void message_field_generator::generate_protocol_define(std::shared_ptr<data_field> data_field_ptr,
-																   const std::string& method)
+																   const std::string& method, bool has_response)
 			{
 				data_field_generator gen(ofs_, data_field_ptr);
 
 				gen.generate_header();
 
-				generate_inheritance_serialize_define(method);
+				generate_inheritance_serialize_define(method, has_response);
 
 				ofs_ << "{" << std::endl;
 
@@ -479,7 +479,7 @@ namespace aquarius
 
 				data_field_generator(ofs_, message_field_ptr_->response(), false).generate_equal_src();
 
-				generate_serialize_method_src(message_field_ptr_->response());
+				generate_serialize_method_src(message_field_ptr_->response(), message_field_ptr_->method() == "get");
 			}
 
 			void message_field_generator::generate_proto_request_define()
@@ -542,14 +542,21 @@ namespace aquarius
 				ofs_ << "{}" << std::endl;
 			}
 
-			void message_field_generator::generate_serialize_method_src(std::shared_ptr<data_field> data_ptr)
+			void message_field_generator::generate_serialize_method_src(std::shared_ptr<data_field> data_ptr, bool has_request)
 			{
 				ofs_ << std::endl;
 
 				auto f = [&](const std::string& method, const std::string& direction,
 							 std::shared_ptr<data_field> data_ptr, bool has_type = false)
 				{
-					if (method == "get")
+					auto m = method;
+
+					if (m == "get" && has_request)
+					{
+						m = "post";
+					}
+
+					if (m == "get")
 					{
 						bool start = true;
 						for (auto& [type, name] : data_ptr->fields())
@@ -577,7 +584,7 @@ namespace aquarius
 							}
 						}
 					}
-					else if (method == "post")
+					else if (m == "post")
 					{
 						if (has_type)
 						{
@@ -622,13 +629,20 @@ namespace aquarius
 				ofs_ << "}" << std::endl;
 			}
 
-			void message_field_generator::generate_inheritance_serialize_define(const std::string& method)
+			void message_field_generator::generate_inheritance_serialize_define(const std::string& method, bool has_response)
 			{
-				if (method == "post")
+				auto m = method;
+
+				if (m == "get" && has_response)
+				{
+					m = "post";
+				}
+
+				if (m == "post")
 				{
 					ofs_ << " : public " << json_serialize_inheritance << std::endl;
 				}
-				else if (method == "get")
+				else if (m == "get")
 				{
 					ofs_ << " : public " << kv_serialize_inheritance << std::endl;
 				}

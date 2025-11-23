@@ -272,7 +272,7 @@ namespace aquarius
 		message_field::message_field()
 			: data_field(struct_type::message)
 			, request_ptr_(new data_field(struct_type::message))
-			, response_ptr_(new data_field(struct_type::message))
+			, response_(new data_field(struct_type::message))
 		{
 
 		}
@@ -289,12 +289,12 @@ namespace aquarius
 
 		void message_field::set_response(std::shared_ptr<data_field> response)
 		{
-			response_ptr_ = response;
+			response_ = response;
 		}
 
 		std::shared_ptr<data_field> message_field::response()
 		{
-			return response_ptr_;
+			return response_;
 		}
 
 		std::ostream& operator<<(std::ostream& os, message_field& field)

@@ -24,6 +24,7 @@ namespace aquarius
 		public:
 			basic_http_protocol()
 				: base()
+				, http_fields()
 				, version_(http_version::unknown)
 			{}
 
@@ -31,6 +32,7 @@ namespace aquarius
 
 			basic_http_protocol(const basic_http_protocol& other)
 				: base(other)
+				, http_fields(other)
 				, version_(other.version_)
 			{}
 
@@ -39,6 +41,7 @@ namespace aquarius
 				if (std::addressof(other) != this)
 				{
 					base::operator=(other);
+					http_fields::operator=(other);
 					version_ = other.version_;
 				}
 
@@ -47,6 +50,7 @@ namespace aquarius
 
 			basic_http_protocol(basic_http_protocol&& other) noexcept
 				: base(std::move(other))
+				, http_fields(std::move(other))
 				, version_(std::exchange(other.version_, http_version::unknown))
 			{}
 
@@ -55,6 +59,7 @@ namespace aquarius
 				if (std::addressof(other) != this)
 				{
 					base::operator=(std::move(other));
+					http_fields::operator=(std::move(other));
 					version_ = std::exchange(other.version_, http_version::unknown);
 				}
 
@@ -110,6 +115,7 @@ namespace aquarius
 		public:
 			basic_http_protocol()
 				: base()
+				, http_fields()
 				, status_(virgo::http_status::ok)
 				, version_(virgo::http_version::unknown)
 			{}
@@ -118,6 +124,7 @@ namespace aquarius
 
 			basic_http_protocol(const basic_http_protocol& other)
 				: base(other)
+				, http_fields(other)
 				, status_(other.status_)
 				, version_(other.version_)
 			{}
@@ -127,6 +134,7 @@ namespace aquarius
 				if (this != std::addressof(other))
 				{
 					base::operator=(other);
+					http_fields::operator=(other);
 					status_ = other.status_;
 					version_ = other.version_;
 				}
@@ -136,6 +144,7 @@ namespace aquarius
 
 			basic_http_protocol(basic_http_protocol&& other) noexcept
 				: base(std::move(other))
+				, http_fields(std::move(other))
 				, status_(std::exchange(other.status_, virgo::http_status::ok))
 				, version_(std::exchange(other.version_, virgo::http_version::unknown))
 			{}
@@ -145,6 +154,7 @@ namespace aquarius
 				if (this != std::addressof(other))
 				{
 					base::operator=(std::move(other));
+					http_fields::operator=(std::move(other));
 					status_ = std::exchange(other.status_, virgo::http_status::ok);
 					version_ = std::exchange(other.version_, 0);
 				}

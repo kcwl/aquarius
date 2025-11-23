@@ -11,7 +11,7 @@
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/ip/http/http_header.hpp>
 #include <fstream>
-#include <aquarius/virgo/http_null_body.hpp>
+#include <aquarius/ip/http/url_encode.hpp>
 
 namespace aquarius
 {
@@ -44,8 +44,11 @@ namespace aquarius
 
 			virgo::http_fields field;
 
-			for (const auto f : buffer | std::views::split(crlf))
+			for (const auto& f : buffer | std::views::split(crlf))
 			{
+				if (std::string_view(f).empty())
+					break;
+
 				auto pos = std::string_view(f).find(":");
 				if (pos == std::string_view::npos)
 				{
@@ -87,31 +90,25 @@ namespace aquarius
 				auto proto_slide_buffer = proto_buffer | std::views::slide(two_crlf.size());
 
 				auto iter =
-					std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
+					std::ranges::find_if(proto_slide_buffer, [&] (auto c) { return std::string_view(c) == two_crlf; });
 
 				auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
 
 				auto header_span = proto_buffer.subspan(0, len);
 
-				auto it = std::ranges::find_if(header_span | std::views::slide(crlf.size()),
-											   [&](auto c) { return std::string_view(c) == crlf; });
+				buffer.consume(len + two_crlf.size());
 
-				if (it == proto_slide_buffer.end())
-				{
-					make_error_response(session_ptr, virgo::http_status::bad_request);
-					continue;
-				}
+				auto slide_proto_buffer = header_span | std::views::slide(crlf.size());
 
-				auto header_len = std::ranges::distance(proto_slide_buffer.begin(), it);
+				auto it =
+					std::ranges::find_if(slide_proto_buffer, [](const auto c) { return std::string_view(c) == crlf; });
+				if (it == slide_proto_buffer.end())
+					break;
 
-				auto header_command = header_span.subspan(0, len);
-
-				auto header_fields = header_span.subspan(header_len + crlf.size(), len - header_len - crlf.size());
-
-				virgo::http_fields hf{};
+				len = std::ranges::distance(slide_proto_buffer.begin(), it);
 
 				error_code http_ec{};
-				auto [method, router, path, version] = parse_command_line(header_command, http_ec);
+				auto [method, router, path, version] = parse_command_line(proto_buffer.subspan(0, len), http_ec);
 
 				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
@@ -119,7 +116,7 @@ namespace aquarius
 														   static_cast<virgo::http_status>(http_ec.value()));
 				}
 
-				hf = parse_field(header_fields, http_ec);
+				auto hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
 
 				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
@@ -152,9 +149,7 @@ namespace aquarius
 					{
 						ec = aquarius::error_code{};
 
-						buffer.prepare(remain_size);
-
-						ec = co_await session_ptr->async_read(buffer);
+						ec = co_await session_ptr->async_read(buffer, remain_size);
 
 						if (ec)
 							break;
@@ -222,7 +217,8 @@ namespace aquarius
 								ifs.read(stream.data(), stream.size());
 							}
 
-							//co_await http_router<Session>::get_mutable_instance().send_response(session_ptr, get_resp);
+							// co_await http_router<Session>::get_mutable_instance().send_response(session_ptr,
+							// get_resp);
 							co_return;
 						},
 						detached);
@@ -232,6 +228,8 @@ namespace aquarius
 
 				if (method == virgo::http_method::get && !path.empty())
 				{
+					auto url = url_decode(std::string(path.data(), path.size()));
+
 					buffer.sputn(path.data(), path.size());
 				}
 
@@ -250,12 +248,12 @@ namespace aquarius
 		template <typename Session>
 		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_status status) -> awaitable<void>
 		{
-			//using http_error_response = virgo::http_response<http_response_header, virgo::http_null_body>;
+			// using http_error_response = virgo::http_response<http_response_header, virgo::http_null_body>;
 
-			//http_error_response resp{};
-			//resp.result(status);
+			// http_error_response resp{};
+			// resp.result(status);
 
-			//co_await http_router<Session>::get_mutable_instance().send_response(session_ptr, resp);
+			// co_await http_router<Session>::get_mutable_instance().send_response(session_ptr, resp);
 			co_return;
 		}
 		auto parse_command_line(std::span<char> header_span, error_code& ec)
@@ -265,7 +263,7 @@ namespace aquarius
 
 			auto sp = header_span | std::views::split(' ');
 
-			auto size = std::ranges::distance(sp.begin(),sp.end());
+			auto size = std::ranges::distance(sp.begin(), sp.end());
 
 			if (size != 3)
 			{
@@ -318,7 +316,9 @@ namespace aquarius
 		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, virgo::http_fields hf,
 							flex_buffer& buffer)
 		{
-			return http_router<Session>::get_mutable_instance().invoke(router == "/" ? "root" : router, session_ptr, hf, buffer);
+			//return http_router<Session>::get_mutable_instance().invoke(router == "/" ? "root" : router, session_ptr, hf,
+			//														   buffer);
+			return false;
 		}
 
 		bool check_get_search(virgo::http_method method, std::string_view path)
@@ -333,7 +333,8 @@ namespace aquarius
 			if (method != virgo::http_method::get || !path.empty())
 				co_return false;
 
-			using http_get_response = virgo::http_response<"get", http_response_header, virgo::http_get_body>;
+			using http_get_response =
+				virgo::http_response<virgo::http_method::get, http_response_header, virgo::http_get_body>;
 
 			http_get_response get_resp{};
 			get_resp.version(virgo::http_version::http1_1);
@@ -409,36 +410,34 @@ namespace aquarius
 			auto proto_slide_buffer = proto_buffer | std::views::slide(two_crlf.size());
 
 			auto iter =
-				std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
+				std::ranges::find_if(proto_slide_buffer, [&] (auto c) { return std::string_view(c) == two_crlf; });
 
 			auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
 
 			auto header_span = proto_buffer.subspan(0, len);
 
-			auto it = std::ranges::find_if(header_span | std::views::slide(crlf.size()),
-										   [&](auto c) { return std::string_view(c) == crlf; });
+			buffer.consume(len + two_crlf.size());
 
-			if (it == proto_slide_buffer.end())
+			auto slide_proto_buffer = header_span | std::views::slide(crlf.size());
+
+			auto it =
+				std::ranges::find_if(slide_proto_buffer, [] (const auto c) { return std::string_view(c) == crlf; });
+			if (it == slide_proto_buffer.end())
+				co_return Response{};
+
+			len = std::ranges::distance(slide_proto_buffer.begin(), it);
+
+			error_code http_ec{};
+			auto [version, status] = parse_command_line(proto_buffer.subspan(0, len), http_ec);
+
+			if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 			{
 				co_return Response{};
 			}
 
-			auto header_len = std::ranges::distance(proto_slide_buffer.begin(), it);
+			auto hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
 
-			auto header_command = header_span.subspan(0, len);
-
-			auto header_fields = header_span.subspan(header_len + crlf.size(), len - header_len - crlf.size());
-
-			auto [version, http_status] = parse_response_line(header_command, ec);
-
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
-			{
-				co_return Response{};
-			}
-
-			auto hf = parse_field(header_fields, ec);
-
-			if (ec.value() != static_cast<int>(virgo::http_status::ok))
+			if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 			{
 				co_return Response{};
 			}
@@ -452,7 +451,7 @@ namespace aquarius
 		}
 
 	private:
-		auto parse_response_line(std::span<char> header_span, error_code& ec)
+		auto parse_command_line(std::span<char> header_span, error_code& ec)
 			-> std::tuple<virgo::http_version, virgo::http_status>
 		{
 			ec = virgo::http_status::ok;
@@ -473,7 +472,7 @@ namespace aquarius
 
 			auto status = static_cast<virgo::http_status>(std::atoi(std::string_view(*iter++).data()));
 
-			return { version, status };
+			return std::make_tuple(version, status);
 		}
 	};
 } // namespace aquarius

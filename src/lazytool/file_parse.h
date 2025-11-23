@@ -87,7 +87,7 @@ namespace aquarius
         private:
             std::shared_ptr<data_field> request_ptr_;
 
-            std::shared_ptr<data_field> response_ptr_;
+            std::shared_ptr<data_field> response_;
         };
 
         class file_parser

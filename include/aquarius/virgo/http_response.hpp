@@ -26,8 +26,8 @@ namespace aquarius
 			http_response() = default;
 			virtual ~http_response() = default;
 
-			http_response(const http_response&) = default;
-			http_response& operator=(const http_response&) = default;
+			http_response(const http_response&) = delete;
+			http_response& operator=(const http_response&) = delete;
 
 			http_response(http_response&&) noexcept = default;
 			http_response& operator=(http_response&&) noexcept = default;

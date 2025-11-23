@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/ip/http/http_param.hpp>
 
 namespace aquarius
 {
@@ -16,7 +17,7 @@ namespace aquarius
 	public:
 		virtual void make_response() override
 		{
-			this->response().version(this->request()->version());
+			this->response().version(get_http_param().version);
 
 			this->response().set_field("Content-Type", this->request()->find("Content-Type"));
 			this->response().set_field("Server", "Aquarius 0.10.0");
@@ -34,7 +35,7 @@ namespace aquarius
 			{
 				auto request = std::make_shared<typename Context::request_t>();
 
-				error_code ec{};
+				error_code ec = virgo::http_status::ok;
 
 				try
 				{

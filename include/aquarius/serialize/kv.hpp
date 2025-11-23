@@ -39,10 +39,7 @@ namespace aquarius
 
 			auto key = get_first_range<'='>(buffer);
 
-			if (key.empty())
-				return T{};
-
-			if (key != name)
+			if (key != name || key.empty())
 				return T{};
 
 			auto value = get_first_range<'&', '#'>(buffer);
@@ -98,16 +95,19 @@ namespace aquarius
 		{
 			auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
-			auto iter = std::ranges::find_if(sp, [&] (const auto c) { return ((c == args), ...); });
+			auto iter = std::find_if(sp.begin(),sp.end(), [&] (const auto c) { return ((c == args) || ...); });
 
 			if (iter == sp.end())
-				return {};
+			{
+				buffer.consume(buffer.size());
+				return std::string(sp.data(), sp.size());
+			}
 
 			auto len = std::ranges::distance(sp.begin(), iter);
 
 			std::string result((char*)buffer.data().data(), len);
 
-			buffer.consume(len);
+			buffer.consume(len + 1);
 				
 			return result;
 		}

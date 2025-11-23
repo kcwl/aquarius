@@ -109,7 +109,7 @@ public:
 	string passwd;
 };
 
-class http_test_get_resp_body : public aquarius::http_kv_serialize
+class http_test_get_resp_body : public aquarius::http_json_serialize
 {
 public:
 	http_test_get_resp_body();

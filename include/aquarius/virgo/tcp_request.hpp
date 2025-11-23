@@ -68,13 +68,23 @@ namespace aquarius
 		public:
 			bool commit(flex_buffer& buffer)
 			{
-				parse_.to_datas(this->timestamp(), buffer);
+				flex_buffer buf{};
 
-				parse_.to_datas(this->version(), buffer);
+				parse_.to_datas(router, buf);
 
-				this->header().serialize(buffer);
+				parse_.to_datas(this->timestamp(), buf);
 
-				this->body().serialize(buffer);
+				parse_.to_datas(this->version(), buf);
+
+				this->header().serialize(buf);
+
+				this->body().serialize(buf);
+
+				auto size = static_cast<uint32_t>(buf.size());
+
+				buffer.sputn((char*)&size, sizeof(uint32_t));
+
+				buffer.sputn((char*)buf.data().data(), buf.data().size());
 
 				return true;
 			}

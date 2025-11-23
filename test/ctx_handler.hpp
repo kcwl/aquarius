@@ -29,12 +29,12 @@ AQUARIUS_HTTP_HANDLER(http_test_get_http_request, http_test_get_http_response, c
 {
 	if (!request())
 	{
-		co_return aquarius::error_code{};
+		co_return aquarius::virgo::http_status::bad_request;
 	}
 
 	response().body().user = request()->body().user;
 
 	response().body().passwd = request()->body().passwd;
 
-	co_return aquarius::error_code{};
+	co_return aquarius::virgo::http_status::ok;
 }

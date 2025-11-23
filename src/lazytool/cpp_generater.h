@@ -86,14 +86,14 @@ namespace aquarius
 			public:
 				void generate();
 
-				void generate_protocol_define(std::shared_ptr<data_field> data_field_ptr, const std::string& method);
+				void generate_protocol_define(std::shared_ptr<data_field> data_field_ptr, const std::string& method, bool has_response = false);
 
 				void generate_protocol_alias_define();
 
 				void generate_protocol_src();
 
 			private:
-				void generate_inheritance_serialize_define(const std::string& method);
+				void generate_inheritance_serialize_define(const std::string& method, bool has_response = false);
 
 				void generate_serialize_method_define();
 
@@ -105,7 +105,7 @@ namespace aquarius
 
 				void generate_construction_src(std::shared_ptr<data_field> data_ptr, bool has_member);
 
-				void generate_serialize_method_src(std::shared_ptr<data_field> data_ptr);
+				void generate_serialize_method_src(std::shared_ptr<data_field> data_ptr, bool has_request = false);
 
 			private:
 				std::shared_ptr<message_field> message_field_ptr_;

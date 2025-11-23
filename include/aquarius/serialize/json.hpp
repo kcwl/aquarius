@@ -31,6 +31,9 @@ namespace aquarius
 
 			buffer.sgetn(json.data(),json.size());
 
+			if (json.empty())
+				return T{};
+
 			auto value = boost::json::parse(json);
 
 			return boost::json::value_to<T>(value);

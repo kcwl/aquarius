@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_method.hpp>
+#include <format>
 
 namespace aquarius
 {
@@ -59,8 +60,8 @@ namespace aquarius
 					this->body().serialize(tempget);
 					std::string temp_str((char*)tempget.data().data(), tempget.data().size());
 
-					headline = std::format("{} /{}{} {}\r\n", virgo::from_method_string(Method), router,
-										   temp_str, virgo::from_string_version(this->version()));
+					headline = std::format("{} {}{} {}\r\n", virgo::from_method_string(Method), router,
+										   url_encode(temp_str), virgo::from_string_version(this->version()));
 				}
 				else
 				{

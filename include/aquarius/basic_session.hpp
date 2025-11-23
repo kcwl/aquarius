@@ -82,12 +82,16 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		auto async_read(flex_buffer& buffer) -> awaitable<error_code>
+		auto async_read(flex_buffer& buffer, std::size_t length) -> awaitable<error_code>
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read(socket_adaptor_.get_implement(), buffer,
+			auto mutable_buffer = buffer.prepare(length);
+
+			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
 											 redirect_error(use_awaitable, ec));
+
+			buffer.commit(length);
 
 			co_return ec;
 		}

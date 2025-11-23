@@ -39,29 +39,23 @@ namespace aquarius
 
                 constexpr auto len = sizeof(length);
 
-                buffer.prepare(len);
-
-                ec = co_await session_ptr->async_read(buffer);
+                ec = co_await session_ptr->async_read(buffer, len);
 
                 if (ec)
                 {
                     break;
                 }
 
-                buffer.sgetn((char*)&length, len);
+                buffer.sgetn((char*)&length, sizeof(uint32_t));
 
-                buffer.prepare(length);
-
-                ec = co_await session_ptr->async_read(buffer);
-
-                buffer.commit(length);
+                ec = co_await session_ptr->async_read(buffer, length);
 
                 if (ec)
                 {
                     break;
                 }
 
-                auto router = binary_parse{}.from_datas<std::string_view>(buffer);
+                auto router = binary_parse{}.from_datas<std::string>(buffer);
 
                 tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
             }
@@ -102,9 +96,7 @@ namespace aquarius
 
             constexpr auto len = sizeof(length);
 
-            buffer.prepare(len);
-
-            auto ec = co_await session_ptr->async_read(buffer);
+            auto ec = co_await session_ptr->async_read(buffer, len);
 
             if (ec)
             {
@@ -113,9 +105,7 @@ namespace aquarius
 
             buffer.sgetn((char*)&length, len);
 
-            buffer.prepare(length);
-
-            ec = co_await session_ptr->async_read(buffer);
+            ec = co_await session_ptr->async_read(buffer, length);
 
             if (ec)
             {

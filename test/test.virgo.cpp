@@ -117,16 +117,12 @@ bool http_test_get_resp_body::operator==(const http_test_get_resp_body& other) c
 
 void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	buffer.sputc('?');
-	this->parse_to(user, buffer, "user");
-	buffer.sputc('&');
-	this->parse_to(passwd, buffer, "passwd");
+	this->parse_to(*this, buffer);
 }
 
 void http_test_get_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<int32>(buffer, "user");
-	passwd = this->parse_from<string>(buffer, "passwd");
+	*this = this->parse_from<http_test_get_resp_body>(buffer); 
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const person& local)

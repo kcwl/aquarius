@@ -2,6 +2,7 @@
 #include <string>
 #include <mutex>
 #include <aquarius/tag_invoke.hpp>
+#include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
 {
@@ -9,6 +10,7 @@ namespace aquarius
 	{
 		std::string root_dir;
 		std::string control_allow_origin;
+		virgo::http_version version = virgo::http_version::http1_1;
 	};
 
 	struct http_param_tag
