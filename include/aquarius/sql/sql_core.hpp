@@ -37,7 +37,9 @@ namespace aquarius
 
     public:
         sql_core(const database_param& param)
-            : param_(param)
+            : mysql_ptr_(nullptr)
+            , stmt_ptr_(nullptr)
+            , param_(param)
         {
         }
 

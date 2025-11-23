@@ -13,7 +13,7 @@ namespace aquarius
 	{
 		struct io_context_param
 		{
-			std::size_t number;
+			std::size_t number = std::thread::hardware_concurrency() * 2;
 		};
 
 		class io_service_pool
@@ -117,17 +117,17 @@ namespace aquarius
 		};
 	} // namespace detail
 
-	inline auto& attach_io_context()
+	inline auto& io_context_pool()
 	{
 		detail::io_context_param param{};
 
 		static std::once_flag flag{};
 
-		std::call_once(flag, [&param] { tag_invoke(value_to<io_context_param_tag>{}, param); });
+		std::call_once(flag, [&param] { value_to<io_context_param_tag>(param); });
 
 		static detail::io_service_pool pool(param.number);
 
-		return pool.get_io_service();
+		return pool;
 	}
 } // namespace aquarius
 

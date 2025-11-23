@@ -7,9 +7,4 @@ namespace aquarius
 
 	struct db_tag
 	{};
-
-
-	template<typename T>
-	struct value_to{};
-
 } // namespace aquarius

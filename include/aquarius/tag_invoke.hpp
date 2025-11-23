@@ -1,26 +1,30 @@
 #pragma once
 #include <aquarius/detail/tag.hpp>
-#include <aquarius/sql/database_param.hpp>
-
-namespace aquarius
-{
-	namespace detail
-	{
-		struct io_context_param;
-	}
-}
 
 namespace aquarius
 {
 	template<typename T>
-	void tag_invoke(value_to<T>, database_param&)
+	struct value_to_tag {};
+
+	template<typename T, typename P, typename = void>
+	struct has_tag_invokable : std::false_type {};
+
+	inline void tag_invoke(value_to_tag<std::nullopt_t>, std::nullopt_t)
 	{
 		return;
 	}
 
-	template<typename T>
-	void tag_invoke(value_to<T>, detail::io_context_param&)
+	template<typename T, typename P>
+	struct has_tag_invokable<T, P, decltype(tag_invoke(value_to_tag<T>(), std::declval<P&>()))> : std::true_type {};
+
+	template<typename T, typename P>
+	inline void value_to(P& t)
 	{
-		return;
+		constexpr bool b = has_tag_invokable<T, P>::value;
+
+		if constexpr (b)
+		{
+			tag_invoke(value_to_tag<T>(), t);
+		}
 	}
 } // namespace aquarius

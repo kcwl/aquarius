@@ -8,58 +8,54 @@
 namespace aquarius
 {
 
-    class sql_pool_core
-    {
-    public:
-        sql_pool_core() = default;
-        virtual ~sql_pool_core() = default;
+	class sql_pool_core
+	{
+	public:
+		sql_pool_core()
+			: sql_pool_()
+			, next_sql_adaptor_()
+		{}
 
-    public:
-        auto run(const database_param& param) -> awaitable<void>
-        {
-            for (int i = 0; i < param.pool_size; ++i)
-            {
+		virtual ~sql_pool_core() = default;
 
-                auto sql_ptr = std::make_shared<sql_core>(param);
+	public:
+		auto run() -> awaitable<error_code>
+		{
+			database_param param{};
 
-                co_await sql_ptr->async_connect();
+			value_to<db_tag>(param);
 
-                sql_pool_.push_back(sql_ptr);
-            }
-        }
+			for (int i = 0; i < param.pool_size; ++i)
+			{
+				auto sql_ptr = std::make_shared<sql_core>(param);
 
-        std::shared_ptr<sql_core> get_sql_adaptor()
-        {
-            if (next_sql_adaptor_ == sql_pool_.size())
-                next_sql_adaptor_ = 0;
+				auto ec = co_await sql_ptr->async_connect();
 
-            return sql_pool_[next_sql_adaptor_++];
-        }
+				if (ec)
+					co_return ec;
 
-    private:
-        std::vector<std::shared_ptr<sql_core>> sql_pool_;
+				sql_pool_.push_back(sql_ptr);
+			}
+		}
 
-        std::size_t next_sql_adaptor_;
-    };
+		std::shared_ptr<sql_core> get_sql_adaptor()
+		{
+			if (next_sql_adaptor_ == sql_pool_.size())
+				next_sql_adaptor_ = 0;
 
-    inline sql_pool_core& sql_pool()
-    {
-        static sql_pool_core pool;
+			return sql_pool_[next_sql_adaptor_++];
+		}
 
-        static std::once_flag once;
+	private:
+		std::vector<std::shared_ptr<sql_core>> sql_pool_;
 
-        std::call_once(once, [&] ->awaitable<void>
-                       {
-                           database_param param{};
+		std::size_t next_sql_adaptor_;
+	};
 
-                           tag_invoke(value_to<db_tag>{}, param);
+	inline sql_pool_core& sql_pool()
+	{
+		static sql_pool_core pool;
 
-                           if (param.pool_size != 0)
-                           {
-                               co_await co_spawn(attach_io_context(), pool.run(param), use_awaitable);
-                           }
-                       });
-
-        return pool;
-    }
-}
+		return pool;
+	}
+} // namespace aquarius

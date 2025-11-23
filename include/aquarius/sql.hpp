@@ -254,13 +254,17 @@ namespace aquarius
 	inline auto sql_query(std::string_view sql) -> awaitable<std::vector<T>>
 	{
 		error_code ec;
+
 		co_return co_await sql_pool().get_sql_adaptor()->async_query<T>(sql, ec);
 	}
 
 	inline auto sql_execute(std::string_view sql) -> awaitable<bool>
 	{
 		error_code ec;
-		co_return co_await sql_pool().get_sql_adaptor()->async_execute(sql, ec);
+
+		auto ptr = sql_pool().get_sql_adaptor();
+
+		co_return co_await ptr->async_execute(sql, ec);
 	}
 } // namespace aquarius
 

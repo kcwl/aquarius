@@ -12,11 +12,11 @@ struct personal
 
 namespace aquarius
 {
-	void tag_invoke(aquarius::value_to<aquarius::db_tag>, aquarius::database_param& param)
+	void tag_invoke(aquarius::value_to_tag<aquarius::db_tag>, aquarius::database_param& param)
 	{
 		param.host = "localhost";
 		param.user = "kcwl";
-		param.password = "123456";
+		param.password = "NN0705lwl1217&";
 		param.db = "unittest";
 	}
 }
@@ -65,23 +65,23 @@ BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
 
-	auto& io = aquarius::attach_io_context();
+	auto future = aquarius::co_spawn(aquarius::io_context_pool().get_io_service(), [&] ->aquarius::awaitable<void>
+									 {
+										 auto ec = co_await aquarius::sql_pool().run();
 
-	auto future = aquarius::co_spawn(
-		io,
-		[&] -> aquarius::awaitable<void>
-		{
-			auto res = co_await aquarius::sql_execute(sql_insert(p)());
+										 BOOST_TEST(!ec);
 
-			BOOST_TEST(res);
+										 auto res = co_await aquarius::sql_execute(sql_insert(p)());
 
-			auto result = co_await aquarius::sql_query<personal>(sql_select(personal)());
+										 BOOST_TEST(res);
 
-			BOOST_TEST(result.size() == 1);
-		},
-		aquarius::use_future);
+										 auto result = co_await aquarius::sql_query<personal>(sql_select(personal)());
 
-	io.run();
+										 BOOST_TEST(result.size() == 1);
+									 },aquarius::use_future);
+
+
+	aquarius::io_context_pool().run();
 
 	future.get();
 }
