@@ -135,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;MYSQL_SQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;D:\boost_1_88_0;$(SolutionDir)../3rd/virgo/include;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -152,7 +152,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
@@ -221,7 +220,10 @@
     <ClInclude Include="..\include\aquarius\sql\closure.hpp" />
     <ClInclude Include="..\include\aquarius\sql\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\sql\condition_view.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\connect.hpp" />
     <ClInclude Include="..\include\aquarius\sql\database_param.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\empty.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\mysql.hpp" />
     <ClInclude Include="..\include\aquarius\sql\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\insert_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\limit_view.hpp" />
@@ -229,9 +231,9 @@
     <ClInclude Include="..\include\aquarius\sql\or_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\select_distinct_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\select_view.hpp" />
-    <ClInclude Include="..\include\aquarius\sql\sql_core.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\sql\sql_error.hpp" />
-    <ClInclude Include="..\include\aquarius\sql\sql_pool_core.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\sql\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\where_view.hpp" />
     <ClInclude Include="..\include\aquarius\tag_invoke.hpp" />

@@ -3,6 +3,10 @@
 #include <aquarius/sql.hpp>
 #include <aquarius/tag_invoke.hpp>
 #include <aquarius/detail/tag.hpp>
+#include <aquarius/sql/database_param.hpp>
+#include <aquarius/io_context.hpp>
+#include <aquarius/coroutine.hpp>
+#include <aquarius/sql/sql_connector.hpp>
 
 struct personal
 {
@@ -65,23 +69,31 @@ BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
 
-	auto future = aquarius::co_spawn(aquarius::io_context_pool().get_io_service(), [&] ->aquarius::awaitable<void>
+	aquarius::io_context io{};
+
+	aquarius::database_param db_param{};
+
+	aquarius::value_to<aquarius::db_tag>(db_param);
+
+	aquarius::sql_connector<aquarius::io_context::executor_type> sql_conn(io, db_param);
+
+	auto future = aquarius::co_spawn(io, [&] ->aquarius::awaitable<void>
 									 {
-										 auto ec = co_await aquarius::sql_pool().run();
+										 auto ec = co_await sql_conn.async_connect();
 
 										 BOOST_TEST(!ec);
 
-										 auto res = co_await aquarius::sql_execute(sql_insert(p)());
+										 auto res = co_await sql_conn.async_insert(sql_insert(p)());
 
-										 BOOST_TEST(res);
+										 BOOST_TEST(res != 0);
 
-										 auto result = co_await aquarius::sql_query<personal>(sql_select(personal)());
+										 auto result = co_await sql_conn.async_select<personal>(sql_select(personal)());
 
-										 BOOST_TEST(result.size() == 1);
+										 BOOST_TEST(!result.empty());
 									 },aquarius::use_future);
 
 
-	aquarius::io_context_pool().run();
+	io.run();
 
 	future.get();
 }

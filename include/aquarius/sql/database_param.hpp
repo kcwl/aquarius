@@ -4,7 +4,6 @@
 
 namespace aquarius
 {
-
 	struct database_param
 	{
 		std::string host;
