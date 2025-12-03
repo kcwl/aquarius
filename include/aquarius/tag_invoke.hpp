@@ -6,6 +6,8 @@ namespace aquarius
 	template<typename T>
 	struct value_to_tag {};
 
+	template<typename T, typename P, typename = void>
+	struct has_tag_invokable : std::false_type {};
 
 	inline void tag_invoke(value_to_tag<std::nullopt_t>, std::nullopt_t)
 	{
