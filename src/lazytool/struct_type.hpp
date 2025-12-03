@@ -9,11 +9,7 @@ namespace aquarius
 			none,
 			structure,
 			message,
-			enumture,
-			router,
-			protocol,
-			domin,
-			service,
+			enumture
 		};
 	} // namespace lazytool
 } // namespace aquarius

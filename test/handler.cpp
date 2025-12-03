@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(http_handler)
 
 	auto session = std::make_shared<aquarius::http_server_session>(io);
 
-	auto req_ptr = std::make_shared<new_http_login_request>();
+	auto req_ptr = std::make_shared<new_http_login_http_request>();
 	req_ptr->version(aquarius::virgo::http_version::http1_1);
 	req_ptr->set_field("Content-Type", "json");
 	req_ptr->set_field("Server", "Aquarius 0.10.0");
@@ -42,16 +42,16 @@ BOOST_AUTO_TEST_CASE(http_handler)
 
 BOOST_AUTO_TEST_CASE(tcp_handler)
 {
-	auto h = std::make_shared<ctx_test_tcp_hander>();
+	auto h = std::make_shared<ctx_tcp_test>();
 	aquarius::io_context io{};
 	auto session = std::make_shared<aquarius::tcp_server_session>(io);
-	std::shared_ptr<login_request> req_ptr{};
+	auto req_ptr = std::make_shared<login_tcp_request>();
 
 	aquarius::co_spawn(io, [&]->aquarius::awaitable<void> 
 					   {
 						   co_await h->visit(session, req_ptr);
 
-						   BOOST_TEST(h->name() == "__handler_ctx_test_tcp_hander");
+						   BOOST_TEST(h->name() == "__handler_ctx_tcp_test");
 
 						   BOOST_TEST(h->response().result() == aquarius::error_code{}.value());
 					   }, aquarius::detached);

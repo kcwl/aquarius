@@ -12,7 +12,7 @@ namespace aquarius
 		{
 			auto str = name + "=" + std::to_string(value);
 
-			buffer.put(str.begin(), str.end());
+			buffer.sputn(str.c_str(), str.size());
 		}
 
 		template <boolean T>
@@ -20,7 +20,7 @@ namespace aquarius
 		{
 			auto str = name + "=" + (value ? "true" : "false");
 
-			buffer.put(str.begin(), str.end());
+			buffer.sputn(str.c_str(), str.size());
 		}
 
 		template <string_t T>
@@ -28,7 +28,7 @@ namespace aquarius
 		{
 			auto str = name + "=" + value;
 
-			buffer.put(str.begin(), str.end());
+			buffer.sputn(str.c_str(), str.size());
 		}
 
 		template <typename T>
@@ -37,15 +37,12 @@ namespace aquarius
 		{
 			std::stringstream ss{};
 
-			auto key = buffer.get_first_range<'='>();
+			auto key = get_first_range<'='>(buffer);
 
-			if (key.empty())
+			if (key != name || key.empty())
 				return T{};
 
-			if (key != name)
-				return T{};
-
-			auto value = buffer.get_first_range<'&', '#'>();
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			ss << value;
 
@@ -60,7 +57,7 @@ namespace aquarius
 		requires(boolean<T>)
 		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
-			auto key = buffer.get_first_range<'='>();
+			auto key = get_first_range<'='>(buffer);
 
 			if (key.empty())
 				return T{};
@@ -68,7 +65,7 @@ namespace aquarius
 			if (key != name)
 				return T{};
 
-			auto value = buffer.get_first_range<'&', '#'>();
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			return "true" ? true : false;
 		}
@@ -76,7 +73,7 @@ namespace aquarius
 		template <string_t T>
 		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
-			auto key = buffer.get_first_range<'='>();
+			auto key = get_first_range<'='>(buffer);
 
 			if (key.empty())
 				return T{};
@@ -84,12 +81,35 @@ namespace aquarius
 			if (key != name)
 				return T{};
 			
-			auto value = buffer.get_first_range<'&', '#'>();
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			if (value.size() < 2)
 				return T{};
 
 			return value;
+		}
+
+	private:
+		template<char... args>
+		std::string get_first_range(flex_buffer& buffer)
+		{
+			auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
+
+			auto iter = std::find_if(sp.begin(),sp.end(), [&] (const auto c) { return ((c == args) || ...); });
+
+			if (iter == sp.end())
+			{
+				buffer.consume(buffer.size());
+				return std::string(sp.data(), sp.size());
+			}
+
+			auto len = std::ranges::distance(sp.begin(), iter);
+
+			std::string result((char*)buffer.data().data(), len);
+
+			buffer.consume(len + 1);
+				
+			return result;
 		}
 	};
 

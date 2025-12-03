@@ -12,7 +12,8 @@ BOOST_AUTO_TEST_CASE(errors)
 	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method::head) == "HEAD");
 	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method::put) == "PUT");
 	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method::delete_) == "DELETE");
-	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method(7)) == "UNKNOWN");
+	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method::redirect) == "REDIRECT");
+	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method(-1)) == "UNKNOWN");
 }
 
 BOOST_AUTO_TEST_CASE(method_streams)

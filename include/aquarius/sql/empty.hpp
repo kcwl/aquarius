@@ -1,46 +1,68 @@
 #pragma once
 #include <aquarius/sql/database_param.hpp>
+#include <aquarius/coroutine.hpp>
 
 namespace aquarius
 {
 	namespace sql
 	{
+		template <typename Executor>
+		class empty_impl
+		{
+		public:
+			empty_impl(const Executor&, const database_param&)
+			{}
+			virtual ~empty_impl() = default;
 
-        class empty_impl
-        {
-        public:
-            empty_impl() = default;
-            virtual ~empty_impl() = default;
+		public:
+			template <typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
+			auto async_connect(CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+				-> awaitable<void>
+			{
+				co_return;
+			}
 
-        public:
-            template<typename Executor>
-            void async_connect(const database_param& param, const Executor& executor)
-            {
-                return;
-            }
+			template <typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
+			auto async_execute(std::string_view sql,
+							   CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+				-> awaitable<std::size_t>
+			{
+				co_return 0;
+			}
 
-            template<typename Executor>
-            std::size_t async_execute(std::string_view sql, const Executor& executor)
-            {
-                return 0;
-            }
+			template <typename T, typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
+			auto async_query(std::string_view sql,
+							 CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+				-> awaitable<std::vector<T>>
+			{
+				co_return std::vector<T>{};
+			}
 
-            template<typename Executor>
-            auto async_query(std::string_view sql, const Executor& executor)
-            {
-                return {};
-            }
+			void enable_transaction()
+			{
+				return;
+			}
 
-            void enable_transaction()
-            {
-                return;
-            }
+			void disable_transaction()
+			{
+				return;
+			}
 
-            void disable_transaction()
-            {
-                return;
-            }
-        };
+			error_code begin()
+			{
+				return error_code{};
+			}
 
-	}
-}
+			error_code commit()
+			{
+				return error_code{};
+			}
+
+			error_code rollback()
+			{
+				return error_code{};
+			}
+		};
+
+	} // namespace sql
+} // namespace aquarius

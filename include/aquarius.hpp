@@ -19,8 +19,6 @@
 #include <aquarius/virgo/tcp_response.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
-#include <aquarius/ip/tcp/tcp_handler.hpp>
-#include <aquarius/ip/http/http_handler.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/serialize/http_json_serialize.hpp>
@@ -33,3 +31,5 @@
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/detail/float.hpp>
 #include <aquarius/ip/http_handler.hpp>
+#include <aquarius/ip/tcp/tcp_handler.hpp>
+#include <aquarius/serialize/http_html_serialize.hpp>
