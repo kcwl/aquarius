@@ -316,6 +316,10 @@ namespace aquarius
 		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, virgo::http_fields hf,
 							flex_buffer& buffer)
 		{
+			(void)session_ptr;
+			(void)router;
+			(void)hf;
+			(void)buffer;
 			//return http_router<Session>::get_mutable_instance().invoke(router == "/" ? "root" : router, session_ptr, hf,
 			//														   buffer);
 			return false;

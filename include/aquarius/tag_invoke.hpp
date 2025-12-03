@@ -15,9 +15,6 @@ namespace aquarius
 	}
 
 
-	template<typename T, typename P, typename = void>
-	struct has_tag_invokable : std::false_type {};
-
 	template<typename T, typename P>
 	struct has_tag_invokable<T, P, decltype(tag_invoke(value_to_tag<T>(), std::declval<P&>()))> : std::true_type {};
 
