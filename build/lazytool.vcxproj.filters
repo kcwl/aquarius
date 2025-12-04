@@ -24,10 +24,52 @@
     <ClCompile Include="..\src\lazytool\registor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lazytool\parser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\enumture_struct.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\structure_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\router_field.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\domin_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\protocol_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\message_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\lazytool\file_parse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lazytool\json_tag.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\enumture_generater.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\structure_generater.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\protocol_generater.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\message_generater.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\lazytool\custom_type.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\data_field.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lazytool\service_struct.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lazytool\cpp_generater.cpp">
@@ -47,13 +89,58 @@
     <ClInclude Include="..\src\lazytool\custom_type.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\lazytool\parse_base.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\parser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\lazytool\struct_type.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\enumture_struct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\structure_parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\router_field.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\domin_parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\protocol_parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\message_parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\generator.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\json_tag.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\cpp_generater.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\parse_helper.hpp">
+    <ClInclude Include="..\src\lazytool\enumture_generater.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\structure_generater.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\protocol_generater.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\message_generater.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\data_field.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lazytool\service_struct.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

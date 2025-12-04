@@ -20,19 +20,18 @@ namespace aquarius
 			if (str == "null")
 				return;
 
-			buffer.sputn(str.c_str(), str.size());
+			buffer.put(str.begin(), str.end());
 		}
 
 		template <typename T>
 		T from_datas(flex_buffer& buffer)
 		{
+			if (buffer.empty())
+				return {};
+
 			std::string json;
-			json.resize(buffer.size());
 
-			buffer.sgetn(json.data(),json.size());
-
-			if (json.empty())
-				return T{};
+			buffer.get(json);
 
 			auto value = boost::json::parse(json);
 

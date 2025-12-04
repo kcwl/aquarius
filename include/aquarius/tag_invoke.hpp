@@ -1,5 +1,5 @@
 #pragma once
-#include <concepts>
+#include <aquarius/detail/tag.hpp>
 
 namespace aquarius
 {
@@ -14,7 +14,6 @@ namespace aquarius
 		return;
 	}
 
-
 	template<typename T, typename P>
 	struct has_tag_invokable<T, P, decltype(tag_invoke(value_to_tag<T>(), std::declval<P&>()))> : std::true_type {};
 
@@ -28,5 +27,4 @@ namespace aquarius
 			tag_invoke(value_to_tag<T>(), t);
 		}
 	}
-
 } // namespace aquarius

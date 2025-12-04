@@ -1,24 +1,18 @@
 #pragma once
+#include <map>
 #include <string>
-#include <memory>
+#include <set>
 
 namespace aquarius
 {
-	namespace lazytool
+	namespace layztool
 	{
-		class data_field;
+		std::string find_custom_type(const std::string& target);
 
-		struct custom
-		{
-			bool has_generate_json;
+		void put_custom_type(const std::string& target);
 
-			std::shared_ptr<data_field> data_ptr;
-		};
-		
-		void put_custom_type(const std::string& type, std::shared_ptr<data_field> data_ptr);
+		bool check_type(const std::string& target);
 
-		std::shared_ptr<custom> get_custom_type(const std::string& type);
-
-		void custom_generate_json(const std::string& name);
+		bool check_router_string(const std::string& target);
 	} // namespace layztool
 } // namespace aquarius

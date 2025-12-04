@@ -2,8 +2,6 @@
 #include <array>
 #include <string_view>
 
-using namespace std::string_view_literals;
-
 namespace aquarius
 {
 	namespace detail

@@ -4,6 +4,7 @@
 #include <aquarius/detail/io_service_pool.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/detail/session_store.hpp>
+#include <aquarius/detail/trie.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/ip/tcp/tcp_server_session.hpp>
 #include <string_view>

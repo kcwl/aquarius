@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(binary)
 
 	person p1 = bp.from_datas<person>(buffer);
 
-	BOOST_TEST(p1 == p);
+	BOOST_TEST(p == p1);
 }
 
 BOOST_AUTO_TEST_CASE(integer_limit)

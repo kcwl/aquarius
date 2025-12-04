@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(store)
 
 	aquarius::detail::regist_session(session_ptr);
 
-	//BOOST_TEST(aquarius::detail::session_storage<aquarius::tcp_server_session>() == 1);
+	BOOST_TEST(aquarius::detail::session_storage<aquarius::tcp_server_session>() == 2);
 
 	auto new_session_ptr = aquarius::detail::attach_session<aquarius::tcp_server_session>(uid);
 
