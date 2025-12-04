@@ -6,6 +6,8 @@
 #include <boost/asio/post.hpp>
 #include <boost/asio/experimental/coro.hpp>
 #include <boost/asio/cancel_after.hpp>
+#include <boost/asio/compose.hpp>
+#include <boost/asio/redirect_error.hpp>
 
 namespace aquarius
 {
@@ -24,4 +26,10 @@ namespace aquarius
 	using boost::asio::experimental::coro;
 
 	using boost::asio::cancel_after;
+
+	using boost::asio::use_awaitable_t;
+
+	using boost::asio::redirect_error_t;
+
+	using boost::asio::async_compose;
 } // namespace aquarius
