@@ -11,7 +11,7 @@ namespace aquarius
     template<bool Server>
     class tcp_proc
     {
-        using impl_type = boost::asio::ip::tcp;
+        using impl_type = ip::tcp;
 
     public:
         using socket = impl_type::socket;
@@ -60,7 +60,7 @@ namespace aquarius
                 tcp_router<Session>::get_mutable_instance().invoke(router, session_ptr, buffer);
             }
 
-            if (ec != boost::asio::error::eof)
+            if (ec != error::eof)
             {
                 XLOG_ERROR() << "on read some occur error - " << ec.message();
             }
@@ -72,7 +72,7 @@ namespace aquarius
     template<>
     class tcp_proc<false>
     {
-        using impl_type = boost::asio::ip::tcp;
+        using impl_type = ip::tcp;
 
     public:
         using socket = impl_type::socket;
@@ -121,6 +121,6 @@ namespace aquarius
     };
 
 	template <>
-	struct is_socket_type<boost::asio::ip::tcp::socket> : std::true_type
+	struct is_socket_type<ip::tcp::socket> : std::true_type
 	{};
 } // namespace aquarius

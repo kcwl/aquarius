@@ -5,9 +5,8 @@
 #include <span>
 #include <aquarius/detail/ssl_context.hpp>
 #include <boost/asio/read.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 #include <boost/asio/connect.hpp>
-#include <aquarius/detail/redirect_error.hpp>
 #include <aquarius/adaptor/timer_adaptor.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/streambuf.hpp>
@@ -122,7 +121,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+			socket_.shutdown(socket_base::shutdown_both, ec);
 		}
 
 		void close()
@@ -176,7 +175,7 @@ namespace aquarius
 
 		protocol proto_;
 
-		timer_adaptor<boost::asio::steady_timer> timer_;
+		timer_adaptor<steady_timer> timer_;
 
 		std::weak_ptr<sql_conn_t> sql_conn_ptr_;
 	};

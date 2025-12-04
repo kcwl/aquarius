@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 #include <memory>
 
 namespace aquarius

@@ -1,13 +1,11 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
 #include <aquarius/detail/io_service_pool.hpp>
-#include <aquarius/detail/signal_set.hpp>
 #include <aquarius/detail/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
-#include <aquarius/coroutine.hpp>
-#include <aquarius/detail/redirect_error.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/sql/sql_connector.hpp>
 #include <aquarius/detail/tag.hpp>
 #include <aquarius/tag_invoke.hpp>
@@ -76,7 +74,7 @@ namespace aquarius
 
 				if (!acceptor_.is_open())
 				{
-					ec = boost::asio::error::bad_descriptor;
+					ec = error::bad_descriptor;
 				}
 
 				if (ec)
@@ -162,7 +160,7 @@ namespace aquarius
 
 		detail::io_service_pool io_service_pool_;
 
-		detail::signal_set signals_;
+		signal_set signals_;
 
 		acceptor acceptor_;
 

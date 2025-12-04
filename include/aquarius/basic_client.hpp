@@ -1,16 +1,13 @@
 ﻿#pragma once
 #include <aquarius/detail/config.hpp>
-#include <aquarius/detail/redirect_error.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/io_context.hpp>
 #include <aquarius/logger.hpp>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
-#include <boost/asio/connect.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/ip/http/http_param.hpp>
 
@@ -79,7 +76,7 @@ namespace aquarius
 
                 if (ec)
                 {
-                    if (ec != boost::asio::error::eof)
+                    if (ec != error::eof)
                     {
                         XLOG_ERROR() << "on read some occur error - " << ec.what();
                     }
@@ -111,7 +108,7 @@ namespace aquarius
 
                 if (ec)
                 {
-                    if (ec != boost::asio::error::eof)
+                    if (ec != error::eof)
                     {
                         XLOG_ERROR() << "on read some occur error - " << ec.what();
                     }
@@ -143,7 +140,7 @@ namespace aquarius
 
                 if (ec)
                 {
-                    if (ec != boost::asio::error::eof)
+                    if (ec != error::eof)
                     {
                         XLOG_ERROR() << "on read some occur error - " << ec.what();
                     }

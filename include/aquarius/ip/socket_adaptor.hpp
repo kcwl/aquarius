@@ -3,7 +3,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 
 namespace aquarius
 {
@@ -64,7 +64,7 @@ namespace aquarius
 
 		using resolver = typename Protocol::resolver;
 
-		using ssl_socket = boost::asio::ssl::stream<socket&>;
+		using ssl_socket = ssl::stream<socket&>;
 
 		using ssl_context = detail::ssl_context_factory<Server>;
 
@@ -89,7 +89,7 @@ namespace aquarius
 
 			error_code ec;
 
-			co_await boost::asio::async_connect(socket_.lowest_layer(), endpoints, redirect_error(use_awaitable, ec));
+			co_await async_connect(socket_.lowest_layer(), endpoints, redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{
@@ -99,7 +99,7 @@ namespace aquarius
 			if (ec)
 				co_return ec;
 
-			co_await socket_.async_handshake(boost::asio::ssl::stream_base::client, redirect_error(use_awaitable, ec));
+			co_await socket_.async_handshake(ssl::stream_base::client, redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{
@@ -117,7 +117,7 @@ namespace aquarius
 			{
 				error_code ec;
 
-				co_await socket_.async_handshake(boost::asio::ssl::stream_base::server,
+				co_await socket_.async_handshake(ssl::stream_base::server,
 												 redirect_error(use_awaitable, ec));
 
 				if (ec)

@@ -47,10 +47,10 @@ namespace aquarius
             return service_.async_connect(param_, token, get_executor());
         }
 
-        auto async_connect() -> boost::asio::awaitable<error_code>
+        auto async_connect() -> awaitable<error_code>
         {
             error_code ec;
-            co_await async_connect(boost::asio::redirect_error(boost::asio::detached, ec));
+            co_await async_connect(redirect_error(detached, ec));
 
             co_return ec;
         }

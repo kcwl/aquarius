@@ -1,11 +1,10 @@
 #pragma once
-#include <aquarius/io_context.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 
 namespace aquarius
 {
-	template <typename Timer, typename Executor = boost::asio::any_io_executor>
+	template <typename Timer, typename Executor = any_io_executor>
 	class timer_adaptor
 	{
 	public:

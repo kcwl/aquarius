@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/sql/database_param.hpp>
-#include <aquarius/coroutine.hpp>
+#include <aquarius/asio.hpp>
 
 namespace aquarius
 {
@@ -15,24 +15,24 @@ namespace aquarius
 			virtual ~empty_impl() = default;
 
 		public:
-			template <typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
-			auto async_connect(CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+			template <typename CompleteToken = default_completion_token_t<Executor>>
+			auto async_connect(CompleteToken&& token = default_completion_token_t<Executor>())
 				-> awaitable<void>
 			{
 				co_return;
 			}
 
-			template <typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
+			template <typename CompleteToken = default_completion_token_t<Executor>>
 			auto async_execute(std::string_view sql,
-							   CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+							   CompleteToken&& token = default_completion_token_t<Executor>())
 				-> awaitable<std::size_t>
 			{
 				co_return 0;
 			}
 
-			template <typename T, typename CompleteToken = boost::asio::default_completion_token_t<Executor>>
+			template <typename T, typename CompleteToken = default_completion_token_t<Executor>>
 			auto async_query(std::string_view sql,
-							 CompleteToken&& token = boost::asio::default_completion_token_t<Executor>())
+							 CompleteToken&& token = default_completion_token_t<Executor>())
 				-> awaitable<std::vector<T>>
 			{
 				co_return std::vector<T>{};

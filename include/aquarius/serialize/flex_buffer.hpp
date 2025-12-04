@@ -4,11 +4,11 @@
 #include <string>
 #include <span>
 #include <aquarius/serialize/error.hpp>
-#include <boost/asio/streambuf.hpp>
+#include <aquarius/asio.hpp>
 
 namespace aquarius
 {
-	using flex_buffer = boost::asio::streambuf;
+	using flex_buffer = streambuf;
 
 	class auto_consume
 	{

@@ -19,7 +19,7 @@ namespace aquarius
 	class http_base
 	{
 	public:
-		using base = boost::asio::ip::tcp;
+		using base = ip::tcp;
 
 		constexpr static std::size_t max_http_length = 8192;
 
@@ -236,7 +236,7 @@ namespace aquarius
 				http_router<Session>::get_mutable_instance().invoke(router, session_ptr, hf, buffer);
 			}
 
-			if (ec != boost::asio::error::eof)
+			if (ec != error::eof)
 			{
 				XLOG_ERROR() << "on read some occur error - " << ec.message();
 			}

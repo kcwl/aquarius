@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 
 	BOOST_CHECK(io1.get_executor() == io2.get_executor());
 
-	aquarius::timer_adaptor<boost::asio::steady_timer> timer(io1);
+	aquarius::timer_adaptor<aquarius::steady_timer> timer(io1);
 	timer.async_wait(1s, [&] { std::cout << "timers\n"; });
 
 	std::thread t([&] { pool.run(); });
