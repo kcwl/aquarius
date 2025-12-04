@@ -5,6 +5,7 @@
 #include <list>
 #include <thread>
 #include <vector>
+#include <aquarius/tag_invoke.hpp>
 
 namespace aquarius
 {
@@ -13,7 +14,7 @@ namespace aquarius
 	private:
 		using io_service_ptr_t = std::shared_ptr<io_context>;
 
-		using work_guard = executor_work_guard<io_context::executor_type>;
+		using work_guard = boost::asio::executor_work_guard<io_context::executor_type>;
 
 	public:
 		explicit io_service_pool(std::size_t pool_size)

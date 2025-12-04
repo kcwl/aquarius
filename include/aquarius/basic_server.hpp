@@ -1,14 +1,12 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
-#include <aquarius/detail/io_service_pool.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <aquarius/detail/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/asio.hpp>
 #include <aquarius/sql/sql_connector.hpp>
-#include <aquarius/detail/tag.hpp>
-#include <aquarius/tag_invoke.hpp>
 
 namespace aquarius
 {
@@ -113,7 +111,7 @@ namespace aquarius
 		bool start_sql_pool()
 		{
 			database_param db_param{};
-			value_to<db_tag>(db_param);
+			//value_to<db_tag>(db_param);
 
 			for (std::size_t i = 0; i < io_service_pool_size_; ++i)
 			{
@@ -158,7 +156,7 @@ namespace aquarius
 	protected:
 		std::size_t io_service_pool_size_;
 
-		detail::io_service_pool io_service_pool_;
+		io_service_pool io_service_pool_;
 
 		signal_set signals_;
 

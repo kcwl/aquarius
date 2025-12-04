@@ -1,8 +1,7 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include <aquarius/detail/io_service_pool.hpp>
-#include <aquarius/adaptor/timer_adaptor.hpp>
-#include <boost/asio/steady_timer.hpp>
+#include <aquarius/io_service_pool.hpp>
+#include <aquarius/timer.hpp>
 
 BOOST_AUTO_TEST_SUITE(io_pool)
 
@@ -10,7 +9,7 @@ using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(ctor)
 {
-	aquarius::detail::io_service_pool pool(1);
+	aquarius::io_service_pool pool(1);
 
 	BOOST_TEST(pool.pool_size() == 1);
 
@@ -38,7 +37,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 
 BOOST_AUTO_TEST_CASE(io_service_pools)
 {
-	BOOST_CHECK_THROW(aquarius::detail::io_service_pool pool(0), std::runtime_error);
+	BOOST_CHECK_THROW(aquarius::io_service_pool pool(0), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

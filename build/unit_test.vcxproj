@@ -171,6 +171,7 @@
     <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
+    <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\ip\concept.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_proc.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp" />
