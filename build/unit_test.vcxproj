@@ -151,8 +151,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
-    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
-    <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
@@ -234,6 +232,7 @@
     <ClInclude Include="..\include\aquarius\sql\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\where_view.hpp" />
     <ClInclude Include="..\include\aquarius\tag_invoke.hpp" />
+    <ClInclude Include="..\include\aquarius\timer.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />

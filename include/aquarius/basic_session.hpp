@@ -7,7 +7,7 @@
 #include <boost/asio/read.hpp>
 #include <aquarius/asio.hpp>
 #include <boost/asio/connect.hpp>
-#include <aquarius/adaptor/timer_adaptor.hpp>
+#include <aquarius/timer.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <aquarius/ip/tcp/tcp_error.hpp>

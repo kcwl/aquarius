@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	template <typename Timer, typename Executor = any_io_executor>
+	template <typename Timer, typename Executor = boost::asio::any_io_executor>
 	class timer_adaptor
 	{
 	public:
