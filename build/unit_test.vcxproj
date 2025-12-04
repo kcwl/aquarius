@@ -117,16 +117,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libssl.lib;libcrypto.lib;mysqlclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;MYSQL_SQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;D:\boost_1_88_0;$(SolutionDir)../3rd/virgo/include;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -145,13 +144,14 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libssl.lib;libcrypto.lib;mysqlclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
+    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
@@ -164,7 +164,6 @@
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />
     <ClInclude Include="..\include\aquarius\detail\ssl_context.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\tag.hpp" />
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp" />
     <ClInclude Include="..\include\aquarius\io_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_server.hpp" />
@@ -176,22 +175,22 @@
     <ClInclude Include="..\include\aquarius\detail\redirect_error.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\detail\signal_set.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\trie.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\concept.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\http\http.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\http\http_proc.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_client_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\http\http_param.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\http\http_redirect.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_router.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\make_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_proc.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_error.hpp" />
@@ -208,6 +207,8 @@
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\html.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\http_html_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp" />
@@ -240,7 +241,9 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_status.hpp" />
@@ -250,7 +253,6 @@
     <ClCompile Include="..\test\binary_serialize.cpp" />
     <ClCompile Include="..\test\concat.cpp" />
     <ClCompile Include="..\test\crc.cpp" />
-    <ClCompile Include="..\test\flex_buffer.cpp" />
     <ClCompile Include="..\test\float.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
     <ClCompile Include="..\test\http_method.cpp" />
@@ -260,7 +262,6 @@
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
-    <ClCompile Include="..\test\make_protocol.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
@@ -281,7 +282,6 @@
     <ClCompile Include="..\test\tcp_error.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
     <ClCompile Include="..\test\test.virgo.cpp" />
-    <ClCompile Include="..\test\trie.cpp" />
     <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>

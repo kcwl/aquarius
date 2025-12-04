@@ -1,12 +1,17 @@
 #pragma once
 #include <aquarius/sql/database_param.hpp>
 #include <aquarius/error_code.hpp>
-#include <mysql.h>
 #include <aquarius/sql/sql_error.hpp>
 #include <aquarius/coroutine.hpp>
-#include <aquarius/sql/mysql.hpp>
+
 #include <expected>
 #include <aquarius/sql/transaction.hpp>
+
+#if defined(MYSQL_SQL)
+#include <aquarius/sql/mysql.hpp>
+#else
+#include <aquarius/sql/empty.hpp>
+#endif
 
 namespace aquarius
 {
@@ -16,7 +21,7 @@ namespace aquarius
 #if defined(MYSQL_SQL)
 		using service_impl = sql::mysql<Executor>;
 #else
-		using service_impl = empty_impl;
+		using service_impl = sql::empty_impl<Executor>;
 #endif
 
 	public:

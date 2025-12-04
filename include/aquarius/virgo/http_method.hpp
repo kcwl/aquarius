@@ -16,7 +16,8 @@ namespace aquarius
 			options,
 			head,
 			put,
-			delete_
+			delete_,
+			redirect
 		};
 
 		inline std::ostream& operator<<(std::ostream& os, http_method m)
@@ -42,11 +43,33 @@ namespace aquarius
 				return "PUT"sv;
 			case http_method::delete_:
 				return "DELETE"sv;
+			case http_method::redirect:
+				return "REDIRECT"sv;
 			default:
 				break;
 			}
 
 			return "UNKNOWN"sv;
+		}
+
+		inline http_method from_string_method(std::string_view s)
+		{
+			if (s == "GET"sv)
+				return http_method::get;
+			else if (s == "POST"sv)
+				return http_method::post;
+			else if (s == "OPTIONS"sv)
+				return http_method::options;
+			else if (s == "HEAD"sv)
+				return http_method::head;
+			else if (s == "PUT"sv)
+				return http_method::put;
+			else if (s == "DELETE"sv)
+				return http_method::delete_;
+			else if (s == "REDIRECT"sv)
+				return http_method::redirect;
+
+			return http_method::none;
 		}
 
 	} // namespace virgo

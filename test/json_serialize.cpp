@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(json)
 
 		person p2 = jp.from_datas<person>(buffer);
 
-		BOOST_TEST(p == p2);
+		BOOST_TEST(p2 == p);
 	}
 }
 BOOST_AUTO_TEST_SUITE_END()

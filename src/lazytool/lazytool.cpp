@@ -5,10 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <filesystem>
-#include "enumture_generater.h"
-#include "message_generater.h"
-#include "structure_generater.h"
-#include "protocol_generater.h"
+#include "cpp_generater.h"
 
 using namespace aquarius::lazytool;
 
@@ -140,8 +137,6 @@ int main(int argc, char** args)
 
 		ofs_path = ofs_path.append(files.filename().string());
 
-		
-
 		if (output_type == "cpp")
 		{
 			std::ofstream ofs_h(ofs_path.string() + ".h");
@@ -153,37 +148,134 @@ int main(int argc, char** args)
 
 			ofs_cpp << "#include \"" << files.filename().string() + ".h\"\n";
 
-			for (auto& k : pr.keywords_)
+			for (auto& k : pr.fields_)
 			{
-				if (k->struct_type_ == struct_type::enumture)
+				ofs_h << std::endl;
+
+				if (k->type() == struct_type::message)
 				{
-					cpp::enumture_generate().visit(k, ofs_h, ofs_cpp);
+					cpp::message_field_generator(ofs_h, std::static_pointer_cast<message_field>(k)).generate();
 				}
-				else if (k->struct_type_ == struct_type::structure)
+				else
 				{
-					cpp::structure_generate().visit(k, ofs_h, ofs_cpp);
-				}
-				else if (k->struct_type_ == struct_type::message)
-				{
-					cpp::message_generate().visit(k, ofs_h, ofs_cpp);
-				}
-				else if (k->struct_type_ == struct_type::protocol)
-				{
-					cpp::protocol_generate().visit(k, ofs_h, ofs_cpp);
+					cpp::data_field_generator(ofs_h, k).generate();
 				}
 			}
 
-			for (auto& k : pr.keywords_)
+			ofs_h << std::endl;
+
+			for (auto& k : pr.fields_)
 			{
-				if (k->struct_type_ == struct_type::message)
+				if (k->type() == struct_type::structure)
 				{
-					cpp::message_generate().defined(k, ofs_h);
+					cpp::data_field_generator(ofs_h, k, false).generate_stream_define();
 				}
-				else if (k->struct_type_ == struct_type::protocol)
+				else if (k->type() == struct_type::message)
 				{
-					cpp::protocol_generate().defined(k, ofs_h);
+					auto msg = std::static_pointer_cast<message_field>(k);
+					if (!msg)
+						continue;
+
+					cpp::data_field_generator(ofs_h, msg->request(), false).generate_stream_define();
+
+					cpp::data_field_generator(ofs_h, msg->response(), false).generate_stream_define();
 				}
-				
+			}
+
+			ofs_h << std::endl;
+
+			for (auto& k : pr.fields_)
+			{
+				if (k->type() == struct_type::message)
+				{
+					auto msg = std::static_pointer_cast<message_field>(k);
+
+					if (!msg)
+						continue;
+
+					cpp::data_field_generator(ofs_h, k, false).generate_json_from_define(msg->request());
+
+					cpp::data_field_generator(ofs_h, k, false).generate_json_to_define(msg->request());
+
+					cpp::data_field_generator(ofs_h, k, false).generate_json_from_define(msg->response());
+
+					cpp::data_field_generator(ofs_h, k, false).generate_json_to_define(msg->response());
+				}
+				else if (k->type() == struct_type::structure)
+				{
+					cpp::data_field_generator(ofs_h, k, false).generate_json_from_define(k);
+					cpp::data_field_generator(ofs_h, k, false).generate_json_to_define(k);
+				}
+			}
+
+			ofs_h << std::endl;
+
+			for (auto& k : pr.fields_)
+			{
+				if (k->type() == struct_type::message)
+				{
+					cpp::message_field_generator(ofs_h, std::static_pointer_cast<message_field>(k))
+						.generate_protocol_alias_define();
+				}
+			}
+
+			for (auto& k : pr.fields_)
+			{
+				ofs_cpp << std::endl;
+
+				if (k->type() == struct_type::message)
+				{
+					cpp::message_field_generator(ofs_cpp, std::static_pointer_cast<message_field>(k))
+						.generate_protocol_src();
+				}
+				else if (k->type() == struct_type::structure)
+				{
+					cpp::data_field_generator gen(ofs_cpp, k, false);
+					gen.generate_equal_src();
+				}
+			}
+
+			for (auto& k : pr.fields_)
+			{
+				if (k->type() == struct_type::message)
+				{
+					auto msg = std::static_pointer_cast<message_field>(k);
+
+					if (!msg)
+						continue;
+
+					cpp::data_field_generator(ofs_cpp, k, false).generate_from_tag(msg->request());
+
+					cpp::data_field_generator(ofs_cpp, k, false).generate_to_tag(msg->request());
+
+					cpp::data_field_generator(ofs_cpp, k, false).generate_from_tag(msg->response());
+
+					cpp::data_field_generator(ofs_cpp, k, false).generate_to_tag(msg->response());
+				}
+				else if (k->type() == struct_type::structure)
+				{
+					cpp::data_field_generator(ofs_cpp, k, false).generate_from_tag(k);
+
+					cpp::data_field_generator(ofs_cpp, k, false).generate_to_tag(k);
+				}
+			}
+
+			for (auto& k : pr.fields_)
+			{
+				if (k->type() == struct_type::structure)
+				{
+					cpp::data_field_generator(ofs_cpp, k, false).generate_stream_src();
+				}
+				else if (k->type() == struct_type::message)
+				{
+					auto msg = std::static_pointer_cast<message_field>(k);
+					if (!msg)
+						continue;
+
+					cpp::data_field_generator(ofs_cpp, msg->request(), false).generate_stream_src();
+
+					cpp::data_field_generator(ofs_cpp, msg->response(), false).generate_stream_src();
+				}
 			}
 		}
 	}

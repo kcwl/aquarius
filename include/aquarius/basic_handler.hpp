@@ -22,8 +22,21 @@ namespace aquarius
 		virtual ~basic_handler() = default;
 
 	public:
-		virtual auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<request_t> request_ptr)
-			-> awaitable<error_code> = 0;
+		auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<request_t> request_ptr, bool has_error = false)
+			-> awaitable<void>
+		{
+			this->session_ptr_ = sessoin_ptr;
+			this->request_ptr_ = request_ptr;
+
+			error_code ec{};
+
+			if (!has_error)
+			{
+				ec = co_await this->handle();
+			}
+
+			co_await send_response(ec);
+		}
 
 		std::string name() const
 		{
@@ -43,9 +56,28 @@ namespace aquarius
 	protected:
 		virtual auto handle() -> awaitable<error_code> = 0;
 
+		virtual void make_response()
+		{
+			return;
+		}
+
 		auto session()
 		{
 			return session_ptr_.lock();
+		}
+
+	private:
+		virtual auto send_response(error_code ec) -> awaitable<void>
+		{
+			response().result(ec.value());
+
+			flex_buffer buffer{};
+
+			make_response();
+
+			response().commit(buffer);
+
+			co_await this->session()->async_send(buffer);
 		}
 
 	protected:

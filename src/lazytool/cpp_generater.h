@@ -1,5 +1,7 @@
 #pragma once
-#include "generator.hpp"
+#include <fstream>
+#include "file_parse.h"
+#include <memory>
 
 namespace aquarius
 {
@@ -7,88 +9,112 @@ namespace aquarius
 	{
 		namespace cpp
 		{
-			class generater : public generator
+			class data_field_generator
 			{
 			public:
-				constexpr static auto CRLF = "\n";
-
-				constexpr static auto TWO_CRLF = "\n\n";
+				enum json_type
+				{
+					integer,
+					string,
+					array,
+					object
+				};
 			public:
-				explicit generater() = default;
-				~generater() = default;
+				data_field_generator(std::ofstream& ofs, std::shared_ptr<data_field> data_field_ptr, bool has_end = true);
+
+				~data_field_generator();
+
+			public:
+				void generate();
+
+				void generate_header();
+
+				void generate_member_variable_define(char end);
+
+				void scope_public();
+				void scope_private();
+				void scope_protected();
+
+				void generate_equal_define();
+
+				void generate_equal_src();
+
+				void generate_stream_define();
+
+				void generate_stream_src();
+
+				void generate_to_tag(std::shared_ptr<data_field> data_ptr);
+
+				void generate_from_tag(std::shared_ptr<data_field> data_ptr);
+
+				void generate_json_from_define(std::shared_ptr<data_field> data_ptr);
+
+				void generate_json_to_define(std::shared_ptr<data_field> data_ptr);
+
+			private:
+				bool generator_array_stream(const std::string& type, const std::string& name);
+
+				void generator_normal_stream(const std::string& name);
+
+				bool generate_to_int(const std::string& type, const std::string& value);
+				bool generate_to_string(const std::string& type, const std::string& value);
+				bool generate_to_array(const std::string& type, const std::string& value);
+				bool generate_to_object(const std::string& type, const std::string& value);
+
+				bool generate_from_int(const std::string& type, const std::string& value);
+				bool generate_from_string(const std::string& type, const std::string& value);
+				bool generate_from_array(const std::string& type, const std::string& value);
+				bool generate_from_object(const std::string& type, const std::string& value);
+
+				json_type check_type(const std::string& type);
 
 			protected:
-				bool generator_array_stream(std::ofstream& ofs, const std::string& type, const std::string& name);
+				std::ofstream& ofs_;
 
-				void generator_normal_stream(std::ofstream& ofs, const std::string& name);
+			private:
+				std::shared_ptr<data_field> data_field_ptr_;
 
-				template<typename T>
-					//requires std::is_base_of_v<parser, T>
-				void generate_operator_equal_define(std::ofstream& ofs, std::shared_ptr<T> parser)
-				{
-					ofs << "\n";
-					ofs << "bool operator==(const " << parser->name() << "& lhs, const " << parser->name() << "& rhs);\n";
-				}
+				bool has_end_;
+			};
 
-				template <typename T>
-					//requires std::is_base_of_v<parser, T>
-				void generate_operator_equal_src(std::ofstream& ofs, std::shared_ptr<T> parser)
-				{
-					ofs << "\n";
-					ofs << "bool operator==(const " << parser->name() << "& lhs, const " << parser->name() << "& rhs)\n";
-					ofs << "{\n";
-					ofs << "\treturn ";
-					for (auto& [_, name] : parser->fields())
-					{
-						ofs << "lhs." << name << " == rhs." << name << " && ";
-					}
-
-					ofs.seekp(-4, std::ios::cur);
-					ofs << ";\n";
-					ofs << "}\n\n";
-				}
-
-				template <typename T>
-					//requires std::is_base_of_v<parser, T>
-				void generate_operator_stream_define(std::ofstream& ofs, std::shared_ptr<T> parser)
-				{
-					ofs << "\n";
-
-					ofs << "std::ostream& operator<<(std::ostream& os, const " << parser->name() << "& other);\n";
-				}
-				template <typename T>
-					//requires std::is_base_of_v<parser, T>
-				void generate_operator_stream_src(std::ofstream& ofs, std::shared_ptr<T> parser)
-				{
-					ofs << "\n";
-
-					ofs << "std::ostream& operator<<(std::ostream& os, const " << parser->name() << "& other)\n";
-					ofs << "{\n";
-					ofs << "\tos ";
-
-					for (auto& [type, name] : parser->fields())
-					{
-						ofs << "<< ";
-
-						if (generator_array_stream(ofs, type, name))
-							continue;
-
-						generator_normal_stream(ofs, name);
-					}
-
-					//ofs.seekp(-4, std::ios::cur);
-
-					ofs << ";\n";
-
-					ofs << "\treturn os;\n";
-
-					ofs << "}\n";
-				}
+			class message_field_generator
+			{
+			
+			public:
+				message_field_generator(std::ofstream& ofs, std::shared_ptr<message_field> message_field_ptr);
 
 			public:
-				std::string file_name_;
+				void generate();
 
-				std::string output_path_;
+				void generate_protocol_define(std::shared_ptr<data_field> data_field_ptr, const std::string& method, bool has_response = false);
+
+				void generate_protocol_alias_define();
+
+				void generate_protocol_src();
+
+			private:
+				void generate_inheritance_serialize_define(const std::string& method, bool has_response = false);
+
+				void generate_serialize_method_define();
+
+				void generate_construction_define(const std::string& name, bool has_member);
+
+				void generate_proto_request_define();
+
+				void generate_proto_response_define();
+
+				void generate_construction_src(std::shared_ptr<data_field> data_ptr, bool has_member);
+
+				void generate_serialize_method_src(std::shared_ptr<data_field> data_ptr, bool has_request = false);
+
+			private:
+				std::shared_ptr<message_field> message_field_ptr_;
+
+				std::ofstream& ofs_;
+
+				std::list<std::string> json_to_wait_;
+
+				std::list<std::string> json_from_wait_;
 			};
 		} // namespace cpp
 	} // namespace lazytool
