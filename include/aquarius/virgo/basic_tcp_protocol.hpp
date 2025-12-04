@@ -5,11 +5,13 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
-		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+		template <bool Request, detail::string_literal Router, typename Header, typename Body, typename Allocator>
+		class basic_tcp_protocol : public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
-			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
+
+			using base::router;
 
 			using typename base::header_t;
 
@@ -26,14 +28,13 @@ namespace aquarius
 
 			virtual ~basic_tcp_protocol() = default;
 
-			basic_tcp_protocol(const basic_tcp_protocol&) = default;
-			basic_tcp_protocol& operator=(const basic_tcp_protocol&) = default;
-
 			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
 				: base(std::move(other))
 				, timestamp_(std::exchange(timestamp_, 0))
 				, version_(std::exchange(version_, 0))
-			{}
+			{
+
+			}
 
 			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
 			{
@@ -51,7 +52,8 @@ namespace aquarius
 		public:
 			bool operator==(const basic_tcp_protocol& other) const
 			{
-				return base::operator==(other) && timestamp_ == other.timestamp_ && version_ == other.version_;
+				return base::operator==(other) && timestamp_ == other.timestamp_ &&
+					   version_ == other.version_;
 			}
 
 			std::ostream& operator<<(std::ostream& os) const
@@ -90,12 +92,14 @@ namespace aquarius
 			int32_t version_;
 		};
 
-		template <typename Header, typename Body, typename Allocator>
-		class basic_tcp_protocol<false, Header, Body, Allocator>
-			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+		template <detail::string_literal Router, typename Header, typename Body, typename Allocator>
+		class basic_tcp_protocol<false, Router, Header, Body, Allocator>
+			: public basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
-			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+			using base = basic_protocol<Router, Header, std::add_pointer_t<Body>, Allocator>;
+
+			using base::router;
 
 			using typename base::header_t;
 
@@ -109,18 +113,14 @@ namespace aquarius
 				, result_()
 			{}
 
-			virtual ~basic_tcp_protocol() = default;
-
-			basic_tcp_protocol(const basic_tcp_protocol&) = default;
-
-			basic_tcp_protocol& operator=(const basic_tcp_protocol&) = default;
-
 			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
 				: base(std::move(other))
 				, timestamp_(std::exchange(other.timestamp_, 0))
 				, version_(std::exchange(other.version_, 0))
 				, result_(std::exchange(other.result_, 0))
-			{}
+			{
+
+			}
 
 			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
 			{
@@ -139,8 +139,8 @@ namespace aquarius
 		public:
 			bool operator==(const basic_tcp_protocol& other) const
 			{
-				return base::operator==(other) && timestamp_ == other.timestamp_ && version_ == other.version_ &&
-					   result_ == other.result_;
+				return base::operator==(other) && timestamp_ == other.timestamp_ &&
+						   version_ == other.version_ && result_ == other.result_;
 			}
 
 			std::ostream& operator<<(std::ostream& os) const
@@ -190,6 +190,5 @@ namespace aquarius
 
 			int32_t result_;
 		};
-
 	} // namespace virgo
 } // namespace aquarius

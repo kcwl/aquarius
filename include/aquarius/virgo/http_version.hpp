@@ -13,8 +13,7 @@ namespace aquarius
 			http1_0,
 			http1_1,
 			http2,
-			http3,
-			unknown
+			http3
 		};
 
 		inline std::ostream& operator<<(std::ostream& os, http_version v)
@@ -24,7 +23,7 @@ namespace aquarius
 			return os;
 		}
 
-		inline std::string_view from_string_version(http_version v)
+		inline std::string_view from_version_string(http_version v)
 		{
 			switch (v)
 			{
@@ -40,24 +39,7 @@ namespace aquarius
 				break;
 			}
 
-			return "Unknown";
-		}
-
-		inline http_version from_version_string(std::string_view s)
-		{
-			if (s.back() == '\n')
-				s.remove_suffix(2);
-
-			if (s == "HTTP/1.0")
-				return http_version::http1_0;
-			else if (s == "HTTP/1.1")
-				return http_version::http1_1;
-			else if (s == "HTTP/2")
-				return http_version::http2;
-			else if (s == "HTTP/3")
-				return http_version::http3;
-
-			return http_version::unknown;
+			return {};
 		}
 	} // namespace http
 } // namespace virgo

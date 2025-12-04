@@ -19,11 +19,11 @@
 
 namespace aquarius
 {
-	template <bool Server, template<bool> typename Protocol>
+	template <bool Server, typename Protocol>
 	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol>>
 	{
 	public:
-		using protocol = Protocol<Server>;
+		using protocol = Protocol;
 
 		constexpr static auto is_server = Server;
 
@@ -89,12 +89,20 @@ namespace aquarius
 		{
 			error_code ec;
 
-			auto mutable_buffer = buffer.prepare(length);
+			if (length > buffer.remain())
+			{
+				co_return ec = tcp_error::no_space;
+			}
 
-			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
+			co_return co_await async_read(buffer.wdata(), length);
+		}
+
+		auto async_read(uint8_t* begin, std::size_t length) -> awaitable<error_code>
+		{
+			error_code ec;
+
+			co_await boost::asio::async_read(socket_adaptor_.get_implement(), boost::asio::buffer(begin, length),
 											 redirect_error(use_awaitable, ec));
-
-			buffer.commit(length);
 
 			co_return ec;
 		}
@@ -103,17 +111,25 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buffer, delm,
+			boost::asio::streambuf buf{};
+
+			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buf, delm,
 												   redirect_error(use_awaitable, ec));
+
+			if (!ec)
+			{
+				buffer.put((uint8_t*)buf.data().data(), buf.size());
+			}
 
 			co_return ec;
 		}
 
-		auto async_send(const flex_buffer& buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 
-			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), redirect_error(use_awaitable, ec));
+			co_await socket_adaptor_.get_implement().async_write_some(
+				boost::asio::buffer(buffer.rdata(), buffer.active()), redirect_error(use_awaitable, ec));
 
 			co_return ec;
 		}
@@ -170,7 +186,7 @@ namespace aquarius
 	private:
 		socket socket_;
 
-		socket_adaptor<Server, protocol> socket_adaptor_;
+		socket_adaptor<Server, Protocol> socket_adaptor_;
 
 		std::size_t uuid_;
 
@@ -181,7 +197,7 @@ namespace aquarius
 		std::weak_ptr<sql_conn_t> sql_conn_ptr_;
 	};
 
-	template <bool Server, template<bool> typename Protocol>
+	template <bool Server, typename Protocol>
 	struct is_session_type<basic_session<Server, Protocol>> : std::true_type
 	{};
 } // namespace aquarius

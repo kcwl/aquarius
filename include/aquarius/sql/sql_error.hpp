@@ -1,5 +1,4 @@
 #pragma once
-#ifdef MYSQL_SQL
 #include <errmsg.h>
 #include <aquarius/error_code.hpp>
 #include <type_traits>
@@ -96,4 +95,3 @@ namespace std
     template<>
     struct is_error_code_enum<aquarius::db_error> : std::true_type {};
 }
-#endif

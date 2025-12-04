@@ -8,51 +8,22 @@ namespace aquarius
 	namespace virgo
 	{
 
-		template <typename Header, typename Body>
-		class tcp_response : public basic_tcp_protocol<false, Header, Body>
+		template <detail::string_literal Router, typename Header, typename Body>
+		class tcp_response : public basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>
 		{
 		public:
-			using base = basic_tcp_protocol<false, Header, Body>;
+			using base = basic_tcp_protocol<false, Router, Header, Body, std::allocator<Body>>;
+
+			using base::router;
 
 			using base::has_request;
 
+			using typename base::header_t;
+
+			using typename base::body_t;
+
 		public:
-			tcp_response()
-				: base()
-				, parse_()
-			{}
-
-			virtual ~tcp_response() = default;
-
-			tcp_response(const tcp_response& other)
-				: base(other)
-				, parse_(other.parse_)
-			{}
-
-			tcp_response& operator=(const tcp_response& other)
-			{
-				if (this != std::addressof(other))
-				{
-					base::operator=(other);
-					parse_ = other.parse_;
-				}
-				return *this;
-			}
-
-			tcp_response(tcp_response&& other) noexcept
-				: base(std::move(other))
-				, parse_(std::exchange(other.parse_, {}))
-			{}
-
-			tcp_response& operator=(tcp_response&& other) noexcept
-			{
-				if (this != std::addressof(other))
-				{
-					base::operator=(std::move(other));
-					parse_ = std::exchange(other.parse_, {});
-				}
-				return *this;
-			}
+			tcp_response() = default;
 
 		public:
 			bool operator==(const tcp_response& other) const
@@ -68,34 +39,26 @@ namespace aquarius
 		public:
 			bool commit(flex_buffer& buffer)
 			{
-				flex_buffer buf{};
+				body_parse_.to_datas(this->result(), buffer);
 
-				parse_.to_datas(this->result(), buf);
+				body_parse_.to_datas(this->timestamp(), buffer);
 
-				parse_.to_datas(this->timestamp(), buf);
+				body_parse_.to_datas(this->version(), buffer);
 
-				parse_.to_datas(this->version(), buf);
+				this->header().serialize(buffer);
 
-				this->header().serialize(buf);
-
-				this->body().serialize(buf);
-
-				auto size = static_cast<uint32_t>(buf.size());
-
-				buffer.sputn((char*)&size, sizeof(uint32_t));
-
-				buffer.sputn((char*)buf.data().data(), buf.data().size());
+				this->body().serialize(buffer);
 
 				return true;
 			}
 
 			void consume(flex_buffer& buffer)
 			{
-				this->result(parse_.from_datas<int32_t>(buffer));
+				this->result(body_parse_.from_datas<int32_t>(buffer));
 
-				this->timestamp(parse_.from_datas<int64_t>(buffer));
+				this->timestamp(body_parse_.from_datas<int64_t>(buffer));
 
-				this->version(parse_.from_datas<int32_t>(buffer));
+				this->version(body_parse_.from_datas<int32_t>(buffer));
 
 				this->header().deserialize(buffer);
 
@@ -103,11 +66,11 @@ namespace aquarius
 			}
 
 		private:
-			binary_parse parse_;
+			binary_parse body_parse_;
 		};
 
-		template <typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const tcp_response<Header, Body>& req)
+		template <detail::string_literal Router, typename Header, typename Body>
+		std::ostream& operator<<(std::ostream& os, const tcp_response<Router, Header, Body>& req)
 		{
 			req << os;
 
@@ -115,7 +78,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <typename Header, typename Body>
-	struct is_message_type<virgo::tcp_response<Header, Body>> : std::true_type
+	template <detail::string_literal Router, typename Header, typename Body>
+	struct is_message_type<virgo::tcp_response<Router, Header, Body>> : std::true_type
 	{};
 } // namespace aquarius

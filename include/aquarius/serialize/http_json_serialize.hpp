@@ -9,11 +9,5 @@ namespace aquarius
 	public:
 		http_json_serialize() = default;
 		virtual ~http_json_serialize() = default;
-
-		http_json_serialize(const http_json_serialize&) = default;
-		http_json_serialize& operator=(const http_json_serialize&) = default;
-
-		http_json_serialize(http_json_serialize&&) = default;
-		http_json_serialize& operator=(http_json_serialize&&) = default;
 	};
 } // namespace aquarius

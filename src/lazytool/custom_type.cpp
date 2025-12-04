@@ -1,10 +1,8 @@
 #include "custom_type.h"
-#include <map>
-#include "file_parse.h"
 
 namespace
 {
-	static std::map<std::string, std::shared_ptr<aquarius::lazytool::data_field>> custom_type;
+	static std::set<std::string> custom_type;
 
 	constexpr static auto router_list = { "tcp-key", "http-str" };
 
@@ -49,33 +47,28 @@ namespace aquarius
 {
 	namespace lazytool
 	{
-		static std::map<std::string, std::shared_ptr<custom>> custom_type;
-		void put_custom_type(const std::string& type, std::shared_ptr<data_field> data_ptr)
+		std::string find_custom_type(const std::string& target)
 		{
-			if (custom_type.find(type) != custom_type.end())
-				return;
-
-			auto ptr = std::make_shared<custom>(false, data_ptr);
-
-			custom_type.emplace(type, ptr);
-		}
-
-		std::shared_ptr<custom> get_custom_type(const std::string& type)
-		{
-			auto iter = custom_type.find(type);
+			auto iter = custom_type.find(target);
 			if (iter == custom_type.end())
-				return nullptr;
-			return iter->second;
+				return {};
+
+			return *iter;
 		}
 
-		void custom_generate_json(const std::string& name)
+		void put_custom_type(const std::string& target)
 		{
-			auto custom = get_custom_type(name);
+			custom_type.insert(target);
+		}
 
-			if (!custom)
-				return;
+		bool check_type(const std::string& target)
+		{
+			return !from_type_string(target).empty() || !find_custom_type(target).empty();
+		}
 
-			custom->has_generate_json = true;
+		bool check_router_string(const std::string& target)
+		{
+			return std::find(router_list.begin(), router_list.end(), target) != router_list.end();
 		}
 	} // namespace lazytool
 } // namespace aquarius
