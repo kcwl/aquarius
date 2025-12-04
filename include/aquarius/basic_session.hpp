@@ -8,6 +8,7 @@
 #include <aquarius/coroutine.hpp>
 #include <boost/asio/connect.hpp>
 #include <aquarius/detail/redirect_error.hpp>
+#include <aquarius/adaptor/sql_adaptor.hpp>
 #include <aquarius/adaptor/timer_adaptor.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/streambuf.hpp>
@@ -15,7 +16,6 @@
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/socket_adaptor.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <aquarius/sql/sql_connector.hpp>
 
 namespace aquarius
 {
@@ -35,16 +35,13 @@ namespace aquarius
 
 		using resolver = protocol::resolver;
 
-		using executor_type = typename socket::executor_type;
-
-		using sql_conn_t = sql_connector<executor_type>;
-
 	public:
 		explicit basic_session(socket sock)
 			: socket_(std::move(sock))
 			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
 			, proto_()
+			, sql_(socket_.get_executor())
 			, timer_(socket_.get_executor())
 		{}
 
@@ -178,9 +175,9 @@ namespace aquarius
 			co_return co_await proto_.template query<Response>(this->shared_from_this());
 		}
 
-		void attach_sql(std::shared_ptr<sql_conn_t> sql_ptr)
+		auto sql()
 		{
-			sql_conn_ptr_ = sql_ptr;
+			return sql_;
 		}
 
 	private:
@@ -192,9 +189,9 @@ namespace aquarius
 
 		protocol proto_;
 
-		timer_adaptor<boost::asio::steady_timer> timer_;
+		sql_adaptor<Server> sql_;
 
-		std::weak_ptr<sql_conn_t> sql_conn_ptr_;
+		timer_adaptor<boost::asio::steady_timer> timer_;
 	};
 
 	template <bool Server, typename Protocol>

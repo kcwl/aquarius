@@ -111,6 +111,9 @@
     <ClInclude Include="..\include\aquarius\io_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\adaptor\sql_adaptor.hpp">
+      <Filter>include\aquarius\adaptor</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\aquarius\adaptor\timer_adaptor.hpp">
       <Filter>include\aquarius\adaptor</Filter>
     </ClInclude>
@@ -317,33 +320,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http_handler.hpp">
       <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\sql_connector.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\tag.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\database_param.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\sql_error.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tag_invoke.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\mysql.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\transaction.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\empty.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\connect.hpp">
-      <Filter>include\aquarius\sql</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

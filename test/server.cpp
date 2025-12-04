@@ -3,8 +3,6 @@
 #include <aquarius/ip/tcp/tcp_server.hpp>
 #include <csignal>
 
-using namespace std::chrono_literals;
-
 BOOST_AUTO_TEST_SUITE(server)
 
 BOOST_AUTO_TEST_CASE(signals)
