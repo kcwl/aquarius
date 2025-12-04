@@ -45,7 +45,7 @@ namespace aquarius
 
 		auto session()
 		{
-			return session_ptr_.lock();
+			return session_ptr_;
 		}
 
 	protected:
@@ -53,7 +53,7 @@ namespace aquarius
 
 		response_t response_;
 
-		std::weak_ptr<Session> session_ptr_;
+		std::shared_ptr<Session> session_ptr_;
 
 	private:
 		std::string name_;
