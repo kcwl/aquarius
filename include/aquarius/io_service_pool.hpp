@@ -88,6 +88,11 @@ namespace aquarius
 			return io_service;
 		}
 
+		std::size_t size() const
+		{
+			return pool_size_;
+		}
+
 	private:
 		io_service_pool(const io_service_pool&) = delete;
 

@@ -152,6 +152,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\pool_task_traits.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\basic_router.hpp" />
@@ -225,6 +227,7 @@
     <ClInclude Include="..\include\aquarius\sql\connect.hpp" />
     <ClInclude Include="..\include\aquarius\sql\database_param.hpp" />
     <ClInclude Include="..\include\aquarius\sql\empty.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\make_sql_task.hpp" />
     <ClInclude Include="..\include\aquarius\sql\mysql.hpp" />
     <ClInclude Include="..\include\aquarius\sql\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\insert_view.hpp" />
@@ -235,6 +238,8 @@
     <ClInclude Include="..\include\aquarius\sql\select_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\sql\sql_error.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\sql_pool.hpp" />
+    <ClInclude Include="..\include\aquarius\sql\task.hpp" />
     <ClInclude Include="..\include\aquarius\sql\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\sql\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\where_view.hpp" />

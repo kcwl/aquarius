@@ -15,7 +15,7 @@
 
 namespace aquarius
 {
-	template <typename Executor>
+	template <typename Executor = any_io_executor>
 	class sql_connector
 	{
 #if defined(MYSQL_SQL)
@@ -30,7 +30,9 @@ namespace aquarius
 			, param_(param)
 			, service_(executor_, param_)
 			, completed_(false)
-		{}
+		{
+			co_spawn(executor_, async_connect(), detached);
+		}
 
 		template <typename Context>
 		sql_connector(Context& context, const database_param& param)
@@ -53,33 +55,31 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_select(std::string_view sql) -> awaitable<std::vector<T>>
+		auto async_query(std::string_view sql) -> awaitable<T>
 		{
 			error_code ec{};
 
-			auto result =  co_await service_.async_query<T>(sql, redirect_error(use_awaitable, ec));
+			auto result =  co_await service_.async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
 
 			if (ec)
-				co_return std::vector<T>{};
+				co_return T{};
 
 			completed_ = !ec;
 
 			co_return result;
 		}
 
-		auto async_insert(std::string_view sql) ->awaitable<std::size_t>
+		auto async_execute(std::string_view sql) -> awaitable<std::size_t>
 		{
-			co_return co_await async_execute(sql);
-		}
+			sql::trans_guard lk(this);
 
-		auto async_update(std::string_view sql) -> awaitable<std::size_t>
-		{
-			co_return co_await async_execute(sql);
-		}
+			error_code ec{};
 
-		auto async_delete(std::string_view sql) -> awaitable<std::size_t>
-		{
-			co_return co_await async_execute(sql);
+			auto result = co_await service_.async_execute(sql, redirect_error(use_awaitable, ec));
+
+			completed_ = !ec;
+
+			co_return ec ? 0 : result;
 		}
 
 		error_code begin()
@@ -95,19 +95,7 @@ namespace aquarius
 		}
 
 	private:
-		auto async_execute(std::string_view sql) -> awaitable<std::size_t>
-		{
-
-			sql::trans_guard lk(this);
-
-			error_code ec{};
-
-			auto result = co_await service_.async_execute(sql, redirect_error(use_awaitable, ec));
-
-			completed_ = !ec;
-
-			co_return ec ? 0 : result;
-		}
+		
 
 	private:
 		Executor executor_;

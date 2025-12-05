@@ -360,6 +360,21 @@
     <ClInclude Include="..\include\aquarius\ip\client_session.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_pool.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\pool_task_traits.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\task.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\sql_pool.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\make_sql_task.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

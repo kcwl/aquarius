@@ -30,3 +30,6 @@
 #include <aquarius/detail/float.hpp>
 #include <aquarius/serialize/http_html_serialize.hpp>
 #include <aquarius/ip/handler.hpp>
+#include <aquarius/basic_pool.hpp>
+#include <aquarius/io_service_pool.hpp>
+#include <aquarius/sql/sql_pool.hpp>
