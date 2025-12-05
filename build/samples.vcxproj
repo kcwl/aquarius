@@ -18,19 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\dbadmin\dbadmin.cpp" />
-    <ClCompile Include="..\src\dbadmin\server.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\dbadmin\error.hpp" />
-    <ClInclude Include="..\src\dbadmin\server.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{f5b9e034-5b6b-4a9c-84a8-6c4f6253a12b}</ProjectGuid>
-    <RootNamespace>dbadmin</RootNamespace>
+    <ProjectGuid>{66b1527c-86f0-4b66-951d-144bdce0a58b}</ProjectGuid>
+    <RootNamespace>samples</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -110,15 +102,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;F:\boost_1_88_0;$(SolutionDir)../3rd/aquarius_protocol/include;D:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\boost_1_88_0\stage\lib;D:\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +122,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\samples\client.cpp" />
+    <ClCompile Include="..\samples\echo_client.cpp" />
+    <ClCompile Include="..\samples\echo_server.cpp" />
+    <ClCompile Include="..\samples\http_server.cpp" />
+    <ClCompile Include="..\samples\samples.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
