@@ -78,9 +78,9 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock));
+				auto session_ptr = std::make_shared<session_type>(std::move(sock), 1s);
 
-				session_ptr->attach_sql(get_sql_connector());
+				//session_ptr->attach_sql(get_sql_connector());
 
 				detail::regist_session(session_ptr);
 

@@ -4,16 +4,16 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/asio.hpp>
+#include <aquarius/ip/protocol.hpp>
 
 namespace aquarius
 {
-	template <bool Server, typename Protocol>
-	requires(is_protocol<Protocol>)
+	template <bool Server, auto Tag>
 	class socket_adaptor
 	{
-		using socket = typename Protocol::socket;
+		using socket = typename protocol<Tag>::socket;
 
-		using resolver = typename Protocol::resolver;
+		using resolver = typename protocol<Tag>::resolver;
 
 	public:
 		socket_adaptor(socket& s)
@@ -55,14 +55,13 @@ namespace aquarius
 		socket& socket_;
 	};
 
-	template <bool Server, typename Protocol>
-	requires(is_protocol<Protocol>)
+	template <bool Server, auto Tag>
 	class ssl_socket_adaptor
 	{
 	public:
-		using socket = typename Protocol::socket;
+		using socket = typename protocol<Tag>::socket;
 
-		using resolver = typename Protocol::resolver;
+		using resolver = typename protocol<Tag>::resolver;
 
 		using ssl_socket = ssl::stream<socket&>;
 

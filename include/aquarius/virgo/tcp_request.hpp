@@ -2,6 +2,7 @@
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/protocol.hpp>
 
 namespace aquarius
 {
@@ -115,4 +116,10 @@ namespace aquarius
 	template <detail::string_literal Router, typename Header, typename Body>
 	struct is_message_type<virgo::tcp_request<Router, Header, Body>> : std::true_type
 	{};
+
+	template <detail::string_literal Router, typename Header, typename Body>
+	struct handler_tag_traits<virgo::tcp_request<Router, Header, Body>>
+	{
+		constexpr static auto tag = protocol_tag::tcp;
+	};
 } // namespace aquarius

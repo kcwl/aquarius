@@ -28,6 +28,5 @@
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/detail/float.hpp>
-#include <aquarius/ip/http_handler.hpp>
-#include <aquarius/ip/tcp/tcp_handler.hpp>
 #include <aquarius/serialize/http_html_serialize.hpp>
+#include <aquarius/ip/handler.hpp>

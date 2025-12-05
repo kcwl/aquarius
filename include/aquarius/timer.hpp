@@ -5,14 +5,14 @@
 namespace aquarius
 {
 	template <typename Timer, typename Executor = boost::asio::any_io_executor>
-	class timer_adaptor
+	class timer
 	{
 	public:
-		explicit timer_adaptor(io_context& ctx)
-			: timer_adaptor(ctx.get_executor())
+		explicit timer(io_context& ctx)
+			: timer(ctx.get_executor())
 		{}
 
-		timer_adaptor(const Executor& ex)
+		timer(const Executor& ex)
 			: executor_(ex)
 			, timer_(executor_)
 		{

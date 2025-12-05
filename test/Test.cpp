@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->query<login_tcp_response>(req);
+			auto resp = co_await cli->async_call<login_tcp_response>(req);
 
 			BOOST_TEST(resp.header().uuid_ == req->header().uuid_);
 			BOOST_TEST(resp.body().per_resp == req->body().per_req);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->post<new_http_login_http_response>(req);
+			auto resp = co_await cli->async_call<new_http_login_http_response>(req);
 
 			BOOST_TEST(resp.body().uuid == req->body().uuid);
 
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 			req->body().user = 12345;
 			req->body().passwd = "passwd123";
 
-			auto resp = co_await cli->get<http_test_get_http_response>(req);
+			auto resp = co_await cli->async_call<http_test_get_http_response>(req);
 
 			BOOST_TEST(resp.body().user == req->body().user);
 
