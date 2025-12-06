@@ -28,7 +28,7 @@ namespace aquarius
 
 			if constexpr (Tag == sql_tag::query)
 			{
-				co_return co_await task_proc->async_query<return_type>(sql_str_);
+				co_return co_await task_proc->template async_query<return_type>(sql_str_);
 			}
 			else
 			{

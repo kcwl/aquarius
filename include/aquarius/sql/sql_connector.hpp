@@ -59,7 +59,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto result = co_await service_.async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
+			auto result = co_await service_.template async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
 
 			if (ec)
 				co_return T{};

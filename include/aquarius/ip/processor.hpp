@@ -3,6 +3,7 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/ip/http/http_param.hpp>
+#include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/serialize/binary.hpp>
@@ -306,7 +307,7 @@ namespace aquarius
 
 				if (method == virgo::http_method::get && !path.empty())
 				{
-					auto url = url_decode(std::string(path.data(), path.size()));
+					auto url = url_decode(path);
 
 					buffer.sputn(path.data(), path.size());
 				}

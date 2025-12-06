@@ -66,7 +66,7 @@ namespace aquarius
 				co_return Response{};
 			}
 
-			co_return co_await session_ptr_->query<Response>();
+			co_return co_await session_ptr_->template query<Response>();
 		}
 
 		std::string remote_address() const

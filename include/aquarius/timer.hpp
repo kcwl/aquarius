@@ -7,23 +7,26 @@ namespace aquarius
 	template <typename Timer, typename Executor = boost::asio::any_io_executor>
 	class timer
 	{
+		using duration = typename Timer::duration;
+
 	public:
-		explicit timer(io_context& ctx)
-			: timer(ctx.get_executor())
+		explicit timer(io_context& ctx, duration timeout)
+			: timer(ctx.get_executor(), timeout)
 		{}
 
-		timer(const Executor& ex)
+		timer(const Executor& ex, duration timeout)
 			: executor_(ex)
 			, timer_(executor_)
+			, timeout_(timeout)
 		{}
 
 	public:
-		template <typename Rep, typename Ratio, typename Func>
-		auto async_wait(std::chrono::duration<Rep, Ratio> dura, Func&& f) -> awaitable<void>
+		template <typename Func>
+		auto async_wait(Func&& f) -> awaitable<void>
 		{
 			for (;;)
 			{
-				timer_.expires_after(dura);
+				timer_.expires_after(timeout_);
 
 				co_await timer_.async_wait(use_awaitable);
 
@@ -42,5 +45,7 @@ namespace aquarius
 		Executor executor_;
 
 		Timer timer_;
+
+		duration timeout_;
 	};
 } // namespace aquarius

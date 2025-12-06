@@ -2,6 +2,7 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/router.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -54,7 +55,7 @@ namespace aquarius
 				module_ptr->visit();
 			};
 
-			router<proto_tag::module_, int>::get_mutable_instance().regist(topic, func);
+			module_router::get_mutable_instance().regist(func);
 		}
 	};
 } // namespace aquarius

@@ -29,7 +29,7 @@ namespace aquarius
 		return result;
 	}
 
-	inline std::string url_decode(const std::string& str)
+	inline std::string url_decode(std::string_view str)
 	{
 		std::stringstream ss{};
 		std::string result{};

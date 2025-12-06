@@ -8,6 +8,8 @@
 #include <aquarius/sql/sql_connector.hpp>
 #include <aquarius/module.hpp>
 
+using namespace std::chrono_literals;
+
 namespace aquarius
 {
 	template <typename Session>

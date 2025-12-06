@@ -2,7 +2,7 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_handler.hpp>
-#include <aquarius/basic_module.hpp>
+#include <aquarius/module.hpp>
 #include <aquarius/basic_pool.hpp>
 #include <aquarius/basic_serialize.hpp>
 #include <aquarius/basic_server.hpp>

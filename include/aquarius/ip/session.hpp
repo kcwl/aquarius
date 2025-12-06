@@ -20,9 +20,8 @@ namespace aquarius
 	public:
 		session(socket sock, std::chrono::steady_clock::duration timeout = 1s)
 			: base_type(std::move(sock))
-			, timeout_(timeout)
 			, proto_()
-			, timer_(this->get_executor())
+			, timer_(this->get_executor(), timeout)
 		{}
 
 	public:
@@ -41,7 +40,6 @@ namespace aquarius
 	private:
 		void start_timer()
 		{
-			timer_.expires_after(timeout_);
 			timer_.async_wait(
 				[this, self = this->shared_from_this()](error_code ec)
 				{
@@ -52,14 +50,10 @@ namespace aquarius
 					}
 
 					proto_.do_timer();
-
-					self->start_timer();
 				});
 		}
 
 	private:
-		std::chrono::steady_clock::duration timeout_;
-
 		proc_type proto_;
 
 		timer<boost::asio::steady_timer> timer_;
