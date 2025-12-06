@@ -78,9 +78,6 @@
     <ClInclude Include="..\include\aquarius\detail\crc.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp">
-      <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\config.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>

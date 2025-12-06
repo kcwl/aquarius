@@ -170,7 +170,6 @@
     <ClInclude Include="..\include\aquarius\cmd_options.hpp" />
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\io_service_pool.hpp" />
     <ClInclude Include="..\include\aquarius\detail\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\basic_handler.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
