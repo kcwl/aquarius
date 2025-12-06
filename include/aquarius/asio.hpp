@@ -6,5 +6,5 @@ namespace aquarius
 {
 	using namespace boost::asio;
 
-	namespace ssl = ssl;
+	namespace ssl = boost::asio::ssl;
 } // namespace aquarius

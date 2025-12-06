@@ -1,23 +1,12 @@
 #pragma once
-#include <aquarius/detail/config.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <span>
-#include <boost/asio/read.hpp>
 #include <aquarius/asio.hpp>
-#include <boost/asio/connect.hpp>
-#include <aquarius/timer.hpp>
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <aquarius/ip/tcp/tcp_error.hpp>
-#include <aquarius/ip/concept.hpp>
-#include <aquarius/ip/socket_adaptor.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/ip/protocol.hpp>
 
 namespace aquarius
 {
-
     template <auto ProtoTag, typename Adaptor>
     class basic_session
     {

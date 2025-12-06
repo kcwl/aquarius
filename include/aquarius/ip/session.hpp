@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/basic_session.hpp>
-#include <aquarius/timer.hpp>
 #include <aquarius/ip/processor.hpp>
+#include <aquarius/timer.hpp>
 
 using namespace std::chrono_literals;
 
@@ -32,7 +32,7 @@ namespace aquarius
 															{ co_return co_await proto_.accept(self); });
 		}
 
-		template<typename Response>
+		template <typename Response>
 		auto query() -> awaitable<Response>
 		{
 			co_return co_await proto_.template query<Response>(this->shared_from_this());
@@ -67,6 +67,5 @@ namespace aquarius
 
 	template <auto Tag, typename Adaptor>
 	struct is_session_type<session<Tag, Adaptor>> : std::true_type
-	{
-	};
+	{};
 } // namespace aquarius

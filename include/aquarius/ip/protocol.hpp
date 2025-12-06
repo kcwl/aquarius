@@ -15,14 +15,14 @@ namespace aquarius
 
 		switch (tag)
 		{
-			case protocol_tag::http:
-				result = "http";
-				break;
-			case protocol_tag::tcp:
-				result = "tcp";
-				break;
-			default:
-				break;
+		case protocol_tag::http:
+			result = "http";
+			break;
+		case protocol_tag::tcp:
+			result = "tcp";
+			break;
+		default:
+			break;
 		}
 
 		return result;

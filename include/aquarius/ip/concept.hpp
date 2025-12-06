@@ -1,6 +1,6 @@
 #pragma once
-#include <type_traits>
 #include <aquarius/asio.hpp>
+#include <type_traits>
 
 namespace aquarius
 {
@@ -20,8 +20,7 @@ namespace aquarius
 
 	template <typename T>
 	struct is_ssl_socket_type : std::false_type
-	{
-	};
+	{};
 
 	template <typename T>
 	concept is_ssl_socket = is_ssl_socket_type<T>::value;

@@ -2,8 +2,8 @@
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/ip/server_session.hpp>
-#include <aquarius/virgo/tcp_request.hpp>
 #include <aquarius/virgo/http_request.hpp>
+#include <aquarius/virgo/tcp_request.hpp>
 
 namespace aquarius
 {
@@ -13,9 +13,7 @@ namespace aquarius
 	public:
 		handler(const std::string& name)
 			: basic_handler<Session, Request, Response>(name)
-		{
-
-		}
+		{}
 
 		virtual ~handler() = default;
 	};
@@ -134,9 +132,9 @@ namespace aquarius
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response,        \
+	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response, \
 						__method)
 
-#define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                              \
-	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response,        \
-						__method)
+#define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
+	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \
+						__response, __method)

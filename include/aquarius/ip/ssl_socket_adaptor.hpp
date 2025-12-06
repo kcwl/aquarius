@@ -1,60 +1,13 @@
 #pragma once
-#include <aquarius/ip/ssl_context.hpp>
-#include <aquarius/logger.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
-#include <aquarius/asio.hpp>
 #include <aquarius/ip/protocol.hpp>
+#include <aquarius/ip/ssl_context.hpp>
+#include <aquarius/logger.hpp>
 
 namespace aquarius
 {
-	template <bool Server, auto Tag>
-	class socket_adaptor
-	{
-		using socket = typename protocol<Tag>::socket;
-
-		using resolver = typename protocol<Tag>::resolver;
-
-	public:
-		socket_adaptor(socket& s)
-			: socket_(s)
-		{}
-
-	public:
-		socket& get_implement()
-		{
-			return socket_;
-		}
-
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
-		{
-			resolver resolve(socket_.lowest_layer().get_executor());
-
-			auto endpoints = resolve.resolve(host, port);
-
-			error_code ec;
-
-			co_await boost::asio::async_connect(socket_.lowest_layer(), endpoints, redirect_error(use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "connect " << host << " failed! " << ec.what();
-			}
-
-			co_return ec;
-		}
-
-		template <typename Func>
-		requires(is_awaitable_func<Func>)
-		auto accept(Func&& f) -> awaitable<void>
-		{
-			co_return co_await f();
-		}
-
-	private:
-		socket& socket_;
-	};
-
 	template <bool Server, auto Tag>
 	class ssl_socket_adaptor
 	{
@@ -112,18 +65,16 @@ namespace aquarius
 		requires(is_awaitable_func<Func>)
 		auto accept(Func&& f) -> awaitable<error_code>
 		{
-			if constexpr (Server)
+			error_code ec;
+
+			co_await socket_.async_handshake(ssl::stream_base::server, redirect_error(use_awaitable, ec));
+
+			if (ec)
 			{
-				error_code ec;
-
-				co_await socket_.async_handshake(ssl::stream_base::server,
-												 redirect_error(use_awaitable, ec));
-
-				if (ec)
-					co_return ec;
+				XLOG_ERROR() << "accept async_handshake  failed! maybe" << ec.what();
 			}
 
-			co_return co_await f();
+			co_return ec;
 		}
 
 	private:

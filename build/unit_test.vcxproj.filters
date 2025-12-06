@@ -138,42 +138,6 @@
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_proc.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_handler.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_router.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_server_session.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_proc.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client_session.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_handler.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_router.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server_session.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\sql.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -231,12 +195,6 @@
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_client_session.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -252,9 +210,6 @@
     <ClInclude Include="..\include\aquarius\ip\concept.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_error.hpp">
-      <Filter>include\aquarius\ip\tcp</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\float.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -264,7 +219,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\socket_adaptor.hpp">
+    <ClInclude Include="..\include\aquarius\ip\raw_socket_adaptor.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp">
@@ -284,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tag_invoke.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_redirect.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
@@ -342,12 +294,6 @@
     <ClInclude Include="..\include\aquarius\ip\handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\server_session.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\client_session.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_pool.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -364,6 +310,39 @@
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\ssl_context.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\ssl_socket_adaptor.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_ssl_client.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_ssl_server.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_client.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_server.hpp">
+      <Filter>include\aquarius\ip\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\server_session.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\ssl_server_session.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
@@ -438,9 +417,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\router.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tcp_error.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\http_method.cpp">
