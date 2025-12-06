@@ -233,7 +233,6 @@
     <ClInclude Include="..\include\aquarius\sql\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\sql\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\sql\where_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tag_invoke.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />

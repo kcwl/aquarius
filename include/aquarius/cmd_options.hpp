@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
-#include <boost/program_options.hpp>
 #include <aquarius/logger.hpp>
+#include <boost/program_options.hpp>
 #include <string>
 
 namespace aquarius

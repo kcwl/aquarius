@@ -1,7 +1,6 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius/sql.hpp>
-#include <aquarius/tag_invoke.hpp>
 #include <aquarius/sql/database_param.hpp>
 #include <aquarius/asio.hpp>
 #include <aquarius/sql/sql_connector.hpp>
@@ -14,17 +13,6 @@ struct personal
 	int age;
 	bool sex;
 };
-
-// namespace aquarius
-//{
-//	void tag_invoke(aquarius::value_to_tag<aquarius::db_tag>, aquarius::database_param& param)
-//	{
-//		param.host = "localhost";
-//		param.user = "kcwl";
-//		param.password = "NN0705lwl1217&";
-//		param.db = "unittest";
-//	}
-// }
 
 BOOST_AUTO_TEST_SUITE(sql)
 

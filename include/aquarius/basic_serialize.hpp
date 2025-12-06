@@ -9,16 +9,12 @@ namespace aquarius
 	public:
 		basic_serialize()
 			: parse_()
-		{
-
-		}
+		{}
 		virtual ~basic_serialize() = default;
 
 		basic_serialize(const basic_serialize& other)
 			: parse_(other.parse_)
-		{
-
-		}
+		{}
 
 		basic_serialize& operator=(const basic_serialize& other)
 		{
@@ -32,9 +28,7 @@ namespace aquarius
 
 		basic_serialize(basic_serialize&& other) noexcept
 			: parse_(std::move(other.parse_))
-		{
-
-		}
+		{}
 
 		basic_serialize& operator=(basic_serialize&& other) noexcept
 		{

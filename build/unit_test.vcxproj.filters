@@ -237,9 +237,6 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_param.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tag_invoke.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>

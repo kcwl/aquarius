@@ -15,9 +15,7 @@ namespace aquarius
 		timer(const Executor& ex)
 			: executor_(ex)
 			, timer_(executor_)
-		{
-
-		}
+		{}
 
 	public:
 		template <typename Rep, typename Ratio, typename Func>

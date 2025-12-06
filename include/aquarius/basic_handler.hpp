@@ -1,12 +1,10 @@
 #pragma once
-#include <aquarius/detail/config.hpp>
-#include <aquarius/error_code.hpp>
 #include <aquarius/asio.hpp>
+#include <aquarius/error_code.hpp>
 #include <memory>
 
 namespace aquarius
 {
-
 	template <typename Session, typename Request, typename Response>
 	class basic_handler
 	{
