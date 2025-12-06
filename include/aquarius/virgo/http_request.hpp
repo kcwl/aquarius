@@ -107,6 +107,6 @@ namespace aquarius
 	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
 	struct handler_tag_traits<virgo::http_request<Router, Method, Header, Body>>
 	{
-		constexpr static auto tag = protocol_tag::http;
+		constexpr static auto tag = proto_tag::http;
 	};
 } // namespace aquarius

@@ -10,7 +10,7 @@ namespace aquarius
 	{};
 
 	template <typename Session>
-	class router<protocol_tag::http, Session>
+	class router<proto_tag::http, Session>
 		: public basic_router<std::string_view,
 							  std::function<bool(std::shared_ptr<Session>, virgo::http_fields, flex_buffer&)>>
 	{};

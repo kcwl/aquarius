@@ -19,7 +19,7 @@ namespace aquarius
 	};
 
 	template <typename Session, typename Request, typename Response>
-	class handler<protocol_tag::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
+	class handler<proto_tag::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
 	{
 	public:
 		handler(const std::string& name)
@@ -72,7 +72,7 @@ namespace aquarius
 	};
 
 	template <typename Session, typename Context>
-	struct auto_handler_register<protocol_tag::http, Session, Context>
+	struct auto_handler_register<proto_tag::http, Session, Context>
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
@@ -101,7 +101,7 @@ namespace aquarius
 				return ec == virgo::http_status::ok;
 			};
 
-			router<protocol_tag::http, Session>::get_mutable_instance().regist(proto, func);
+			router<proto_tag::http, Session>::get_mutable_instance().regist(proto, func);
 		}
 	};
 

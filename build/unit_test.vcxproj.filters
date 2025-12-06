@@ -339,6 +339,9 @@
     <ClInclude Include="..\include\aquarius\ip\ssl_server_session.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\module.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">

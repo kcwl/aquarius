@@ -1,12 +1,12 @@
 #pragma once
 #include <aquarius/asio.hpp>
-#include <aquarius/detail/config.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/session_store.hpp>
 #include <aquarius/sql/sql_connector.hpp>
+#include <aquarius/module.hpp>
 
 namespace aquarius
 {
@@ -40,6 +40,8 @@ namespace aquarius
 		void run()
 		{
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
+
+			module_router::get_mutable_instance().run();
 
 			io_service_pool_.run();
 		}

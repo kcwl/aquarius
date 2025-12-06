@@ -120,6 +120,6 @@ namespace aquarius
 	template <detail::string_literal Router, typename Header, typename Body>
 	struct handler_tag_traits<virgo::tcp_request<Router, Header, Body>>
 	{
-		constexpr static auto tag = protocol_tag::tcp;
+		constexpr static auto tag = proto_tag::tcp;
 	};
 } // namespace aquarius

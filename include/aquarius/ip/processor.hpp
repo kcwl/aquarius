@@ -111,7 +111,7 @@ namespace aquarius
 	};
 
 	template <>
-	struct processor<protocol_tag::http>
+	struct processor<proto_tag::http>
 	{
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
@@ -311,12 +311,12 @@ namespace aquarius
 					buffer.sputn(path.data(), path.size());
 				}
 
-				router<protocol_tag::http, Session>::get_mutable_instance().invoke(_router, session_ptr, hf, buffer);
+				router<proto_tag::http, Session>::get_mutable_instance().invoke(_router, session_ptr, hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
 			{
-				XLOG_ERROR() << from_tag_string(protocol_tag::http) << " read occur error[" << ec.value() << "]"
+				XLOG_ERROR() << from_tag_string(proto_tag::http) << " read occur error[" << ec.value() << "]"
 							 << ", remote_address: " << session_ptr->remote_address();
 			}
 
@@ -485,7 +485,7 @@ namespace aquarius
 				ifs.read(stream.data(), stream.size());
 			}
 
-			co_await router<protocol_tag::http, Session>::get_mutable_instance().send_response(session_ptr, get_resp);
+			co_await router<proto_tag::http, Session>::get_mutable_instance().send_response(session_ptr, get_resp);
 
 			flex_buffer buffer{};
 			get_resp.commit(buffer);

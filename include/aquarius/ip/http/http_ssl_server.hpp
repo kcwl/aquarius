@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	using http_ssl_server_session = ssl_server_session<protocol_tag::http>;
+	using http_ssl_server_session = ssl_server_session<proto_tag::http>;
 
 	using http_ssl_server = basic_server<http_ssl_server_session>;
 } // namespace aquarius
