@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/sql/database_param.hpp>
-#include <aquarius/error_code.hpp>
-#include <aquarius/sql/sql_error.hpp>
 #include <aquarius/asio.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/sql/database_param.hpp>
+#include <aquarius/sql/sql_error.hpp>
 
-#include <expected>
 #include <aquarius/sql/transaction.hpp>
+#include <expected>
 
 #if defined(MYSQL_SQL)
 #include <aquarius/sql/mysql.hpp>
@@ -59,7 +59,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto result =  co_await service_.async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
+			auto result = co_await service_.async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
 
 			if (ec)
 				co_return T{};
@@ -95,8 +95,6 @@ namespace aquarius
 		}
 
 	private:
-		
-
 	private:
 		Executor executor_;
 

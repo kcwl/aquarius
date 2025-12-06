@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/detail/ssl_context.hpp>
+#include <aquarius/ip/ssl_context.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
@@ -65,7 +65,7 @@ namespace aquarius
 
 		using ssl_socket = ssl::stream<socket&>;
 
-		using ssl_context = detail::ssl_context_factory<Server>;
+		using ssl_context = ssl_context_factory<Server>;
 
 	public:
 		ssl_socket_adaptor(socket& socket)

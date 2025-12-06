@@ -10,8 +10,6 @@ namespace aquarius
 		template <typename T>
 		inline constexpr std::string_view struct_name()
 		{
-			using namespace std::string_view_literals;
-
 #ifndef __linux
 			constexpr std::string_view name = __FUNCSIG__ ""sv;
 

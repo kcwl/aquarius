@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(check_equal)
 	float a = 0.99999999999f;
 	float b = 0.99999999998f;
 
-	BOOST_TEST(aquarius::check_equal(a, b));
+	BOOST_TEST(aquarius::detail::check_equal(a, b));
 }
 
 BOOST_AUTO_TEST_CASE(check_not_equal)
@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(check_not_equal)
 	float a = 0.9999999f;
 	float b = 1.8999999f;
 
-	BOOST_TEST(!aquarius::check_equal(a, b));
+	BOOST_TEST(!aquarius::detail::check_equal(a, b));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

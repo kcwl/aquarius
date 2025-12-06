@@ -1,11 +1,17 @@
 #pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/detail/pool_task_traits.hpp>
 #include <memory>
 
 namespace aquarius
 {
+	template <typename T, typename Core>
+	concept enable_pool_task = requires {
+		typename T::return_type;
+
+		{ std::declval<T>()(std::shared_ptr<Core>{}) } -> std::same_as<awaitable<typename T::return_type>>;
+	};
+
 	template <typename T, typename IoPool>
 	class basic_pool
 	{

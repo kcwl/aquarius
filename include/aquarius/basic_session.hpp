@@ -3,7 +3,6 @@
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
 #include <span>
-#include <aquarius/detail/ssl_context.hpp>
 #include <boost/asio/read.hpp>
 #include <aquarius/asio.hpp>
 #include <boost/asio/connect.hpp>

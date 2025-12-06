@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/detail/crc.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
-#include <aquarius/detail/session_store.hpp>
+#include <aquarius/session_store.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <string_view>
 #include <csignal>

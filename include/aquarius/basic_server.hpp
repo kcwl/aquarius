@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/config.hpp>
 #include <aquarius/io_service_pool.hpp>
-#include <aquarius/detail/session_store.hpp>
+#include <aquarius/session_store.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/detail/make_endpoint.hpp>
@@ -82,7 +82,7 @@ namespace aquarius
 
 				//session_ptr->attach_sql(get_sql_connector());
 
-				detail::regist_session(session_ptr);
+				regist_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
