@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
+#include <aquarius/sql/concepts.hpp>
 
 using namespace std::string_view_literals;
 
@@ -8,7 +8,6 @@ namespace aquarius
 {
 	namespace sql
 	{
-
 		struct order_desc
 		{
 			constexpr static auto value = " desc"sv;

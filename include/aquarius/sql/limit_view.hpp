@@ -1,12 +1,11 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
+#include <aquarius/sql/concepts.hpp>
 
 namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename T, typename Cond>
 		requires enable_select<T>
 		struct limit_view

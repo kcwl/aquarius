@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	template<typename T>
+	template <typename T>
 	inline auto make_query_task(std::string_view sql)
 	{
 		return sql_task<sql_tag::query, std::vector<T>>{ sql };

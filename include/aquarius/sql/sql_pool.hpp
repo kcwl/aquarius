@@ -14,7 +14,7 @@ namespace aquarius
 		return pool_ptr;
 	}
 
-	template<typename IoPool>
+	template <typename IoPool>
 	inline void create_sql_pool(IoPool& pool)
 	{
 		auto pool_ptr = sql_pool();

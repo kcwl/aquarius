@@ -215,7 +215,6 @@
     <ClInclude Include="..\include\aquarius\sql\closure.hpp" />
     <ClInclude Include="..\include\aquarius\sql\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\sql\condition_view.hpp" />
-    <ClInclude Include="..\include\aquarius\sql\connect.hpp" />
     <ClInclude Include="..\include\aquarius\sql\database_param.hpp" />
     <ClInclude Include="..\include\aquarius\sql\empty.hpp" />
     <ClInclude Include="..\include\aquarius\sql\make_sql_task.hpp" />

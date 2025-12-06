@@ -1,10 +1,10 @@
 #pragma once
-#include <boost/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <mysql.h>
-#include <aquarius/sql/sql_error.hpp>
 #include <aquarius/sql/database_param.hpp>
+#include <aquarius/sql/sql_error.hpp>
+#include <boost/asio.hpp>
 #include <boost/pfr.hpp>
+#include <mysql.h>
 
 namespace aquarius
 {
@@ -128,9 +128,7 @@ namespace aquarius
 				void make_result(std::vector<T>& results, const MYSQL_ROW& row)
 				{
 					auto to_struct = [&, this]<std::size_t... I>(std::index_sequence<I...>)
-					{
-						return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... };
-					};
+					{ return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... }; };
 
 					results.push_back(to_struct(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{}));
 				}
@@ -203,12 +201,12 @@ namespace aquarius
 			template <typename CompleteToken = default_completion_token_t<Executor>>
 			auto async_connect(CompleteToken&& token = default_completion_token_t<Executor>()) -> awaitable<void>
 			{
-				co_await async_compose<CompleteToken, void(error_code)>(initiate_connect_task(this),
-																		token, executor_);
+				co_await async_compose<CompleteToken, void(error_code)>(initiate_connect_task(this), token, executor_);
 			}
 
 			template <typename T, typename CompleteToken = default_completion_token_t<Executor>>
-			auto async_query(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>()) -> awaitable<std::vector<T>>
+			auto async_query(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>())
+				-> awaitable<std::vector<T>>
 			{
 				error_code ec{};
 
@@ -219,7 +217,8 @@ namespace aquarius
 			}
 
 			template <typename CompleteToken = default_completion_token_t<Executor>>
-			auto async_execute(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>()) -> awaitable<std::size_t>
+			auto async_execute(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>())
+				-> awaitable<std::size_t>
 			{
 				co_return co_await async_compose<CompleteToken, void(error_code, std::size_t)>(
 					initiate_execute_task(this, sql), token, executor_);
@@ -256,7 +255,6 @@ namespace aquarius
 
 				return static_cast<db_error>(mysql_errno(mysql_ptr_));
 			}
-			
 
 		private:
 			Executor executor_;

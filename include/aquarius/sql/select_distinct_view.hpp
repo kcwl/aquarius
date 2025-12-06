@@ -1,12 +1,12 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
+#include <aquarius/sql/concepts.hpp>
+#include <aquarius/sql/closure.hpp>
 
 namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename T>
 		class select_distinct_view
 		{
@@ -31,7 +31,7 @@ namespace aquarius
 		struct enable_select_view<select_distinct_view<T>> : std::true_type
 		{};
 
-		struct _select_distinct : detail::sql_adaptor_closure
+		struct _select_distinct : sql_adaptor_closure
 		{
 			template <typename T>
 			constexpr auto operator()() const

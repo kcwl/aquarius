@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/struct_name.hpp>
+#include <aquarius/sql/concepts.hpp>
 
 using namespace std::string_view_literals;
 
