@@ -4,7 +4,6 @@
 
 namespace aquarius
 {
-
 	class http_html_serialize : public basic_serialize<html_parse>
 	{
 	public:
@@ -19,7 +18,7 @@ namespace aquarius
 		}
 
 		template <typename... Args>
-		void parse_from(flex_buffer & buffer, Args&&... args)
+		void parse_from(flex_buffer& buffer, Args&&... args)
 		{
 			stream_ = this->parse_.from_datas(buffer, std::forward<Args>(args)...);
 		}

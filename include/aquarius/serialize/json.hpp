@@ -1,7 +1,6 @@
 #pragma once
-#include <boost/json.hpp>
-#include <string>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <boost/json.hpp>
 #include <string>
 
 namespace aquarius
@@ -29,7 +28,7 @@ namespace aquarius
 			std::string json;
 			json.resize(buffer.size());
 
-			buffer.sgetn(json.data(),json.size());
+			buffer.sgetn(json.data(), json.size());
 
 			if (json.empty())
 				return T{};

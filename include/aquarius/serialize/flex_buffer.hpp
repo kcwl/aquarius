@@ -1,9 +1,4 @@
 #pragma once
-#include <vector>
-#include <expected>
-#include <string>
-#include <span>
-#include <aquarius/serialize/error.hpp>
 #include <aquarius/asio.hpp>
 
 namespace aquarius
@@ -15,9 +10,7 @@ namespace aquarius
 	public:
 		auto_consume(flex_buffer& buffer)
 			: buffer_(buffer)
-		{
-
-		}
+		{}
 
 		~auto_consume()
 		{
@@ -33,9 +26,7 @@ namespace aquarius
 	public:
 		auto_commit(flex_buffer& buffer)
 			: buffer_(buffer)
-		{
-
-		}
+		{}
 
 		~auto_commit()
 		{

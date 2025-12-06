@@ -3,21 +3,8 @@
 #include <string>
 #include <string_view>
 
-namespace boost
-{
-	namespace asio
-	{
-		class execution_context;
-	}
-} // namespace boost
-
 namespace aquarius
 {
-	class execution_context;
-
-	template <typename T>
-	concept execution_context_convertible = std::is_convertible_v<T&, execution_context&>;
-
 	template <typename T, typename... Args>
 	concept disjunction_same_as = std::disjunction_v<std::is_same<std::remove_cvref_t<T>, Args>...>;
 
@@ -26,28 +13,23 @@ namespace aquarius
 
 	template <typename T>
 	struct is_vector : std::false_type
-	{
-	};
+	{};
 
 	template <typename T, typename Alloc>
 	struct is_vector<std::vector<T, Alloc>> : public std::true_type
-	{
-	};
+	{};
 
 	template <typename T>
 	struct is_string : std::false_type
-	{
-	};
+	{};
 
 	template <>
 	struct is_string<std::string> : public std::true_type
-	{
-	};
+	{};
 
 	template <>
 	struct is_string<std::string_view> : public std::true_type
-	{
-	};
+	{};
 
 	template <typename T>
 	concept boolean = std::same_as<T, bool>;

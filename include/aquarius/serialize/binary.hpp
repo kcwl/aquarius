@@ -1,7 +1,8 @@
 #pragma once
 #include <aquarius/serialize/concept.hpp>
-#include <boost/pfr.hpp>
+#include <aquarius/serialize/error.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <boost/pfr.hpp>
 
 namespace aquarius
 {
@@ -171,5 +172,4 @@ namespace aquarius
 			return from_binary_impl(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{});
 		}
 	};
-
 } // namespace aquarius
