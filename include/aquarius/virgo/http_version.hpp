@@ -59,5 +59,5 @@ namespace aquarius
 
 			return http_version::unknown;
 		}
-	} // namespace http
-} // namespace virgo
+	} // namespace virgo
+} // namespace aquarius

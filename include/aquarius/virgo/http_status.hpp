@@ -1,11 +1,11 @@
 #pragma once
+#include <aquarius/error_code.hpp>
+#include <boost/system/error_category.hpp>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <boost/system/error_category.hpp>
-#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {

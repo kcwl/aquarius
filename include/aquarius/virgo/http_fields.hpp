@@ -12,14 +12,12 @@ namespace aquarius
 		public:
 			http_fields() = default;
 
-			virtual~http_fields() = default;
+			virtual ~http_fields() = default;
 
 		public:
 			http_fields(const http_fields& other)
 				: fields_(other.fields_)
-			{
-
-			}
+			{}
 
 			http_fields& operator=(const http_fields& other)
 			{
@@ -33,9 +31,7 @@ namespace aquarius
 
 			http_fields(http_fields&& other) noexcept
 				: fields_(std::move(other.fields_))
-			{
-
-			}
+			{}
 
 			http_fields& operator=(http_fields&& other) noexcept
 			{
@@ -71,13 +67,13 @@ namespace aquarius
 				return iter->second;
 			}
 
-			//void set_field(const std::string& f, const std::string& v)
+			// void set_field(const std::string& f, const std::string& v)
 			//{
 			//	fields_[f] = v;
-			//}
+			// }
 			void set_field(std::string_view f, std::string_view v)
 			{
-				fields_[std::string(f.data(),f.size())] = std::string(v.data(), v.size());
+				fields_[std::string(f.data(), f.size())] = std::string(v.data(), v.size());
 			}
 
 			bool has_content_length() const

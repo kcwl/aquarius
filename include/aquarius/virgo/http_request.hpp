@@ -1,9 +1,9 @@
 #pragma once
+#include <aquarius/ip/http/url_encode.hpp>
+#include <aquarius/ip/protocol.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <format>
-#include <aquarius/ip/http/url_encode.hpp>
-#include <aquarius/ip/protocol.hpp>
 
 namespace aquarius
 {
@@ -71,8 +71,8 @@ namespace aquarius
 
 					this->content_length(body_buffer.size());
 
-					headline =
-						std::format("{} {} {}\r\n", virgo::from_method_string(Method),router, virgo::from_string_version(this->version()));
+					headline = std::format("{} {} {}\r\n", virgo::from_method_string(Method), router,
+										   virgo::from_string_version(this->version()));
 				}
 
 				for (auto& s : this->fields())

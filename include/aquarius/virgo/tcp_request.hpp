@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/virgo/basic_tcp_protocol.hpp>
-#include <aquarius/serialize/binary.hpp>
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/protocol.hpp>
+#include <aquarius/serialize/binary.hpp>
+#include <aquarius/virgo/basic_tcp_protocol.hpp>
 
 namespace aquarius
 {
