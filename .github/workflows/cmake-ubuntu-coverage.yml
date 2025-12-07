@@ -165,3 +165,4 @@ jobs:
         disable_search: true
         disable_file_fixes: true
         token: ${{ secrets.CODECOV_TOKEN}}
+        slug: kcwl/aquarius
