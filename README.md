@@ -4,7 +4,6 @@ c++ modern frame work with asio
 ## build status
 [![codecov](https://codecov.io/gh/kcwl/aquarius/graph/badge.svg?token=4ACYCIPH8B)](https://codecov.io/gh/kcwl/aquarius)
 [![ubuntu(gcc)](https://github.com/kcwl/aquarius/actions/workflows/cmake-ubuntu-gcc.yml/badge.svg)](https://github.com/kcwl/aquarius/actions/workflows/cmake-ubuntu-gcc.yml)
-[![ubuntu(clang)](https://github.com/kcwl/aquarius/actions/workflows/cmake-ubuntu-clang.yml/badge.svg)](https://github.com/kcwl/aquarius/actions/workflows/cmake-ubuntu-clang.yml)
 [![visual stadio](https://github.com/kcwl/aquarius/actions/workflows/cmake-windows-vs.yml/badge.svg)](https://github.com/kcwl/aquarius/actions/workflows/cmake-windows-vs.yml)
 
 
@@ -53,11 +52,7 @@ lazytool --input test.virgo --cpp_out .
 ```
 #include <aquarius.hpp>
 
-// tcp handler
-AQUAIURS_TCP_HANDLER(request, response, ctx_test)
-
-// http handler
-AQUAIURS_HTTP_HANDLER(request, response, ctx_test)
+AQUAIURS_HANDLER(request, response, ctx_test)
 
 {
     // To do something
@@ -69,13 +64,29 @@ AQUAIURS_HTTP_HANDLER(request, response, ctx_test)
 ```
 #include <aquarius.hpp>
 
-AQUAIURS_TCP_HANDLER(request, response, ctx_test)
+struct personal
 {
-    // use sql engine to execute sql
-    this->sql()->execute_sql("select * from test");
-}
+	int32_t age;
+	bool sex;_
+};
+
+//start sql pool
+co_await aquarius::sql_pool().run(pool.size(), db_param);
+
+auto res = co_await aquarius::sql_pool().async_execute(
+	aquarius::make_execute_task(sql_insert(p)()));
+
+// res will be number `1` that insert effective rows
+
+auto result = co_await aquarius::sql_pool().async_execute(
+	aquarius::make_query_task<personal>(sql_select(personal)()));
+
+// result will be a vector of personal
+
 ```
 
 # How to Use Lua for Handler?
+Coming Soon
 
 # How to Extern Custom Protocal and Handler?
+Coming Soon
