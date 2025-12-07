@@ -4,7 +4,7 @@ name: ubuntu(coverage)
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "feature"]
   pull_request:
     branches: [ "master" ]
 
@@ -133,6 +133,12 @@ jobs:
           make coverage
 
     - name: upload coverage reports
-      uses: romeovs/lcov-reporter-action@v0.2.16
+      uses: codecov/codecov-action@v4
       with:
-        lcov-file: ./test/coverage-aquarius.info
+        verbose: true
+        fail_ci_if_error: true
+        file: ./test/coverage-aquarius.info
+        plugins: noop
+        disable_search: true
+        disable_file_fixes: true
+        token: ${{ secrets.CODECOV_TOKEN}}
