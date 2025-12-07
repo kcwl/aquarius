@@ -2,6 +2,15 @@
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: ubuntu(coverage)
 
+permissions:
+    packages: write
+
+env:
+    USERNAME: aquarius
+    VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
+    FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
+    VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/aquarius/index.json,readwrite"
+
 on:
   push:
     branches: [ "master", "feature"]
