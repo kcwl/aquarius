@@ -20,7 +20,7 @@ namespace aquarius
 #if defined(MYSQL_SQL)
 		using service_impl = sql::mysql;
 #else
-		using service_impl = sql::empty_impl<Executor>;
+		using service_impl = sql::empty_impl;
 #endif
 
 	public:

@@ -6,31 +6,26 @@ namespace aquarius
 {
 	namespace sql
 	{
-		template <typename Executor>
 		class empty_impl
 		{
 		public:
-			empty_impl(const Executor&, const database_param&)
+			empty_impl(const database_param&)
 			{}
 			virtual ~empty_impl() = default;
 
 		public:
-			template <typename CompleteToken = default_completion_token_t<Executor>>
-			auto async_connect(CompleteToken&& token = default_completion_token_t<Executor>()) -> awaitable<void>
+			auto async_connect() -> awaitable<error_code>
 			{
-				co_return;
+				co_return error_code{};
 			}
 
-			template <typename CompleteToken = default_completion_token_t<Executor>>
-			auto async_execute(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>())
-				-> awaitable<std::size_t>
+			auto async_execute(std::string_view sql, error_code& ec) -> awaitable<std::size_t>
 			{
 				co_return 0;
 			}
 
-			template <typename T, typename CompleteToken = default_completion_token_t<Executor>>
-			auto async_query(std::string_view sql, CompleteToken&& token = default_completion_token_t<Executor>())
-				-> awaitable<std::vector<T>>
+			template <typename T>
+			auto async_query(std::string_view sql, error_code& ec) -> awaitable<std::vector<T>>
 			{
 				co_return std::vector<T>{};
 			}
