@@ -94,8 +94,8 @@ namespace aquarius
 				}
 
 				co_spawn(
-					session->get_executor(), [session, ec, req = std::move(request)]() mutable -> awaitable<void>
-					{ co_await std::make_shared<Context>()->visit(session, req, ec != virgo::http_status::ok); },
+					session->get_executor(), [session, ec, request]() mutable -> awaitable<void>
+					{ co_await std::make_shared<Context>()->visit(session, request, ec != virgo::http_status::ok); },
 					detached);
 
 				return ec == virgo::http_status::ok;

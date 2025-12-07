@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", "8100");
 
-			BOOST_CHECK(!is_connect);
+			BOOST_CHECK(is_connect);
 
 			auto req = std::make_shared<login_tcp_request>();
 			req->header().uuid_ = 1;
@@ -82,10 +82,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", "80");
 
-			BOOST_TEST(!is_connect);
-
-			if (is_connect)
-				co_return;
+			BOOST_TEST(is_connect);
 
 			auto req = std::make_shared<new_http_login_http_request>();
 			req->body().uuid = 1;
@@ -143,10 +140,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", "8080");
 
-			BOOST_TEST(!is_connect);
-
-			if (is_connect)
-				co_return;
+			BOOST_TEST(is_connect);
 
 			auto req = std::make_shared<http_test_get_http_request>();
 			req->body().user = 12345;

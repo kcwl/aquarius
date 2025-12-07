@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/ip/http/http_param.hpp>
+#include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <functional>
@@ -47,6 +49,11 @@ namespace aquarius
 		template <typename Response, typename Request>
 		auto async_call(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
+			if constexpr (handler_tag_traits<Request>::tag == proto_tag::http)
+			{
+				req->version(get_http_param().version);
+			}
+
 			flex_buffer buffer{};
 
 			req->commit(buffer);

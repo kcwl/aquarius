@@ -74,7 +74,7 @@ namespace aquarius
 
 			auto mutable_buffer = buffer.prepare(length);
 
-			co_await boost::asio::async_read(socket_adaptor_.get_implement(), buffer,
+			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
 											 redirect_error(use_awaitable, ec));
 
 			if (ec)

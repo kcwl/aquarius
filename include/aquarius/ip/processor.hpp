@@ -179,9 +179,13 @@ namespace aquarius
 				auto it =
 					std::ranges::find_if(slide_proto_buffer, [](const auto c) { return std::string_view(c) == crlf; });
 				if (it == slide_proto_buffer.end())
-					break;
-
-				len = std::ranges::distance(slide_proto_buffer.begin(), it);
+				{
+					len = header_span.size();
+				}
+				else
+				{
+					len = std::ranges::distance(slide_proto_buffer.begin(), it);
+				}
 
 				error_code http_ec{};
 				auto [method, _router, path, version] = parse_command_line<true>(proto_buffer.subspan(0, len), http_ec);
@@ -330,7 +334,7 @@ namespace aquarius
 			std::string header{};
 			auto make_command_line = [&]()
 			{
-				header += std::format("{} {} {}\r\n", virgo::from_string_version(get_http_param().version),
+				header += std::format("{} {} {}\r\n\r\n", virgo::from_string_version(get_http_param().version),
 									  static_cast<int>(status), virgo::from_status_string(status));
 			};
 
@@ -548,7 +552,7 @@ namespace aquarius
 			Response resp{};
 			resp.consume(buffer);
 
-			co_return resp;
+			co_return std::move(resp);
 		}
 	};
 } // namespace aquarius
