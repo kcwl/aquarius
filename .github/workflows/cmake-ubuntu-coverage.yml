@@ -5,12 +5,6 @@ name: ubuntu(coverage)
 permissions:
     packages: write
 
-env:
-    USERNAME: aquarius
-    VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
-    FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
-    VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/aquarius/index.json,readwrite"
-
 on:
   push:
     branches: [ "master", "feature"]
@@ -109,16 +103,20 @@ jobs:
 
     - name: Add NuGet sources
       shell: bash
+      env:
+        USERNAME: aquarius
+        VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
+        FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
       run: |
-        .$(${{ env.VCPKG_EXE }} fetch nuget) `
-          sources add `
-          -Source "${{ env.FEED_URL }}" `
-          -StorePasswordInClearText `
-          -Name GitHubPackages `
-          -UserName "${{ env.USERNAME }}" `
+        mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+          sources add \
+          -Source "${{ env.FEED_URL }}" \
+          -StorePasswordInClearText \
+          -Name GitHubPackages \
+          -UserName "${{ env.USERNAME }}" \
           -Password "${{ secrets.GITHUB_TOKEN }}"
-        .$(${{ env.VCPKG_EXE }} fetch nuget) `
-          setapikey "${{ secrets.GITHUB_TOKEN }}" `
+        mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+          setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -Source "${{ env.FEED_URL }}"
 
     - name: Configure CMake
