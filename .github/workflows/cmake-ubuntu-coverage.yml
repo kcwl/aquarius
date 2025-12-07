@@ -108,6 +108,7 @@ jobs:
         VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
         FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
       run: |
+        sudo apt install -y mono-complete
         mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
           sources add \
           -Source "${{ env.FEED_URL }}" \
