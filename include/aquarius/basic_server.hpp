@@ -5,7 +5,6 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/session_store.hpp>
-#include <aquarius/sql/sql_connector.hpp>
 #include <aquarius/module.hpp>
 
 using namespace std::chrono_literals;
@@ -20,8 +19,6 @@ namespace aquarius
 		using acceptor = typename Session::acceptor;
 
 		using endpoint = typename acceptor::endpoint_type;
-
-		using sql_connection = sql_connector<typename Session::executor_type>;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})

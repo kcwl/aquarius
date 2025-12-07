@@ -14,7 +14,7 @@ namespace aquarius
 		int32_t pool_size = 1;
 		std::string CA;
 		std::optional<int32_t> timeout;
-		std::optional<bool> reconnect;
+		std::optional<char> reconnect;
 		std::optional<bool> enable_transaction;
 	};
 } // namespace aquarius

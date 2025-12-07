@@ -26,9 +26,7 @@ namespace aquarius
 			template <typename Self>
 			auto operator()(Self& self, error_code ec = {}) -> awaitable<void>
 			{
-				auto result = co_await task(proc_ptr);
-
-				self.complete(ec, result);
+				
 			}
 
 			std::shared_ptr<T> proc_ptr;
@@ -37,50 +35,55 @@ namespace aquarius
 		};
 
 	public:
-		explicit basic_pool(IoPool& io_pool)
-			: io_pool_(io_pool)
+		explicit basic_pool()
+			: index_(0)
+			, task_pool_()
 		{}
 
 	public:
 		template <typename... Args>
-		void run(Args&&... args)
+		auto run(std::size_t size, Args&&... args) -> awaitable<bool>
 		{
-			auto size = io_pool_.size();
-
 			for (std::size_t i = 0; i < size; ++i)
 			{
-				task_pool_.emplace_back(std::make_shared<T>(io_pool_.get_io_service(), std::forward<Args>(args)...));
+				auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
+
+				auto result = co_await ptr->start();
+
+				if (!result)
+					co_return false;
+
+				task_pool_.emplace_back(ptr);
 			}
+
+			co_return true;
 		}
 
 		template <typename Task>
 		requires(enable_pool_task<Task, T>)
 		auto async_execute(Task&& task) -> awaitable<typename Task::return_type>
 		{
+			using return_type = typename Task::return_type;
 			error_code ec{};
 
-			auto result = co_await async_execute_impl(std::forward<Task>(task), redirect_error(use_awaitable, ec));
+			auto proc_ptr = get_task_proc();
 
-			if (ec)
-			{
-				using return_type = typename Task::return_type;
-
+			if (!proc_ptr)
 				co_return return_type{};
-			}
 
-			co_return result;
-		}
-
-		void stop()
-		{
-			io_pool_.stop();
+			co_return co_await task(proc_ptr);
 		}
 
 	private:
 		std::shared_ptr<T> get_task_proc()
 		{
 			if (task_pool_.empty())
+			{
+				XLOG_WARNING() << "task pool is empty!";
+
 				return nullptr;
+			}
+				
 
 			if (index_ == task_pool_.size())
 				index_ = 0;
@@ -88,20 +91,7 @@ namespace aquarius
 			return task_pool_[index_++];
 		}
 
-		template <typename Task, typename CompleteToken>
-		auto async_execute_impl(Task&& task, CompleteToken&& token) -> awaitable<typename Task::return_type>
-		{
-			auto task_proc = get_task_proc();
-
-			using return_type = typename Task::return_type;
-
-			co_return co_await async_compose<CompleteToken, void(error_code, return_type)>(
-				initialize_task(task_proc, std::forward<Task>(task)), token, io_pool_.get_io_service());
-		}
-
 	private:
-		IoPool& io_pool_;
-
 		std::size_t index_;
 
 		std::vector<std::shared_ptr<T>> task_pool_;

@@ -1,9 +1,9 @@
 #pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/logger.hpp>
 #include <aquarius/sql/database_param.hpp>
 #include <aquarius/sql/sql_error.hpp>
-
 #include <aquarius/sql/transaction.hpp>
 #include <expected>
 
@@ -15,41 +15,37 @@
 
 namespace aquarius
 {
-	template <typename Executor = any_io_executor>
 	class sql_connector
 	{
 #if defined(MYSQL_SQL)
-		using service_impl = sql::mysql<Executor>;
+		using service_impl = sql::mysql;
 #else
 		using service_impl = sql::empty_impl<Executor>;
 #endif
 
 	public:
-		sql_connector(const Executor& exector, const database_param& param)
-			: executor_(exector)
-			, param_(param)
-			, service_(executor_, param_)
+		sql_connector(const database_param& param)
+			: param_(param)
+			, service_(param_)
 			, completed_(false)
 		{
-			co_spawn(executor_, async_connect(), detached);
+			
 		}
 
-		template <typename Context>
-		sql_connector(Context& context, const database_param& param)
-			: sql_connector(context.get_executor(), param)
-		{}
-
 	public:
-		Executor get_executor() const
+		auto start() -> awaitable<bool>
 		{
-			return executor_;
+			co_return co_await async_connect();
 		}
 
 		auto async_connect() -> awaitable<bool>
 		{
-			error_code ec{};
+			error_code ec = co_await service_.async_connect();
 
-			co_await service_.async_connect(redirect_error(use_awaitable, ec));
+			if (ec)
+			{
+				XLOG_ERROR() << "sql connect " << param_.host << " failed! error: " << ec.what();
+			}
 
 			co_return !ec;
 		}
@@ -59,7 +55,8 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto result = co_await service_.template async_query<typename T::value_type>(sql, redirect_error(use_awaitable, ec));
+			auto result =
+				co_await service_.template async_query<typename T::value_type>(sql, ec);
 
 			if (ec)
 				co_return T{};
@@ -75,7 +72,7 @@ namespace aquarius
 
 			error_code ec{};
 
-			auto result = co_await service_.async_execute(sql, redirect_error(use_awaitable, ec));
+			auto result = co_await service_.async_execute(sql, ec);
 
 			completed_ = !ec;
 
@@ -95,9 +92,6 @@ namespace aquarius
 		}
 
 	private:
-	private:
-		Executor executor_;
-
 		database_param param_;
 
 		service_impl service_;

@@ -1,12 +1,12 @@
 #define BOOST_TEST_NO_MAIN
-#include <boost/test/unit_test.hpp>
+#include <aquarius/asio.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <aquarius/sql.hpp>
 #include <aquarius/sql/database_param.hpp>
-#include <aquarius/asio.hpp>
-#include <aquarius/sql/sql_connector.hpp>
-#include <aquarius/io_service_pool.hpp>
-#include <aquarius/sql/sql_pool.hpp>
 #include <aquarius/sql/make_sql_task.hpp>
+#include <aquarius/sql/sql_connector.hpp>
+#include <aquarius/sql/sql_pool.hpp>
+#include <boost/test/unit_test.hpp>
 
 struct personal
 {
@@ -55,11 +55,12 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 using namespace std::chrono_literals;
 
+#if defined(MYSQL_SQL)
 BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
 
-	aquarius::io_service_pool pool(10);
+	aquarius::io_service_pool pool(1);
 
 	aquarius::database_param db_param{};
 	db_param.host = "localhost";
@@ -67,31 +68,33 @@ BOOST_AUTO_TEST_CASE(connecting)
 	db_param.password = "NN0705lwl1217&";
 	db_param.db = "unittest";
 
-	aquarius::create_sql_pool(pool);
+	auto future = aquarius::co_spawn(pool.get_io_service(), aquarius::sql_pool().run(pool.size(), db_param), aquarius::use_future);
 
-	aquarius::sql_pool()->run(db_param);
+	std::thread t([&] { pool.run(); });
 
-	std::this_thread::sleep_for(3s);
+	future.get();
 
-	auto& io = pool.get_io_service();
-
-	auto future = aquarius::co_spawn(
-		io,
+	auto fur = aquarius::co_spawn(
+		pool.get_io_service(),
 		[&] -> aquarius::awaitable<void>
 		{
-			auto res = co_await aquarius::sql_pool()->async_execute(aquarius::make_execute_task(sql_insert(p)()));
+			auto res = co_await aquarius::sql_pool().async_execute(aquarius::make_execute_task(sql_insert(p)()));
 
 			BOOST_TEST(res != 0);
 
-			auto result = co_await aquarius::sql_pool()->async_execute(aquarius::make_query_task<personal>(sql_select(personal)()));
+			auto result = co_await aquarius::sql_pool().async_execute(
+				aquarius::make_query_task<personal>(sql_select(personal)()));
 
 			BOOST_TEST(result.size() != 0);
 		},
 		aquarius::use_future);
 
-	io.run();
+	fur.get();
 
-	future.get();
+	pool.stop();
+
+	t.join();
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
