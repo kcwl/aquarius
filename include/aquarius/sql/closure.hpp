@@ -5,7 +5,6 @@ namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename Adaptor, typename... Args>
 		concept adaptor_invocable = requires { std::declval<Adaptor>()(std::declval<Args>()...); };
 

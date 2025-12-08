@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/sql/closure.hpp>
 #include <aquarius/detail/int_to_string.hpp>
+#include <aquarius/sql/closure.hpp>
+#include <aquarius/sql/concepts.hpp>
 
 using namespace std::string_view_literals;
 
@@ -10,7 +10,6 @@ namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename Cond, const auto& Table, const auto& Left, const auto& Right>
 		struct condition_view
 		{
@@ -111,8 +110,7 @@ namespace aquarius
 			using base::operator();
 		};
 
-
-		template<auto Value>
+		template <auto Value>
 		struct single_number_condition_view
 		{
 			constexpr auto operator()() const
@@ -121,7 +119,7 @@ namespace aquarius
 			}
 		};
 
-		template<auto Value>
+		template <auto Value>
 		struct _single_number : sql_adaptor<_single_number<Value>>
 		{
 			constexpr auto operator()() const

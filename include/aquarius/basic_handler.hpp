@@ -1,7 +1,6 @@
 #pragma once
-#include <aquarius/detail/config.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/coroutine.hpp>
 #include <memory>
 
 namespace aquarius
@@ -25,6 +24,9 @@ namespace aquarius
 		auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<request_t> request_ptr, bool has_error = false)
 			-> awaitable<void>
 		{
+			if (!request_ptr)
+				co_return;
+
 			this->session_ptr_ = sessoin_ptr;
 			this->request_ptr_ = request_ptr;
 
@@ -61,7 +63,7 @@ namespace aquarius
 			return;
 		}
 
-		auto session()
+		auto session() const
 		{
 			return session_ptr_.lock();
 		}
@@ -77,6 +79,9 @@ namespace aquarius
 
 			response().commit(buffer);
 
+			if (!this->session())
+				co_return;
+
 			co_await this->session()->async_send(buffer);
 		}
 
@@ -91,5 +96,3 @@ namespace aquarius
 		std::string name_;
 	};
 } // namespace aquarius
-
-#define AQUARIUS_GLOBAL_STR_ID(request) #request

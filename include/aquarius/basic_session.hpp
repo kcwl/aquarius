@@ -1,55 +1,31 @@
 #pragma once
-#include <aquarius/detail/config.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <span>
-#include <aquarius/detail/ssl_context.hpp>
-#include <boost/asio/read.hpp>
-#include <aquarius/coroutine.hpp>
-#include <boost/asio/connect.hpp>
-#include <aquarius/detail/redirect_error.hpp>
-#include <aquarius/adaptor/timer_adaptor.hpp>
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <aquarius/ip/tcp/tcp_error.hpp>
-#include <aquarius/ip/concept.hpp>
-#include <aquarius/ip/socket_adaptor.hpp>
+#include <aquarius/ip/protocol.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <aquarius/sql/sql_connector.hpp>
 
 namespace aquarius
 {
-	template <bool Server, template<bool> typename Protocol>
-	class basic_session : public std::enable_shared_from_this<basic_session<Server, Protocol>>
+	template <auto ProtoTag, typename Adaptor>
+	class basic_session
 	{
 	public:
-		using protocol = Protocol<Server>;
+		using socket = typename protocol<ProtoTag>::socket;
 
-		constexpr static auto is_server = Server;
+		using endpoint = typename protocol<ProtoTag>::endpoint;
 
-		using socket = protocol::socket;
+		using acceptor = typename protocol<ProtoTag>::acceptor;
 
-		using endpoint = protocol::endpoint;
-
-		using acceptor = protocol::acceptor;
-
-		using resolver = protocol::resolver;
+		using resolver = typename protocol<ProtoTag>::resolver;
 
 		using executor_type = typename socket::executor_type;
-
-		using sql_conn_t = sql_connector<executor_type>;
 
 	public:
 		explicit basic_session(socket sock)
 			: socket_(std::move(sock))
 			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
-			, proto_()
-			, timer_(socket_.get_executor())
-		{}
-
-		basic_session(io_context& io)
-			: basic_session(std::move(socket(io)))
 		{}
 
 		virtual ~basic_session() = default;
@@ -65,9 +41,16 @@ namespace aquarius
 			return uuid_;
 		}
 
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
+		auto async_connect(const std::string& host, const std::string& port) -> awaitable<bool>
 		{
-			co_return co_await socket_adaptor_.async_connect(host, port);
+			auto ec = co_await socket_adaptor_.async_connect(host, port);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "async_connect error: " << ec.what();
+			}
+
+			co_return !ec;
 		}
 
 		std::string remote_address() const
@@ -94,6 +77,11 @@ namespace aquarius
 			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
 											 redirect_error(use_awaitable, ec));
 
+			if (ec)
+			{
+				XLOG_INFO() << "async_read exception: " << ec.what() << ", remote_address: " << remote_address();
+			}
+
 			buffer.commit(length);
 
 			co_return ec;
@@ -105,6 +93,11 @@ namespace aquarius
 
 			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buffer, delm,
 												   redirect_error(use_awaitable, ec));
+
+			if (ec)
+			{
+				XLOG_INFO() << "async_read_util exception: " << ec.what() << ", remote_address: " << remote_address();
+			}
 
 			co_return ec;
 		}
@@ -132,17 +125,11 @@ namespace aquarius
 			socket_.close(ec);
 		}
 
-		auto accept() -> awaitable<void>
-		{
-			co_return co_await socket_adaptor_.accept([this] -> awaitable<void>
-													  { co_return co_await proto_.accept(this->shared_from_this()); });
-		}
-
 		bool keep_alive(bool value)
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol::keep_alive(value), ec);
+			socket_.set_option(typename protocol<ProtoTag>::keep_alive(value), ec);
 
 			return !ec;
 		}
@@ -151,37 +138,16 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol::no_delay(enable), ec);
+			socket_.set_option(typename protocol<ProtoTag>::no_delay(enable), ec);
 
 			return !ec;
 		}
 
-		template <typename Response>
-		auto query() -> awaitable<Response>
-		{
-			co_return co_await proto_.template query<Response>(this->shared_from_this());
-		}
-
-		void attach_sql(std::shared_ptr<sql_conn_t> sql_ptr)
-		{
-			sql_conn_ptr_ = sql_ptr;
-		}
-
-	private:
+	protected:
 		socket socket_;
 
-		socket_adaptor<Server, protocol> socket_adaptor_;
+		Adaptor socket_adaptor_;
 
 		std::size_t uuid_;
-
-		protocol proto_;
-
-		timer_adaptor<boost::asio::steady_timer> timer_;
-
-		std::weak_ptr<sql_conn_t> sql_conn_ptr_;
 	};
-
-	template <bool Server, template<bool> typename Protocol>
-	struct is_session_type<basic_session<Server, Protocol>> : std::true_type
-	{};
 } // namespace aquarius

@@ -1,11 +1,10 @@
 #pragma once
-#include <string>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 
 namespace aquarius
 {
-
 	inline std::string url_encode(const std::string& str)
 	{
 		std::stringstream ss{};
@@ -13,7 +12,8 @@ namespace aquarius
 
 		for (const auto& s : str)
 		{
-			if (std::isalnum((uint8_t)s) || s == '-' || s == '_' || s == '.' || s == '~' || s == '&' || s == '?' || s == '=')
+			if (std::isalnum((uint8_t)s) || s == '-' || s == '_' || s == '.' || s == '~' || s == '&' || s == '?' ||
+				s == '=')
 			{
 				result.push_back(s);
 			}
@@ -29,7 +29,7 @@ namespace aquarius
 		return result;
 	}
 
-	inline std::string url_decode(const std::string& str)
+	inline std::string url_decode(std::string_view str)
 	{
 		std::stringstream ss{};
 		std::string result{};
@@ -86,5 +86,4 @@ namespace aquarius
 
 		return url_encode(ss.str());
 	}
-
 } // namespace aquarius

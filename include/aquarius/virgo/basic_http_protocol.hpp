@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
 #include <aquarius/virgo/http_fields.hpp>
-#include <aquarius/virgo/http_version.hpp>
 #include <aquarius/virgo/http_status.hpp>
+#include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
 {

@@ -1,4 +1,6 @@
 #pragma once
+#include <aquarius/ip/http/url_encode.hpp>
+#include <aquarius/ip/protocol.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <format>
@@ -69,8 +71,8 @@ namespace aquarius
 
 					this->content_length(body_buffer.size());
 
-					headline =
-						std::format("{} {} {}\r\n", virgo::from_method_string(Method),router, virgo::from_string_version(this->version()));
+					headline = std::format("{} {} {}\r\n", virgo::from_method_string(Method), router,
+										   virgo::from_string_version(this->version()));
 				}
 
 				for (auto& s : this->fields())
@@ -101,4 +103,10 @@ namespace aquarius
 	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
 	struct is_message_type<virgo::http_request<Router, Method, Header, Body>> : std::true_type
 	{};
+
+	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
+	struct handler_tag_traits<virgo::http_request<Router, Method, Header, Body>>
+	{
+		constexpr static auto tag = proto_tag::http;
+	};
 } // namespace aquarius

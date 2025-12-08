@@ -1,17 +1,17 @@
 #pragma once
-#include <string_view>
-#include <format>
-#include <aquarius/sql/select_view.hpp>
-#include <aquarius/sql/insert_view.hpp>
-#include <aquarius/sql/remove_view.hpp>
-#include <aquarius/sql/update_view.hpp>
-#include <aquarius/sql/where_view.hpp>
+#include <aquarius/detail/string_literal.hpp>
 #include <aquarius/sql/and_view.hpp>
+#include <aquarius/sql/condition_view.hpp>
+#include <aquarius/sql/insert_view.hpp>
+#include <aquarius/sql/limit_view.hpp>
 #include <aquarius/sql/or_view.hpp>
 #include <aquarius/sql/order_view.hpp>
-#include <aquarius/sql/limit_view.hpp>
-#include <aquarius/sql/condition_view.hpp>
-#include <aquarius/detail/string_literal.hpp>
+#include <aquarius/sql/remove_view.hpp>
+#include <aquarius/sql/select_view.hpp>
+#include <aquarius/sql/update_view.hpp>
+#include <aquarius/sql/where_view.hpp>
+#include <format>
+#include <string_view>
 
 namespace aquarius
 {
@@ -255,9 +255,12 @@ namespace aquarius
 #define sql_insert(content) aquarius::sql::insert(content)
 #define sql_update(content) aquarius::sql::update(content)
 #define sql_delete(content) aquarius::sql::remove<content>()
-#define sql_where(content) aquarius::sql::where(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
-#define sql_and(content) aquarius::sql::and_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_where(content)                                                                                             \
+	aquarius::sql::where(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_and(content)                                                                                               \
+	aquarius::sql::and_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
 #define sql_or(content) aquarius::sql::or_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
-#define sql_desc(...) aquarius::sql::desc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
+#define sql_desc(...)                                                                                                  \
+	aquarius::sql::desc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
 #define sql_asc(...) aquarius::sql::asc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
 #define sql_limit(n) aquarius::sql::limit(aquarius::sql::_single_number<n>())

@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/detail/string_literal.hpp>
 #include <boost/core/empty_value.hpp>
 #include <iostream>
-#include <aquarius/detail/string_literal.hpp>
 
 namespace aquarius
 {

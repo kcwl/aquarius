@@ -15,7 +15,6 @@ namespace aquarius
 		}
 
 	public:
-
 		virtual void serialize(flex_buffer&) override
 		{
 			return;
@@ -59,5 +58,4 @@ namespace aquarius
 	{
 		return os;
 	}
-
 } // namespace aquarius

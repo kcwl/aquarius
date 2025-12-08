@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/serialize/concept.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <span>
 
 namespace aquarius
 {
@@ -80,7 +81,7 @@ namespace aquarius
 
 			if (key != name)
 				return T{};
-			
+
 			auto value = get_first_range<'&', '#'>(buffer);
 
 			if (value.size() < 2)
@@ -90,12 +91,12 @@ namespace aquarius
 		}
 
 	private:
-		template<char... args>
+		template <char... args>
 		std::string get_first_range(flex_buffer& buffer)
 		{
 			auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
-			auto iter = std::find_if(sp.begin(),sp.end(), [&] (const auto c) { return ((c == args) || ...); });
+			auto iter = std::find_if(sp.begin(), sp.end(), [&](const auto c) { return ((c == args) || ...); });
 
 			if (iter == sp.end())
 			{
@@ -108,7 +109,7 @@ namespace aquarius
 			std::string result((char*)buffer.data().data(), len);
 
 			buffer.consume(len + 1);
-				
+
 			return result;
 		}
 	};

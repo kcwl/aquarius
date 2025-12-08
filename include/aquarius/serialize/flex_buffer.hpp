@@ -1,23 +1,16 @@
 #pragma once
-#include <vector>
-#include <expected>
-#include <string>
-#include <span>
-#include <aquarius/serialize/error.hpp>
-#include <boost/asio/streambuf.hpp>
+#include <aquarius/asio.hpp>
 
 namespace aquarius
 {
-	using flex_buffer = boost::asio::streambuf;
+	using flex_buffer = streambuf;
 
 	class auto_consume
 	{
 	public:
 		auto_consume(flex_buffer& buffer)
 			: buffer_(buffer)
-		{
-
-		}
+		{}
 
 		~auto_consume()
 		{
@@ -33,9 +26,7 @@ namespace aquarius
 	public:
 		auto_commit(flex_buffer& buffer)
 			: buffer_(buffer)
-		{
-
-		}
+		{}
 
 		~auto_commit()
 		{

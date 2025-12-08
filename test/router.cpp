@@ -1,7 +1,5 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include <aquarius/ip/http/http_router.hpp>
-#include <aquarius/ip/tcp/tcp_router.hpp>
 #include "ctx_handler.hpp"
 
 BOOST_AUTO_TEST_SUITE(routers)

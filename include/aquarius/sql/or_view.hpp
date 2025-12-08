@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
+#include <aquarius/sql/concepts.hpp>
 
 namespace aquarius
 {

@@ -8,11 +8,11 @@
 #include <boost/log/keywords/registration.hpp>
 #include <boost/log/sinks.hpp>
 #include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/record_ordering.hpp>
+#include <boost/log/utility/setup/console.hpp>
+#include <filesystem>
 #include <source_location>
 #include <string>
-#include <filesystem>
 
 namespace aquarius
 {
@@ -38,8 +38,8 @@ namespace aquarius
 
 		void init_logger()
 		{
-			auto console_sink_ptr = logging::add_console_log(std::clog,
-									 keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
+			auto console_sink_ptr = logging::add_console_log(
+				std::clog, keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
 
 			auto file_sink_ptr = boost::make_shared<file_sink>(
 				keywords::file_name = "file.log", keywords::target_file_name = "%Y%m%d_%H%M%S.%5N.log",
@@ -51,9 +51,9 @@ namespace aquarius
 											keywords::max_files = 512, keywords::min_free_space = 100 * 1024 * 1024));
 
 			file_sink_ptr->set_formatter(expr::format("[%1%][%2%:%3%]<%4%> %5%") %
-									 expr::attr<trivial::severity_level>("Severity") % expr::attr<std::string>("File") %
-									 expr::attr<uint32_t>("Line") % expr::attr<boost::posix_time::ptime>("TimeStamp") %
-									 expr::smessage);
+										 expr::attr<trivial::severity_level>("Severity") %
+										 expr::attr<std::string>("File") % expr::attr<uint32_t>("Line") %
+										 expr::attr<boost::posix_time::ptime>("TimeStamp") % expr::smessage);
 
 			file_sink_ptr->set_filter(trivial::severity >= trivial::info);
 

@@ -1,15 +1,14 @@
 #pragma once
-#include <aquarius/sql/concepts.hpp>
 #include <aquarius/detail/concat.hpp>
+#include <aquarius/detail/struct_name.hpp>
+#include <aquarius/sql/concepts.hpp>
 #include <boost/pfr.hpp>
 #include <sstream>
-#include <aquarius/detail/struct_name.hpp>
 
 namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename T>
 		class update_view
 		{
