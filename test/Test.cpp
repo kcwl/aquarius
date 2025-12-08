@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 BOOST_AUTO_TEST_CASE(http_post_flow)
 {
-	aquarius::http_server srv(80, 10, "async http post server");
+	aquarius::http_server srv(8099, 10, "async http post server");
 
 	std::thread t([&] { srv.run(); });
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "80");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", "8099");
 
 			BOOST_TEST(is_connect);
 
