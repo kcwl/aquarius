@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			BOOST_TEST(resp.body().per_resp == req->body().per_req);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
-			BOOST_TEST(cli->remote_port() == 80);
+			BOOST_TEST(cli->remote_port() == 8099);
 		},
 		aquarius::use_future);
 
