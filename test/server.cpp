@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE(server)
 BOOST_AUTO_TEST_CASE(signals)
 {
 	{
-		aquarius::tcp_server srv(8100, 10, "signal[SIGINT] for server");
+		aquarius::tcp_server srv(8888, 10, "signal[SIGINT] for server");
 
 		std::thread t([&] { srv.run(); });
 
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(signals)
 	}
 
 	{
-		aquarius::tcp_server srv(8100, 10, "signal[SIGTERM] for server");
+		aquarius::tcp_server srv(9999, 10, "signal[SIGTERM] for server");
 
 		std::thread t([&] { srv.run(); });
 
