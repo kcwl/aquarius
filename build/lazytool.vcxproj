@@ -19,18 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\lazytool\cpp_db_generate.cpp" />
     <ClCompile Include="..\src\lazytool\cpp_generater.cpp" />
     <ClCompile Include="..\src\lazytool\custom_type.cpp" />
     <ClCompile Include="..\src\lazytool\file_parse.cpp" />
     <ClCompile Include="..\src\lazytool\lazytool.cpp" />
     <ClCompile Include="..\src\lazytool\log.cpp" />
+    <ClCompile Include="..\src\lazytool\model_parse.cpp" />
     <ClCompile Include="..\src\lazytool\registor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\lazytool\cpp_db_generate.h" />
     <ClInclude Include="..\src\lazytool\cpp_generater.h" />
     <ClInclude Include="..\src\lazytool\custom_type.h" />
     <ClInclude Include="..\src\lazytool\log.h" />
     <ClInclude Include="..\src\lazytool\file_parse.h" />
+    <ClInclude Include="..\src\lazytool\model_parse.h" />
     <ClInclude Include="..\src\lazytool\parse_helper.hpp" />
     <ClInclude Include="..\src\lazytool\registor.h" />
     <ClInclude Include="..\src\lazytool\struct_type.hpp" />

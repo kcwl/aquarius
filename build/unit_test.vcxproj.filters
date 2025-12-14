@@ -147,41 +147,8 @@
     <ClInclude Include="..\include\aquarius\sql\concepts.hpp">
       <Filter>include\aquarius\sql</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\select_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\concat.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\insert_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\remove_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\update_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\select_distinct_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\where_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\and_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\or_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\order_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\limit_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\condition_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\sql\closure.hpp">
       <Filter>include\aquarius\sql</Filter>
@@ -341,6 +308,33 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\field.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\key.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\common.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\index.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\attribute.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\integer.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\decimal.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\datetime.hpp">
+      <Filter>include\aquarius\sql</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\sql\generate_view.hpp">
+      <Filter>include\aquarius\sql</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

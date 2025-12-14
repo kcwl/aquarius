@@ -66,6 +66,27 @@ bool parse_command(int argc, char** argv, std::vector<std::string>& input_files,
 				return false;
 			}
 		}
+		else if (std::string(argv[i]) == "--db_input")
+		{
+			while (i + 1 < argc && argv[i + 1][0] != '-')
+			{
+				std::string file = argv[++i];
+
+				if (!check_suffix(file, "tbl"))
+				{
+					std::cout << "Input file error! there must be *.tbl file!\n";
+					return false;
+				}
+
+				input_files.push_back(file);
+			}
+
+			if (input_files.empty())
+			{
+				std::cout << "No input files!\n";
+				return false;
+			}
+		}
 		else if (std::string(argv[i]) == "--cpp_out")
 		{
 			if (i + 1 < argc && argv[i + 1][0] != '-')
@@ -126,7 +147,7 @@ int main(int argc, char** args)
 
 	for (auto& file : input_files)
 	{
-		file_parser pr{};
+		proto_parser pr{};
 
 		if (!pr.read_file(file))
 			return 0;

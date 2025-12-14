@@ -90,11 +90,11 @@ namespace aquarius
             std::shared_ptr<data_field> response_;
         };
 
-        class file_parser
+        class proto_parser
         {
         public:
-            file_parser();
-            ~file_parser() = default;
+            proto_parser();
+            ~proto_parser() = default;
 
         public:
             bool read_file(const std::string& file_path);

@@ -316,7 +316,7 @@ namespace aquarius
 			return os;
 		}
 
-		file_parser::file_parser()
+		proto_parser::proto_parser()
 			: fields_()
 			, registor_()
 			, column_(0)
@@ -366,7 +366,7 @@ namespace aquarius
 							 });
 		}
 
-		bool file_parser::read_file(const std::string& file_path)
+		bool proto_parser::read_file(const std::string& file_path)
 		{
 			std::ifstream ifs(file_path);
 			if (!ifs.is_open())
@@ -395,7 +395,7 @@ namespace aquarius
 			return true;
 		}
 
-		std::ostream& operator<<(std::ostream& os, const file_parser& pr)
+		std::ostream& operator<<(std::ostream& os, const proto_parser& pr)
 		{
 			for (auto& s : pr.fields_)
 			{
