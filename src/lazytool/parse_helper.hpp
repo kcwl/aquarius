@@ -64,7 +64,11 @@ namespace aquarius
 				if constexpr (Token == token::value)
 				{
 					if (c != '_' && !std::isalnum(c))
+					{
+						ends = c;
 						break;
+					}
+						
 				}
 				else if constexpr (Token == token::key || Token == token::domin)
 				{
@@ -74,6 +78,8 @@ namespace aquarius
 						{
 							ifs.seekg(-static_cast<int64_t>(value.size()), std::ios::cur);
 						}
+
+						ends = c;
 
 						break;
 					}

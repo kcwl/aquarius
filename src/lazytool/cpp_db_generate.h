@@ -13,8 +13,6 @@ namespace aquarius
 		public:
 			void generate_table(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr);
 
-			void generate_field_template(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr);
-
 		private:
 			void generate_language(std::ofstream& ofs, const std::string& value);
 

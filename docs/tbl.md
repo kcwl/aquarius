@@ -66,7 +66,7 @@ model test_table -> utf8
 + double
 
 ## decimal
-+ decimal
++ decimal(暂未支持)
 
 ## string
 + char
@@ -74,17 +74,17 @@ model test_table -> utf8
 + text
 
 ## binary
-+ blob
++ blob(暂未支持)
 
 ## enum
-+ enum
++ enum(暂未支持)
 
 ## set
-+ set
++ set(暂未支持)
 
 ## datetime
-+ year
-+ timestamp
-+ date
++ year(暂未支持)
++ timestamp(暂未支持)
++ date(暂未支持)
 + datetime
-+ time
++ time(暂未支持)

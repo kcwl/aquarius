@@ -37,7 +37,7 @@ namespace aquarius
 			bool parse_model(std::ifstream& ifs, std::shared_ptr<model_field> model_field_ptr);
 
 		public:
-			std::vector<model_field> models_;
+			std::vector<std::shared_ptr<model_field>> models_;
 
 			std::size_t column_;
 

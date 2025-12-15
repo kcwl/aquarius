@@ -11,11 +11,14 @@ namespace aquarius
 			if (!ifs.is_open())
 				return false;
 
-			char end;
 			while (!ifs.eof())
 			{
-				if (!parse_model(ifs))
+				auto model_field_ptr = std::make_shared<model_field>();
+
+				if (!parse_model(ifs, model_field_ptr))
 					continue;
+
+				models_.push_back(model_field_ptr);
 			}
 
 			return true;
@@ -56,16 +59,24 @@ namespace aquarius
 
 				field.type = read_value<token::key, ' '>(ifs, column_, row_, end);
 
+				if (end == '}')
+				{
+					ifs.get();
+					break;
+				}
+
 				field.name = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
 				while (end != ';')
 				{
 					auto t = read_value<token::value, '@', '^', '$'>(ifs, column_, row_, end);
 
-					if (t.empty())
+					if (end != '@' && end != '^' && end != '$')
 						return false;
 
-					auto value = read_value<token::value, ' '>(ifs, column_, row_, end);
+					t = end;
+
+					value = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
 					if (value.empty())
 						return false;
