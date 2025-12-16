@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/sql/common.hpp>
+#include <aquarius/tbl/common.hpp>
 #include <string_view>
 
 using namespace std::string_view_literals;
@@ -10,15 +10,6 @@ namespace aquarius
 	{
 		template <typename T>
 		struct key
-		{
-			void operator()()
-			{
-				static_assert(false, "illegal sql k;ey type");
-			}
-		};
-
-		template <>
-		struct key<primary>
 		{
 			constexpr std::string_view operator()()
 			{
@@ -43,5 +34,5 @@ namespace aquarius
 				return "UNIQUE"sv;
 			}
 		};
-	} // namespace sql
+	} // namespace tbl
 } // namespace aquarius

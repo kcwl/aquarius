@@ -14,7 +14,7 @@ namespace aquarius
 		template <>
 		struct integer_impl<1>
 		{
-			using value_type = int8_t;
+			using value_type = uint8_t;
 
 			static constexpr value_type filter = 0xff;
 
@@ -24,7 +24,7 @@ namespace aquarius
 		template <>
 		struct integer_impl<2>
 		{
-			using value_type = int16_t;
+			using value_type = uint16_t;
 
 			static constexpr value_type filter = 0xffff;
 
@@ -34,7 +34,7 @@ namespace aquarius
 		template <>
 		struct integer_impl<3>
 		{
-			using value_type = int32_t;
+			using value_type = uint32_t;
 
 			static constexpr value_type filter = 0xffffff;
 
@@ -44,7 +44,7 @@ namespace aquarius
 		template <>
 		struct integer_impl<4>
 		{
-			using value_type = int32_t;
+			using value_type = uint32_t;
 
 			static constexpr value_type filter = 0xffffffff;
 
