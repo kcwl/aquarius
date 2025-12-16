@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/tbl/field.hpp>
-#include <aquarius/tbl/generate_view.hpp>
-#include <aquarius/tbl/integer.hpp>
-#include <aquarius/tbl/key.hpp>
+#include <aquarius/tbl/engine/field.hpp>
+#include <aquarius/tbl/engine/generate_view.hpp>
+#include <aquarius/tbl/engine/integer.hpp>
+#include <aquarius/tbl/engine/key.hpp>
 #include <aquarius/tbl/sql_pool.hpp>
 
 namespace aquarius
