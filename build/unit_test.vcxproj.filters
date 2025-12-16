@@ -43,6 +43,12 @@
     <Filter Include="include\aquarius\tbl\engine">
       <UniqueIdentifier>{6f0fcd11-8fea-4f07-97e7-30d514280e25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\module">
+      <UniqueIdentifier>{682e5ada-f82d-4f5b-bace-8e54531bf769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ini">
+      <UniqueIdentifier>{5a72fa1f-ac88-420a-9a16-98bef9228ba5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -341,6 +347,24 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp">
       <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_module.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\module_router.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\schedule.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\schedule.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ini\parse.hpp">
+      <Filter>include\aquarius\ini</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
