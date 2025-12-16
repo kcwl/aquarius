@@ -2,15 +2,15 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/sql/database_param.hpp>
-#include <aquarius/sql/sql_error.hpp>
-#include <aquarius/sql/transaction.hpp>
+#include <aquarius/tbl/database_param.hpp>
+#include <aquarius/tbl/sql_error.hpp>
+#include <aquarius/tbl/transaction.hpp>
 #include <expected>
 
 #if defined(MYSQL_SQL)
-#include <aquarius/sql/mysql.hpp>
+#include <aquarius/tbl/mysql.hpp>
 #else
-#include <aquarius/sql/empty.hpp>
+#include <aquarius/tbl/empty.hpp>
 #endif
 
 namespace aquarius

@@ -2,7 +2,7 @@
 #include <aquarius/basic_pool.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/sql/sql_connector.hpp>
+#include <aquarius/tbl/sql_connector.hpp>
 
 namespace aquarius
 {

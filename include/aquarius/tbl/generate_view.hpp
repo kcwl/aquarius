@@ -1,7 +1,11 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/sql/closure.hpp>
-#include <aquarius/sql/concepts.hpp>
+#include <aquarius/detail/int_to_string.hpp>
+#include <aquarius/detail/struct_name.hpp>
+#include <aquarius/tbl/add_string.hpp>
+#include <aquarius/tbl/closure.hpp>
+#include <aquarius/tbl/concepts.hpp>
+#include <boost/pfr.hpp>
 
 namespace aquarius
 {

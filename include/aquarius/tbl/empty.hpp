@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/asio.hpp>
-#include <aquarius/sql/database_param.hpp>
+#include <aquarius/tbl/database_param.hpp>
 
 namespace aquarius
 {

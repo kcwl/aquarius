@@ -1,12 +1,9 @@
 #define BOOST_TEST_NO_MAIN
 #include <aquarius/asio.hpp>
 #include <aquarius/io_service_pool.hpp>
-#include <aquarius/sql.hpp>
-#include <aquarius/sql/database_param.hpp>
-#include <aquarius/sql/make_sql_task.hpp>
-#include <aquarius/sql/sql_connector.hpp>
-#include <aquarius/sql/sql_pool.hpp>
+#include <aquarius/tbl.hpp>
 #include <boost/test/unit_test.hpp>
+#include "test_model.tbl.h"
 
 struct personal
 {

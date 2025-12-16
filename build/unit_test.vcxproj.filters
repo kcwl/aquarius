@@ -37,7 +37,7 @@
     <Filter Include="include\aquarius\ip\http">
       <UniqueIdentifier>{b9092472-bc12-4030-a092-3b78e0026498}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\sql">
+    <Filter Include="include\aquarius\tbl">
       <UniqueIdentifier>{8b00fb3a-7488-4423-ae02-0d96221c5544}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -138,23 +138,14 @@
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql.hpp">
+    <ClInclude Include="..\include\aquarius\tbl.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\test\test.virgo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\concepts.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\concat.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\closure.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\add_string.hpp">
-      <Filter>include\aquarius\sql</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp">
       <Filter>include\aquarius\detail</Filter>
@@ -216,24 +207,6 @@
     <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\database_param.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\empty.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\mysql.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\sql_connector.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\sql_error.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\transaction.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\timer.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -257,15 +230,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_pool.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\task.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\sql_pool.hpp">
-      <Filter>include\aquarius\sql</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\make_sql_task.hpp">
-      <Filter>include\aquarius\sql</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\session_store.hpp">
       <Filter>include\aquarius</Filter>
@@ -309,32 +273,71 @@
     <ClInclude Include="..\include\aquarius\module.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\field.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\test\test_model.tbl.h">
+      <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\key.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\add_string.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\common.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\attribute.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\index.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\closure.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\attribute.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\common.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\integer.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\decimal.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\datetime.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\datetime.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\sql\generate_view.hpp">
-      <Filter>include\aquarius\sql</Filter>
+    <ClInclude Include="..\include\aquarius\tbl\decimal.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\field.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\generate_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\index.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\integer.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\key.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\make_sql_task.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\mysql.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\sql_pool.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\task.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\transaction.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

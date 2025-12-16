@@ -1,15 +1,7 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
-#include <aquarius/sql/and_view.hpp>
-#include <aquarius/sql/condition_view.hpp>
-#include <aquarius/sql/insert_view.hpp>
-#include <aquarius/sql/limit_view.hpp>
-#include <aquarius/sql/or_view.hpp>
-#include <aquarius/sql/order_view.hpp>
-#include <aquarius/sql/remove_view.hpp>
-#include <aquarius/sql/select_view.hpp>
-#include <aquarius/sql/update_view.hpp>
-#include <aquarius/sql/where_view.hpp>
+#include <aquarius/tbl/generate_view.hpp>
+#include <aquarius/tbl/sql_pool.hpp>
 #include <format>
 #include <string_view>
 
@@ -17,7 +9,6 @@ namespace aquarius
 {
 	namespace sql
 	{
-
 		template <typename T, auto Member>
 		constexpr bool member_find()
 		{
