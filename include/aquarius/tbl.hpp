@@ -9,6 +9,16 @@ namespace aquarius
 {
 	namespace tbl
 	{
+		struct _float
+		{
+			constexpr static auto name = "float"sv;
+		};
+
+		struct _double
+		{
+			constexpr static auto name = "_double"sv;
+		};
+
 		using string = std::string;
 	} // namespace tbl
 } // namespace aquarius

@@ -34,6 +34,10 @@ BOOST_AUTO_TEST_CASE(sql_)
 	constexpr auto sql = select_view<personal>();
 
 	static_assert(sql() == "select * from personal");
+
+	auto sql4 = create_view<test_model>();
+
+	BOOST_TEST(sql4() == "create table if not exists test_model(id1 int1 primary key,id2 int2, id3 int3, id4 int4, id5 int8, id6 float, id7 double)");
 }
 
 using namespace std::chrono_literals;

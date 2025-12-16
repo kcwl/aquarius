@@ -180,15 +180,49 @@ namespace aquarius
 		template <typename T>
 		struct create_view
 		{
-			constexpr static auto left_space = "("sv;
-			constexpr static auto right_space = ")"sv;
+			template <typename Field>
+			struct attr_bind
+			{
+				constexpr static std::string_view get_attrs()
+				{
+					using attr_type = typename Field::attr_type;
+
+					if constexpr (std::tuple_size_v<attr_type> == 0)
+					{
+						return ""sv;
+					}
+					else
+					{
+						auto f = []<std::size_t... I>(std::index_sequence<I...>)
+						{
+							return (std::tuple_element_t<I, attr_type>()(), ...);
+						};
+
+						constexpr auto size = std::tuple_size_v<attr_type>;
+
+						return f(std::make_index_sequence<size>{});
+					}
+				}
+
+				constexpr static auto type_name = Field::value_type::name;
+
+				constexpr static auto attrs = get_attrs();
+			};
+
+			template <std::size_t I, typename T>
+			struct name_bind
+			{
+				constexpr static auto value = boost::pfr::get_name<I, T>();
+			};
 
 			auto operator()() -> std::string
 			{
-				constexpr static auto sql_str = "CREATE TABLE IF NOT EXISTS "sv;
-
 				auto f = []<std::size_t... I>(std::index_sequence<I...>)
-				{ return (boost::pfr::tuple_element_t<I, T>::template get<boost::pfr::get_name<I, T>()>(), ...); };
+				{
+					return ((concat_v<attr_bind<boost::pfr::tuple_element_t<I, T>>::type_name, name_bind<I, T>::value,
+									  attr_bind<boost::pfr::tuple_element_t<I, T>>::attrs>),
+							...);
+				};
 
 				constexpr auto size = boost::pfr::tuple_size_v<std::decay_t<T>>;
 
