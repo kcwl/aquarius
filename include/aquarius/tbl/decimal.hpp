@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <std::size_t Significant = 10, std::size_t Decimal = 0>
 		class basic_decimal

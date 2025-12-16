@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
         struct primary {};
         struct foreign {};

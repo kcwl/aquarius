@@ -2,7 +2,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		struct unique
 		{};

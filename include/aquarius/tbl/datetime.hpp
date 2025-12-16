@@ -6,7 +6,7 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		namespace detail
 		{

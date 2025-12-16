@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <typename T>
 		inline T add_string_format(T value)

@@ -3,7 +3,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <typename T>
 		struct enable_condition_view : std::false_type

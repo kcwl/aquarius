@@ -7,7 +7,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <typename T, auto Member>
 		constexpr bool member_find()
@@ -156,29 +156,29 @@ namespace aquarius
 
 			constexpr static auto trip_cond_value = trip<cond_value>();
 
-			if constexpr (symbol == aquarius::sql::less::value)
+			if constexpr (symbol == aquarius::tbl::less::value)
 			{
-				return aquarius::sql::cond_less<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_less<table_name, trip_member, trip_cond_value>();
 			}
-			else if constexpr (symbol == aquarius::sql::less_equal::value)
+			else if constexpr (symbol == aquarius::tbl::less_equal::value)
 			{
-				return aquarius::sql::cond_less_equal<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_less_equal<table_name, trip_member, trip_cond_value>();
 			}
-			else if constexpr (symbol == aquarius::sql::greater::value)
+			else if constexpr (symbol == aquarius::tbl::greater::value)
 			{
-				return aquarius::sql::cond_greater<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_greater<table_name, trip_member, trip_cond_value>();
 			}
-			else if constexpr (symbol == aquarius::sql::greater_equal::value)
+			else if constexpr (symbol == aquarius::tbl::greater_equal::value)
 			{
-				return aquarius::sql::cond_greater_equal<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_greater_equal<table_name, trip_member, trip_cond_value>();
 			}
-			else if constexpr (symbol == aquarius::sql::not_equal::value)
+			else if constexpr (symbol == aquarius::tbl::not_equal::value)
 			{
-				return aquarius::sql::cond_not_equal<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_not_equal<table_name, trip_member, trip_cond_value>();
 			}
-			else if constexpr (symbol == aquarius::sql::equal::value)
+			else if constexpr (symbol == aquarius::tbl::equal::value)
 			{
-				return aquarius::sql::cond_equal<table_name, trip_member, trip_cond_value>();
+				return aquarius::tbl::cond_equal<table_name, trip_member, trip_cond_value>();
 			}
 			else
 			{
@@ -237,21 +237,21 @@ namespace aquarius
 		{
 			constexpr static std::string_view content = aquarius::detail::bind_param<Value>::value;
 
-			return aquarius::sql::_tp_condition<content>();
+			return aquarius::tbl::_tp_condition<content>();
 		}
 	} // namespace sql
 } // namespace aquarius
 
-#define sql_select(content) aquarius::sql::select<content>()
-#define sql_insert(content) aquarius::sql::insert(content)
-#define sql_update(content) aquarius::sql::update(content)
-#define sql_delete(content) aquarius::sql::remove<content>()
+#define sql_select(content) aquarius::tbl::select<content>()
+#define sql_insert(content) aquarius::tbl::insert(content)
+#define sql_update(content) aquarius::tbl::update(content)
+#define sql_delete(content) aquarius::tbl::remove<content>()
 #define sql_where(content)                                                                                             \
-	aquarius::sql::where(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+	aquarius::tbl::where(aquarius::tbl::parse_condition<aquarius::detail::string_literal(#content)>())
 #define sql_and(content)                                                                                               \
-	aquarius::sql::and_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
-#define sql_or(content) aquarius::sql::or_(aquarius::sql::parse_condition<aquarius::detail::string_literal(#content)>())
+	aquarius::tbl::and_(aquarius::tbl::parse_condition<aquarius::detail::string_literal(#content)>())
+#define sql_or(content) aquarius::tbl::or_(aquarius::tbl::parse_condition<aquarius::detail::string_literal(#content)>())
 #define sql_desc(...)                                                                                                  \
-	aquarius::sql::desc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
-#define sql_asc(...) aquarius::sql::asc_odr(aquarius::sql::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
-#define sql_limit(n) aquarius::sql::limit(aquarius::sql::_single_number<n>())
+	aquarius::tbl::desc_odr(aquarius::tbl::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
+#define sql_asc(...) aquarius::tbl::asc_odr(aquarius::tbl::parse_args<aquarius::detail::string_literal(#__VA_ARGS__)>())
+#define sql_limit(n) aquarius::tbl::limit(aquarius::tbl::_single_number<n>())

@@ -6,7 +6,7 @@ using namespace std::string_view_literals;
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <typename T>
 		struct key

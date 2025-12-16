@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		class empty_impl
 		{

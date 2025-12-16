@@ -9,7 +9,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		template <typename T>
 		class insert_view

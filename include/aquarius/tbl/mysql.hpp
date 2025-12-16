@@ -8,7 +8,7 @@
 
 namespace aquarius
 {
-	namespace sql
+	namespace tbl
 	{
 		class mysql
 		{

@@ -20,7 +20,7 @@ namespace aquarius
 #if defined(MYSQL_SQL)
 		using service_impl = sql::mysql;
 #else
-		using service_impl = sql::empty_impl;
+		using service_impl = tbl::empty_impl;
 #endif
 
 	public:
@@ -68,7 +68,7 @@ namespace aquarius
 
 		auto async_execute(std::string_view sql) -> awaitable<std::size_t>
 		{
-			sql::trans_guard lk(this);
+			tbl::trans_guard lk(this);
 
 			error_code ec{};
 
