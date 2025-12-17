@@ -41,6 +41,11 @@ namespace aquarius
 			timer_.cancel(ec);
 		}
 
+		duration dura() const
+		{
+			return timeout_;
+		}
+
 	private:
 		Executor executor_;
 

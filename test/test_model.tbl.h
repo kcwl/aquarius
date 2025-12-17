@@ -9,6 +9,6 @@ struct test_model
 	field<int3> id3;
 	field<int4> id4;
 	field<int8> id5;
-	field<_float> id6;
-	field<_double> id7;
+	field<floatable> id6;
+	field<doublable> id7;
 };
