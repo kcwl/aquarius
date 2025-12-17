@@ -38,6 +38,8 @@ namespace aquarius
 	template <typename Task>
 	class basic_module : public module_base
 	{
+		using return_type = typename Task::return_type;
+
 	public:
 		basic_module(const std::string& name)
 			: module_base(name)
@@ -57,10 +59,17 @@ namespace aquarius
 			return task_ptr_;
 		}
 
+		return_type result() const
+		{
+			return result_;
+		}
+
 	protected:
 		virtual auto handle() -> awaitable<error_code> = 0;
 
 	private:
 		std::shared_ptr<Task> task_ptr_;
+
+		return_type result_;
 	};
 } // namespace aquarius

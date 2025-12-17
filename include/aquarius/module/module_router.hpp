@@ -7,6 +7,7 @@
 
 namespace aquarius
 {
+
 	class module_router : public singleton<module_router>
 	{
 	public:
@@ -48,35 +49,34 @@ namespace aquarius
 		}
 
 		template <typename IoContext, typename Task>
-		void schedule(IoContext& io, std::string_view module_name, std::shared_ptr<Task> task)
+		auto schedule(IoContext& io, std::string_view module_name, std::shared_ptr<Task> task)
+			-> awaitable<typename Task::return_type>
 		{
+			using return_type = typename Task::return_type;
+
 			std::lock_guard lk(mutex_);
 
 			auto iter = routers_.find(module_name);
 			if (iter == routers_.end())
 			{
 				XLOG_WARNING() << "[" << module_name << "] module not found";
-				return;
+				co_return;
 			}
 
 			auto temp_module = std::dynamic_pointer_cast<basic_module<Task>>(iter->second);
 			if (!temp_module)
 			{
 				XLOG_WARNING() << "[" << module_name << "] task type not match";
-				return;
+				co_return return_type{};
 			}
 
-			co_spawn(
-				io,
-				[&] -> awaitable<void>
-				{
-					auto ec = co_await temp_module->visit(task);
-					if (ec)
-					{
-						XLOG_ERROR() << "[" << temp_module->name() << "] handle error: " << ec.message();
-					}
-				},
-				detached);
+			auto ec = co_await temp_module->visit(task);
+			if (ec)
+			{
+				XLOG_ERROR() << "[" << temp_module->name() << "] handle error: " << ec.message();
+			}
+
+			co_return temp_module->result();
 		}
 
 		void hot_update(std::string_view module_name)
@@ -93,6 +93,19 @@ namespace aquarius
 			{
 				XLOG_WARNING() << "[" << iter->second->name() << "] init error";
 				return;
+			}
+		}
+
+		void timer(std::chrono::milliseconds ms)
+		{
+			std::lock_guard lk(mutex_);
+
+			for (auto& f : routers_)
+			{
+				if (!f.second)
+					continue;
+
+				f.second->timer(ms);
 			}
 		}
 
