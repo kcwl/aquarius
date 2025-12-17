@@ -7,7 +7,6 @@
 
 namespace aquarius
 {
-
 	class module_router : public singleton<module_router>
 	{
 	public:
