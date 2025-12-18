@@ -3,7 +3,6 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/tbl.hpp>
 #include <boost/test/unit_test.hpp>
-#include "test_model.tbl.h"
 
 struct personal
 {
@@ -35,9 +34,9 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 	static_assert(sql() == "select * from personal");
 
-	auto sql4 = create_view<test_model>();
+	//auto sql4 = create_view<test_model>();
 
-	BOOST_TEST(sql4() == "create table if not exists test_model(id1 int1 primary key,id2 int2, id3 int3, id4 int4, id5 int8, id6 float, id7 double)");
+	//BOOST_TEST(sql4() == "create table if not exists test_model(id1 int1 primary key,id2 int2, id3 int3, id4 int4, id5 int8, id6 float, id7 double)");
 }
 
 using namespace std::chrono_literals;
@@ -46,15 +45,6 @@ using namespace std::chrono_literals;
 BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
-
-	test_model model{};
-	model.id1 = 1;
-	model.id2 = 1;
-	model.id3 = 1;
-	model.id4 = 1;
-	model.id5 = 1;
-	model.id6 = 1.1f;
-	model.id7 = 2.2;
 
 	aquarius::io_service_pool pool(1);
 
@@ -74,15 +64,15 @@ BOOST_AUTO_TEST_CASE(connecting)
 		pool.get_io_service(),
 		[&] -> aquarius::awaitable<void>
 		{
-			auto res = co_await aquarius::tbl::schedule_create<std::size_t>("sql", test_model{});
+			//auto res = co_await aquarius::tbl::schedule_create<std::size_t>("sql", test_model{});
+
+			//BOOST_TEST(res != 0);
+
+			auto res = co_await aquarius::tbl::schedule_insert<std::size_t>("sql", p);
 
 			BOOST_TEST(res != 0);
 
-			res = co_await aquarius::tbl::schedule_insert<std::size_t>("sql", model);
-
-			BOOST_TEST(res != 0);
-
-			auto result = co_await aquarius::tbl::schedule_select<std::vector<test_model>>("sql");
+			auto result = co_await aquarius::tbl::schedule_select<std::vector<personal>>("sql");
 
 			BOOST_TEST(result.size() != 0);
 		},

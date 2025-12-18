@@ -30,11 +30,11 @@ namespace aquarius
 			co_return co_await module_schedule(module_name, std::make_shared<sql_task<select_, int, R>>(0));
 		}
 
-		template <typename R, typename T>
-		auto schedule_create(std::string_view module_name, T&& v) -> awaitable<R>
-		{
-			co_return co_await module_schedule(module_name, std::make_shared<sql_task<create, T, R>>(std::forward<T>(v)));
-		}
+		//template <typename R, typename T>
+		//auto schedule_create(std::string_view module_name, T&& v) -> awaitable<R>
+		//{
+		//	co_return co_await module_schedule(module_name, std::make_shared<sql_task<create, T, R>>(std::forward<T>(v)));
+		//}
 
 		template <typename R = std::size_t>
 		auto schedule_query(std::string_view module_name, std::string_view sql) -> awaitable<R>

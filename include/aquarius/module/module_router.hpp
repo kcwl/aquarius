@@ -47,9 +47,8 @@ namespace aquarius
 			return true;
 		}
 
-		template <typename IoContext, typename Task>
-		auto schedule(IoContext& io, std::string_view module_name, std::shared_ptr<Task> task)
-			-> awaitable<typename Task::return_type>
+		template <typename Task>
+		auto schedule(std::string_view module_name, std::shared_ptr<Task> task) -> awaitable<typename Task::return_type>
 		{
 			using return_type = typename Task::return_type;
 
@@ -59,7 +58,7 @@ namespace aquarius
 			if (iter == routers_.end())
 			{
 				XLOG_WARNING() << "[" << module_name << "] module not found";
-				co_return;
+				co_return return_type{};
 			}
 
 			auto temp_module = std::dynamic_pointer_cast<basic_module<Task>>(iter->second);

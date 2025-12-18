@@ -25,7 +25,7 @@ namespace aquarius
 				: value_(value)
 			{}
 
-			using return_type = T;
+			using return_type = R;
 
 			template <typename Core>
 			auto operator()(std::shared_ptr<Core> task_proc) -> awaitable<return_type>
