@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
+#include <aquarius/ini/parse.hpp>
 #include <aquarius/logger.hpp>
 
 namespace aquarius

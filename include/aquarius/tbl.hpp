@@ -8,6 +8,7 @@
 #include <aquarius/tbl/engine/key.hpp>
 #include <aquarius/tbl/engine/text.hpp>
 #include <aquarius/tbl/engine/varchar.hpp>
+#include <aquarius/tbl/schedule.hpp>
 #include <aquarius/tbl/sql_pool.hpp>
 
 namespace aquarius

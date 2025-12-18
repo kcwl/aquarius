@@ -42,10 +42,19 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 using namespace std::chrono_literals;
 
-#if defined(MYSQL_SQL)
+
 BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
+
+	test_model model{};
+	model.id1 = 1;
+	model.id2 = 1;
+	model.id3 = 1;
+	model.id4 = 1;
+	model.id5 = 1;
+	model.id6 = 1.1f;
+	model.id7 = 2.2;
 
 	aquarius::io_service_pool pool(1);
 
@@ -65,12 +74,15 @@ BOOST_AUTO_TEST_CASE(connecting)
 		pool.get_io_service(),
 		[&] -> aquarius::awaitable<void>
 		{
-			auto res = co_await aquarius::sql_pool().async_execute(aquarius::make_execute_task(sql_insert(p)()));
+			auto res = co_await aquarius::tbl::schedule_create<std::size_t>("sql", test_model{});
 
 			BOOST_TEST(res != 0);
 
-			auto result = co_await aquarius::sql_pool().async_execute(
-				aquarius::make_query_task<personal>(sql_select(personal)()));
+			res = co_await aquarius::tbl::schedule_insert<std::size_t>("sql", model);
+
+			BOOST_TEST(res != 0);
+
+			auto result = co_await aquarius::tbl::schedule_select<std::vector<test_model>>("sql");
 
 			BOOST_TEST(result.size() != 0);
 		},
@@ -82,6 +94,5 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 	t.join();
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()

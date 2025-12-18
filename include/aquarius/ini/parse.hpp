@@ -18,7 +18,7 @@ namespace aquarius
 
 			constexpr auto size = boost::pfr::tuple_size<T>::value;
 
-			constexpr auto name = struct_name<T>::value;
+			constexpr auto name = detail::struct_name<T>::value;
 
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{

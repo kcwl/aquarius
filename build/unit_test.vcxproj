@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;MYSQL_SQL;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;D:\boost_1_88_0;$(SolutionDir)../3rd/virgo/include;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -217,21 +217,25 @@
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\basic_datatype.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\closure.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\database_param.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\empty.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\attribute.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\engine\bool.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\common.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\datetime.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\decimal.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\field.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\engine\float.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\generate_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\index.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\integer.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\key.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\mysql.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\make_sql_task.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\engine\text.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\engine\varchar.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\schedule.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp" />

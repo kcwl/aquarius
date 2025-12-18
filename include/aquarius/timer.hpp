@@ -24,13 +24,15 @@ namespace aquarius
 		template <typename Func>
 		auto async_wait(Func&& f) -> awaitable<void>
 		{
+			error_code ec{};
+
 			for (;;)
 			{
 				timer_.expires_after(timeout_);
 
-				co_await timer_.async_wait(use_awaitable);
+				co_await timer_.async_wait(redirect_error(use_awaitable, ec));
 
-				std::forward<Func>(f)();
+				std::forward<Func>(f)(ec);
 			}
 		}
 
@@ -41,9 +43,9 @@ namespace aquarius
 			timer_.cancel(ec);
 		}
 
-		duration dura() const
+		std::chrono::milliseconds dura() const
 		{
-			return timeout_;
+			return std::chrono::duration_cast<std::chrono::milliseconds>(timeout_);
 		}
 
 	private:

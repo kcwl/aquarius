@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <aquarius/tbl/engine/varchar.hpp>
 
 namespace aquarius
 {

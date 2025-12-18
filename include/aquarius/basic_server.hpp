@@ -22,8 +22,8 @@ namespace aquarius
 		using endpoint = typename acceptor::endpoint_type;
 
 	public:
-		explicit basic_server(uint16_t port, int32_t io_service_pool_size, std::chrono::milliseconds global_time_dura,
-							  const std::string& name = {})
+		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
+							  std::chrono::milliseconds global_time_dura = 30ms)
 			: io_service_pool_size_(io_service_pool_size)
 			, io_service_pool_(io_service_pool_size_)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
@@ -109,8 +109,8 @@ namespace aquarius
 
 		void init_global_timer()
 		{
-			timer_.async_wait(
-				[this, self = this->shared_from_this()](error_code ec)
+			global_timer_.async_wait(
+				[this](error_code ec)
 				{
 					if (ec)
 					{
@@ -118,7 +118,7 @@ namespace aquarius
 						return;
 					}
 
-					module_router::get_mutable_instance().timer(timer_.dura());
+					module_router::get_mutable_instance().timer(global_timer_.dura());
 				});
 		}
 

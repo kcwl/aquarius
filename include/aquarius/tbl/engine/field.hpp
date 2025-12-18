@@ -11,6 +11,16 @@ namespace aquarius
 			using value_type = T;
 
 			using attr_type = std::tuple<Args...>;
+
+			template<typename U>
+			field& operator=(const U& u)
+			{
+				value = u;
+
+				return *this;
+			}
+
+			value_type value;
 		};
 	} // namespace tbl
 } // namespace aquarius
