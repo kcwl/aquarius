@@ -32,7 +32,7 @@ namespace aquarius
 		auto schedule_select(const std::string& module_name) -> awaitable<R>
 		{
 			co_return co_await module_schedule<sql_connector>(module_name,
-															  std::make_shared<sql_task<select_, int, R>>(0));
+															  std::make_shared<sql_task<select_, typename R::return_type, R>>());
 		}
 
 		// template <typename R, typename T>

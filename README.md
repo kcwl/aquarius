@@ -67,21 +67,29 @@ AQUAIURS_HANDLER(request, response, ctx_test)
 struct personal
 {
 	int32_t age;
-	bool sex;_
+	bool sex;
 };
 
-//start sql pool
-co_await aquarius::sql_pool().run(pool.size(), db_param);
+personal p{1,true};
 
-auto res = co_await aquarius::sql_pool().async_execute(
-	aquarius::make_execute_task(sql_insert(p)()));
+//insert 
 
-// res will be number `1` that insert effective rows
+schedule_insert("sql", p);
 
-auto result = co_await aquarius::sql_pool().async_execute(
-	aquarius::make_query_task<personal>(sql_select(personal)()));
+//select
+std::vector<personal> result = schedule_select<std::vector<personal>>("sql");
 
-// result will be a vector of personal
+//delete
+schedule_delete<std::size_t>("sql", p);
+
+//update
+schedule_update<std::size_t>("sql", p);
+
+
+// custom sql
+std::vector<T> result = schedule_query<std::vector<T>>("sql", sql_str);
+
+std::size_t result = schedule_execute<>("sql", sql_str);
 
 ```
 
