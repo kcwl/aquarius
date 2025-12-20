@@ -44,7 +44,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-      path: ${{ github.workspace }}
+      path: '/home/runner/work/aquarius/'
       with:
          submodules: recursive
 
