@@ -72,7 +72,7 @@ jobs:
     #         ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-cover
 
     - name: setup gcc-14.2.1
-      shell: sh
+      shell: bash
       run: |
         scl enable gcc-toolset-14 bash
         gcc -v
