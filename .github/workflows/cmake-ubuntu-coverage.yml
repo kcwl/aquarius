@@ -15,6 +15,11 @@ jobs:
   gcc-build-cov:
     runs-on: ${{ matrix.os }}
 
+    container:
+      image: ghcr.io/kcwl/aquarius:v1
+      volumes:
+        - /var/run/mysqld:/var/run/mysqld
+
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
