@@ -63,7 +63,7 @@ jobs:
          mysql-version: 8.4
          database: unittest
          user: unit
-      run: |
+    - run: |
         mysql -D unittest -e 'create table if not exist personal(id int, sex int)'
         
 
