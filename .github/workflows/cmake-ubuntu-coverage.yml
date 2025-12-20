@@ -62,7 +62,7 @@ jobs:
         source scl_source enable gcc-toolset-14
         gcc -v
         cc -v
-        export PATH=$PATH:/opt/rh/gcc-toolset-14/root/usr/bin
+        yum install -y make
         
 
     - name: Configure CMake
