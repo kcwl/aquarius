@@ -74,6 +74,7 @@ jobs:
     - name: setup gcc-14.2.1
       shell: sh
       run: |
+        yum install -y gcc-toolset-14
         scl enable gcc-toolset-14 bash
         gcc -v
 
