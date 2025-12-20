@@ -57,7 +57,11 @@ namespace aquarius
 			auto result = co_await service_.template async_query<typename T::value_type>(sql, ec);
 
 			if (ec)
+			{
+				XLOG_ERROR() << "sql[" << sql << "] query failed! " << ec.what() << "\t" << ec.message();
+
 				co_return T{};
+			}
 
 			completed_ = !ec;
 

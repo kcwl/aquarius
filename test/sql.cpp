@@ -41,66 +41,30 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 using namespace std::chrono_literals;
 
-struct mysql_config
-{
-	std::string host;
-	std::string user;
-	std::string db;
-	std::string db_passwd;
-};
-
-class sqlmodule : public aquarius::_module<aquarius::sql_connector, mysql_config, "mysql.ini">
-{
-	using sql_pool = aquarius::basic_pool<aquarius::sql_connector>;
-
-	using base_type = aquarius::_module<aquarius::sql_connector, mysql_config, "mysql.ini">;
-
-public:
-	using typename base_type::core_type;
-
-	using typename base_type::config_type;
-
-	using base_type::config_path;
-
-public:
-	virtual bool init() override
-	{
-		param_.host = configs().host;
-		param_.user = configs().user;
-		param_.db = configs().db;
-		param_.password = configs().db_passwd;
-	}
-
-	virtual auto run() -> aquarius::awaitable<void>
-	{
-		co_await pool_.run(3, param_);
-	}
-
-	virtual std::shared_ptr<core_type> core() override
-	{
-		return pool_.get_task_proc();
-	}
-
-private:
-	sql_pool pool_;
-
-	aquarius::database_param param_;
-};
-
-AQUARIUS_MODULE(sqlmodule);
-
 BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
 
 	aquarius::io_service_pool pool(1);
 
-	auto future = aquarius::co_spawn(pool.get_io_service(), aquarius::module_router::get_mutable_instance().run(),
+	using sql_pool = aquarius::basic_pool<aquarius::sql_connector>;
+
+	sql_pool _sql_pool{};
+	
+	aquarius::database_param db_param{};
+	db_param.host = "localhost";
+	db_param.user = "unit";
+	db_param.db = "unittest";
+	db_param.password = "UTbest1234&";
+
+	auto future = aquarius::co_spawn(pool.get_io_service(), _sql_pool.run(1, db_param),
 									 aquarius::use_future);
 
 	std::thread t([&] { pool.run(); });
 
-	future.get();
+	auto result = future.get();
+
+	BOOST_TEST(result);
 
 	auto fur = aquarius::co_spawn(
 		pool.get_io_service(),
@@ -110,13 +74,17 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 			// BOOST_TEST(res != 0);
 
-			auto res = co_await aquarius::tbl::schedule_insert<std::size_t>("sqlmodule", p);
+			//auto res = co_await aquarius::tbl::schedule_insert<std::size_t>("sqlmodule", p);
+			auto insert_task = std::make_shared<sql_task<insert, personal, std::size_t>>(std::move(p));
+
+			auto res = co_await (*insert_task)(_sql_pool.get_task_proc());
 
 			BOOST_TEST(res != 0);
 
-			auto result = co_await aquarius::tbl::schedule_select<std::vector<personal>>("sqlmodule");
+			auto select_task = std::make_shared<sql_task<select_, personal, std::vector<personal>>>();
+			auto select_res = co_await (*select_task)(_sql_pool.get_task_proc());
 
-			BOOST_TEST(result.size() != 0);
+			BOOST_TEST(select_res.size() != 0);
 		},
 		aquarius::use_future);
 

@@ -24,7 +24,7 @@ namespace aquarius
 			routers_.insert({ module_name, std::make_shared<_module<Core, Config, ConfigPath>>(module_name) });
 		}
 
-		auto run() -> awaitable<void>
+		auto run() -> awaitable<bool>
 		{
 			std::lock_guard lk(mutex_);
 
@@ -35,17 +35,19 @@ namespace aquarius
 
 				if (!f.second->config())
 				{
-					co_return;
+					co_return false;
 				}
 
 				if (!f.second->init())
 				{
 					XLOG_WARNING() << "[" << f.second->name() << "] init error";
-					co_return;
+					co_return false;
 				}
 
 				co_await f.second->run();
 			}
+
+			co_return true;
 		}
 
 		template <typename Core, typename Task>

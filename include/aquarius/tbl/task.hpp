@@ -21,6 +21,12 @@ namespace aquarius
 		template <typename Tag, typename T, typename R>
 		struct sql_task
 		{
+			sql_task()
+				: value_()
+			{
+
+			}
+
 			sql_task(T&& value)
 				: value_(value)
 			{}
