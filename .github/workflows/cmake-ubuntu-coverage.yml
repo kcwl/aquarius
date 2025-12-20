@@ -43,7 +43,7 @@ jobs:
             cpp_compiler: g++
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
          submodules: recursive
 
@@ -52,7 +52,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{GITHUB_WORKSPACE}}/build_coverage" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
     # - name: Cache Vcpkg
     #   id: cache-aquarius
@@ -138,7 +138,7 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=true
-        -S ${{GITHUB_WORKSPACE}}
+        -S ${{ github.workspace }}
         # -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         # -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
 
@@ -149,7 +149,7 @@ jobs:
     - name: Copy CRT
       shell: bash
       run: >
-        cp -r ${{GITHUB_WORKSPACE}}/crt ${{ steps.strings.outputs.build-output-dir }}/test
+        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
