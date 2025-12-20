@@ -44,6 +44,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      path: '${{ github.workspace }}'
       with:
          submodules: recursive
 
