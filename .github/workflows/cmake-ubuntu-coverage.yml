@@ -44,7 +44,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-      path: '/home/runner/work/aquarius/'
+      path: /home/runner/work/aquarius/
       with:
          submodules: recursive
 
