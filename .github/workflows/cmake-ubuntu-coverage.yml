@@ -52,6 +52,7 @@ jobs:
       id: strings
       shell: bash
       run: |
+        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
         echo "build-output-dir=${{ env.GITHUB_WORKSPACE }}/build_coverage" >> "$GITHUB_OUTPUT"
 
     # - name: Cache Vcpkg
