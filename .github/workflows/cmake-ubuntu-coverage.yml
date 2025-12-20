@@ -81,7 +81,7 @@ jobs:
     - name: install lcov
       shell: sh
       run: |
-         sudo apt install -y lcov
+         yum install -y lcov
 
     # - name: install boost-1.89
     #   shell: bash
@@ -96,37 +96,37 @@ jobs:
     #      sudo apt-get install -y pip
     #      pip install gcovr
 
-    - name: config vcpkg
-      shell: bash
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
-        git clone https://github.com/microsoft/vcpkg.git temp
-        mkdir -p vcpkg
-        mv temp/.git vcpkg/.git
-        cd vcpkg
-        git pull
-        git checkout .
-        ./bootstrap-vcpkg.sh -disableMetrics
+    # - name: config vcpkg
+    #   shell: bash
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y autoconf automake autoconf-archive ninja-build
+    #     git clone https://github.com/microsoft/vcpkg.git temp
+    #     mkdir -p vcpkg
+    #     mv temp/.git vcpkg/.git
+    #     cd vcpkg
+    #     git pull
+    #     git checkout .
+    #     ./bootstrap-vcpkg.sh -disableMetrics
 
-    - name: Add NuGet sources
-      shell: bash
-      env:
-        USERNAME: aquarius
-        VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
-        FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
-      run: |
-        sudo apt install -y mono-complete
-        mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-          sources add \
-          -Source "${{ env.FEED_URL }}" \
-          -StorePasswordInClearText \
-          -Name GitHubPackages \
-          -UserName "${{ env.USERNAME }}" \
-          -Password "${{ secrets.GITHUB_TOKEN }}"
-        mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-          setapikey "${{ secrets.GITHUB_TOKEN }}" \
-          -Source "${{ env.FEED_URL }}"
+    # - name: Add NuGet sources
+    #   shell: bash
+    #   env:
+    #     USERNAME: aquarius
+    #     VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
+    #     FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
+    #   run: |
+    #     sudo apt install -y mono-complete
+    #     mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+    #       sources add \
+    #       -Source "${{ env.FEED_URL }}" \
+    #       -StorePasswordInClearText \
+    #       -Name GitHubPackages \
+    #       -UserName "${{ env.USERNAME }}" \
+    #       -Password "${{ secrets.GITHUB_TOKEN }}"
+    #     mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+    #       setapikey "${{ secrets.GITHUB_TOKEN }}" \
+    #       -Source "${{ env.FEED_URL }}"
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -156,7 +156,7 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       # run: sudo ctest --build-config ${{ matrix.build_type }} --output-on-failure
-      run: sudo make test
+      run: make test
 
     - name: generate codecov report
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
