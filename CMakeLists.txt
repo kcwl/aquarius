@@ -9,6 +9,8 @@ set(AQUARIUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 enable_testing()
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 add_subdirectory(deps)
 
 add_subdirectory(test)

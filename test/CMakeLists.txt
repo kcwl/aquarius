@@ -28,6 +28,13 @@ target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
 target_link_libraries(unittest PUBLIC gcov)
 endif()
 
+if(ENABLE_MYSQL)
+message(STATUS "enable mysql")
+target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
+target_link_libraries(unittest PUBLIC mysql)
+endif()
+
+
 
 add_test(
 	NAME unittest COMMAND unittest
