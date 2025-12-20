@@ -55,78 +55,14 @@ jobs:
         echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
         echo "build-output-dir=${{ env.GITHUB_WORKSPACE }}/build_coverage" >> "$GITHUB_OUTPUT"
 
-    # - name: Cache Vcpkg
-    #   id: cache-aquarius
-    #   uses: actions/cache@v4
-    #   env:
-    #     VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-    #   with:
-    #     path: |
-    #         ${{ env.VCPKG_ROOT }}
-    #         ${{ github.workspace }}/vcpkg_installed
-    #         !${{ env.VCPKG_ROOT }}/.git
-    #         ${{ env.VCPKG_ROOT }}/buildtrees
-    #         ${{ env.VCPKG_ROOT }}/packages
-    #         ${{ env.VCPKG_ROOT }}/downloads
-    #     key: |
-    #         ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-cover
-
     - name: setup gcc-14.2.1
       shell: bash
       run: |
         source scl_source enable gcc-toolset-14
         gcc -v
-
-
-    # - name: install lcov
-    #   shell: sh
-    #   run: |
-    #      yum install -y lcov
-
-    # - name: install boost-1.89
-    #   shell: bash
-    #   run: |
-    #     sudo add-apt-repository ppa:kcwl-ppa/libboost1.89-dev
-    #     sudo apt update
-    #     sudo apt-get install -y boost
-
-    # - name: install gcovr
-    #   shell: bash
-    #   run: |
-    #      sudo apt-get install -y pip
-    #      pip install gcovr
-
-    # - name: config vcpkg
-    #   shell: bash
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y autoconf automake autoconf-archive ninja-build
-    #     git clone https://github.com/microsoft/vcpkg.git temp
-    #     mkdir -p vcpkg
-    #     mv temp/.git vcpkg/.git
-    #     cd vcpkg
-    #     git pull
-    #     git checkout .
-    #     ./bootstrap-vcpkg.sh -disableMetrics
-
-    # - name: Add NuGet sources
-    #   shell: bash
-    #   env:
-    #     USERNAME: aquarius
-    #     VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg
-    #     FEED_URL: https://nuget.pkg.github.com/aquarius/index.json
-    #   run: |
-    #     sudo apt install -y mono-complete
-    #     mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-    #       sources add \
-    #       -Source "${{ env.FEED_URL }}" \
-    #       -StorePasswordInClearText \
-    #       -Name GitHubPackages \
-    #       -UserName "${{ env.USERNAME }}" \
-    #       -Password "${{ secrets.GITHUB_TOKEN }}"
-    #     mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-    #       setapikey "${{ secrets.GITHUB_TOKEN }}" \
-    #       -Source "${{ env.FEED_URL }}"
+        g++ -v
+        CC -v
+        C++ -v
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -139,8 +75,6 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=true
         -S ${{ env.GITHUB_WORKSPACE }}
-        # -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        # -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
