@@ -74,7 +74,7 @@ jobs:
     - name: setup gcc-14.2.1
       shell: bash
       run: |
-        scl_source enable gcc-toolset-14 bash
+        source scl_source enable gcc-toolset-14
         gcc -v
 
 
