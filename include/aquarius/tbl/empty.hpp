@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/tbl/database_param.hpp>
+#include <aquarius/tbl/sql_error.hpp>
 
 namespace aquarius
 {
@@ -56,5 +57,5 @@ namespace aquarius
 			}
 		};
 
-	} // namespace sql
+	} // namespace tbl
 } // namespace aquarius

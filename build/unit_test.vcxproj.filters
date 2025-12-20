@@ -318,25 +318,16 @@
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\closure.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\sql_pool.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\task.hpp">
@@ -377,6 +368,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\engine\varchar.hpp">
       <Filter>include\aquarius\tbl\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

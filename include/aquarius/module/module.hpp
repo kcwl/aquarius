@@ -5,31 +5,36 @@
 
 namespace aquarius
 {
-	template <typename Task, typename Config, auto ConfigPath>
-	class _module : public basic_module<Task>
+	template <typename Core, typename Config, detail::string_literal ConfigPath>
+	class _module : public basic_module<Core>
 	{
 	public:
+		using typename basic_module<Core>::core_type;
+		using config_type = Config;
+		constexpr static auto config_path = ConfigPath;
+
+	public:
 		_module(const std::string& name)
-			: basic_module<Task>(name)
+			: basic_module<Core>(name)
 		{}
 
 		virtual ~_module() = default;
 
 	public:
-		virtual void config() override
+		virtual bool config() override
 		{
 			error_code ec{};
-			config_ = ini::parse<Config>(std::ifstream{ ConfigPath }, ec);
+			config_ = ini::parse<Config>(std::string(detail::bind_param<ConfigPath>::value), ec);
 
 			if (!ec)
-				return;
+				return true;
 
 			XLOG_ERROR() << "parse config error: " << ec.message();
 
 			throw ec;
 		}
 
-		Config config() const
+		Config configs() const
 		{
 			return config_;
 		}
@@ -49,33 +54,18 @@ namespace aquarius
 			return;
 		}
 
+		virtual auto run() -> awaitable<void>
+		{
+			co_return;
+		}
+
+	protected:
+		virtual std::shared_ptr<core_type> core() override
+		{
+			return nullptr;
+		}
+
 	private:
 		Config config_;
 	};
 } // namespace aquarius
-
-#define AQUARIUS_MODULE_CONFIG()                                                                                       \
-public:                                                                                                                \
-	virtual bool config() override
-
-#define AQUARIUS_MODULE_INIT()                                                                                         \
-public:                                                                                                                \
-	virtual bool init() override
-
-#define AQUARIUS_MODULE_STOP()                                                                                         \
-public:                                                                                                                \
-	virtual void stop() override
-
-#define AQUARIUS_MODULE_TIMER(ms)                                                                                      \
-public:                                                                                                                \
-	virtual void timer(std::chrono::milliseconds ms) override
-
-#define AQUARIUS_MODULE_VISIT()                                                                                        \
-public:                                                                                                                \
-	virtual auto handle() -> awaitable<error_code> override
-
-#define AQUARIUS_MODULE(__method, __task, __config, __config_path)                                                     \
-	class __method;                                                                                                    \
-	[[maybe_unused]] static aquarius::auto_module_register<__task, __config, __config_path>                            \
-		__auto_register_##__method(##__method);                                                                        \
-	class __method : public module<__task, __config, __config_path>

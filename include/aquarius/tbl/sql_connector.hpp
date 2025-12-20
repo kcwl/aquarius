@@ -3,12 +3,13 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/tbl/database_param.hpp>
+
 #include <aquarius/tbl/sql_error.hpp>
 #include <aquarius/tbl/transaction.hpp>
 #include <expected>
 
-#if defined(MYSQL_SQL)
-#include <aquarius/tbl/mysql.hpp>
+#ifdef ENABLE_MYSQL
+#include <aquarius/tbl/engine/mysql.hpp>
 #else
 #include <aquarius/tbl/empty.hpp>
 #endif
@@ -17,8 +18,8 @@ namespace aquarius
 {
 	class sql_connector
 	{
-#if defined(MYSQL_SQL)
-		using service_impl = sql::mysql;
+#ifdef ENABLE_MYSQL
+		using service_impl = tbl::mysql;
 #else
 		using service_impl = tbl::empty_impl;
 #endif
@@ -28,9 +29,7 @@ namespace aquarius
 			: param_(param)
 			, service_(param_)
 			, completed_(false)
-		{
-			
-		}
+		{}
 
 	public:
 		auto start() -> awaitable<bool>
@@ -55,8 +54,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto result =
-				co_await service_.template async_query<typename T::value_type>(sql, ec);
+			auto result = co_await service_.template async_query<typename T::value_type>(sql, ec);
 
 			if (ec)
 				co_return T{};

@@ -1,12 +1,11 @@
 #pragma once
-#ifdef MYSQL_SQL
+#ifdef ENABLE_MYSQL
 #include <aquarius/error_code.hpp>
 #include <errmsg.h>
 #include <type_traits>
 
 namespace aquarius
 {
-
 #define AQUARIUS_DB_DEF(value) value
 
 	enum class db_error
@@ -90,6 +89,7 @@ namespace aquarius
 	{
 		return error_code(static_cast<int>(ec), get_db_error_category());
 	}
+
 } // namespace aquarius
 
 namespace std

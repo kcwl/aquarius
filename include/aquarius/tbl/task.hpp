@@ -35,26 +35,26 @@ namespace aquarius
 
 				if constexpr (std::same_as<Tag, select_>)
 				{
-					constexpr auto sql_str = tbl::select_view<T>();
+					constexpr auto sql_str = tbl::select_view<T>()();
 
 					co_return co_await task_proc->template async_query<return_type>(sql_str);
 				}
 				else if constexpr (std::same_as<Tag, update>)
 				{
-					co_return co_await task_proc->template async_execute<return_type>(tbl::update_view(value_));
+					co_return co_await task_proc->async_execute(tbl::update_view(value_)());
 				}
 				else if constexpr (std::same_as<Tag, insert>)
 				{
-					co_return co_await task_proc->template async_execute<return_type>(tbl::insert_view(value_));
+					co_return co_await task_proc->async_execute(tbl::insert_view(value_)());
 				}
 				else if constexpr (std::same_as<Tag, delete_>)
 				{
-					co_return co_await task_proc->template async_execute<return_type>(tbl::remove_view<T>(value_));
+					co_return co_await task_proc->async_execute(tbl::remove_view<T>(value_)());
 				}
-				else if constexpr (std::same_as<Tag, create>)
-				{
-					co_return co_await task_proc->template async_execute<return_type>(tbl::create_view<T>());
-				}
+				//else if constexpr (std::same_as<Tag, create>)
+				//{
+				//	co_return co_await task_proc->async_execute(tbl::create_view<T>()());
+				//}
 				else
 				{
 					static_assert(false, "Invalid operation type");

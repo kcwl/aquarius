@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/error_code.hpp>
-#include <aquarius/sql/database_param.hpp>
-#include <aquarius/sql/sql_error.hpp>
+#include <aquarius/tbl/database_param.hpp>
+#include <aquarius/tbl/sql_error.hpp>
 #include <boost/asio.hpp>
 #include <boost/pfr.hpp>
 #include <mysql.h>
@@ -53,9 +53,8 @@ namespace aquarius
 				mysql_options(mysql_ptr_, MYSQL_OPT_RECONNECT, &reconnect);
 				mysql_options(mysql_ptr_, MYSQL_SET_CHARSET_NAME, "utf8");
 
-				if (mysql_real_connect(mysql_ptr_, param_.host.c_str(), param_.user.c_str(),
-									   param_.password.c_str(), param_.db.c_str(), param_.port,
-									   nullptr, 0) == nullptr)
+				if (mysql_real_connect(mysql_ptr_, param_.host.c_str(), param_.user.c_str(), param_.password.c_str(),
+									   param_.db.c_str(), param_.port, nullptr, 0) == nullptr)
 				{
 					co_return static_cast<db_error>(mysql_errno(mysql_ptr_));
 				}
@@ -164,9 +163,7 @@ namespace aquarius
 			void make_result(std::vector<T>& results, const MYSQL_ROW& row)
 			{
 				auto to_struct = [&, this]<std::size_t... I>(std::index_sequence<I...>)
-				{
-					return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... };
-				};
+				{ return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... }; };
 
 				results.push_back(to_struct(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{}));
 			}
@@ -195,5 +192,5 @@ namespace aquarius
 
 			bool enable_transaction_;
 		};
-	} // namespace sql
+	} // namespace tbl
 } // namespace aquarius

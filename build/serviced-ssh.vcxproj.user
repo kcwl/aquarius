@@ -3,5 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>--host 127.0.0.1 --port 3399</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>--host 127.0.0.1 --port 3399|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>

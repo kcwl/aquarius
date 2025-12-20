@@ -6,7 +6,6 @@
 
 namespace aquarius
 {
-
 	class module_base
 	{
 	public:
@@ -27,6 +26,8 @@ namespace aquarius
 
 		virtual bool init() = 0;
 
+		virtual auto run() -> awaitable<void> = 0;
+
 		virtual void stop() = 0;
 
 		virtual void timer(std::chrono::milliseconds) = 0;
@@ -35,41 +36,29 @@ namespace aquarius
 		std::string name_;
 	};
 
-	template <typename Task>
+	template <typename T>
 	class basic_module : public module_base
 	{
-		using return_type = typename Task::return_type;
+	public:
+		using core_type = T;
 
 	public:
 		basic_module(const std::string& name)
 			: module_base(name)
-			, task_ptr_(nullptr)
 		{}
 
 	public:
-		virtual auto visit(std::shared_ptr<Task> task_ptr) -> awaitable<error_code>
+		template <typename Task>
+		auto visit(std::shared_ptr<Task> task_ptr) -> awaitable<typename Task::return_type>
 		{
-			task_ptr_ = task_ptr;
+			using return_type = typename Task::return_type;
+			if (!task_ptr)
+				co_return return_type{};
 
-			co_return co_await handle();
-		}
-
-		std::shared_ptr<Task> get_task()
-		{
-			return task_ptr_;
-		}
-
-		return_type result() const
-		{
-			return result_;
+			co_return co_await (*task_ptr)(core());
 		}
 
 	protected:
-		virtual auto handle() -> awaitable<error_code> = 0;
-
-	private:
-		std::shared_ptr<Task> task_ptr_;
-
-		return_type result_;
+		virtual std::shared_ptr<T> core() = 0;
 	};
 } // namespace aquarius

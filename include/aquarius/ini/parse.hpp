@@ -18,13 +18,15 @@ namespace aquarius
 
 			constexpr auto size = boost::pfr::tuple_size<T>::value;
 
-			constexpr auto name = detail::struct_name<T>::value;
+			constexpr auto name = detail::struct_name<T>();
 
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{
-				return T{ pt.get<boost::pfr::tuple_element_t<I, T>>(name.data() + "." +
-																	boost::pfr::get_name<I, T>())... };
+				return T{ pt.get<boost::pfr::tuple_element_t<I, T>>(std::string(name) + std::string(".") +
+																	std::string(boost::pfr::get_name<I, T>()))... };
 			};
+
+			ec = {};
 
 			return f(std::make_index_sequence<size>());
 		}

@@ -45,7 +45,7 @@ namespace aquarius
 		{
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			module_router::get_mutable_instance().run();
+			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
 
 			io_service_pool_.run();
 		}

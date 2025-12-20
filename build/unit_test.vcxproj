@@ -120,11 +120,12 @@
       <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -134,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;BOOST_ALL_DYN_LINK;_WIN32_WINNT=0x0A00;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../include;D:\openssl\include;D:\boost_1_88_0;$(SolutionDir)../3rd/virgo/include;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -218,7 +219,6 @@
     <ClInclude Include="..\include\aquarius\tbl.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\basic_datatype.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\closure.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\database_param.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\empty.hpp" />
@@ -239,7 +239,6 @@
     <ClInclude Include="..\include\aquarius\tbl\schedule.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\sql_pool.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\task.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />

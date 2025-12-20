@@ -4,7 +4,6 @@
 #include <aquarius/detail/string_literal.hpp>
 #include <aquarius/detail/struct_name.hpp>
 #include <aquarius/tbl/add_string.hpp>
-#include <aquarius/tbl/closure.hpp>
 #include <aquarius/tbl/concepts.hpp>
 #include <boost/pfr.hpp>
 
@@ -209,10 +208,10 @@ namespace aquarius
 				constexpr static auto attrs = get_attrs();
 			};
 
-			template <std::size_t I, typename T>
+			template <std::size_t I, typename U>
 			struct name_bind
 			{
-				constexpr static auto value = boost::pfr::get_name<I, T>();
+				constexpr static auto value = boost::pfr::get_name<I, U>();
 			};
 
 			auto operator()() -> std::string
