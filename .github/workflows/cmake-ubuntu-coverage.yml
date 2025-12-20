@@ -74,7 +74,6 @@ jobs:
     - name: setup gcc-14.2.1
       shell: sh
       run: |
-        yum install -y centos-release-scl scl-utils scl-utils-build
         scl enable gcc-toolset-14 bash
         gcc -v
 
