@@ -19,7 +19,7 @@ jobs:
       image: ghcr.io/kcwl/aquarius:v1
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       volumes:
         - /var/run/mysqld:/var/run/mysqld
 
