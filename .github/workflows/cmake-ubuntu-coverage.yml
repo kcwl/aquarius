@@ -47,7 +47,7 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
     - name: cache boost
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: '${{ runner.workspace }}/boost_*.tar.gz'
         key: 'boost-1.88.0'
