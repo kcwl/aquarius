@@ -62,7 +62,7 @@ jobs:
         source scl_source enable gcc-toolset-14
         gcc -v
         cc -v
-        ln -s /usr/bin/gcc $(whereis gcc)
+        ln -s $(whereis gcc) /usr/bin/gcc 
         /usr/bin/gcc -v
         
 
