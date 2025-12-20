@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     container:
-      image: ghcr.io/kcwl/aquarius:v1
+      image: ghcr.io/kcwl/aquarius:v2
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GH_TOKEN }}
@@ -70,18 +70,18 @@ jobs:
     #     key: |
     #         ${{ hashFiles( 'vcpkg.json' ) }}-${{ runner.os }}-cache-key-cover
 
-    - name: test gcc/g++
-      shell: sh
-      run: |
-        gcc --version
-        g++ --version
-        gcov --version
+    # - name: test gcc/g++
+    #   shell: sh
+    #   run: |
+    #     gcc --version
+    #     g++ --version
+    #     gcov --version
 
 
-    - name: install lcov
-      shell: sh
-      run: |
-         yum install -y lcov
+    # - name: install lcov
+    #   shell: sh
+    #   run: |
+    #      yum install -y lcov
 
     # - name: install boost-1.89
     #   shell: bash
