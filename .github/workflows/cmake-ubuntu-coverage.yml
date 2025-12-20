@@ -15,14 +15,6 @@ jobs:
   gcc-build-cov:
     runs-on: ${{ matrix.os }}
 
-    container:
-      image: ghcr.io/kcwl/aquarius:v2
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GH_TOKEN }}
-      volumes:
-        - /var/run/mysqld:/var/run/mysqld
-
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
@@ -52,17 +44,27 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-        echo "build-output-dir=${{ env.GITHUB_WORKSPACE }}/build_coverage" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
-    - name: setup gcc-14.2.1
-      shell: bash
+    - name: cache boost
+      uses: actions/cache@v2
+      with:
+        path: '${{ runner.workspace }}/boost_*.tar.gz'
+        key: 'boost-1.88.0'
+
+    - name: build boost
+      uses: egor-tensin/build-boost@v1
+      with:
+        version: 1.88.0
+
+    - name: install mysql
+      uses: ankane/setup-mysql@v1
+      with: 
+         mysql-version: 8.4
+         database: unittest
+         user: unit
       run: |
-        echo $PATH
-        source scl_source enable gcc-toolset-14
-        gcc -v
-        cc -v
-        yum install -y make
+        mysql -D unittest -e 'create table if not exist personal(id int, sex int)'
         
 
     - name: Configure CMake
@@ -75,7 +77,8 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=true
-        -S ${{ env.GITHUB_WORKSPACE }}
+        -DENABLE_MYSQL=true
+        -S ${{ github.workspace }}
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
@@ -84,7 +87,7 @@ jobs:
     - name: Copy CRT
       shell: bash
       run: >
-        cp -r ${{ env.GITHUB_WORKSPACE }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
+        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
