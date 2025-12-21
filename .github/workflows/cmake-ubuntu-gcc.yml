@@ -1,6 +1,9 @@
 # This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: ubuntu(gcc)
+name: ubuntu-gcc
+
+permissions:
+    packages: write
 
 on:
   push:
@@ -9,7 +12,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  gcc-build:
+  gcc-build-cov:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -24,7 +27,7 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest]
-        build_type: [Release]
+        build_type: [Debug, Release]
         c_compiler: [gcc]
         include:
           - os: ubuntu-latest
@@ -32,7 +35,7 @@ jobs:
             cpp_compiler: g++
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
          submodules: recursive
 
@@ -41,41 +44,50 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
-    # - name: install boost-1.89
-    #   shell: bash
-    #   run: |
-    #     sudo add-apt-repositoryppa:kcwl-ppa/libboost1.89-dev
-    #     sudo apt update
-    #     sudo apt-get install -y boost
+    - name: cache boost
+      id: cache-boost
+      uses: actions/cache@v4
+      env:
+        cache-name: boost-module
+      with:
+        path: '${{ runner.workspace }}/boost_1_88_0'
+        key: ${{ runner.os }}-build-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
 
-    - name: test gcc/g++
-      shell: sh
+    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
+      name: Boost Setup
       run: |
-        gcc --version
-        g++ --version
-        gcov --version
-        cmake --version
+        wget -P ${{ runner.workspace }} https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+        cd ${{ runner.workspace }}
+        tar zxvf boost_1_88_0.tar.gz
+        cd boost_1_88_0
+        sudo ./bootstrap.sh
+        sudo ./b2
 
-    # - name: install gcovr
-    #   shell: bash
-    #   run: |
-    #      sudo apt-get install -y pip
-    #      pip install gcovr
+    - name: Boost Install
+      run: |
+        cd ${{ runner.workspace }}/boost_1_88_0
+        sudo ./b2 install
+        echo $PATH
+        export PATH=$PATH:/usr/local/lib
+        sudo ldconfig
 
-    - name: configure vcpkg
+    - name: install mysql
+      uses: ankane/setup-mysql@v1
+      with: 
+         mysql-version: 8.0
+         database: unittest
+
+    - name: create unittest table
+      run: |
+        sudo mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
+        
+    - name: setup lcov
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y autoconf automake autoconf-archive ninja-build
-        git clone https://github.com/microsoft/vcpkg.git temp
-        mkdir -p vcpkg
-        mv temp/.git vcpkg/.git
-        cd vcpkg
-        git pull
-        git checkout .
-        ./bootstrap-vcpkg.sh -disableMetrics
+        sudo apt-get install -y lcov
+
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -86,9 +98,9 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCOVERAGE=true
+        -DENABLE_MYSQL=true
         -S ${{ github.workspace }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        -DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
@@ -97,10 +109,29 @@ jobs:
     - name: Copy CRT
       shell: bash
       run: >
-        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
+        sudo cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: sudo ctest --build-config ${{ matrix.build_type }} --output-on-failure
+
+    - if: ${{ matrix.build_type == 'Debug' }}
+      name: generate codecov report
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: |
+          sudo make coverage
+
+    - if: ${{ matrix.build_type == 'Debug' }}
+      name: upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        verbose: true
+        fail_ci_if_error: true
+        file: ${{ steps.strings.outputs.build-output-dir }}/test/coverage-aquarius.info
+        plugins: noop
+        disable_search: true
+        disable_file_fixes: true
+        token: ${{ secrets.CODECOV_TOKEN}}
+        slug: kcwl/aquarius
