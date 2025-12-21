@@ -73,7 +73,7 @@ jobs:
     - name: install mysql
       uses: ankane/setup-mysql@v1
       with: 
-         mysql-version: 8.4
+         mysql-version: 8.0
          database: unittest
          user: unit
     - run: |
