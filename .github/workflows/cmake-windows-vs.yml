@@ -66,7 +66,8 @@ jobs:
     - name: Boost Install
       run: |
         cd ${{ runner.workspace }}/boost_1_88_0
-        ./b2 install
+        set Boost_DIR=${{ runner.workspace }}/boost_1_88_0/stage/lib
+        set BOOST_ROOT=${{ runner.workspace }}/boost_1_88_0/stage/lib
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
