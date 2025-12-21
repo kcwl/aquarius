@@ -66,8 +66,8 @@ jobs:
 
     - name: Boost Install
       run: |
-      cd ${{ runner.workspace }}
-      ./b2 install
+        cd ${{ runner.workspace }}
+        ./b2 install
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
