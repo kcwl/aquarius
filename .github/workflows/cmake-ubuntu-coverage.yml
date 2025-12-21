@@ -77,7 +77,7 @@ jobs:
          database: unittest
          user: unit
     - run: |
-        sudo mysql -D unittest -e 'create table if not exist personal(id int, sex int)'
+        sudo mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
         
 
     - name: Configure CMake
