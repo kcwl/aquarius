@@ -63,12 +63,6 @@ jobs:
         ./bootstrap.bat
         ./b2
 
-    - name: Boost Install
-      run: |
-        cd ${{ runner.workspace }}/boost_1_88_0
-        set Boost_DIR=${{ runner.workspace }}/boost_1_88_0/stage/lib
-        set BOOST_ROOT=${{ runner.workspace }}/boost_1_88_0/stage/lib
-
     - name: install mysql
       uses: ankane/setup-mysql@v1
       with: 
@@ -88,6 +82,9 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DENABLE_MYSQL=true
+        -DBOOST_ROOT=${{ runner.workspace }}/boost_1_88_0
+        -DBOOST_LIBRARYDIR=${{ runner.workspace }}/boost_1_88_0/stage/lib
+        -DBoost_USE_STATIC_LIBS=true
         -S ${{ github.workspace }}
         
     - name: Build
