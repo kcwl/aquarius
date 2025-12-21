@@ -59,6 +59,7 @@ jobs:
       name: Boost Setup
       run: |
         wget -P ${{ runner.workspace }} https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+        cd ${{ runner.workspace }}
         tar zxvf boost_1_88_0.tar.gz
         cd boost_1_88_0
         ./bootstrap.sh
