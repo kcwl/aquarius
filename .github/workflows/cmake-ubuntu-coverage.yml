@@ -62,13 +62,13 @@ jobs:
         cd ${{ runner.workspace }}
         tar zxvf boost_1_88_0.tar.gz
         cd boost_1_88_0
-        ./bootstrap.sh
-        ./b2
+        sudo ./bootstrap.sh
+        sudo ./b2
 
     - name: Boost Install
       run: |
         cd ${{ runner.workspace }}/boost_1_88_0
-        ./b2 install
+        sudo ./b2 install
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
@@ -77,7 +77,7 @@ jobs:
          database: unittest
          user: unit
     - run: |
-        mysql -D unittest -e 'create table if not exist personal(id int, sex int)'
+        sudo mysql -D unittest -e 'create table if not exist personal(id int, sex int)'
         
 
     - name: Configure CMake
@@ -100,19 +100,19 @@ jobs:
     - name: Copy CRT
       shell: bash
       run: >
-        cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
+        sudo cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       # run: sudo ctest --build-config ${{ matrix.build_type }} --output-on-failure
-      run: make test
+      run: sudo make test
 
     - name: generate codecov report
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
-          make coverage
+          sudo make coverage
 
     - name: upload coverage reports
       uses: codecov/codecov-action@v4
