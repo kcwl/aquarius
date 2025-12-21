@@ -60,8 +60,8 @@ jobs:
         curl -o boost_1_88_0.zip https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip
         7z x boost_1_88_0.zip
         cd boost_1_88_0
-        sudo ./bootstrap.bat
-        sudo ./b2
+        ./bootstrap.bat
+        ./b2
 
     - name: Boost Install
       run: |
@@ -76,7 +76,7 @@ jobs:
 
     - name: create unittest table
       run: |
-        sudo mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
+        mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
