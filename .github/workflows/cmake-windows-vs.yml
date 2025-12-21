@@ -49,8 +49,8 @@ jobs:
       env:
         cache-name: boost-module
       with:
-        path: '${{ runner.workspace }}/boost_1_88_0'
-        key: ${{ runner.os }}-build-${{env.cache-name}}-1.88}}
+        path: '${{ runner.workspace }}\boost_1_88_0'
+        key: ${{ runner.os }}-build-${{env.cache-name}}-1.88
 
     - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
       name: Boost Setup
