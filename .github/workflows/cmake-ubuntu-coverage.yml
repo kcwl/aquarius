@@ -47,15 +47,27 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
     - name: cache boost
+      id: cache-boost
       uses: actions/cache@v4
+      env:
+        cache-name: boost-module
       with:
-        path: '${{ runner.workspace }}/boost_*.tar.gz'
-        key: 'boost-1.88.0'
+        path: '${{ runner.workspace }}/boost_1_88_0'
+        key: ${{ runner.os }}-build-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
 
-    - name: build boost
-      uses: egor-tensin/build-boost@v1
-      with:
-        version: 1.88.0
+    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
+      name: Boost Setup
+      run: |
+        wget -P ${{ runner.workspace }} https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+        tar zxvf boost_1_88_0
+        cd boost_1_88_0
+        ./bootstrap.sh
+        ./b2
+
+    - name: Boost Install
+      run: |
+      cd ${{ runner.workspace }}
+      ./b2 install
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
