@@ -85,6 +85,7 @@ jobs:
         -DBOOST_ROOT=${{ runner.workspace }}/boost_1_88_0
         -DBOOST_LIBRARYDIR=${{ runner.workspace }}/boost_1_88_0/stage/lib
         -DBoost_USE_STATIC_LIBS=true
+        -DBoost_DIR=${{ runner.workspace }}/boost_1_88_0
         -S ${{ github.workspace }}
         
     - name: Build
