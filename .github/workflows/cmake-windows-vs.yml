@@ -58,7 +58,7 @@ jobs:
       run: |
         cd  ${{ runner.workspace }}
         curl -o boost_1_88_0.zip https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip
-        7z x boost_1_88_0.tar.gz
+        7z x boost_1_88_0.zip
         cd boost_1_88_0
         sudo ./bootstrap.bat
         sudo ./b2
