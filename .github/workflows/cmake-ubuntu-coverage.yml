@@ -67,7 +67,7 @@ jobs:
 
     - name: Boost Install
       run: |
-        cd ${{ runner.workspace }}
+        cd ${{ runner.workspace }}/boost_1_88_0
         ./b2 install
 
     - name: install mysql
