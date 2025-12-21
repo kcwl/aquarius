@@ -71,7 +71,7 @@ jobs:
         sudo ./b2 install
         echo $PATH
         export PATH=$PATH:/usr/local/lib
-        ldconfig
+        sudo ldconfig
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
