@@ -4,7 +4,7 @@ target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 
-file(GLOB BOOST_LINK_LIBS "${BOOST_LIBS}/*.dll"
+file(GLOB BOOST_LINK_LIBS "${BOOST_LIBS}/*.dll")
 
 target_link_libraries(boost INTERFACE ${BOOST_LINK_LIBS})
 
