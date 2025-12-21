@@ -78,7 +78,6 @@ jobs:
       with: 
          mysql-version: 8.0
          database: unittest
-         user: unit
     - run: |
         sudo mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
         

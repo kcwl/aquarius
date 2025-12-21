@@ -53,9 +53,8 @@ BOOST_AUTO_TEST_CASE(connecting)
 	
 	aquarius::database_param db_param{};
 	db_param.host = "localhost";
-	db_param.user = "unit";
+	db_param.user = "root";
 	db_param.db = "unittest";
-	db_param.password = "UTbest1234&";
 
 	auto future = aquarius::co_spawn(pool.get_io_service(), _sql_pool.run(1, db_param),
 									 aquarius::use_future);
