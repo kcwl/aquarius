@@ -9,6 +9,9 @@ file(GLOB BOOST_LINK_LIBS "${BOOST_LIBS}/*.dll")
 
 target_link_libraries(boost INTERFACE ${BOOST_DYN_LINKS} ${BOOST_LINK_LIBS})
 
+message(STATUS "boost lib:${BOOST_DYN_LINKS}")
+message(STATUS "boost dll:${BOOST_LINK_LIBS}")
+
 target_link_directories(boost INTERFACE ${BOOST_LIBS})
 
 target_include_directories(boost INTERFACE ${BOOST_ROOT})
