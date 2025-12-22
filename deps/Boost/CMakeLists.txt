@@ -8,7 +8,9 @@ file(GLOB BOOST_LINK_LIBS "${BOOST_LIBS}/*.dll")
 
 target_link_libraries(boost INTERFACE ${BOOST_LINK_LIBS})
 
-target_link_directories(boost INTERFACE ${BOOST_ROOT})
+target_link_directories(boost INTERFACE ${BOOST_LIBS})
+
+target_include_directories(boost INTERFACE ${BOOST_ROOT})
 
 message(STATUS "Boost ROOT ${BOOST_ROOT}")
 
