@@ -61,7 +61,7 @@ jobs:
         7z x boost_1_88_0.zip
         cd boost_1_88_0
         ./bootstrap.bat
-        ./b2
+        ./b2 link=shared address-model=64
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
