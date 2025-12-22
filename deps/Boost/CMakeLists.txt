@@ -1,5 +1,4 @@
 add_library(boost INTERFACE)
-target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
 if(WIN32)
 cmake_policy(SET CMP0074 NEW)
@@ -19,6 +18,8 @@ target_include_directories(boost INTERFACE ${BOOST_ROOT})
 message(STATUS "Boost ROOT ${BOOST_ROOT}")
 
 else()
+
+target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
 set(AQUARIUS_NEED_BOOST 
 	unit_test_framework
