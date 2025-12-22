@@ -73,11 +73,6 @@ jobs:
       run: |
         mysql -D unittest -e 'create table if not exists personal(id int, sex int)'
 
-    - name: fix for 0xc0000135
-      shell: pwsh
-      run: |
-        sfc /scannow
-
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -100,6 +95,10 @@ jobs:
     #   run: >
     #     cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
+    - name: Copy Boost Dll
+      shell: bash
+      run: |
+        cp ${{ runner.workspace }}\boost_1_88_0\stage\lib\*.dll ${{ steps.strings.outputs.build-output-dir }}
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
