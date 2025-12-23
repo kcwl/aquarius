@@ -42,8 +42,8 @@ add_test(
 )
 
 if(WIN32)
-message(STATUS $<TARGET_RUNTIME_DLL_DIRS:unittest>)
-set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
+message(STATUS $<TARGET_RUNTIME_DLL_DIRS:boost>)
+set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
 message(STATUS "PATH: ${PATH}")
 endif()
 
