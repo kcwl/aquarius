@@ -96,7 +96,7 @@ jobs:
     #     cp -r ${{ github.workspace }}/crt ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Copy Boost Dll
-      shell: bash
+      shell: pwsh
       run: |
         cp ${{ runner.workspace }}\boost_1_88_0\stage\lib\*.dll ${{ steps.strings.outputs.build-output-dir }}
 
