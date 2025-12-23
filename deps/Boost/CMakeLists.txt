@@ -14,6 +14,9 @@ target_include_directories(boost INTERFACE ${BOOST_ROOT})
 
 message(STATUS "Boost ROOT ${BOOST_ROOT}")
 
+file(GLOB boost_test_libs "${BOOST_ROOT}/*/dll")
+message(STATUS "Boost Libs ${boost_test_libs}")
+
 else()
 
 set(AQUARIUS_NEED_BOOST 
