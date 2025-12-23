@@ -98,7 +98,7 @@ jobs:
     - name: Copy Boost Dll
       shell: pwsh
       run: |
-        cp ${{ runner.workspace }}\boost_1_88_0\stage\lib\*.dll ${{ steps.strings.outputs.build-output-dir }}
+        cp ${{ runner.workspace }}\boost_1_88_0\stage\lib\*.dll ${{ steps.strings.outputs.build-output-dir }}/test
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
