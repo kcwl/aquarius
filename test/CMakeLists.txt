@@ -20,6 +20,7 @@ if(USE_WIN7_FOR_BOOST_LOG)
 message(STATUS "Set Config USE_WIN7_FOR_BOOST_LOG")
 target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
 endif()
+set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
 endif()
 
 if(COVERAGE)
