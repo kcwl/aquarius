@@ -42,7 +42,9 @@ add_test(
 )
 
 if(WIN32)
+message(STATUS $<TARGET_RUNTIME_DLL_DIRS:unittest>)
 set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
+message(STATUS "PATH: ${PATH})
 endif()
 
 add_custom_target(coverage 
