@@ -35,7 +35,7 @@ endif()
 
 message(STATUS "Found Boost ${Boost_VERSION}")
 
-target_link_libraries(boost PUBLIC Boost::unit_test_framework Boost::log Boost::log_setup Boost::system Boost::program_options Boost::json Boost::charconv)
+target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system Boost::program_options Boost::json Boost::charconv)
 
-target_include_directories(boost PUBLIC ${Boost_INCLUDE_DIRS})
+target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})
 endif()
