@@ -20,6 +20,7 @@ if(USE_WIN7_FOR_BOOST_LOG)
 message(STATUS "Set Config USE_WIN7_FOR_BOOST_LOG")
 target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
 endif()
+
 endif()
 
 if(COVERAGE)
@@ -28,10 +29,24 @@ target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
 target_link_libraries(unittest PUBLIC gcov)
 endif()
 
+if(ENABLE_MYSQL)
+message(STATUS "enable mysql")
+target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
+target_link_libraries(unittest PUBLIC mysql)
+endif()
+
+
 
 add_test(
 	NAME unittest COMMAND unittest
 )
+
+if(WIN32)
+#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
+#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
+#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:mysql>)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
 
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius

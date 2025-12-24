@@ -12,28 +12,9 @@ namespace aquarius
 		{ std::declval<T>()(std::shared_ptr<Core>{}) } -> std::same_as<awaitable<typename T::return_type>>;
 	};
 
-	template <typename T, typename IoPool>
+	template <typename T>
 	class basic_pool
 	{
-		template <typename Task>
-		struct initialize_task
-		{
-			initialize_task(std::shared_ptr<T> proc, Task&& t)
-				: proc_ptr(proc)
-				, task(std::forward<Task>(t))
-			{}
-
-			template <typename Self>
-			auto operator()(Self& self, error_code ec = {}) -> awaitable<void>
-			{
-				
-			}
-
-			std::shared_ptr<T> proc_ptr;
-
-			Task task;
-		};
-
 	public:
 		explicit basic_pool()
 			: index_(0)
@@ -59,22 +40,21 @@ namespace aquarius
 			co_return true;
 		}
 
-		template <typename Task>
-		requires(enable_pool_task<Task, T>)
-		auto async_execute(Task&& task) -> awaitable<typename Task::return_type>
-		{
-			using return_type = typename Task::return_type;
-			error_code ec{};
+		//template <typename Task>
+		//requires(enable_pool_task<Task, T>)
+		//auto async_execute(Task&& task) -> awaitable<typename Task::return_type>
+		//{
+		//	using return_type = typename Task::return_type;
+		//	error_code ec{};
 
-			auto proc_ptr = get_task_proc();
+		//	auto proc_ptr = get_task_proc();
 
-			if (!proc_ptr)
-				co_return return_type{};
+		//	if (!proc_ptr)
+		//		co_return return_type{};
 
-			co_return co_await task(proc_ptr);
-		}
+		//	co_return co_await task(proc_ptr);
+		//}
 
-	private:
 		std::shared_ptr<T> get_task_proc()
 		{
 			if (task_pool_.empty())

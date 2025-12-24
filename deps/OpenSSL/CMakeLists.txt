@@ -15,4 +15,6 @@ add_library(openssl INTERFACE)
 
 target_link_libraries(openssl INTERFACE OpenSSL::SSL OpenSSL::Crypto)
 
+target_link_directories(openssl INTERFACE ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+
 target_include_directories(openssl INTERFACE ${OPENSSL_INCLUDE_DIR})

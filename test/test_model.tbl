@@ -1,0 +1,13 @@
+
+model test_model -> utf8
+{
+	int1 id @primary;
+	int2 id @primary;
+	int3 id @primary;
+	int4 id @primary;
+	int8 id @primary;
+	float id @primary;
+	double id @primary;
+	string id @primary;
+	datetime id @primary;
+}

@@ -4,8 +4,9 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/module_router.hpp>
 #include <aquarius/session_store.hpp>
-#include <aquarius/module.hpp>
+#include <aquarius/timer.hpp>
 
 using namespace std::chrono_literals;
 
@@ -21,14 +22,18 @@ namespace aquarius
 		using endpoint = typename acceptor::endpoint_type;
 
 	public:
-		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {})
+		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
+							  std::chrono::milliseconds global_time_dura = 30ms)
 			: io_service_pool_size_(io_service_pool_size)
 			, io_service_pool_(io_service_pool_size_)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
 			, acceptor_(io_service_pool_.get_io_service(), detail::make_v4_endpoint(port))
 			, server_name_(name)
+			, global_timer_(io_service_pool_.get_io_service(), global_time_dura)
 		{
 			init_signal();
+
+			init_global_timer();
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 		}
@@ -40,7 +45,7 @@ namespace aquarius
 		{
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
 
-			module_router::get_mutable_instance().run();
+			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
 
 			io_service_pool_.run();
 		}
@@ -102,6 +107,21 @@ namespace aquarius
 				});
 		}
 
+		void init_global_timer()
+		{
+			global_timer_.async_wait(
+				[this](error_code ec)
+				{
+					if (ec)
+					{
+						XLOG_ERROR() << "globale timer error: " << ec.what();
+						return;
+					}
+
+					module_router::get_mutable_instance().timer(global_timer_.dura());
+				});
+		}
+
 	protected:
 		std::size_t io_service_pool_size_;
 
@@ -112,5 +132,7 @@ namespace aquarius
 		acceptor acceptor_;
 
 		std::string server_name_;
+
+		timer<steady_timer> global_timer_;
 	};
 } // namespace aquarius
