@@ -16,3 +16,5 @@ add_library(mysql INTERFACE)
 target_link_libraries(mysql INTERFACE ${MYSQL_LIB})
 
 target_include_directories(mysql INTERFACE ${MYSQL_INCLUDE_DIR})
+
+target_link_directories(mysql INTERFACE ${MYSQL_LIB_DIR})
