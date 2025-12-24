@@ -11,7 +11,7 @@ endif()
 
 message(STATUS "Found OpenSSL ${OPENSSL_VERSION}")
 
-add_library(openssl SHARED)
+add_library(openssl INTERFACE)
 
 target_link_libraries(openssl PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 

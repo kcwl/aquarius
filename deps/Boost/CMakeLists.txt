@@ -1,4 +1,4 @@
-add_library(boost SHARED)
+add_library(boost INTERFACE)
 target_compile_options(boost PUBLIC -DBOOST_ALL_DYN_LINK)
 
 if(WIN32)

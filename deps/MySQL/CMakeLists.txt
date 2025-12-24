@@ -11,7 +11,7 @@ endif()
 
 message(STATUS "Found MySQL ${MYSQL_VERSION}")
 
-add_library(mysql SHARED)
+add_library(mysql INTERFACE)
 
 target_link_libraries(mysql PUBLIC ${MYSQL_LIB})
 
