@@ -82,7 +82,6 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DENABLE_MYSQL=true
-        -D
         -DBOOST_ROOT=${{ runner.workspace }}\boost_1_88_0
         -S ${{ github.workspace }}
         
