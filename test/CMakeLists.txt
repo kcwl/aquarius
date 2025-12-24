@@ -45,8 +45,10 @@ if(WIN32)
 set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
 set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
 #set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:mysql>)
-file(GENERATE OUTPUT .gitignore CONTENT "*")
-message(STATUS "PATH: ${PATH}")
+#file(GENERATE OUTPUT .gitignore CONTENT "*")
+message(STATUS "unittest: $<TARGET_RUNTIME_DLL_DIRS:unittest>")
+message(STATUS "boost: $<TARGET_RUNTIME_DLL_DIRS:boost>")
+message(STATUS "mysql: $<TARGET_RUNTIME_DLL_DIRS:mysql>")
 endif()
 
 add_custom_target(coverage 
