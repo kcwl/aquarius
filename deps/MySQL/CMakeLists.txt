@@ -13,6 +13,6 @@ message(STATUS "Found MySQL ${MYSQL_VERSION}")
 
 add_library(mysql INTERFACE)
 
-target_link_libraries(mysql PUBLIC ${MYSQL_LIB})
+target_link_libraries(mysql INTERFACE ${MYSQL_LIB})
 
-target_include_directories(mysql PUBLIC ${MYSQL_INCLUDE_DIR})
+target_include_directories(mysql INTERFACE ${MYSQL_INCLUDE_DIR})

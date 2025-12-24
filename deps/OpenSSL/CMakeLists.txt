@@ -13,6 +13,6 @@ message(STATUS "Found OpenSSL ${OPENSSL_VERSION}")
 
 add_library(openssl INTERFACE)
 
-target_link_libraries(openssl PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(openssl INTERFACE OpenSSL::SSL OpenSSL::Crypto)
 
-target_include_directories(openssl PUBLIC ${OPENSSL_INCLUDE_DIR})
+target_include_directories(openssl INTERFACE ${OPENSSL_INCLUDE_DIR})
