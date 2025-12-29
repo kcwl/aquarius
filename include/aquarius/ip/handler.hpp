@@ -11,6 +11,9 @@ namespace aquarius
 	class handler : public basic_handler<Session, Request, Response>
 	{
 	public:
+		using session_t = Session;
+
+	public:
 		handler(const std::string& name)
 			: basic_handler<Session, Request, Response>(name)
 		{}
@@ -21,6 +24,9 @@ namespace aquarius
 	template <typename Session, typename Request, typename Response>
 	class handler<proto_tag::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
 	{
+	public:
+		using session_t = Session;
+
 	public:
 		handler(const std::string& name)
 			: basic_handler<Session, Request, Response>(name)
@@ -116,6 +122,7 @@ namespace aquarius
 	public:                                                                                                            \
 		using base_type =                                                                                              \
 			aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>;         \
+		using session_t = typename base_type::session_t;                                                               \
                                                                                                                        \
 	public:                                                                                                            \
 		__method()                                                                                                     \

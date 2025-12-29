@@ -114,14 +114,21 @@ namespace aquarius
 
 				ofs_ << "\treturn ";
 
-				for (auto& s : data_field_ptr_->fields())
+				if (data_field_ptr_->fields().empty())
 				{
-					ofs_ << start_sp << s.second << " == other." << s.second;
-
-					if (!start)
+					ofs_ << "true";
+				}
+				else
+				{
+					for (auto& s : data_field_ptr_->fields())
 					{
-						start_sp = " && ";
-						start = !start;
+						ofs_ << start_sp << s.second << " == other." << s.second;
+
+						if (!start)
+						{
+							start_sp = " && ";
+							start = !start;
+						}
 					}
 				}
 
@@ -139,7 +146,8 @@ namespace aquarius
 				ofs_ << std::endl;
 				ofs_ << "std::ostream& operator<<(std::ostream& os, const " << data_field_ptr_->name() << "& other)\n";
 				ofs_ << "{\n";
-				ofs_ << "\tos ";
+				if(!data_field_ptr_->fields().empty())
+					ofs_ << "\tos ";
 
 				for (auto& [type, name] : data_field_ptr_->fields())
 				{
@@ -153,7 +161,8 @@ namespace aquarius
 
 				//ofs.seekp(-4, std::ios::cur);
 
-				ofs_ << ";\n";
+				if (!data_field_ptr_->fields().empty())
+					ofs_ << ";\n";
 
 				ofs_ << "\treturn os;\n";
 

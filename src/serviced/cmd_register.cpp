@@ -1,8 +1,7 @@
 #include "cmd_register.h"
-#include "client_factory.h"
 #include "cmd_store.h"
 #include "error.hpp"
-#include <aquarius/async.hpp>
+#include <aquarius.hpp>
 
 namespace serviced
 {
@@ -12,44 +11,44 @@ namespace serviced
 		help_op->cmd_ptr->add_option<std::string>("h", "help message");
 		help_op->opt_func = [](std::string& output) -> aquarius::awaitable<aquarius::error_code>
 		{
-			auto cmds = CMD.cmds();
+			//auto cmds = CMD.cmds();
 
-			for (auto& c : cmds)
-			{
-				if (!c.second)
-					continue;
+			//for (auto& c : cmds)
+			//{
+			//	if (!c.second)
+			//		continue;
 
-				output.append(c.second->cmd_ptr->desc() + ":\n");
+			//	output.append(c.second->cmd_ptr->desc() + ":\n");
 
-				for (const auto& o : c.second->cmd_ptr->options())
-				{
-					if (!o)
-						continue;
+			//	for (const auto& o : c.second->cmd_ptr->options())
+			//	{
+			//		if (!o)
+			//			continue;
 
-					output.append("\t--" + o->long_name() + "\t" + o->description() + "\n");
-				}
-			}
+			//		output.append("\t--" + o->long_name() + "\t" + o->description() + "\n");
+			//	}
+			//}
 
 			co_return errc::success;
 		};
 
-		CMD.insert(help_op);
+		//CMD.insert(help_op);
 
 		auto list_op = std::make_shared<cmd_info>("list");
 		list_op->cmd_ptr->add_option<std::string>("h", "show server infos");
 		list_op->opt_func = [](std::string& output) -> aquarius::awaitable<aquarius::error_code>
 		{
-			auto clients = CLIENT.get_client();
+			//auto clients = CLIENT.get_client();
 
-			for (auto& c : clients)
-			{
-				output.append(c->remote_address() + ":" + std::to_string(c->remote_port()) + "\n");
-			}
+			//for (auto& c : clients)
+			//{
+			//	output.append(c->remote_address() + ":" + std::to_string(c->remote_port()) + "\n");
+			//}
 
 			co_return errc::success;
 		};
 
-		CMD.insert(list_op);
+		//CMD.insert(list_op);
 
 		auto add_op = std::make_shared<cmd_info>("add");
 		add_op->cmd_ptr->add_option<std::string>("host", "server addr");
@@ -62,14 +61,14 @@ namespace serviced
 
 			auto port = add_op->cmd_ptr->option<std::string>("port");
 
-			auto client_ptr = aquarius::async_generator<client_factory::client>(ip_addr, port);
+			//auto client_ptr = aquarius::async_generator<client_factory::client>(ip_addr, port);
 
-			CLIENT.insert(add_op->cmd_ptr->option<std::size_t>("topic"), ip_addr, port, client_ptr);
+			//CLIENT.insert(add_op->cmd_ptr->option<std::size_t>("topic"), ip_addr, port, client_ptr);
 
 			co_return errc::success;
 		};
 
-		CMD.insert(add_op);
+		//CMD.insert(add_op);
 
 		auto remove_op = std::make_shared<cmd_info>("remove");
 		remove_op->cmd_ptr->add_option<std::string>("host", "server addr");
@@ -82,11 +81,11 @@ namespace serviced
 			auto port = remove_op->cmd_ptr->option<std::string>("port");
 			auto topic = remove_op->cmd_ptr->option<std::size_t>("topic");
 
-			CLIENT.remove(topic, ip_addr, port);
+			//CLIENT.remove(topic, ip_addr, port);
 
 			co_return errc::success;
 		};
 
-		CMD.insert(remove_op);
+		//CMD.insert(remove_op);
 	}
 } // namespace serviced

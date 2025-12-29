@@ -1,0 +1,11 @@
+message subscribe:tcp -> 10000
+{
+	request
+	{
+		string topic;
+		string payload;
+	}
+	response
+	{
+	}
+}
