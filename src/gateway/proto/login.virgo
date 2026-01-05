@@ -1,0 +1,11 @@
+message login:tcp -> 10000
+{
+	request
+	{
+		string user;
+		string passwd;
+	}
+	response
+	{
+	}
+}

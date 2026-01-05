@@ -19,9 +19,15 @@ using namespace std::string_view_literals;
 
 namespace aquarius
 {
-	template <auto Tag>
+	template <typename HandlerSelector = default_tcp_selector>
 	struct processor
 	{
+		struct proto_header
+		{
+			uint32_t length;
+			uint32_t seq_number;
+		};
+
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
@@ -31,9 +37,9 @@ namespace aquarius
 			{
 				flex_buffer buffer{};
 
-				uint32_t length = 0;
+				proto_header proto{};
 
-				constexpr auto len = sizeof(length);
+				constexpr auto len = sizeof(proto);
 
 				ec = co_await session_ptr->async_read(buffer, len);
 
@@ -42,23 +48,23 @@ namespace aquarius
 					break;
 				}
 
-				buffer.sgetn((char*)&length, sizeof(uint32_t));
+				buffer.sgetn((char*)&proto, sizeof(proto_header));
 
-				ec = co_await session_ptr->async_read(buffer, length);
+				ec = co_await session_ptr->async_read(buffer, proto.length);
 
 				if (ec)
 				{
 					break;
 				}
 
-				auto topic = binary_parse{}.from_datas<std::string>(buffer);
+				auto topic = binary_parse{}.from_datas<std::string_view>(buffer);
 
-				router<Tag, Session>::get_mutable_instance().invoke(topic, session_ptr, buffer);
+				HandlerSelector()(topic, session_ptr, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
 			{
-				XLOG_ERROR() << from_tag_string(Tag) << " read occur error - " << ec.message()
+				XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " read occur error - " << ec.message()
 							 << ", remote_address: " << session_ptr->remote_address();
 			}
 
@@ -66,32 +72,40 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Session>
-		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		auto query(uint32_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
 		{
 			flex_buffer buffer{};
 
-			uint32_t length = 0;
-
-			constexpr auto len = sizeof(length);
-
-			auto ec = co_await session_ptr->async_read(buffer, len);
-
-			if (ec)
+			std::map<std::size_t, flex_buffer> buffer_controller;
+			for (;;)
 			{
-				XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
-							 << ", remote_address: " << session_ptr->remote_address();
-				co_return Response{};
-			}
+				proto_header h{};
+				constexpr auto len = sizeof(proto_header);
 
-			buffer.sgetn((char*)&length, len);
+				auto ec = co_await session_ptr->async_read(buffer, len);
 
-			ec = co_await session_ptr->async_read(buffer, length);
+				if (ec)
+				{
+					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
+								 << ", remote_address: " << session_ptr->remote_address();
+					co_return Response{};
+				}
 
-			if (ec)
-			{
-				XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
-							 << ", remote_address: " << session_ptr->remote_address();
-				co_return Response{};
+				buffer.sgetn((char*)&h, len);
+
+				ec = co_await session_ptr->async_read(buffer, h.length);
+
+				if (ec)
+				{
+					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
+								 << ", remote_address: " << session_ptr->remote_address();
+					co_return Response{};
+				}
+
+				if (seq_number == h.seq_number)
+					break;
+
+				buffer_controller.emplace(h.seq_number, buffer);
 			}
 
 			Response resp{};
@@ -107,12 +121,12 @@ namespace aquarius
 
 			constexpr std::string_view ping_router = "tcp_ping"sv;
 
-			router<Tag, Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
+			router<HandlerSelector::tag, Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
 		}
 	};
 
 	template <>
-	struct processor<proto_tag::http>
+	struct processor<default_http_selector>
 	{
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
@@ -316,7 +330,8 @@ namespace aquarius
 					buffer.sputn(path.data(), path.size());
 				}
 
-				router<proto_tag::http, Session>::get_mutable_instance().invoke(_router, session_ptr, hf, buffer);
+				// router<proto_tag::http, Session>::get_mutable_instance().invoke(_router, session_ptr, hf, buffer);
+				HandlerSelector()(_router, session_ptr, hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)

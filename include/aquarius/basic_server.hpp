@@ -12,14 +12,20 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
+
 	template <typename Session>
 	class basic_server
 	{
+	public:
 		using session_type = Session;
 
 		using acceptor = typename Session::acceptor;
 
 		using endpoint = typename acceptor::endpoint_type;
+
+		using ip_filter_func = std::function<bool(const std::string&)>;
+
+		using callback_func = std::function<void(std::shared_ptr<Session>)>;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
@@ -36,6 +42,8 @@ namespace aquarius
 			init_global_timer();
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
+
+			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
 		}
 
 		~basic_server() = default;
@@ -44,8 +52,6 @@ namespace aquarius
 		void run()
 		{
 			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
-
-			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
 
 			io_service_pool_.run();
 		}
@@ -60,6 +66,21 @@ namespace aquarius
 		bool enable() const
 		{
 			return acceptor_.is_open() && io_service_pool_.enable();
+		}
+
+		void set_ip_filter(const ip_filter_func& func)
+		{
+			ip_filter_ = func;
+		}
+
+		void set_accept_func(const callback_func& func)
+		{
+			accept_func_ = func;
+		}
+
+		void set_close_func(const callback_func& func)
+		{
+			close_func_ = func;
 		}
 
 	private:
@@ -85,7 +106,23 @@ namespace aquarius
 
 				co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr] -> awaitable<void> { co_return co_await session_ptr->accept(); }, detached);
+					[session_ptr, this] -> awaitable<void>
+					{
+						if (ip_filter_)
+						{
+							if (!ip_filter_(session_ptr->remote_endpoint().address().to_string()))
+							{
+								session_ptr->close();
+								co_return;
+							}
+						}
+
+						if (accept_func_)
+							accept_func_();
+
+						co_return co_await session_ptr->accept();
+					},
+					detached);
 			}
 		}
 
@@ -134,5 +171,11 @@ namespace aquarius
 		std::string server_name_;
 
 		timer<steady_timer> global_timer_;
+
+		ip_filter_func ip_filter_;
+
+		callback_func accept_func_;
+
+		callback_func close_func_;
 	};
 } // namespace aquarius

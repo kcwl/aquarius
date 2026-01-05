@@ -155,6 +155,8 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
     <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\default_http_selector.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\default_tcp_selector.hpp" />
     <ClInclude Include="..\include\aquarius\module.hpp" />
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />

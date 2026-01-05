@@ -21,6 +21,8 @@ namespace aquarius
 
 		using executor_type = typename socket::executor_type;
 
+		using callback_func = std::function<void(std::shared_ptr<basic_session<ProtoTag, Adaptor>>)>;
+
 	public:
 		explicit basic_session(socket sock)
 			: socket_(std::move(sock))
@@ -149,5 +151,7 @@ namespace aquarius
 		Adaptor socket_adaptor_;
 
 		std::size_t uuid_;
+
+		callback_func close_func_
 	};
 } // namespace aquarius

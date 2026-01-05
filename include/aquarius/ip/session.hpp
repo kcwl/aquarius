@@ -17,6 +17,8 @@ namespace aquarius
 
 		using proc_type = processor<Tag>;
 
+		using callback_func = std::function<void(std::shared_ptr<session<Tag, Adaptor>>)>;
+
 	public:
 		session(socket sock, std::chrono::steady_clock::duration timeout = 1s)
 			: base_type(std::move(sock))
@@ -35,6 +37,11 @@ namespace aquarius
 		auto query() -> awaitable<Response>
 		{
 			co_return co_await proto_.template query<Response>(this->shared_from_this());
+		}
+
+		void set_close_func(const callback_func& f)
+		{
+			close_func_ = f;
 		}
 
 	private:
@@ -57,6 +64,8 @@ namespace aquarius
 		proc_type proto_;
 
 		timer<boost::asio::steady_timer> timer_;
+
+		callback_func close_func_;
 	};
 
 	template <auto Tag, typename Adaptor>

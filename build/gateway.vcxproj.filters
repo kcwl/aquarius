@@ -24,12 +24,33 @@
     <ClCompile Include="..\src\gateway\transfer_client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gateway\auth_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\server.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\auth_task.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\auth_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_task.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_handler.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\default_tcp_selector.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
