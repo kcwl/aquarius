@@ -4,6 +4,6 @@
 
 namespace aquarius
 {
-	template <auto Tag>
-	using server_session = session<Tag, raw_socket_adaptor<Tag>>;
+	template <typename Tag>
+	using server_session = session<Tag, raw_socket_adaptor<Tag::tag>>;
 } // namespace aquarius

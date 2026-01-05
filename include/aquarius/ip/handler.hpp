@@ -116,12 +116,12 @@ namespace aquarius
 #define AQUARIUS_GLOBAL_STR_ID(request) #request
 
 #define __AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)                                            \
-	class __method final                                                                                               \
-		: public aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>     \
+	class __method final : public aquarius::handler<aquarius::handler_tag_traits<__request>::selector::tag, __session, \
+													__request, __response>                                             \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type =                                                                                              \
-			aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>;         \
+		using base_type = aquarius::handler<aquarius::handler_tag_traits<__request>::selector::tag, __session,         \
+											__request, __response>;                                                    \
 		using session_t = typename base_type::session_t;                                                               \
                                                                                                                        \
 	public:                                                                                                            \
@@ -134,14 +134,15 @@ namespace aquarius
 
 #define AQUARIUS_CONTEXT_BY(__session, __request, __response, __method)                                                \
 	class __method;                                                                                                    \
-	[[maybe_unused]] static aquarius::auto_handler_register<aquarius::handler_tag_traits<__request>::tag, __session,   \
-															__method> __auto_register_##__method(__request::router);   \
+	[[maybe_unused]] static aquarius::auto_handler_register<aquarius::handler_tag_traits<__request>::selector::tag,    \
+															__session, __method>                                       \
+		__auto_register_##__method(__request::router);                                                                 \
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response, \
-						__method)
+	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::selector>, __request,        \
+						__response, __method)
 
 #define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
-	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \
+	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::selector>, __request,    \
 						__response, __method)

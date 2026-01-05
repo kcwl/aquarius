@@ -25,19 +25,13 @@ namespace aquarius
 	} // namespace gateway
 
 	template <typename... Args>
-	void insert_player(std::size_t id, Args&&... args)
+	inline void insert_player(std::size_t id, Args&&... args)
 	{
 		return gateway::player_manager::get_mutable_instance().insert(
-			std::make_shared<player>(id, std::forward<Args>(args)...));
+			id, std::make_shared<gateway::player>(id, std::forward<Args>(args)...));
 	}
 
-	std::shared_ptr<gateway::player> defer_player(std::size_t id)
-	{
-		return gateway::player_manager::get_mutable_instance().get(id);
-	}
+	std::shared_ptr<gateway::player> defer_player(std::size_t id);
 
-	void erase_player(std::size_t id)
-	{
-		return gateway::player_manager::get_mutable_instance().erase(id);
-	}
+	void erase_player(std::size_t id);
 } // namespace aquarius

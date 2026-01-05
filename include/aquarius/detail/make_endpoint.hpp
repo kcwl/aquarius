@@ -5,16 +5,16 @@ namespace aquarius
 {
 	namespace detail
 	{
-		using endpoint = ip::tcp::endpoint;
+		using endpoint = boost::asio::ip::tcp::endpoint;
 
 		inline endpoint make_v4_endpoint(uint16_t port)
 		{
-			return endpoint(ip::tcp::v4(), port);
+			return endpoint(boost::asio::ip::tcp::v4(), port);
 		}
 
 		inline endpoint make_v6_endpoint(uint16_t port)
 		{
-			return endpoint(ip::tcp::v6(), port);
+			return endpoint(boost::asio::ip::tcp::v6(), port);
 		}
 	} // namespace detail
 } // namespace aquarius

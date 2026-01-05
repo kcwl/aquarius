@@ -12,7 +12,6 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-
 	template <typename Session>
 	class basic_server
 	{
@@ -102,6 +101,8 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), 1s);
 
+				session_ptr->set_close_func(close_func_);
+
 				regist_session(session_ptr);
 
 				co_spawn(
@@ -110,7 +111,7 @@ namespace aquarius
 					{
 						if (ip_filter_)
 						{
-							if (!ip_filter_(session_ptr->remote_endpoint().address().to_string()))
+							if (!ip_filter_(session_ptr->remote_address()))
 							{
 								session_ptr->close();
 								co_return;
@@ -118,7 +119,7 @@ namespace aquarius
 						}
 
 						if (accept_func_)
-							accept_func_();
+							accept_func_(session_ptr);
 
 						co_return co_await session_ptr->accept();
 					},

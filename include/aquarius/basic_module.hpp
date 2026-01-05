@@ -30,6 +30,8 @@ namespace aquarius
 
 		virtual void stop() = 0;
 
+		virtual bool enable() = 0;
+
 		virtual void timer(std::chrono::milliseconds) = 0;
 
 	private:

@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/logger.hpp>
 #include <boost/msm/back11/state_machine.hpp>
 #include <boost/msm/front/state_machine_def.hpp>
-#include <aquarius/logger.hpp>
 
 namespace aquarius
 {
@@ -69,45 +69,40 @@ namespace aquarius
 				}
 			};
 
-			struct verify_complete_state : public boost::msm::front::state<>
+			struct complete_state : public boost::msm::front::state<>
 			{
 				// if the play event arrives in this state, defer it until a state handles it or
 				// rejects it
-				typedef boost::mpl::vector<verify_complete> deferred_events;
+				typedef boost::mpl::vector<complete> deferred_events;
 				// every (optional) entry/exit methods get the event passed.
 				template <class Event, class FSM>
 				void on_entry(Event const&, FSM&)
 				{
-					XLOG_DEBUG() << "entering: verify_complete_state" << std::endl;
+					XLOG_DEBUG() << "entering: complete_state" << std::endl;
 				}
 				template <class Event, class FSM>
 				void on_exit(Event const&, FSM&)
 				{
-					XLOG_DEBUG() << "leaving: verify_complete_state" << std::endl;
+					XLOG_DEBUG() << "leaving: complete_state" << std::endl;
 				}
 			};
 
 			void inits(const init&);
 
-			void verify_user_handler(const verify_user&);
+			void verify_user_handler(const verify&);
 
-			void verify_passwd_handler(const verify_passwd&);
-
-			void verify_complete_handler(const verify_complete&);
+			void verify_complete_handler(const complete&);
 
 			struct transition_table
 				: boost::mpl::vector<
 					  //    Start     Event         Next      Action                   Guard
 					  //  +---------+-------------+---------+------------------------+----------------------+
-					  a_row<init_state, init, verify_user_state, &player_define::inits>,
-					  a_row<verify_user_state, verify_user, verify_passwd_state, &player_define::verify_user_handler>,
-					  a_row<verify_passwd_state, verify_passwd, verify_complete_state,
-							&player_define::verify_passwd_handler>,
-					  a_row<verify_complete_state, verify_complete, verify_complete_state,
-							&player_define::verify_complete_handler>>
+					  a_row<init_state, init, verify_state, &player_define::inits>,
+					  a_row<verify_state, verify, complete_state, &player_define::verify_user_handler>,
+					  a_row<complete_state, complete, complete_state, &player_define::verify_complete_handler>>
 			{};
 
-			typedef boost::mpl::vector<init_state, verify_user_state> initial_state;
+			typedef boost::mpl::vector<init_state, verify_state> initial_state;
 
 			template <class Event, class FSM>
 			void no_transition(Event const& e, FSM&, int state)
@@ -119,7 +114,10 @@ namespace aquarius
 		class player : public boost::msm::back11::state_machine<player_define>
 		{
 		public:
-			player() = default;
+			player(std::size_t id);
+
+		private:
+			std::size_t id_;
 		};
 	} // namespace gateway
 } // namespace aquarius

@@ -6,13 +6,14 @@
 
 namespace aquarius
 {
-	template <typename Core, typename Config, detail::string_literal ConfigPath>
+
+	template <typename Core, typename Config>
 	class _module : public basic_module<Core>
 	{
 	public:
 		using typename basic_module<Core>::core_type;
 		using config_type = Config;
-		constexpr static auto config_path = ConfigPath;
+		constexpr static std::string_view config_path = config_type::path;
 
 	public:
 		_module(const std::string& name)
@@ -25,7 +26,7 @@ namespace aquarius
 		virtual bool config() override
 		{
 			error_code ec{};
-			config_ = ini::parse<Config>(std::string(detail::bind_param<ConfigPath>::value), ec);
+			config_ = ini::parse<config_type>(std::string(config_path.data()), ec);
 
 			if (!ec)
 				return true;
@@ -50,6 +51,11 @@ namespace aquarius
 			return;
 		}
 
+		virtual bool enable() override
+		{
+			return true;
+		}
+
 		virtual void timer(std::chrono::milliseconds) override
 		{
 			return;
@@ -69,4 +75,12 @@ namespace aquarius
 	private:
 		Config config_;
 	};
+
+	struct no_config 
+	{
+		constexpr static std::string_view path = "empty"sv;
+	};
+
+	template<typename Core>
+	using no_config_module = _module<Core, no_config>;
 } // namespace aquarius

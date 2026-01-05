@@ -7,7 +7,7 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <auto Tag, typename Adaptor>
+	template <typename Tag, typename Adaptor>
 	class session : public basic_session<Tag, Adaptor>, public std::enable_shared_from_this<session<Tag, Adaptor>>
 	{
 	public:
@@ -68,7 +68,7 @@ namespace aquarius
 		callback_func close_func_;
 	};
 
-	template <auto Tag, typename Adaptor>
+	template <typename Tag, typename Adaptor>
 	struct is_session_type<session<Tag, Adaptor>> : std::true_type
 	{};
 } // namespace aquarius

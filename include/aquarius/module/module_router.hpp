@@ -16,12 +16,12 @@ namespace aquarius
 		~module_router() = default;
 
 	public:
-		template <typename Core, typename Config, auto ConfigPath>
+		template <typename Core, typename Config>
 		void regist(const std::string& module_name)
 		{
 			std::lock_guard lk(mutex_);
 
-			routers_.insert({ module_name, std::make_shared<_module<Core, Config, ConfigPath>>(module_name) });
+			routers_.insert({ module_name, std::make_shared<_module<Core, Config>>(module_name) });
 		}
 
 		auto run() -> awaitable<bool>
@@ -51,7 +51,8 @@ namespace aquarius
 		}
 
 		template <typename Core, typename Task>
-		auto schedule(const std::string& module_name, std::shared_ptr<Task> task) -> awaitable<typename Task::return_type>
+		auto schedule(const std::string& module_name, std::shared_ptr<Task> task)
+			-> awaitable<typename Task::return_type>
 		{
 			using return_type = typename Task::return_type;
 
@@ -71,14 +72,7 @@ namespace aquarius
 				co_return return_type{};
 			}
 
-			// auto ec = co_await temp_module->visit(task);
 			co_return co_await temp_module->visit(task);
-			// if (ec)
-			//{
-			//	XLOG_ERROR() << "[" << temp_module->name() << "] handle error: " << ec.message();
-			// }
-
-			// co_return temp_module->result();
 		}
 
 		void hot_update(const std::string& module_name)

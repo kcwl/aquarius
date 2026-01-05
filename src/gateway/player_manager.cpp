@@ -29,4 +29,14 @@ namespace aquarius
 			players_.erase(id);
 		}
 	} // namespace gateway
+
+	std::shared_ptr<gateway::player> defer_player(std::size_t id)
+	{
+		return gateway::player_manager::get_mutable_instance().get(id);
+	}
+
+	void erase_player(std::size_t id)
+	{
+		return gateway::player_manager::get_mutable_instance().erase(id);
+	}
 } // namespace aquarius

@@ -25,7 +25,7 @@ namespace aquarius
 			std::vector<std::string>& macs_;
 		};
 
-		class firewall_module : public _module<int>
+		class firewall_module : public no_config_module<int>
 		{
 		public:
 			firewall_module() = default;

@@ -1,5 +1,4 @@
 ﻿#include "server.hpp"
-#include "transfer_client.h"
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/logger.hpp>
 #include <iostream>
@@ -15,8 +14,6 @@ int main(int argc, char* argv[])
 	cmd.add_option<std::string>("name", "server name");
 	cmd.add_option<std::string>("transfer", "transfer ip addr");
 
-	TRANSFER.set_addr(cmd.option<std::string>("transfer"));
-
 	cmd.load_options(argc, argv);
 
 	gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
@@ -27,7 +24,10 @@ int main(int argc, char* argv[])
 							aquarius::insert_player(session_ptr->uuid());
 						});
 
-	srv.set
+	srv.set_close_func([] (std::shared_ptr<gateway::server::session_type> session_ptr)
+					   {
+						   aquarius::erase_player(session_ptr->uuid());
+					   });
 
 	srv.run();
 

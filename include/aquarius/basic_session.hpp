@@ -7,17 +7,17 @@
 
 namespace aquarius
 {
-	template <auto ProtoTag, typename Adaptor>
+	template <typename ProtoTag, typename Adaptor>
 	class basic_session
 	{
 	public:
-		using socket = typename protocol<ProtoTag>::socket;
+		using socket = typename protocol<ProtoTag::tag>::socket;
 
-		using endpoint = typename protocol<ProtoTag>::endpoint;
+		using endpoint = typename protocol<ProtoTag::tag>::endpoint;
 
-		using acceptor = typename protocol<ProtoTag>::acceptor;
+		using acceptor = typename protocol<ProtoTag::tag>::acceptor;
 
-		using resolver = typename protocol<ProtoTag>::resolver;
+		using resolver = typename protocol<ProtoTag::tag>::resolver;
 
 		using executor_type = typename socket::executor_type;
 
@@ -152,6 +152,6 @@ namespace aquarius
 
 		std::size_t uuid_;
 
-		callback_func close_func_
+		callback_func close_func_;
 	};
 } // namespace aquarius

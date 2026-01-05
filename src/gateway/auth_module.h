@@ -6,23 +6,23 @@ namespace aquarius
 {
 	namespace gateway
 	{
-        class auth_op
-        {
-        public:
-            auth_op() = default;
-            ~auth_op() = default;
+		class auth_op
+		{
+		public:
+			auth_op() = default;
+			~auth_op() = default;
 
-        public:
-            bool auth(const std::string_view& username, const std::string_view& password);
-        };
+		public:
+			bool auth(const std::string_view& username, const std::string_view& password);
+		};
 
-        class auth_module : public _module<auth_op>
-        {
-        public:
-            auth_module() = default;
+		class auth_module : public no_config_module<auth_op>
+		{
+		public:
+			auth_module() = default;
 
-        private:
-            std::shared_ptr<auth_op> op_ptr_;
-        };
-	}
-}
+		private:
+			std::shared_ptr<auth_op> op_ptr_;
+		};
+	} // namespace gateway
+} // namespace aquarius
