@@ -15,7 +15,7 @@ namespace aquarius
 
 		using typename base_type::socket;
 
-		using proc_type = processor<Tag>;
+		using proc_type = processor<Tag::tag, Tag>;
 
 		using callback_func = std::function<void(std::shared_ptr<session<Tag, Adaptor>>)>;
 

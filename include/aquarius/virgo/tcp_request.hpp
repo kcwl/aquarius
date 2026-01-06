@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/default_tcp_selector.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/basic_tcp_protocol.hpp>

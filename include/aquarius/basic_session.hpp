@@ -23,6 +23,8 @@ namespace aquarius
 
 		using callback_func = std::function<void(std::shared_ptr<basic_session<ProtoTag, Adaptor>>)>;
 
+		constexpr static auto tag = ProtoTag::tag;
+
 	public:
 		explicit basic_session(socket sock)
 			: socket_(std::move(sock))

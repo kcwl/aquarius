@@ -32,7 +32,7 @@
     <ClInclude Include="..\src\gateway\auth_schedule.hpp" />
     <ClInclude Include="..\src\gateway\client_module.h" />
     <ClInclude Include="..\src\gateway\client_schedule.hpp" />
-    <ClInclude Include="..\src\gateway\default_tcp_selector.hpp" />
+    <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />
     <ClInclude Include="..\src\gateway\firewal_task.hpp" />
     <ClInclude Include="..\src\gateway\player.h" />
@@ -40,7 +40,9 @@
     <ClInclude Include="..\src\gateway\proto\login.virgo.h" />
     <ClInclude Include="..\src\gateway\server.hpp" />
     <ClInclude Include="..\src\gateway\transfer_handler.hpp" />
-    <ClInclude Include="..\src\gateway\transfer_task.hpp" />
+    <ClInclude Include="..\src\gateway\transfer_module.hpp" />
+    <ClInclude Include="..\src\gateway\transfer_module_traits.hpp" />
+    <ClInclude Include="..\src\gateway\transfer_schedule.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

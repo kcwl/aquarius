@@ -76,6 +76,26 @@ namespace aquarius
 			co_return co_await session_ptr_->template query<Response>();
 		}
 
+		auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
+		{
+			auto ec = co_await session_ptr_->async_send(buffer);
+
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.what();
+				}
+				session_ptr_->shutdown();
+				if (close_func_)
+					close_func_();
+
+				co_return flex_buffer{};
+			}
+
+			co_return co_await session_ptr_->query_buffer();
+		}
+
 		std::string remote_address() const
 		{
 			return session_ptr_->remote_address();

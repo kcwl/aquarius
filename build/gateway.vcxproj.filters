@@ -47,13 +47,10 @@
     <ClInclude Include="..\src\gateway\auth_module.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\transfer_task.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_handler.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\default_tcp_selector.hpp">
+    <ClInclude Include="..\src\gateway\default_selector.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\player.h">
@@ -78,6 +75,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\client_schedule.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_module.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_module_traits.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

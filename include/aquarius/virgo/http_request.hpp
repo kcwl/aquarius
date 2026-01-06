@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/ip/default_http_selector.hpp>
 #include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>

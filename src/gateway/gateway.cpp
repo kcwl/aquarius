@@ -3,6 +3,9 @@
 #include <aquarius/logger.hpp>
 #include <iostream>
 #include "player_manager.h"
+#include <aquarius/ip/http/http_client.hpp>
+
+TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::http_client)
 
 int main(int argc, char* argv[])
 {
@@ -16,15 +19,15 @@ int main(int argc, char* argv[])
 
 	cmd.load_options(argc, argv);
 
-	gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+	aquarius::gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
 						cmd.option<std::string>("name"));
 
-	srv.set_accept_func([&] (std::shared_ptr<gateway::server::session_type> session_ptr) 
+	srv.set_accept_func([&] (std::shared_ptr<aquarius::gateway::server::session_type> session_ptr)
 						{
 							aquarius::insert_player(session_ptr->uuid());
 						});
 
-	srv.set_close_func([] (std::shared_ptr<gateway::server::session_type> session_ptr)
+	srv.set_close_func([] (std::shared_ptr<aquarius::gateway::server::session_type> session_ptr)
 					   {
 						   aquarius::erase_player(session_ptr->uuid());
 					   });
