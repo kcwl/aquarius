@@ -80,9 +80,6 @@
     <ClInclude Include="..\src\gateway\transfer_module.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\transfer_module_traits.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
