@@ -1,29 +1,24 @@
 #pragma once
-#include <aquarius/logger.hpp>
-#include <map>
-#include <mutex>
-#include <string_view>
+#include "channel.hpp"
+#include "player.h"
+#include <aquarius/module/module.hpp>
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		template <typename Channel>
-		class channel_group
+		struct channel_config
+		{
+			bool enabled;
+			int64_t timeout;
+		};
+
+		class channel_module : public _module<channel, channel_config>
 		{
 		public:
-			template <typename Subscriber>
-			void subscribe(std::string_view name, std::shared_ptr<Subscriber> subscribe)
-			{
-				std::lock_guard lock(mutex_);
+			virtual bool enable() override;
 
-				auto& chan = channels_[name];
-
-				if (!chan)
-					chan = std::make_shared<Channel>();
-
-				chan->subscribe(subscribe);
-			}
+			void subscribe(std::string_view name, std::shared_ptr<player> subscribe);
 
 			template <typename Task>
 			auto publish(std::string_view name, Task&& task)
@@ -45,7 +40,7 @@ namespace aquarius
 		private:
 			std::mutex mutex_;
 
-			std::map<std::string_view, std::shared_ptr<Channel>> channels_;
+			std::map<std::string_view, std::shared_ptr<channel>> channels_;
 		};
 	} // namespace serviced
 } // namespace aquarius

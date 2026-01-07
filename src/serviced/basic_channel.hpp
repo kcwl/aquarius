@@ -1,16 +1,15 @@
 #pragma once
+#include "player.h"
+#include <map>
 #include <memory>
-#include <set>
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		template <typename Session, typename Policy, typename Less>
+		template <typename Policy>
 		class basic_channel
 		{
-			using role = channel_role<Session>;
-
 		public:
 			basic_channel() = default;
 
@@ -21,13 +20,13 @@ namespace aquarius
 				policy_.publish(subscribers_, std::forward<Task>(task));
 			}
 
-			void subscribe(std::shared_ptr<role> subscriber)
+			void subscribe(std::shared_ptr<player> subscriber)
 			{
-				subscribers_.insert(subscriber);
+				subscribers_.emplace(subscriber->id(), subscriber);
 			}
 
 		private:
-			std::set<std::shared_ptr<role>, Less> subscribers_;
+			std::map<std::size_t, std::shared_ptr<player>> subscribers_;
 
 			Policy policy_;
 		};

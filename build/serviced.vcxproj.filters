@@ -30,22 +30,19 @@
     <ClInclude Include="..\src\serviced\cmd_register.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\channel_group.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\channel_role.hpp">
+    <ClInclude Include="..\src\serviced\player.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\serviced\basic_channel.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\channel_task.hpp">
+    <ClInclude Include="..\src\serviced\channel_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\channel_module.hpp">
+    <ClInclude Include="..\src\serviced\channel_module.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\serviced\channel.hpp">
@@ -56,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h">
       <Filter>proto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\schedule.hpp">
-      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +76,12 @@
     </ClCompile>
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp">
       <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\player.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\channel_module.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

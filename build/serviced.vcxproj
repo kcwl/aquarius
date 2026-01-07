@@ -130,24 +130,24 @@
   <ItemGroup>
     <ClInclude Include="..\src\serviced\basic_channel.hpp" />
     <ClInclude Include="..\src\serviced\channel.hpp" />
-    <ClInclude Include="..\src\serviced\channel_group.hpp" />
-    <ClInclude Include="..\src\serviced\channel_module.hpp" />
-    <ClInclude Include="..\src\serviced\channel_role.hpp" />
-    <ClInclude Include="..\src\serviced\channel_task.hpp" />
+    <ClInclude Include="..\src\serviced\channel_module.h" />
+    <ClInclude Include="..\src\serviced\player.h" />
+    <ClInclude Include="..\src\serviced\channel_schedule.hpp" />
     <ClInclude Include="..\src\serviced\cmd_register.h" />
     <ClInclude Include="..\src\serviced\cmd_store.h" />
     <ClInclude Include="..\src\serviced\error.hpp" />
     <ClInclude Include="..\src\serviced\payload.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h" />
-    <ClInclude Include="..\src\serviced\schedule.hpp" />
     <ClInclude Include="..\src\serviced\server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\serviced\channel_module.cpp" />
     <ClCompile Include="..\src\serviced\cmd_register.cpp" />
     <ClCompile Include="..\src\serviced\cmd_store.cpp" />
     <ClCompile Include="..\src\serviced\ctx_channel.cpp" />
     <ClCompile Include="..\src\serviced\ctx_cmd.cpp" />
+    <ClCompile Include="..\src\serviced\player.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp" />
     <ClCompile Include="..\src\serviced\serviced.cpp" />
