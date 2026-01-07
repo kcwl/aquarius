@@ -24,19 +24,18 @@
     <ClCompile Include="..\src\gateway\firewall_module.cpp" />
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
-    <ClCompile Include="..\src\gateway\player_manager.cpp" />
+    <ClCompile Include="..\src\gateway\player_module.cpp" />
     <ClCompile Include="..\src\gateway\proto\login.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
     <ClInclude Include="..\src\gateway\auth_schedule.hpp" />
-    <ClInclude Include="..\src\gateway\client_module.h" />
-    <ClInclude Include="..\src\gateway\client_schedule.hpp" />
     <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />
-    <ClInclude Include="..\src\gateway\firewal_task.hpp" />
+    <ClInclude Include="..\src\gateway\firewall_schedule.hpp" />
     <ClInclude Include="..\src\gateway\player.h" />
-    <ClInclude Include="..\src\gateway\player_manager.h" />
+    <ClInclude Include="..\src\gateway\player_module.h" />
+    <ClInclude Include="..\src\gateway\player_schedule.hpp" />
     <ClInclude Include="..\src\gateway\proto\login.virgo.h" />
     <ClInclude Include="..\src\gateway\server.hpp" />
     <ClInclude Include="..\src\gateway\transfer_handler.hpp" />

@@ -36,7 +36,7 @@
     <ClCompile Include="..\src\gateway\firewall_module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\gateway\player_manager.cpp">
+    <ClCompile Include="..\src\gateway\player_module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,28 +59,25 @@
     <ClInclude Include="..\src\gateway\proto\login.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\firewal_task.hpp">
+    <ClInclude Include="..\src\gateway\firewall_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\firewall_module.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\player_manager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\gateway\auth_schedule.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\gateway\client_module.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\gateway\client_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_module.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_schedule.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player_schedule.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
