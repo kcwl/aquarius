@@ -73,7 +73,7 @@ namespace aquarius
 				co_return Response{};
 			}
 
-			co_return co_await session_ptr_->template query<Response>();
+			co_return co_await session_ptr_->template query<Response>(1);
 		}
 
 		auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
@@ -93,7 +93,7 @@ namespace aquarius
 				co_return flex_buffer{};
 			}
 
-			co_return co_await session_ptr_->query_buffer();
+			co_return co_await session_ptr_->query_buffer(1);
 		}
 
 		std::string remote_address() const

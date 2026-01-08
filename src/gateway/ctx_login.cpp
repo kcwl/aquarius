@@ -1,6 +1,6 @@
 #include "auth_schedule.hpp"
-#include "player_manager.h"
 #include "proto/login.virgo.h"
+#include "player_schedule.hpp"
 
 namespace aquarius
 {
@@ -8,12 +8,12 @@ namespace aquarius
 	{
 		AQUARIUS_HANDLER(login_tcp_request, login_tcp_response, ctx_login)
 		{
-			auto player = aquarius::defer_player(session()->uuid());
+			auto player_ptr = co_await mpc_get_player<std::shared_ptr<player>>(session()->uuid());
 
-			if (!player)
+			if (!player_ptr)
 				co_return aquarius::error_code();
 
-			auto result = player->process_event(verify{});
+			auto result = player_ptr->process_event(verify{});
 
 			if (result == boost::msm::back::HandledEnum::HANDLED_FALSE)
 				co_return aquarius::error_code();

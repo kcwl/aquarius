@@ -12,6 +12,7 @@
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <fstream>
+#include <map>
 #include <ranges>
 #include <string_view>
 
@@ -71,9 +72,8 @@ namespace aquarius
 			session_ptr->shutdown();
 		}
 
-
-		template <typename Response, typename Session>
-		auto query_buffer(uint32_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		template <typename Session>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<flex_buffer>
 		{
 			flex_buffer buffer{};
 
@@ -88,7 +88,7 @@ namespace aquarius
 				if (ec)
 				{
 					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
-						<< ", remote_address: " << session_ptr->remote_address();
+								 << ", remote_address: " << session_ptr->remote_address();
 					co_return flex_buffer{};
 				}
 
@@ -99,7 +99,7 @@ namespace aquarius
 				if (ec)
 				{
 					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
-						<< ", remote_address: " << session_ptr->remote_address();
+								 << ", remote_address: " << session_ptr->remote_address();
 					co_return flex_buffer{};
 				}
 
@@ -523,9 +523,8 @@ namespace aquarius
 			co_return true;
 		}
 
-
-		template <typename Response, typename Session>
-		auto query_buffer(uint32_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		template <typename Session>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<flex_buffer>
 		{
 			error_code ec{};
 
@@ -538,14 +537,14 @@ namespace aquarius
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
-					co_return Response{};
+					co_return flex_buffer{};
 
 				auto proto_buffer = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
 				auto proto_slide_buffer = proto_buffer | std::views::slide(two_crlf.size());
 
 				auto iter =
-					std::ranges::find_if(proto_slide_buffer, [&] (auto c) { return std::string_view(c) == two_crlf; });
+					std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
 
 				auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
 
@@ -556,7 +555,7 @@ namespace aquarius
 				auto slide_proto_buffer = header_span | std::views::slide(crlf.size());
 
 				auto it =
-					std::ranges::find_if(slide_proto_buffer, [] (const auto c) { return std::string_view(c) == crlf; });
+					std::ranges::find_if(slide_proto_buffer, [](const auto c) { return std::string_view(c) == crlf; });
 				if (it == slide_proto_buffer.end())
 					co_return flex_buffer{};
 
@@ -579,17 +578,22 @@ namespace aquarius
 
 				auto seq = hf.find("seq_number");
 
-				if (seq_number == seq)
+				if (seq.empty())
+					continue;
+
+				std::size_t seq_n = static_cast<std::size_t>(std::atoi(seq.data()));
+
+				if (seq_number == seq_n)
 					break;
 
-				buffer_controller.emplace(seq, buffer);
+				buffer_controller.insert(std::make_pair<std::size_t, flex_buffer>(std::move(seq_n), std::move(buffer)));
 			}
 
 			co_return buffer;
 		}
 
 		template <typename Response, typename Session>
-		auto query(uint32_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		auto query(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
 		{
 			auto buffer = co_await query_buffer(seq_number, session_ptr);
 

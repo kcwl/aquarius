@@ -57,7 +57,7 @@ namespace aquarius
 			if (!task_ptr)
 				co_return return_type{};
 
-			co_return (*task_ptr)(core());
+			co_return co_await (*task_ptr)(core());
 		}
 
 	protected:

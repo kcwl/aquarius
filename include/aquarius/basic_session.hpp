@@ -95,7 +95,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buffer, delm,
+			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
 												   redirect_error(use_awaitable, ec));
 
 			if (ec)

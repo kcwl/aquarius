@@ -39,6 +39,11 @@ namespace aquarius
 			co_return co_await proto_.template query<Response>(this->shared_from_this());
 		}
 
+		auto query_buffer(std::size_t seq_number) -> awaitable<flex_buffer>
+		{
+			co_return co_await proto_.query_buffer(seq_number, this->shared_from_this());
+		}
+
 		void set_close_func(const callback_func& f)
 		{
 			close_func_ = f;
