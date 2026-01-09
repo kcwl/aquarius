@@ -36,7 +36,7 @@
     <ClInclude Include="..\src\serviced\basic_channel.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\channel_schedule.hpp">
+    <ClInclude Include="..\src\serviced\channel_schedule.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
@@ -81,6 +81,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\channel_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\channel_schedule.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

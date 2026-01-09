@@ -14,7 +14,7 @@ namespace aquarius
 			{}
 
 			template <typename Subscriber, typename CompleteToken>
-			auto publish(std::set<Subscriber> subscribers, CompleteToken&& token)
+			auto publish(const std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token)
 			{
 				if (subscribers.empty())
 					return;
@@ -37,7 +37,7 @@ namespace aquarius
 			constexpr static std::size_t max_weigth = 100;
 
 			template <typename Subscriber, typename CompleteToken>
-			auto publish(std::set<Subscriber> subscribers, CompleteToken&& token)
+			auto publish(const std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token)
 			{
 				if (subscribers.empty())
 					return;
@@ -64,7 +64,7 @@ namespace aquarius
 		struct uuid_hash
 		{
 			template <typename Subscriber, typename Task>
-			auto publish(std::set<Subscriber> subscribers, Task&& task)
+			auto publish(const std::map<std::size_t, std::shared_ptr<player>>& subscribers, Task&& task)
 			{
 				if (subscribers.empty())
 					return;
@@ -81,7 +81,7 @@ namespace aquarius
 		struct some_min
 		{
 			template <typename Subscriber, typename CompleteToken>
-			auto publish(std::set<Subscriber> subscribers, CompleteToken&& token)
+			auto publish(const std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token)
 			{
 				if (subscribers.empty())
 					return;

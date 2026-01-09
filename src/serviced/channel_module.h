@@ -9,15 +9,15 @@ namespace aquarius
 	{
 		struct channel_config
 		{
+			constexpr static auto path = "channel"sv;
+
 			bool enabled;
 			int64_t timeout;
 		};
 
-		class channel_module : public _module<channel, channel_config>
+		class channel_module : public _module<channel_module, channel_config>
 		{
 		public:
-			virtual bool enable() override;
-
 			void subscribe(std::string_view name, std::shared_ptr<player> subscribe);
 
 			template <typename Task>

@@ -6,7 +6,7 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		class player_module : public no_config_module<player>
+		class player_module : public no_config_module<player_module>
 		{
 		public:
 			player_module() = default;

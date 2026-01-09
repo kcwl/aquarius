@@ -13,7 +13,7 @@ namespace aquarius
 		{}
 
 		template <typename T>
-		auto operator()(std::shared_ptr<T> ptr) -> awaitable<return_type>
+		auto operator()(T* ptr) -> awaitable<return_type>
 		{
 			co_return co_await func_(ptr);
 		}

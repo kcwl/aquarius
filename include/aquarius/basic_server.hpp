@@ -42,7 +42,7 @@ namespace aquarius
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
-			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
+			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
 		}
 
 		~basic_server() = default;

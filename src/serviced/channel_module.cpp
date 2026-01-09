@@ -4,11 +4,6 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		bool channel_module::enable()
-		{
-			return configs().enabled;
-		}
-
 		void channel_module::subscribe(std::string_view name, std::shared_ptr<player> subscribe)
 		{
 			std::lock_guard lock(mutex_);

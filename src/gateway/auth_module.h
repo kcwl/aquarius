@@ -1,28 +1,18 @@
 #pragma once
 #include <aquarius/module/module.hpp>
-#include <string_view>
+#include <string>
 
 namespace aquarius
 {
 	namespace gateway
 	{
-		class auth_op
-		{
-		public:
-			auth_op() = default;
-			~auth_op() = default;
-
-		public:
-			bool auth(const std::string_view& username, const std::string_view& password);
-		};
-
-		class auth_module : public no_config_module<auth_op>
+		class auth_module : public no_config_module<auth_module>
 		{
 		public:
 			auth_module() = default;
 
-		private:
-			std::shared_ptr<auth_op> op_ptr_;
+		public:
+			bool auth(const std::string& username, const std::string& password);
 		};
 	} // namespace gateway
 } // namespace aquarius

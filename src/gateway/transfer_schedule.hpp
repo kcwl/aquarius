@@ -13,9 +13,9 @@ namespace aquarius
 		inline auto mpu_transfer(flex_buffer& buffer) -> awaitable<flex_buffer>
 		{
 			co_return co_await mpc::call<flex_buffer, T>("transfer_module"sv,
-														 [&](std::shared_ptr<T> ptr) -> awaitable<flex_buffer>
-														 { 
-															 auto result =  co_await ptr->async_sendback(buffer); 
+														 [&](T* ptr) -> awaitable<flex_buffer>
+														 {
+															 auto result = co_await ptr->async_sendback(buffer);
 
 															 co_return std::move(result);
 														 });

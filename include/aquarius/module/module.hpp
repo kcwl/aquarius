@@ -61,15 +61,9 @@ namespace aquarius
 			return;
 		}
 
-		virtual auto run() -> awaitable<void>
+		virtual auto run(io_context&) -> awaitable<void>
 		{
 			co_return;
-		}
-
-	protected:
-		virtual std::shared_ptr<core_type> core() override
-		{
-			return nullptr;
 		}
 
 	private:

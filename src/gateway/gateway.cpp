@@ -1,11 +1,12 @@
-﻿#include "player_schedule.hpp"
+﻿#include "player_schedule.h"
 #include "server.hpp"
+#include "transfer_module.hpp"
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/logger.hpp>
 #include <iostream>
 
-TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::http_client)
+TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::gateway::transfer_module<aquarius::http_client>)
 
 int main(int argc, char* argv[])
 {

@@ -24,7 +24,7 @@ namespace aquarius
 			routers_.insert({ module_name, std::make_shared<_module<Core, Config>>(module_name) });
 		}
 
-		auto run() -> awaitable<bool>
+		auto run(io_context& ios) -> awaitable<bool>
 		{
 			std::lock_guard lk(mutex_);
 
@@ -44,7 +44,7 @@ namespace aquarius
 					co_return false;
 				}
 
-				co_await f.second->run();
+				co_await f.second->run(ios);
 			}
 
 			co_return true;
