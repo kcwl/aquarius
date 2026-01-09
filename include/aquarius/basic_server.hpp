@@ -5,7 +5,7 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_router.hpp>
-#include <aquarius/session_store.hpp>
+#include <aquarius/module/session_schedule.hpp>
 #include <aquarius/timer.hpp>
 
 using namespace std::chrono_literals;
@@ -42,7 +42,10 @@ namespace aquarius
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
-			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
+			module_router::get_mutable_instance().regist<session_module<Session>>(std::string(session_module_name.data()));
+
+			co_spawn(io_service_pool_.get_io_service(),
+					 module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
 		}
 
 		~basic_server() = default;
@@ -103,7 +106,7 @@ namespace aquarius
 
 				session_ptr->set_close_func(close_func_);
 
-				regist_session(session_ptr);
+				mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),

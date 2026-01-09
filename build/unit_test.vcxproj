@@ -178,7 +178,7 @@
     <ClInclude Include="..\include\aquarius\module\module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\session_store.hpp" />
+    <ClInclude Include="..\include\aquarius\module\session_module.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
@@ -206,6 +206,7 @@
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
+    <ClInclude Include="..\include\aquarius\module\session_schedule.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />

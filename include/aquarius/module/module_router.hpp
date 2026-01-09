@@ -16,12 +16,12 @@ namespace aquarius
 		~module_router() = default;
 
 	public:
-		template <typename Core, typename Config>
+		template <typename Module>
 		void regist(const std::string& module_name)
 		{
 			std::lock_guard lk(mutex_);
 
-			routers_.insert({ module_name, std::make_shared<_module<Core, Config>>(module_name) });
+			routers_.insert({ module_name, std::make_shared<Module>(module_name) });
 		}
 
 		auto run(io_context& ios) -> awaitable<bool>
@@ -111,12 +111,12 @@ namespace aquarius
 		std::map<std::string, std::shared_ptr<module_base>> routers_;
 	};
 
-	template <typename Core, typename Config, detail::string_literal ConfigPath>
+	template <typename Module>
 	struct auto_module_register
 	{
 		auto_module_register(const std::string& module_name)
 		{
-			module_router::get_mutable_instance().regist<Core, Config, ConfigPath>(module_name);
+			module_router::get_mutable_instance().regist<Module>(module_name);
 		}
 	};
 } // namespace aquarius
@@ -126,6 +126,5 @@ namespace aquarius
 #define AQUARIUS_MODULE_STR(str) #str
 
 #define AQUARIUS_MODULE(__method)                                                                                      \
-	[[maybe_unused]] static aquarius::auto_module_register<typename __method::core_type, __method::config_type,        \
-														   __method::config_path>                                      \
+	[[maybe_unused]] static aquarius::auto_module_register<__method>        \
 		AQUARIUS_MODULE_CAT(__auto_register_, __method)(AQUARIUS_MODULE_STR(__method));\

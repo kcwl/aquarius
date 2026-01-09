@@ -34,9 +34,9 @@ namespace aquarius
 		}
 
 		template <typename Response>
-		auto query() -> awaitable<Response>
+		auto query(std::size_t seq_number) -> awaitable<Response>
 		{
-			co_return co_await proto_.template query<Response>(this->shared_from_this());
+			co_return co_await proto_.template query<Response>(seq_number, this->shared_from_this());
 		}
 
 		auto query_buffer(std::size_t seq_number) -> awaitable<flex_buffer>

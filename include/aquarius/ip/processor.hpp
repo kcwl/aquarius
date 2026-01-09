@@ -106,14 +106,14 @@ namespace aquarius
 				if (seq_number == h.seq_number)
 					break;
 
-				buffer_controller.emplace(h.seq_number, buffer);
+				buffer_controller.emplace(std::move(h.seq_number), std::move(buffer));
 			}
 
 			co_return buffer;
 		}
 
 		template <typename Response, typename Session>
-		auto query(uint32_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		auto query(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
 		{
 			auto buffer = co_await query_buffer(seq_number, session_ptr);
 

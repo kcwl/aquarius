@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/asio.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <atomic>
 #include <memory>
@@ -17,7 +18,7 @@ namespace aquarius
 		public:
 			std::size_t id() const;
 
-			void feedback(flex_buffer& buffer);
+			auto feedback(flex_buffer& buffer) -> awaitable<void>;
 
 			void complete();
 

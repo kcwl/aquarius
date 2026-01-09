@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 
+
 namespace aquarius
 {
 	namespace serviced
@@ -15,9 +16,9 @@ namespace aquarius
 
 		public:
 			template <typename Task>
-			void publish(Task&& task)
+			auto publish(Task&& task) -> awaitable<void>
 			{
-				policy_.publish(subscribers_, std::forward<Task>(task));
+				co_await policy_.publish(subscribers_, std::forward<Task>(task));
 			}
 
 			void subscribe(std::shared_ptr<player> subscriber)

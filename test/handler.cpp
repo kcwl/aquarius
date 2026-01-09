@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(http_handler)
 
 	aquarius::io_context io{};
 
-	auto session = std::make_shared<aquarius::http_server_session>(std::move(aquarius::ip::tcp::socket(io)), 2s);
+	auto session = std::make_shared<aquarius::http_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 2s);
 
 	auto req_ptr = std::make_shared<new_http_login_http_request>();
 	req_ptr->version(aquarius::virgo::http_version::http1_1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(tcp_handler)
 {
 	auto h = std::make_shared<ctx_tcp_test>();
 	aquarius::io_context io{};
-	auto session = std::make_shared<aquarius::tcp_server_session>(std::move(aquarius::ip::tcp::socket(io)), 2s);
+	auto session = std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 2s);
 	auto req_ptr = std::make_shared<login_tcp_request>();
 
 	aquarius::co_spawn(

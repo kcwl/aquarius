@@ -1,41 +1,63 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
+#include <aquarius/asio.hpp>
 #include <aquarius/ip/tcp/tcp_server.hpp>
-#include <aquarius/session_store.hpp>
+#include <aquarius/module/session_schedule.hpp>
+
 
 BOOST_AUTO_TEST_SUITE(session_store)
 
 BOOST_AUTO_TEST_CASE(store)
 {
 	aquarius::io_context io;
-	auto session_ptr = std::make_shared<aquarius::tcp_server_session>(std::move(aquarius::ip::tcp::socket(io)));
 
-	auto uid = session_ptr->uuid();
+	auto future = aquarius::co_spawn(io,
+					   [&] -> aquarius::awaitable<void>
+					   {
+						   auto session_ptr =
+							   std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)));
 
-	aquarius::regist_session(session_ptr);
+						   auto uid = session_ptr->uuid();
 
-	//BOOST_TEST(aquarius::detail::session_storage<aquarius::tcp_server_session>() == 1);
+						   co_await aquarius::mpc_insert_session<aquarius::tcp_server_session>(session_ptr);
 
-	auto new_session_ptr = aquarius::attach_session<aquarius::tcp_server_session>(uid);
+						   // BOOST_TEST(aquarius::detail::session_storage<aquarius::tcp_server_session>() == 1);
 
-	BOOST_TEST(new_session_ptr);
+						   auto new_session_ptr = co_await aquarius::mpc_find_session<aquarius::tcp_server_session>(uid);
 
-	aquarius::remove_session<aquarius::tcp_server_session>(uid);
+						   BOOST_TEST(!!new_session_ptr);
 
-	auto new_session_ptr_1 = aquarius::attach_session<aquarius::tcp_server_session>(uid);
+						   co_await aquarius::mpc_erase_session<aquarius::tcp_server_session>(uid);
 
-	BOOST_TEST(!new_session_ptr_1);
+						   auto new_session_ptr_1 = co_await aquarius::mpc_find_session<aquarius::tcp_server_session>(uid);
+
+						   BOOST_TEST(!new_session_ptr_1);
+					   },aquarius::use_future);
+
+	io.run();
+
+	future.get();
 }
 
 BOOST_AUTO_TEST_CASE(multi_regist)
 {
 	aquarius::io_context io;
 
-	auto session_ptr = std::make_shared<aquarius::tcp_server_session>(std::move(aquarius::ip::tcp::socket(io)));
+	auto future = aquarius::co_spawn(
+		io,
+		[&] -> aquarius::awaitable<void>
+		{
+			auto session_ptr = std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)));
 
-	BOOST_TEST(aquarius::regist_session(session_ptr));
+			BOOST_TEST(co_await aquarius::mpc_insert_session<aquarius::tcp_server_session>(session_ptr));
 
-	BOOST_TEST(!aquarius::regist_session(session_ptr));
+			BOOST_TEST(!co_await aquarius::mpc_insert_session<aquarius::tcp_server_session>(session_ptr));
+		},
+		aquarius::use_future);
+
+	io.run();
+
+	future.get();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

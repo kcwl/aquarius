@@ -49,7 +49,7 @@ namespace aquarius
 		template <typename Response, typename Request>
 		auto async_call(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
-			if constexpr (handler_tag_traits<Request>::tag == proto_tag::http)
+			if constexpr (handler_tag_traits<Request>::selector::tag == proto_tag::http)
 			{
 				req->version(get_http_param().version);
 			}

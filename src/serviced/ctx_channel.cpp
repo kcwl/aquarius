@@ -1,5 +1,5 @@
+#include "channel_schedule.h"
 #include "proto/channel.virgo.h"
-#include "schedule.hpp"
 
 namespace aquarius
 {
@@ -9,11 +9,11 @@ namespace aquarius
 		{
 			auto& topic = request()->body().topic;
 
-			auto role = std::make_shared<channel_role<session_t>>(session());
+			auto role = std::make_shared<player>(session()->uuid());
 
-			co_await schedule_subscribe(topic, role);
+			co_await mpc_subscribe(topic, role);
 
 			co_return error_code{};
 		}
-	} // namespace serivced
+	} // namespace serviced
 } // namespace aquarius

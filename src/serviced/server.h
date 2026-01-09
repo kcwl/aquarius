@@ -1,7 +1,10 @@
 #pragma once
 #include <aquarius.hpp>
 
-namespace serviced
+namespace aquarius
 {
-	using tcp_server = aquarius::tcp_server;
-}
+	namespace serviced
+	{
+		using server = aquarius::tcp_server;
+	}
+} // namespace aquarius

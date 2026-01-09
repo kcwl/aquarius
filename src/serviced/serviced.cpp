@@ -9,7 +9,7 @@ int main()
 {
     serviced::cmd_register();
 
-    serviced::tcp_server srv(3399, 10, "serviced");
+    aquarius::serviced::server srv(3399, 10, "serviced");
 
     srv.run();
 }
