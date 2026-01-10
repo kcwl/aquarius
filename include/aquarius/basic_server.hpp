@@ -4,6 +4,7 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/logger_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/session_schedule.hpp>
 #include <aquarius/timer.hpp>
@@ -40,9 +41,9 @@ namespace aquarius
 
 			init_global_timer();
 
-			co_spawn(acceptor_.get_executor(), start_accept(), detached);
+			regist_module();
 
-			module_router::get_mutable_instance().regist<session_module<Session>>(std::string(session_module_name.data()));
+			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
 			co_spawn(io_service_pool_.get_io_service(),
 					 module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
@@ -161,6 +162,14 @@ namespace aquarius
 
 					module_router::get_mutable_instance().timer(global_timer_.dura());
 				});
+		}
+
+		void regist_module()
+		{
+			module_router::get_mutable_instance().regist<session_module<Session>>(
+				std::string(session_module_name.data()));
+
+			module_router::get_mutable_instance().regist<logger_module>("logger_module");
 		}
 
 	protected:
