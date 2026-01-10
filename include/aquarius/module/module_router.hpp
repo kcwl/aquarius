@@ -126,5 +126,9 @@ namespace aquarius
 #define AQUARIUS_MODULE_STR(str) #str
 
 #define AQUARIUS_MODULE(__method)                                                                                      \
-	[[maybe_unused]] static aquarius::auto_module_register<__method>        \
-		AQUARIUS_MODULE_CAT(__auto_register_, __method)(AQUARIUS_MODULE_STR(__method));\
+	[[maybe_unused]] static aquarius::auto_module_register<__method> AQUARIUS_MODULE_CAT(__auto_register_, __method)(  \
+		AQUARIUS_MODULE_STR(__method));
+
+#define AQUARIUS_MODULE_NAMESPACE(__namespace, __method)                                                               \
+	[[maybe_unused]] static aquarius::auto_module_register<__namespace::__method> AQUARIUS_MODULE_CAT(                 \
+		__auto_register_, __method)(AQUARIUS_MODULE_STR(__method));\

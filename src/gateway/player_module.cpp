@@ -4,6 +4,11 @@ namespace aquarius
 {
 	namespace gateway
 	{
+		player_module::player_module(const std::string& name)
+			: no_config_module<player_module>(name)
+		{
+
+		}
 		void player_module::insert(std::size_t id, std::shared_ptr<player> player_ptr)
 		{
 			std::lock_guard lk(mutex_);
@@ -30,3 +35,5 @@ namespace aquarius
 		}
 	} // namespace gateway
 } // namespace aquarius
+
+AQUARIUS_MODULE_NAMESPACE(aquarius::gateway, player_module)

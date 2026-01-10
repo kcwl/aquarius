@@ -175,10 +175,10 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			flex_buffer buffer{};
-
 			for (;;)
 			{
+				flex_buffer buffer{};
+
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)

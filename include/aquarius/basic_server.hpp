@@ -25,7 +25,7 @@ namespace aquarius
 
 		using ip_filter_func = std::function<bool(const std::string&)>;
 
-		using callback_func = std::function<void(std::shared_ptr<Session>)>;
+		using callback_func = std::function<aquarius::awaitable<void>(std::shared_ptr<Session>)>;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
@@ -121,7 +121,7 @@ namespace aquarius
 						}
 
 						if (accept_func_)
-							accept_func_(session_ptr);
+							co_await accept_func_(session_ptr);
 
 						co_return co_await session_ptr->accept();
 					},

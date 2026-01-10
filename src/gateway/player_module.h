@@ -1,6 +1,7 @@
 #pragma once
 #include "player.h"
 #include <aquarius/module/module.hpp>
+#include <aquarius/module/module_router.hpp>
 
 namespace aquarius
 {
@@ -9,7 +10,7 @@ namespace aquarius
 		class player_module : public no_config_module<player_module>
 		{
 		public:
-			player_module() = default;
+			player_module(const std::string& name);
 
 		public:
 			void insert(std::size_t id, std::shared_ptr<player> player_ptr);
@@ -23,6 +24,8 @@ namespace aquarius
 
 			std::map<std::size_t, std::shared_ptr<player>> players_;
 		};
+
+		AQUARIUS_MODULE(player_module)
 
 	} // namespace gateway
 } // namespace aquarius

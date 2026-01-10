@@ -1,9 +1,16 @@
 #include "firewall_module.h"
+#include <aquarius/module/module_router.hpp>
 
 namespace aquarius
 {
 	namespace gateway
 	{
+		firewall_module::firewall_module(const std::string& name)
+			: no_config_module<firewall_module>(name)
+		{
+
+		}
+
 		bool firewall_module::init()
 		{
 			get_ip_addrs();
@@ -34,3 +41,5 @@ namespace aquarius
 		}
 	} // namespace gateway
 } // namespace aquarius
+
+AQUARIUS_MODULE_NAMESPACE(aquarius::gateway, firewall_module)
