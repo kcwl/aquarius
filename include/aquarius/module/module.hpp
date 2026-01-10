@@ -76,5 +76,19 @@ namespace aquarius
 	};
 
 	template<typename Core>
-	using no_config_module = _module<Core, no_config>;
+	class no_config_module : public _module<Core, no_config>
+	{
+	public:
+		no_config_module(const std::string& name)
+			: _module<Core, no_config>(name)
+		{
+
+		}
+
+	public:
+		virtual bool config() override
+		{
+			return true;
+		}
+	};
 } // namespace aquarius

@@ -105,7 +105,7 @@ namespace aquarius
 
 				session_ptr->set_close_func(close_func_);
 
-				mpc_insert_session(session_ptr);
+				co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
