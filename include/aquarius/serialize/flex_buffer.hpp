@@ -279,10 +279,6 @@ namespace aquarius
 			: sb_(other.sb_)
 		{}
 
-		basic_flexbuf_ref(basic_flexbuf_ref&& other) noexcept
-			: sb_(other.sb_)
-		{}
-
 		std::size_t size() const noexcept
 		{
 			return sb_.size();
