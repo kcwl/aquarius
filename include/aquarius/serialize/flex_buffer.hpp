@@ -148,8 +148,9 @@ namespace aquarius
 		{
 			std::size_t pnext = pptr() - &buffer_[0];
 			std::size_t gnext = gptr() - &buffer_[0];
+			std::size_t pend = epptr() - &buffer_[0];
 
-			if (n <= pnext - gnext)
+			if (n <= pend - pnext)
 				return;
 
 			if (gnext > 0)
@@ -158,8 +159,6 @@ namespace aquarius
 
 				std::copy(&buffer_[0], &buffer_[0] + gnext, &buffer_[0] + gnext + pnext);
 			}
-
-			std::size_t pend = epptr() - &buffer_[0];
 
 			if (pend - pnext < n)
 			{
@@ -278,6 +277,11 @@ namespace aquarius
 		basic_flexbuf_ref(const basic_flexbuf_ref& other) noexcept
 			: sb_(other.sb_)
 		{}
+
+		basic_flexbuf_ref(basic_flexbuf_ref&& other) noexcept
+			: sb_(other.sb_)
+		{
+		}
 
 		std::size_t size() const noexcept
 		{
