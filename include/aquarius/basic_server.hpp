@@ -54,8 +54,6 @@ namespace aquarius
 	public:
 		void run()
 		{
-			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
-
 			io_service_pool_.run();
 		}
 

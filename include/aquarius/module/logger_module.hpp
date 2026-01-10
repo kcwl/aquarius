@@ -25,9 +25,6 @@ namespace aquarius
 	namespace keywords = boost::log::keywords;
 	namespace trivial = boost::log::trivial;
 
-	BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "Line", uint32_t)
-	BOOST_LOG_ATTRIBUTE_KEYWORD(file_name, "File", attrs::mutable_constant<std::string>)
-
 	class logger_module : public no_config_module<logger_module>
 	{
 		using file_sink = sinks::asynchronous_sink<sinks::text_file_backend>;

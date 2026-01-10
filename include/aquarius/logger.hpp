@@ -21,6 +21,8 @@ namespace aquarius
 	namespace keywords = boost::log::keywords;
 	namespace trivial = boost::log::trivial;
 
+	BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "Line", uint32_t)
+	BOOST_LOG_ATTRIBUTE_KEYWORD(file_name, "File", attrs::mutable_constant<std::string>)
 
 	template <typename T>
 	auto set_attribute_file_name(const std::string& file_name)
