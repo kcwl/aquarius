@@ -5,8 +5,12 @@
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/logger.hpp>
 #include <iostream>
+#include "transfer_module.hpp"
 
 TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::gateway::transfer_module<aquarius::http_client>)
+
+using transfer_module = aquarius::gateway::transfer_module<aquarius::http_client>;
+AQUARIUS_MODULE(transfer_module)
 
 int main(int argc, char* argv[])
 {

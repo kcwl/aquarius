@@ -18,7 +18,11 @@ namespace aquarius
 		class transfer_module : public _module<transfer_module<T>, transfer_config>
 		{
 		public:
-			transfer_module() = default;
+			transfer_module(const std::string& name)
+				: _module<transfer_module<T>, transfer_config>(name)
+			{
+
+			}
 
 		public:
 			virtual auto run(io_context& ios) -> awaitable<void> override

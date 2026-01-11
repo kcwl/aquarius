@@ -35,6 +35,7 @@ namespace aquarius
 
 				if (!f.second->config())
 				{
+					XLOG_ERROR() << "[" << f.second->name() << "] config error";
 					co_return false;
 				}
 

@@ -26,7 +26,7 @@ namespace aquarius
 		virtual bool config() override
 		{
 			error_code ec{};
-			config_ = ini::parse<config_type>(std::string(config_path.data()), ec);
+			config_ = ini::parse<config_type>(std::string(config_path.data()) + ".ini", ec);
 
 			if (!ec)
 				return true;
