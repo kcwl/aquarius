@@ -5,6 +5,6 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		using server = aquarius::tcp_server;
+		using server = aquarius::http_server;
 	}
 } // namespace aquarius

@@ -16,6 +16,8 @@ namespace aquarius
 			co_return co_await mpc::call<flex_buffer, T>(__transfer_module__,
 														 [&](T* ptr) -> awaitable<flex_buffer>
 														 {
+															 buffer.pubseekpos(0, std::ios::out);
+
 															 auto result = co_await ptr->async_sendback(buffer);
 
 															 co_return std::move(result);

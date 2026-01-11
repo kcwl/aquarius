@@ -29,7 +29,12 @@ namespace aquarius
 			{
 				transfer_ptr_ = std::make_shared<T>(ios);
 
-				co_await transfer_ptr_->async_connect(this->configs().ip_addr, this->configs().port);
+				auto result = co_await transfer_ptr_->async_connect(this->configs().ip_addr, this->configs().port);
+
+				if (!result)
+				{
+					XLOG_ERROR() << "transfer connect error!";
+				}
 			}
 
 			auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
