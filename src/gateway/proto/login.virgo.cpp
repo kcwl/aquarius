@@ -12,14 +12,12 @@ bool login_req_body::operator==(const login_req_body& other) const
 
 void login_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(user, buffer);
-	this->parse_to(passwd, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void login_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<string>(buffer);
-	passwd = this->parse_from<string>(buffer);
+	*this = this->parse_from<login_req_body>(buffer); 
 }
 
 bool login_resp_body::operator==(const login_resp_body& other) const
@@ -29,10 +27,12 @@ bool login_resp_body::operator==(const login_resp_body& other) const
 
 void login_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
+	this->parse_to(*this, buffer);
 }
 
 void login_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
+	*this = this->parse_from<login_resp_body>(buffer); 
 }
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_req_body& local)

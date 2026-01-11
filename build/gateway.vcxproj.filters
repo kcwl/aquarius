@@ -48,6 +48,9 @@
     <ClCompile Include="..\src\gateway\player_schedule.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gateway\gate_error_code.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\server.hpp">
@@ -87,6 +90,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\player_schedule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\gate_error_code.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

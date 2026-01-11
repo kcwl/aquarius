@@ -35,8 +35,6 @@ namespace aquarius
 		{
 			setg(other.eback(), other.gptr(), other.egptr());
 			setp(other.pptr(), other.epptr());
-
-			other.reset();
 		}
 
 		basic_flexbuf& operator=(basic_flexbuf&& other) noexcept
@@ -102,12 +100,6 @@ namespace aquarius
 			n = std::min<std::size_t>(n, size());
 
 			gbump(static_cast<int>(n));
-		}
-
-		void reset()
-		{
-			setg(&buffer_[0], &buffer_[0], &buffer_[0]);
-			setp(&buffer_[0], &buffer_[0] + buffer_.size());
 		}
 
 	protected:

@@ -1,4 +1,4 @@
-message login:tcp -> 10000
+message login:http[post] -> /login
 {
 	request
 	{

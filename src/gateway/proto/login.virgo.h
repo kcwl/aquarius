@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius.hpp>
 
-class login_req_body : public aquarius::tcp_binary_serialize
+class login_req_body : public aquarius::http_json_serialize
 {
 public:
 	login_req_body();
@@ -20,7 +20,7 @@ public:
 	string passwd;
 };
 
-class login_resp_body : public aquarius::tcp_binary_serialize
+class login_resp_body : public aquarius::http_json_serialize
 {
 public:
 	login_resp_body() = default;
@@ -45,5 +45,5 @@ login_req_body tag_invoke(const aquarius::json::value_to_tag<login_req_body>&, c
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_resp_body& local);
 login_resp_body tag_invoke(const aquarius::json::value_to_tag<login_resp_body>&, const aquarius::json::value& jv);
 
-using login_tcp_request = aquarius::virgo::tcp_request<"10000", aquarius::tcp_request_header, login_req_body>;
-using login_tcp_response = aquarius::virgo::tcp_response<aquarius::tcp_response_header, login_resp_body>;
+using login_http_request = aquarius::virgo::http_request<"/login", aquarius::virgo::http_method::post, aquarius::http_request_header, login_req_body>;
+using login_http_response = aquarius::virgo::http_response<aquarius::virgo::http_method::post, aquarius::http_response_header, login_resp_body>;
