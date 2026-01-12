@@ -18,6 +18,9 @@ namespace aquarius
 		class channel_module : public _module<channel_module, channel_config>
 		{
 		public:
+			channel_module(const std::string& name);
+
+		public:
 			void subscribe(std::string_view name, std::shared_ptr<player> subscribe);
 
 			template <typename Task>

@@ -131,6 +131,7 @@
     <ClInclude Include="..\src\serviced\basic_channel.hpp" />
     <ClInclude Include="..\src\serviced\channel.hpp" />
     <ClInclude Include="..\src\serviced\channel_module.h" />
+    <ClInclude Include="..\src\serviced\channel_selector.hpp" />
     <ClInclude Include="..\src\serviced\player.h" />
     <ClInclude Include="..\src\serviced\channel_schedule.h" />
     <ClInclude Include="..\src\serviced\cmd_register.h" />

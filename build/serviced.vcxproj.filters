@@ -54,6 +54,9 @@
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\serviced\channel_selector.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\serviced.cpp">

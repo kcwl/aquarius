@@ -1,10 +1,14 @@
 #pragma once
-#include <aquarius.hpp>
+#include "channel_selector.hpp"
+#include <aquarius/basic_server.hpp>
+#include <aquarius/ip/server_session.hpp>
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		using server = aquarius::http_server;
-	}
+		using channel_server_session = server_session<channel_http_selector>;
+
+		using server = aquarius::basic_server<channel_server_session>;
+	} // namespace serviced
 } // namespace aquarius
