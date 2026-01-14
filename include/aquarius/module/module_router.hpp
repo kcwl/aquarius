@@ -36,13 +36,13 @@ namespace aquarius
 				if (!f.second->config())
 				{
 					XLOG_ERROR() << "[" << f.second->name() << "] config error";
-					co_return false;
+					continue;
 				}
 
 				if (!f.second->init())
 				{
 					XLOG_WARNING() << "[" << f.second->name() << "] init error";
-					co_return false;
+					continue;
 				}
 
 				co_await f.second->run(ios);

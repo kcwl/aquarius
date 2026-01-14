@@ -35,14 +35,16 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual void make_response() override
+		virtual auto make_response() -> awaitable<void> override
 		{
-			this->response().version(get_http_param().version);
+			this->response().version(virgo::from_version_string(co_await mpc_http_version()));
 
 			this->response().set_field("Content-Type", this->request()->find("Content-Type"));
 			this->response().set_field("Server", "Aquarius 0.10.0");
 			this->response().set_field("Connection", this->request()->find("Connection"));
 			this->response().set_field("Access-Control-Allow-Origin", "*");
+
+			co_return;
 		}
 	};
 

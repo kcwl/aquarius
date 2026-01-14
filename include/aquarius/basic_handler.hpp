@@ -58,9 +58,9 @@ namespace aquarius
 	protected:
 		virtual auto handle() -> awaitable<error_code> = 0;
 
-		virtual void make_response()
+		virtual auto make_response() -> awaitable<void>
 		{
-			return;
+			co_return;
 		}
 
 		auto session() const

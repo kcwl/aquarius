@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/http/http_param.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <functional>
+#include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
 {
@@ -51,7 +52,7 @@ namespace aquarius
 		{
 			if constexpr (handler_tag_traits<Request>::selector::tag == proto_tag::http)
 			{
-				req->version(get_http_param().version);
+				req->version(virgo::from_version_string(co_await mpc_http_version()));
 			}
 
 			flex_buffer buffer{};

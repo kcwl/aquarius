@@ -2,10 +2,10 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/http/http_header.hpp>
-#include <aquarius/ip/http/http_param.hpp>
 #include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/http_get_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -277,9 +277,9 @@ namespace aquarius
 							get_resp.version(virgo::http_version::http1_1);
 							get_resp.set_field("Server", "Aqarius 1.00.0");
 							get_resp.set_field("Connection", "keep-alive");
-							get_resp.set_field("Access-Control-Allow-Origin", get_http_param().control_allow_origin);
+							get_resp.set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 
-							auto file_path = get_http_param().root_dir + std::string(_router.data(), _router.size());
+							auto file_path = (co_await mpc_http_root()) + std::string(_router.data(), _router.size());
 
 							std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 							if (!ifs.is_open())
@@ -355,10 +355,13 @@ namespace aquarius
 		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_status status) -> awaitable<void>
 		{
 			std::string header{};
+
+			auto http_version = co_await mpc_http_version();
+
 			auto make_command_line = [&]()
 			{
-				header += std::format("{} {} {}\r\n\r\n", virgo::from_string_version(get_http_param().version),
-									  static_cast<int>(status), virgo::from_status_string(status));
+				header += std::format("{} {} {}\r\n\r\n", http_version, static_cast<int>(status),
+									  virgo::from_status_string(status));
 			};
 
 			make_command_line();
@@ -470,9 +473,9 @@ namespace aquarius
 			get_resp.version(virgo::http_version::http1_1);
 			get_resp.set_field("Server", "Aqarius 1.00.0");
 			get_resp.set_field("Connection", "keep-alive");
-			get_resp.set_field("Access-Control-Allow-Origin", get_http_param().control_allow_origin);
+			get_resp.set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 
-			auto file_path = get_http_param().root_dir + std::string(_router.data(), _router.size());
+			auto file_path = (co_await mpc_http_root()) + std::string(_router.data(), _router.size());
 
 			std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 			if (!ifs.is_open())
