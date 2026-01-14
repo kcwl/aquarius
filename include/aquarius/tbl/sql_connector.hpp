@@ -3,7 +3,6 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/tbl/database_param.hpp>
-
 #include <aquarius/tbl/sql_error.hpp>
 #include <aquarius/tbl/transaction.hpp>
 #include <expected>
