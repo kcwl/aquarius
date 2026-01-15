@@ -5,4 +5,9 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArgumentsHistory>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
 </Project>

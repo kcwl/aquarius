@@ -10,7 +10,7 @@ namespace aquarius
 			-> awaitable<bool>
 		{
 			co_return co_await mpc::call<bool, auth_module>(module_name, [&](auth_module* op_ptr) -> awaitable<bool>
-															{ co_return op_ptr->auth(user, passwd); });
+															{ co_return co_await op_ptr->auth(user, passwd); });
 		}
 	} // namespace gateway
 } // namespace aquarius

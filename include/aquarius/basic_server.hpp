@@ -7,7 +7,9 @@
 #include <aquarius/module/logger_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/session_schedule.hpp>
+#include <aquarius/module/sql_module.hpp>
 #include <aquarius/timer.hpp>
+#include <aquarius/module/http_config_module.hpp>
 
 using namespace std::chrono_literals;
 
@@ -164,10 +166,14 @@ namespace aquarius
 
 		void regist_module()
 		{
+			module_router::get_mutable_instance().regist<logger_module>("alogger_module");
+
 			module_router::get_mutable_instance().regist<session_module<Session>>(
 				std::string(session_module_name.data()));
 
-			module_router::get_mutable_instance().regist<logger_module>("logger_module");
+			module_router::get_mutable_instance().regist<sql_module>("sql_module");
+
+			module_router::get_mutable_instance().regist<http_config_module>("http_config_module");
 		}
 
 	protected:

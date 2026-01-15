@@ -26,14 +26,30 @@ namespace aquarius
 		virtual bool config() override
 		{
 			error_code ec{};
-			config_ = ini::parse<config_type>(std::string(config_path.data()) + ".ini", ec);
 
-			if (!ec)
-				return true;
+			auto path = std::filesystem::current_path().append(config_path);
+			path += ".ini";
 
-			XLOG_ERROR() << "parse config error: " << ec.message();
+			if (!std::filesystem::exists(path))
+			{
+				XLOG_ERROR() << "module[" << this->name() << "] config file not exsit! path:" << path;
 
-			throw ec;
+				return false;
+			}
+
+			try
+			{
+				config_ = ini::parse<config_type>(path.string(), ec);
+			}
+			catch(...)
+			{
+				XLOG_ERROR() << "module[" << this->name() << "] config structure error!";
+
+				return false;
+			}
+			
+
+			return !ec;
 		}
 
 		Config configs() const

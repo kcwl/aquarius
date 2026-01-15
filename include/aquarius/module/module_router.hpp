@@ -35,7 +35,6 @@ namespace aquarius
 
 				if (!f.second->config())
 				{
-					XLOG_ERROR() << "[" << f.second->name() << "] config error";
 					continue;
 				}
 
@@ -57,7 +56,7 @@ namespace aquarius
 		{
 			using return_type = typename Task::return_type;
 
-			std::lock_guard lk(mutex_);
+			//std::lock_guard lk(mutex_);
 
 			auto iter = routers_.find(module_name);
 			if (iter == routers_.end())

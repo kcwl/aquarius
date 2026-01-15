@@ -16,6 +16,9 @@
     <Filter Include="proto">
       <UniqueIdentifier>{fc611f35-a375-4912-a211-a8c15deb0212}</UniqueIdentifier>
     </Filter>
+    <Filter Include="table">
+      <UniqueIdentifier>{527eaaa4-2be9-4711-95d1-25579d745f18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gateway\gateway.cpp">
@@ -94,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\src\gateway\gate_error_code.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\table\account_table.h">
+      <Filter>table</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

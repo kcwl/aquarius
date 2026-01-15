@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/module/schedule.hpp>
 #include <aquarius/module/sql_module.hpp>
+#include <aquarius/tbl/engine/generate_view.hpp>
 
 namespace aquarius
 {
@@ -32,7 +33,10 @@ namespace aquarius
 	auto mpc_query(std::string_view sql) -> awaitable<std::vector<T>>
 	{
 		co_return co_await mpc::call<std::vector<T>, sql_module>(
-			"sql_module", [&](sql_module* ptr) { co_return co_await ptr->template async_query<T>(sql); });
+			"sql_module", [&](sql_module* ptr) -> awaitable<std::vector<T>>
+			{ 
+				co_return co_await ptr->template async_query<T>(sql); 
+			});
 	}
 
 	auto mpc_execute(std::string_view sql) -> awaitable<std::size_t>

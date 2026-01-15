@@ -75,7 +75,7 @@ namespace aquarius
 
 			flex_buffer buffer{};
 
-			make_response();
+			co_await make_response();
 
 			response().commit(buffer);
 

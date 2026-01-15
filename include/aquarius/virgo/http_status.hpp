@@ -150,7 +150,12 @@ namespace aquarius
 				{ http_status::not_extended, "Not Extended" },
 				{ http_status::network_authentication_required, "Network Authentication Required" }
 			};
-			return statuses.at(s);
+
+			auto iter = statuses.find(s);
+			if (iter == statuses.end())
+				return "Unknown";
+
+			return iter->second;
 		}
 
 		inline std::string_view from_status_string(int s)

@@ -9,6 +9,9 @@ namespace aquarius
 	public:
 		sql_module(const std::string& name)
 			: _module<sql_module, database_param>(name)
+			, index_(0)
+			, mutex_()
+			, connectors_()
 		{}
 
 	public:
@@ -41,7 +44,7 @@ namespace aquarius
 		{
 			auto connector = get_connector();
 
-			co_return co_await connector->async_query(sql);
+			co_return co_await connector->async_query<T>(sql);
 		}
 
 		auto async_execute(std::string_view sql) -> awaitable<std::size_t>

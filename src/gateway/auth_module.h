@@ -12,7 +12,7 @@ namespace aquarius
 			auth_module(const std::string& name);
 
 		public:
-			bool auth(const std::string& username, const std::string& password);
+			auto auth(const std::string& username, const std::string& password) ->awaitable<bool>;
 		};
 	} // namespace gateway
 } // namespace aquarius

@@ -1,5 +1,4 @@
 #include "auth_schedule.h"
-#include "gate_error_code.h"
 #include "player_schedule.h"
 #include "proto/login.virgo.h"
 #include "server.hpp"
@@ -22,7 +21,7 @@ namespace aquarius
 
 			auto auth_res = co_await mpc_auth("auth_module"sv, request()->body().user, request()->body().passwd);
 
-			co_return auth_res ? gate_op::success : gate_op::auth_failed;
+			co_return auth_res ? virgo::http_status::ok : virgo::http_status::unauthorized;
 		}
 	} // namespace gateway
 } // namespace aquarius

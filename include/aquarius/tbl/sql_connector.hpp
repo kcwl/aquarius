@@ -49,17 +49,17 @@ namespace aquarius
 		}
 
 		template <typename T>
-		auto async_query(std::string_view sql) -> awaitable<T>
+		auto async_query(std::string_view sql) -> awaitable<std::vector<T>>
 		{
 			error_code ec{};
 
-			auto result = co_await service_.template async_query<typename T::value_type>(sql, ec);
+			auto result = co_await service_.template async_query<T>(sql, ec);
 
 			if (ec)
 			{
 				XLOG_ERROR() << "sql[" << sql << "] query failed! " << ec.what() << "\t" << ec.message();
 
-				co_return T{};
+				co_return std::vector<T>{};
 			}
 
 			completed_ = !ec;

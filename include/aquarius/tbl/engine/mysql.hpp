@@ -1,8 +1,8 @@
 #pragma once
+#include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/tbl/database_param.hpp>
 #include <aquarius/tbl/sql_error.hpp>
-#include <boost/asio.hpp>
 #include <boost/pfr.hpp>
 #include <mysql.h>
 
@@ -35,9 +35,9 @@ namespace aquarius
 					co_return db_error::bad_alloc;
 				}
 
-				enable_transaction_ = param_.enable_transaction.value_or(false);
+				enable_transaction_ = param_.enable_transaction;
 
-				int32_t timeout = param_.timeout.value_or(-1);
+				int32_t timeout = param_.timeout == 0 ? -1 : param_.timeout;
 
 				if (timeout > 0)
 				{
@@ -48,7 +48,7 @@ namespace aquarius
 					}
 				}
 
-				auto reconnect = param_.reconnect.value_or(1);
+				auto reconnect = param_.reconnect;
 
 				mysql_options(mysql_ptr_, MYSQL_OPT_RECONNECT, &reconnect);
 				mysql_options(mysql_ptr_, MYSQL_SET_CHARSET_NAME, "utf8");
@@ -100,7 +100,7 @@ namespace aquarius
 					make_result<T>(results, row);
 				}
 
-				co_return results;
+				co_return std::move(results);
 			}
 
 			auto async_execute(std::string_view sql, error_code& ec) -> awaitable<std::size_t>

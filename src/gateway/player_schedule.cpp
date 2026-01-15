@@ -10,7 +10,9 @@ namespace aquarius
 		{
 			co_return co_await mpc::call<void, player_module>(
 				"player_module", [&](player_module* ptr) -> awaitable<void>
-				{ co_return ptr->insert(id, std::make_shared<player>(id)); });
+				{ 
+					co_return ptr->insert(id, std::make_shared<player>(id)); 
+				});
 		}
 
 		auto mpc_erase_player(std::size_t id) -> awaitable<void>

@@ -37,7 +37,8 @@ namespace aquarius
 	public:
 		virtual auto make_response() -> awaitable<void> override
 		{
-			this->response().version(virgo::from_version_string(co_await mpc_http_version()));
+			auto ver = co_await mpc_http_version();
+			this->response().version(virgo::from_version_string(ver));
 
 			this->response().set_field("Content-Type", this->request()->find("Content-Type"));
 			this->response().set_field("Server", "Aquarius 0.10.0");
