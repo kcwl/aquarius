@@ -133,7 +133,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<ProtoTag>::keep_alive(value), ec);
+			socket_.set_option(typename protocol<ProtoTag::tag>::keep_alive(value), ec);
 
 			return !ec;
 		}
@@ -142,7 +142,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<ProtoTag>::no_delay(enable), ec);
+			socket_.set_option(typename protocol<ProtoTag::tag>::no_delay(enable), ec);
 
 			return !ec;
 		}
