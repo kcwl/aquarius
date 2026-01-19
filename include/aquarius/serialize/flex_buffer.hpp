@@ -46,8 +46,6 @@ namespace aquarius
 
 				setg(other.eback(), other.gptr(), other.egptr());
 				setp(other.pbase(), other.pptr());
-
-				other.reset();
 			}
 
 			return *this;

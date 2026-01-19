@@ -1,18 +1,19 @@
 ﻿#pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <functional>
 #include <aquarius/virgo/http_version.hpp>
+#include <functional>
 
 namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	template <typename Session>
+	template <typename Session, typename Executor = any_io_executor>
 	class basic_client : public std::enable_shared_from_this<basic_client<Session>>
 	{
 		using socket = Session::socket;
@@ -21,7 +22,11 @@ namespace aquarius
 
 	public:
 		explicit basic_client(io_context& context, std::chrono::milliseconds timeout = 1000ms)
-			: io_context_(context)
+			: basic_client(context.get_executor(), timeout)
+		{}
+
+		basic_client(const Executor& context, std::chrono::milliseconds timeout = 1000ms)
+			: executor_(context)
 			, host_()
 			, port_()
 			, session_ptr_(nullptr)
@@ -37,7 +42,7 @@ namespace aquarius
 			host_ = host;
 			port_ = port;
 
-			session_ptr_ = std::make_shared<Session>(std::move(socket(io_context_)));
+			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)));
 
 			co_return co_await session_ptr_->async_connect(host_, port_);
 		}
@@ -48,18 +53,14 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Request>
-		auto async_call(std::shared_ptr<Request> req) -> awaitable<Response>
+		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
-			if constexpr (handler_tag_traits<Request>::selector::tag == proto_tag::http)
-			{
-				req->version(virgo::from_version_string(co_await mpc_http_version()));
-			}
-
 			flex_buffer buffer{};
 
 			req->commit(buffer);
 
-			auto ec = co_await session_ptr_->async_send(buffer);
+			error_code ec{};
+			auto buf = co_await session_ptr_->async_send(buffer, ec);
 
 			if (ec)
 			{
@@ -74,12 +75,16 @@ namespace aquarius
 				co_return Response{};
 			}
 
-			co_return co_await session_ptr_->template query<Response>(1);
+			Response resp{};
+			resp.consume(buf);
+
+			co_return resp;
 		}
 
-		auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
+		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id = detail::uuid_generator()())
+			-> awaitable<flex_buffer>
 		{
-			auto ec = co_await session_ptr_->async_send(buffer);
+			ec = co_await session_ptr_->async_send(buffer);
 
 			if (ec)
 			{
@@ -94,7 +99,7 @@ namespace aquarius
 				co_return flex_buffer{};
 			}
 
-			co_return co_await session_ptr_->query_buffer(1);
+			co_return co_await session_ptr_->query_buffer(id);
 		}
 
 		std::string remote_address() const
@@ -121,7 +126,7 @@ namespace aquarius
 		}
 
 	private:
-		io_context& io_context_;
+		Executor executor_;
 
 		std::string host_;
 

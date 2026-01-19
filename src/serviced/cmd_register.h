@@ -1,6 +1,9 @@
 #pragma once
 
-namespace serviced
+namespace aquarius
 {
-	void cmd_register();
-}
+	namespace serviced
+	{
+		void cmd_register();
+	}
+} // namespace aquarius

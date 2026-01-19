@@ -1,4 +1,5 @@
 #include "channel_schedule.h"
+#include "error.hpp"
 #include "proto/channel.virgo.h"
 
 namespace aquarius
@@ -9,11 +10,19 @@ namespace aquarius
 		{
 			auto& topic = request()->body().topic;
 
-			auto role = std::make_shared<player>(session()->uuid());
+			auto player_ptr = std::make_shared<player>(session()->uuid());
 
-			co_await mpc_subscribe(topic, role);
+			if (!player_ptr)
+				co_return errc::no_player;
 
-			co_return error_code{};
+			auto result = co_await player_ptr->create_client(session()->get_executor());
+
+			if (!result)
+				co_return errc::create_client_error;
+
+			co_await mpc_subscribe(topic, player_ptr);
+
+			co_return errc::success;
 		}
 	} // namespace serviced
 } // namespace aquarius

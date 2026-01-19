@@ -140,6 +140,7 @@
     <ClInclude Include="..\src\serviced\payload.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h" />
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
     <ClInclude Include="..\src\serviced\server.h" />
   </ItemGroup>
   <ItemGroup>
@@ -149,9 +150,11 @@
     <ClCompile Include="..\src\serviced\cmd_store.cpp" />
     <ClCompile Include="..\src\serviced\ctx_channel.cpp" />
     <ClCompile Include="..\src\serviced\ctx_cmd.cpp" />
+    <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
     <ClCompile Include="..\src\serviced\player.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp" />
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
     <ClCompile Include="..\src\serviced\serviced.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

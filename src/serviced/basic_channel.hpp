@@ -15,10 +15,9 @@ namespace aquarius
 			basic_channel() = default;
 
 		public:
-			template <typename Task>
-			auto publish(Task&& task) -> awaitable<void>
+			auto publish(flex_buffer& buffer) -> awaitable<void>
 			{
-				co_await policy_.publish(subscribers_, std::forward<Task>(task));
+				co_await policy_.publish(subscribers_, buffer);
 			}
 
 			void subscribe(std::shared_ptr<player> subscriber)

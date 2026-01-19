@@ -1,0 +1,12 @@
+message regist:tcp -> 10001
+{
+	request
+	{
+		int32 protocol;
+		string ip_addr;
+		int32 port;
+	}
+	response
+	{
+	}
+}

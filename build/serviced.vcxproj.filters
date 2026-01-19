@@ -57,6 +57,9 @@
     <ClInclude Include="..\src\serviced\channel_selector.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\serviced.cpp">
@@ -87,6 +90,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\channel_schedule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\ctx_regist.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

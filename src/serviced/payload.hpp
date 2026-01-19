@@ -7,18 +7,17 @@ namespace aquarius
 {
 	namespace serviced
 	{
-
 		struct round_robin
 		{
 			round_robin()
 				: index(0)
 			{}
 
-			template <typename CompleteToken>
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token) -> awaitable<void>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+				-> awaitable<bool>
 			{
 				if (subscribers.empty())
-					co_return;
+					co_return false;
 
 				if (index >= subscribers.size())
 				{
@@ -27,7 +26,7 @@ namespace aquarius
 
 				auto& subscriber = subscribers[index++];
 
-				co_await subscriber->feedback(token);
+				co_return co_await subscriber->feedback(buffer);
 			}
 
 			std::size_t index;
@@ -37,12 +36,11 @@ namespace aquarius
 		{
 			constexpr static std::size_t max_weigth = 100;
 
-			template <typename CompleteToken>
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token)
-				-> awaitable<void>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+				-> awaitable<bool>
 			{
 				if (subscribers.empty())
-					co_return;
+					co_return false;
 
 				std::random_device rd{};
 				std::mt19937 gen{ rd() };
@@ -53,42 +51,41 @@ namespace aquarius
 
 				for (auto& subscriber : subscribers)
 				{
-					if (weight < subscriber.weight())
+					if (weight < subscriber.second->weight())
 					{
-						co_await subscriber->feedback(token);
-						break;
+						co_return co_await subscriber.second->feedback(buffer);
 					}
 				}
+
+				co_return false;
 			}
 		};
 
 		template <typename UUID>
 		struct uuid_hash
 		{
-			template <typename Task>
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, Task&& task)
-				-> awaitable<void>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+				-> awaitable<bool>
 			{
 				if (subscribers.empty())
-					co_return;
+					co_return false;
 
 				auto index = UUID()() % subscribers.size();
 
 				auto& subscriber = subscribers[index];
 
-				co_await subscriber->feedback(task);
+				co_return co_await subscriber->feedback(buffer);
 			}
 		};
 
 		template <typename Invoke>
 		struct some_min
 		{
-			template <typename CompleteToken>
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, CompleteToken&& token)
-				-> awaitable<void>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+				-> awaitable<bool>
 			{
 				if (subscribers.empty())
-					co_return;
+					co_return false;
 
 				int index = 0;
 				int target = index;
@@ -107,11 +104,11 @@ namespace aquarius
 				}
 
 				if (target >= subscribers.size())
-					co_return;
+					co_return false;
 
 				auto& subscriber = subscribers[target];
 
-				co_await subscriber->feedback(token);
+				co_return co_await subscriber->feedback(buffer);
 			}
 		};
 	} // namespace serviced

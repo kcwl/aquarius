@@ -5,55 +5,62 @@
 
 using namespace std::string_view_literals;
 
-namespace serviced
+namespace aquarius
 {
-	enum class errc
+	namespace serviced
 	{
-		success,
-		no_return,
-		invalid_cmd,
-		not_connected
-	};
-
-	inline std::string_view db_result_map(int result)
-	{
-		static std::map<int, std::string_view> db_results{
-			{ static_cast<int>(errc::success), "success"sv },
-			{ static_cast<int>(errc::no_return), "no operator for return back"sv },
-			{ static_cast<int>(errc::invalid_cmd), "invalid command"sv },
-			{ static_cast<int>(errc::not_connected), "not connect server"sv }
+		enum class errc
+		{
+			success,
+			no_return,
+			invalid_cmd,
+			not_connected,
+			no_player,
+			create_client_error,
 		};
 
-		return db_results[result];
-	}
-
-	class db_result_category : public std::error_category
-	{
-	public:
-		constexpr db_result_category() noexcept
-			: std::error_category(_Generic_addr)
-		{}
-
-		[[nodiscard]] const char* name() const noexcept override
+		inline std::string_view db_result_map(int result)
 		{
-			return "serviced errc";
+			static std::map<int, std::string_view> db_results{
+				{ static_cast<int>(errc::success), "success"sv },
+				{ static_cast<int>(errc::no_return), "no operator for return back"sv },
+				{ static_cast<int>(errc::invalid_cmd), "invalid command"sv },
+				{ static_cast<int>(errc::not_connected), "not connect server"sv },
+				{ static_cast<int>(errc::no_player), "no player"sv },
+				{ static_cast<int>(errc::create_client_error), "create client error"sv }
+			};
+
+			return db_results[result];
 		}
 
-		[[nodiscard]] std::string message(int err_code) const override
+		class db_result_category : public std::error_category
 		{
-			return std::string(db_result_map(err_code).data());
-		}
-	};
+		public:
+			constexpr db_result_category() noexcept
+				: std::error_category(_Generic_addr)
+			{}
 
-	inline aquarius::error_code make_error_code(errc result)
-	{
-		return aquarius::error_code(std::error_code(static_cast<int>(result), db_result_category()));
-	}
-} // namespace serviced
+			[[nodiscard]] const char* name() const noexcept override
+			{
+				return "serviced errc";
+			}
+
+			[[nodiscard]] std::string message(int err_code) const override
+			{
+				return std::string(db_result_map(err_code).data());
+			}
+		};
+
+		inline aquarius::error_code make_error_code(errc result)
+		{
+			return aquarius::error_code(std::error_code(static_cast<int>(result), db_result_category()));
+		}
+	} // namespace serviced
+} // namespace aquarius
 
 namespace std
 {
 	template <>
-	struct is_error_code_enum<serviced::errc> : std::true_type
+	struct is_error_code_enum<aquarius::serviced::errc> : std::true_type
 	{};
 } // namespace std
