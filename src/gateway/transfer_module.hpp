@@ -39,7 +39,7 @@ namespace aquarius
 
 			auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
 			{
-				co_return co_await transfer_ptr_->async_sendback(buffer);
+				co_return co_await transfer_ptr_->async_send(buffer);
 			}
 
 		private:

@@ -21,18 +21,16 @@ namespace aquarius
 		{
 			flex_buffer feed_buffer{};
 
-			error_code ec{};
-
 			if (protocol_ == 0)
 			{
-				feed_buffer = co_await tcp_client_ptr_->async_send(buffer, ec);
+				feed_buffer = co_await tcp_client_ptr_->async_send(buffer);
 			}
 			else if (protocol_ == 1)
 			{
-				feed_buffer = co_await http_client_ptr_->async_send(buffer, ec);
+				feed_buffer = co_await http_client_ptr_->async_send(buffer);
 			}
 
-			if (ec)
+			if (feed_buffer.size() == 0)
 				co_return false;
 
 			auto session = co_await aquarius::mpc_find_session<server::session_type>(id_);
