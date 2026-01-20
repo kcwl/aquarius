@@ -4,12 +4,13 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/logger_module.hpp>
 #include <aquarius/module/module_router.hpp>
+#include <aquarius/module/player_module.hpp>
 #include <aquarius/module/session_schedule.hpp>
 #include <aquarius/module/sql_module.hpp>
 #include <aquarius/timer.hpp>
-#include <aquarius/module/http_config_module.hpp>
 
 using namespace std::chrono_literals;
 
@@ -174,6 +175,8 @@ namespace aquarius
 			module_router::get_mutable_instance().regist<sql_module>("sql_module");
 
 			module_router::get_mutable_instance().regist<http_config_module>("http_config_module");
+
+			module_router::get_mutable_instance().regist<player_module>("player_module");
 		}
 
 	protected:

@@ -17,15 +17,11 @@ int main()
 
     srv.set_accept_func([&] (std::shared_ptr<server::session_type> session_ptr) ->aquarius::awaitable<void>
                         {
-                            auto player_ptr = std::make_shared<player>(session_ptr->uuid());
-
-                            co_await aquarius::mpc_player_insert("player_module"sv, session_ptr->uuid(), player_ptr);
+                            co_await aquarius::mpc_player_insert("player_module"sv, session_ptr->uuid(), std::make_shared<player>(session_ptr->uuid()));
                         });
 
     srv.set_close_func([&] (std::shared_ptr<server::session_type> session_ptr) ->aquarius::awaitable<void>
                        {
-                           auto player_ptr = std::make_shared<player>(session_ptr->uuid());
-
                            co_await aquarius::mpc_player_erase<player>("player_module"sv, session_ptr->uuid());
                        });
 

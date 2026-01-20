@@ -14,10 +14,10 @@ namespace aquarius
 			{}
 
 			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
-				-> awaitable<bool>
+				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
-					co_return false;
+					co_return flex_buffer{};
 
 				if (index >= subscribers.size())
 				{
@@ -37,10 +37,10 @@ namespace aquarius
 			constexpr static std::size_t max_weigth = 100;
 
 			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
-				-> awaitable<bool>
+				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
-					co_return false;
+					co_return flex_buffer{};
 
 				std::random_device rd{};
 				std::mt19937 gen{ rd() };
@@ -57,7 +57,7 @@ namespace aquarius
 					}
 				}
 
-				co_return false;
+				co_return flex_buffer{};
 			}
 		};
 
@@ -65,10 +65,10 @@ namespace aquarius
 		struct uuid_hash
 		{
 			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
-				-> awaitable<bool>
+				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
-					co_return false;
+					co_return flex_buffer{};
 
 				auto index = UUID()() % subscribers.size();
 
@@ -82,10 +82,10 @@ namespace aquarius
 		struct some_min
 		{
 			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
-				-> awaitable<bool>
+				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
-					co_return false;
+					co_return flex_buffer{};
 
 				int index = 0;
 				int target = index;

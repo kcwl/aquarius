@@ -1,6 +1,4 @@
 #include "player.h"
-#include "server.h"
-#include <aquarius/module/session_schedule.hpp>
 
 namespace aquarius
 {
@@ -17,7 +15,7 @@ namespace aquarius
 			return id_;
 		}
 
-		auto player::feedback(flex_buffer& buffer) -> awaitable<bool>
+		auto player::feedback(flex_buffer& buffer) -> awaitable<flex_buffer>
 		{
 			flex_buffer feed_buffer{};
 
@@ -30,16 +28,9 @@ namespace aquarius
 				feed_buffer = co_await http_client_ptr_->async_send(buffer);
 			}
 
-			if (feed_buffer.size() == 0)
-				co_return false;
-
-			auto session = co_await aquarius::mpc_find_session<server::session_type>(id_);
-
-			co_await session->async_send(feed_buffer);
-
 			complete();
 
-			co_return true;
+			co_return feed_buffer;
 		}
 
 		void player::complete()

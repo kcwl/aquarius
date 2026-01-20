@@ -23,22 +23,7 @@ namespace aquarius
 		public:
 			void subscribe(std::string_view name, std::shared_ptr<player> subscribe);
 
-			template <typename Task>
-			auto publish(std::string_view name, Task&& task)
-			{
-				std::lock_guard lock(mutex_);
-
-				auto it = channels_.find(name);
-
-				if (it == channels_.end())
-				{
-					XLOG_ERROR() << "channel [" << name << "] not found";
-
-					return;
-				}
-
-				it->second->publish(std::forward<Task>(task));
-			}
+			auto publish(std::string_view name, flex_buffer& task) ->awaitable<flex_buffer>;
 
 		private:
 			std::mutex mutex_;

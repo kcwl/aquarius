@@ -22,6 +22,23 @@ namespace aquarius
 
 			chan->subscribe(subscribe);
 		}
+
+
+		auto channel_module::publish(std::string_view name, flex_buffer& buffer) ->awaitable<flex_buffer>
+		{
+			std::lock_guard lock(mutex_);
+
+			auto it = channels_.find(name);
+
+			if (it == channels_.end())
+			{
+				XLOG_ERROR() << "channel [" << name << "] not found";
+
+				co_return flex_buffer{};
+			}
+
+			co_return co_await it->second->publish(buffer);
+		}
 	} // namespace serviced
 } // namespace aquarius
 

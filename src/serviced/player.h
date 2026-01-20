@@ -2,6 +2,7 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
+#include <aquarius/module/player_module.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <atomic>
 #include <memory>
@@ -11,7 +12,7 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		class player
+		class player : public player_base
 		{
 		public:
 			player(std::size_t id);
@@ -21,7 +22,7 @@ namespace aquarius
 		public:
 			std::size_t id() const;
 
-			virtual auto feedback(flex_buffer& buffer) -> awaitable<bool>;
+			auto feedback(flex_buffer& buffer) -> awaitable<flex_buffer>;
 
 			void complete();
 
@@ -39,7 +40,7 @@ namespace aquarius
 
 			int32_t protocol() const;
 
-			template<typename Executor>
+			template <typename Executor>
 			auto create_client(const Executor& ex) -> awaitable<bool>
 			{
 				if (protocol_ == 0)

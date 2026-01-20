@@ -5,22 +5,30 @@
 
 namespace aquarius
 {
-	template <typename T>
-	class player_module : public no_config_module<player_module<T>>
+	class player_base
+	{
+	public:
+		player_base() = default;
+
+		virtual ~player_base() = default;
+	};
+
+	class player_module : public no_config_module<player_module>
 	{
 	public:
 		player_module(const std::string& name)
-			: no_config_module<player_module<T>>(name)
+			: no_config_module<player_module>(name)
 		{}
 
 	public:
-		void insert(std::size_t id, std::shared_ptr<T> player_ptr)
+		void insert(std::size_t id, std::shared_ptr<player_base> player_ptr)
 		{
 			std::lock_guard lk(mutex_);
 
 			players_.emplace(id, player_ptr);
 		}
 
+		template<typename T>
 		std::shared_ptr<T> get(std::size_t id)
 		{
 			std::lock_guard lk(mutex_);
@@ -29,7 +37,7 @@ namespace aquarius
 			if (iter == players_.end())
 				return nullptr;
 
-			return iter->second;
+			return std::dynamic_pointer_cast<T>(iter->second);
 		}
 
 		void erase(std::size_t id)
@@ -42,6 +50,6 @@ namespace aquarius
 	private:
 		std::mutex mutex_;
 
-		std::map<std::size_t, std::shared_ptr<T>> players_;
+		std::map<std::size_t, std::shared_ptr<player_base>> players_;
 	};
 } // namespace aquarius

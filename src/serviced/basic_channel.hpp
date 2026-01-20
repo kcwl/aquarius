@@ -1,8 +1,8 @@
 #pragma once
 #include "player.h"
+#include <aquarius/asio.hpp>
 #include <map>
 #include <memory>
-
 
 namespace aquarius
 {
@@ -15,9 +15,9 @@ namespace aquarius
 			basic_channel() = default;
 
 		public:
-			auto publish(flex_buffer& buffer) -> awaitable<void>
+			auto publish(flex_buffer& buffer) -> awaitable<flex_buffer>
 			{
-				co_await policy_.publish(subscribers_, buffer);
+				co_return co_await policy_.publish(subscribers_, buffer);
 			}
 
 			void subscribe(std::shared_ptr<player> subscriber)

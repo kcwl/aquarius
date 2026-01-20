@@ -9,7 +9,7 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		auto mpc_publish(std::string_view topic, flex_buffer& task) -> awaitable<void>;
+		auto mpc_publish(std::string_view topic, flex_buffer& task) -> awaitable<flex_buffer>;
 
 		auto mpc_subscribe(std::string_view topic, std::shared_ptr<player> role_ptr) -> awaitable<void>;
 

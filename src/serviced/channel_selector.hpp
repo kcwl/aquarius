@@ -13,27 +13,26 @@ namespace aquarius
 	{
 		constexpr static auto __channel__ = "channel"sv;
 
-		struct channel_tcp_selector
-		{
-			constexpr static auto tag = proto_tag::tcp;
+        struct channel_selector
+        {
+            constexpr static auto tag = proto_tag::tcp;
 
-			template <typename Session>
-			auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr, flex_buffer& buffer)
-			{
-				co_spawn(session_ptr->get_executor(), mpc_publish(topic, buffer), detached);
-			};
-		};
+            template <typename Session>
+            auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr, flex_buffer& buffer)
+            {
+                co_spawn(session_ptr->get_executor(), [&] ()->awaitable<void>
+                         {
+                             auto buf = co_await mpc_publish(topic, buffer);
 
-		struct channel_http_selector
-		{
-			constexpr static auto tag = proto_tag::http;
+                             if (buf.size() == 0)
+                             {
+                                 co_return;
+                             }
 
-			template <typename Session>
-			auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr, virgo::http_fields,
-							flex_buffer& buffer)
-			{
-				co_spawn(session_ptr->get_executor(), mpc_publish(topic, buffer), detached);
-			};
-		};
+                             co_await session_ptr->async_send(buf);
+
+                         }, detached);
+            };
+        };
 	} // namespace serviced
 } // namespace aquarius

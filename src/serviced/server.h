@@ -7,7 +7,7 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		using channel_server_session = server_session<channel_http_selector>;
+		using channel_server_session = server_session<channel_selector>;
 
 		using server = aquarius::basic_server<channel_server_session>;
 	} // namespace serviced

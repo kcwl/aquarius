@@ -24,8 +24,5 @@ namespace aquarius
 
 			std::map<std::size_t, std::shared_ptr<player>> players_;
 		};
-
-		AQUARIUS_MODULE(player_module)
-
 	} // namespace gateway
 } // namespace aquarius
