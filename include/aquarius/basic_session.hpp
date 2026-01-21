@@ -85,6 +85,10 @@ namespace aquarius
 			{
 				XLOG_INFO() << "async_read exception: " << ec.what() << ", remote_address: " << remote_address();
 			}
+			else
+			{
+				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
+			}
 
 			buffer.commit(length);
 
@@ -102,6 +106,10 @@ namespace aquarius
 			{
 				XLOG_INFO() << "async_read_util exception: " << ec.what() << ", remote_address: " << remote_address();
 			}
+			else
+			{
+				XLOG_DEBUG() << "[async read util] receive " << buffer.size() << " bytes";
+			}
 
 			co_return ec;
 		}
@@ -111,6 +119,11 @@ namespace aquarius
 			error_code ec{};
 
 			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), redirect_error(use_awaitable, ec));
+
+			if (!ec)
+			{
+				XLOG_DEBUG() << "[async send] send " << buffer.size() << " bytes";
+			}
 
 			co_return ec;
 		}
