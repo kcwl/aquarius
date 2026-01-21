@@ -36,21 +36,24 @@ void subscribe_resp_body::deserialize(aquarius::flex_buffer& buffer)
 }
 
 transfer_req_body::transfer_req_body()
-	: feedbuf()
+	: topic()
+	, feedbuf()
 {}
 
 bool transfer_req_body::operator==(const transfer_req_body& other) const
 {
-	return feedbuf == other.feedbuf;
+	return topic == other.topic && feedbuf == other.feedbuf;
 }
 
 void transfer_req_body::serialize(aquarius::flex_buffer& buffer)
 {
+	this->parse_to(topic, buffer);
 	this->parse_to(feedbuf, buffer);
 }
 
 void transfer_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
+	topic = this->parse_from<string>(buffer);
 	feedbuf = this->parse_from<bytes>(buffer);
 }
 transfer_resp_body::transfer_resp_body()
@@ -107,6 +110,7 @@ subscribe_resp_body tag_invoke(const aquarius::json::value_to_tag<subscribe_resp
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const transfer_req_body& local)
 {
 	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("topic", local.topic);
 	jv_obj.emplace("feedbuf", aquarius::json_value_from_array(local.feedbuf));
 }
 
@@ -116,6 +120,7 @@ transfer_req_body tag_invoke(const aquarius::json::value_to_tag<transfer_req_bod
 	auto obj = jv.try_as_object();
 	if(obj->empty())
 		return {};
+	result.topic = static_cast<string>(obj->at("topic").as_string());
 	result.feedbuf = aquarius::json_value_to_array(obj->at("feedbuf"));
 	return result;
 }
@@ -149,7 +154,7 @@ std::ostream& operator<<(std::ostream& os, const subscribe_resp_body& other)
 
 std::ostream& operator<<(std::ostream& os, const transfer_req_body& other)
 {
-	os << "[";
+	os << other.topic<< "[";
 	for (auto& s : other.feedbuf)
 	{
 		os << s << ", ";

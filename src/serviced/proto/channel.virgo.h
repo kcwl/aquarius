@@ -52,6 +52,7 @@ public:
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 public:
+	string topic;
 	bytes feedbuf;
 };
 
