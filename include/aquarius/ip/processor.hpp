@@ -58,7 +58,7 @@ namespace aquarius
 					break;
 				}
 
-				auto topic = binary_parse{}.from_datas<std::string_view>(buffer);
+				auto topic = binary_parse{}.from_datas<std::string>(buffer);
 
 				HandlerSelector()(topic, session_ptr, buffer);
 			}
