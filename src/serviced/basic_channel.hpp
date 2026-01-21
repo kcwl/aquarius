@@ -15,9 +15,9 @@ namespace aquarius
 			basic_channel() = default;
 
 		public:
-			auto publish(flex_buffer& buffer) -> awaitable<flex_buffer>
+			auto publish(flex_buffer& buffer, std::size_t id) -> awaitable<flex_buffer>
 			{
-				co_return co_await policy_.publish(subscribers_, buffer);
+				co_return co_await policy_.publish(subscribers_, buffer, id);
 			}
 
 			void subscribe(std::shared_ptr<player> subscriber)

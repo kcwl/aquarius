@@ -24,7 +24,7 @@ namespace aquarius
 		}
 
 
-		auto channel_module::publish(std::string_view name, flex_buffer& buffer) ->awaitable<flex_buffer>
+		auto channel_module::publish(std::string_view name, flex_buffer& buffer, std::size_t id) ->awaitable<flex_buffer>
 		{
 			std::lock_guard lock(mutex_);
 
@@ -37,7 +37,7 @@ namespace aquarius
 				co_return flex_buffer{};
 			}
 
-			co_return co_await it->second->publish(buffer);
+			co_return co_await it->second->publish(buffer, id);
 		}
 	} // namespace serviced
 } // namespace aquarius

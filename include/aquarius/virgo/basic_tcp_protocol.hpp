@@ -88,6 +88,8 @@ namespace aquarius
 			int64_t timestamp_;
 
 			int32_t version_;
+
+			uint32_t seq_number_;
 		};
 
 		template <typename Header, typename Body, typename Allocator>

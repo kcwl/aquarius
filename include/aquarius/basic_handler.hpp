@@ -77,7 +77,7 @@ namespace aquarius
 
 			co_await make_response();
 
-			response().commit(buffer);
+			response().commit(buffer, request()->seq_number());
 
 			if (!this->session())
 				co_return;

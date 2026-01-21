@@ -23,7 +23,7 @@ namespace aquarius
 		public:
 			void subscribe(std::string_view name, std::shared_ptr<player> subscribe);
 
-			auto publish(std::string_view name, flex_buffer& task) ->awaitable<flex_buffer>;
+			auto publish(std::string_view name, flex_buffer& buffer, std::size_t id) ->awaitable<flex_buffer>;
 
 		private:
 			std::mutex mutex_;

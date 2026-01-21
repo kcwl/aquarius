@@ -46,12 +46,12 @@ namespace aquarius
 			}
 
 		public:
-			void consume(flex_buffer& buffer)
+			void consume(flex_buffer& buffer, uint32_t = 0)
 			{
 				this->body().deserialize(buffer);
 			}
 
-			void commit(flex_buffer& buffer)
+			void commit(flex_buffer& buffer, uint32_t = 0)
 			{
 				flex_buffer body_buffer{};
 

@@ -6,11 +6,11 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		auto mpc_publish(std::string_view topic, flex_buffer& buffer) -> awaitable<flex_buffer>
+		auto mpc_publish(std::string_view topic, flex_buffer& buffer, std::size_t id) -> awaitable<flex_buffer>
 		{
 			co_return co_await mpc::call<flex_buffer, channel_module>(
 				"channel_module",
-				[&](channel_module* ptr) -> awaitable<flex_buffer> { co_return co_await ptr->publish(topic, buffer); });
+				[&](channel_module* ptr) -> awaitable<flex_buffer> { co_return co_await ptr->publish(topic, buffer, id); });
 		}
 
 		auto mpc_subscribe(std::string_view topic, std::shared_ptr<player> role_ptr) -> awaitable<void>

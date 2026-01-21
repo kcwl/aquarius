@@ -23,6 +23,7 @@ namespace aquarius
 			: base_body()
 			, header_()
 			, alloc_(alloc)
+			, seq_number_()
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
@@ -31,6 +32,7 @@ namespace aquarius
 			: base_body(other)
 			, header_(other.header_)
 			, alloc_(other.alloc_)
+			, seq_number_(other.seq_number_)
 		{}
 		basic_protocol& operator=(const basic_protocol& other)
 		{
@@ -39,6 +41,7 @@ namespace aquarius
 				this->get() = other.get();
 				header_ = other.header_;
 				alloc_ = other.alloc_;
+				seq_number_ = other.seq_number_;
 			}
 
 			return *this;
@@ -46,6 +49,7 @@ namespace aquarius
 		basic_protocol(basic_protocol&& other) noexcept
 			: header_(std::exchange(other.header_, {}))
 			, alloc_(std::move(other.alloc_))
+			, seq_number_(std::exchange(other.seq_number_, 0))
 		{
 			this->get() = std::exchange(other.get(), nullptr);
 		}
@@ -56,6 +60,7 @@ namespace aquarius
 				header_ = std::move(other.header_);
 				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
+				seq_number_ = std::exchange(other.seq_number(), 0);
 			}
 			return *this;
 		}
@@ -92,8 +97,21 @@ namespace aquarius
 			return *this->get();
 		}
 
+		uint32_t seq_number() const
+		{
+			return seq_number_;
+		}
+
+		void seq_number(uint32_t seq)
+		{
+			seq_number_ = seq;
+		}
+
 	private:
 		header_t header_;
+
 		Allocator alloc_;
+
+		uint32_t seq_number_;
 	};
 } // namespace aquarius

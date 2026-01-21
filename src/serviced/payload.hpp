@@ -13,7 +13,7 @@ namespace aquarius
 				: index(0)
 			{}
 
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
 				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
@@ -26,7 +26,7 @@ namespace aquarius
 
 				auto& subscriber = subscribers[index++];
 				error_code ec{};
-				co_return co_await subscriber->feedback(buffer, ec);
+				co_return co_await subscriber->feedback(buffer, ec, id);
 			}
 
 			std::size_t index;
@@ -36,7 +36,7 @@ namespace aquarius
 		{
 			constexpr static std::size_t max_weigth = 100;
 
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
 				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
@@ -55,7 +55,7 @@ namespace aquarius
 				{
 					if (weight < subscriber.second->weight())
 					{
-						co_return co_await subscriber.second->feedback(buffer, ec);
+						co_return co_await subscriber.second->feedback(buffer, ec, id);
 					}
 				}
 
@@ -66,7 +66,7 @@ namespace aquarius
 		template <typename UUID>
 		struct uuid_hash
 		{
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
 				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
@@ -83,7 +83,7 @@ namespace aquarius
 		template <typename Invoke>
 		struct some_min
 		{
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer)
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
 				-> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())

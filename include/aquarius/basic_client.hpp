@@ -57,11 +57,11 @@ namespace aquarius
 		{
 			flex_buffer buffer{};
 
-			req->commit(buffer);
+			req->commit(buffer, static_cast<uint32_t>(detail::uuid_generator()()));
 
 			error_code ec{};
 
-			auto buf = co_await async_send(buffer, ec);
+			auto buf = co_await async_send(buffer, ec, req->seq_number());
 
 			if (ec)
 			{
@@ -82,7 +82,7 @@ namespace aquarius
 			co_return resp;
 		}
 
-		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id = detail::uuid_generator()())
+		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id)
 			-> awaitable<flex_buffer>
 		{
 			ec = co_await session_ptr_->async_send(buffer);

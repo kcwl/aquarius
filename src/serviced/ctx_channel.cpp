@@ -35,7 +35,7 @@ namespace aquarius
 			flex_buffer buf{};
 			buf.sputn(request()->body().feedbuf.data(), request()->body().feedbuf.size());
 
-			auto feedbuf = co_await mpc_publish(request()->body().topic, buf);
+			auto feedbuf = co_await mpc_publish(request()->body().topic, buf, request()->seq_number());
 
 			std::copy((char*)feedbuf.data().data(), (char*)feedbuf.data().data() + feedbuf.data().size(), std::back_inserter(response().body().feedbuf));
 

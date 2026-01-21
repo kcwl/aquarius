@@ -66,7 +66,7 @@ namespace aquarius
 			}
 
 		public:
-			bool commit(flex_buffer& buffer)
+			bool commit(flex_buffer& buffer, uint32_t seq)
 			{
 				flex_buffer buf{};
 
@@ -83,6 +83,8 @@ namespace aquarius
 				auto size = static_cast<uint32_t>(buf.size());
 
 				buffer.sputn((char*)&size, sizeof(uint32_t));
+				this->seq_number(seq);
+				buffer.sputn((char*)&seq, sizeof(uint32_t));
 
 				buffer.sputn((char*)buf.data().data(), buf.data().size());
 
