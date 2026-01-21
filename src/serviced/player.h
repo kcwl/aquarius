@@ -22,7 +22,7 @@ namespace aquarius
 		public:
 			std::size_t id() const;
 
-			auto feedback(flex_buffer& buffer) -> awaitable<flex_buffer>;
+			auto feedback(flex_buffer& buffer, error_code& ec) -> awaitable<flex_buffer>;
 
 			void complete();
 

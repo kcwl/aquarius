@@ -15,17 +15,17 @@ namespace aquarius
 			return id_;
 		}
 
-		auto player::feedback(flex_buffer& buffer) -> awaitable<flex_buffer>
+		auto player::feedback(flex_buffer& buffer, error_code& ec) -> awaitable<flex_buffer>
 		{
 			flex_buffer feed_buffer{};
 
 			if (protocol_ == 0)
 			{
-				feed_buffer = co_await tcp_client_ptr_->async_send(buffer);
+				feed_buffer = co_await tcp_client_ptr_->async_send(buffer, ec);
 			}
 			else if (protocol_ == 1)
 			{
-				feed_buffer = co_await http_client_ptr_->async_send(buffer);
+				feed_buffer = co_await http_client_ptr_->async_send(buffer, ec);
 			}
 
 			complete();

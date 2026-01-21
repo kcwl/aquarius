@@ -25,8 +25,8 @@ namespace aquarius
 				}
 
 				auto& subscriber = subscribers[index++];
-
-				co_return co_await subscriber->feedback(buffer);
+				error_code ec{};
+				co_return co_await subscriber->feedback(buffer, ec);
 			}
 
 			std::size_t index;
@@ -45,6 +45,8 @@ namespace aquarius
 				std::random_device rd{};
 				std::mt19937 gen{ rd() };
 
+				error_code ec{};
+
 				std::uniform_int_distribution<> distrib(0, max_weigth);
 
 				auto weight = distrib(gen);
@@ -53,7 +55,7 @@ namespace aquarius
 				{
 					if (weight < subscriber.second->weight())
 					{
-						co_return co_await subscriber.second->feedback(buffer);
+						co_return co_await subscriber.second->feedback(buffer, ec);
 					}
 				}
 
