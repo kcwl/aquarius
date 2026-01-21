@@ -9,3 +9,15 @@ message subscribe:tcp -> 10000
 	{
 	}
 }
+
+message transfer:tcp ->10001
+{
+	request
+	{
+		bytes feedbuf;
+	}
+	response
+	{
+		bytes feedbuf;
+	}
+}

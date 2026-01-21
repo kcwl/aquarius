@@ -30,6 +30,7 @@
     <ClCompile Include="..\src\gateway\player_module.cpp" />
     <ClCompile Include="..\src\gateway\player_schedule.cpp" />
     <ClCompile Include="..\src\gateway\proto\login.virgo.cpp" />
+    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\src\gateway\transfer_handler.hpp" />
     <ClInclude Include="..\src\gateway\transfer_module.hpp" />
     <ClInclude Include="..\src\gateway\transfer_schedule.hpp" />
+    <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -152,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_88_0;E:\openssl-lib\include;E:\软件\mysql84\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_88_0;E:\openssl-lib\include;E:\软件\mysql84\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>

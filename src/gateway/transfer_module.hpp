@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/module/module.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <proto/channel.virgo.h>
 
 namespace aquarius
 {
@@ -20,9 +21,7 @@ namespace aquarius
 		public:
 			transfer_module(const std::string& name)
 				: _module<transfer_module<T>, transfer_config>(name)
-			{
-
-			}
+			{}
 
 		public:
 			virtual auto run(io_context& ios) -> awaitable<void> override
@@ -39,7 +38,16 @@ namespace aquarius
 
 			auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
 			{
-				co_return co_await transfer_ptr_->async_send(buffer);
+				auto req = std::make_shared<transfer_tcp_request>();
+
+				std::copy((char*)buffer.data().data(), (char*)buffer.data().data() + buffer.data().size(), std::back_inserter(req->body().feedbuf));
+
+				auto resp =  co_await transfer_ptr_->async_send<transfer_tcp_response>(req);
+
+				flex_buffer resp_buffer{};
+				resp_buffer.sputn(resp.body().feedbuf.data(), resp.body().feedbuf.size());
+
+				co_return std::move(resp_buffer);
 			}
 
 		private:

@@ -54,6 +54,9 @@
     <ClCompile Include="..\src\gateway\gate_error_code.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\server.hpp">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="..\src\gateway\table\account_table.h">
       <Filter>table</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
+      <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
