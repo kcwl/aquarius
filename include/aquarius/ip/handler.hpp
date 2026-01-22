@@ -70,8 +70,8 @@ namespace aquarius
 				}
 
 				co_spawn(
-					session->get_executor(), [session, &ec, request = std::move(req)]() mutable -> awaitable<void>
-					{ co_await std::make_shared<Context>()->visit(session, request, !!ec); }, detached);
+					session->get_executor(), [session, &ec, req]() mutable -> awaitable<void>
+					{ co_await std::make_shared<Context>()->visit(session, req, !!ec); }, detached);
 
 				return !ec;
 			};

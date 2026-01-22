@@ -107,7 +107,6 @@ namespace aquarius
 			seq_number_ = seq;
 		}
 
-	protected:
 		void parse_seq(flex_buffer& buffer)
 		{
 			buffer.sgetn((char*)&this->seq_number_, sizeof(seq_number_));
