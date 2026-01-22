@@ -29,6 +29,8 @@ namespace aquarius
 			uint32_t seq_number;
 		};
 
+		std::map<std::size_t, flex_buffer> buffer_controller;
+
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
@@ -75,11 +77,10 @@ namespace aquarius
 		template <typename Session>
 		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<flex_buffer>
 		{
-			flex_buffer buffer{};
-
-			std::map<std::size_t, flex_buffer> buffer_controller;
 			for (;;)
 			{
+				flex_buffer buffer{};
+
 				proto_header h{};
 				constexpr auto len = sizeof(proto_header);
 
@@ -104,12 +105,14 @@ namespace aquarius
 				}
 
 				if (seq_number == h.seq_number)
-					break;
+				{
+					co_return buffer;
+				}
 
 				buffer_controller.emplace(std::move(h.seq_number), std::move(buffer));
 			}
 
-			co_return buffer;
+			co_return flex_buffer{};
 		}
 
 		template <typename Response, typename Session>

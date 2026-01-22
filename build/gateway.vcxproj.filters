@@ -57,6 +57,9 @@
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gateway\transfer_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\server.hpp">
@@ -86,7 +89,7 @@
     <ClInclude Include="..\src\gateway\auth_schedule.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\transfer_module.hpp">
+    <ClInclude Include="..\src\gateway\transfer_module.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\transfer_schedule.hpp">
