@@ -37,6 +37,8 @@ namespace aquarius
 
 			auto feedbuf = co_await mpc_publish(request()->body().topic, buf, request()->seq_number());
 
+			response().seq_number(request()->seq_number());
+
 			std::copy((char*)feedbuf.data().data(), (char*)feedbuf.data().data() + feedbuf.data().size(), std::back_inserter(response().body().feedbuf));
 
 			co_return errc::success;

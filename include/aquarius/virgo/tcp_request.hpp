@@ -95,6 +95,8 @@ namespace aquarius
 
 			void consume(flex_buffer& buffer)
 			{
+				this->parse_seq(buffer);
+
 				this->timestamp(parse_.from_datas<int64_t>(buffer));
 
 				this->version(parse_.from_datas<int32_t>(buffer));
