@@ -4,7 +4,6 @@
 
 BOOST_AUTO_TEST_SUITE(sql)
 
-#ifdef ENABLE_MYSQL
 struct personal
 {
 	int age;
@@ -63,25 +62,17 @@ BOOST_AUTO_TEST_CASE(connecting)
 		io,
 		[&] -> aquarius::awaitable<void>
 		{
-			auto select_task = std::make_shared<sql_task<select_, personal, std::vector<personal>>>();
-			
-
-			auto res = co_await mpc_execute<personal>("insert into personal values(1,1)");
+			auto res = co_await aquarius::mpc_execute("insert into personal values(1,1)");
 
 			BOOST_TEST(res != 0);
 
-			auto select_res = co_await mpc_query<personal>("select * from personal");
+			auto select_res = co_await aquarius::mpc_query<personal>("select * from personal");
 
 			BOOST_TEST(select_res.size() != 0);
 		},
 		aquarius::use_future);
 
 	fur.get();
-
-	pool.stop();
-
-	t.join();
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()

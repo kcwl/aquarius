@@ -58,7 +58,9 @@ namespace aquarius
 		{
 			auto connector = get_connector();
 
-			co_return co_await connector->async_query<T>(sql);
+			error_code ec{};
+
+			co_return co_await connector->async_query<T>(sql, ec);
 		}
 
 		auto async_execute(std::string_view sql) -> awaitable<std::size_t>

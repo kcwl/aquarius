@@ -41,7 +41,7 @@ namespace aquarius
 				if (!result.has_value())
 					co_return results;
 
-				for (auto& r : result.rows())
+				for (const auto r : result.rows())
 				{
 					make_result<T>(results, r);
 				}
@@ -103,17 +103,17 @@ namespace aquarius
 				results.push_back(to_struct(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{}));
 			}
 
-			template <typename T>
-			auto cast(const char* field)
+			template <typename T, typename Field>
+			auto cast(const Field& field)
 			{
 				std::stringstream ss{};
-				ss << field;
+				//ss << field;
 
 				using type = std::remove_cvref_t<T>;
 
 				type result{};
 
-				ss >> result;
+				//ss >> result;
 
 				return result;
 			}
