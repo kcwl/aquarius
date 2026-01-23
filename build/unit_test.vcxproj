@@ -245,8 +245,6 @@
     <ClInclude Include="..\include\aquarius\tbl\engine\mysql.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\text.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\varchar.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\task.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />

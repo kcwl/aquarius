@@ -315,9 +315,6 @@
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -338,9 +335,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\schedule.hpp">
       <Filter>include\aquarius\module</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\schedule.hpp">
-      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ini\parse.hpp">
       <Filter>include\aquarius\ini</Filter>

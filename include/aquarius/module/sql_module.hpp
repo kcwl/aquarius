@@ -1,14 +1,18 @@
 #pragma once
+#include <aquarius/io_service_pool.hpp>
 #include <aquarius/module/module.hpp>
-#include <aquarius/tbl/sql_connector.hpp>
+#include <aquarius/tbl/engine/mysql.hpp>
 
 namespace aquarius
 {
 	class sql_module : public _module<sql_module, database_param>
 	{
+		using service = tbl::mysql;
+
 	public:
 		sql_module(const std::string& name)
 			: _module<sql_module, database_param>(name)
+			, pool_ptr_(nullptr)
 			, index_(0)
 			, mutex_()
 			, connectors_()
@@ -17,26 +21,36 @@ namespace aquarius
 	public:
 		virtual bool init() override
 		{
-			auto pool_size = configs().pool_size;
+			pool_ptr_= std::make_shared<io_service_pool>(configs().pool_size);
 
-			for (int i = 0; i < pool_size; ++i)
+			
+
+			for (int i = 0; i < pool_ptr_->pool_size(); ++i)
 			{
-				auto connector_ptr = std::make_shared<sql_connector>(configs());
+				boost::mysql::pool_params params{};
+				params.server_address.emplace_host_and_port(configs().host, static_cast<uint16_t>(configs().port));
+				params.username = configs().user;
+				params.password = configs().password;
+				params.database = configs().db;
+
+				auto connector_ptr = std::make_shared<service>(pool_ptr_->get_io_service(), std::move(params));
 				connectors_.push_back(connector_ptr);
 			}
 
 			return true;
 		}
 
-		virtual auto run(io_context& io) -> awaitable<void> override
+		virtual auto run(io_context&) -> awaitable<void> override
 		{
 			for (auto& connector : connectors_)
 			{
 				if (!connector)
 					continue;
 
-				co_await connector->start();
+				connector->async_run();
 			}
+
+			co_return;
 		}
 
 		template <typename T>
@@ -51,11 +65,13 @@ namespace aquarius
 		{
 			auto connector = get_connector();
 
-			co_return co_await connector->async_execute(sql);
+			error_code ec{};
+
+			co_return co_await connector->async_execute(sql, ec);
 		}
 
 	private:
-		std::shared_ptr<sql_connector> get_connector()
+		std::shared_ptr<service> get_connector()
 		{
 			std::lock_guard lock(mutex_);
 
@@ -73,10 +89,12 @@ namespace aquarius
 		}
 
 	private:
+		std::shared_ptr<io_service_pool> pool_ptr_;
+
 		std::size_t index_;
 
 		std::mutex mutex_;
 
-		std::vector<std::shared_ptr<sql_connector>> connectors_;
+		std::vector<std::shared_ptr<service>> connectors_;
 	};
 } // namespace aquarius
