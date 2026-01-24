@@ -73,6 +73,8 @@ namespace aquarius
 		{
 			response().result(ec.value());
 
+			response().seq_number(request()->seq_number());
+
 			flex_buffer buffer{};
 
 			co_await make_response();

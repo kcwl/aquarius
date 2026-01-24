@@ -360,9 +360,6 @@
     <ClInclude Include="..\include\aquarius\ip\default_selector.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\default_http_selector.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\session_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>

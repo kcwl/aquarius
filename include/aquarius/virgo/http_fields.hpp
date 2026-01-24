@@ -78,9 +78,9 @@ namespace aquarius
 			//{
 			//	fields_[f] = v;
 			// }
-			void set_field(std::string_view f, std::string_view v)
+			void set_field(const std::string& f, const std::string& v)
 			{
-				fields_[std::string(f.data(), f.size())] = std::string(v.data(), v.size());
+				fields_[f] = v;
 			}
 
 			bool has_content_length() const

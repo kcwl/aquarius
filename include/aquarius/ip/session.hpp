@@ -8,7 +8,8 @@ using namespace std::chrono_literals;
 namespace aquarius
 {
 	template <auto Tag, typename ProtoTag, typename Adaptor>
-	class session : public basic_session<Tag, ProtoTag, Adaptor>, public std::enable_shared_from_this<session<Tag,ProtoTag, Adaptor>>
+	class session : public basic_session<Tag, ProtoTag, Adaptor>,
+					public std::enable_shared_from_this<session<Tag, ProtoTag, Adaptor>>
 	{
 	public:
 		using base_type = basic_session<Tag, ProtoTag, Adaptor>;
@@ -39,9 +40,9 @@ namespace aquarius
 			co_return co_await proto_.template query<Response>(seq_number, this->shared_from_this());
 		}
 
-		auto query_buffer(std::size_t seq_number) -> awaitable<flex_buffer>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
 		{
-			co_return co_await proto_.query_buffer(seq_number, this->shared_from_this());
+			co_return co_await proto_.query_buffer(seq_number, this->shared_from_this(), hf);
 		}
 
 		void set_close_func(const callback_func& f)
@@ -49,7 +50,7 @@ namespace aquarius
 			close_func_ = f;
 		}
 
-		auto make_error_response(error_code& ec) ->awaitable<flex_buffer>
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
 		{
 			co_return co_await proto_.make_error_response(ec);
 		}

@@ -85,6 +85,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			BOOST_TEST(is_connect);
 
 			auto req = std::make_shared<new_http_login_http_request>();
+			req->version(aquarius::virgo::http_version::http1_1);
 			req->body().uuid = 1;
 			req->body().per_req.sex = true;
 			req->body().per_req.addr = 2;
@@ -109,9 +110,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(10s);
-
-	BOOST_CHECK(status == std::future_status::ready);
+	future.get();
 
 	io.stop();
 
@@ -143,6 +142,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 			BOOST_TEST(is_connect);
 
 			auto req = std::make_shared<http_test_get_http_request>();
+			req->version(aquarius::virgo::http_version::http1_1);
 			req->body().user = 12345;
 			req->body().passwd = "passwd123";
 
@@ -156,9 +156,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(10s);
-
-	BOOST_CHECK(status == std::future_status::ready);
+	future.get();
 
 	io.stop();
 

@@ -7,6 +7,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
+#include <aquarius/virgo/header_field_base.hpp>
 #include <aquarius/virgo/http_get_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_response.hpp>
@@ -79,7 +80,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<flex_buffer>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
 		{
 			for (;;)
 			{
@@ -107,6 +108,8 @@ namespace aquarius
 								 << ", remote_address: " << session_ptr->remote_address();
 					co_return flex_buffer{};
 				}
+
+				hf->seq_number(h.seq_number);
 
 				if (seq_number == h.seq_number)
 				{
@@ -137,12 +140,12 @@ namespace aquarius
 
 			constexpr std::string_view ping_router = "tcp_ping"sv;
 
-			router<HandlerSelector::tag, Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
+			router<Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
 		}
 
 		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
 		{
-			return flex_buffer{};
+			co_return flex_buffer{};
 		}
 	};
 
@@ -152,6 +155,8 @@ namespace aquarius
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
 		constexpr static auto crlf = "\r\n"sv;
+
+		std::map<std::size_t, flex_buffer> buffer_controller;
 
 		auto parse_field(std::span<char> buffer, error_code& ec) -> std::shared_ptr<virgo::http_fields>
 		{
@@ -176,7 +181,7 @@ namespace aquarius
 				auto key = std::string_view(f).substr(0, pos);
 				auto value = std::string_view(f).substr(pos + 1, f.size() - pos - 1);
 
-				field->set_field(key, value);
+				field->set_field(std::string(key), std::string(value));
 			}
 
 			return field;
@@ -384,7 +389,7 @@ namespace aquarius
 			co_await session_ptr->async_send(buffer);
 		}
 
-		auto make_error_response(error_code& ec) ->awaitable<flex_buffer>
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
 		{
 			std::string header{};
 
@@ -405,8 +410,6 @@ namespace aquarius
 
 			co_return buffer;
 		}
-
-
 
 		template <bool Server>
 		auto parse_command_line(std::span<char> header_span, error_code& ec) -> std::conditional_t<
@@ -478,8 +481,8 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, std::shared_ptr<virgo::http_fields> hf,
-							flex_buffer& buffer)
+		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router,
+							std::shared_ptr<virgo::http_fields> hf, flex_buffer& buffer)
 		{
 			(void)session_ptr;
 			(void)router;
@@ -553,7 +556,7 @@ namespace aquarius
 				ifs.read(stream.data(), stream.size());
 			}
 
-			co_await router<proto_tag::http, Session>::get_mutable_instance().send_response(session_ptr, get_resp);
+			co_await router<Session>::get_mutable_instance().send_response(session_ptr, get_resp);
 
 			flex_buffer buffer{};
 			get_resp.commit(buffer);
@@ -564,16 +567,14 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<flex_buffer>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
 		{
 			error_code ec{};
 
-			flex_buffer buffer{};
-
-			std::map<std::size_t, flex_buffer> buffer_controller;
-
 			for (;;)
 			{
+				flex_buffer buffer{};
+
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
@@ -609,27 +610,35 @@ namespace aquarius
 					co_return flex_buffer{};
 				}
 
-				auto hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
+				hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
 
 				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
 				{
 					co_return flex_buffer{};
 				}
 
-				auto seq = hf->find("seq_number");
+				auto seq = std::dynamic_pointer_cast<virgo::http_fields>(hf)->find("seq_number");
 
 				if (seq.empty())
 					continue;
 
-				std::size_t seq_n = static_cast<std::size_t>(std::atoi(seq.data()));
+				std::stringstream ss{};
+
+				ss << seq;
+
+				uint32_t seq_n = 0;
+
+				ss >> seq_n;
 
 				if (seq_number == seq_n)
-					break;
+				{
+					co_return buffer;
+				}
 
-				buffer_controller.insert(std::make_pair<std::size_t, flex_buffer>(std::move(seq_n), std::move(buffer)));
+				buffer_controller.emplace(seq_n, std::move(buffer));
 			}
 
-			co_return buffer;
+			co_return flex_buffer{};
 		}
 
 		template <typename Response, typename Session>

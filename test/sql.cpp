@@ -85,9 +85,13 @@ BOOST_AUTO_TEST_CASE(connecting)
 		},
 		aquarius::use_future);
 
-	io.run();
+	std::thread t([&] { io.run(); });
 
 	fur.get();
+
+	io.stop();
+
+	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

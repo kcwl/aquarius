@@ -46,7 +46,7 @@ namespace aquarius
 			this->response().set_field("Connection", this->request()->find("Connection"));
 			this->response().set_field("Access-Control-Allow-Origin", "*");
 
-			co_return;
+			this->response().set_field("seq_number", this->request()->find("seq_number"));
 		}
 	};
 
