@@ -20,9 +20,9 @@ namespace aquarius
 			}
 		}
 
-		auto transfer_module::async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>
+		auto transfer_module::async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf) -> awaitable<flex_buffer>
 		{
-			auto req = std::make_shared<transfer_tcp_request>();
+			auto req = std::make_shared<transfer_tcp_request>(std::move(*hf));
 
 			std::copy((char*)buffer.data().data(), (char*)buffer.data().data() + buffer.data().size(),
 					  std::back_inserter(req->body().feedbuf));

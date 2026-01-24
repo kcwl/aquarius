@@ -3,6 +3,7 @@
 #include <aquarius/module/module.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <proto/channel.virgo.h>
+#include <aquarius/virgo/header_field_base.hpp>
 
 namespace aquarius
 {
@@ -24,7 +25,7 @@ namespace aquarius
 		public:
 			virtual auto run(io_context& ios) -> awaitable<void> override;
 
-			auto async_sendback(flex_buffer& buffer) -> awaitable<flex_buffer>;
+			auto async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf) -> awaitable<flex_buffer>;
 
 		private:
 			std::shared_ptr<tcp_client> transfer_ptr_;
