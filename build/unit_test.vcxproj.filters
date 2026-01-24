@@ -369,9 +369,6 @@
     <ClInclude Include="..\include\aquarius\module\session_schedule.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\logger_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>

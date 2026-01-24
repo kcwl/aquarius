@@ -5,7 +5,6 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_module.hpp>
-#include <aquarius/module/logger_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
 #include <aquarius/module/session_schedule.hpp>
@@ -167,8 +166,6 @@ namespace aquarius
 
 		void regist_module()
 		{
-			module_router::get_mutable_instance().regist<logger_module>("alogger_module");
-
 			module_router::get_mutable_instance().regist<session_module<Session>>(
 				std::string(session_module_name.data()));
 

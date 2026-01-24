@@ -177,7 +177,6 @@
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_server.hpp" />
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\http_config_schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\module\logger_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
