@@ -1,4 +1,5 @@
 #include "channel_module.h"
+#include "error.hpp"
 #include <aquarius/module/module_router.hpp>
 
 namespace aquarius
@@ -7,9 +8,7 @@ namespace aquarius
 	{
 		channel_module::channel_module(const std::string& name)
 			: _module<channel_module, channel_config>(name)
-		{
-
-		}
+		{}
 
 		void channel_module::subscribe(std::string_view name, std::shared_ptr<player> subscribe)
 		{
@@ -23,8 +22,8 @@ namespace aquarius
 			chan->subscribe(subscribe);
 		}
 
-
-		auto channel_module::publish(std::string_view name, flex_buffer& buffer, std::size_t id) ->awaitable<flex_buffer>
+		auto channel_module::publish(std::string_view name, flex_buffer& buffer, std::size_t id, error_code& ec)
+			-> awaitable<flex_buffer>
 		{
 			std::lock_guard lock(mutex_);
 
@@ -34,10 +33,12 @@ namespace aquarius
 			{
 				XLOG_ERROR() << "channel [" << name << "] not found";
 
+				ec = errc::channel_not_find;
+
 				co_return flex_buffer{};
 			}
 
-			co_return co_await it->second->publish(buffer, id);
+			co_return co_await it->second->publish(buffer, id, ec);
 		}
 	} // namespace serviced
 } // namespace aquarius

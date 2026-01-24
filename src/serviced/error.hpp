@@ -17,6 +17,8 @@ namespace aquarius
 			not_connected,
 			no_player,
 			create_client_error,
+			channel_not_find,
+			not_subscriber
 		};
 
 		inline std::string_view db_result_map(int result)
@@ -27,7 +29,9 @@ namespace aquarius
 				{ static_cast<int>(errc::invalid_cmd), "invalid command"sv },
 				{ static_cast<int>(errc::not_connected), "not connect server"sv },
 				{ static_cast<int>(errc::no_player), "no player"sv },
-				{ static_cast<int>(errc::create_client_error), "create client error"sv }
+				{ static_cast<int>(errc::create_client_error), "create client error"sv },
+				{ static_cast<int>(errc::channel_not_find), "channel not find"sv },
+				{ static_cast<int>(errc::not_subscriber), "not subscriber"sv }
 			};
 
 			return db_results[result];

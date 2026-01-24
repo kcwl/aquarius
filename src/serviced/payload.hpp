@@ -1,4 +1,5 @@
 #pragma once
+#include "error.hpp"
 #include <aquarius/asio.hpp>
 #include <random>
 #include <set>
@@ -13,11 +14,15 @@ namespace aquarius
 				: index(0)
 			{}
 
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
-				-> awaitable<flex_buffer>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer,
+						 std::size_t id, error_code& ec) -> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
+				{
+					ec = errc::not_subscriber;
+
 					co_return flex_buffer{};
+				}
 
 				if (index >= subscribers.size())
 				{
@@ -25,7 +30,7 @@ namespace aquarius
 				}
 
 				auto& subscriber = subscribers[index++];
-				error_code ec{};
+
 				co_return co_await subscriber->feedback(buffer, ec, id);
 			}
 
@@ -36,16 +41,18 @@ namespace aquarius
 		{
 			constexpr static std::size_t max_weigth = 100;
 
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
-				-> awaitable<flex_buffer>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer,
+						 std::size_t id, error_code& ec) -> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
+				{
+					ec = errc::not_subscriber;
+
 					co_return flex_buffer{};
+				}
 
 				std::random_device rd{};
 				std::mt19937 gen{ rd() };
-
-				error_code ec{};
 
 				std::uniform_int_distribution<> distrib(0, max_weigth);
 
@@ -66,28 +73,36 @@ namespace aquarius
 		template <typename UUID>
 		struct uuid_hash
 		{
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
-				-> awaitable<flex_buffer>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer,
+						 std::size_t id, error_code& ec) -> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
+				{
+					ec = errc::not_subscriber;
+
 					co_return flex_buffer{};
+				}
 
 				auto index = UUID()() % subscribers.size();
 
 				auto& subscriber = subscribers[index];
 
-				co_return co_await subscriber->feedback(buffer);
+				co_return co_await subscriber->feedback(buffer, ec, id);
 			}
 		};
 
 		template <typename Invoke>
 		struct some_min
 		{
-			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer, std::size_t id)
-				-> awaitable<flex_buffer>
+			auto publish(std::map<std::size_t, std::shared_ptr<player>>& subscribers, flex_buffer& buffer,
+						 std::size_t id, error_code& ec) -> awaitable<flex_buffer>
 			{
 				if (subscribers.empty())
+				{
+					ec = errc::not_subscriber;
+
 					co_return flex_buffer{};
+				}
 
 				int index = 0;
 				int target = index;
@@ -110,7 +125,7 @@ namespace aquarius
 
 				auto& subscriber = subscribers[target];
 
-				co_return co_await subscriber->feedback(buffer);
+				co_return co_await subscriber->feedback(buffer, ec, id);
 			}
 		};
 	} // namespace serviced
