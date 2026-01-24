@@ -2,6 +2,7 @@
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/ip/server_session.hpp>
+#include <aquarius/virgo/http_fields.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 
@@ -49,53 +50,31 @@ namespace aquarius
 		}
 	};
 
-	template <auto Tag, typename Session, typename Context>
+	template <typename Session, typename Context>
 	struct auto_handler_register
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto func = [&](std::shared_ptr<Session> session, flex_buffer& buffer)
+			auto func =
+				[&](std::shared_ptr<Session> session, std::shared_ptr<header_field_base> hf, flex_buffer& buffer)
 			{
-				error_code ec{};
+				std::shared_ptr<typename Context::request_t> request;
 
-				auto req = std::make_shared<typename Context::request_t>();
-
-				try
+				if constexpr (Session::tag == proto_tag::http)
 				{
-					req->consume(buffer);
+					request = std::make_shared<typename Context::request_t>(
+						*std::dynamic_pointer_cast<virgo::http_fields>(hf));
 				}
-				catch (error_code& ex)
+				else
 				{
-					ec = ex;
+					request = std::make_shared<typename Context::request_t>(*hf);
 				}
-
-				co_spawn(
-					session->get_executor(), [session, &ec, req]() mutable -> awaitable<void>
-					{ co_await std::make_shared<Context>()->visit(session, req, !!ec); }, detached);
-
-				return !ec;
-			};
-
-			router<Tag, Session>::get_mutable_instance().regist(proto, func);
-		}
-	};
-
-	template <typename Session, typename Context>
-	struct auto_handler_register<proto_tag::http, Session, Context>
-	{
-		explicit auto_handler_register(std::string_view proto)
-		{
-			auto func = [&](std::shared_ptr<Session> session, virgo::http_fields hf, flex_buffer& buffer)
-			{
-				auto request = std::make_shared<typename Context::request_t>();
 
 				error_code ec = virgo::http_status::ok;
 
 				try
 				{
 					request->consume(buffer);
-
-					request->move_copy(hf);
 				}
 				catch (error_code& ex)
 				{
@@ -110,7 +89,7 @@ namespace aquarius
 				return ec == virgo::http_status::ok;
 			};
 
-			router<proto_tag::http, Session>::get_mutable_instance().regist(proto, func);
+			router<Session>::get_mutable_instance().regist(proto, func);
 		}
 	};
 
@@ -119,12 +98,12 @@ namespace aquarius
 #define AQUARIUS_GLOBAL_STR_ID(request) #request
 
 #define __AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)                                            \
-	class __method final : public aquarius::handler<aquarius::handler_tag_traits<__request>::selector::tag, __session, \
-													__request, __response>                                             \
+	class __method final                                                                                               \
+		: public aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>     \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type = aquarius::handler<aquarius::handler_tag_traits<__request>::selector::tag, __session,         \
-											__request, __response>;                                                    \
+		using base_type =                                                                                              \
+			aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>;         \
 		using session_t = typename base_type::session_t;                                                               \
                                                                                                                        \
 	public:                                                                                                            \
@@ -137,15 +116,14 @@ namespace aquarius
 
 #define AQUARIUS_CONTEXT_BY(__session, __request, __response, __method)                                                \
 	class __method;                                                                                                    \
-	[[maybe_unused]] static aquarius::auto_handler_register<aquarius::handler_tag_traits<__request>::selector::tag,    \
-															__session, __method>                                       \
-		__auto_register_##__method(__request::router);                                                                 \
+	[[maybe_unused]] static aquarius::auto_handler_register<__session, __method> __auto_register_##__method(           \
+		__request::router);                                                                                            \
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::selector>, __request,        \
-						__response, __method)
+	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response, \
+						__method)
 
 #define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
-	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::selector>, __request,    \
+	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \
 						__response, __method)

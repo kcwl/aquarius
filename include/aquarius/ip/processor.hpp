@@ -60,14 +60,18 @@ namespace aquarius
 					break;
 				}
 
+				std::shared_ptr<header_field_base> hf = std::make_shared<header_field_base>();
+
+				hf->seq_number(proto.seq_number);
+
 				auto topic = binary_parse{}.from_datas<std::string>(buffer);
 
-				HandlerSelector()(topic, session_ptr, buffer);
+				HandlerSelector()(topic, session_ptr, hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
 			{
-				XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " read occur error - " << ec.message()
+				XLOG_ERROR() << from_tag_string(Tag) << " read occur error - " << ec.message()
 							 << ", remote_address: " << session_ptr->remote_address();
 			}
 
@@ -88,7 +92,7 @@ namespace aquarius
 
 				if (ec)
 				{
-					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
+					XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
 								 << ", remote_address: " << session_ptr->remote_address();
 					co_return flex_buffer{};
 				}
@@ -99,7 +103,7 @@ namespace aquarius
 
 				if (ec)
 				{
-					XLOG_ERROR() << from_tag_string(HandlerSelector::tag) << " query occur error - " << ec.message()
+					XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
 								 << ", remote_address: " << session_ptr->remote_address();
 					co_return flex_buffer{};
 				}
@@ -144,11 +148,11 @@ namespace aquarius
 
 		constexpr static auto crlf = "\r\n"sv;
 
-		auto parse_field(std::span<char> buffer, error_code& ec) -> virgo::http_fields
+		auto parse_field(std::span<char> buffer, error_code& ec) -> std::shared_ptr<virgo::http_fields>
 		{
 			ec = virgo::http_status::ok;
 
-			virgo::http_fields field;
+			auto field = std::make_shared<virgo::http_fields>();
 
 			for (const auto& f : buffer | std::views::split(crlf))
 			{
@@ -167,7 +171,7 @@ namespace aquarius
 				auto key = std::string_view(f).substr(0, pos);
 				auto value = std::string_view(f).substr(pos + 1, f.size() - pos - 1);
 
-				field.set_field(key, value);
+				field->set_field(key, value);
 			}
 
 			return field;
@@ -242,14 +246,14 @@ namespace aquarius
 				//     virgo::http_status::payload_too_large);
 				// }
 
-				if (!hf.find("Expect").empty())
+				if (!hf->find("Expect").empty())
 				{
 					co_return co_await make_error_response(session_ptr, virgo::http_status::expectation_failed);
 				}
 
-				if (hf.content_length() != 0)
+				if (hf->content_length() != 0)
 				{
-					auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.size());
+					auto remain_size = static_cast<int64_t>(hf->content_length() - buffer.size());
 
 					if (remain_size > 0)
 					{
@@ -444,7 +448,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, virgo::http_fields hf,
+		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, std::shared_ptr<virgo::http_fields> hf,
 							flex_buffer& buffer)
 		{
 			(void)session_ptr;
@@ -582,7 +586,7 @@ namespace aquarius
 					co_return flex_buffer{};
 				}
 
-				auto seq = hf.find("seq_number");
+				auto seq = hf->find("seq_number");
 
 				if (seq.empty())
 					continue;

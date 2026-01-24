@@ -7,17 +7,17 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename Tag, typename Adaptor>
-	class session : public basic_session<Tag, Adaptor>, public std::enable_shared_from_this<session<Tag, Adaptor>>
+	template <auto Tag, typename ProtoTag, typename Adaptor>
+	class session : public basic_session<Tag, ProtoTag, Adaptor>, public std::enable_shared_from_this<session<Tag,ProtoTag, Adaptor>>
 	{
 	public:
-		using base_type = basic_session<Tag, Adaptor>;
+		using base_type = basic_session<Tag, ProtoTag, Adaptor>;
 
 		using typename base_type::socket;
 
-		using proc_type = processor<Tag::tag, Tag>;
+		using proc_type = processor<Tag, ProtoTag>;
 
-		using callback_func = std::function<void(std::shared_ptr<session<Tag, Adaptor>>)>;
+		using callback_func = std::function<void(std::shared_ptr<session<Tag, ProtoTag, Adaptor>>)>;
 
 	public:
 		session(socket sock, std::chrono::steady_clock::duration timeout = 1s)
@@ -73,7 +73,7 @@ namespace aquarius
 		callback_func close_func_;
 	};
 
-	template <typename Tag, typename Adaptor>
-	struct is_session_type<session<Tag, Adaptor>> : std::true_type
+	template <auto Tag, typename ProtoTag, typename Adaptor>
+	struct is_session_type<session<Tag, ProtoTag, Adaptor>> : std::true_type
 	{};
 } // namespace aquarius

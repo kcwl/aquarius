@@ -57,7 +57,9 @@ namespace aquarius
 		{
 			flex_buffer buffer{};
 
-			req->commit(buffer, static_cast<uint32_t>(detail::uuid_generator()()));
+			req->seq_number(static_cast<uint32_t>(detail::uuid_generator()()));
+
+			req->commit(buffer);
 
 			error_code ec{};
 
@@ -78,6 +80,7 @@ namespace aquarius
 
 			Response resp{};
 			resp.consume(buf);
+			resp.seq_number(req->seq_number());
 
 			co_return resp;
 		}

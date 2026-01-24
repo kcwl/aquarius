@@ -357,7 +357,7 @@
     <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\default_tcp_selector.hpp">
+    <ClInclude Include="..\include\aquarius\ip\default_selector.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\default_http_selector.hpp">
@@ -389,6 +389,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
       <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\header_field_base.hpp">
+      <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

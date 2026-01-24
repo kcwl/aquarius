@@ -26,6 +26,13 @@ namespace aquarius
 
 		public:
 			http_request() = default;
+
+			http_request(http_fields f)
+				: base(std::move(f))
+			{
+
+			}
+
 			virtual ~http_request() = default;
 
 			http_request(const http_request&) = default;
@@ -46,12 +53,12 @@ namespace aquarius
 			}
 
 		public:
-			void consume(flex_buffer& buffer, uint32_t = 0)
+			void consume(flex_buffer& buffer)
 			{
 				this->body().deserialize(buffer);
 			}
 
-			void commit(flex_buffer& buffer, uint32_t = 0)
+			void commit(flex_buffer& buffer)
 			{
 				flex_buffer body_buffer{};
 
@@ -108,6 +115,6 @@ namespace aquarius
 	template <detail::string_literal Router, virgo::http_method Method, typename Header, typename Body>
 	struct handler_tag_traits<virgo::http_request<Router, Method, Header, Body>>
 	{
-		using selector = ip::default_http_selector;
+		constexpr static auto tag = proto_tag::http;
 	};
 } // namespace aquarius

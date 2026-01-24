@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/ip/concept.hpp>
-#include <aquarius/ip/default_tcp_selector.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
@@ -23,6 +22,10 @@ namespace aquarius
 			tcp_request()
 				: base()
 				, parse_()
+			{}
+
+			tcp_request(header_field_base f)
+				: base(std::move(f))
 			{}
 
 			virtual ~tcp_request() = default;
@@ -68,7 +71,7 @@ namespace aquarius
 			}
 
 		public:
-			bool commit(flex_buffer& buffer, uint32_t seq)
+			bool commit(flex_buffer& buffer)
 			{
 				flex_buffer buf{};
 
@@ -85,7 +88,7 @@ namespace aquarius
 				uint32_t length = static_cast<uint32_t>(buf.size());
 
 				buffer.sputn((char*)&length, sizeof(uint32_t));
-				this->seq_number(seq);
+				auto seq = this->seq_number();
 				buffer.sputn((char*)&seq, sizeof(uint32_t));
 
 				buffer.sputn((char*)buf.data().data(), buf.data().size());
@@ -95,8 +98,6 @@ namespace aquarius
 
 			void consume(flex_buffer& buffer)
 			{
-				this->parse_seq(buffer);
-
 				this->timestamp(parse_.from_datas<int64_t>(buffer));
 
 				this->version(parse_.from_datas<int32_t>(buffer));
@@ -125,6 +126,6 @@ namespace aquarius
 	template <detail::string_literal Router, typename Header, typename Body>
 	struct handler_tag_traits<virgo::tcp_request<Router, Header, Body>>
 	{
-		using selector = ip::default_tcp_selector;
+		constexpr static auto tag = proto_tag::tcp;
 	};
 } // namespace aquarius

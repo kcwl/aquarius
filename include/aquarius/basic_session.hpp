@@ -7,23 +7,23 @@
 
 namespace aquarius
 {
-	template <typename ProtoTag, typename Adaptor>
+	template <auto Tag, typename ProtoTag, typename Adaptor>
 	class basic_session
 	{
 	public:
-		using socket = typename protocol<ProtoTag::tag>::socket;
+		using socket = typename protocol<Tag>::socket;
 
-		using endpoint = typename protocol<ProtoTag::tag>::endpoint;
+		using endpoint = typename protocol<Tag>::endpoint;
 
-		using acceptor = typename protocol<ProtoTag::tag>::acceptor;
+		using acceptor = typename protocol<Tag>::acceptor;
 
-		using resolver = typename protocol<ProtoTag::tag>::resolver;
+		using resolver = typename protocol<Tag>::resolver;
 
 		using executor_type = typename socket::executor_type;
 
-		using callback_func = std::function<void(std::shared_ptr<basic_session<ProtoTag, Adaptor>>)>;
+		using callback_func = std::function<void(std::shared_ptr<basic_session<Tag, ProtoTag, Adaptor>>)>;
 
-		constexpr static auto tag = ProtoTag::tag;
+		constexpr static auto tag = Tag;
 
 	public:
 		explicit basic_session(socket sock)

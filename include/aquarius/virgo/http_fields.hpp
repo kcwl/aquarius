@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/virgo/header_field_base.hpp>
 #include <iostream>
 #include <map>
 #include <string>
@@ -7,7 +8,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		class http_fields
+		class http_fields : public header_field_base
 		{
 		public:
 			http_fields() = default;
@@ -16,13 +17,16 @@ namespace aquarius
 
 		public:
 			http_fields(const http_fields& other)
-				: fields_(other.fields_)
+				: header_field_base(other)
+				, fields_(other.fields_)
 			{}
 
 			http_fields& operator=(const http_fields& other)
 			{
 				if (this != std::addressof(other))
 				{
+					header_field_base::operator=(other);
+
 					fields_ = other.fields_;
 				}
 
@@ -30,13 +34,16 @@ namespace aquarius
 			}
 
 			http_fields(http_fields&& other) noexcept
-				: fields_(std::move(other.fields_))
+				: header_field_base(std::move(other))
+				, fields_(std::move(other.fields_))
 			{}
 
 			http_fields& operator=(http_fields&& other) noexcept
 			{
 				if (this != std::addressof(other))
 				{
+					header_field_base::operator=(std::move(other));
+
 					fields_ = std::move(other.fields_);
 				}
 
@@ -107,11 +114,6 @@ namespace aquarius
 			void keep_alive(bool k)
 			{
 				fields_["Connection"] = k ? "keep-alive" : "close";
-			}
-
-			void move_copy(http_fields hf)
-			{
-				*this = std::move(hf);
 			}
 
 			std::map<std::string, std::string> fields() const

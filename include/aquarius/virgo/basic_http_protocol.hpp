@@ -23,8 +23,14 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
+				: basic_http_protocol(http_fields{})
+			{
+
+			}
+
+			basic_http_protocol(http_fields f)
 				: base()
-				, http_fields()
+				, http_fields(std::move(f))
 				, version_(http_version::unknown)
 			{}
 
@@ -114,8 +120,14 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
+				: basic_http_protocol(http_fields{})
+			{
+
+			}
+
+			basic_http_protocol(http_fields f)
 				: base()
-				, http_fields()
+				, http_fields(f)
 				, status_(virgo::http_status::ok)
 				, version_(virgo::http_version::unknown)
 			{}

@@ -156,7 +156,7 @@
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
     <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
     <ClInclude Include="..\include\aquarius\ip\default_http_selector.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\default_tcp_selector.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\default_selector.hpp" />
     <ClInclude Include="..\include\aquarius\module.hpp" />
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
@@ -248,6 +248,7 @@
     <ClInclude Include="..\include\aquarius\tbl\task.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\header_field_base.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />

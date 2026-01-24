@@ -22,6 +22,12 @@ namespace aquarius
 				, parse_()
 			{}
 
+			tcp_response(header_field_base f)
+				: base(std::move(f))
+			{
+
+			}
+
 			virtual ~tcp_response() = default;
 
 			tcp_response(const tcp_response& other)
@@ -66,7 +72,7 @@ namespace aquarius
 			}
 
 		public:
-			bool commit(flex_buffer& buffer, uint32_t seq)
+			bool commit(flex_buffer& buffer)
 			{
 				flex_buffer buf{};
 
@@ -83,7 +89,7 @@ namespace aquarius
 				auto size = static_cast<uint32_t>(buf.size());
 
 				buffer.sputn((char*)&size, sizeof(uint32_t));
-				this->seq_number(seq);
+				auto seq = this->seq_number();
 				buffer.sputn((char*)&seq, sizeof(uint32_t));
 
 				buffer.sputn((char*)buf.data().data(), buf.data().size());
@@ -93,8 +99,6 @@ namespace aquarius
 
 			void consume(flex_buffer& buffer)
 			{
-				this->parse_seq(buffer);
-
 				this->result(parse_.from_datas<int32_t>(buffer));
 
 				this->timestamp(parse_.from_datas<int64_t>(buffer));

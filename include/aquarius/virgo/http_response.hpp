@@ -24,6 +24,12 @@ namespace aquarius
 
 		public:
 			http_response() = default;
+			http_response(http_fields f)
+				: base(std::move(f))
+			{
+
+			}
+
 			virtual ~http_response() = default;
 
 			http_response(const http_response&) = delete;
@@ -44,12 +50,12 @@ namespace aquarius
 			}
 
 		public:
-			void consume(flex_buffer& buffer, uint32_t = 0)
+			void consume(flex_buffer& buffer)
 			{
 				this->body().deserialize(buffer);
 			}
 
-			void commit(flex_buffer& buffer, uint32_t = 0)
+			void commit(flex_buffer& buffer)
 			{
 				flex_buffer body_buffer{};
 
