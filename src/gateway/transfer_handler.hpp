@@ -16,11 +16,23 @@ namespace aquarius
 				{
 					co_spawn(
 						session->get_executor(),
-						[&] -> awaitable<void>
+						[&, session] -> awaitable<void>
 						{
-							auto resp_buffer = co_await ip::mpu_transfer<T>(buffer, hf);
+							error_code ec{};
 
-							co_await session->async_send(resp_buffer);
+							auto resp_buffer = co_await ip::mpu_transfer<T>(buffer, hf, ec);
+
+							if (!ec)
+							{
+								co_await session->async_send(resp_buffer);
+							}
+							else
+							{
+								auto buf = co_await session->make_error_response(ec);
+
+								co_await session->async_send(buf);
+							}
+							
 						},
 						detached);
 

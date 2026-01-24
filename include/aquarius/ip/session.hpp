@@ -49,6 +49,11 @@ namespace aquarius
 			close_func_ = f;
 		}
 
+		auto make_error_response(error_code& ec) ->awaitable<flex_buffer>
+		{
+			co_return co_await proto_.make_error_response(ec);
+		}
+
 	private:
 		void start_timer()
 		{

@@ -1,4 +1,5 @@
 #include "transfer_module.h"
+#include <error.hpp>
 
 namespace aquarius
 {
@@ -20,7 +21,7 @@ namespace aquarius
 			}
 		}
 
-		auto transfer_module::async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf) -> awaitable<flex_buffer>
+		auto transfer_module::async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf, error_code& ec) -> awaitable<flex_buffer>
 		{
 			auto req = std::make_shared<transfer_tcp_request>(std::move(*hf));
 
@@ -28,6 +29,8 @@ namespace aquarius
 					  std::back_inserter(req->body().feedbuf));
 
 			auto resp = co_await transfer_ptr_->async_send<transfer_tcp_response>(req);
+
+			ec = static_cast<serviced::errc>(resp.result());
 
 			flex_buffer resp_buffer{};
 			resp_buffer.sputn(resp.body().feedbuf.data(), resp.body().feedbuf.size());

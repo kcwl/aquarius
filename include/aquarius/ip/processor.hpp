@@ -139,6 +139,11 @@ namespace aquarius
 
 			router<HandlerSelector::tag, Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
 		}
+
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
+		{
+			return flex_buffer{};
+		}
 	};
 
 	template <typename HandlerSelector>
@@ -378,6 +383,31 @@ namespace aquarius
 
 			co_await session_ptr->async_send(buffer);
 		}
+
+		auto make_error_response(error_code& ec) ->awaitable<flex_buffer>
+		{
+			std::string header{};
+
+			auto http_version = co_await mpc_http_version();
+
+			auto status = ec ? virgo::http_status::not_implemented : virgo::http_status::ok;
+
+			auto make_command_line = [&]()
+			{
+				header += std::format("{} {} {}\r\n\r\n", http_version, static_cast<int>(status),
+									  virgo::from_status_string(status));
+			};
+
+			make_command_line();
+
+			flex_buffer buffer{};
+			buffer.sputn(header.c_str(), header.size());
+
+			co_return buffer;
+		}
+
+
+
 		template <bool Server>
 		auto parse_command_line(std::span<char> header_span, error_code& ec) -> std::conditional_t<
 			Server, std::tuple<virgo::http_method, std::string_view, std::string_view, virgo::http_version>,

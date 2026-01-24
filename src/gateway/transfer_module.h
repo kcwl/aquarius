@@ -25,7 +25,7 @@ namespace aquarius
 		public:
 			virtual auto run(io_context& ios) -> awaitable<void> override;
 
-			auto async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf) -> awaitable<flex_buffer>;
+			auto async_sendback(flex_buffer& buffer, std::shared_ptr<header_field_base> hf, error_code& ec) -> awaitable<flex_buffer>;
 
 		private:
 			std::shared_ptr<tcp_client> transfer_ptr_;
