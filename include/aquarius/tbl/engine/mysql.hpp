@@ -27,11 +27,6 @@ namespace aquarius
 				error_code ec{};
 
 				//co_await pool_.async_run(aquarius::redirect_error(use_awaitable, ec));
-
-				//if (ec)
-				//{
-				//	XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
-				//}
 				pool_.async_run(detached);
 
 				if (ec)
