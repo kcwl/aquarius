@@ -76,14 +76,38 @@ namespace aquarius
 			ip_filter_ = func;
 		}
 
+		bool ip_filter(const std::string& host)
+		{
+			if (!ip_filter_)
+				return true;
+
+			return ip_filter_(host);
+		}
+
 		void set_accept_func(const callback_func& func)
 		{
 			accept_func_ = func;
 		}
 
+		auto accept_func(std::shared_ptr<session_type> session) -> awaitable<void>
+		{
+			if (!accept_func_)
+				co_return;
+
+			co_await accept_func_(session);
+		}
+
 		void set_close_func(const callback_func& func)
 		{
 			close_func_ = func;
+		}
+
+		auto close_func(std::shared_ptr<session_type> session)-> awaitable<void>
+		{
+			if (!close_func_)
+				co_return;
+
+			co_await close_func_(session);
 		}
 
 	private:
@@ -113,17 +137,13 @@ namespace aquarius
 					acceptor_.get_executor(),
 					[session_ptr, this] -> awaitable<void>
 					{
-						if (ip_filter_)
+						if (!ip_filter(session_ptr->remote_address()))
 						{
-							if (!ip_filter_(session_ptr->remote_address()))
-							{
-								session_ptr->close();
-								co_return;
-							}
+							session_ptr->close();
+							co_return;
 						}
 
-						if (accept_func_)
-							co_await accept_func_(session_ptr);
+						co_await accept_func(session_ptr);
 
 						co_return co_await session_ptr->accept();
 					},
