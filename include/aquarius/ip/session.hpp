@@ -7,15 +7,18 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <auto Tag, typename Adaptor>
-	class session : public basic_session<Tag, Adaptor>, public std::enable_shared_from_this<session<Tag, Adaptor>>
+	template <auto Tag, typename ProtoTag, typename Adaptor>
+	class session : public basic_session<Tag, ProtoTag, Adaptor>,
+					public std::enable_shared_from_this<session<Tag, ProtoTag, Adaptor>>
 	{
 	public:
-		using base_type = basic_session<Tag, Adaptor>;
+		using base_type = basic_session<Tag, ProtoTag, Adaptor>;
 
 		using typename base_type::socket;
 
-		using proc_type = processor<Tag>;
+		using proc_type = processor<Tag, ProtoTag>;
+
+		using callback_func = std::function<void(std::shared_ptr<session<Tag, ProtoTag, Adaptor>>)>;
 
 	public:
 		session(socket sock, std::chrono::steady_clock::duration timeout = 1s)
@@ -32,9 +35,24 @@ namespace aquarius
 		}
 
 		template <typename Response>
-		auto query() -> awaitable<Response>
+		auto query(std::size_t seq_number) -> awaitable<Response>
 		{
-			co_return co_await proto_.template query<Response>(this->shared_from_this());
+			co_return co_await proto_.template query<Response>(seq_number, this->shared_from_this());
+		}
+
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
+		{
+			co_return co_await proto_.query_buffer(seq_number, this->shared_from_this(), hf);
+		}
+
+		void set_close_func(const callback_func& f)
+		{
+			close_func_ = f;
+		}
+
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
+		{
+			co_return co_await proto_.make_error_response(ec);
 		}
 
 	private:
@@ -57,9 +75,11 @@ namespace aquarius
 		proc_type proto_;
 
 		timer<boost::asio::steady_timer> timer_;
+
+		callback_func close_func_;
 	};
 
-	template <auto Tag, typename Adaptor>
-	struct is_session_type<session<Tag, Adaptor>> : std::true_type
+	template <auto Tag, typename ProtoTag, typename Adaptor>
+	struct is_session_type<session<Tag, ProtoTag, Adaptor>> : std::true_type
 	{};
 } // namespace aquarius

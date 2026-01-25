@@ -25,6 +25,13 @@ namespace aquarius
 
 		public:
 			http_request() = default;
+
+			http_request(http_fields f)
+				: base(std::move(f))
+			{
+
+			}
+
 			virtual ~http_request() = default;
 
 			http_request(const http_request&) = default;
@@ -55,6 +62,8 @@ namespace aquarius
 				flex_buffer body_buffer{};
 
 				std::string headline{};
+
+				this->set_field("seq_number", std::to_string(this->seq_number()));
 
 				if constexpr (Method == virgo::http_method::get)
 				{

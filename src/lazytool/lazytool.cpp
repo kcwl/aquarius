@@ -192,23 +192,23 @@ int main(int argc, char** args)
 
 				ofs_h << std::endl;
 
-				for (auto& k : pr.fields_)
-				{
-					if (k->type() == struct_type::structure)
-					{
-						cpp::data_field_generator(ofs_h, k, false).generate_stream_define();
-					}
-					else if (k->type() == struct_type::message)
-					{
-						auto msg = std::static_pointer_cast<message_field>(k);
-						if (!msg)
-							continue;
+				//for (auto& k : pr.fields_)
+				//{
+				//	if (k->type() == struct_type::structure)
+				//	{
+				//		cpp::data_field_generator(ofs_h, k, false).generate_stream_define();
+				//	}
+				//	else if (k->type() == struct_type::message)
+				//	{
+				//		auto msg = std::static_pointer_cast<message_field>(k);
+				//		if (!msg)
+				//			continue;
 
-						cpp::data_field_generator(ofs_h, msg->request(), false).generate_stream_define();
+				//		cpp::data_field_generator(ofs_h, msg->request(), false).generate_stream_define();
 
-						cpp::data_field_generator(ofs_h, msg->response(), false).generate_stream_define();
-					}
-				}
+				//		cpp::data_field_generator(ofs_h, msg->response(), false).generate_stream_define();
+				//	}
+				//}
 
 				ofs_h << std::endl;
 
@@ -288,23 +288,23 @@ int main(int argc, char** args)
 					}
 				}
 
-				for (auto& k : pr.fields_)
-				{
-					if (k->type() == struct_type::structure)
-					{
-						cpp::data_field_generator(ofs_cpp, k, false).generate_stream_src();
-					}
-					else if (k->type() == struct_type::message)
-					{
-						auto msg = std::static_pointer_cast<message_field>(k);
-						if (!msg)
-							continue;
+				//for (auto& k : pr.fields_)
+				//{
+				//	if (k->type() == struct_type::structure)
+				//	{
+				//		cpp::data_field_generator(ofs_cpp, k, false).generate_stream_src();
+				//	}
+				//	else if (k->type() == struct_type::message)
+				//	{
+				//		auto msg = std::static_pointer_cast<message_field>(k);
+				//		if (!msg)
+				//			continue;
 
-						cpp::data_field_generator(ofs_cpp, msg->request(), false).generate_stream_src();
+				//		cpp::data_field_generator(ofs_cpp, msg->request(), false).generate_stream_src();
 
-						cpp::data_field_generator(ofs_cpp, msg->response(), false).generate_stream_src();
-					}
-				}
+				//		cpp::data_field_generator(ofs_cpp, msg->response(), false).generate_stream_src();
+				//	}
+				//}
 			}
 		}
 		else if (extension == ".tbl")

@@ -26,9 +26,11 @@ namespace aquarius
 
 		virtual bool init() = 0;
 
-		virtual auto run() -> awaitable<void> = 0;
+		virtual auto run(io_context&) -> awaitable<void> = 0;
 
 		virtual void stop() = 0;
+
+		virtual bool enable() = 0;
 
 		virtual void timer(std::chrono::milliseconds) = 0;
 
@@ -55,10 +57,13 @@ namespace aquarius
 			if (!task_ptr)
 				co_return return_type{};
 
-			co_return co_await (*task_ptr)(core());
+			co_return co_await (*task_ptr)(_this());
 		}
 
 	protected:
-		virtual std::shared_ptr<T> core() = 0;
+		T* _this()
+		{
+			return static_cast<T*>(this);
+		}
 	};
 } // namespace aquarius

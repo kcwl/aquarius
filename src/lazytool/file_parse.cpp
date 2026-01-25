@@ -67,6 +67,15 @@ namespace
 				k = read_value<token::key, ' '>(ifs, column, row, end);
 				if (k.empty())
 					return parse_error::syntax;
+
+				if (k == "repeated")
+				{
+					auto t = read_value<token::value, ' '>(ifs, column, row, end);
+					if (end != ' ')
+						return parse_error::syntax;
+
+					k = "std::vector<" + t + ">";
+				}
 			}
 
 			auto v = read_value<token::value, ';'>(ifs, column, row, end);

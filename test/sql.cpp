@@ -4,7 +4,6 @@
 
 BOOST_AUTO_TEST_SUITE(sql)
 
-#ifdef ENABLE_MYSQL
 struct personal
 {
 	int age;
@@ -45,54 +44,54 @@ BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, true };
 
-	aquarius::io_service_pool pool(1);
+	aquarius::io_context io;
 
-	using sql_pool = aquarius::basic_pool<aquarius::sql_connector>;
+	boost::mysql::pool_params params{};
+	params.server_address.emplace_host_and_port("localhost");
+	params.username = "root";
+	params.database = "unittest";
+	params.ssl = boost::mysql::ssl_mode::disable;
 
-	sql_pool _sql_pool{};
-	
-	aquarius::database_param db_param{};
-	db_param.host = "localhost";
-	db_param.user = "root";
-	db_param.db = "unittest";
+	aquarius::tbl::mysql connector(io, std::move(params));
 
-	auto future = aquarius::co_spawn(pool.get_io_service(), _sql_pool.run(1, db_param),
-									 aquarius::use_future);
+	boost::mysql::any_connection conn(io);
 
-	std::thread t([&] { pool.run(); });
+	std::this_thread::sleep_for(2s);
 
-	auto result = future.get();
-
-	BOOST_TEST(result);
+	aquarius::error_code ec{};
 
 	auto fur = aquarius::co_spawn(
-		pool.get_io_service(),
+		io,
 		[&] -> aquarius::awaitable<void>
 		{
-			// auto res = co_await aquarius::tbl::schedule_create<std::size_t>("sql", test_model{});
+			try
+			{
+				co_await connector.async_run();
 
-			// BOOST_TEST(res != 0);
+				auto res = co_await connector.async_execute("insert into personal values(1,1)", ec);
 
-			//auto res = co_await aquarius::tbl::schedule_insert<std::size_t>("sqlmodule", p);
-			auto insert_task = std::make_shared<sql_task<insert, personal, std::size_t>>(std::move(p));
+				BOOST_TEST(res != 0);
 
-			auto res = co_await (*insert_task)(_sql_pool.get_task_proc());
+				auto select_res = co_await connector.async_query<personal>("select * from personal", ec);
 
-			BOOST_TEST(res != 0);
+				BOOST_TEST(select_res.size() != 0);
+			}
+			catch (const boost::mysql::error_with_diagnostics& err)
+			{
+				std::cerr << "Error: " << err.what() << ", error code: " << err.code() << '\n'
+					<< "Server diagnostics: " << err.get_diagnostics().server_message() << std::endl;
+			}
 
-			auto select_task = std::make_shared<sql_task<select_, personal, std::vector<personal>>>();
-			auto select_res = co_await (*select_task)(_sql_pool.get_task_proc());
-
-			BOOST_TEST(select_res.size() != 0);
 		},
 		aquarius::use_future);
 
+	std::thread t([&] { io.run(); });
+
 	fur.get();
 
-	pool.stop();
+	io.stop();
 
 	t.join();
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()

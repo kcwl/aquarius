@@ -24,6 +24,10 @@ namespace aquarius
 				, parse_()
 			{}
 
+			tcp_request(header_field_base f)
+				: base(std::move(f))
+			{}
+
 			virtual ~tcp_request() = default;
 
 			tcp_request(const tcp_request& other)
@@ -81,9 +85,11 @@ namespace aquarius
 
 				this->body().serialize(buf);
 
-				auto size = static_cast<uint32_t>(buf.size());
+				uint32_t length = static_cast<uint32_t>(buf.size());
 
-				buffer.sputn((char*)&size, sizeof(uint32_t));
+				buffer.sputn((char*)&length, sizeof(uint32_t));
+				auto seq = this->seq_number();
+				buffer.sputn((char*)&seq, sizeof(uint32_t));
 
 				buffer.sputn((char*)buf.data().data(), buf.data().size());
 

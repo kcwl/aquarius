@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/basic_server.hpp>
-#include <aquarius/ip/protocol.hpp>
 #include <aquarius/ip/server_session.hpp>
 
 namespace aquarius

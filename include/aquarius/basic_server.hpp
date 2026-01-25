@@ -4,8 +4,11 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/module_router.hpp>
-#include <aquarius/session_store.hpp>
+#include <aquarius/module/player_module.hpp>
+#include <aquarius/module/session_schedule.hpp>
+#include <aquarius/module/sql_module.hpp>
 #include <aquarius/timer.hpp>
 
 using namespace std::chrono_literals;
@@ -15,11 +18,16 @@ namespace aquarius
 	template <typename Session>
 	class basic_server
 	{
+	public:
 		using session_type = Session;
 
 		using acceptor = typename Session::acceptor;
 
 		using endpoint = typename acceptor::endpoint_type;
+
+		using ip_filter_func = std::function<bool(const std::string&)>;
+
+		using callback_func = std::function<aquarius::awaitable<void>(std::shared_ptr<Session>)>;
 
 	public:
 		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
@@ -35,7 +43,12 @@ namespace aquarius
 
 			init_global_timer();
 
+			regist_module();
+
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
+
+			co_spawn(io_service_pool_.get_io_service(),
+					 module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
 		}
 
 		~basic_server() = default;
@@ -43,10 +56,6 @@ namespace aquarius
 	public:
 		void run()
 		{
-			XLOG_INFO() << "[server] " << server_name_ << " server is started!";
-
-			co_spawn(io_service_pool_.get_io_service(), module_router::get_mutable_instance().run(), detached);
-
 			io_service_pool_.run();
 		}
 
@@ -60,6 +69,45 @@ namespace aquarius
 		bool enable() const
 		{
 			return acceptor_.is_open() && io_service_pool_.enable();
+		}
+
+		void set_ip_filter(const ip_filter_func& func)
+		{
+			ip_filter_ = func;
+		}
+
+		bool ip_filter(const std::string& host)
+		{
+			if (!ip_filter_)
+				return true;
+
+			return ip_filter_(host);
+		}
+
+		void set_accept_func(const callback_func& func)
+		{
+			accept_func_ = func;
+		}
+
+		auto accept_func(std::shared_ptr<session_type> session) -> awaitable<void>
+		{
+			if (!accept_func_)
+				co_return;
+
+			co_await accept_func_(session);
+		}
+
+		void set_close_func(const callback_func& func)
+		{
+			close_func_ = func;
+		}
+
+		auto close_func(std::shared_ptr<session_type> session)-> awaitable<void>
+		{
+			if (!close_func_)
+				co_return;
+
+			co_await close_func_(session);
 		}
 
 	private:
@@ -81,11 +129,25 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), 1s);
 
-				regist_session(session_ptr);
+				session_ptr->set_close_func(close_func_);
+
+				co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr] -> awaitable<void> { co_return co_await session_ptr->accept(); }, detached);
+					[session_ptr, this] -> awaitable<void>
+					{
+						if (!ip_filter(session_ptr->remote_address()))
+						{
+							session_ptr->close();
+							co_return;
+						}
+
+						co_await accept_func(session_ptr);
+
+						co_return co_await session_ptr->accept();
+					},
+					detached);
 			}
 		}
 
@@ -122,6 +184,18 @@ namespace aquarius
 				});
 		}
 
+		void regist_module()
+		{
+			module_router::get_mutable_instance().regist<session_module<Session>>(
+				std::string(session_module_name.data()));
+
+			module_router::get_mutable_instance().regist<sql_module>("sql_module");
+
+			module_router::get_mutable_instance().regist<http_config_module>("http_config_module");
+
+			module_router::get_mutable_instance().regist<player_module>("player_module");
+		}
+
 	protected:
 		std::size_t io_service_pool_size_;
 
@@ -134,5 +208,11 @@ namespace aquarius
 		std::string server_name_;
 
 		timer<steady_timer> global_timer_;
+
+		ip_filter_func ip_filter_;
+
+		callback_func accept_func_;
+
+		callback_func close_func_;
 	};
 } // namespace aquarius

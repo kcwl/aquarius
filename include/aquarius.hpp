@@ -19,6 +19,8 @@
 #include <aquarius/ip/tcp/tcp_server.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module.hpp>
+#include <aquarius/module/session_schedule.hpp>
+#include <aquarius/module/sql_schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/http_html_serialize.hpp>
 #include <aquarius/serialize/http_json_serialize.hpp>

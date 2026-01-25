@@ -1,10 +1,13 @@
 #pragma once
+#include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/tbl/database_param.hpp>
 #include <aquarius/tbl/sql_error.hpp>
-#include <boost/asio.hpp>
 #include <boost/pfr.hpp>
-#include <mysql.h>
+#include <boost/mysql.hpp>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 namespace aquarius
 {
@@ -13,118 +16,58 @@ namespace aquarius
 		class mysql
 		{
 		public:
-			mysql(const database_param& param)
-				: param_(param)
-				, mysql_ptr_(nullptr)
-				, stmt_ptr_(nullptr)
+			mysql(io_context& io, boost::mysql::pool_params param)
+				: pool_(io, std::move(param))
 				, enable_transaction_(true)
 			{}
 
 		public:
-			auto async_connect() -> awaitable<error_code>
+			auto async_run() ->awaitable<error_code>
 			{
-				if (mysql_ptr_)
+				error_code ec{};
+
+				//co_await pool_.async_run(aquarius::redirect_error(use_awaitable, ec));
+				pool_.async_run(detached);
+
+				if (ec)
 				{
-					mysql_close(mysql_ptr_);
+					XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
 				}
 
-				mysql_ptr_ = mysql_init(nullptr);
-
-				if (!mysql_ptr_)
-				{
-					co_return db_error::bad_alloc;
-				}
-
-				enable_transaction_ = param_.enable_transaction.value_or(false);
-
-				int32_t timeout = param_.timeout.value_or(-1);
-
-				if (timeout > 0)
-				{
-					auto err = mysql_options(mysql_ptr_, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
-					if (err != 0)
-					{
-						co_return static_cast<db_error>(mysql_errno(mysql_ptr_));
-					}
-				}
-
-				auto reconnect = param_.reconnect.value_or(1);
-
-				mysql_options(mysql_ptr_, MYSQL_OPT_RECONNECT, &reconnect);
-				mysql_options(mysql_ptr_, MYSQL_SET_CHARSET_NAME, "utf8");
-
-				if (mysql_real_connect(mysql_ptr_, param_.host.c_str(), param_.user.c_str(), param_.password.c_str(),
-									   param_.db.c_str(), param_.port, nullptr, 0) == nullptr)
-				{
-					co_return static_cast<db_error>(mysql_errno(mysql_ptr_));
-				}
-
-				co_return error_code{};
+				co_return ec;
 			}
 
 			template <typename T>
 			auto async_query(std::string_view sql, error_code& ec) -> awaitable<std::vector<T>>
 			{
-				auto result = mysql_real_query(mysql_ptr_, sql.data(), static_cast<uint32_t>(sql.size()));
-				if (result != 0)
-				{
-					ec = static_cast<db_error>(mysql_errno(mysql_ptr_));
-					co_return std::vector<T>{};
-				}
+				auto conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
 
-				result = mysql_field_count(mysql_ptr_);
-				if (result == 0)
-				{
-					ec = db_error::field_empty;
+				boost::mysql::results result{};
 
-					co_return std::vector<T>{};
-				}
-
-				auto res = mysql_store_result(mysql_ptr_);
-
-				result = mysql_num_fields(res);
-
-				constexpr size_t current_fields = boost::pfr::tuple_size_v<T>;
-
-				if (current_fields != result)
-				{
-					ec = db_error::field_number;
-
-					co_return std::vector<T>{};
-				}
+				co_await conn_ptr->async_execute(sql, result);
 
 				std::vector<T> results{};
 
-				while (auto row = mysql_fetch_row(res))
+				if (!result.has_value())
+					co_return results;
+
+				for (const auto r : result.rows())
 				{
-					make_result<T>(results, row);
+					make_result<T>(results, r);
 				}
 
-				co_return results;
+				co_return std::move(results);
 			}
 
 			auto async_execute(std::string_view sql, error_code& ec) -> awaitable<std::size_t>
 			{
-				ec = db_error::success;
+				auto conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
 
-				auto result = mysql_real_query(mysql_ptr_, sql.data(), static_cast<uint32_t>(sql.size()));
-				if (result != 0)
-				{
-					ec = static_cast<db_error>(mysql_errno(mysql_ptr_));
+				boost::mysql::results result{};
 
-					co_return 0;
-				}
+				co_await conn_ptr->async_execute(sql, result);
 
-				result = mysql_field_count(mysql_ptr_);
-
-				if (result != 0)
-				{
-					ec = db_error::field_not_empty;
-
-					co_return 0;
-				}
-
-				co_return mysql_affected_rows(mysql_ptr_);
+				co_return result.affected_rows();
 			}
 
 			bool enable_transaction() const
@@ -132,35 +75,37 @@ namespace aquarius
 				return enable_transaction_;
 			}
 
-			error_code begin()
+			auto begin() ->awaitable<error_code>
 			{
 				return transation("BEGIN");
 			}
 
-			error_code commit()
+			auto commit() -> awaitable<error_code>
 			{
 				return transation("COMMIT");
 			}
 
-			error_code rollback()
+			auto rollback() -> awaitable<error_code>
 			{
 				return transation("ROLLBACK");
 			}
 
 		private:
-			error_code transation(const std::string& option)
+			auto transation(const std::string& option) ->awaitable<error_code>
 			{
-				auto result = mysql_query(mysql_ptr_, option.c_str());
-				if (result == 0)
-				{
-					return db_error::success;
-				}
+				boost::mysql::results empty_result{};
 
-				return static_cast<db_error>(mysql_errno(mysql_ptr_));
+				error_code ec{};
+
+				boost::mysql::pooled_connection conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
+
+				co_await conn_ptr->async_execute(option, empty_result, aquarius::redirect_error(ec));
+
+				co_return ec;
 			}
 
-			template <typename T>
-			void make_result(std::vector<T>& results, const MYSQL_ROW& row)
+			template <typename T, typename Row>
+			void make_result(std::vector<T>& results, const Row& row)
 			{
 				auto to_struct = [&, this]<std::size_t... I>(std::index_sequence<I...>)
 				{ return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... }; };
@@ -168,8 +113,8 @@ namespace aquarius
 				results.push_back(to_struct(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{}));
 			}
 
-			template <typename T>
-			auto cast(const char* field)
+			template <typename T, typename Field>
+			auto cast(const Field& field)
 			{
 				std::stringstream ss{};
 				ss << field;
@@ -184,11 +129,7 @@ namespace aquarius
 			}
 
 		private:
-			database_param param_;
-
-			MYSQL* mysql_ptr_;
-
-			MYSQL_STMT* stmt_ptr_;
+			boost::mysql::connection_pool pool_;
 
 			bool enable_transaction_;
 		};

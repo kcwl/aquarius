@@ -2,16 +2,18 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/http/http_header.hpp>
-#include <aquarius/ip/http/http_param.hpp>
 #include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
+#include <aquarius/virgo/header_field_base.hpp>
 #include <aquarius/virgo/http_get_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <fstream>
+#include <map>
 #include <ranges>
 #include <string_view>
 
@@ -19,9 +21,17 @@ using namespace std::string_view_literals;
 
 namespace aquarius
 {
-	template <auto Tag>
+	template <auto Tag, typename HandlerSelector>
 	struct processor
 	{
+		struct proto_header
+		{
+			uint32_t length;
+			uint32_t seq_number;
+		};
+
+		std::map<std::size_t, flex_buffer> buffer_controller;
+
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> awaitable<void>
 		{
@@ -31,9 +41,9 @@ namespace aquarius
 			{
 				flex_buffer buffer{};
 
-				uint32_t length = 0;
+				proto_header proto{};
 
-				constexpr auto len = sizeof(length);
+				constexpr auto len = sizeof(proto);
 
 				ec = co_await session_ptr->async_read(buffer, len);
 
@@ -42,18 +52,22 @@ namespace aquarius
 					break;
 				}
 
-				buffer.sgetn((char*)&length, sizeof(uint32_t));
+				buffer.sgetn((char*)&proto, sizeof(proto_header));
 
-				ec = co_await session_ptr->async_read(buffer, length);
+				ec = co_await session_ptr->async_read(buffer, proto.length);
 
 				if (ec)
 				{
 					break;
 				}
 
+				std::shared_ptr<header_field_base> hf = std::make_shared<header_field_base>();
+
+				hf->seq_number(proto.seq_number);
+
 				auto topic = binary_parse{}.from_datas<std::string>(buffer);
 
-				router<Tag, Session>::get_mutable_instance().invoke(topic, session_ptr, buffer);
+				HandlerSelector()(topic, session_ptr, hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -65,39 +79,58 @@ namespace aquarius
 			session_ptr->shutdown();
 		}
 
-		template <typename Response, typename Session>
-		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		template <typename Session>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
 		{
-			flex_buffer buffer{};
-
-			uint32_t length = 0;
-
-			constexpr auto len = sizeof(length);
-
-			auto ec = co_await session_ptr->async_read(buffer, len);
-
-			if (ec)
+			for (;;)
 			{
-				XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
-							 << ", remote_address: " << session_ptr->remote_address();
-				co_return Response{};
+				flex_buffer buffer{};
+
+				proto_header h{};
+				constexpr auto len = sizeof(proto_header);
+
+				auto ec = co_await session_ptr->async_read(buffer, len);
+
+				if (ec)
+				{
+					XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
+								 << ", remote_address: " << session_ptr->remote_address();
+					co_return flex_buffer{};
+				}
+
+				buffer.sgetn((char*)&h, len);
+
+				ec = co_await session_ptr->async_read(buffer, h.length);
+
+				if (ec)
+				{
+					XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
+								 << ", remote_address: " << session_ptr->remote_address();
+					co_return flex_buffer{};
+				}
+
+				hf->seq_number(h.seq_number);
+
+				if (seq_number == h.seq_number)
+				{
+					co_return buffer;
+				}
+
+				buffer_controller.emplace(std::move(h.seq_number), std::move(buffer));
 			}
 
-			buffer.sgetn((char*)&length, len);
+			co_return flex_buffer{};
+		}
 
-			ec = co_await session_ptr->async_read(buffer, length);
-
-			if (ec)
-			{
-				XLOG_ERROR() << from_tag_string(Tag) << " query occur error - " << ec.message()
-							 << ", remote_address: " << session_ptr->remote_address();
-				co_return Response{};
-			}
+		template <typename Response, typename Session>
+		auto query(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		{
+			auto buffer = co_await query_buffer(seq_number, session_ptr);
 
 			Response resp{};
 			resp.consume(buffer);
 
-			co_return resp;
+			co_return std::move(resp);
 		}
 
 		template <typename Session>
@@ -107,22 +140,29 @@ namespace aquarius
 
 			constexpr std::string_view ping_router = "tcp_ping"sv;
 
-			router<Tag, Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
+			router<Session>::get_mutable_instance().invoke(ping_router, session_ptr, buffer);
+		}
+
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
+		{
+			co_return flex_buffer{};
 		}
 	};
 
-	template <>
-	struct processor<proto_tag::http>
+	template <typename HandlerSelector>
+	struct processor<proto_tag::http, HandlerSelector>
 	{
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
 		constexpr static auto crlf = "\r\n"sv;
 
-		auto parse_field(std::span<char> buffer, error_code& ec) -> virgo::http_fields
+		std::map<std::size_t, flex_buffer> buffer_controller;
+
+		auto parse_field(std::span<char> buffer, error_code& ec) -> std::shared_ptr<virgo::http_fields>
 		{
 			ec = virgo::http_status::ok;
 
-			virgo::http_fields field;
+			auto field = std::make_shared<virgo::http_fields>();
 
 			for (const auto& f : buffer | std::views::split(crlf))
 			{
@@ -141,7 +181,7 @@ namespace aquarius
 				auto key = std::string_view(f).substr(0, pos);
 				auto value = std::string_view(f).substr(pos + 1, f.size() - pos - 1);
 
-				field.set_field(key, value);
+				field->set_field(std::string(key), std::string(value));
 			}
 
 			return field;
@@ -152,10 +192,10 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			flex_buffer buffer{};
-
 			for (;;)
 			{
+				flex_buffer buffer{};
+
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
@@ -216,14 +256,14 @@ namespace aquarius
 				//     virgo::http_status::payload_too_large);
 				// }
 
-				if (!hf.find("Expect").empty())
+				if (!hf->find("Expect").empty())
 				{
 					co_return co_await make_error_response(session_ptr, virgo::http_status::expectation_failed);
 				}
 
-				if (hf.content_length() != 0)
+				if (hf->content_length() != 0)
 				{
-					auto remain_size = static_cast<int64_t>(hf.content_length() - buffer.size());
+					auto remain_size = static_cast<int64_t>(hf->content_length() - buffer.size());
 
 					if (remain_size > 0)
 					{
@@ -254,9 +294,9 @@ namespace aquarius
 							get_resp.version(virgo::http_version::http1_1);
 							get_resp.set_field("Server", "Aqarius 1.00.0");
 							get_resp.set_field("Connection", "keep-alive");
-							get_resp.set_field("Access-Control-Allow-Origin", get_http_param().control_allow_origin);
+							get_resp.set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 
-							auto file_path = get_http_param().root_dir + std::string(_router.data(), _router.size());
+							auto file_path = (co_await mpc_http_root()) + std::string(_router.data(), _router.size());
 
 							std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 							if (!ifs.is_open())
@@ -316,7 +356,7 @@ namespace aquarius
 					buffer.sputn(path.data(), path.size());
 				}
 
-				router<proto_tag::http, Session>::get_mutable_instance().invoke(_router, session_ptr, hf, buffer);
+				HandlerSelector()(_router, session_ptr, hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -332,10 +372,13 @@ namespace aquarius
 		auto make_error_response(std::shared_ptr<Session> session_ptr, virgo::http_status status) -> awaitable<void>
 		{
 			std::string header{};
+
+			auto http_version = co_await mpc_http_version();
+
 			auto make_command_line = [&]()
 			{
-				header += std::format("{} {} {}\r\n\r\n", virgo::from_string_version(get_http_param().version),
-									  static_cast<int>(status), virgo::from_status_string(status));
+				header += std::format("{} {} {}\r\n\r\n", http_version, static_cast<int>(status),
+									  virgo::from_status_string(status));
 			};
 
 			make_command_line();
@@ -345,6 +388,29 @@ namespace aquarius
 
 			co_await session_ptr->async_send(buffer);
 		}
+
+		auto make_error_response(error_code& ec) -> awaitable<flex_buffer>
+		{
+			std::string header{};
+
+			auto http_version = co_await mpc_http_version();
+
+			auto status = ec ? virgo::http_status::not_implemented : virgo::http_status::ok;
+
+			auto make_command_line = [&]()
+			{
+				header += std::format("{} {} {}\r\n\r\n", http_version, static_cast<int>(status),
+									  virgo::from_status_string(status));
+			};
+
+			make_command_line();
+
+			flex_buffer buffer{};
+			buffer.sputn(header.c_str(), header.size());
+
+			co_return buffer;
+		}
+
 		template <bool Server>
 		auto parse_command_line(std::span<char> header_span, error_code& ec) -> std::conditional_t<
 			Server, std::tuple<virgo::http_method, std::string_view, std::string_view, virgo::http_version>,
@@ -415,8 +481,8 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router, virgo::http_fields hf,
-							flex_buffer& buffer)
+		bool check_redirect(std::shared_ptr<Session> session_ptr, std::string_view router,
+							std::shared_ptr<virgo::http_fields> hf, flex_buffer& buffer)
 		{
 			(void)session_ptr;
 			(void)router;
@@ -447,9 +513,9 @@ namespace aquarius
 			get_resp.version(virgo::http_version::http1_1);
 			get_resp.set_field("Server", "Aqarius 1.00.0");
 			get_resp.set_field("Connection", "keep-alive");
-			get_resp.set_field("Access-Control-Allow-Origin", get_http_param().control_allow_origin);
+			get_resp.set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 
-			auto file_path = get_http_param().root_dir + std::string(_router.data(), _router.size());
+			auto file_path = (co_await mpc_http_root()) + std::string(_router.data(), _router.size());
 
 			std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 			if (!ifs.is_open())
@@ -490,7 +556,7 @@ namespace aquarius
 				ifs.read(stream.data(), stream.size());
 			}
 
-			co_await router<proto_tag::http, Session>::get_mutable_instance().send_response(session_ptr, get_resp);
+			co_await router<Session>::get_mutable_instance().send_response(session_ptr, get_resp);
 
 			flex_buffer buffer{};
 			get_resp.commit(buffer);
@@ -500,54 +566,85 @@ namespace aquarius
 			co_return true;
 		}
 
-		template <typename Response, typename Session>
-		auto query(std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		template <typename Session>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
 		{
 			error_code ec{};
 
-			flex_buffer buffer{};
-
-			ec = co_await session_ptr->async_read_util(buffer, two_crlf);
-
-			if (ec)
-				co_return Response{};
-
-			auto proto_buffer = std::span<char>((char*)buffer.data().data(), buffer.data().size());
-
-			auto proto_slide_buffer = proto_buffer | std::views::slide(two_crlf.size());
-
-			auto iter =
-				std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
-
-			auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
-
-			auto header_span = proto_buffer.subspan(0, len);
-
-			buffer.consume(len + two_crlf.size());
-
-			auto slide_proto_buffer = header_span | std::views::slide(crlf.size());
-
-			auto it =
-				std::ranges::find_if(slide_proto_buffer, [](const auto c) { return std::string_view(c) == crlf; });
-			if (it == slide_proto_buffer.end())
-				co_return Response{};
-
-			len = std::ranges::distance(slide_proto_buffer.begin(), it);
-
-			error_code http_ec{};
-			auto [version, status] = parse_command_line<false>(proto_buffer.subspan(0, len), http_ec);
-
-			if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
+			for (;;)
 			{
-				co_return Response{};
+				flex_buffer buffer{};
+
+				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
+
+				if (ec)
+					co_return flex_buffer{};
+
+				auto proto_buffer = std::span<char>((char*)buffer.data().data(), buffer.data().size());
+
+				auto proto_slide_buffer = proto_buffer | std::views::slide(two_crlf.size());
+
+				auto iter =
+					std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
+
+				auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
+
+				auto header_span = proto_buffer.subspan(0, len);
+
+				buffer.consume(len + two_crlf.size());
+
+				auto slide_proto_buffer = header_span | std::views::slide(crlf.size());
+
+				auto it =
+					std::ranges::find_if(slide_proto_buffer, [](const auto c) { return std::string_view(c) == crlf; });
+				if (it == slide_proto_buffer.end())
+					co_return flex_buffer{};
+
+				len = std::ranges::distance(slide_proto_buffer.begin(), it);
+
+				error_code http_ec{};
+				auto [version, status] = parse_command_line<false>(proto_buffer.subspan(0, len), http_ec);
+
+				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
+				{
+					co_return flex_buffer{};
+				}
+
+				hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
+
+				if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
+				{
+					co_return flex_buffer{};
+				}
+
+				auto seq = std::dynamic_pointer_cast<virgo::http_fields>(hf)->find("seq_number");
+
+				if (seq.empty())
+					continue;
+
+				std::stringstream ss{};
+
+				ss << seq;
+
+				uint32_t seq_n = 0;
+
+				ss >> seq_n;
+
+				if (seq_number == seq_n)
+				{
+					co_return buffer;
+				}
+
+				buffer_controller.emplace(seq_n, std::move(buffer));
 			}
 
-			auto hf = parse_field(proto_buffer.subspan(len + crlf.size()), http_ec);
+			co_return flex_buffer{};
+		}
 
-			if (http_ec.value() != static_cast<int>(virgo::http_status::ok))
-			{
-				co_return Response{};
-			}
+		template <typename Response, typename Session>
+		auto query(std::size_t seq_number, std::shared_ptr<Session> session_ptr) -> awaitable<Response>
+		{
+			auto buffer = co_await query_buffer(seq_number, session_ptr);
 
 			Response resp{};
 			resp.consume(buffer);

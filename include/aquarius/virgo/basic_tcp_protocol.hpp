@@ -1,12 +1,14 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
+#include <aquarius/virgo/header_field_base.hpp>
 
 namespace aquarius
 {
 	namespace virgo
 	{
 		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
-		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>,
+								   public header_field_base
 		{
 		public:
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
@@ -19,7 +21,14 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
+				: basic_tcp_protocol(header_field_base{})
+			{
+
+			}
+
+			basic_tcp_protocol(header_field_base f)
 				: base()
+				, header_field_base(std::move(f))
 				, timestamp_()
 				, version_()
 			{}
@@ -88,11 +97,14 @@ namespace aquarius
 			int64_t timestamp_;
 
 			int32_t version_;
+
+			uint32_t seq_number_;
 		};
 
 		template <typename Header, typename Body, typename Allocator>
 		class basic_tcp_protocol<false, Header, Body, Allocator>
 			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+			, public header_field_base
 		{
 		public:
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
@@ -103,7 +115,14 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
+				: basic_tcp_protocol(header_field_base{})
+			{
+
+			}
+
+			basic_tcp_protocol(header_field_base f)
 				: base()
+				, header_field_base(std::move(f))
 				, timestamp_()
 				, version_()
 				, result_()

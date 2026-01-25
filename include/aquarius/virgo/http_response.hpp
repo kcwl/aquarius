@@ -24,6 +24,12 @@ namespace aquarius
 
 		public:
 			http_response() = default;
+			http_response(http_fields f)
+				: base(std::move(f))
+			{
+
+			}
+
 			virtual ~http_response() = default;
 
 			http_response(const http_response&) = delete;
@@ -60,8 +66,7 @@ namespace aquarius
 				this->content_length(body_buffer.size());
 
 				headline =
-					std::format("{} {} {}\r\n", virgo::from_string_version(this->version()),
-								static_cast<int>(this->result()), virgo::from_status_string(this->result()).data());
+					std::format("{} {} {}\r\n", virgo::from_string_version(this->version()).data(), static_cast<int>(this->result()), virgo::from_status_string(this->result()));
 
 				for (auto& s : this->fields())
 				{

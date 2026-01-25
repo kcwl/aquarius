@@ -1,11 +1,15 @@
 #pragma once
-#include <optional>
 #include <string>
+#include <string_view>
+
+using namespace std::string_view_literals;
 
 namespace aquarius
 {
 	struct database_param
 	{
+		constexpr static auto path = "mysql"sv;
+
 		std::string host;
 		std::string user;
 		std::string password;
@@ -13,8 +17,8 @@ namespace aquarius
 		std::string db;
 		int32_t pool_size = 1;
 		std::string CA;
-		std::optional<int32_t> timeout;
-		std::optional<char> reconnect;
-		std::optional<bool> enable_transaction;
+		int32_t timeout;
+		int reconnect;
+		bool enable_transaction;
 	};
 } // namespace aquarius

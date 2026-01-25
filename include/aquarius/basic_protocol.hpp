@@ -94,6 +94,7 @@ namespace aquarius
 
 	private:
 		header_t header_;
+
 		Allocator alloc_;
 	};
 } // namespace aquarius

@@ -1,0 +1,11 @@
+message cmd_op:tcp -> 10001
+{
+	request
+	{
+		bytes input;
+	}
+	response
+	{
+		string output;
+	}
+}

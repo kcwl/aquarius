@@ -7,19 +7,23 @@
 
 namespace aquarius
 {
-	template <auto ProtoTag, typename Adaptor>
+	template <auto Tag, typename ProtoTag, typename Adaptor>
 	class basic_session
 	{
 	public:
-		using socket = typename protocol<ProtoTag>::socket;
+		using socket = typename protocol<Tag>::socket;
 
-		using endpoint = typename protocol<ProtoTag>::endpoint;
+		using endpoint = typename protocol<Tag>::endpoint;
 
-		using acceptor = typename protocol<ProtoTag>::acceptor;
+		using acceptor = typename protocol<Tag>::acceptor;
 
-		using resolver = typename protocol<ProtoTag>::resolver;
+		using resolver = typename protocol<Tag>::resolver;
 
 		using executor_type = typename socket::executor_type;
+
+		using callback_func = std::function<void(std::shared_ptr<basic_session<Tag, ProtoTag, Adaptor>>)>;
+
+		constexpr static auto tag = Tag;
 
 	public:
 		explicit basic_session(socket sock)
@@ -60,7 +64,16 @@ namespace aquarius
 
 		uint32_t remote_address_u() const
 		{
-			return socket_.remote_endpoint().address().to_v4().to_uint();
+			error_code ec{};
+
+			auto edp = socket_.remote_endpoint(ec);
+
+			if (ec)
+			{
+				return 0;
+			}
+
+			return edp.address().to_v4().to_uint();
 		}
 
 		uint16_t remote_port() const
@@ -81,6 +94,10 @@ namespace aquarius
 			{
 				XLOG_INFO() << "async_read exception: " << ec.what() << ", remote_address: " << remote_address();
 			}
+			else
+			{
+				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
+			}
 
 			buffer.commit(length);
 
@@ -91,12 +108,16 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buffer, delm,
+			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
 												   redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{
 				XLOG_INFO() << "async_read_util exception: " << ec.what() << ", remote_address: " << remote_address();
+			}
+			else
+			{
+				XLOG_DEBUG() << "[async read util] receive " << buffer.size() << " bytes";
 			}
 
 			co_return ec;
@@ -108,37 +129,46 @@ namespace aquarius
 
 			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), redirect_error(use_awaitable, ec));
 
+			if (!ec)
+			{
+				XLOG_DEBUG() << "[async send] send " << buffer.size() << " bytes";
+			}
+
 			co_return ec;
 		}
 
-		void shutdown()
+		bool shutdown()
 		{
 			error_code ec;
 
 			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
-		}
-
-		void close()
-		{
-			error_code ec;
-
-			socket_.close(ec);
-		}
-
-		bool keep_alive(bool value)
-		{
-			error_code ec;
-
-			socket_.set_option(typename protocol<ProtoTag>::keep_alive(value), ec);
 
 			return !ec;
 		}
 
-		bool set_nodelay(bool enable)
+		bool close()
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<ProtoTag>::no_delay(enable), ec);
+			socket_.close(ec);
+
+			return !ec;
+		}
+
+		bool keep_alive(bool enable = true)
+		{
+			error_code ec;
+
+			socket_.set_option(typename protocol<Tag>::keep_alive(enable), ec);
+
+			return !ec;
+		}
+
+		bool set_nodelay(bool enable = true)
+		{
+			error_code ec;
+
+			socket_.set_option(typename protocol<Tag>::no_delay(enable), ec);
 
 			return !ec;
 		}
@@ -149,5 +179,7 @@ namespace aquarius
 		Adaptor socket_adaptor_;
 
 		std::size_t uuid_;
+
+		callback_func close_func_;
 	};
 } // namespace aquarius

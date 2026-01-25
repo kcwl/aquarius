@@ -38,7 +38,7 @@ namespace aquarius
 
 		void init_logger()
 		{
-			auto console_sink_ptr = logging::add_console_log(
+			logging::add_console_log(
 				std::clog, keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
 
 			auto file_sink_ptr = boost::make_shared<file_sink>(
@@ -57,7 +57,7 @@ namespace aquarius
 
 			file_sink_ptr->set_filter(trivial::severity >= trivial::info);
 
-			logging::core::get()->add_sink(console_sink_ptr);
+			//logging::core::get()->add_sink(console_sink_ptr);
 			logging::core::get()->add_sink(file_sink_ptr);
 
 			logging::core::get()->add_global_attribute("TimeStamp", attrs::local_clock());

@@ -1,17 +1,20 @@
 ﻿#pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/http/http_param.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/virgo/http_version.hpp>
 #include <functional>
 
 namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	template <typename Session>
+	template <typename Session, typename Executor = any_io_executor>
 	class basic_client : public std::enable_shared_from_this<basic_client<Session>>
 	{
 		using socket = Session::socket;
@@ -20,7 +23,11 @@ namespace aquarius
 
 	public:
 		explicit basic_client(io_context& context, std::chrono::milliseconds timeout = 1000ms)
-			: io_context_(context)
+			: basic_client(context.get_executor(), timeout)
+		{}
+
+		basic_client(const Executor& context, std::chrono::milliseconds timeout = 1000ms)
+			: executor_(context)
 			, host_()
 			, port_()
 			, session_ptr_(nullptr)
@@ -36,7 +43,7 @@ namespace aquarius
 			host_ = host;
 			port_ = port;
 
-			session_ptr_ = std::make_shared<Session>(std::move(socket(io_context_)));
+			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)));
 
 			co_return co_await session_ptr_->async_connect(host_, port_);
 		}
@@ -47,18 +54,19 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Request>
-		auto async_call(std::shared_ptr<Request> req) -> awaitable<Response>
+		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
-			if constexpr (handler_tag_traits<Request>::tag == proto_tag::http)
-			{
-				req->version(get_http_param().version);
-			}
-
 			flex_buffer buffer{};
+
+			req->seq_number(static_cast<uint32_t>(detail::uuid_generator()()));
 
 			req->commit(buffer);
 
-			auto ec = co_await session_ptr_->async_send(buffer);
+			error_code ec{};
+
+			std::shared_ptr<header_field_base> hf = std::make_shared<header_field_base>();
+
+			auto buf = co_await async_send(buffer, ec, req->seq_number(), hf);
 
 			if (ec)
 			{
@@ -73,7 +81,40 @@ namespace aquarius
 				co_return Response{};
 			}
 
-			co_return co_await session_ptr_->template query<Response>();
+			if constexpr (Session::tag == proto_tag::http)
+			{
+				Response resp{ *std::dynamic_pointer_cast<virgo::http_fields>(hf) };
+				resp.consume(buf);
+				co_return resp;
+			}
+			else
+			{
+				Response resp{ *hf};
+				resp.consume(buf);
+
+				co_return resp;
+			}
+		}
+
+		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id, std::shared_ptr<header_field_base>& hf)
+			-> awaitable<flex_buffer>
+		{
+			ec = co_await session_ptr_->async_send(buffer);
+
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "on read some occur error - " << ec.what();
+				}
+				session_ptr_->shutdown();
+				if (close_func_)
+					close_func_();
+
+				co_return flex_buffer{};
+			}
+
+			co_return co_await session_ptr_->query_buffer(id, hf);
 		}
 
 		std::string remote_address() const
@@ -100,7 +141,7 @@ namespace aquarius
 		}
 
 	private:
-		io_context& io_context_;
+		Executor executor_;
 
 		std::string host_;
 

@@ -13,15 +13,51 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="proto">
+      <UniqueIdentifier>{fc611f35-a375-4912-a211-a8c15deb0212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="table">
+      <UniqueIdentifier>{527eaaa4-2be9-4711-95d1-25579d745f18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gateway\gateway.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\gateway\ctx_transfer.cpp">
+    <ClCompile Include="..\src\gateway\auth_module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\gateway\transfer_client.cpp">
+    <ClCompile Include="..\src\gateway\player.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\proto\login.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\ctx_login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\firewall_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\player_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\auth_schedule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\firewall_schedule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\player_schedule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\gate_error_code.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\transfer_module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,8 +65,50 @@
     <ClInclude Include="..\src\gateway\server.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\transfer_client.h">
+    <ClInclude Include="..\src\gateway\auth_module.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_handler.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\default_selector.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\proto\login.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\firewall_schedule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\firewall_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\auth_schedule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\transfer_schedule.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\player_schedule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\gate_error_code.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\table\account_table.h">
+      <Filter>table</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
+      <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

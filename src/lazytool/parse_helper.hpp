@@ -65,7 +65,7 @@ namespace aquarius
 				{
 					if (c != '_' && !std::isalnum(c))
 					{
-						ends = c;
+						ends = static_cast<char>(c);
 						break;
 					}
 						
@@ -79,7 +79,7 @@ namespace aquarius
 							ifs.seekg(-static_cast<int64_t>(value.size()), std::ios::cur);
 						}
 
-						ends = c;
+						ends = static_cast<char>(c);
 
 						break;
 					}

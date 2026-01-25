@@ -4,12 +4,26 @@
 #include <iostream>
 #include "server.h"
 #include "cmd_register.h"
+#include <aquarius/module/player_schedule.hpp>
+#include "player.h"
+
+using namespace aquarius::serviced;
 
 int main()
 {
-    serviced::cmd_register();
+    cmd_register();
 
-    serviced::tcp_server srv(3399, 10, "serviced");
+    server srv(3399, 10, "serviced");
+
+    srv.set_accept_func([&] (std::shared_ptr<server::session_type> session_ptr) ->aquarius::awaitable<void>
+                        {
+                            co_await aquarius::mpc_player_insert("player_module"sv, session_ptr->uuid(), std::make_shared<player>(session_ptr->uuid()));
+                        });
+
+    srv.set_close_func([&] (std::shared_ptr<server::session_type> session_ptr) ->aquarius::awaitable<void>
+                       {
+                           co_await aquarius::mpc_player_erase<player>("player_module"sv, session_ptr->uuid());
+                       });
 
     srv.run();
 }

@@ -1,11 +1,13 @@
-﻿// gateway.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
-
+﻿#include "player_schedule.h"
 #include "server.hpp"
+#include "transfer_module.h"
+#include "transfer_module.h"
 #include <aquarius/cmd_options.hpp>
+#include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/logger.hpp>
 #include <iostream>
-#include "transfer_client.h"
+
+TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::gateway::transfer_module)
 
 int main(int argc, char* argv[])
 {
@@ -17,25 +19,20 @@ int main(int argc, char* argv[])
 	cmd.add_option<std::string>("name", "server name");
 	cmd.add_option<std::string>("transfer", "transfer ip addr");
 
-	TRANSFER.set_addr(cmd.option<std::string>("transfer"));
-
 	cmd.load_options(argc, argv);
 
-	gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
-						cmd.option<std::string>("name"));
+	aquarius::gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+								  cmd.option<std::string>("name"));
+
+	srv.set_accept_func(
+		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
+		{ co_await aquarius::gateway::mpc_insert_player(session_ptr->uuid()); });
+
+	srv.set_close_func(
+		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
+		{ co_await aquarius::gateway::mpc_erase_player(session_ptr->uuid()); });
 
 	srv.run();
 
 	return 0;
 }
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门使用技巧:
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件

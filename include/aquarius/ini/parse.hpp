@@ -4,6 +4,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <aquarius/detail/struct_name.hpp>
+#include <filesystem>
 
 namespace aquarius
 {
@@ -14,7 +15,7 @@ namespace aquarius
 		{
 			boost::property_tree::ptree pt;
 
-			boost::property_tree::ini_parser::read_ini(filepath, pt);
+			boost::property_tree::ini_parser::read_ini(std::filesystem::current_path().append(filepath).string(), pt);
 
 			constexpr auto size = boost::pfr::tuple_size<T>::value;
 

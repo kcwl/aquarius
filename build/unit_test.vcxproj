@@ -155,6 +155,7 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
     <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\default_selector.hpp" />
     <ClInclude Include="..\include\aquarius\module.hpp" />
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
@@ -173,10 +174,14 @@
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_server.hpp" />
+    <ClInclude Include="..\include\aquarius\module\http_config_module.hpp" />
+    <ClInclude Include="..\include\aquarius\module\http_config_schedule.hpp" />
     <ClInclude Include="..\include\aquarius\module\module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
+    <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
+    <ClInclude Include="..\include\aquarius\module\player_schedule.hpp" />
     <ClInclude Include="..\include\aquarius\module\schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\session_store.hpp" />
+    <ClInclude Include="..\include\aquarius\module\session_module.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
@@ -193,7 +198,6 @@
     <ClInclude Include="..\include\aquarius\ip\concept.hpp" />
     <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\http\http_param.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\processor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp" />
@@ -204,6 +208,9 @@
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
+    <ClInclude Include="..\include\aquarius\module\session_schedule.hpp" />
+    <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
+    <ClInclude Include="..\include\aquarius\module\sql_schedule.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
@@ -236,12 +243,11 @@
     <ClInclude Include="..\include\aquarius\tbl\engine\mysql.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\text.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\engine\varchar.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\task.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\header_field_base.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp" />
@@ -270,7 +276,7 @@
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\cmd_options.cpp" />
-    <ClInclude Include="..\test\session.h" />
+    <ClCompile Include="..\test\session.cpp" />
     <ClInclude Include="..\test\ctx_handler.hpp" />
     <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />

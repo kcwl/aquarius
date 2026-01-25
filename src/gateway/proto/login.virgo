@@ -1,0 +1,11 @@
+message login:http[post] -> /login
+{
+	request
+	{
+		string user;
+		string passwd;
+	}
+	response
+	{
+	}
+}

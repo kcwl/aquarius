@@ -54,9 +54,6 @@
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\session.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\ctx_handler.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -201,9 +198,6 @@
     <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_param.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
@@ -238,9 +232,6 @@
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_pool.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\session_store.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\ssl_context.hpp">
@@ -321,12 +312,6 @@
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\sql_connector.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\sql_error.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -348,9 +333,6 @@
     <ClInclude Include="..\include\aquarius\module\schedule.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\schedule.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ini\parse.hpp">
       <Filter>include\aquarius\ini</Filter>
     </ClInclude>
@@ -371,6 +353,39 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
       <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\default_selector.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\session_module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\session_schedule.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\http_config_module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\http_config_schedule.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\sql_module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\sql_schedule.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\player_module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\player_schedule.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\header_field_base.hpp">
+      <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -453,6 +468,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\http_version.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
