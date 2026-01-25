@@ -276,7 +276,7 @@
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\cmd_options.cpp" />
-    <ClInclude Include="..\test\session.h" />
+    <ClCompile Include="..\test\session.cpp" />
     <ClInclude Include="..\test\ctx_handler.hpp" />
     <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />

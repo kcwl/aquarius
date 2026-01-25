@@ -41,5 +41,9 @@ namespace aquarius
 		using acceptor = boost::asio::ip::tcp::acceptor;
 
 		using resolver = boost::asio::ip::tcp::resolver;
+
+		using no_delay = boost::asio::ip::tcp::no_delay;
+
+		using keep_alive = boost::asio::socket_base::keep_alive;
 	};
 } // namespace aquarius

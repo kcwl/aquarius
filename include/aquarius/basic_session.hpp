@@ -64,7 +64,16 @@ namespace aquarius
 
 		uint32_t remote_address_u() const
 		{
-			return socket_.remote_endpoint().address().to_v4().to_uint();
+			error_code ec{};
+
+			auto edp = socket_.remote_endpoint(ec);
+
+			if (ec)
+			{
+				return 0;
+			}
+
+			return edp.address().to_v4().to_uint();
 		}
 
 		uint16_t remote_port() const
@@ -128,34 +137,38 @@ namespace aquarius
 			co_return ec;
 		}
 
-		void shutdown()
+		bool shutdown()
 		{
 			error_code ec;
 
 			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
-		}
-
-		void close()
-		{
-			error_code ec;
-
-			socket_.close(ec);
-		}
-
-		bool keep_alive(bool value)
-		{
-			error_code ec;
-
-			socket_.set_option(typename protocol<ProtoTag::tag>::keep_alive(value), ec);
 
 			return !ec;
 		}
 
-		bool set_nodelay(bool enable)
+		bool close()
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<ProtoTag::tag>::no_delay(enable), ec);
+			socket_.close(ec);
+
+			return !ec;
+		}
+
+		bool keep_alive(bool enable = true)
+		{
+			error_code ec;
+
+			socket_.set_option(typename protocol<Tag>::keep_alive(enable), ec);
+
+			return !ec;
+		}
+
+		bool set_nodelay(bool enable = true)
+		{
+			error_code ec;
+
+			socket_.set_option(typename protocol<Tag>::no_delay(enable), ec);
 
 			return !ec;
 		}
