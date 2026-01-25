@@ -22,9 +22,24 @@ namespace aquarius
 			{}
 
 		public:
-			void async_run()
+			auto async_run() ->awaitable<error_code>
 			{
+				error_code ec{};
+
+				//co_await pool_.async_run(aquarius::redirect_error(use_awaitable, ec));
+
+				//if (ec)
+				//{
+				//	XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
+				//}
 				pool_.async_run(detached);
+
+				if (ec)
+				{
+					XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
+				}
+
+				co_return ec;
 			}
 
 			template <typename T>
@@ -107,13 +122,13 @@ namespace aquarius
 			auto cast(const Field& field)
 			{
 				std::stringstream ss{};
-				//ss << field;
+				ss << field;
 
 				using type = std::remove_cvref_t<T>;
 
 				type result{};
 
-				//ss >> result;
+				ss >> result;
 
 				return result;
 			}

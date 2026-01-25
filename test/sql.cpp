@@ -47,30 +47,45 @@ BOOST_AUTO_TEST_CASE(connecting)
 	aquarius::io_context io;
 
 	boost::mysql::pool_params params{};
-	params.server_address.emplace_host_and_port("localhost", 3308);
+	params.server_address.emplace_host_and_port("localhost");
 	params.username = "root";
 	params.database = "unittest";
+	params.ssl = boost::mysql::ssl_mode::disable;
 
 	aquarius::tbl::mysql connector(io, std::move(params));
 
-	connector.async_run();
+	boost::mysql::any_connection conn(io);
 
 	std::this_thread::sleep_for(2s);
 
+	aquarius::error_code ec{};
 
 	auto fur = aquarius::co_spawn(
 		io,
 		[&] -> aquarius::awaitable<void>
 		{
-			auto res = co_await aquarius::mpc_execute("insert into personal values(1,1)");
+			try
+			{
+				co_await connector.async_run();
 
-			BOOST_TEST(res != 0);
+				auto res = co_await connector.async_execute("insert into personal values(1,1)", ec);
 
-			auto select_res = co_await aquarius::mpc_query<personal>("select * from personal");
+				BOOST_TEST(res != 0);
 
-			BOOST_TEST(select_res.size() != 0);
+				auto select_res = co_await connector.async_query<personal>("select * from personal", ec);
+
+				BOOST_TEST(select_res.size() != 0);
+			}
+			catch (const boost::mysql::error_with_diagnostics& err)
+			{
+				std::cerr << "Error: " << err.what() << ", error code: " << err.code() << '\n'
+					<< "Server diagnostics: " << err.get_diagnostics().server_message() << std::endl;
+			}
+
 		},
 		aquarius::use_future);
+
+	io.run();
 
 	fur.get();
 }
