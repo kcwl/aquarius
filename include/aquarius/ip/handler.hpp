@@ -41,10 +41,11 @@ namespace aquarius
 			auto ver = co_await mpc_http_version();
 			this->response().version(virgo::from_version_string(ver));
 
-			this->response().set_field("Content-Type", this->request()->find("Content-Type"));
+			this->response().set_field("Content-Type", "application/json");
 			this->response().set_field("Server", "Aquarius 0.10.0");
 			this->response().set_field("Connection", this->request()->find("Connection"));
 			this->response().set_field("Access-Control-Allow-Origin", "*");
+			this->response().set_field("access-control-request-method", "POST");
 
 			this->response().set_field("seq_number", this->request()->find("seq_number"));
 		}

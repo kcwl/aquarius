@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/tbl/engine/field.hpp>
 #include <cstdint>
 #include <string_view>
 
@@ -8,68 +9,84 @@ namespace aquarius
 {
 	namespace tbl
 	{
-
-		template <typename T>
-		struct integer;
-
-		template <>
-		struct integer<uint8_t>
+		template <std::size_t I, typename... Args>
+		class integer : public field<Args...>
 		{
-			using value_type = uint8_t;
+		public:
+			constexpr static auto get_type_name()
+			{
+				if constexpr (I <= 1)
+				{
+					return " tinyint"sv;
+				}
+				else if constexpr (I == 2)
+				{
+					return " smallint"sv;
+				}
+				else if constexpr (I == 3)
+				{
+					return " mediumint"sv;
+				}
+				else if constexpr (I == 4)
+				{
+					return " int"sv;
+				}
+				else if constexpr (I <= 8)
+				{
+					return " bigint";
+				}
+			}
 
-			static constexpr auto max_length = std::numeric_limits<uint8_t>::max();
+		public:
+			integer() = default;
 
-			static constexpr value_type filter = 0xff;
+			integer(uint64_t v)
+				: value_(v)
+			{}
 
-			static constexpr std::string_view name = " tinyint"sv;
-		};
+			integer(const integer& other)
+				: value_(other.value_)
+			{}
 
-		template <>
-		struct integer<uint16_t>
-		{
-			using value_type = uint16_t;
+			integer(integer&& other) noexcept
+				: value_(std::exchange(other.value_, 0))
+			{}
 
-			static constexpr auto max_length = std::numeric_limits<uint16_t>::max();
+			integer& operator=(const integer& other)
+			{
+				if (this != &other)
+				{
+					value_ = other.value_;
+				}
 
-			static constexpr value_type filter = 0xffff;
+				return *this;
+			}
 
-			static constexpr std::string_view name = " smallint"sv;
-		};
+			integer& operator=(integer&& other) noexcept
+			{
+				if (this != &other)
+				{
+					value_ = std::exchange(other.value_, 0);
+				}
 
-		template <>
-		struct integer<int32_t>
-		{
-			using value_type = int32_t;
+				return *this;
+			}
 
-			static constexpr auto max_length = std::numeric_limits<int32_t>::max();
+			static_assert(I < 8, "integer requires I less than 8");
 
-			static constexpr value_type filter = 0xffffff;
+			void set_value(std::stringstream& ss)
+			{
+				ss >> value_;
+			}
 
-			static constexpr std::string_view name = " mediumint"sv;
-		};
+		public:
+			operator uint64_t() const
+			{
+				return value_;
+			}
 
-		template <>
-		struct integer<uint32_t>
-		{
-			using value_type = uint32_t;
-
-			static constexpr auto max_length = std::numeric_limits<uint32_t>::max();
-
-			static constexpr value_type filter = 0xffffffff;
-
-			static constexpr std::string_view name = " int"sv;
-		};
-
-		template <>
-		struct integer<uint64_t>
-		{
-			using value_type = int64_t;
-
-			static constexpr auto max_length = std::numeric_limits<uint64_t>::max();
-
-			static constexpr value_type filter = 0xffffffffffffffff;
-
-			static constexpr std::string_view name = " bigint"sv;
+		private:
+			uint64_t value_;
 		};
 	} // namespace tbl
 } // namespace aquarius

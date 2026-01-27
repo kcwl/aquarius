@@ -51,6 +51,28 @@ namespace aquarius
 			co_return co_await connector_->async_execute(sql, ec);
 		}
 
+		auto async_execute(const std::vector<std::string>& sqls) -> awaitable<std::size_t>
+		{
+			error_code ec{};
+
+			co_await connector_->begin();
+
+			for (auto& s : sqls)
+			{
+				auto result = co_await async_execute(s);
+
+				if (result == 0)
+				{
+					connector_->rollback();
+					co_return result;
+				}
+			}
+
+			connector_->commit();
+
+			co_return sqls.size();
+		}
+
 	private:
 		std::size_t index_;
 

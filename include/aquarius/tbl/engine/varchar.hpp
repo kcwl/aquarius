@@ -8,37 +8,67 @@ namespace aquarius
 {
 	namespace tbl
 	{
-		template <typename T>
-		struct _char
+
+		template <bool Dynamic, std::size_t I, typename... Args>
+		class basic_char : public field<Args...>
 		{
-			using value_type = T;
+			static_assert(I < 256, "char length must be less than 256");
 
-			constexpr static auto max_length = std::tuple_size_v<T>;
+		public:
+			constexpr static auto get_type_name()
+			{
+				constexpr static auto char_type_name = " char("sv;
+				constexpr static auto varchar_type_name = " varchar("sv;
+				constexpr static auto end = ")"sv;
 
-			static_assert(max_length < std::numeric_limits<uint8_t>::max(), "char size must be less than 256");
+				constexpr static auto number_str = int_to_string<I>();
 
-			constexpr static auto left_bracket = " char("sv;
-			constexpr static auto right_bracket = ")"sv;
+				return concat_v < Dynamic ? varchar_type_name : char_type_name, number_str, end > ;
+			}
 
-			constexpr static auto size = detail::int_to_string<max_length>();
+		public:
+			basic_char() = default;
 
-			constexpr static auto name = concat_v<left_bracket, size, right_bracket>;
+			basic_char(const std::array<char, I>& v)
+				: value_(v.data(), I)
+			{}
+
+			basic_char(const std::string& v)
+			{
+				auto size = v.size() > I - 1 ? I - 1 : v.size();
+
+				value_ = std::string{ v.data(), size };
+			}
+
+			basic_char(const char* value)
+				: value_(value)
+			{}
+
+			operator std::string() const
+			{
+				return "'" + value_ + "'";
+			}
+
+		public:
+			void set_value(std::stringstream& ss)
+			{
+				ss >> value_;
+			}
+
+		private:
+			std::string value_;
 		};
 
-		template <typename T>
-		struct _varchar
+		template <bool Dynamic, std::size_t I, typename... Args>
+		std::ostream& operator<<(std::ostream& os, const basic_char<Dynamic, I, Args...>& v)
 		{
-			static constexpr auto name = " varchar"sv;
+			return os << static_cast<std::string>(v);
+		}
 
-			static constexpr auto max_length = -1;
-		};
+		template <std::size_t I, typename... Args>
+		using _char = basic_char<false, I, Args...>;
 
-		template <typename T>
-		struct _nvarchar
-		{
-			static constexpr auto name = " nvarchar"sv;
-
-			static constexpr auto max_length = -1;
-		};
+		template <std::size_t I, typename... Args>
+		using varchar = basic_char<true, I, Args...>;
 	} // namespace tbl
 } // namespace aquarius

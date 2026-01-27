@@ -5,6 +5,7 @@ namespace aquarius
 {
 	namespace lazytool
 	{
+
 		bool model_parse::read_file(const std::string& file_path)
 		{
 			std::ifstream ifs(file_path);
@@ -61,20 +62,27 @@ namespace aquarius
 
 				if (end == '}')
 				{
-					ifs.get();
-					break;
+					return true;
 				}
+
+				if (!check_type(field.type))
+					return false;
+
+				
 
 				field.name = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
 				while (end != ';')
 				{
-					auto t = read_value<token::value, '@', '^', '$'>(ifs, column_, row_, end);
+					auto t = read_value<token::value, '$'>(ifs, column_, row_, end);
 
-					if (end != '@' && end != '^' && end != '$')
+					if (end != '$')
 						return false;
 
 					t = end;
+
+					if (end == '}')
+						return true;
 
 					value = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
@@ -83,22 +91,55 @@ namespace aquarius
 
 					auto beg = *t.begin();
 
-					if (beg == '@')
-					{
-						field.attrs.push_back("key<"+value + ">");
-					}
-					else if (beg == '^')
-					{
-						field.attrs.push_back("index<" + value + ">");
-					}
-					else if (beg == '$')
-					{
-						field.attrs.push_back("attr<" + value + ">");
-					}
-					else
-					{
+					if (beg != '$')
 						return false;
-					}
+
+					if (!check_attribute(value))
+						return false;
+
+					field.attrs.push_back(value);
+				}
+			}
+
+			return true;
+		}
+
+		bool model_parse::check_attribute(const std::string& value)
+		{
+			auto f = [&](const auto&... args) { return ((value == args) || ...); };
+
+			return f("PK", "UN", "AI", "AT", "DF", "NN");
+		}
+
+		bool model_parse::check_type(const std::string& value)
+		{
+			auto sp = value.find_first_of("<");
+
+			if (sp == std::string::npos)
+			{
+				if (value != "float" && value != "double" && value != "date" && value != "timestamp")
+					return false;
+			}
+			else
+			{
+				auto prefix = value.substr(0, sp);
+
+				auto f = [&](const auto&... args) { return ((prefix == args) || ...); };
+
+				if (!f("integer", "char", "varchar", "decimal", "bit", "datetime", "time", "binary", "varbinary"))
+					return false;
+
+				auto pos = value.find_last_of(">");
+
+				if (pos == std::string::npos)
+					return false;
+
+				auto suffix = value.substr(sp + 1, pos - sp - 1);
+
+				for (auto& c : suffix)
+				{
+					if (!std::isdigit(c))
+						return false;
 				}
 			}
 

@@ -6,56 +6,76 @@ namespace aquarius
 {
 	namespace tbl
 	{
-		template <std::size_t Significant = 10, std::size_t Decimal = 0>
-		class basic_decimal
+
+		template <std::size_t Significant, std::size_t Decimal, typename... Args>
+		class decimal : public field<Args...>
 		{
 			static_assert(Significant < 65, "decimal significant must be less than 65");
 
 		public:
-			basic_decimal() = default;
+			constexpr static auto get_type_name()
+			{
+				constexpr static auto type_name = " decimal("sv;
+				constexpr static auto sp = ","sv;
+				constexpr static auto end = ")"sv;
 
-			basic_decimal(const char* v)
-				: basic_decimal(std::string(v))
+				constexpr static auto num_str_dec = int_to_string<Decimal>();
+				constexpr static auto num_str_sign = int_to_string<Significant>();
+
+				return concat_v<type_name, num_str_sign, sp, num_str_dec, end>;
+			}
+
+		public:
+			decimal() = default;
+
+			decimal(const char* v)
+				: decimal(std::string(v))
 			{}
 
-			basic_decimal(const std::string& v)
-				: value()
+			decimal(const std::string& v)
+				: value_()
 			{
 				assign(v);
 			}
 
-			basic_decimal(const basic_decimal& d)
-				: value(d.value)
+			template <typename T>
+			requires std::is_floating_point_v<T>
+			decimal(T v)
+				: decimal(std::to_string(v))
 			{}
 
-			basic_decimal(basic_decimal&& d) noexcept
-				: value(std::move(d.value))
+			decimal(const decimal& d)
+				: value_(d.value_)
 			{}
 
-			basic_decimal& operator=(const basic_decimal& d)
+			decimal(decimal&& d) noexcept
+				: value_(std::move(d.value_))
+			{}
+
+			decimal& operator=(const decimal& d)
 			{
 				if (this != std::addressof(d))
 				{
-					value = d.value;
+					value_ = d.value_;
 				}
 
 				return *this;
 			}
 
-			basic_decimal& operator=(basic_decimal&& d) noexcept
+			decimal& operator=(decimal&& d) noexcept
 			{
 				if (this != std::addressof(d))
 				{
-					value = std::move(d.value);
+					value_ = std::move(d.value_);
 				}
 
 				return *this;
 			}
 
 		public:
-			operator std::string()
+			operator std::string() const
 			{
-				return value;
+				return value_;
 			}
 
 		private:
@@ -81,7 +101,7 @@ namespace aquarius
 					return;
 				}
 
-				value = val;
+				value_ = val;
 			}
 
 			std::string big_add(const std::string& value)
@@ -133,8 +153,20 @@ namespace aquarius
 				return result;
 			}
 
+			void set_value(std::stringstream& ss)
+			{
+				ss >> value_;
+			}
+
 		private:
-			std::string value;
+			std::string value_;
 		};
-	} // namespace sql
+	} // namespace tbl
 } // namespace aquarius
+
+template <std::size_t Significant, std::size_t Decimal, typename... Args>
+std::ostream& operator<<(std::ostream& os, const aquarius::tbl::decimal<Significant, Decimal, Args...>& v)
+{
+	os << static_cast<std::string>(v);
+	return os;
+}

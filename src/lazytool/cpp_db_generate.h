@@ -17,6 +17,10 @@ namespace aquarius
 			void generate_language(std::ofstream& ofs, const std::string& value);
 
 			void generate_field(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr);
+
+			void generate_member_func(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr);
+
+			void generate_member_name_func(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr);
 		};
 	} // namespace lazytool
 } // namespace aquarius

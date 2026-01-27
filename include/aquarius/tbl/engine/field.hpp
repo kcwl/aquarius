@@ -5,22 +5,10 @@ namespace aquarius
 {
 	namespace tbl
 	{
-		template <typename T, typename... Args>
+		template<typename... Args>
 		struct field
 		{
-			using value_type = T;
-
-			using attr_type = std::tuple<Args...>;
-
-			template<typename U>
-			field& operator=(const U& u)
-			{
-				value = u;
-
-				return *this;
-			}
-
-			value_type value;
+			using type = std::tuple<Args...>;
 		};
 	} // namespace tbl
 } // namespace aquarius

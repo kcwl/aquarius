@@ -25,6 +25,7 @@ namespace aquarius
 			std::vector<model_data_field> fields;
 		};
 
+
 		class model_parse
 		{
 		public:
@@ -35,6 +36,10 @@ namespace aquarius
 
 		private:
 			bool parse_model(std::ifstream& ifs, std::shared_ptr<model_field> model_field_ptr);
+
+			bool check_attribute(const std::string& value);
+
+			bool check_type(const std::string& value);
 
 		public:
 			std::vector<std::shared_ptr<model_field>> models_;

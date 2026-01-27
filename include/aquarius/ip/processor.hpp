@@ -10,6 +10,7 @@
 #include <aquarius/virgo/header_field_base.hpp>
 #include <aquarius/virgo/http_get_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
+#include <aquarius/virgo/http_null_body.hpp>
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <fstream>
@@ -354,6 +355,28 @@ namespace aquarius
 					auto url = url_decode(path);
 
 					buffer.sputn(path.data(), path.size());
+				}
+
+				if (method == virgo::http_method::options)
+				{
+					using http_option_response =
+						virgo::http_response<virgo::http_method::options, http_response_header, virgo::http_null_body>;
+
+					http_option_response resp{};
+
+					resp.version(virgo::http_version::http1_1);
+					resp.set_field("Server", "Aqarius 1.00.0");
+					resp.set_field("Connection", "keep-alive");
+					resp.set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
+					resp.set_field("Access-Control-Request-Method", "POST");
+					resp.set_field("Access-Control-Allow-Headers", "content-type");
+					resp.result(virgo::http_status::ok);
+
+					flex_buffer buf{};
+					resp.commit(buf);
+
+					co_await session_ptr->async_send(buf);
+					continue;
 				}
 
 				HandlerSelector()(_router, session_ptr, hf, buffer);

@@ -5,231 +5,191 @@
 #include <aquarius/detail/struct_name.hpp>
 #include <aquarius/tbl/add_string.hpp>
 #include <aquarius/tbl/concepts.hpp>
-#include <boost/pfr.hpp>
+#include <aquarius/tbl/engine/common.hpp>
+#include <aquarius/tbl/reflect.hpp>
 
 namespace aquarius
 {
 	namespace tbl
 	{
-		template <typename T>
-		class insert_view
+		struct insert_view
 		{
-		public:
-			insert_view(T&& value)
+			template <typename T>
+			auto operator()(T&& value) -> std::string
 			{
-				constexpr static auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
+				complete_sql.str("");
 
-				constexpr static auto insert_sql = "insert into "sv;
-				constexpr static auto values_sql = " values("sv;
+				constexpr auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
 
-				constexpr static auto complete_sql = concat_v<insert_sql, struct_name, values_sql>;
+				complete_sql << "insert into " << struct_name << "(";
 
-				complete_sql_ << complete_sql;
+				using type = std::remove_cvref_t<T>;
 
-				constexpr auto size = boost::pfr::tuple_size_v<std::decay_t<T>>;
+				constexpr auto size = struct_size<T>();
+
+				auto type_f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{
+					((!has_attribute<AI, struct_element_t<I, T>>()
+						  ? (complete_sql << struct_element_name<I, T>() << (size != I + 1 ? "," : ""))
+						  : complete_sql),
+					 ...);
+				};
+
+				type_f(std::make_index_sequence<size>{});
+
+				complete_sql << ") values (";
 
 				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{
-					((complete_sql_ << add_string_format(boost::pfr::get<I, T>(value)) << (size != I + 1 ? "," : "")),
+					((!has_attribute<AI, struct_element_t<I, T>>()
+						  ? complete_sql << struct_element_value<I, T>(value) << (size != I + 1 ? "," : "")
+						  : complete_sql),
 					 ...);
 				};
 
 				f(std::make_index_sequence<size>{});
 
-				complete_sql_ << ")";
+				complete_sql << ")";
+
+				return complete_sql.str();
 			}
 
-		public:
-			auto operator()() -> std::string
-			{
-				return complete_sql_.str();
-			}
-
-		private:
-			std::stringstream complete_sql_;
+			std::stringstream complete_sql;
 		};
 
-		template <typename T>
-		insert_view(T&&) -> insert_view<T>;
-
-		template <typename T>
 		struct remove_view
 		{
-			constexpr auto operator()() const
+			template <typename T>
+			auto operator()(T&& value) -> std::string
 			{
-				constexpr static auto struct_name = aquarius::detail::struct_name<T>();
+				constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
 
-				constexpr static auto delete_sql = "delete from "sv;
+				complete_sql.str("");
 
-				return concat_v<delete_sql, struct_name>;
+				complete_sql << "delete from " << struct_name;
+
+				int start = 0;
+
+				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{
+					((has_attribute<PK, struct_element_t<I, T>>()
+						  ? (complete_sql << (start++ == 0 ? " where " : " and ") << struct_element_name<I, T>() << "="
+										  << struct_element_value<I, T>(value))
+						  : complete_sql),
+					 ...);
+				};
+
+				f(std::make_index_sequence<struct_size<T>()>{});
+
+				return complete_sql.str();
 			}
+
+			std::stringstream complete_sql;
 		};
 
-		template <typename T>
-		class update_view
+		struct update_view
 		{
-		public:
-			update_view(T&& value)
+			template <typename T>
+			auto operator()(T&& value) -> std::string
 			{
-				constexpr static auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
+				complete_sql.str("");
 
-				constexpr static auto update_sql = "update "sv;
-				constexpr static auto set_sql = " set "sv;
+				constexpr auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
 
-				constexpr auto complete_sql = concat_v<update_sql, struct_name, set_sql>;
-				ss_ << complete_sql;
+				complete_sql << "update " << struct_name;
 
-				constexpr auto size = boost::pfr::tuple_size_v<std::decay_t<T>>;
+				constexpr auto size = struct_size<T>();
 
-				boost::pfr::for_each_field_with_name(
-					value, [&](auto name, auto value, std::size_t index)
-					{ ss_ << name.data() << "=" << add_string_format(value) << (index != size - 1 ? " and " : ""); });
+				int start = 0;
+
+				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{
+					((has_attribute<PK, struct_element_t<I, T>>()
+						  ? (complete_sql << (start++ == 0 ? " set " : " and ") << struct_element_name<I, T>() << "="
+										  << struct_element_value<I, T>(value))
+						  : complete_sql),
+					 ...);
+				};
+
+				f(std::make_index_sequence<size>{});
+
+				return complete_sql.str();
 			}
 
-		public:
-			auto operator()() const -> std::string
-			{
-				return ss_.str();
-			}
-
-		private:
-			std::stringstream ss_;
+			std::stringstream complete_sql;
 		};
 
-		template <typename T>
-		update_view(T&&) -> update_view<T&&>;
-
-		template <typename T>
 		struct select_view
 		{
-			constexpr auto operator()() const -> std::string_view
+			template <typename T>
+			auto operator()(T&& value) -> std::string
 			{
-				constexpr static auto struct_name = aquarius::detail::struct_name<T>();
+				complete_sql.str("");
 
-				constexpr static std::string_view sql = "select * from "sv;
+				constexpr auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
 
-				return concat_v<sql, struct_name>;
-			}
-		};
+				complete_sql << "select * from " << struct_name;
 
-		template <detail::string_literal Op>
-		struct condition_param
-		{
-			std::string_view operator()(auto v)
-			{
-				return std::format("{} {}", Op, v);
-			}
-		};
+				int start = 0;
 
-		template <typename Cond, typename T>
-		struct condition
-		{
-			constexpr condition(T&& value)
-				: value_(std::forward<T>(value))
-			{}
+				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{
+					((has_attribute<PK, struct_element_t<I, T>>()
+						  ? (complete_sql << (start++ == 0 ? " where " : " and ") << struct_element_name<I, T>() << "="
+										  << struct_element_value<I, T>(value))
+						  : complete_sql),
+					 ...);
+				};
 
-			std::string_view operator()() const
-			{
-				return std::string_view{ Cond()(value_) };
+				f(std::make_index_sequence<struct_size<T>()>{});
+
+				return complete_sql.str();
 			}
 
-			T value_;
+			std::stringstream complete_sql;
 		};
-
-		template <typename T>
-		constexpr inline condition<condition_param<"<">, T> less_than;
-
-		template <typename T>
-		constexpr inline condition<condition_param<">">, T> greater_than;
-
-		template <typename T>
-		constexpr inline condition<condition_param<"<=">, T> less_equal_than;
-		template <typename T>
-		constexpr inline condition<condition_param<">=">, T> greater_equal_than;
-
-		template <typename T>
-		constexpr inline condition<condition_param<"==">, T> equal_than;
-
-		template <typename T>
-		constexpr inline condition<condition_param<"!=">, T> not_equal_than;
-
-		template <detail::string_literal Op, typename LCond, typename RCond>
-		struct _condition
-		{
-			constexpr _condition(LCond&& l, RCond&& r)
-				: left_(std::forward<LCond>(l))
-				, right_(std::forward<RCond>(r))
-			{}
-
-			constexpr auto operator()() const -> std::string_view
-			{
-				return concat_v<left_(), detail::bind_param<Op>::value, right_()>;
-			}
-
-			LCond left_;
-			RCond right_;
-		};
-
-		template <typename LCond, typename RCond>
-		constexpr inline _condition<" and ", LCond, RCond> add;
-
-		template <typename LCond, typename RCond>
-		constexpr inline _condition<" or ", LCond, RCond> or_;
 
 		template <typename T>
 		struct create_view
 		{
-			template <typename Field>
-			struct attr_bind
-			{
-				constexpr static std::string_view get_attrs()
-				{
-					using attr_type = typename Field::attr_type;
-
-					if constexpr (std::tuple_size_v<attr_type> == 0)
-					{
-						return ""sv;
-					}
-					else
-					{
-						auto f = []<std::size_t... I>(std::index_sequence<I...>)
-						{
-							return (std::tuple_element_t<I, attr_type>()(), ...);
-						};
-
-						constexpr auto size = std::tuple_size_v<attr_type>;
-
-						return f(std::make_index_sequence<size>{});
-					}
-				}
-
-				constexpr static auto type_name = Field::value_type::name;
-
-				constexpr static auto attrs = get_attrs();
-			};
-
-			template <std::size_t I, typename U>
-			struct name_bind
-			{
-				constexpr static auto value = boost::pfr::get_name<I, U>();
-			};
-
 			auto operator()() -> std::string
 			{
-				auto f = []<std::size_t... I>(std::index_sequence<I...>)
+				constexpr auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
+
+				complete_sql.str("");
+
+				complete_sql << "create table if not exists " << struct_name << "(";
+
+				constexpr auto size = struct_size<T>();
+
+				auto for_each_attribute = [&]<typename R, std::size_t... I>(std::index_sequence<I...>)
 				{
-					return ((concat_v<attr_bind<boost::pfr::tuple_element_t<I, T>>::type_name, name_bind<I, T>::value,
-									  attr_bind<boost::pfr::tuple_element_t<I, T>>::attrs>),
-							...);
+					constexpr auto r_size = std::tuple_size_v<R>;
+					((complete_sql << std::tuple_element_t<I, R>::value << I), ...);
 				};
 
-				constexpr auto size = boost::pfr::tuple_size_v<std::decay_t<T>>;
+				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{
+					((complete_sql << struct_element_name<I, T>() << " "
+								   << remove_class_pointer<std::decay_t<struct_element_t<I, T>>>::type::get_type_name()
+								   << collect_attribute<struct_element_t<I, T>>()),
+					 ...);
+				};
 
-				constexpr static auto member_str = f(std::make_index_sequence<size>());
+				f(std::make_index_sequence<size>{});
 
-				return std::format("create table if not exists {} ({})", aquarius::detail::struct_name<T>(),
-								   member_str);
+				return complete_sql.str();
 			}
+
+			std::stringstream complete_sql;
 		};
+
+		static insert_view insert;
+		static remove_view remove;
+		static update_view update;
+		static select_view select;
+
+		template <typename T>
+		static create_view<T> create;
 	} // namespace tbl
 } // namespace aquarius
