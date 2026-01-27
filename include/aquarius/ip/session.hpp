@@ -40,7 +40,7 @@ namespace aquarius
 			co_return co_await proto_.template query<Response>(seq_number, this->shared_from_this());
 		}
 
-		auto query_buffer(std::size_t seq_number, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
+		auto query_buffer(std::size_t seq_number, virgo::header_fields& hf) -> awaitable<flex_buffer>
 		{
 			co_return co_await proto_.query_buffer(seq_number, this->shared_from_this(), hf);
 		}

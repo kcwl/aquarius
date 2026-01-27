@@ -93,7 +93,7 @@
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_fields.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\header_fields.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
@@ -353,9 +353,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
       <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\header_field_base.hpp">
-      <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\engine\datetime.hpp">
       <Filter>include\aquarius\tbl\engine</Filter>

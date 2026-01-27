@@ -7,7 +7,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
-#include <aquarius/virgo/header_field_base.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 #include <aquarius/virgo/http_get_body.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_null_body.hpp>
@@ -62,7 +62,7 @@ namespace aquarius
 					break;
 				}
 
-				std::shared_ptr<header_field_base> hf = std::make_shared<header_field_base>();
+				header_fields hf;
 
 				hf->seq_number(proto.seq_number);
 
@@ -81,7 +81,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, std::shared_ptr<header_field_base>& hf) -> awaitable<flex_buffer>
+		auto query_buffer(std::size_t seq_number, std::shared_ptr<Session> session_ptr, header_fields& hf) -> awaitable<flex_buffer>
 		{
 			for (;;)
 			{
@@ -640,7 +640,7 @@ namespace aquarius
 					co_return flex_buffer{};
 				}
 
-				auto seq = std::dynamic_pointer_cast<virgo::http_fields>(hf)->find("seq_number");
+				auto seq = std::dynamic_pointer_cast<virgo::header_fields>(hf)->find("seq_number");
 
 				if (seq.empty())
 					continue;

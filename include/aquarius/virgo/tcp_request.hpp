@@ -24,7 +24,7 @@ namespace aquarius
 				, parse_()
 			{}
 
-			tcp_request(header_field_base f)
+			tcp_request(header_fields f)
 				: base(std::move(f))
 			{}
 

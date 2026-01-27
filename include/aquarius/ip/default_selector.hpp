@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/ip/router.hpp>
-#include <aquarius/virgo/header_field_base.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 
 namespace aquarius
 {
@@ -10,8 +10,8 @@ namespace aquarius
 		struct default_selector
 		{
 			template <typename Session>
-			auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr,
-							std::shared_ptr<header_field_base> hf, flex_buffer& buffer)
+			auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr, virgo::header_fields& hf,
+							flex_buffer& buffer)
 			{
 				router<Session>::get_mutable_instance().invoke(topic, session_ptr, hf, buffer);
 			};

@@ -2,7 +2,7 @@
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/ip/router.hpp>
 #include <aquarius/ip/server_session.hpp>
-#include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 
@@ -57,14 +57,14 @@ namespace aquarius
 		explicit auto_handler_register(std::string_view proto)
 		{
 			auto func =
-				[&](std::shared_ptr<Session> session, std::shared_ptr<header_field_base> hf, flex_buffer& buffer)
+				[&](std::shared_ptr<Session> session, virgo::header_fields hf, flex_buffer& buffer)
 			{
 				std::shared_ptr<typename Context::request_t> request;
 
 				if constexpr (Session::tag == proto_tag::http)
 				{
 					request = std::make_shared<typename Context::request_t>(
-						*std::dynamic_pointer_cast<virgo::http_fields>(hf));
+						*std::dynamic_pointer_cast<virgo::header_fields>(hf));
 				}
 				else
 				{

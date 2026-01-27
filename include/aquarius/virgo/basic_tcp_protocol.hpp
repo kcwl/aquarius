@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
-#include <aquarius/virgo/header_field_base.hpp>
 
 namespace aquarius
 {
@@ -8,7 +7,6 @@ namespace aquarius
 	{
 		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
 		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>,
-								   public header_field_base
 		{
 		public:
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
@@ -21,14 +19,13 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
-				: basic_tcp_protocol(header_field_base{})
+				: basic_tcp_protocol(header_fields{})
 			{
 
 			}
 
-			basic_tcp_protocol(header_field_base f)
+			basic_tcp_protocol(header_fields f)
 				: base()
-				, header_field_base(std::move(f))
 				, timestamp_()
 				, version_()
 			{}
@@ -93,6 +90,25 @@ namespace aquarius
 				version_ = value;
 			}
 
+			uint32_t seq_number() const
+			{
+				auto num = this->find("seq_number");
+				if (num.empty())
+					return 0;
+
+				std::stringstream ss{};
+				ss << num;
+				uint32_t result;
+				ss >> result;
+
+				return result;
+			}
+
+			void seq_number(uint32_t v)
+			{
+				this->set_field("seq_number", std::to_string(v));
+			}
+
 		private:
 			int64_t timestamp_;
 
@@ -104,7 +120,6 @@ namespace aquarius
 		template <typename Header, typename Body, typename Allocator>
 		class basic_tcp_protocol<false, Header, Body, Allocator>
 			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
-			, public header_field_base
 		{
 		public:
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
@@ -115,14 +130,13 @@ namespace aquarius
 
 		public:
 			basic_tcp_protocol()
-				: basic_tcp_protocol(header_field_base{})
+				: basic_tcp_protocol(header_fields{})
 			{
 
 			}
 
-			basic_tcp_protocol(header_field_base f)
+			basic_tcp_protocol(header_fields f)
 				: base()
-				, header_field_base(std::move(f))
 				, timestamp_()
 				, version_()
 				, result_()
@@ -200,6 +214,25 @@ namespace aquarius
 			void result(int32_t value)
 			{
 				result_ = value;
+			}
+
+			uint32_t seq_number() const
+			{
+				auto num = this->find("seq_number");
+				if (num.empty())
+					return 0;
+
+				std::stringstream ss{};
+				ss << num;
+				uint32_t result;
+				ss >> result;
+
+				return result;
+			}
+
+			void seq_number(uint32_t v)
+			{
+				this->set_field("seq_number", std::to_string(v));
 			}
 
 		private:

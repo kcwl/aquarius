@@ -26,7 +26,7 @@ namespace aquarius
 		public:
 			http_request() = default;
 
-			http_request(http_fields f)
+			http_request(header_fields f)
 				: base(std::move(f))
 			{
 

@@ -6,7 +6,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_schedule.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
-#include <aquarius/virgo/http_fields.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <functional>
 
@@ -64,7 +64,7 @@ namespace aquarius
 
 			error_code ec{};
 
-			std::shared_ptr<header_field_base> hf = std::make_shared<header_field_base>();
+			virgo::header_fields hf;
 
 			auto buf = co_await async_send(buffer, ec, req->seq_number(), hf);
 
@@ -83,7 +83,7 @@ namespace aquarius
 
 			if constexpr (Session::tag == proto_tag::http)
 			{
-				Response resp{ *std::dynamic_pointer_cast<virgo::http_fields>(hf) };
+				Response resp{ *std::dynamic_pointer_cast<virgo::header_fields>(hf) };
 				resp.consume(buf);
 				co_return resp;
 			}
@@ -96,7 +96,7 @@ namespace aquarius
 			}
 		}
 
-		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id, std::shared_ptr<header_field_base>& hf)
+		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id, virgo::header_fields& hf)
 			-> awaitable<flex_buffer>
 		{
 			ec = co_await session_ptr_->async_send(buffer);

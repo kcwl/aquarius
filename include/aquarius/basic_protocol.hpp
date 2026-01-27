@@ -1,12 +1,13 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 #include <boost/core/empty_value.hpp>
 #include <iostream>
 
 namespace aquarius
 {
 	template <typename Header, typename Body, typename Allocator>
-	class basic_protocol : public boost::empty_value<Body>
+	class basic_protocol : public boost::empty_value<Body>, public virgo::header_fields
 	{
 		static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
 
@@ -27,6 +28,14 @@ namespace aquarius
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
 		}
+
+		basic_protocol(virgo::header_fields f)
+			: virgo::header_fields(f)
+			, basic_protocol()
+		{
+
+		}
+
 		basic_protocol(const basic_protocol& other)
 			: base_body(other)
 			, header_(other.header_)
