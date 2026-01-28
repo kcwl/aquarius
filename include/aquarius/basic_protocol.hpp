@@ -30,8 +30,7 @@ namespace aquarius
 		}
 
 		basic_protocol(virgo::header_fields f)
-			: virgo::header_fields(f)
-			, basic_protocol()
+			: virgo::header_fields(std::move(f))
 		{
 
 		}

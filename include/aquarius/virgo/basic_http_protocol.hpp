@@ -50,7 +50,7 @@ namespace aquarius
 
 			basic_http_protocol(basic_http_protocol&& other) noexcept
 				: base(std::move(other))
-				, http_fields(std::move(other))
+				, header_fields(std::move(other))
 				, version_(std::exchange(other.version_, http_version::unknown))
 			{}
 
@@ -59,7 +59,7 @@ namespace aquarius
 				if (std::addressof(other) != this)
 				{
 					base::operator=(std::move(other));
-					http_fields::operator=(std::move(other));
+					header_fields::operator=(std::move(other));
 					version_ = std::exchange(other.version_, http_version::unknown);
 				}
 
@@ -90,42 +90,42 @@ namespace aquarius
 				version_ = version;
 			}
 
-			auto fields() const
-			{
-				return this->fields_;
-			}
-
 			bool has_content_length() const
 			{
-				return !find("Content-Length").empty();
+				return !this->find("Content-Length").empty();
 			}
 
 			void content_length(uint64_t len)
 			{
-				fields_["Content-Length"] = std::string_view(std::to_string(len).c_str());
+				this->set_field("Content-Length", std::to_string(len));
 			}
 
 			uint64_t content_length()
 			{
-				auto iter = fields_.find("Content-Length");
-				if (iter == fields_.end())
+				auto value = this->find("Content-Length");
+
+				if (value.empty())
 					return 0;
 
-				return std::atoi(iter->second.data());
+				std::stringstream ss{};
+				ss << value;
+
+				uint64_t result;
+				ss >> result;
+
+				return result;
 			}
 
 			bool keep_alive()
 			{
-				auto iter = fields_.find("Connection");
-				if (iter == fields_.end())
-					return false;
+				auto value = this->find("Connection");
 
-				return iter->second == "keep-alive" ? true : false;
+				return value == "keep-alive" ? true : false;
 			}
 
 			void keep_alive(bool k)
 			{
-				fields_["Connection"] = k ? "keep-alive" : "close";
+				this->set_field("Connection", k ? "keep-alive" : "close");
 			}
 
 		private:
@@ -134,7 +134,7 @@ namespace aquarius
 
 		template <typename Header, typename Body, typename Allocator>
 		class basic_http_protocol<false, Header, Body, Allocator>
-			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>, public http_fields
+			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
 			constexpr static auto json_type = "aquarius-json"sv;
@@ -147,12 +147,11 @@ namespace aquarius
 
 		public:
 			basic_http_protocol()
-				: basic_http_protocol(http_fields{})
+				: basic_http_protocol(header_fields{})
 			{}
 
-			basic_http_protocol(http_fields f)
-				: base()
-				, http_fields(f)
+			basic_http_protocol(header_fields f)
+				: base(std::move(f))
 				, status_(virgo::http_status::ok)
 				, version_(virgo::http_version::unknown)
 			{}
@@ -161,7 +160,6 @@ namespace aquarius
 
 			basic_http_protocol(const basic_http_protocol& other)
 				: base(other)
-				, http_fields(other)
 				, status_(other.status_)
 				, version_(other.version_)
 			{}
@@ -171,7 +169,7 @@ namespace aquarius
 				if (this != std::addressof(other))
 				{
 					base::operator=(other);
-					http_fields::operator=(other);
+					header_fields::operator=(other);
 					status_ = other.status_;
 					version_ = other.version_;
 				}
@@ -181,7 +179,6 @@ namespace aquarius
 
 			basic_http_protocol(basic_http_protocol&& other) noexcept
 				: base(std::move(other))
-				, http_fields(std::move(other))
 				, status_(std::exchange(other.status_, virgo::http_status::ok))
 				, version_(std::exchange(other.version_, virgo::http_version::unknown))
 			{}
@@ -191,7 +188,6 @@ namespace aquarius
 				if (this != std::addressof(other))
 				{
 					base::operator=(std::move(other));
-					http_fields::operator=(std::move(other));
 					status_ = std::exchange(other.status_, virgo::http_status::ok);
 					version_ = std::exchange(other.version_, 0);
 				}
@@ -236,42 +232,42 @@ namespace aquarius
 				version_ = version;
 			}
 
-			auto fields() const
-			{
-				return this->fields_;
-			}
-
 			bool has_content_length() const
 			{
-				return !find("Content-Length").empty();
+				return !this->find("Content-Length").empty();
 			}
 
 			void content_length(uint64_t len)
 			{
-				fields_["Content-Length"] = std::string_view(std::to_string(len).c_str());
+				this->set_field("Content-Length", std::to_string(len));
 			}
 
 			uint64_t content_length()
 			{
-				auto iter = fields_.find("Content-Length");
-				if (iter == fields_.end())
+				auto value = this->find("Content-Length");
+
+				if (value.empty())
 					return 0;
 
-				return std::atoi(iter->second.data());
+				std::stringstream ss{};
+				ss << value;
+
+				uint64_t result;
+				ss >> result;
+
+				return result;
 			}
 
 			bool keep_alive()
 			{
-				auto iter = fields_.find("Connection");
-				if (iter == fields_.end())
-					return false;
+				auto value = this->find("Connection");
 
-				return iter->second == "keep-alive" ? true : false;
+				return value == "keep-alive" ? true : false;
 			}
 
 			void keep_alive(bool k)
 			{
-				fields_["Connection"] = k ? "keep-alive" : "close";
+				this->set_field("Connection", k ? "keep-alive" : "close");
 			}
 
 		private:

@@ -15,7 +15,7 @@ namespace aquarius
 		constexpr static std::size_t buffer_delta = 256;
 
 	public:
-		explicit basic_flexbuf(std::size_t max_size = std::numeric_limits<std::size_t>::max(),
+		basic_flexbuf(std::size_t max_size = std::numeric_limits<std::size_t>::max(),
 							   Allocator alloc = Allocator{})
 			: max_size_(max_size)
 			, buffer_(alloc)

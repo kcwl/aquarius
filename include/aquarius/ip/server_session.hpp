@@ -6,8 +6,8 @@
 namespace aquarius
 {
 	template <auto Tag>
-	using server_session = session<Tag, ip::default_selector, raw_socket_adaptor<Tag>>;
+	using server_session = session<Tag, raw_socket_adaptor, ip::tcp_selector>;
 
-	template<auto Tag, typename Selector>
-	using custom_server_session = session<Tag, Selector, raw_socket_adaptor<Tag>>;
+	template <auto Tag, typename Selector>
+	using custom_server_session = session<Tag, raw_socket_adaptor, Selector>;
 } // namespace aquarius

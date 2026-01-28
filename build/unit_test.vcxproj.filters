@@ -219,9 +219,6 @@
     <ClInclude Include="..\include\aquarius\ip\session.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\processor.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
@@ -233,9 +230,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_pool.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\ssl_context.hpp">
-      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\ssl_socket_adaptor.hpp">
       <Filter>include\aquarius\ip</Filter>
@@ -377,6 +371,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\reflect.hpp">
       <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_method_handler.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_method_define.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

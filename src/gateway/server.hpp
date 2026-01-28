@@ -9,7 +9,7 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		using transfer_server_session = custom_server_session<proto_tag::http, transfer_selector>;
+		using transfer_server_session = custom_server_session<proto::http, transfer_selector>;
 
 		using server = aquarius::basic_server<transfer_server_session>;
 	} // namespace gateway

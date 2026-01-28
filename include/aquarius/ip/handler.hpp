@@ -23,7 +23,7 @@ namespace aquarius
 	};
 
 	template <typename Session, typename Request, typename Response>
-	class handler<proto_tag::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
+	class handler<proto::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
 	{
 	public:
 		using session_t = Session;
@@ -56,20 +56,11 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto func =
-				[&](std::shared_ptr<Session> session, virgo::header_fields hf, flex_buffer& buffer)
+			auto func = [&](std::shared_ptr<Session> session, virgo::header_fields hf, flex_buffer& buffer)
 			{
 				std::shared_ptr<typename Context::request_t> request;
 
-				if constexpr (Session::tag == proto_tag::http)
-				{
-					request = std::make_shared<typename Context::request_t>(
-						*std::dynamic_pointer_cast<virgo::header_fields>(hf));
-				}
-				else
-				{
-					request = std::make_shared<typename Context::request_t>(*hf);
-				}
+				request = std::make_shared<typename Context::request_t>(std::move(hf));
 
 				error_code ec = virgo::http_status::ok;
 
@@ -81,10 +72,18 @@ namespace aquarius
 				{
 					ec = ex;
 				}
+				catch (...)
+				{
+					ec = virgo::http_status::bad_request;
+				}
 
 				co_spawn(
-					session->get_executor(), [session, ec, request]() mutable -> awaitable<void>
-					{ co_await std::make_shared<Context>()->visit(session, request, ec != virgo::http_status::ok); },
+					session->get_executor(),
+					[session, ec, request]() mutable -> awaitable<void>
+					{
+						co_await std::make_shared<Context>()->visit(session, request, ec,
+																	ec != virgo::http_status::ok ? 1u : 1);
+					},
 					detached);
 
 				return ec == virgo::http_status::ok;

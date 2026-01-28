@@ -3,22 +3,22 @@
 
 namespace aquarius
 {
-	enum class proto_tag
+	enum class proto
 	{
 		tcp = 0,
 		http = 1,
 	};
 
-	inline std::string from_tag_string(proto_tag tag)
+	inline std::string from_tag_string(proto tag)
 	{
 		std::string result = "none";
 
 		switch (tag)
 		{
-		case proto_tag::http:
+		case proto::http:
 			result = "http";
 			break;
-		case proto_tag::tcp:
+		case proto::tcp:
 			result = "tcp";
 			break;
 		default:

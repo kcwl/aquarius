@@ -24,7 +24,7 @@ namespace aquarius
 
 		public:
 			http_response() = default;
-			http_response(http_fields f)
+			http_response(virgo::header_fields f)
 				: base(std::move(f))
 			{
 

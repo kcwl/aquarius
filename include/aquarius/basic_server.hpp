@@ -127,9 +127,7 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock), 1s);
-
-				session_ptr->set_close_func(close_func_);
+				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
 
 				co_await mpc_insert_session(session_ptr);
 
@@ -145,7 +143,15 @@ namespace aquarius
 
 						co_await accept_func(session_ptr);
 
-						co_return co_await session_ptr->accept();
+						auto ec = co_await session_ptr->accept();
+
+						if (ec)
+						{
+							close_func(session_ptr);
+						}
+
+						session_ptr->shutdown();
+						session_ptr->close();
 					},
 					detached);
 			}

@@ -26,26 +26,34 @@ namespace aquarius
 			: basic_client(context.get_executor(), timeout)
 		{}
 
-		basic_client(const Executor& context, std::chrono::milliseconds timeout = 1000ms)
-			: executor_(context)
+		basic_client(const Executor& executor, std::chrono::milliseconds timeout)
+			: executor_(executor)
 			, host_()
 			, port_()
 			, session_ptr_(nullptr)
 			, close_func_()
+			, accept_func_()
 			, timeout_(timeout)
 		{}
 
 		virtual ~basic_client() = default;
 
 	public:
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<bool>
+		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
 		{
 			host_ = host;
 			port_ = port;
 
-			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)));
+			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)), 30ms ,timeout_);
 
-			co_return co_await session_ptr_->async_connect(host_, port_);
+			auto ec = co_await session_ptr_->async_connect(host_, port_);
+
+			if (make_error(ec))
+				co_return ec;
+
+			accept_invoke();
+
+			co_return ec;
 		}
 
 		auto reconnect() -> awaitable<error_code>
@@ -58,63 +66,28 @@ namespace aquarius
 		{
 			flex_buffer buffer{};
 
-			req->seq_number(static_cast<uint32_t>(detail::uuid_generator()()));
+			// req->seq_number(static_cast<uint32_t>(detail::uuid_generator()()));
 
 			req->commit(buffer);
 
-			error_code ec{};
+			// error_code ec{};
 
-			virgo::header_fields hf;
+			virgo::header_fields hf{};
 
-			auto buf = co_await async_send(buffer, ec, req->seq_number(), hf);
+			auto ec = co_await session_ptr_->async_send(buffer);
 
-			if (ec)
+			Response resp{};
+
+			if (make_error(ec))
 			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.what();
-				}
-				session_ptr_->shutdown();
-				if (close_func_)
-					close_func_();
-
-				co_return Response{};
-			}
-
-			if constexpr (Session::tag == proto_tag::http)
-			{
-				Response resp{ *std::dynamic_pointer_cast<virgo::header_fields>(hf) };
-				resp.consume(buf);
 				co_return resp;
 			}
-			else
-			{
-				Response resp{ *hf};
-				resp.consume(buf);
 
-				co_return resp;
-			}
-		}
+			co_await session_ptr_->query(resp, req->seq_number(), hf, ec);
 
-		auto async_send(flex_buffer& buffer, error_code& ec, std::size_t id, virgo::header_fields& hf)
-			-> awaitable<flex_buffer>
-		{
-			ec = co_await session_ptr_->async_send(buffer);
+			make_error(ec);
 
-			if (ec)
-			{
-				if (ec != boost::asio::error::eof)
-				{
-					XLOG_ERROR() << "on read some occur error - " << ec.what();
-				}
-				session_ptr_->shutdown();
-				if (close_func_)
-					close_func_();
-
-				co_return flex_buffer{};
-			}
-
-			co_return co_await session_ptr_->query_buffer(id, hf);
+			co_return resp;
 		}
 
 		std::string remote_address() const
@@ -133,11 +106,51 @@ namespace aquarius
 			close_func_ = std::forward<Func>(f);
 		}
 
+		void close_invoke()
+		{
+			if (!close_func_)
+				return;
+
+			close_func_(session_ptr_);
+		}
+
+		template <typename Func>
+		void set_accept_func(Func&& f)
+		{
+			accept_func_ = std::forward<Func>(f);
+		}
+
+		void accept_invoke()
+		{
+			if (!accept_func_)
+				return;
+
+			accept_func_(session_ptr_);
+		}
+
 		void close()
 		{
 			session_ptr_->close();
 
 			std::shared_ptr<Session>().swap(session_ptr_);
+		}
+
+	private:
+		bool make_error(error_code& ec)
+		{
+			if (!ec)
+				return false;
+
+			if (ec != boost::asio::error::eof)
+			{
+				XLOG_ERROR() << "on read some occur error - " << ec.what();
+			}
+
+			session_ptr_->shutdown();
+
+			close_invoke();
+
+			return true;
 		}
 
 	private:
@@ -149,7 +162,9 @@ namespace aquarius
 
 		std::shared_ptr<Session> session_ptr_;
 
-		std::function<void()> close_func_;
+		std::function<void(std::shared_ptr<Session>)> close_func_;
+
+		std::function<void(std::shared_ptr<Session>)> accept_func_;
 
 		std::chrono::milliseconds timeout_;
 	};

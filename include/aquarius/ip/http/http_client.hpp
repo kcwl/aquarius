@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	using http_client_session = session<proto_tag::http, ip::default_selector, raw_socket_adaptor<proto_tag::http>>;
+	using http_client_session = session<proto::http, raw_socket_adaptor, ip::http_selector>;
 
 	using http_client = basic_client<http_client_session>;
 } // namespace aquarius

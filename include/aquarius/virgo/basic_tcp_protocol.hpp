@@ -6,7 +6,7 @@ namespace aquarius
 	namespace virgo
 	{
 		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
-		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>,
+		class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
 		{
 		public:
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
@@ -20,12 +20,10 @@ namespace aquarius
 		public:
 			basic_tcp_protocol()
 				: basic_tcp_protocol(header_fields{})
-			{
-
-			}
+			{}
 
 			basic_tcp_protocol(header_fields f)
-				: base()
+				: base(std::move(f))
 				, timestamp_()
 				, version_()
 			{}
@@ -131,12 +129,10 @@ namespace aquarius
 		public:
 			basic_tcp_protocol()
 				: basic_tcp_protocol(header_fields{})
-			{
-
-			}
+			{}
 
 			basic_tcp_protocol(header_fields f)
-				: base()
+				: base(std::move(f))
 				, timestamp_()
 				, version_()
 				, result_()

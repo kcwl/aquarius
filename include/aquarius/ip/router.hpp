@@ -2,6 +2,7 @@
 #include <aquarius/basic_router.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/virgo/header_fields.hpp>
 
 namespace aquarius
 {

@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(store)
 					   [&] -> aquarius::awaitable<void>
 					   {
 						   auto session_ptr =
-							   std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)));
+							   std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 30ms,3s);
 
 						   auto uid = session_ptr->uuid();
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(multi_regist)
 		io,
 		[&] -> aquarius::awaitable<void>
 		{
-			auto session_ptr = std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)));
+			auto session_ptr = std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 30ms, 3s);
 
 			BOOST_TEST(co_await aquarius::mpc_insert_session<aquarius::tcp_server_session>(session_ptr));
 

@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(filter)
 
 	BOOST_TEST(server.ip_filter(""));
 
-	server.set_ip_filter([](const std::string& ip) { return false; });
+	server.set_ip_filter([](const std::string&) { return false; });
 
 	BOOST_TEST(!server.ip_filter(""));
 }
