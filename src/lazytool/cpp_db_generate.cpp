@@ -44,20 +44,26 @@ namespace aquarius
 				else
 				{
 					ofs.seekp(-1, std::ios::cur);
-					ofs << ", ";
-				}
-
-				for (auto& attr : field.attrs)
-				{
-					ofs << attr << ", ";
 				}
 
 				if (!field.attrs.empty())
 				{
+					if(pos != std::string::npos)
+					{
+						ofs << ", ";
+					}
+
+					for (auto& attr : field.attrs)
+					{
+						ofs << attr << ", ";
+					}
+
 					ofs.seekp(-2, std::ios::cur);
 				}
 
-				ofs << "> " << field.name << ";" << std::endl;
+				ofs << "> ";
+
+				ofs << field.name << ";" << std::endl;
 			}
 		}
 
