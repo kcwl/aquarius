@@ -5,7 +5,6 @@
 #include "cpp_generater.h"
 #include "file_parse.h"
 #include "model_parse.h"
-#include <aquarius/cmd_options.hpp>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
