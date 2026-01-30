@@ -6,7 +6,7 @@ namespace aquarius
 	namespace tbl
 	{
 		template<typename... Args>
-		struct field
+		struct fields
 		{
 			using type = std::tuple<Args...>;
 		};

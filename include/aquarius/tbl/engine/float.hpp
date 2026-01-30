@@ -9,7 +9,7 @@ namespace aquarius
 	{
 		template <typename T, typename... Args>
 		requires std::is_floating_point_v<T>
-		class basic_float : public field<Args...>
+		class basic_float : public fields<Args...>
 		{
 		public:
 			basic_float() = default;

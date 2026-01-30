@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/detail/concat.hpp>
 #include <aquarius/tbl/engine/field.hpp>
 #include <cstdint>
 #include <limits>
@@ -11,7 +12,7 @@ namespace aquarius
 	namespace tbl
 	{
 		template <bool Dynamic, std::size_t I, typename... Args>
-		class basic_binary : public field<Args...>
+		class basic_binary : public fields<Args...>
 		{
 		public:
 			constexpr static auto get_type_name()

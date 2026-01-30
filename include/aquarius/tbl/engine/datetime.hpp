@@ -11,7 +11,7 @@ namespace aquarius
 	namespace tbl
 	{
 		template <auto Tag, std::size_t I, typename... Args>
-		class basic_datetime : public field<Args...>
+		class basic_datetime : public fields<Args...>
 		{
 			static_assert(I < 7, "datetime second precision must be less than 7");
 
@@ -60,7 +60,7 @@ namespace aquarius
 				return std::format("'{} {}'", to_date(), to_time());
 			}
 
-		private:
+		protected:
 			std::chrono::system_clock::time_point value_;
 		};
 
@@ -173,6 +173,17 @@ namespace aquarius
 				: base_type(v)
 			{}
 
+			date(const std::string& v)
+				: base_type()
+			{
+				std::stringstream ss(v);
+
+				tm t{};
+				ss >> std::get_time(&t, "%Y-%m-%d");
+
+				this->value_ = std::chrono::system_clock::from_time_t(std::mktime(&t));
+			}
+
 			date(const std::chrono::system_clock::time_point& v)
 				: base_type(v)
 			{}
@@ -180,6 +191,14 @@ namespace aquarius
 			operator std::string() const
 			{
 				return this->to_date();
+			}
+
+			void set_value(std::stringstream& ss)
+			{
+				std::string value{};
+				ss >> value;
+
+				*this = date<Args...>(value);
 			}
 
 		public:
@@ -206,9 +225,9 @@ namespace aquarius
 			is >> value;
 
 			tm t{};
-			std::get_time(&t, "%Y-%m-%d");
+			
 
-			v = date<Args...>(std::chrono::system_clock::from_time_t(std::mktime(&t)));
+			v = date<Args...>();
 
 			return is;
 		}

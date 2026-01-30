@@ -8,7 +8,7 @@ namespace aquarius
 	{
 
 		template <std::size_t Significant, std::size_t Decimal, typename... Args>
-		class decimal : public field<Args...>
+		class decimal : public fields<Args...>
 		{
 			static_assert(Significant < 65, "decimal significant must be less than 65");
 

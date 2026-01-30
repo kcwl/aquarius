@@ -7,7 +7,7 @@ namespace aquarius
 	namespace tbl
 	{
 		template <std::size_t I, typename... Args>
-		class bit : public field<Args...>, public std::bitset<I>
+		class bit : public fields<Args...>, public std::bitset<I>
 		{
 			static_assert(I < 65, "bit index must be less than 65");
 

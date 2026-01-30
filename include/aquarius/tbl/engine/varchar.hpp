@@ -10,7 +10,7 @@ namespace aquarius
 	{
 
 		template <bool Dynamic, std::size_t I, typename... Args>
-		class basic_char : public field<Args...>
+		class basic_char : public fields<Args...>
 		{
 			static_assert(I < 256, "char length must be less than 256");
 

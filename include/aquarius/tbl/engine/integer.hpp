@@ -10,7 +10,7 @@ namespace aquarius
 	namespace tbl
 	{
 		template <std::size_t I, typename... Args>
-		class integer : public field<Args...>
+		class integer : public fields<Args...>
 		{
 		public:
 			constexpr static auto get_type_name()
@@ -72,7 +72,7 @@ namespace aquarius
 				return *this;
 			}
 
-			static_assert(I < 8, "integer requires I less than 8");
+			static_assert(I < 9, "integer requires I less than 9");
 
 			void set_value(std::stringstream& ss)
 			{

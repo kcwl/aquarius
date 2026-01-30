@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/module/schedule.hpp>
 #include <aquarius/module/module.hpp>
 #include <map>
 #include <mutex>
