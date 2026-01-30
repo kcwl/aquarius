@@ -10,25 +10,20 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <virgo::http_method Method, typename Header, typename Body>
-		class http_response : public basic_http_protocol<false, Header, Body>
+
+		template <virgo::http_method Method, typename Body>
+		class http_response : public basic_http_protocol<false, http_response_header, Body>
 		{
 		public:
-			using base = basic_http_protocol<false, Header, Body>;
+			using base = basic_http_protocol<false, http_response_header, Body>;
 
 			using base::has_request;
-
-			using base::json_type;
-
-			using base::splitor;
 
 		public:
 			http_response() = default;
 			http_response(virgo::header_fields f)
 				: base(std::move(f))
-			{
-
-			}
+			{}
 
 			virtual ~http_response() = default;
 
@@ -50,28 +45,30 @@ namespace aquarius
 			}
 
 		public:
-			void consume(flex_buffer& buffer)
-			{
-				this->body().deserialize(buffer);
-			}
-
 			void commit(flex_buffer& buffer)
 			{
-				flex_buffer body_buffer{};
+				flex_buffer header_buffer{};
+				this->header().serialize(header_buffer);
 
-				std::string headline{};
+				this->serialize_custom_header(header_buffer);
+
+				flex_buffer body_buffer{};
 
 				this->body().serialize(body_buffer);
 
-				this->content_length(body_buffer.size());
-
-				headline =
-					std::format("{} {} {}\r\n", virgo::from_string_version(this->version()).data(), static_cast<int>(this->result()), virgo::from_status_string(this->result()));
-
-				for (auto& s : this->fields())
+				if (body_buffer.size() != 0)
 				{
-					headline += std::format("{}: {}\r\n", s.first, s.second);
+					this->content_length(body_buffer.size());
 				}
+
+				//auto ver = co_await mpc_http_version();
+				auto ver = "HTTP/1.1"sv;
+
+				std::string headline =
+					std::format("{} {} {}\r\n", ver,
+								static_cast<int>(this->header().result()), virgo::from_status_string(this->header().result()));
+
+				headline += this->header_field();
 
 				headline += "\r\n";
 
@@ -82,10 +79,19 @@ namespace aquarius
 					buffer.sputn((char*)body_buffer.data().data(), body_buffer.data().size());
 				}
 			}
+
+			void consume(flex_buffer& buffer)
+			{
+				auto buf = this->deserialize_custom_header();
+
+				this->header().deserialize(buf);
+
+				this->body().deserialize(buffer);
+			}
 		};
 
-		template <virgo::http_method Method, typename Header, typename Body>
-		std::ostream& operator<<(std::ostream& os, const http_response<Method, Header, Body>& req)
+		template <virgo::http_method Method, typename Body>
+		std::ostream& operator<<(std::ostream& os, const http_response<Method, Body>& req)
 		{
 			req << os;
 
@@ -93,7 +99,7 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <virgo::http_method Method, typename Header, typename Body>
-	struct is_message_type<virgo::http_response<Method, Header, Body>> : std::true_type
+	template <virgo::http_method Method, typename Body>
+	struct is_message_type<virgo::http_response<Method, Body>> : std::true_type
 	{};
 } // namespace aquarius

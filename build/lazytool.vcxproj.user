@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>--input D:\wise-run-server\table\approval_table.tbl --cpp_out D:\wise-run-server\table</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--input ../test/test.virgo --cpp_out ../test</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArgumentsHistory>--input ../test/test_model.tbl --cpp_out ../test|--input D:\wise-run-server\table\approval.tbl --cpp_out .|--input D:\wise-run-server\table\approval_table.tbl --cpp_out .|--input D:\\wise-run-server\\table\\approval_table.tbl --cpp_out D:\\wise-run-server\\table|--input D:\wise-run-server\table\approval_table.tbl --cpp_out D:\wise-run-server\table|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArgumentsHistory>--input D:\wise-run-server\table\delay_report_table.tbl --cpp_out D:\wise-run-server\table|--input D:\wise-run-server\table\delay_report_table.tbl --cpp_out .|--input .\delay_report_table.tbl --cpp_out .|--input ../test/test_model.tbl --cpp_out ../test|--input ../test/test.virgo --cpp_out ../test|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

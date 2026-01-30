@@ -59,9 +59,9 @@ namespace aquarius
 	protected:
 		virtual auto handle() -> awaitable<error_code> = 0;
 
-		virtual auto make_response() -> awaitable<void>
+		virtual void make_response()
 		{
-			co_return;
+			return;
 		}
 
 		auto session() const
@@ -72,13 +72,13 @@ namespace aquarius
 	private:
 		virtual auto send_response(error_code ec) -> awaitable<void>
 		{
-			response().result(ec.value());
+			response().header().result(ec.value());
 
 			response().seq_number(request()->seq_number());
 
 			flex_buffer buffer{};
 
-			co_await make_response();
+			make_response();
 
 			response().commit(buffer);
 

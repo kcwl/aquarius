@@ -263,7 +263,7 @@ namespace aquarius
 					continue;
 				}
 
-				resp.result(packet.status);
+				resp.header().result(static_cast<int>(packet.status));
 				resp.set_header_fields(packet.hf);
 				resp.consume(packet.body);
 

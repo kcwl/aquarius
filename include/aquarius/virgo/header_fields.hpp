@@ -9,6 +9,13 @@ namespace aquarius
 	{
 		class header_fields
 		{
+			using key_t = std::string;
+
+			using value_t = std::string;
+
+			constexpr static auto __seq_number__ = "seq_number"sv;
+			constexpr static auto __content_length__ = "Content-Length"sv;
+
 		public:
 			header_fields() = default;
 
@@ -44,16 +51,9 @@ namespace aquarius
 			}
 
 		public:
-			std::ostream& operator<<(std::ostream& os) const
+			bool operator==(const header_fields& other) const
 			{
-				for (auto& s : fields_)
-				{
-					os << s.first << ":" << s.second << "\r\n";
-				}
-
-				os << "\r\n";
-
-				return os;
+				return fields_ == other.fields_;
 			}
 
 		public:
@@ -62,69 +62,59 @@ namespace aquarius
 				*this = std::move(hf);
 			}
 
-			std::string find(const std::string& f) const
+			value_t find(const key_t& key) const
 			{
-				auto iter = fields_.find(f);
+				auto iter = fields_.find(key);
 
 				if (iter == fields_.end())
-					return {};
+					return value_t{};
 
 				return iter->second;
 			}
 
-			void set_field(const std::string& f, const std::string& v)
+			void set_field(const key_t& key, const value_t& v)
 			{
-				fields_[f] = v;
-			}
-
-			std::map<std::string, std::string> fields() const
-			{
-				return fields_;
-			}
-
-			std::string content_type() const
-			{
-				return find("content-type");
+				fields_[key] = v;
 			}
 
 			uint32_t seq_number()
 			{
-				auto value = find("seq_number");
-
-				if (value.empty())
-					return static_cast<uint32_t>(-1);
-
-				return to_integer<uint32_t>(value);
+				return to_integer<uint32_t>(find(std::string(__seq_number__)));
 			}
 
 			void seq_number(uint32_t v)
 			{
-				this->set_field("seq_number", std::to_string(v));
+				this->set_field(std::string(__seq_number__), std::to_string(v));
 			}
 
-			uint32_t content_length()
+			bool has_content_length() const
 			{
-				auto value = find("content-length");
+				return !this->find(std::string(__content_length__)).empty();
+			}
+
+			void content_length(uint64_t len)
+			{
+				this->set_field(std::string(__content_length__), std::to_string(len));
+			}
+
+			uint64_t content_length()
+			{
+				auto value = this->find(std::string(__content_length__));
+
 				if (value.empty())
 					return 0;
 
-				return to_integer<uint32_t>(value);
-			}
-
-			void content_length(uint32_t v)
-			{
-				this->set_field("content-length", std::to_string(v));
+				return to_integer<uint64_t>(value);
 			}
 
 		private:
-			template<typename T>
+			template <typename T>
 			T to_integer(const std::string& value)
 			{
 				std::stringstream ss{};
 				ss << value;
 
 				T result;
-
 				ss >> result;
 
 				return result;

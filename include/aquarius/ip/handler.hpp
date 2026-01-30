@@ -36,11 +36,8 @@ namespace aquarius
 		virtual ~handler() = default;
 
 	public:
-		virtual auto make_response() -> awaitable<void> override
+		virtual void make_response() override
 		{
-			auto ver = co_await mpc_http_version();
-			this->response().version(virgo::from_version_string(ver));
-
 			this->response().set_field("Content-Type", "application/json");
 			this->response().set_field("Server", "Aquarius 0.10.0");
 			this->response().set_field("Connection", this->request()->find("Connection"));
@@ -60,13 +57,14 @@ namespace aquarius
 			{
 				std::shared_ptr<typename Context::request_t> request;
 
-				request = std::make_shared<typename Context::request_t>(std::move(hf));
+				request = std::make_shared<typename Context::request_t>();
 
 				error_code ec = virgo::http_status::ok;
 
 				try
 				{
 					request->consume(buffer);
+					request->set_header_fields(std::move(hf));
 				}
 				catch (error_code& ex)
 				{

@@ -6,8 +6,9 @@
 
 namespace aquarius
 {
+
 	template <typename Header, typename Body, typename Allocator>
-	class basic_protocol : public boost::empty_value<Body>, public virgo::header_fields
+	class basic_protocol : public boost::empty_value<Body>
 	{
 		static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
 
@@ -29,17 +30,12 @@ namespace aquarius
 			::new (static_cast<void*>(this->get())) body_t();
 		}
 
-		basic_protocol(virgo::header_fields f)
-			: virgo::header_fields(std::move(f))
-		{
-
-		}
-
 		basic_protocol(const basic_protocol& other)
 			: base_body(other)
 			, header_(other.header_)
 			, alloc_(other.alloc_)
 		{}
+
 		basic_protocol& operator=(const basic_protocol& other)
 		{
 			if (this != std::addressof(other))

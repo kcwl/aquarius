@@ -34,10 +34,9 @@ namespace aquarius
 			{
 				std::string final_router(router_);
 
-				auto content_type = hf.content_type();
+				auto content_type = hf.find("content-type");
 
-				if ((content_type == "application/json" || content_type == "text/html" || content_type == "text/css") &&
-					method == virgo::http_method::get)
+				if (content_type != "application/json" && method == virgo::http_method::get)
 				{
 					final_router = __get_handler__;
 				}

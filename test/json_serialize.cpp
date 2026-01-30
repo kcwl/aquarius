@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(json)
 	{
 		auto p1 = jp.from_datas<person>(buffer);
 
-		BOOST_TEST(p1 == p);
+		BOOST_CHECK(p1 == p);
 	}
 
 	{
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(json)
 
 		person p2 = jp.from_datas<person>(buffer);
 
-		BOOST_TEST(p2 == p);
+		BOOST_CHECK(p2 == p);
 	}
 }
 BOOST_AUTO_TEST_SUITE_END()
