@@ -9,11 +9,9 @@ namespace aquarius
 	class session_module : public no_config_module<session_module<Session>>
 	{
 	public:
-		session_module(const std::string& name)
-			: no_config_module<session_module<Session>>(name)
-		{
-
-		}
+		session_module(io_context& io, const std::string& name)
+			: no_config_module<session_module<Session>>(io, name)
+		{}
 
 	public:
 		bool insert(std::shared_ptr<Session> session)
@@ -51,4 +49,25 @@ namespace aquarius
 
 		std::map<std::size_t, std::shared_ptr<Session>> sessions_;
 	};
+
+	template <typename Session>
+	inline auto mpc_insert_session(std::shared_ptr<Session> session_ptr) -> awaitable<bool>
+	{
+		co_return co_await mpc::call<bool, session_module<Session>>([&](session_module<Session>* ptr) -> awaitable<bool>
+																	{ co_return ptr->insert(session_ptr); });
+	}
+
+	template <typename Session>
+	inline auto mpc_erase_session(std::size_t id) -> awaitable<void>
+	{
+		co_return co_await mpc::call<void, session_module<Session>>([&](session_module<Session>* ptr) -> awaitable<void>
+																	{ co_return ptr->erase(id); });
+	}
+
+	template <typename Session>
+	inline auto mpc_find_session(std::size_t id) -> awaitable<std::shared_ptr<Session>>
+	{
+		co_return co_await mpc::call<std::shared_ptr<Session>, session_module<Session>>(
+			[&](session_module<Session>* ptr) -> awaitable<std::shared_ptr<Session>> { co_return ptr->find(id); });
+	}
 } // namespace aquarius

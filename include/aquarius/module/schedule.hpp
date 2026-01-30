@@ -4,11 +4,11 @@
 namespace aquarius
 {
 	template <typename R, typename Signature>
-	struct module_task
+	struct module_data
 	{
 		using return_type = R;
 
-		module_task(const Signature& func)
+		module_data(const Signature& func)
 			: func_(func)
 		{}
 
@@ -24,12 +24,13 @@ namespace aquarius
 
 	struct mpc
 	{
-		template <typename R, typename T,typename Func>
-		static auto call(std::string_view module_name, Func&& f) -> awaitable<R>
+		template <typename R, typename T, typename Func>
+		static auto call(Func&& f) -> awaitable<R>
 		{
-			auto task = std::make_shared<module_task<R, Func>>(f);
+			auto task = std::make_shared<module_data<R,Func>>(f);
 
-			co_return co_await module_router::get_mutable_instance().schedule<T>(std::string(module_name.data()), task);
+			co_return co_await module_router::get_mutable_instance().schedule<T>(task);
 		}
 	};
+
 } // namespace aquarius

@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module.hpp>
 #include <aquarius/singleton.hpp>
@@ -11,27 +12,32 @@ namespace aquarius
 	class module_router : public singleton<module_router>
 	{
 	public:
-		module_router() = default;
+		module_router()
+			: pool_(std::thread::hardware_concurrency() / 2)
+		{}
 
 		~module_router() = default;
 
 	public:
 		template <typename Module>
-		void regist(const std::string& module_name)
+		void regist()
 		{
-			std::lock_guard lk(mutex_);
+			std::unique_lock lock(mutex_);
 
-			routers_.insert({ module_name, std::make_shared<Module>(module_name) });
+			constexpr auto module_name = detail::struct_name<Module>();
+
+			routers_.insert({ std::string(module_name),
+							  std::make_shared<Module>(pool_.get_io_service(), std::string(module_name)) });
 		}
 
-		auto run(io_context& ios) -> awaitable<bool>
+		void run()
 		{
-			std::lock_guard lk(mutex_);
-
 			for (auto& f : routers_)
 			{
 				if (!f.second)
+				{
 					continue;
+				}
 
 				if (!f.second->config())
 				{
@@ -44,57 +50,52 @@ namespace aquarius
 					continue;
 				}
 
-				co_await f.second->run(ios);
+				co_spawn(f.second->get_executor(), [&]() -> awaitable<void> { co_await f.second->run(); }, detached);
 			}
-
-			co_return true;
 		}
 
-		template <typename Core, typename Task>
-		auto schedule(const std::string& module_name, std::shared_ptr<Task> task)
-			-> awaitable<typename Task::return_type>
+		template <typename T, typename Task>
+		auto schedule(std::shared_ptr<Task> task) -> awaitable<typename Task::return_type>
 		{
+			std::shared_lock lock(mutex_);
+
 			using return_type = typename Task::return_type;
 
-			//std::lock_guard lk(mutex_);
+			constexpr auto module_name = detail::struct_name<T>();
 
-			auto iter = routers_.find(module_name);
+			auto iter = routers_.find(std::string(module_name));
 			if (iter == routers_.end())
 			{
 				XLOG_WARNING() << "[" << module_name << "] module not found";
 				co_return return_type{};
 			}
 
-			auto temp_module = std::dynamic_pointer_cast<basic_module<Core>>(iter->second);
+			auto temp_module = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
 			if (!temp_module)
 			{
 				XLOG_WARNING() << "[" << module_name << "] task type not match";
 				co_return return_type{};
 			}
 
-			co_return co_await temp_module->visit(task);
+			co_return co_await co_spawn(
+				temp_module->get_executor(),
+				[&]() -> awaitable<return_type> { co_return co_await temp_module->visit(task); }, use_awaitable);
 		}
 
 		void hot_update(const std::string& module_name)
 		{
-			std::lock_guard lk(mutex_);
-
 			auto iter = routers_.find(module_name);
 			if (iter == routers_.end())
 				return;
 
 			iter->second->stop();
 
-			if (!iter->second->init())
-			{
-				XLOG_WARNING() << "[" << iter->second->name() << "] init error";
-				return;
-			}
+			run();
 		}
 
 		void timer(std::chrono::milliseconds ms)
 		{
-			std::lock_guard lk(mutex_);
+			std::shared_lock lock(mutex_);
 
 			for (auto& f : routers_)
 			{
@@ -106,9 +107,11 @@ namespace aquarius
 		}
 
 	private:
-		std::mutex mutex_;
+		std::shared_mutex mutex_;
 
 		std::map<std::string, std::shared_ptr<module_base>> routers_;
+
+		io_service_pool pool_;
 	};
 
 	template <typename Module>

@@ -17,7 +17,12 @@ namespace aquarius
 		{
 		public:
 			mysql(io_context& io, boost::mysql::pool_params param)
-				: pool_(io, std::move(param))
+				: mysql(io.get_executor(), std::move(param))
+			{}
+
+			template <typename Executor>
+			mysql(const Executor& executor, boost::mysql::pool_params param)
+				: pool_(executor, std::move(param))
 				, enable_transaction_(true)
 			{}
 

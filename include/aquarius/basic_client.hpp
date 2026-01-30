@@ -4,7 +4,7 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/http_config_schedule.hpp>
+#include <aquarius/module/http_config_module.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/header_fields.hpp>
 #include <aquarius/virgo/http_version.hpp>
@@ -44,7 +44,7 @@ namespace aquarius
 			host_ = host;
 			port_ = port;
 
-			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)), 30ms ,timeout_);
+			session_ptr_ = std::make_shared<Session>(std::move(socket(executor_)), 30ms, timeout_);
 
 			auto ec = co_await session_ptr_->async_connect(host_, port_);
 

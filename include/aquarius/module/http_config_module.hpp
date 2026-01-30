@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/module/module.hpp>
+#include <aquarius/module/schedule.hpp>
 
 namespace aquarius
 {
@@ -16,8 +17,8 @@ namespace aquarius
 	class http_config_module : public aquarius::_module<http_config_module, aquarius::http_param>
 	{
 	public:
-		http_config_module(const std::string& name)
-			: _module<http_config_module, aquarius::http_param>(name)
+		http_config_module(io_context& io, const std::string& name)
+			: _module<http_config_module, aquarius::http_param>(io, name)
 		{}
 
 	public:
@@ -36,4 +37,21 @@ namespace aquarius
 			return configs().root_dir;
 		}
 	};
+
+	inline auto mpc_http_version() -> awaitable<std::string>
+	{
+		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
+														 { co_return ptr->get_version(); });
+	}
+
+	inline auto mpc_http_origin() -> awaitable<std::string>
+	{
+		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
+														 { co_return ptr->get_origin(); });
+	}
+	inline auto mpc_http_root() -> awaitable<std::string>
+	{
+		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
+														 { co_return ptr->get_root_dir(); });
+	}
 } // namespace aquarius
