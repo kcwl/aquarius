@@ -1,5 +1,6 @@
 #include "model_parse.h"
 #include "parse_helper.hpp"
+#include <iostream>
 
 namespace aquarius
 {
@@ -66,9 +67,10 @@ namespace aquarius
 				}
 
 				if (!check_type(field.type))
+				{
+					std::cout << "error type! value:" << field.type << std::endl;
 					return false;
-
-				
+				}
 
 				field.name = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
@@ -87,16 +89,28 @@ namespace aquarius
 					value = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
 
 					if (value.empty())
+					{
+						std::cout << "value empty:" << std::endl;
+
 						return false;
+					}
 
 					auto beg = *t.begin();
 
 					if (beg != '$')
-						return false;
+					{
+						std::cout << "attribute key-word error! value:" << beg << std::endl;
 
+						return false;
+					}
+						
 					if (!check_attribute(value))
-						return false;
+					{
+						std::cout << "check attribute error! value:" << value << std::endl;
 
+						return false;
+					}
+						
 					field.attrs.push_back(value);
 				}
 			}
