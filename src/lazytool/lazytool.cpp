@@ -25,11 +25,12 @@ void help()
 			  << "Specify the C++ standard\n";
 }
 
-bool check_suffix(const std::string& file_path, const std::string& suffix)
+template<typename... Args>
+bool check_suffix(const std::string& file_path, Args&&... args)
 {
 	std::filesystem::path file(file_path);
 
-	return file.extension().compare(suffix);
+	return ((file.extension().compare(args) == 0) || ...);
 }
 
 bool parse_command(int argc, char** argv, std::string& input_files, std::string& output_file, std::string& output_state,
@@ -53,7 +54,7 @@ bool parse_command(int argc, char** argv, std::string& input_files, std::string&
 			{
 				std::string file = argv[++i];
 
-				if (!check_suffix(file, "virgo"))
+				if (!check_suffix(file, ".virgo", ".tbl"))
 				{
 					std::cout << "Input file error! there must be *.virgo file!\n";
 					return false;
@@ -128,7 +129,7 @@ int main(int argc, char** args)
 
 	std::filesystem::path ofs_path(output_path);
 
-	std::filesystem::path files(input_files);
+	std::filesystem::path files(std::filesystem::absolute(input_files));
 
 	ofs_path = ofs_path.append(files.filename().string());
 
@@ -286,7 +287,7 @@ int main(int argc, char** args)
 	{
 		auto parse = std::make_shared<model_parse>();
 
-		if (!parse->read_file(input_files))
+		if (!parse->read_file(files.string()))
 			return 0;
 
 		std::ofstream ofs(ofs_path.string() + ".h");
