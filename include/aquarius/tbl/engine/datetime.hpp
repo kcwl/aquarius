@@ -255,13 +255,10 @@ namespace aquarius
 
 			void set_value(std::stringstream& ss)
 			{
-				std::string value{};
-				ss >> value;
-
 				tm t{};
-				std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+				ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
 
-				*this = date<Args...>(std::chrono::system_clock::from_time_t(std::mktime(&t)));
+				*this = datetime<I, Args...>(std::chrono::system_clock::from_time_t(std::mktime(&t)));
 			}
 
 		public:
@@ -282,16 +279,6 @@ namespace aquarius
 			os << static_cast<std::string>(v);
 
 			return os;
-		}
-
-		template <std::size_t I, typename... Args>
-		std::istream& operator>>(std::istream& is, datetime<I, Args...>& v)
-		{
-			is << static_cast<std::string>(v);
-
-
-
-			return is;
 		}
 	} // namespace tbl
 } // namespace aquarius
