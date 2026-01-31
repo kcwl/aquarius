@@ -13,10 +13,18 @@ namespace aquarius
 	{
 	public:
 		module_router()
-			: pool_(std::thread::hardware_concurrency() / 2)
+			: mutex_()
+			, routers_()
+			, pool_(std::thread::hardware_concurrency() / 2)
+			, pool_run_thread_ptr_(nullptr)
 		{}
 
-		~module_router() = default;
+		~module_router()
+		{
+			pool_.stop();
+
+			pool_run_thread_ptr_->join();
+		}
 
 	public:
 		template <typename Module>
@@ -52,6 +60,8 @@ namespace aquarius
 
 				co_spawn(f.second->get_executor(), [&]() -> awaitable<void> { co_await f.second->run(); }, detached);
 			}
+
+			pool_run_thread_ptr_ = std::make_shared<std::thread>([&] { pool_.run(); });
 		}
 
 		template <typename T, typename Task>
@@ -112,6 +122,8 @@ namespace aquarius
 		std::map<std::string, std::shared_ptr<module_base>> routers_;
 
 		io_service_pool pool_;
+
+		std::shared_ptr<std::thread> pool_run_thread_ptr_;
 	};
 
 	template <typename Module>
