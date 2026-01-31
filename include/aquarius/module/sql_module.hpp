@@ -34,7 +34,9 @@ namespace aquarius
 
 			connector_ = std::make_shared<service>(this->get_executor(), std::move(params));
 
-			co_await connector_->async_run();
+			connector_->async_run();
+
+			co_return;
 		}
 
 		template <typename T>
@@ -42,14 +44,28 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			co_return co_await connector_->async_query<T>(sql, ec);
+			auto results = co_await connector_->async_query<T>(sql, ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "[async query] error: " << ec.what() << ", sql:" << sql;
+			}
+
+			co_return results;
 		}
 
 		auto async_execute(std::string_view sql) -> awaitable<std::size_t>
 		{
 			error_code ec{};
 
-			co_return co_await connector_->async_execute(sql, ec);
+			auto results = co_await connector_->async_execute(sql, ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "[async query] error: " << ec.what() << ", sql:" << sql;
+			}
+
+			co_return results;
 		}
 
 		auto async_execute(const std::vector<std::string>& sqls) -> awaitable<std::size_t>
@@ -121,8 +137,8 @@ namespace aquarius
 	}
 
 	template <typename T>
-	inline auto mpc_select(T&& v) -> awaitable<std::vector<T>>
+	inline auto mpc_select(const T& v) -> awaitable<std::vector<T>>
 	{
-		co_return co_await mpc_execute(tbl::select(std::forward<T>(v)));
+		co_return co_await mpc_query<T>(tbl::select(v));
 	}
 } // namespace aquarius
