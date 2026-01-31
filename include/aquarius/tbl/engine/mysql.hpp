@@ -27,19 +27,9 @@ namespace aquarius
 			{}
 
 		public:
-			auto async_run() -> awaitable<error_code>
+			void async_run()
 			{
-				error_code ec{};
-
-				// co_await pool_.async_run(aquarius::redirect_error(use_awaitable, ec));
 				pool_.async_run(detached);
-
-				if (ec)
-				{
-					XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
-				}
-
-				co_return ec;
 			}
 
 			template <typename T>
@@ -49,7 +39,7 @@ namespace aquarius
 
 				boost::mysql::results result{};
 
-				co_await conn_ptr->async_execute(sql, result);
+				co_await conn_ptr->async_execute(sql, result, aquarius::cancel_after(1s, aquarius::redirect_error(use_awaitable, ec)));
 
 				std::vector<T> results{};
 
