@@ -48,6 +48,8 @@ namespace aquarius
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
 			module_router::get_mutable_instance().run();
+
+			[[maybe_unused]] static aquarius::logger __auto_init_log;
 		}
 
 		~basic_server() = default;
@@ -128,7 +130,7 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
 
-				co_await mpc_insert_session(session_ptr);
+				//co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),

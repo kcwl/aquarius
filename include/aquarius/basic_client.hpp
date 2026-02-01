@@ -34,7 +34,9 @@ namespace aquarius
 			, close_func_()
 			, accept_func_()
 			, timeout_(timeout)
-		{}
+		{
+			[[maybe_unused]] static aquarius::logger __auto_init_log;
+		}
 
 		virtual ~basic_client() = default;
 
