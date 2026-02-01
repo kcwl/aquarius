@@ -72,7 +72,7 @@ namespace aquarius
 
 				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{
-					((has_attribute<PK, struct_element_t<I, T>>()
+					(((has_attribute<PK, struct_element_t<I, T>>() && !has_attribute<AI, struct_element_t<I, T>>())
 						  ? (complete_sql << (start++ == 0 ? " where " : " and ") << struct_element_name<I, T>() << "="
 										  << struct_element_value<I, T>(value))
 						  : complete_sql),
@@ -104,7 +104,7 @@ namespace aquarius
 
 				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{
-					((has_attribute<PK, struct_element_t<I, T>>()
+					(((has_attribute<PK, struct_element_t<I, T>>() && !has_attribute<AI, struct_element_t<I, T>>())
 						  ? (complete_sql << (start++ == 0 ? " set " : " and ") << struct_element_name<I, T>() << "="
 										  << struct_element_value<I, T>(value))
 						  : complete_sql),
@@ -134,7 +134,7 @@ namespace aquarius
 
 				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{
-					((has_attribute<PK, struct_element_t<I, T>>()
+					(((has_attribute<PK, struct_element_t<I, T>>() && !has_attribute<AI, struct_element_t<I, T>>())
 						  ? (complete_sql << (start++ == 0 ? " where " : " and ") << struct_element_name<I, T>() << "="
 										  << struct_element_value<I, T>(value))
 						  : complete_sql),
