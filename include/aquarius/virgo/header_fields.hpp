@@ -13,7 +13,7 @@ namespace aquarius
 
 			using value_t = std::string;
 
-			constexpr static auto __seq_number__ = "seq_number"sv;
+			constexpr static auto __seq_number__ = "Seq-Number"sv;
 			constexpr static auto __content_length__ = "Content-Length"sv;
 
 		public:
