@@ -5,6 +5,6 @@ using namespace std::string_view_literals;
 
 namespace aquarius
 {
-	constexpr static auto __get_handler__ = "__http_get_handler"sv;
-	constexpr static auto __options_handler__ = "__http_options_handler"sv;
+	constexpr static auto __http_source_handler__ = "__http_source_handler__"sv;
+	constexpr static auto __http_options_handler__ = "__http_options_handler__"sv;
 } // namespace aquarius

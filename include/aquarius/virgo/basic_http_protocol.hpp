@@ -74,6 +74,11 @@ namespace aquarius
 				this->set_field(key, value);
 			}
 
+			std::string content_type() const
+			{
+				return this->find("Content-Type");
+			}
+
 		protected:
 			void serialize_custom_header(flex_buffer& value)
 			{

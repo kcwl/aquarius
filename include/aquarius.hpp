@@ -13,6 +13,7 @@
 #include <aquarius/ip/handler.hpp>
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/ip/http/http_header.hpp>
+#include <aquarius/ip/http/http_method_handler.hpp>
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/tcp/tcp_header.hpp>

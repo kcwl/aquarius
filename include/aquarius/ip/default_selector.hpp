@@ -38,7 +38,9 @@ namespace aquarius
 
 				if (content_type != "application/json" && method == virgo::http_method::get)
 				{
-					final_router = __get_handler__;
+					final_router = __http_source_handler__;
+
+					hf.set_field("router", std::string(router_));
 				}
 				else if (method == virgo::http_method::get)
 				{
@@ -49,7 +51,9 @@ namespace aquarius
 				}
 				else if (method == virgo::http_method::options)
 				{
-					final_router = __options_handler__;
+					final_router = __http_options_handler__;
+
+					hf.set_field("router", std::string(router_));
 				}
 
 				router<Session>::get_mutable_instance().invoke(final_router, session_ptr, hf, buffer);

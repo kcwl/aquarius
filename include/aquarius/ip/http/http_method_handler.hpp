@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/ip/handler.hpp>
+#include <aquarius/ip/http/http_method_define.hpp>
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_null_body.hpp>
@@ -18,16 +19,15 @@ namespace aquarius
 
 	public:
 		http_options_method_handler()
-			: base(__http_options_handler__)
+			: base(std::string(__http_options_handler__))
 		{}
 
 	public:
-		virtual auto handler() -> awaitable<error_code> override
+		virtual auto handle() -> awaitable<error_code> override
 		{
-			response().version(virgo::http_version::http1_1);
-			response().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
-			response().set_field("Access-Control-Request-Method", "POST");
-			response().set_field("Access-Control-Allow-Headers", "content-type");
+			this->response().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
+			this->response().set_field("Access-Control-Request-Method", "POST");
+			this->response().set_field("Access-Control-Allow-Headers", "*");
 
 			co_return virgo::http_status::ok;
 		}
@@ -71,14 +71,14 @@ namespace aquarius
 		using base = handler<proto::http, Session, resource_request, resource_response>;
 
 	public:
-		http_method_handler()
-			: base(__http_source_handler__)
+		http_source_method_handler()
+			: base(std::string(__http_source_handler__))
 		{}
 
 	public:
-		virtual auto handler() -> awaitable<error_code> override
+		virtual auto handle() -> awaitable<error_code> override
 		{
-			auto router = request().url_path();
+			auto router = this->request()->find("router");
 
 			auto file_path = (co_await mpc_http_root()) + std::string(router.data(), router.size());
 
@@ -90,13 +90,13 @@ namespace aquarius
 
 			auto file_size = std::filesystem::file_size(file_path);
 
-			response().set_field("Content-Length", std::to_string(file_size));
+			this->response().set_field("Content-Length", std::to_string(file_size));
 
 			auto ext = std::filesystem::path(file_path).extension();
 
-			response().set_field("Content-Type", content_type);
+			this->response().set_field("Content-Type", this->request()->content_type());
 
-			auto& stream = response().body().stream_;
+			auto& stream = this->response().body().stream;
 			stream.resize(file_size);
 			ifs.read(stream.data(), stream.size());
 
@@ -108,9 +108,9 @@ namespace aquarius
 #define HTTP_INNER_HANDLER
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
 		http_server_session,
-		http_options_method_handler<http_server_session>> __auto_register_options_handler(__options_handler__);
+		http_options_method_handler<http_server_session>> __auto_register_options_handler(__http_options_handler__);
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
 		http_server_session,
-		http_source_method_handler<http_server_session>> __auto_register_source_handler(__get_handler__);
+		http_source_method_handler<http_server_session>> __auto_register_source_handler(__http_source_handler__);
 #endif
 } // namespace aquarius

@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/default_selector.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/ip/tcp/tcp_header.hpp>
 #include <aquarius/serialize/binary.hpp>
@@ -92,5 +93,7 @@ namespace aquarius
 	struct handler_tag_traits<virgo::tcp_request<Router, Body>>
 	{
 		constexpr static auto tag = proto::tcp;
+
+		using selector = ip::tcp_selector;
 	};
 } // namespace aquarius

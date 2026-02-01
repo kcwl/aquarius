@@ -3,6 +3,7 @@
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/timer.hpp>
+#include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
 #include <ranges>
@@ -218,7 +219,8 @@ namespace aquarius
 				if (ec)
 					break;
 
-				HandlerSelector(method, version)(std::string_view(url->path().data(), url->path().size()), this->shared_from_this(), hf, buffer);
+				HandlerSelector(method, version)(std::string_view(url->path().data(), url->path().size()),
+												 this->shared_from_this(), hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -286,9 +288,12 @@ namespace aquarius
 			{
 				auto proto_span_buffer = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 
-				auto iter = std::ranges::find_first_of(proto_span_buffer, two_crlf);
+				auto proto_slide_buffer = proto_span_buffer | std::views::slide(two_crlf.size());
 
-				auto len = std::ranges::distance(proto_span_buffer.begin(), iter);
+				auto iter =
+					std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
+
+				auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
 
 				auto header_span = proto_span_buffer.subspan(0, len);
 
@@ -319,7 +324,7 @@ namespace aquarius
 
 		std::string parse_field(std::span<char> buffer, virgo::header_fields& hf, error_code& ec)
 		{
-			ec = virgo::http_status::ok;
+			ec = error_code{};
 
 			auto headers = buffer | std::views::split(crlf);
 

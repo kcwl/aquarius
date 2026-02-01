@@ -59,12 +59,12 @@ namespace aquarius
 
 				request = std::make_shared<typename Context::request_t>();
 
-				error_code ec = virgo::http_status::ok;
+				error_code ec{};
 
 				try
 				{
-					request->consume(buffer);
 					request->set_header_fields(std::move(hf));
+					request->consume(buffer);
 				}
 				catch (error_code& ex)
 				{
@@ -79,12 +79,11 @@ namespace aquarius
 					session->get_executor(),
 					[session, ec, request]() mutable -> awaitable<void>
 					{
-						co_await std::make_shared<Context>()->visit(session, request, ec,
-																	ec != virgo::http_status::ok ? 1u : 1);
+						co_await std::make_shared<Context>()->visit(session, request, ec);
 					},
 					detached);
 
-				return ec == virgo::http_status::ok;
+				return !ec;
 			};
 
 			router<Session>::get_mutable_instance().regist(proto, func);
@@ -119,8 +118,9 @@ namespace aquarius
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	AQUARIUS_CONTEXT_BY(aquarius::server_session<aquarius::handler_tag_traits<__request>::tag>, __request, __response, \
-						__method)
+	using custom_session = aquarius::server_session<aquarius::handler_tag_traits<__request>::tag,                      \
+													aquarius::handler_tag_traits<__request>::selector>;                \
+	AQUARIUS_CONTEXT_BY(custom_session, __request, __response, __method)
 
 #define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
 	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \

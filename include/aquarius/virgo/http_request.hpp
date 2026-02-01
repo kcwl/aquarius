@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/detail/uuid_generator.hpp>
+#include <aquarius/ip/default_selector.hpp>
 #include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/protocol.hpp>
@@ -66,8 +67,10 @@ namespace aquarius
 					auto get_url =
 						boost::urls::url_view(std::string_view((char*)body_buffer.data().data(), body_buffer.size()));
 
-					headline = std::format("{} {}{} {}\r\n", virgo::from_method_string(Method), router,
-										   std::string(get_url.encoded_params().buffer().data(), get_url.encoded_params().buffer().size()), /*virgo::from_string_version(this->version())*/ "HTTP/1.1");
+					headline = std::format(
+						"{} {}{} {}\r\n", virgo::from_method_string(Method), router,
+						std::string(get_url.encoded_params().buffer().data(), get_url.encoded_params().buffer().size()),
+						/*virgo::from_string_version(this->version())*/ "HTTP/1.1");
 				}
 				else
 				{
@@ -76,7 +79,7 @@ namespace aquarius
 					this->set_header("Content-Type", "application/json");
 
 					headline = std::format("{} {} {}\r\n", virgo::from_method_string(Method), router,
-										   /*virgo::from_string_version(this->version())*/"HTTP/1.1");
+										   /*virgo::from_string_version(this->version())*/ "HTTP/1.1");
 				}
 
 				headline += this->header_field();
@@ -118,5 +121,7 @@ namespace aquarius
 	struct handler_tag_traits<virgo::http_request<Router, Method, Body>>
 	{
 		constexpr static auto tag = proto::http;
+
+		using selector = ip::http_selector;
 	};
 } // namespace aquarius
