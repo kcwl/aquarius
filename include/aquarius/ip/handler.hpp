@@ -43,16 +43,6 @@ namespace aquarius
 			this->response().set_field("Connection", this->request()->find("Connection"));
 			this->response().set_field("Access-Control-Allow-Origin", "*");
 			this->response().set_field("Access-Control-Request-Method", "POST");
-			this->response().set_field("Access-Control-Max-Age", "31536000");
-
-
-			auto seq_number = this->request()->find("Seq-Number");
-
-			if (seq_number.empty())
-			{
-				seq_number = "0";
-			}
-			this->response().set_field("Seq-Number", seq_number);
 		}
 	};
 

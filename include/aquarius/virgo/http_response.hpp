@@ -10,7 +10,6 @@ namespace aquarius
 {
 	namespace virgo
 	{
-
 		template <virgo::http_method Method, typename Body>
 		class http_response : public basic_http_protocol<false, http_response_header, Body>
 		{
