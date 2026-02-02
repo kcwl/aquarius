@@ -82,14 +82,14 @@ namespace aquarius
 		protected:
 			void serialize_custom_header(flex_buffer& value)
 			{
-				this->set_field("CustomHeader", std::string((char*)value.data().data(), value.size()));
+				this->set_field("Set-Cookie", std::string((char*)value.data().data(), value.size()));
 			}
 
 			flex_buffer deserialize_custom_header() const
 			{
 				flex_buffer buffer{};
 
-				auto value = find("CustomHeader");
+				auto value = find("Set-Cookie");
 
 				buffer.sputn(value.data(), value.size());
 
