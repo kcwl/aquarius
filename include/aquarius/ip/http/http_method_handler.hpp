@@ -27,7 +27,7 @@ namespace aquarius
 		{
 			this->response().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 			this->response().set_field("Access-Control-Request-Method", "POST");
-			this->response().set_field("Access-Control-Allow-Headers", "*");
+			this->response().set_field("Access-Control-Allow-Headers", "Aquarius-Header");
 			this->response().set_field("Access-Control-Max-Age", "31536000");
 			this->response().set_field("Access-Control-Allow-Credentials", "true");
 

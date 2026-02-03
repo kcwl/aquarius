@@ -43,6 +43,7 @@ namespace aquarius
 			this->response().set_field("Connection", this->request()->find("Connection"));
 			this->response().set_field("Access-Control-Allow-Origin", "*");
 			this->response().set_field("Access-Control-Request-Method", "POST");
+			this->response().set_field("Access-Control-Expose-Headers", "Aquarius-Header");
 		}
 	};
 

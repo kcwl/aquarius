@@ -209,9 +209,11 @@
     <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\html.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\http_cookie_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_html_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp" />

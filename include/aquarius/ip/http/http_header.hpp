@@ -1,11 +1,11 @@
 #pragma once
-#include <aquarius/serialize/http_cookie_serialize.hpp>
+#include <aquarius/serialize/http_json_serialize.hpp>
 
 namespace aquarius
 {
-	class http_request_header : public http_cookie_serialize
+	class http_request_header : public http_json_serialize
 	{
-		using base = http_cookie_serialize;
+		using base = http_json_serialize;
 
 	public:
 		http_request_header()
@@ -55,12 +55,12 @@ namespace aquarius
 	public:
 		virtual void serialize(flex_buffer& buffer) override
 		{
-			this->parse_to(uuid_, buffer, "uuid");
+			this->parse_to(*this, buffer);
 		}
 
 		virtual void deserialize(flex_buffer& buffer) override
 		{
-			uuid_ = this->parse_from<uint64_t>(buffer, "uuid");
+			*this = this->parse_from<http_request_header>(buffer);
 		}
 
 		uint64_t uuid() const
@@ -77,9 +77,9 @@ namespace aquarius
 		uint64_t uuid_;
 	};
 
-	class http_response_header : public http_request_header
+	class http_response_header : public http_json_serialize
 	{
-		using base = http_request_header;
+		using base = http_json_serialize;
 
 	public:
 		http_response_header()
@@ -128,21 +128,12 @@ namespace aquarius
 	public:
 		virtual void serialize(flex_buffer& buffer) override
 		{
-			base::serialize(buffer);
-			buffer.sputc(',');
-			this->parse_to(result_, buffer, "result");
+			this->parse_to(*this, buffer);
 		}
 
 		virtual void deserialize(flex_buffer& buffer) override
 		{
-			base::deserialize(buffer);
-			char c{};
-			buffer.sgetn(&c, sizeof(char));
-			if (c != ',')
-			{
-				return;
-			}
-			result_ = base::parse_from<int32_t>(buffer, "result");
+			*this = this->parse_from<http_response_header>(buffer);
 		}
 
 		int32_t result() const
@@ -155,7 +146,19 @@ namespace aquarius
 			result_ = v;
 		}
 
+		uint64_t uuid() const
+		{
+			return uuid_;
+		}
+
+		void uuid(uint64_t v)
+		{
+			uuid_ = v;
+		}
+
 	private:
+		uint64_t uuid_;
+
 		int32_t result_;
 	};
 
@@ -172,4 +175,42 @@ namespace aquarius
 
 		return os;
 	}
+
+	inline void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_request_header& local)
+	{
+		auto& jv_obj = jv.emplace_object();
+		jv_obj.emplace("uuid", local.uuid());
+	}
+
+	inline http_request_header tag_invoke(const aquarius::json::value_to_tag<http_request_header>&, const aquarius::json::value& jv)
+	{
+		http_request_header result{};
+		auto obj = jv.try_as_object();
+		if (obj->empty())
+			return {};
+		result.uuid(static_cast<uint64_t>(obj->at("uuid").as_int64()));
+
+		return result;
+	}
+
+	inline void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_response_header& local)
+	{
+		auto& jv_obj = jv.emplace_object();
+		jv_obj.emplace("uuid", local.uuid());
+		jv_obj.emplace("result", local.result());
+	}
+
+	inline http_response_header tag_invoke(const aquarius::json::value_to_tag<http_response_header>&, const aquarius::json::value& jv)
+	{
+		http_response_header result{};
+		auto obj = jv.try_as_object();
+		if (obj->empty())
+			return {};
+
+		result.uuid(static_cast<uint64_t>(obj->at("uuid").as_int64()));
+		result.result(static_cast<uint64_t>(obj->at("result").as_int64()));
+
+		return result;
+	}
+
 } // namespace aquarius

@@ -366,6 +366,12 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_method_define.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\cookie.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\http_cookie_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
