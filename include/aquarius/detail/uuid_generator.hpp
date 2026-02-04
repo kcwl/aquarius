@@ -7,11 +7,11 @@ namespace aquarius
 	{
 		struct uuid_generator
 		{
-			std::size_t operator()()
+			uint32_t operator()()
 			{
 				boost::uuids::random_generator gen;
 
-				return boost::uuids::hash_value(gen());
+				return static_cast<uint32_t>(boost::uuids::hash_value(gen()));
 			}
 		};
 	} // namespace detail
