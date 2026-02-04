@@ -36,7 +36,7 @@ namespace aquarius
 
 				auto content_type = hf.find("content-type");
 
-				if (content_type != "application/json" && method == virgo::http_method::get)
+				if (!content_type.empty() && content_type != "application/json" && method == virgo::http_method::get)
 				{
 					final_router = __http_source_handler__;
 
