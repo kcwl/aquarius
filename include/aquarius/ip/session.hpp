@@ -219,7 +219,7 @@ namespace aquarius
 				if (ec)
 					break;
 
-				HandlerSelector(method, version)(std::string_view(url->path().data(), url->path().size()),
+				HandlerSelector(method, version, std::string(url->encoded_params().buffer().data(), url->encoded_params().buffer().size()))(std::string_view(url->path().data(), url->path().size()),
 												 this->shared_from_this(), hf, buffer);
 			}
 
