@@ -35,7 +35,7 @@ namespace aquarius
 			template <typename T>
 			auto async_query(std::string_view sql, error_code& ec) -> awaitable<std::vector<T>>
 			{
-				auto conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
+				auto conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s, aquarius::redirect_error(use_awaitable, ec)));
 
 				boost::mysql::results result{};
 
@@ -109,6 +109,21 @@ namespace aquarius
 				constexpr static auto size = struct_size<T>();
 
 				results.push_back(to_struct(std::make_index_sequence<size>{}));
+			}
+
+			template<typename T, typename Row>
+			requires(std::is_integral_v<T>)
+			void make_result(std::vector<T>& results, const Row& row)
+			{
+				std::stringstream ss{};
+
+				ss << row[0];
+
+				T result{};
+				
+				ss >> result;
+
+				results.push_back(result);
 			}
 
 			template <typename T, typename Field>
