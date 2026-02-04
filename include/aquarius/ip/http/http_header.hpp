@@ -208,7 +208,7 @@ namespace aquarius
 			return {};
 
 		result.uuid(static_cast<uint64_t>(obj->at("uuid").as_int64()));
-		result.result(static_cast<uint64_t>(obj->at("result").as_int64()));
+		result.result(static_cast<int32_t>(obj->at("result").as_int64()));
 
 		return result;
 	}
