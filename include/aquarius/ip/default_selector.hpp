@@ -56,7 +56,10 @@ namespace aquarius
 					hf.set_field("router", std::string(router_));
 				}
 
-				router<Session>::get_mutable_instance().invoke(final_router, session_ptr, hf, buffer);
+				if (!router<Session>::get_mutable_instance().invoke(final_router, session_ptr, hf, buffer))
+				{
+					XLOG_ERROR() << "[" << final_router << "] is not exist";
+				}
 			};
 
 			virgo::http_method method;

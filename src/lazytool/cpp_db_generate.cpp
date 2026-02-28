@@ -9,8 +9,6 @@ namespace aquarius
 		{
 			ofs << "struct " << model_field_ptr->name << std::endl;
 			ofs << "{" << std::endl;
-			ofs << "\t";
-			generate_language(ofs, model_field_ptr->db_languase);
 
 			generate_field(ofs, model_field_ptr);
 
@@ -21,11 +19,6 @@ namespace aquarius
 			ofs << "};";
 		}
 
-		void cpp_db_generate::generate_language(std::ofstream& ofs, const std::string& value)
-		{
-			ofs << "constexpr static auto language = \"" << value << "\";\n";
-		}
-
 		void cpp_db_generate::generate_field(std::ofstream& ofs, std::shared_ptr<model_field> model_field_ptr)
 		{
 			for (auto& field : model_field_ptr->fields)
@@ -33,35 +26,7 @@ namespace aquarius
 				if (field.type.empty())
 					continue;
 
-				ofs << "\t" << field.type;
-
-				auto pos = field.type.find_last_of(">");
-
-				if (pos == std::string::npos)
-				{
-					ofs << "<";
-				}
-				else
-				{
-					ofs.seekp(-1, std::ios::cur);
-				}
-
-				if (!field.attrs.empty())
-				{
-					if(pos != std::string::npos)
-					{
-						ofs << ", ";
-					}
-
-					for (auto& attr : field.attrs)
-					{
-						ofs << attr << ", ";
-					}
-
-					ofs.seekp(-2, std::ios::cur);
-				}
-
-				ofs << "> ";
+				ofs << "\taquarius::tbl::" << field.type << " ";
 
 				ofs << field.name << ";" << std::endl;
 			}
@@ -72,6 +37,7 @@ namespace aquarius
 			ofs << "\tconstexpr static auto member()\n";
 			ofs << "\t{\n";
 			ofs << "\t\treturn std::make_tuple(";
+
 			for (auto& field : model_field_ptr->fields)
 			{
 				if (field.type.empty())
@@ -94,7 +60,7 @@ namespace aquarius
 		{
 			ofs << "\tconstexpr static auto member_name()\n";
 			ofs << "\t{\n";
-			ofs << "\t\treturn std::make_tuple(\n";
+			ofs << "\t\treturn std::array{";
 			for (auto& field : model_field_ptr->fields)
 			{
 				if (field.type.empty())
@@ -108,7 +74,7 @@ namespace aquarius
 				ofs.seekp(-1, std::ios_base::cur);
 			}
 
-			ofs << "\n\t\t);\n";
+			ofs << "\n\t\t};\n";
 			ofs << "\t}\n";
 		}
 	} // namespace lazytool

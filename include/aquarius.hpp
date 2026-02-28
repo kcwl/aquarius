@@ -21,6 +21,7 @@
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module.hpp>
 #include <aquarius/serialize/binary.hpp>
+#include <aquarius/serialize/cpp_type.hpp>
 #include <aquarius/serialize/http_html_serialize.hpp>
 #include <aquarius/serialize/http_json_serialize.hpp>
 #include <aquarius/serialize/http_kv_serialize.hpp>
@@ -28,7 +29,6 @@
 #include <aquarius/serialize/tcp_binary_serialize.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl.hpp>
-#include <aquarius/virgo/cpp_type.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/tcp_request.hpp>

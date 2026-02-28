@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/module/module.hpp>
-#include <aquarius/tbl/engine/generate_view.hpp>
-#include <aquarius/tbl/engine/mysql.hpp>
+#include <aquarius/tbl/generate_view.hpp>
+#include <aquarius/tbl/mysql.hpp>
 
 namespace aquarius
 {
@@ -136,9 +136,9 @@ namespace aquarius
 		co_return co_await mpc_execute(tbl::update(std::forward<T>(v)));
 	}
 
-	template <typename T>
+	template <typename T, detail::string_literal... Name>
 	inline auto mpc_select(const T& v) -> awaitable<std::vector<T>>
 	{
-		co_return co_await mpc_query<T>(tbl::select(v));
+		co_return co_await mpc_query<T>(tbl::select<T, Name...>(v));
 	}
 } // namespace aquarius

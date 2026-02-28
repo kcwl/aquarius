@@ -117,9 +117,9 @@ namespace aquarius
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	using custom_session = aquarius::server_session<aquarius::handler_tag_traits<__request>::tag,                      \
+	using custom_session##__request = aquarius::server_session<aquarius::handler_tag_traits<__request>::tag,                      \
 													aquarius::handler_tag_traits<__request>::selector>;                \
-	AQUARIUS_CONTEXT_BY(custom_session, __request, __response, __method)
+	AQUARIUS_CONTEXT_BY(custom_session##__request, __request, __response, __method)
 
 #define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
 	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \

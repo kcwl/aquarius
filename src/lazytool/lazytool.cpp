@@ -296,8 +296,6 @@ int main(int argc, char** args)
 
 		ofs << "#include <aquarius/tbl.hpp>\n" << std::endl;
 
-		ofs << "using namespace aquarius::tbl;" << std::endl;
-
 		for (auto& m : parse->models_)
 		{
 			generate.generate_table(ofs, m);
