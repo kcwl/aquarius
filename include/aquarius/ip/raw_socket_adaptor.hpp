@@ -7,50 +7,46 @@
 
 namespace aquarius
 {
-	template <auto Tag>
+	template <bool, typename Socket, typename Resolver>
 	class raw_socket_adaptor
 	{
-		using socket = typename protocol<Tag>::socket;
+		using socket_t = Socket;
 
-		using resolver = typename protocol<Tag>::resolver;
+		using resolver_t = Resolver;
 
 	public:
-		raw_socket_adaptor(socket& s)
-			: socket_(s)
+		raw_socket_adaptor(socket_t& socket)
+			: socket_(socket)
 		{}
 
 	public:
-		socket& get_implement()
+		socket_t& get_implement()
 		{
 			return socket_;
 		}
 
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
+		template <typename Dura>
+		auto async_connect(const std::string& host, const std::string& port, Dura timeout) -> awaitable<error_code>
 		{
-			resolver resolve(socket_.lowest_layer().get_executor());
+			resolver_t resolve(socket_.lowest_layer().get_executor());
 
 			auto endpoints = resolve.resolve(host, port);
 
 			error_code ec;
 
-			co_await boost::asio::async_connect(socket_.lowest_layer(), endpoints, redirect_error(use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "connect " << host << " failed! " << ec.what();
-			}
+			co_await boost::asio::async_connect(socket_.lowest_layer(), endpoints,
+												cancel_after(timeout, redirect_error(use_awaitable, ec)));
 
 			co_return ec;
 		}
 
-		template <typename Func>
-		requires(is_awaitable_func<Func>)
-		auto accept(Func&& f) -> awaitable<void>
+		template <typename Dura>
+		auto accept(Dura) -> awaitable<error_code>
 		{
-			co_return co_await f();
+			co_return error_code{};
 		}
 
 	private:
-		socket& socket_;
+		socket_t& socket_;
 	};
 } // namespace aquarius

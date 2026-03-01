@@ -493,8 +493,7 @@ namespace aquarius
 
 			void message_field_generator::generate_proto_request_define()
 			{
-				ofs_ << "using " << message_field_ptr_->name() << "_" << message_field_ptr_->protocol()
-					 << "_request = aquarius::virgo::" << message_field_ptr_->protocol() << "_request<\"" << message_field_ptr_->router()
+				ofs_ << "using " << message_field_ptr_->name() << "_request = aquarius::virgo::" << message_field_ptr_->protocol() << "_request<\"" << message_field_ptr_->router()
 					 << "\", ";
 
 				if (message_field_ptr_->protocol() == "http")
@@ -502,22 +501,21 @@ namespace aquarius
 					ofs_ << "aquarius::virgo::http_method::" << message_field_ptr_->method() << ", ";
 				}
 
-				ofs_ << "aquarius::" << message_field_ptr_->protocol() << "_request_header, ";
+				//ofs_ << "aquarius::" << message_field_ptr_->protocol() << "_request_header, ";
 
 				ofs_ << message_field_ptr_->request()->name() << ">;" << std::endl;
 			}
 
 			void message_field_generator::generate_proto_response_define()
 			{
-				ofs_ << "using " << message_field_ptr_->name() << "_" << message_field_ptr_->protocol()
-					 << "_response = aquarius::virgo::" << message_field_ptr_->protocol() << "_response<";
+				ofs_ << "using " << message_field_ptr_->name() << "_response = aquarius::virgo::" << message_field_ptr_->protocol() << "_response<";
 
 				if (message_field_ptr_->protocol() == "http")
 				{
 					ofs_ << "aquarius::virgo::http_method::" << message_field_ptr_->method() << ", ";
 				}
 
-				ofs_ << "aquarius::" << message_field_ptr_->protocol() << "_response_header, ";
+				//ofs_ << "aquarius::" << message_field_ptr_->protocol() << "_response_header, ";
 
 				ofs_ << message_field_ptr_->response()->name() << ">;" << std::endl;
 			}

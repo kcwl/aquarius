@@ -7,14 +7,14 @@ BOOST_AUTO_TEST_SUITE(protocol)
 BOOST_AUTO_TEST_CASE(ctor)
 {
 	{
-		auto req = std::make_shared<login_tcp_request>();
-		req->header().uuid_ = 1;
+		auto req = std::make_shared<login_request>();
+		req->header().uuid(1);
 		req->body().per_req.sex = true;
 		req->body().per_req.addr = 2;
 
 		auto req_move = std::move(req);
 
-		BOOST_TEST(req_move->header().uuid_ == 1);
+		BOOST_TEST(req_move->header().uuid() == 1);
 		BOOST_TEST(req_move->body().per_req.sex == true);
 		BOOST_TEST(req_move->body().per_req.addr == 2u);
 
@@ -22,14 +22,14 @@ BOOST_AUTO_TEST_CASE(ctor)
 	}
 
 	{
-		auto resp = std::make_shared<login_tcp_response>();
-		resp->header().uuid_ = 1;
+		auto resp = std::make_shared<login_response>();
+		resp->header().uuid(1);
 		resp->body().per_resp.sex = true;
 		resp->body().per_resp.addr = 2;
 
 		auto req_move = std::move(resp);
 
-		BOOST_TEST(req_move->header().uuid_ == 1);
+		BOOST_TEST(req_move->header().uuid() == 1);
 		BOOST_TEST(req_move->body().per_resp.sex == true);
 		BOOST_TEST(req_move->body().per_resp.addr == 2u);
 

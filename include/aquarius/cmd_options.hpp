@@ -31,9 +31,9 @@ namespace aquarius
 		}
 
 		template <typename T>
-		void add_option(const std::string& option, const std::string& desc)
+		void add_option(const std::string& option, const std::string& desc, T default_value = {})
 		{
-			desc_.add_options()(option.c_str(), boost::program_options::value<T>(), desc.c_str());
+			desc_.add_options()(option.c_str(), boost::program_options::value<T>(&default_value), desc.c_str());
 		}
 
 		template <typename T>

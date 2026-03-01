@@ -7,7 +7,7 @@
 #include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
-#include <aquarius/module/session_schedule.hpp>
+#include <aquarius/module/session_module.hpp>
 #include <aquarius/module/sql_module.hpp>
 #include <aquarius/timer.hpp>
 
@@ -47,8 +47,9 @@ namespace aquarius
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
-			co_spawn(io_service_pool_.get_io_service(),
-					 module_router::get_mutable_instance().run(io_service_pool_.get_io_service()), detached);
+			module_router::get_mutable_instance().run();
+
+			[[maybe_unused]] static aquarius::logger __auto_init_log;
 		}
 
 		~basic_server() = default;
@@ -102,7 +103,7 @@ namespace aquarius
 			close_func_ = func;
 		}
 
-		auto close_func(std::shared_ptr<session_type> session)-> awaitable<void>
+		auto close_func(std::shared_ptr<session_type> session) -> awaitable<void>
 		{
 			if (!close_func_)
 				co_return;
@@ -127,11 +128,9 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock), 1s);
+				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
 
-				session_ptr->set_close_func(close_func_);
-
-				co_await mpc_insert_session(session_ptr);
+				//co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
@@ -145,7 +144,15 @@ namespace aquarius
 
 						co_await accept_func(session_ptr);
 
-						co_return co_await session_ptr->accept();
+						auto ec = co_await session_ptr->accept();
+
+						if (ec)
+						{
+							close_func(session_ptr);
+						}
+
+						session_ptr->shutdown();
+						session_ptr->close();
 					},
 					detached);
 			}
@@ -186,14 +193,13 @@ namespace aquarius
 
 		void regist_module()
 		{
-			module_router::get_mutable_instance().regist<session_module<Session>>(
-				std::string(session_module_name.data()));
+			module_router::get_mutable_instance().regist<session_module<Session>>();
 
-			module_router::get_mutable_instance().regist<sql_module>("sql_module");
+			module_router::get_mutable_instance().regist<sql_module>();
 
-			module_router::get_mutable_instance().regist<http_config_module>("http_config_module");
+			module_router::get_mutable_instance().regist<http_config_module>();
 
-			module_router::get_mutable_instance().regist<player_module>("player_module");
+			module_router::get_mutable_instance().regist<player_module>();
 		}
 
 	protected:

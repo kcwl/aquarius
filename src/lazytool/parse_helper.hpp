@@ -65,21 +65,21 @@ namespace aquarius
 				{
 					if (c != '_' && !std::isalnum(c))
 					{
-						ends = static_cast<char>(c);
+						ends = static_cast<char>(ifs.get());
 						break;
 					}
 						
 				}
 				else if constexpr (Token == token::key || Token == token::domin)
 				{
-					if (!std::isalnum(c) && c != '-')
+					if (!std::isalnum(c) && c != '-' && c != '<' && c != '>')
 					{
 						if constexpr (Token == token::domin)
 						{
 							ifs.seekg(-static_cast<int64_t>(value.size()), std::ios::cur);
 						}
 
-						ends = static_cast<char>(c);
+						ends = static_cast<char>(ifs.get());
 
 						break;
 					}

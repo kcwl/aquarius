@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
-#include <aquarius/virgo/http_fields.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>
 
@@ -10,216 +9,92 @@ namespace aquarius
 	{
 		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
 		class basic_http_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>,
-									public http_fields
+									public header_fields
 		{
 		public:
-			constexpr static auto json_type = "aquarius-json"sv;
-
-			constexpr static auto splitor = "<->"sv;
-
 			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+
+			using header_field_type = header_fields;
 
 			constexpr static auto has_request = Request;
 
 		public:
-			basic_http_protocol()
-				: basic_http_protocol(http_fields{})
-			{
-
-			}
-
-			basic_http_protocol(http_fields f)
-				: base()
-				, http_fields(std::move(f))
-				, version_(http_version::unknown)
-			{}
+			basic_http_protocol() = default;
 
 			virtual ~basic_http_protocol() = default;
 
-			basic_http_protocol(const basic_http_protocol& other)
-				: base(other)
-				, http_fields(other)
-				, version_(other.version_)
-			{}
+			basic_http_protocol(const basic_http_protocol& other) = default;
 
-			basic_http_protocol& operator=(const basic_http_protocol& other)
-			{
-				if (std::addressof(other) != this)
-				{
-					base::operator=(other);
-					http_fields::operator=(other);
-					version_ = other.version_;
-				}
+			basic_http_protocol& operator=(const basic_http_protocol& other) = default;
 
-				return *this;
-			}
+			basic_http_protocol(basic_http_protocol&& other) noexcept = default;
 
-			basic_http_protocol(basic_http_protocol&& other) noexcept
-				: base(std::move(other))
-				, http_fields(std::move(other))
-				, version_(std::exchange(other.version_, http_version::unknown))
-			{}
-
-			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept
-			{
-				if (std::addressof(other) != this)
-				{
-					base::operator=(std::move(other));
-					http_fields::operator=(std::move(other));
-					version_ = std::exchange(other.version_, http_version::unknown);
-				}
-
-				return *this;
-			}
+			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept = default;
 
 		public:
 			bool operator==(const basic_http_protocol& other) const
 			{
-				return base::operator==(other) && version_ == other.version_;
+				return base::operator==(other) && header_field_type::operator==(other);
 			}
 
 			std::ostream& operator<<(std::ostream& os) const
 			{
-				os << this->header() << " " << this->body() << " " << static_cast<int>(version());
+				os << this->header() << " " << this->body();
 
 				return os;
 			}
 
 		public:
-			http_version version() const
+			bool keep_alive()
 			{
-				return version_;
+				auto value = this->find("Connection");
+
+				return value == "keep-alive" ? true : false;
 			}
 
-			void version(http_version version)
+			void keep_alive(bool k)
 			{
-				version_ = version;
+				this->set_field("Connection", k ? "keep-alive" : "close");
 			}
 
-			auto fields() const
+			std::string header_field() const
 			{
-				return this->fields_;
-			}
+				std::string headline{};
 
-		private:
-			http_version version_;
-		};
-
-		template <typename Header, typename Body, typename Allocator>
-		class basic_http_protocol<false, Header, Body, Allocator>
-			: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>, public http_fields
-		{
-		public:
-			constexpr static auto json_type = "aquarius-json"sv;
-
-			constexpr static auto splitor = "<->"sv;
-
-			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
-
-			constexpr static auto has_request = false;
-
-		public:
-			basic_http_protocol()
-				: basic_http_protocol(http_fields{})
-			{
-
-			}
-
-			basic_http_protocol(http_fields f)
-				: base()
-				, http_fields(f)
-				, status_(virgo::http_status::ok)
-				, version_(virgo::http_version::unknown)
-			{}
-
-			virtual ~basic_http_protocol() = default;
-
-			basic_http_protocol(const basic_http_protocol& other)
-				: base(other)
-				, http_fields(other)
-				, status_(other.status_)
-				, version_(other.version_)
-			{}
-
-			basic_http_protocol& operator=(const basic_http_protocol& other)
-			{
-				if (this != std::addressof(other))
+				for (auto& s : this->fields_)
 				{
-					base::operator=(other);
-					http_fields::operator=(other);
-					status_ = other.status_;
-					version_ = other.version_;
+					headline += std::format("{}: {}\r\n", s.first, s.second);
 				}
 
-				return *this;
+				return headline;
 			}
 
-			basic_http_protocol(basic_http_protocol&& other) noexcept
-				: base(std::move(other))
-				, http_fields(std::move(other))
-				, status_(std::exchange(other.status_, virgo::http_status::ok))
-				, version_(std::exchange(other.version_, virgo::http_version::unknown))
-			{}
-
-			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept
+			void set_header(const std::string& key, const std::string& value)
 			{
-				if (this != std::addressof(other))
-				{
-					base::operator=(std::move(other));
-					http_fields::operator=(std::move(other));
-					status_ = std::exchange(other.status_, virgo::http_status::ok);
-					version_ = std::exchange(other.version_, 0);
-				}
-
-				return *this;
+				this->set_field(key, value);
 			}
 
-		public:
-			bool operator==(const basic_http_protocol& other) const
+			std::string content_type() const
 			{
-				return base::operator==(other) && status_ == other.status_ && version_ == other.version_;
+				return this->find("Content-Type");
 			}
 
-			std::ostream& operator<<(std::ostream& os) const
+		protected:
+			void serialize_custom_header(flex_buffer& value)
 			{
-				return os << this->header() << " " << this->body() << " " << result() << " " << version();
+				this->set_field("Aquarius-Header", std::string((char*)value.data().data(), value.size()));
 			}
 
-		public:
-			http_status result() const
+			flex_buffer deserialize_custom_header() const
 			{
-				return status_;
+				flex_buffer buffer{};
+
+				auto value = find("Aquarius-Header");
+
+				buffer.sputn(value.data(), value.size());
+
+				return std::move(buffer);
 			}
-
-			void result(int s)
-			{
-				return result(static_cast<http_status>(s));
-			}
-
-			void result(http_status s)
-			{
-				status_ = s;
-			}
-
-			http_version version() const
-			{
-				return version_;
-			}
-
-			void version(http_version version)
-			{
-				version_ = version;
-			}
-
-			auto fields() const
-			{
-				return this->fields_;
-			}
-
-		private:
-			http_status status_;
-
-			http_version version_;
 		};
 	} // namespace virgo
 } // namespace aquarius

@@ -60,36 +60,54 @@ AQUAIURS_HANDLER(request, response, ctx_test)
 ```
 
 # How To Use SQL?
+for details, please refer to [here]()
 
 ```
 #include <aquarius.hpp>
 
 struct personal
 {
-	int32_t age;
-	bool sex;
-};
+    integer<4, PK, AI> id;
+    varchar<10> name;
 
-personal p{1,true};
+    constexpr static auto member()
+    {
+        return std::make_tuple(
+            &personal::id, 
+            &personal::name
+        );
+    }
+
+    constexpr static auto member_name()
+    {
+        return std::make_tuple(
+            "id", 
+            "name"
+        );
+    }
+}£»
+
+personal p{1,"jhon"};
 
 //insert 
-
-schedule_insert("sql", p);
+mpc_insert(p);
 
 //select
-std::vector<personal> result = schedule_select<std::vector<personal>>("sql");
+std::vector<personal> result = mpc_select<std::vector<personal>>();
 
 //delete
-schedule_delete<std::size_t>("sql", p);
+mpc_delete(p);
 
 //update
-schedule_update<std::size_t>("sql", p);
+mpc_update(p);
 
 
 // custom sql
-std::vector<T> result = schedule_query<std::vector<T>>("sql", sql_str);
+std::string sql_str = "select * from personal";
 
-std::size_t result = schedule_execute<>("sql", sql_str);
+std::vector<T> result = mpc_query<T>(sql_str);
+
+std::size_t result = mpc_execute(sql_str);
 
 ```
 

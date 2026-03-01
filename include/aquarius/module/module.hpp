@@ -6,18 +6,19 @@
 
 namespace aquarius
 {
-
-	template <typename Core, typename Config>
-	class _module : public basic_module<Core>
+	template <typename T, typename Config>
+	class _module : public basic_module<T>
 	{
+		using base = basic_module<T>;
+
 	public:
-		using typename basic_module<Core>::core_type;
+		using typename base::core_type;
 		using config_type = Config;
 		constexpr static std::string_view config_path = config_type::path;
 
 	public:
-		_module(const std::string& name)
-			: basic_module<Core>(name)
+		_module(io_context& io, const std::string& name)
+			: base(io, name)
 		{}
 
 		virtual ~_module() = default;
@@ -41,13 +42,12 @@ namespace aquarius
 			{
 				config_ = ini::parse<config_type>(path.string(), ec);
 			}
-			catch(...)
+			catch (...)
 			{
 				XLOG_ERROR() << "module[" << this->name() << "] config structure error!";
 
 				return false;
 			}
-			
 
 			return !ec;
 		}
@@ -77,7 +77,7 @@ namespace aquarius
 			return;
 		}
 
-		virtual auto run(io_context&) -> awaitable<void>
+		virtual auto run() -> awaitable<void> override
 		{
 			co_return;
 		}
@@ -86,20 +86,18 @@ namespace aquarius
 		Config config_;
 	};
 
-	struct no_config 
+	struct no_config
 	{
 		constexpr static std::string_view path = "empty"sv;
 	};
 
-	template<typename Core>
+	template <typename Core>
 	class no_config_module : public _module<Core, no_config>
 	{
 	public:
-		no_config_module(const std::string& name)
-			: _module<Core, no_config>(name)
-		{
-
-		}
+		no_config_module(io_context& io, const std::string& name)
+			: _module<Core, no_config>(io, name)
+		{}
 
 	public:
 		virtual bool config() override

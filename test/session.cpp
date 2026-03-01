@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(no_connect)
 	aquarius::io_context io;
 	boost::asio::ip::tcp::socket _socket(io);
 
-	aquarius::tcp_client_session session(std::move(_socket));
+	aquarius::tcp_client_session session(std::move(_socket), 30ms, 3s);
 
 	BOOST_TEST(session.uuid() != 0);
 
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(no_connect)
 		{
 			BOOST_TEST(!co_await session.async_connect("127.0.0.1", "9999"));
 
-			BOOST_TEST(session.remote_address_u() == 0);
+			BOOST_TEST(session.remote_address_u() == 0u);
 
 			BOOST_TEST(!session.shutdown());
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(conn)
 	aquarius::io_context io;
 	boost::asio::ip::tcp::socket _socket(io);
 
-	aquarius::tcp_client_session session(std::move(_socket));
+	aquarius::tcp_client_session session(std::move(_socket), 30ms, 3s);
 
 	auto future = aquarius::co_spawn(
 		io,
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(conn)
 
 			BOOST_TEST(session.keep_alive());
 
-			BOOST_TEST(session.remote_address_u() == 2130706433);
+			BOOST_TEST(session.remote_address_u() == 2130706433u);
 
 			BOOST_TEST(session.shutdown());
 

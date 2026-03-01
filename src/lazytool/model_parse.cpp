@@ -1,10 +1,12 @@
 #include "model_parse.h"
 #include "parse_helper.hpp"
+#include <iostream>
 
 namespace aquarius
 {
 	namespace lazytool
 	{
+
 		bool model_parse::read_file(const std::string& file_path)
 		{
 			std::ifstream ifs(file_path);
@@ -36,19 +38,9 @@ namespace aquarius
 			if (value != "model")
 				return false;
 
-			model_field_ptr->name = read_value<token::value, '-'>(ifs, column_, row_, end);
+			model_field_ptr->name = read_value<token::value, '{'>(ifs, column_, row_, end);
 
 			if (model_field_ptr->name.empty())
-				return false;
-
-			auto error = seek<'>'>(ifs, column_, row_);
-
-			if (error != parse_error::success)
-				return false;
-
-			model_field_ptr->db_languase = read_value<token::value, '{'>(ifs, column_, row_, end);
-
-			if (model_field_ptr->db_languase.empty())
 				return false;
 
 			while (!ifs.eof())
@@ -61,46 +53,26 @@ namespace aquarius
 
 				if (end == '}')
 				{
-					ifs.get();
-					break;
+					return true;
+				}
+
+				if (!check_type(field.type))
+				{
+					std::cout << "error type! value:" << field.type << std::endl;
+					return false;
 				}
 
 				field.name = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
-
-				while (end != ';')
-				{
-					auto t = read_value<token::value, '@', '^', '$'>(ifs, column_, row_, end);
-
-					if (end != '@' && end != '^' && end != '$')
-						return false;
-
-					t = end;
-
-					value = read_value<token::value, ' ', ';'>(ifs, column_, row_, end);
-
-					if (value.empty())
-						return false;
-
-					auto beg = *t.begin();
-
-					if (beg == '@')
-					{
-						field.attrs.push_back("key<"+value + ">");
-					}
-					else if (beg == '^')
-					{
-						field.attrs.push_back("index<" + value + ">");
-					}
-					else if (beg == '$')
-					{
-						field.attrs.push_back("attr<" + value + ">");
-					}
-					else
-					{
-						return false;
-					}
-				}
 			}
+
+			return true;
+		}
+
+		bool model_parse::check_type(const std::string& value)
+		{
+			if (value != "float" && value != "double" && value != "date" && value != "timestamp" &&
+				value != "integer" && value != "string" && value != "datetime" && value != "time" && value != "binary")
+				return false;
 
 			return true;
 		}

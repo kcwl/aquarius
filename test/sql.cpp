@@ -4,33 +4,51 @@
 
 BOOST_AUTO_TEST_SUITE(sql)
 
+using namespace aquarius::tbl;
+
 struct personal
 {
-	int age;
-	bool sex;
+	integer age;
+	integer sex;
+
+	constexpr static auto member()
+	{
+		return std::make_tuple(
+			&personal::age,
+			&personal::sex
+		);
+	}
+
+	constexpr static auto member_name()
+	{
+		return std::make_tuple(
+			"age"sv,
+			"sex"sv
+		);
+	}
 };
 
-using namespace aquarius::tbl;
+
 
 BOOST_AUTO_TEST_CASE(sql_)
 {
 	personal p{ 1, true };
 
-	auto sql1 = insert_view(p);
+	auto sql1 = aquarius::tbl::insert(p);
 
-	BOOST_TEST(sql1() == "insert into personal values(1,1)");
+	BOOST_TEST(sql1 == "insert into personal values(1,1)");
 
-	auto sql3 = remove_view<personal>();
+	auto sql3 = aquarius::tbl::remove(p);
 
-	BOOST_TEST(sql3() == "delete from personal");
+	BOOST_TEST(sql3 == "delete from personal");
 
-	auto sql2 = update_view(p);
+	auto sql2 = aquarius::tbl::update(p);
 
-	BOOST_TEST(sql2() == "update personal set age=1 and sex=1");
+	BOOST_TEST(sql2 == "update personal set age=1 and sex=1");
 
-	constexpr auto sql = select_view<personal>();
+	auto sql = aquarius::tbl::select<personal>(p);
 
-	static_assert(sql() == "select * from personal");
+	BOOST_TEST(sql == "select * from personal");
 
 	// auto sql4 = create_view<test_model>();
 
@@ -42,7 +60,7 @@ using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(connecting)
 {
-	personal p{ 1, true };
+	personal p{ 1, 1 };
 
 	aquarius::io_context io;
 
@@ -66,7 +84,7 @@ BOOST_AUTO_TEST_CASE(connecting)
 		{
 			try
 			{
-				co_await connector.async_run();
+				connector.async_run();
 
 				auto res = co_await connector.async_execute("insert into personal values(1,1)", ec);
 

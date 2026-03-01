@@ -101,5 +101,3 @@ namespace aquarius
 #define XLOG_WARNING() XLOG_FILE_AND_LINE(warning)
 #define XLOG_ERROR() XLOG_FILE_AND_LINE(error)
 #define XLOG_FATAL() XLOG_FILE_AND_LINE(fatal)
-
-[[maybe_unused]] inline static aquarius::logger __auto_init_log;

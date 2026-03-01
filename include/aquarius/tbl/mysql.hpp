@@ -2,8 +2,7 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/tbl/database_param.hpp>
-#include <aquarius/tbl/sql_error.hpp>
-#include <boost/pfr.hpp>
+#include <aquarius/tbl/reflect.hpp>
 #include <boost/mysql.hpp>
 #include <chrono>
 
@@ -17,34 +16,31 @@ namespace aquarius
 		{
 		public:
 			mysql(io_context& io, boost::mysql::pool_params param)
-				: pool_(io, std::move(param))
+				: mysql(io.get_executor(), std::move(param))
+			{}
+
+			template <typename Executor>
+			mysql(const Executor& executor, boost::mysql::pool_params param)
+				: pool_(executor, std::move(param))
 				, enable_transaction_(true)
 			{}
 
 		public:
-			auto async_run() ->awaitable<error_code>
+			void async_run()
 			{
-				error_code ec{};
-
-				//co_await pool_.async_run(aquarius::redirect_error(use_awaitable, ec));
 				pool_.async_run(detached);
-
-				if (ec)
-				{
-					XLOG_ERROR() << "[mysql] connect failed! " << ec.message();
-				}
-
-				co_return ec;
 			}
 
 			template <typename T>
 			auto async_query(std::string_view sql, error_code& ec) -> awaitable<std::vector<T>>
 			{
-				auto conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
+				auto conn_ptr = co_await pool_.async_get_connection(
+					aquarius::cancel_after(1s, aquarius::redirect_error(use_awaitable, ec)));
 
 				boost::mysql::results result{};
 
-				co_await conn_ptr->async_execute(sql, result);
+				co_await conn_ptr->async_execute(
+					sql, result, aquarius::cancel_after(1s, aquarius::redirect_error(use_awaitable, ec)));
 
 				std::vector<T> results{};
 
@@ -75,7 +71,7 @@ namespace aquarius
 				return enable_transaction_;
 			}
 
-			auto begin() ->awaitable<error_code>
+			auto begin() -> awaitable<error_code>
 			{
 				return transation("BEGIN");
 			}
@@ -91,13 +87,14 @@ namespace aquarius
 			}
 
 		private:
-			auto transation(const std::string& option) ->awaitable<error_code>
+			auto transation(const std::string& option) -> awaitable<error_code>
 			{
 				boost::mysql::results empty_result{};
 
 				error_code ec{};
 
-				boost::mysql::pooled_connection conn_ptr = co_await pool_.async_get_connection(aquarius::cancel_after(1s));
+				boost::mysql::pooled_connection conn_ptr =
+					co_await pool_.async_get_connection(aquarius::cancel_after(1s));
 
 				co_await conn_ptr->async_execute(option, empty_result, aquarius::redirect_error(ec));
 
@@ -108,9 +105,26 @@ namespace aquarius
 			void make_result(std::vector<T>& results, const Row& row)
 			{
 				auto to_struct = [&, this]<std::size_t... I>(std::index_sequence<I...>)
-				{ return T{ cast<decltype(boost::pfr::get<I>(std::declval<T>()))>(row[I])... }; };
+				{ return T{ cast<struct_element_t<I, T>>(row[I])... }; };
 
-				results.push_back(to_struct(std::make_index_sequence<boost::pfr::tuple_size_v<T>>{}));
+				constexpr static auto size = struct_size<T>();
+
+				results.push_back(to_struct(std::make_index_sequence<size>{}));
+			}
+
+			template <typename T, typename Row>
+			requires(std::is_integral_v<T>)
+			void make_result(std::vector<T>& results, const Row& row)
+			{
+				std::stringstream ss{};
+
+				ss << row[0];
+
+				T result{};
+
+				ss >> result;
+
+				results.push_back(result);
 			}
 
 			template <typename T, typename Field>
@@ -119,13 +133,11 @@ namespace aquarius
 				std::stringstream ss{};
 				ss << field;
 
-				using type = std::remove_cvref_t<T>;
+				std::remove_cvref_t<T> value{};
 
-				type result{};
+				value.serialize(ss);
 
-				ss >> result;
-
-				return result;
+				return value;
 			}
 
 		private:

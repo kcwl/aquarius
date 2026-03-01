@@ -12,18 +12,15 @@ namespace aquarius
 			std::string type;
 
 			std::string name;
-
-			std::vector<std::string> attrs;
 		};
 
 		struct model_field
 		{
-			std::string db_languase;
-
 			std::string name;
 
 			std::vector<model_data_field> fields;
 		};
+
 
 		class model_parse
 		{
@@ -35,6 +32,8 @@ namespace aquarius
 
 		private:
 			bool parse_model(std::ifstream& ifs, std::shared_ptr<model_field> model_field_ptr);
+
+			bool check_type(const std::string& value);
 
 		public:
 			std::vector<std::shared_ptr<model_field>> models_;

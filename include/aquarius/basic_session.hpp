@@ -7,7 +7,7 @@
 
 namespace aquarius
 {
-	template <auto Tag, typename ProtoTag, typename Adaptor>
+	template <auto Tag, template<bool,typename,typename>typename Adaptor>
 	class basic_session
 	{
 	public:
@@ -19,15 +19,14 @@ namespace aquarius
 
 		using resolver = typename protocol<Tag>::resolver;
 
-		using executor_type = typename socket::executor_type;
+		using duration = std::chrono::system_clock::duration;
 
-		using callback_func = std::function<void(std::shared_ptr<basic_session<Tag, ProtoTag, Adaptor>>)>;
-
-		constexpr static auto tag = Tag;
+		using adaptor_t = Adaptor<true, socket, resolver>;
 
 	public:
-		explicit basic_session(socket sock)
-			: socket_(std::move(sock))
+		explicit basic_session(socket _socket, duration timeout)
+			: socket_(std::move(_socket))
+			, timeout_(timeout)
 			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
 		{}
@@ -45,16 +44,16 @@ namespace aquarius
 			return uuid_;
 		}
 
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<bool>
+		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
 		{
-			auto ec = co_await socket_adaptor_.async_connect(host, port);
+			auto ec = co_await socket_adaptor_.async_connect(host, port, timeout_);
 
 			if (ec)
 			{
 				XLOG_ERROR() << "async_connect error: " << ec.what();
 			}
 
-			co_return !ec;
+			co_return ec;
 		}
 
 		std::string remote_address() const
@@ -64,16 +63,7 @@ namespace aquarius
 
 		uint32_t remote_address_u() const
 		{
-			error_code ec{};
-
-			auto edp = socket_.remote_endpoint(ec);
-
-			if (ec)
-			{
-				return 0;
-			}
-
-			return edp.address().to_v4().to_uint();
+			return socket_.remote_endpoint().address().to_v4().to_uint();
 		}
 
 		uint16_t remote_port() const
@@ -88,18 +78,18 @@ namespace aquarius
 			auto mutable_buffer = buffer.prepare(length);
 
 			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-											 redirect_error(use_awaitable, ec));
+									  redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{
-				XLOG_INFO() << "async_read exception: " << ec.what() << ", remote_address: " << remote_address();
+				XLOG_ERROR() << "[async read] error: " << ec.what() << ", remote_address: " << remote_address();
 			}
 			else
 			{
+				buffer.commit(length);
+
 				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
 			}
-
-			buffer.commit(length);
 
 			co_return ec;
 		}
@@ -113,7 +103,7 @@ namespace aquarius
 
 			if (ec)
 			{
-				XLOG_INFO() << "async_read_util exception: " << ec.what() << ", remote_address: " << remote_address();
+				XLOG_ERROR() << "[async read util] error: " << ec.what() << ", remote_address: " << remote_address();
 			}
 			else
 			{
@@ -129,7 +119,11 @@ namespace aquarius
 
 			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), redirect_error(use_awaitable, ec));
 
-			if (!ec)
+			if (ec)
+			{
+				XLOG_ERROR() << "[async send] error: " << ec.what();
+			}
+			else
 			{
 				XLOG_DEBUG() << "[async send] send " << buffer.size() << " bytes";
 			}
@@ -143,6 +137,11 @@ namespace aquarius
 
 			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
 
+			if (ec)
+			{
+				XLOG_ERROR() << "[shutdown] error: " << ec.what();
+			}
+
 			return !ec;
 		}
 
@@ -151,6 +150,11 @@ namespace aquarius
 			error_code ec;
 
 			socket_.close(ec);
+
+			if (ec)
+			{
+				XLOG_ERROR() << "[close] error: " << ec.what();
+			}
 
 			return !ec;
 		}
@@ -161,6 +165,11 @@ namespace aquarius
 
 			socket_.set_option(typename protocol<Tag>::keep_alive(enable), ec);
 
+			if (ec)
+			{
+				XLOG_ERROR() << "[keep alive] error: " << ec.what();
+			}
+
 			return !ec;
 		}
 
@@ -170,16 +179,21 @@ namespace aquarius
 
 			socket_.set_option(typename protocol<Tag>::no_delay(enable), ec);
 
+			if (ec)
+			{
+				XLOG_ERROR() << "[set nodelay] error: " << ec.what();
+			}
+
 			return !ec;
 		}
 
 	protected:
 		socket socket_;
 
-		Adaptor socket_adaptor_;
+		adaptor_t socket_adaptor_;
 
 		std::size_t uuid_;
 
-		callback_func close_func_;
+		duration timeout_;
 	};
 } // namespace aquarius

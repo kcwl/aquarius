@@ -28,8 +28,8 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 			BOOST_CHECK(is_connect);
 
-			auto req = std::make_shared<login_tcp_request>();
-			req->header().uuid_ = 1;
+			auto req = std::make_shared<login_request>();
+			req->header().uuid(1);
 			req->body().per_req.sex = true;
 			req->body().per_req.addr = 2;
 			req->body().per_req.age = 15;
@@ -40,10 +40,10 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<login_tcp_response>(req);
+			auto resp = co_await cli->async_send<login_response>(req);
 
-			BOOST_TEST(resp.header().uuid_ == req->header().uuid_);
-			BOOST_TEST(resp.body().per_resp == req->body().per_req);
+			BOOST_TEST(resp.header().uuid() == req->header().uuid());
+			BOOST_CHECK(resp.body().per_resp == req->body().per_req);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8100);
@@ -84,8 +84,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 			BOOST_TEST(is_connect);
 
-			auto req = std::make_shared<new_http_login_http_request>();
-			req->version(aquarius::virgo::http_version::http1_1);
+			auto req = std::make_shared<new_http_login_request>();
 			req->body().uuid = 1;
 			req->body().per_req.sex = true;
 			req->body().per_req.addr = 2;
@@ -97,11 +96,11 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<new_http_login_http_response>(req);
+			auto resp = co_await cli->async_send<new_http_login_response>(req);
 
 			BOOST_TEST(resp.body().uuid == req->body().uuid);
 
-			BOOST_TEST(resp.body().per_resp == req->body().per_req);
+			BOOST_CHECK(resp.body().per_resp == req->body().per_req);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8099);
@@ -141,12 +140,11 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 			BOOST_TEST(is_connect);
 
-			auto req = std::make_shared<http_test_get_http_request>();
-			req->version(aquarius::virgo::http_version::http1_1);
+			auto req = std::make_shared<http_test_get_request>();
 			req->body().user = 12345;
 			req->body().passwd = "passwd123";
 
-			auto resp = co_await cli->async_send<http_test_get_http_response>(req);
+			auto resp = co_await cli->async_send<http_test_get_response>(req);
 
 			BOOST_TEST(resp.body().user == req->body().user);
 

@@ -9,8 +9,9 @@ namespace aquarius
 	class module_base
 	{
 	public:
-		module_base(const std::string& name)
-			: name_(name)
+		module_base(io_context& io, const std::string& name)
+			: io_context_(io)
+			, name_(name)
 		{}
 
 		virtual ~module_base() = default;
@@ -21,12 +22,17 @@ namespace aquarius
 			return name_;
 		}
 
+		auto get_executor()
+		{
+			return io_context_.get_executor();
+		}
+
 	public:
 		virtual bool config() = 0;
 
 		virtual bool init() = 0;
 
-		virtual auto run(io_context&) -> awaitable<void> = 0;
+		virtual auto run() -> awaitable<void> = 0;
 
 		virtual void stop() = 0;
 
@@ -35,6 +41,8 @@ namespace aquarius
 		virtual void timer(std::chrono::milliseconds) = 0;
 
 	private:
+		io_context& io_context_;
+
 		std::string name_;
 	};
 
@@ -45,8 +53,8 @@ namespace aquarius
 		using core_type = T;
 
 	public:
-		basic_module(const std::string& name)
-			: module_base(name)
+		basic_module(io_context& io, const std::string& name)
+			: module_base(io, name)
 		{}
 
 	public:
