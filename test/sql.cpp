@@ -8,8 +8,8 @@ using namespace aquarius::tbl;
 
 struct personal
 {
-	integer<4> age;
-	integer<2> sex;
+	integer age;
+	integer sex;
 
 	constexpr static auto member()
 	{
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 	BOOST_TEST(sql2 == "update personal set age=1 and sex=1");
 
-	auto sql = aquarius::tbl::select(p);
+	auto sql = aquarius::tbl::select<personal>(p);
 
 	BOOST_TEST(sql == "select * from personal");
 
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(connecting)
 		{
 			try
 			{
-				co_await connector.async_run();
+				connector.async_run();
 
 				auto res = co_await connector.async_execute("insert into personal values(1,1)", ec);
 

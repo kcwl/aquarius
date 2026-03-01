@@ -125,8 +125,6 @@ namespace aquarius
 			{
 				auto operator()(const T& value) -> std::string
 				{
-					value.id.has_condition();
-
 					static_assert(sizeof...(Name) <= struct_size<T>(), "too many fields");
 
 					check_table_name<T, Name...>();
