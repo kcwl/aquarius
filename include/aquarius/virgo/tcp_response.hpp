@@ -50,7 +50,7 @@ namespace aquarius
 
 				auto size = static_cast<uint32_t>(buffer.size());
 
-				buffer.pubseekpos(0, std::ios::beg);
+				buffer.pubseekpos(0, std::ios::in);
 
 				buffer.sputn((char*)&size, sizeof(uint32_t));
 

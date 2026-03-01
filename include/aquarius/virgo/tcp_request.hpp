@@ -55,7 +55,7 @@ namespace aquarius
 
 				this->body().serialize(buffer);
 
-				buffer.pubseekpos(0, std::ios::beg);
+				buffer.pubseekpos(0, std::ios::in);
 
 				uint32_t length = static_cast<uint32_t>(buffer.size());
 

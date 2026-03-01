@@ -6,6 +6,7 @@
 #include <aquarius/singleton.hpp>
 #include <map>
 #include <mutex>
+#include <shared_mutex>
 
 namespace aquarius
 {
