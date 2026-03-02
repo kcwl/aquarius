@@ -7,12 +7,10 @@
 
 namespace aquarius
 {
-	template <bool, typename Socket, typename Resolver>
+	template <typename Socket>
 	class raw_socket_adaptor
 	{
 		using socket_t = Socket;
-
-		using resolver_t = Resolver;
 
 	public:
 		raw_socket_adaptor(socket_t& socket)
@@ -25,16 +23,12 @@ namespace aquarius
 			return socket_;
 		}
 
-		template <typename Dura>
-		auto async_connect(const std::string& host, const std::string& port, Dura timeout) -> awaitable<error_code>
+		template <typename Endpoint, typename Dura>
+		auto async_connect(const Endpoint& endpoint, Dura timeout) -> awaitable<error_code>
 		{
-			resolver_t resolve(socket_.lowest_layer().get_executor());
-
-			auto endpoints = resolve.resolve(host, port);
-
 			error_code ec;
 
-			co_await boost::asio::async_connect(socket_.lowest_layer(), endpoints,
+			co_await boost::asio::async_connect(socket_, endpoint,
 												cancel_after(timeout, redirect_error(use_awaitable, ec)));
 
 			co_return ec;

@@ -1,6 +1,8 @@
 #pragma once
 #include <aquarius/basic_session.hpp>
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/protocol.hpp>
+#include <aquarius/module/channel_module.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/timer.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -13,18 +15,12 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <auto Tag, template <bool, typename, typename> typename Adaptor, typename HandlerSelector>
-	class session : public basic_session<Tag, Adaptor>,
-					public std::enable_shared_from_this<session<Tag, Adaptor, HandlerSelector>>
+	template <typename Protocol, template <typename> typename Adaptor, typename HandlerSelector>
+	class session : public basic_session<Protocol, Adaptor>,
+					public std::enable_shared_from_this<session<Protocol, Adaptor, HandlerSelector>>
 	{
-		struct proto_header
-		{
-			uint32_t length;
-			uint32_t seq_number;
-		};
-
 	public:
-		using base_type = basic_session<Tag, Adaptor>;
+		using base_type = basic_session<Protocol, Adaptor>;
 
 		using typename base_type::socket;
 
@@ -46,9 +42,10 @@ namespace aquarius
 				for (;;)
 				{
 					flex_buffer buffer{};
-					virgo::header_fields hf;
 
-					ec = co_await recv(buffer, hf);
+					uint32_t req{};
+
+					ec = co_await recv(buffer, req);
 
 					if (ec)
 					{
@@ -59,7 +56,9 @@ namespace aquarius
 
 					XLOG_INFO() << "[accept] parse protocol router: " << router;
 
-					HandlerSelector()(router, this->shared_from_this(), hf, buffer);
+					HandlerSelector selector(req);
+
+					selector(router, this->shared_from_this(), buffer);
 				}
 			}
 
@@ -71,65 +70,68 @@ namespace aquarius
 			co_return ec;
 		}
 
-		template <typename Response>
-		auto query(Response& resp, std::size_t seq_number, virgo::header_fields& hf, error_code& ec) -> awaitable<void>
+		auto query(std::size_t seq_number, error_code& ec) -> awaitable<flex_buffer>
 		{
-			for (;;)
+			flex_buffer buffer{};
+
+			ec = error_code{};
+
+			auto iter = buffer_controller_.find(seq_number);
+
+			if (iter != buffer_controller_.end())
 			{
-				flex_buffer buffer{};
+				XLOG_INFO() << "[query from controll buffer] seq_number: " << seq_number;
 
-				ec = co_await recv(buffer, hf);
-				if (ec)
+				buffer = std::move(iter->second);
+
+				buffer_controller_.erase(iter);
+			}
+			else
+			{
+				for (;;)
 				{
-					break;
+					uint32_t seq{};
+					ec = co_await recv(buffer, seq);
+					if (ec)
+					{
+						break;
+					}
+
+					if (seq == seq_number)
+					{
+						co_return buffer;
+					}
+
+					buffer.pubseekoff(0 - sizeof(uint32_t), std::ios::cur);
+
+					XLOG_INFO() << "[query controll buffer] seq_number: " << seq << ", wait seq: " << seq_number;
+
+					buffer_controller_.emplace(seq, std::move(buffer));
 				}
-
-				auto iter = buffer_controller_.find(hf.seq_number());
-
-				if (iter != buffer_controller_.end())
-				{
-					XLOG_INFO() << "[query from controll buffer] seq_number: " << hf.seq_number();
-
-					buffer = std::move(iter->second);
-
-					buffer_controller_.erase(iter);
-				}
-				else if (hf.seq_number() != seq_number)
-				{
-					XLOG_INFO() << "[query controll buffer] seq_number: " << hf.seq_number()
-								<< ", wait seq: " << seq_number;
-
-					buffer_controller_.emplace(hf.seq_number(), std::move(buffer));
-					continue;
-				}
-
-				resp.set_header_fields(std::move(hf));
-				resp.consume(buffer);
-				break;
 			}
 
 			if (ec != boost::asio::error::eof)
 			{
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
 			}
+
+			co_return buffer;
 		}
 
 	private:
-		auto recv(flex_buffer& buffer, virgo::header_fields& hf) -> awaitable<error_code>
+		auto recv(flex_buffer& buffer, uint32_t& req) -> awaitable<error_code>
 		{
-			proto_header proto{};
+			uint32_t packet_length{};
 
-			constexpr auto len = sizeof(proto);
+			constexpr auto len = sizeof(packet_length);
 
 			auto ec = co_await this->async_read(buffer, len);
 
 			if (!ec)
 			{
-				buffer.sgetn((char*)&proto, sizeof(proto_header));
+				buffer.sgetn((char*)&packet_length, sizeof(packet_length));
 
-				ec = co_await this->async_read(buffer, proto.length);
-
-				hf.set_field("seq_number", std::to_string(proto.seq_number));
+				ec = co_await this->async_read(buffer, packet_length);
 			}
 
 			co_return ec;
@@ -156,7 +158,8 @@ namespace aquarius
 
 			constexpr std::string_view ping_router = "tcp_ping"sv;
 
-			// router<Session>::get_mutable_instance().invoke(ping_router, this->shared_from_this(), buffer);
+			// router<Session>::get_mutable_instance().invoke(ping_router,
+			// this->shared_from_this(), buffer);
 		}
 
 	private:
@@ -165,10 +168,10 @@ namespace aquarius
 		std::map<std::size_t, flex_buffer> buffer_controller_;
 	};
 
-	template <template <bool, typename, typename> typename Adaptor, typename HandlerSelector>
-	class session<proto::http, Adaptor, HandlerSelector>
-		: public basic_session<proto::http, Adaptor>,
-		  public std::enable_shared_from_this<session<proto::http, Adaptor, HandlerSelector>>
+	template <template <typename> typename Adaptor, typename HandlerSelector>
+	class session<http_protocol, Adaptor, HandlerSelector>
+		: public basic_session<http_protocol, Adaptor>,
+		  public std::enable_shared_from_this<session<http_protocol, Adaptor, HandlerSelector>>
 	{
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
@@ -176,16 +179,10 @@ namespace aquarius
 
 		constexpr static std::size_t header_part = 3;
 
-		struct http_packet
-		{
-			virgo::http_version version;
-			virgo::http_status status;
-			virgo::header_fields hf;
-			flex_buffer body;
-		};
+		using self_type = session<http_protocol, Adaptor, HandlerSelector>;
 
 	public:
-		using base_type = basic_session<proto::http, Adaptor>;
+		using base_type = basic_session<http_protocol, Adaptor>;
 
 		using typename base_type::socket;
 
@@ -205,22 +202,11 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
-				virgo::header_fields hf{};
-				std::string header_command_line{};
-
-				ec = co_await recv(buffer, header_command_line, hf);
+				auto handler_ptr = co_await server_recv(buffer, ec);
 				if (ec)
 				{
 					break;
 				}
-
-				auto [method, url, version] = parse_command_line<true>(std::span(header_command_line), ec);
-
-				if (ec)
-					break;
-
-				HandlerSelector(method, version, std::string(url->encoded_params().buffer().data(), url->encoded_params().buffer().size()))(std::string_view(url->path().data(), url->path().size()),
-												 this->shared_from_this(), hf, buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -231,136 +217,163 @@ namespace aquarius
 			co_return ec;
 		}
 
-		template <typename Response>
-		auto query(Response& resp, std::size_t seq_number, virgo::header_fields& hf, error_code& ec) -> awaitable<void>
+		auto query(std::size_t seq_number, error_code& ec) -> awaitable<flex_buffer>
 		{
-			for (;;)
+			flex_buffer packet{};
+
+			auto iter = buffer_controller_.find(seq_number);
+
+			if (iter != buffer_controller_.end())
 			{
-				http_packet packet{};
-				std::string header_command_line{};
+				XLOG_INFO() << "[query from controll buffer] seq_number: " << seq_number;
 
-				ec = co_await recv(packet.body, header_command_line, packet.hf);
+				packet = std::move(iter->second);
 
-				if (ec)
+				buffer_controller_.erase(iter);
+			}
+			else
+			{
+				for (;;)
 				{
+					uint32_t seq{};
+					co_await recv(packet, seq, ec);
+
+					if (ec)
+					{
+						break;
+					}
+
+					if (seq != seq_number)
+					{
+						XLOG_INFO() << "[query controll buffer] seq_number: " << seq
+									<< ", wait seq: " << seq_number;
+
+						buffer_controller_.emplace(seq, std::move(packet));
+						continue;
+					}
+
 					break;
 				}
-
-				auto iter = buffer_controller_.find(packet.hf.seq_number());
-
-				if (iter != buffer_controller_.end())
-				{
-					XLOG_INFO() << "[query from controll buffer] seq_number: " << packet.hf.seq_number();
-
-					packet = std::move(iter->second);
-
-					buffer_controller_.erase(iter);
-				}
-				else if (packet.hf.seq_number() != seq_number)
-				{
-					XLOG_INFO() << "[query controll buffer] seq_number: " << packet.hf.seq_number()
-								<< ", wait seq: " << seq_number;
-
-					buffer_controller_.emplace(packet.hf.seq_number(), std::move(packet));
-					continue;
-				}
-
-				resp.header().result(static_cast<int>(packet.status));
-				resp.set_header_fields(packet.hf);
-				resp.consume(packet.body);
-
-				break;
 			}
 
 			if (ec != boost::asio::error::eof)
 			{
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
 			}
+
+			co_return std::move(packet);
 		}
 
 	private:
-		auto recv(flex_buffer& buffer, std::string& header_command_line, virgo::header_fields& hf)
-			-> awaitable<error_code>
+		auto server_recv(flex_buffer& buffer, error_code& ec) -> awaitable<std::shared_ptr<basic_handler<self_type>>>
 		{
-			auto ec = co_await this->async_read_util(buffer, two_crlf);
+			ec = co_await this->async_read_util(buffer, crlf);
 
-			if (!ec)
+			if (ec)
 			{
-				auto proto_span_buffer = std::span<char>((char*)buffer.data().data(), buffer.data().size());
+				co_return;
+			}
 
-				auto proto_slide_buffer = proto_span_buffer | std::views::slide(two_crlf.size());
+			auto header_line = std::string((char*)buffer.data().data(), buffer.size());
 
-				auto iter =
-					std::ranges::find_if(proto_slide_buffer, [&](auto c) { return std::string_view(c) == two_crlf; });
+			auto [method, url, version] = parse_command_line<true>(std::span<char>(header_line), ec);
 
-				auto len = std::ranges::distance(proto_slide_buffer.begin(), iter);
+			std::string router(std::string_view(url->path().data(), url->path().size()));
 
-				auto header_span = proto_span_buffer.subspan(0, len);
+			//auto content_type = hf.find("content-type");
 
-				buffer.consume(len + two_crlf.size());
+			//if (!content_type.empty() && content_type != "application/json" && method == virgo::http_method::get)
+			//{
+			//	router = __http_source_handler__;
+			//}
+			//else if (method == virgo::http_method::get)
+			//{
+			//	if (!path.empty())
+			//	{
+			//		buffer.sputn(path.data(), path.size());
+			//	}
+			//}
+			//else if (method == virgo::http_method::options)
+			//{
+			//	router = __http_options_handler__;
+			//}
 
-				header_command_line = parse_field(header_span, hf, ec);
+			auto handler_ptr = co_await mpc_publish<self_type>(router);
 
-				if (ec)
+			auto request_ptr = handler_ptr->request();
+
+			ec = co_await this->async_read_util(buffer, two_crlf);
+
+			if (ec)
+			{
+				co_return;
+			}
+
+			request_ptr->consume_header(buffer);
+
+			auto content_length = request_ptr->content_length();
+
+			if (content_length != 0)
+			{
+				auto remain_size = static_cast<int64_t>(content_length - buffer.size());
+
+				if (remain_size > 0)
 				{
-					co_return ec;
-				}
-
-				auto content_length = hf.content_length();
-
-				if (content_length != 0)
-				{
-					auto remain_size = static_cast<int64_t>(content_length - buffer.size());
-
-					if (remain_size > 0)
-					{
-						ec = co_await this->async_read(buffer, remain_size);
-					}
+					ec = co_await this->async_read(buffer, remain_size);
 				}
 			}
 
-			co_return ec;
+			if (ec)
+			{
+				co_return;
+			}
+
+			request_ptr->consume_body(buffer);
+
+			HandlerSelector()(handler_ptr, this->shared_from_this());
 		}
 
-		std::string parse_field(std::span<char> buffer, virgo::header_fields& hf, error_code& ec)
+		auto recv(flex_buffer& buffer,uint32_t& req, error_code& ec) -> awaitable<void>
 		{
-			ec = error_code{};
+			ec = co_await this->async_read_util(buffer, crlf);
 
-			auto headers = buffer | std::views::split(crlf);
-
-			auto len = std::ranges::distance(headers.begin(), headers.end());
-
-			std::string header_command_line{};
-
-			if (len == 0)
+			if (ec)
 			{
-				ec = boost::asio::error::eof;
-				return header_command_line;
+				co_return;
 			}
 
-			auto iter = headers.begin();
+			auto header_line = std::string((char*)buffer.data().data(), buffer.size());
 
-			header_command_line = std::string(std::string_view(*iter));
+			auto [version, status] = parse_command_line<false>(std::span<char>(header_line), ec);
 
-			while (++iter != headers.end())
+			//std::string router = std::string_view(url->path().data(), url->path().size());
+
+			//auto handler_ptr = co_await mpc_publish(router);
+
+			//auto request_ptr = handler_ptr->get_request();
+
+			ec = co_await this->async_read_util(buffer, two_crlf);
+
+			if (ec)
 			{
-				auto str = std::string_view(*iter);
-				auto pos = str.find(":");
-
-				if (pos == std::string_view::npos)
-				{
-					ec = boost::asio::error::eof;
-
-					break;
-				}
-
-				auto key = str.substr(0, pos);
-				auto value = str.substr(pos + 1, str.size() - pos - 1);
-
-				hf.set_field(std::string(key), std::string(value));
+				co_return;
 			}
 
-			return header_command_line;
+			//request_ptr->consume_header(buffer);
+
+			//auto content_length = request_ptr->content_length();
+
+			//if (content_length != 0)
+			//{
+			//	auto remain_size = static_cast<int64_t>(content_length - buffer.size());
+
+			//	if (remain_size > 0)
+			//	{
+			//		ec = co_await this->async_read(buffer, remain_size);
+			//	}
+			//}
+
+			//req = request_ptr->seq_number();
 		}
 
 		template <bool Server>
@@ -425,10 +438,10 @@ namespace aquarius
 	private:
 		timer<boost::asio::steady_timer> timer_;
 
-		std::map<std::size_t, http_packet> buffer_controller_;
+		std::map<std::size_t, flex_buffer> buffer_controller_;
 	};
 
-	template <auto Tag, template <bool, typename, typename> typename Adaptor, typename HandlerSelector>
-	struct is_session_type<session<Tag, Adaptor, HandlerSelector>> : std::true_type
+	template <typename Protocol, template <typename> typename Adaptor, typename HandlerSelector>
+	struct is_session_type<session<Protocol, Adaptor, HandlerSelector>> : std::true_type
 	{};
 } // namespace aquarius

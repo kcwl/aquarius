@@ -13,9 +13,9 @@ namespace aquarius
 	using options_response = virgo::http_response<virgo::http_method::options, virgo::http_null_body>;
 
 	template <typename Session>
-	class http_options_method_handler : public handler<proto::http, Session, options_request, options_response>
+	class http_options_method_handler : public handler<Session, options_request, options_response>
 	{
-		using base = handler<proto::http, Session, options_request, options_response>;
+		using base = handler<Session, options_request, options_response>;
 
 	public:
 		http_options_method_handler()
@@ -68,9 +68,9 @@ namespace aquarius
 	using resource_response = virgo::http_response<virgo::http_method::get, http_stream_body>;
 
 	template <typename Session>
-	class http_source_method_handler : public handler<proto::http, Session, resource_request, resource_response>
+	class http_source_method_handler : public handler<Session, resource_request, resource_response>
 	{
-		using base = handler<proto::http, Session, resource_request, resource_response>;
+		using base = handler<Session, resource_request, resource_response>;
 
 	public:
 		http_source_method_handler()

@@ -5,7 +5,7 @@
 
 namespace aquarius
 {
-	using http_server_session = server_session<proto::http, ip::http_selector>;
+	using http_server_session = server_session<http_protocol, ip::http_selector>;
 
 	using http_server = basic_server<http_server_session>;
 } // namespace aquarius

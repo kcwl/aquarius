@@ -1,91 +1,90 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
-#include <aquarius/ip/router.hpp>
 #include <aquarius/ip/server_session.hpp>
-#include <aquarius/virgo/header_fields.hpp>
+#include <aquarius/module/channel_module.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 
 namespace aquarius
 {
-	template <auto Tag, typename Session, typename Request, typename Response>
-	class handler : public basic_handler<Session, Request, Response>
-	{
-	public:
-		using session_t = Session;
-
-	public:
-		handler(const std::string& name)
-			: basic_handler<Session, Request, Response>(name)
-		{}
-
-		virtual ~handler() = default;
-	};
-
 	template <typename Session, typename Request, typename Response>
-	class handler<proto::http, Session, Request, Response> : public basic_handler<Session, Request, Response>
+	class handler : public basic_handler<Session>
 	{
 	public:
+		using request_t = Request;
+
+		using response_t = Response;
+
 		using session_t = Session;
 
 	public:
 		handler(const std::string& name)
-			: basic_handler<Session, Request, Response>(name)
+			: basic_handler<Session>(name)
 		{}
 
 		virtual ~handler() = default;
 
 	public:
-		virtual void make_response() override
+		virtual auto visit(std::shared_ptr<Session> sessoin_ptr) -> awaitable<error_code> override
 		{
-			this->response().set_field("Content-Type", "application/json");
-			this->response().set_field("Server", "Aquarius 0.10.0");
-			this->response().set_field("Connection", this->request()->find("Connection"));
-			this->response().set_field("Access-Control-Allow-Origin", "*");
-			this->response().set_field("Access-Control-Request-Method", "POST");
-			this->response().set_field("Access-Control-Expose-Headers", "Aquarius-Header");
+			this->session_ptr_ = sessoin_ptr;
+
+			co_return co_await send_response(co_await this->handle());
 		}
+
+		std::shared_ptr<Request> request() const
+		{
+			return request_ptr_;
+		}
+
+		Response& response()
+		{
+			return response_;
+		}
+
+	protected:
+		virtual auto handle() -> awaitable<error_code> = 0;
+
+		auto session() const
+		{
+			return session_ptr_.lock();
+		}
+
+	private:
+		virtual auto send_response(error_code ec) -> awaitable<error_code>
+		{
+			response().header().result(ec.value());
+
+			response().seq_number(request()->seq_number());
+
+			flex_buffer buffer{};
+
+			response().commit(buffer);
+
+			if (!this->session())
+				co_return;
+
+			co_return co_await this->session()->async_send(std::move(buffer));
+		}
+
+	protected:
+		std::shared_ptr<request_t> request_ptr_;
+
+		response_t response_;
+
+		std::weak_ptr<Session> session_ptr_;
 	};
 
-	template <typename Session, typename Context>
+	template <typename Session, typename Handler>
 	struct auto_handler_register
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto func = [&](std::shared_ptr<Session> session, virgo::header_fields hf, flex_buffer& buffer)
-			{
-				std::shared_ptr<typename Context::request_t> request;
+			auto func = [] { return std::make_shared<Handler>(); };
 
-				request = std::make_shared<typename Context::request_t>();
-
-				error_code ec{};
-
-				try
-				{
-					request->set_header_fields(std::move(hf));
-					request->consume(buffer);
-				}
-				catch (error_code& ex)
-				{
-					ec = ex;
-				}
-				catch (...)
-				{
-					ec = virgo::http_status::bad_request;
-				}
-
-				co_spawn(
-					session->get_executor(),
-					[session, ec, request]() mutable -> awaitable<void>
-					{
-						co_await std::make_shared<Context>()->visit(session, request, ec);
-					},
-					detached);
-
-				return !ec;
-			};
-
-			router<Session>::get_mutable_instance().regist(proto, func);
+			//co_spawn(
+			//	this_coro::executor, [&]() -> awaitable<void> { co_await mpc_subscribe<Session>(proto, func); },
+			//	detached);
 		}
 	};
 
@@ -94,12 +93,10 @@ namespace aquarius
 #define AQUARIUS_GLOBAL_STR_ID(request) #request
 
 #define __AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)                                            \
-	class __method final                                                                                               \
-		: public aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>     \
+	class __method final : public aquarius::handler<__session, __request, __response>                                  \
 	{                                                                                                                  \
 	public:                                                                                                            \
-		using base_type =                                                                                              \
-			aquarius::handler<aquarius::handler_tag_traits<__request>::tag, __session, __request, __response>;         \
+		using base_type = aquarius::handler<__session, __request, __response>;                                         \
 		using session_t = typename base_type::session_t;                                                               \
                                                                                                                        \
 	public:                                                                                                            \
@@ -113,14 +110,17 @@ namespace aquarius
 #define AQUARIUS_CONTEXT_BY(__session, __request, __response, __method)                                                \
 	class __method;                                                                                                    \
 	[[maybe_unused]] static aquarius::auto_handler_register<__session, __method> __auto_register_##__method(           \
-		__request::router);                                                                                            \
+		__request::this_router);                                                                                       \
 	__AQUARIUS_HANDLER_IMPL(__session, __method, __request, __response)
 
 #define AQUARIUS_HANDLER(__request, __response, __method)                                                              \
-	using custom_session##__request = aquarius::server_session<aquarius::handler_tag_traits<__request>::tag,                      \
-													aquarius::handler_tag_traits<__request>::selector>;                \
+	using custom_session##__request =                                                                                  \
+		aquarius::server_session<typename aquarius::handler_tag_traits<__request>::type,                               \
+								 typename aquarius::handler_tag_traits<__request>::selector>;                          \
 	AQUARIUS_CONTEXT_BY(custom_session##__request, __request, __response, __method)
 
 #define AQUARIUS_SSL_HANDLER(__request, __response, __method)                                                          \
-	AQUARIUS_CONTEXT_BY(aquarius::ssl_server_session<aquarius::handler_tag_traits<__request>::tag>, __request,         \
-						__response, __method)
+	using custom_session##__request =                                                                                  \
+		aquarius::ssl_server_session<typename aquarius::handler_tag_traits<__request>::type,                           \
+									 typename aquarius::handler_tag_traits<__request>::selector>;                      \
+	AQUARIUS_CONTEXT_BY(custom_session##__request, __request, __response, __method)

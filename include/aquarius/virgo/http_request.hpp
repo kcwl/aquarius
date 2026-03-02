@@ -12,17 +12,16 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <detail::string_literal Router, virgo::http_method Method, typename Body>
-		class http_request : public basic_http_protocol<true, http_request_header, Body>
+		template <detail::string_literal Router, virgo::http_method Method,
+				  typename Body, virgo::http_version Version = virgo::http_version::http1_1>
+		class http_request : public basic_http_protocol<true, Method, http_request_header, Body>
 		{
-			constexpr static auto crlf = "\r\n"sv;
-
 		public:
-			using base = basic_http_protocol<true, http_request_header, Body>;
+			using base = basic_http_protocol<true, Method, http_request_header, Body>;
 
 			using base::has_request;
 
-			constexpr static auto router = detail::bind_param<Router>::value;
+			constexpr static auto this_router = detail::bind_param<Router>::value;
 
 		public:
 			http_request() = default;
@@ -46,61 +45,23 @@ namespace aquarius
 				return base::operator<<(os);
 			}
 
-		public:
-			void commit(flex_buffer& buffer)
+		protected:
+			virtual std::string commit_header() override
 			{
-				this->seq_number(detail::uuid_generator()());
+				std::string get_url(this_router);
 
-				flex_buffer header_buffer{};
-				this->header().serialize(header_buffer);
-
-				this->serialize_custom_header(header_buffer);
-
-				flex_buffer body_buffer{};
-
-				std::string headline{};
-
-				this->body().serialize(body_buffer);
-
-				if constexpr (Method == virgo::http_method::get)
+				if constexpr ( Method == virgo::http_method::get)
 				{
-					auto get_url =
-						boost::urls::url_view(std::string_view((char*)body_buffer.data().data(), body_buffer.size()));
+					flex_buffer buffer{};
 
-					headline = std::format(
-						"{} {}{} {}\r\n", virgo::from_method_string(Method), router,
-						std::string(get_url.encoded_params().buffer().data(), get_url.encoded_params().buffer().size()),
-						/*virgo::from_string_version(this->version())*/ "HTTP/1.1");
+					this->body().serialize(buffer);
+
+					get_url += std::string((char*)buffer.data().data(), buffer.size());
 				}
-				else
-				{
-					this->content_length(body_buffer.size());
+				
 
-					this->set_header("Content-Type", "application/json");
-
-					headline = std::format("{} {} {}\r\n", virgo::from_method_string(Method), router,
-										   /*virgo::from_string_version(this->version())*/ "HTTP/1.1");
-				}
-
-				headline += this->header_field();
-
-				headline += crlf;
-
-				buffer.sputn(headline.data(), headline.size());
-
-				if constexpr (Method != virgo::http_method::get)
-				{
-					buffer.sputn((char*)body_buffer.data().data(), body_buffer.data().size());
-				}
-			}
-
-			void consume(flex_buffer& buffer)
-			{
-				auto buf = this->deserialize_custom_header();
-
-				this->header().deserialize(buf);
-
-				this->body().deserialize(buffer);
+				return std::format("{} {} {}\r\n", virgo::from_method_string(Method), get_url,
+								   virgo::from_string_version(Version));
 			}
 		};
 
@@ -113,14 +74,14 @@ namespace aquarius
 		}
 	} // namespace virgo
 
-	template <detail::string_literal Router, virgo::http_method Method, typename Body>
-	struct is_message_type<virgo::http_request<Router, Method, Body>> : std::true_type
+	template <detail::string_literal Router, virgo::http_method Method, typename Body, virgo::http_version Version>
+	struct is_message_type<virgo::http_request<Router, Method, Body, Version>> : std::true_type
 	{};
 
-	template <detail::string_literal Router, virgo::http_method Method, typename Body>
-	struct handler_tag_traits<virgo::http_request<Router, Method, Body>>
+	template <detail::string_literal Router, virgo::http_method Method, typename Body, virgo::http_version Version>
+	struct handler_tag_traits<virgo::http_request<Router, Method, Body, Version>>
 	{
-		constexpr static auto tag = proto::http;
+		using type = http_protocol;
 
 		using selector = ip::http_selector;
 	};

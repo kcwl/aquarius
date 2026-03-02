@@ -1,12 +1,12 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
-#include <aquarius/virgo/header_fields.hpp>
+#include <aquarius/detail/uuid_generator.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
 #include <boost/core/empty_value.hpp>
 #include <iostream>
 
 namespace aquarius
 {
-
 	template <typename Header, typename Body, typename Allocator>
 	class basic_protocol : public boost::empty_value<Body>
 	{
@@ -16,6 +16,8 @@ namespace aquarius
 		using header_t = Header;
 		using body_t = std::remove_pointer_t<Body>;
 		using base_body = boost::empty_value<Body>;
+		using seq_t = uint32_t;
+		using version_t = int;
 
 	public:
 		basic_protocol()
@@ -25,6 +27,8 @@ namespace aquarius
 			: base_body()
 			, header_()
 			, alloc_(alloc)
+			, version_(0)
+			, seq_number_(detail::uuid_generator()())
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
@@ -34,6 +38,8 @@ namespace aquarius
 			: base_body(other)
 			, header_(other.header_)
 			, alloc_(other.alloc_)
+			, version_(other.version_)
+			, seq_number_(other.seq_number_)
 		{}
 
 		basic_protocol& operator=(const basic_protocol& other)
@@ -43,6 +49,8 @@ namespace aquarius
 				this->get() = other.get();
 				header_ = other.header_;
 				alloc_ = other.alloc_;
+				version_ = other.version_;
+				seq_number_ = other.seq_number_;
 			}
 
 			return *this;
@@ -50,6 +58,7 @@ namespace aquarius
 		basic_protocol(basic_protocol&& other) noexcept
 			: header_(std::exchange(other.header_, {}))
 			, alloc_(std::move(other.alloc_))
+			, version_(std::move(other.version_))
 		{
 			this->get() = std::exchange(other.get(), nullptr);
 		}
@@ -60,6 +69,8 @@ namespace aquarius
 				header_ = std::move(other.header_);
 				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
+				version_ = std::move(other.version_);
+				seq_number_ = std::move(other.seq_number_);
 			}
 			return *this;
 		}
@@ -76,6 +87,24 @@ namespace aquarius
 		bool operator==(const basic_protocol& other) const
 		{
 			return header() == other.header() && body() == other.body();
+		}
+
+		std::ostream& operator<<(std::ostream& os) const
+		{
+			os << this->header() << " " << this->body();
+
+			return os;
+		}
+
+	public:
+		virtual bool commit(flex_buffer& buffer) = 0;
+
+		virtual bool consume_header(flex_buffer& buffer) = 0;
+
+		virtual bool consume_body(flex_buffer& buffer)
+		{
+			this->body().deserialize(buffer);
+			return true;
 		}
 
 	public:
@@ -96,9 +125,66 @@ namespace aquarius
 			return *this->get();
 		}
 
+		void version(version_t v)
+		{
+			version_ = v;
+		}
+
+		version_t version() const
+		{
+			return version_;
+		}
+
+		version_t& version()
+		{
+			return version_;
+		}
+
+		void seq_number(seq_t v)
+		{
+			seq_number_ = v;
+		}
+
+		seq_t seq_number() const
+		{
+			return seq_number_;
+		}
+
+		seq_t& seq_number()
+		{
+			return seq_number_;
+		}
+
 	private:
 		header_t header_;
 
 		Allocator alloc_;
+
+		int version_;
+
+		seq_t seq_number_;
+	};
+
+	struct null_protocol
+	{
+		bool commit(flex_buffer&)
+		{
+			return false;
+		}
+
+		bool consume_header(flex_buffer&)
+		{
+			return false;
+		}
+
+		bool consume_body(flex_buffer&)
+		{
+			return false;
+		}
+
+		std::size_t content_length()
+		{
+			return 0;
+		}
 	};
 } // namespace aquarius

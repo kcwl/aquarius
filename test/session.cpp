@@ -23,8 +23,6 @@ BOOST_AUTO_TEST_CASE(no_connect)
 
 			BOOST_TEST(session.remote_address_u() == 0u);
 
-			BOOST_TEST(!session.shutdown());
-
 			BOOST_TEST(session.close());
 		},
 		aquarius::use_future);
@@ -60,8 +58,6 @@ BOOST_AUTO_TEST_CASE(conn)
 			BOOST_TEST(session.keep_alive());
 
 			BOOST_TEST(session.remote_address_u() == 2130706433u);
-
-			BOOST_TEST(session.shutdown());
 
 			BOOST_TEST(session.close());
 		},

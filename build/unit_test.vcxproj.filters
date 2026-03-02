@@ -46,6 +46,12 @@
     <Filter Include="include\aquarius\ini">
       <UniqueIdentifier>{5a72fa1f-ac88-420a-9a16-98bef9228ba5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\ip\adaptor">
+      <UniqueIdentifier>{86f7649e-b223-4e63-89f9-30f505bdf254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ip\adaptor\detail">
+      <UniqueIdentifier>{dee91bcf-3e8d-40d0-9758-09883de3e3ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -90,9 +96,6 @@
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\header_fields.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
@@ -122,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_router.hpp">
-      <Filter>include\aquarius</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\asio.hpp">
       <Filter>include\aquarius</Filter>
@@ -180,9 +180,6 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\raw_socket_adaptor.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
@@ -219,17 +216,11 @@
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\router.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_pool.hpp">
       <Filter>include\aquarius</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\ssl_socket_adaptor.hpp">
-      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp">
       <Filter>include\aquarius\ip\http</Filter>
@@ -335,6 +326,21 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\cpp_type.hpp">
       <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_client_socket_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_server_socket_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\detail\ssl_context_base.hpp">
+      <Filter>include\aquarius\ip\adaptor\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_socket_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\channel_module.hpp">
+      <Filter>include\aquarius\module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

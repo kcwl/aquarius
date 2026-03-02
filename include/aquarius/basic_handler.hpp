@@ -1,41 +1,32 @@
 #pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/basic_protocol.hpp>
 #include <aquarius/error_code.hpp>
 #include <memory>
 
 namespace aquarius
 {
-	template <typename Session, typename Request, typename Response>
+	template <typename Session>
 	class basic_handler
 	{
-	public:
-		using request_t = Request;
-
-		using response_t = Response;
+		using request_t = null_protocol;
 
 	public:
 		basic_handler(const std::string& name)
 			: name_(name)
 		{}
 
-		virtual ~basic_handler() = default;
-
 	public:
-		auto visit(std::shared_ptr<Session> sessoin_ptr, std::shared_ptr<request_t> request_ptr, error_code ec)
-			-> awaitable<void>
+		virtual auto visit(std::shared_ptr<Session> sessoin_ptr) -> awaitable<error_code>
 		{
-			if (!request_ptr)
-				co_return;
+			XLOG_ERROR() << "invalid protocol";
 
-			this->session_ptr_ = sessoin_ptr;
-			this->request_ptr_ = request_ptr;
+			co_return boost::asio::error::eof;
+		}
 
-			if (!ec)
-			{
-				ec = co_await this->handle();
-			}
-
-			co_await send_response(ec);
+		std::shared_ptr<request_t> request() const
+		{
+			return request_ptr_;
 		}
 
 		std::string name() const
@@ -43,56 +34,9 @@ namespace aquarius
 			return name_;
 		}
 
-		std::shared_ptr<Request> request() const
-		{
-			return request_ptr_;
-		}
-
-		Response& response()
-		{
-			return response_;
-		}
-
-	protected:
-		virtual auto handle() -> awaitable<error_code> = 0;
-
-		virtual void make_response()
-		{
-			return;
-		}
-
-		auto session() const
-		{
-			return session_ptr_.lock();
-		}
-
 	private:
-		virtual auto send_response(error_code ec) -> awaitable<void>
-		{
-			response().header().result(ec.value());
-
-			response().seq_number(request()->seq_number());
-
-			flex_buffer buffer{};
-
-			make_response();
-
-			response().commit(buffer);
-
-			if (!this->session())
-				co_return;
-
-			co_await this->session()->async_send(buffer);
-		}
-
-	protected:
 		std::shared_ptr<request_t> request_ptr_;
 
-		response_t response_;
-
-		std::weak_ptr<Session> session_ptr_;
-
-	private:
 		std::string name_;
 	};
 } // namespace aquarius

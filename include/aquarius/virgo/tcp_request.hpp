@@ -10,6 +10,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
+
 		template <detail::string_literal Router, typename Body>
 		class tcp_request : public basic_tcp_protocol<true, tcp_request_header, Body>
 		{
@@ -18,20 +19,20 @@ namespace aquarius
 
 			using base::has_request;
 
-			constexpr static auto router = detail::bind_param<Router>::value;
+			constexpr static auto this_router = detail::bind_param<Router>::value;
 
 		public:
 			tcp_request() = default;
 
 			virtual ~tcp_request() = default;
 
-			tcp_request(const tcp_request& other) = default;
+			tcp_request(const tcp_request&) = default;
 
-			tcp_request& operator=(const tcp_request& other) = default;
+			tcp_request& operator=(const tcp_request&) = default;
 
-			tcp_request(tcp_request&& other) noexcept = default;
+			tcp_request(tcp_request&&) noexcept = default;
 
-			tcp_request& operator=(tcp_request&& other) noexcept = default;
+			tcp_request& operator=(tcp_request&&) noexcept = default;
 
 		public:
 			bool operator==(const tcp_request& other) const
@@ -44,36 +45,10 @@ namespace aquarius
 				return base::operator<<(os);
 			}
 
-		public:
-			bool commit(flex_buffer& buffer)
+		protected:
+			virtual std::string router() override
 			{
-				buffer.commit(sizeof(uint32_t) + sizeof(uint32_t));
-
-				binary_parse{}.to_datas(router, buffer);
-
-				this->header().serialize(buffer);
-
-				this->body().serialize(buffer);
-
-				buffer.pubseekpos(0, std::ios::in);
-
-				uint32_t length = static_cast<uint32_t>(buffer.size());
-
-				buffer.sputn((char*)&length, sizeof(uint32_t));
-
-				auto seq = detail::uuid_generator()();
-				buffer.sputn((char*)&seq, sizeof(uint32_t));
-
-				this->seq_number(seq);
-
-				return true;
-			}
-
-			void consume(flex_buffer& buffer)
-			{
-				this->header().deserialize(buffer);
-
-				this->body().deserialize(buffer);
+				return std::string(this_router);
 			}
 		};
 
@@ -92,7 +67,7 @@ namespace aquarius
 	template <detail::string_literal Router, typename Body>
 	struct handler_tag_traits<virgo::tcp_request<Router, Body>>
 	{
-		constexpr static auto tag = proto::tcp;
+		using type = tcp_protocol;
 
 		using selector = ip::tcp_selector;
 	};

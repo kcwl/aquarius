@@ -151,7 +151,6 @@ namespace aquarius
 							close_func(session_ptr);
 						}
 
-						session_ptr->shutdown();
 						session_ptr->close();
 					},
 					detached);

@@ -155,6 +155,10 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
     <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\adaptor\detail\ssl_context_base.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_socket_adaptor.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_client_socket_adaptor.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_server_socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\default_selector.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_method_define.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_method_handler.hpp" />
@@ -162,7 +166,6 @@
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_router.hpp" />
     <ClInclude Include="..\include\aquarius\asio.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_server.hpp" />
@@ -170,11 +173,11 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_ssl_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\server_session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\ssl_server_session.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\ssl_socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_server.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_client.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_server.hpp" />
+    <ClInclude Include="..\include\aquarius\module\channel_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
@@ -199,9 +202,7 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\router.hpp" />
     <ClInclude Include="..\include\aquarius\ip\session.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\raw_socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
@@ -234,7 +235,6 @@
     <ClInclude Include="..\include\aquarius\timer.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\header_fields.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp" />
