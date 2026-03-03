@@ -120,13 +120,13 @@ namespace aquarius
 		{
 			std::unique_lock lk(mutex_);
 
-			auto subscribe = impl_.find(topic);
+			auto subscribe = impl_.find(std::string(topic));
 			if (subscribe)
 			{
 				return;
 			}
 
-			impl_.add(topic, func);
+			impl_.add(std::string(topic), func);
 		}
 
 	private:
@@ -136,21 +136,21 @@ namespace aquarius
 	};
 
 	template <typename Session>
-	inline auto mpc_publish(std::string_view topic) -> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
-	{
-		co_return co_await mpc::call<std::shared_ptr<typename channel_module<Session>::subscribe_t>, channel_module<Session>>(
-			[&](channel_module<Session>* ptr) -> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
-			{ co_return ptr->publish(topic); });
-	}
-
-	template <typename Session>
-	inline auto mpc_subscribe(std::string_view topic, const typename channel_module<Session>::subscribe_func_t& func)
-		-> awaitable<void>
+	inline auto mpc_publish(std::string_view topic)
+		-> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
 	{
 		co_return co_await mpc::call<std::shared_ptr<typename channel_module<Session>::subscribe_t>,
 									 channel_module<Session>>(
 			[&](channel_module<Session>* ptr)
 				-> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
-			{ co_return ptr->subscribe(topic, func); });
+			{ co_return ptr->publish(topic); });
 	}
+
+	template <typename Session>
+	inline void mpc_subscribe(std::string_view topic, const typename channel_module<Session>::subscribe_func_t& func)
+	{
+		return mpc::call_sync<void, channel_module<Session>>([&](channel_module<Session>* ptr)
+															 { return ptr->subscribe(topic, func); });
+	}
+
 } // namespace aquarius

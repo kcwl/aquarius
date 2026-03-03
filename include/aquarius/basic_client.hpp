@@ -2,6 +2,7 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_module.hpp>
@@ -37,7 +38,7 @@ namespace aquarius
 		virtual auto query(uint32_t, error_code&) -> awaitable<flex_buffer> = 0;
 
 		template <typename Response, typename Request>
-		requires is_message_type<Request>::value && is_message_type<Response>::value
+		requires(is_message_type<Request>::value)
 		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
 			flex_buffer buffer{};

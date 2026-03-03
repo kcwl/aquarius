@@ -93,6 +93,32 @@ namespace aquarius
 				[&]() -> awaitable<return_type> { co_return co_await temp_module->visit(task); }, use_awaitable);
 		}
 
+		template <typename T, typename Task>
+		auto sync_schedule(std::shared_ptr<Task> task) -> typename Task::return_type
+		{
+			std::shared_lock lock(mutex_);
+
+			using return_type = typename Task::return_type;
+
+			constexpr auto module_name = detail::struct_name<T>();
+
+			auto iter = routers_.find(std::string(module_name));
+			if (iter == routers_.end())
+			{
+				XLOG_WARNING() << "[" << module_name << "] module not found";
+				return return_type{};
+			}
+
+			auto temp_module = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
+			if (!temp_module)
+			{
+				XLOG_WARNING() << "[" << module_name << "] task type not match";
+				return return_type{};
+			}
+
+			return temp_module->visit_sync(task);
+		}
+
 		void hot_update(const std::string& module_name)
 		{
 			auto iter = routers_.find(module_name);

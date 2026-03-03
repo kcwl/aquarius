@@ -24,6 +24,7 @@ set(AQUARIUS_NEED_BOOST
 	json
 	charconv
 	program_options
+	url
 )
 
 find_package(Boost 1.88 CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
@@ -35,7 +36,7 @@ endif()
 
 message(STATUS "Found Boost ${Boost_VERSION}")
 
-target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system Boost::program_options Boost::json Boost::charconv)
+target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system Boost::program_options Boost::json Boost::charconv Boost::url)
 
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})
 endif()

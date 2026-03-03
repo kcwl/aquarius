@@ -38,6 +38,25 @@ namespace aquarius
 			{
 				return base::operator<<(os);
 			}
+
+		public:
+			int result() const
+			{
+				return result_;
+			}
+
+			int& result()
+			{
+				return result_;
+			}
+
+			void result(int r)
+			{
+				result_ = r;
+			}
+
+		private:
+			int result_;
 		};
 
 		template <typename Body>

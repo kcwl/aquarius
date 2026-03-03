@@ -68,6 +68,17 @@ namespace aquarius
 			co_return co_await (*task_ptr)(_this());
 		}
 
+
+		template <typename Task>
+		auto visit_sync(std::shared_ptr<Task> task_ptr) -> typename Task::return_type
+		{
+			using return_type = typename Task::return_type;
+			if (!task_ptr)
+				return return_type{};
+
+			return (*task_ptr)(_this());
+		}
+
 	protected:
 		T* _this()
 		{

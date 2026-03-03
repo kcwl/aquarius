@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/ip/concept.hpp>
+#include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -39,6 +40,25 @@ namespace aquarius
 			{
 				return base::operator<<(os);
 			}
+
+		public:
+			int result() const
+			{
+				return result_;
+			}
+
+			int& result()
+			{
+				return result_;
+			}
+
+			void result(int r)
+			{
+				result_ = r;
+			}
+
+		private:
+			int result_;
 
 		protected:
 			virtual std::string commit_header() override

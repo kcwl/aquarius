@@ -6,6 +6,8 @@
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/timer.hpp>
 #include <aquarius/virgo/http_method.hpp>
+#include <aquarius/virgo/http_null_body.hpp>
+#include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
 #include <ranges>
@@ -202,7 +204,7 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
-				auto handler_ptr = co_await server_recv(buffer, ec);
+				co_await server_recv(buffer, ec);
 				if (ec)
 				{
 					break;
@@ -235,6 +237,7 @@ namespace aquarius
 			{
 				for (;;)
 				{
+					auto size = packet.size();
 					uint32_t seq{};
 					co_await recv(packet, seq, ec);
 
@@ -245,8 +248,9 @@ namespace aquarius
 
 					if (seq != seq_number)
 					{
-						XLOG_INFO() << "[query controll buffer] seq_number: " << seq
-									<< ", wait seq: " << seq_number;
+						XLOG_INFO() << "[query controll buffer] seq_number: " << seq << ", wait seq: " << seq_number;
+
+						packet.pubseekoff(size, std::ios::beg);
 
 						buffer_controller_.emplace(seq, std::move(packet));
 						continue;
@@ -265,7 +269,7 @@ namespace aquarius
 		}
 
 	private:
-		auto server_recv(flex_buffer& buffer, error_code& ec) -> awaitable<std::shared_ptr<basic_handler<self_type>>>
+		auto server_recv(flex_buffer& buffer, error_code& ec) -> awaitable<void>
 		{
 			ec = co_await this->async_read_util(buffer, crlf);
 
@@ -280,23 +284,23 @@ namespace aquarius
 
 			std::string router(std::string_view(url->path().data(), url->path().size()));
 
-			//auto content_type = hf.find("content-type");
+			// auto content_type = hf.find("content-type");
 
-			//if (!content_type.empty() && content_type != "application/json" && method == virgo::http_method::get)
+			// if (!content_type.empty() && content_type != "application/json" && method == virgo::http_method::get)
 			//{
 			//	router = __http_source_handler__;
-			//}
-			//else if (method == virgo::http_method::get)
+			// }
+			// else if (method == virgo::http_method::get)
 			//{
 			//	if (!path.empty())
 			//	{
 			//		buffer.sputn(path.data(), path.size());
 			//	}
-			//}
-			//else if (method == virgo::http_method::options)
+			// }
+			// else if (method == virgo::http_method::options)
 			//{
 			//	router = __http_options_handler__;
-			//}
+			// }
 
 			auto handler_ptr = co_await mpc_publish<self_type>(router);
 
@@ -333,7 +337,7 @@ namespace aquarius
 			HandlerSelector()(handler_ptr, this->shared_from_this());
 		}
 
-		auto recv(flex_buffer& buffer,uint32_t& req, error_code& ec) -> awaitable<void>
+		auto recv(flex_buffer& buffer, uint32_t& req, error_code& ec) -> awaitable<void>
 		{
 			ec = co_await this->async_read_util(buffer, crlf);
 
@@ -346,11 +350,12 @@ namespace aquarius
 
 			auto [version, status] = parse_command_line<false>(std::span<char>(header_line), ec);
 
-			//std::string router = std::string_view(url->path().data(), url->path().size());
+			using temp_http_response = virgo::http_response<virgo::http_method::post, virgo::http_null_body>;
 
-			//auto handler_ptr = co_await mpc_publish(router);
+			temp_http_response resp{};
 
-			//auto request_ptr = handler_ptr->get_request();
+			resp.version(static_cast<int32_t>(version));
+			resp.result(static_cast<int32_t>(status));
 
 			ec = co_await this->async_read_util(buffer, two_crlf);
 
@@ -359,21 +364,21 @@ namespace aquarius
 				co_return;
 			}
 
-			//request_ptr->consume_header(buffer);
+			resp.consume_header(buffer);
 
-			//auto content_length = request_ptr->content_length();
+			auto content_length = resp.content_length();
 
-			//if (content_length != 0)
-			//{
-			//	auto remain_size = static_cast<int64_t>(content_length - buffer.size());
+			if (content_length != 0)
+			{
+				auto remain_size = static_cast<int64_t>(content_length - buffer.size());
 
-			//	if (remain_size > 0)
-			//	{
-			//		ec = co_await this->async_read(buffer, remain_size);
-			//	}
-			//}
+				if (remain_size > 0)
+				{
+					ec = co_await this->async_read(buffer, remain_size);
+				}
+			}
 
-			//req = request_ptr->seq_number();
+			req = resp.seq_number();
 		}
 
 		template <bool Server>

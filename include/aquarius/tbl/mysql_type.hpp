@@ -404,11 +404,6 @@ namespace aquarius
 				: base_type(v)
 			{}
 
-			operator std::string() const
-			{
-				return this->to_datetime();
-			}
-
 			datetime(const std::string& v)
 			{
 				std::stringstream ss;
@@ -418,20 +413,19 @@ namespace aquarius
 				base_type::serialize(ss);
 			}
 
-		private:
 			std::string to_datetime() const
 			{
 				std::chrono::year_month_day ymd(std::chrono::floor<std::chrono::days>(value_));
 
 				std::chrono::hh_mm_ss hms(value_ - std::chrono::floor<std::chrono::days>(value_));
 
-				return std::format("'{%F} {%T}'", ymd, hms);
+				return std::format("'{:%F} {:%T}'", ymd, hms);
 			}
 		};
 
 		inline std::ostream& operator<<(std::ostream& os, const datetime& v)
 		{
-			os << static_cast<std::string>(v);
+			os << v.to_datetime();
 
 			return os;
 		}

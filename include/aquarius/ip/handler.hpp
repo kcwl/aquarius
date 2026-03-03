@@ -62,7 +62,7 @@ namespace aquarius
 			response().commit(buffer);
 
 			if (!this->session())
-				co_return;
+				co_return error_code{};
 
 			co_return co_await this->session()->async_send(std::move(buffer));
 		}
@@ -80,11 +80,7 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto func = [] { return std::make_shared<Handler>(); };
-
-			//co_spawn(
-			//	this_coro::executor, [&]() -> awaitable<void> { co_await mpc_subscribe<Session>(proto, func); },
-			//	detached);
+			mpc_subscribe<Session>(proto, [] { return std::make_shared<Handler>(); });
 		}
 	};
 
