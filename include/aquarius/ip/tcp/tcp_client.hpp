@@ -6,7 +6,7 @@
 
 namespace aquarius
 {
-	using tcp_client_session = session<tcp_protocol, raw_socket_adaptor, ip::tcp_selector>;
+	using tcp_client_session = session<tcp_protocol, raw_socket_adaptor, tcp_selector>;
 
 	using tcp_client = basic_client<tcp_client_session>;
 } // namespace aquarius

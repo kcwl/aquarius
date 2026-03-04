@@ -69,6 +69,6 @@ namespace aquarius
 	{
 		using type = tcp_protocol;
 
-		using selector = ip::tcp_selector;
+		using selector = tcp_selector;
 	};
 } // namespace aquarius

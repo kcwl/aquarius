@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/uuid_generator.hpp>
-#include <aquarius/ip/default_selector.hpp>
+#include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/ip/http/url_encode.hpp>
 #include <aquarius/ip/protocol.hpp>
@@ -10,10 +10,15 @@
 
 namespace aquarius
 {
+	struct http_selector;
+}
+
+namespace aquarius
+{
 	namespace virgo
 	{
-		template <detail::string_literal Router, virgo::http_method Method,
-				  typename Body, virgo::http_version Version = virgo::http_version::http1_1>
+		template <detail::string_literal Router, virgo::http_method Method, typename Body,
+				  virgo::http_version Version = virgo::http_version::http1_1>
 		class http_request : public basic_http_protocol<true, Method, http_request_header, Body>
 		{
 		public:
@@ -50,7 +55,7 @@ namespace aquarius
 			{
 				std::string get_url(this_router);
 
-				if constexpr ( Method == virgo::http_method::get)
+				if constexpr (Method == virgo::http_method::get)
 				{
 					flex_buffer buffer{};
 
@@ -58,7 +63,6 @@ namespace aquarius
 
 					get_url += std::string((char*)buffer.data().data(), buffer.size());
 				}
-				
 
 				return std::format("{} {} {}\r\n", virgo::from_method_string(Method), get_url,
 								   virgo::from_string_version(Version));
@@ -83,6 +87,6 @@ namespace aquarius
 	{
 		using type = http_protocol;
 
-		using selector = ip::http_selector;
+		using selector = http_selector;
 	};
 } // namespace aquarius
