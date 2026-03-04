@@ -6,14 +6,21 @@
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/timer.hpp>
 #include <aquarius/virgo/http_method.hpp>
-#include <aquarius/virgo/http_null_body.hpp>
-#include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/http_status.hpp>
+#include <aquarius/virgo/http_version.hpp>
 #include <boost/url.hpp>
 #include <ranges>
 #include <span>
 
 using namespace std::chrono_literals;
+
+namespace aquarius
+{
+	namespace virgo
+	{
+		class http_null_response;
+	}
+} // namespace aquarius
 
 namespace aquarius
 {
@@ -350,9 +357,7 @@ namespace aquarius
 
 			auto [version, status] = parse_command_line<false>(std::span<char>(header_line), ec);
 
-			using temp_http_response = virgo::http_response<virgo::http_method::post, virgo::http_null_body>;
-
-			temp_http_response resp{};
+			virgo::http_null_response resp{};
 
 			resp.version(static_cast<int32_t>(version));
 			resp.result(static_cast<int32_t>(status));

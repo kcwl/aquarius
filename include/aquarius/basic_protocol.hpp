@@ -164,27 +164,4 @@ namespace aquarius
 
 		seq_t seq_number_;
 	};
-
-	struct null_protocol
-	{
-		bool commit(flex_buffer&)
-		{
-			return false;
-		}
-
-		bool consume_header(flex_buffer&)
-		{
-			return false;
-		}
-
-		bool consume_body(flex_buffer&)
-		{
-			return false;
-		}
-
-		std::size_t content_length()
-		{
-			return 0;
-		}
-	};
 } // namespace aquarius

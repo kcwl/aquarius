@@ -3,9 +3,7 @@
 #include <aquarius/ip/http/http_method_define.hpp>
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/virgo/http_method.hpp>
-#include <aquarius/virgo/http_null_body.hpp>
-#include <aquarius/virgo/http_request.hpp>
-#include <aquarius/virgo/http_response.hpp>
+#include <aquarius/virgo/http_null_protocol.hpp>
 
 namespace aquarius
 {

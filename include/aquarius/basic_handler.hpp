@@ -1,15 +1,22 @@
 #pragma once
 #include <aquarius/asio.hpp>
-#include <aquarius/basic_protocol.hpp>
 #include <aquarius/error_code.hpp>
 #include <memory>
+
+namespace aquarius
+{
+	namespace virgo
+	{
+		class http_null_request;
+	}
+}
 
 namespace aquarius
 {
 	template <typename Session>
 	class basic_handler
 	{
-		using request_t = null_protocol;
+		using request_t = virgo::http_null_request;
 
 	public:
 		basic_handler(const std::string& name)

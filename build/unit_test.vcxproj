@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="test\gpt_test\detail_tests.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
@@ -237,7 +238,7 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
-    <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\http_null_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_status.hpp" />

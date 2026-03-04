@@ -74,10 +74,6 @@ public:
 	bytes feedbuf;
 };
 
-std::ostream& operator<<(std::ostream& os, const subscribe_req_body& other);
-std::ostream& operator<<(std::ostream& os, const subscribe_resp_body& other);
-std::ostream& operator<<(std::ostream& os, const transfer_req_body& other);
-std::ostream& operator<<(std::ostream& os, const transfer_resp_body& other);
 
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const subscribe_req_body& local);
 subscribe_req_body tag_invoke(const aquarius::json::value_to_tag<subscribe_req_body>&, const aquarius::json::value& jv);
@@ -88,7 +84,7 @@ transfer_req_body tag_invoke(const aquarius::json::value_to_tag<transfer_req_bod
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const transfer_resp_body& local);
 transfer_resp_body tag_invoke(const aquarius::json::value_to_tag<transfer_resp_body>&, const aquarius::json::value& jv);
 
-using subscribe_tcp_request = aquarius::virgo::tcp_request<"10000", aquarius::tcp_request_header, subscribe_req_body>;
-using subscribe_tcp_response = aquarius::virgo::tcp_response<aquarius::tcp_response_header, subscribe_resp_body>;
-using transfer_tcp_request = aquarius::virgo::tcp_request<"10001", aquarius::tcp_request_header, transfer_req_body>;
-using transfer_tcp_response = aquarius::virgo::tcp_response<aquarius::tcp_response_header, transfer_resp_body>;
+using subscribe_request = aquarius::virgo::tcp_request<"10000", subscribe_req_body>;
+using subscribe_response = aquarius::virgo::tcp_response<subscribe_resp_body>;
+using transfer_request = aquarius::virgo::tcp_request<"10001", transfer_req_body>;
+using transfer_response = aquarius::virgo::tcp_response<transfer_resp_body>;

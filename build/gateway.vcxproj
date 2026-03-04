@@ -27,8 +27,6 @@
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
-    <ClCompile Include="..\src\gateway\player_module.cpp" />
-    <ClCompile Include="..\src\gateway\player_schedule.cpp" />
     <ClCompile Include="..\src\gateway\proto\login.virgo.cpp" />
     <ClCompile Include="..\src\gateway\transfer_module.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
@@ -41,12 +39,9 @@
     <ClInclude Include="..\src\gateway\firewall_module.h" />
     <ClInclude Include="..\src\gateway\firewall_schedule.h" />
     <ClInclude Include="..\src\gateway\player.h" />
-    <ClInclude Include="..\src\gateway\player_module.h" />
-    <ClInclude Include="..\src\gateway\player_schedule.h" />
     <ClInclude Include="..\src\gateway\proto\login.virgo.h" />
     <ClInclude Include="..\src\gateway\server.hpp" />
-    <ClInclude Include="..\src\gateway\table\account_table.h" />
-    <ClInclude Include="..\src\gateway\transfer_handler.hpp" />
+    <ClInclude Include="..\src\gateway\table\account.tbl.h" />
     <ClInclude Include="..\src\gateway\transfer_module.h" />
     <ClInclude Include="..\src\gateway\transfer_schedule.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
@@ -140,6 +135,7 @@
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_88_0;E:\openssl-lib\include;E:\软件\mysql84\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

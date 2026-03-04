@@ -8,19 +8,17 @@ namespace aquarius
 	namespace ip
 	{
 		constexpr static auto __transfer__ = "transfer"sv;
-		constexpr static auto __transfer_module__ = "transfer_module"sv;
 
-		template <typename T>
-		inline auto mpu_transfer(flex_buffer& buffer, std::shared_ptr<header_field_base> hf, error_code& ec) -> awaitable<flex_buffer>
+		template <typename T, typename Request>
+		inline auto mpu_transfer(std::shared_ptr<Request> request, error_code& ec) -> awaitable<flex_buffer>
 		{
-			co_return co_await mpc::call<flex_buffer, T>(__transfer_module__,
-														 [&](T* ptr) -> awaitable<flex_buffer>
+			co_return co_await mpc::call<flex_buffer, T>([&](T* ptr) -> awaitable<flex_buffer>
 														 {
-															 buffer.pubseekpos(0, std::ios::out);
+															 //buffer.pubseekpos(0, std::ios::out);
 
-															 auto result = co_await ptr->async_sendback(buffer, hf, ec);
+															 //auto result = co_await ptr->async_sendback(buffer, hf, ec);
 
-															 co_return std::move(result);
+															 //co_return std::move(result);
 														 });
 		}
 

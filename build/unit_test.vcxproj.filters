@@ -192,7 +192,7 @@
     <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_null_body.hpp">
+    <ClInclude Include="..\include\aquarius\virgo\http_null_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\html.hpp">
@@ -426,6 +426,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\session.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test\gpt_test\detail_tests.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

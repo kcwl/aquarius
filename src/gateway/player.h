@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/logger.hpp>
+#include <aquarius/module/player_module.hpp>
 #include <boost/msm/back11/state_machine.hpp>
 #include <boost/msm/front/state_machine_def.hpp>
 
@@ -111,7 +112,7 @@ namespace aquarius
 			}
 		};
 
-		class player : public boost::msm::back11::state_machine<player_define>
+		class player : public boost::msm::back11::state_machine<player_define>, public aquarius::player_base
 		{
 		public:
 			player(std::size_t id);

@@ -1,7 +1,5 @@
 #pragma once
 #include <aquarius/ip/protocol.hpp>
-#include <aquarius/ip/router.hpp>
-#include <aquarius/virgo/http_fields.hpp>
 #include <string_view>
 
 using namespace std::string_view_literals;
@@ -14,14 +12,23 @@ namespace aquarius
 
 		struct transfer_selector
 		{
-			template <typename Session>
-			auto operator()(std::string_view topic, std::shared_ptr<Session> session_ptr,
-							std::shared_ptr<header_field_base> hf, flex_buffer& buffer)
+			template <typename Handler, typename Session>
+			auto operator()(std::shared_ptr<Handler> handler, std::shared_ptr<Session> session_ptr)
 			{
-				if (!router<Session>::get_mutable_instance().invoke(topic, session_ptr, hf, buffer))
-				{
-					router<Session>::get_mutable_instance().invoke(__transfer__, session_ptr, hf, buffer);
-				}
+				//error_code ec{};
+
+				//auto resp_buffer = co_await ip::mpu_transfer<T>(buffer, hf, ec);
+
+				//if (!ec)
+				//{
+				//	co_await session->async_send(resp_buffer);
+				//}
+				//else
+				//{
+				//	auto buf = co_await session->make_error_response(ec);
+
+				//	co_await session->async_send(buf);
+				//}
 			};
 		};
 	} // namespace gateway

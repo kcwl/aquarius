@@ -10,7 +10,7 @@ namespace aquarius
 		class firewall_module : public no_config_module<firewall_module>
 		{
 		public:
-			firewall_module(const std::string& name);
+			firewall_module(io_context& io, const std::string& name);
 
 		public:
 			virtual bool init() override;
