@@ -3,48 +3,83 @@
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/tcp/tcp_server.hpp>
 
-BOOST_AUTO_TEST_SUITE(client_test)
 
-//BOOST_AUTO_TEST_CASE(client_tcp)
-//{
-//	aquarius::tcp_server srv(8100, 10, "async tcp server");
-//
-//	std::thread t([&] { srv.run(); });
-//
-//	std::this_thread::sleep_for(2s);
-//
-//	aquarius::io_context io;
-//
-//	auto cli = std::make_shared<aquarius::tcp_client>(io, "127.0.0.1", "8100");
-//
-//	auto future = aquarius::co_spawn(
-//		io,
-//		[cli] -> aquarius::awaitable<void>
-//		{
-//			auto is_connect = co_await cli->async_connect();
-//
-//			BOOST_CHECK(!is_connect);
-//
-//			cli->close();
-//
-//			is_connect = co_await cli->reconnect();
-//
-//			BOOST_CHECK(!is_connect);
-//		},
-//		aquarius::use_future);
-//
-//	std::thread t1([&] { io.run(); });
-//
-//	auto status = future.wait_for(5s);
-//
-//	BOOST_CHECK(status == std::future_status::ready);
-//
-//	io.stop();
-//
-//	srv.stop();
-//
-//	t.join();
-//	t1.join();
-//}
+template <typename Server>
+struct test_server_fixture
+{
+	test_server_fixture()
+	{
+		srv = std::make_shared<Server>(3, 8100, "test server");
+
+		t = std::make_shared<std::thread>([&] { srv->run(); });
+	}
+
+	~test_server_fixture()
+	{
+		srv->stop();
+		t->join();
+	}
+
+	std::shared_ptr<Server> srv;
+	std::shared_ptr<std::thread> t;
+};
+
+BOOST_AUTO_TEST_SUITE(tcp_client_test_suite, *boost::unit_test::fixture<test_server_fixture<aquarius::tcp_server>>())
+
+BOOST_AUTO_TEST_CASE(ctor)
+{
+	aquarius::io_context io;
+	{
+		aquarius::tcp_client client(io, 1000ms);
+
+		BOOST_TEST(client.get_executor() == io.get_executor());
+		BOOST_TEST(client.get_timeout() == 1000ms);
+	}
+
+	{
+		aquarius::tcp_client client(io.get_executor(), 1000ms);
+
+		BOOST_TEST(client.get_executor() == io.get_executor());
+		BOOST_TEST(client.get_timeout() == 1000ms);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(tcp_client_flow)
+{
+	aquarius::io_context io;
+	aquarius::tcp_client client(io, 300ms);
+
+	int acc_success = 0;
+	int clo_success = 0;
+
+	client.set_accept_func([&] { acc_success++; });
+	client.set_close_func([&] { clo_success++; });
+
+	aquarius::co_spawn(
+		io,
+		[&] -> aquarius::awaitable<void>
+		{
+			auto ec = co_await client.async_connect("", 0);
+			BOOST_TEST(ec);
+
+			ec = co_await client.async_connect("127.0.0.1", 8100);
+			BOOST_TEST(!ec);
+
+			ec = co_await client.reconnect();
+			BOOST_TEST(!ec);
+
+			BOOST_CHECK_EQUAL(client.remote_address(), "127.0.0.1");
+			BOOST_CHECK_EQUAL(client.remote_port(), 8100);
+
+			auto req = std::make_shared<test_request>();
+
+			auto resp = co_await client.async_send<test_response>(req);
+
+			BOOST_TEST(req, resp);
+		},
+		aquarius::detached);
+
+	io.run();
+}
 
 BOOST_AUTO_TEST_SUITE_END()

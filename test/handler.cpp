@@ -6,66 +6,56 @@
 
 using namespace std::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE(handlers)
+BOOST_AUTO_TEST_SUITE(test_handler_suite)
 
-BOOST_AUTO_TEST_CASE(http_handler)
+class test_handler : public aquarius::handler<test_request, test_response>
 {
-	//auto h = std::make_shared<ctx_test_http_hander>();
+public:
+public:
+    using base_type = aquarius::handler<test_request, test_response>;
 
-	//aquarius::io_context io{};
+public:
+    test_handler() : base_type("__handler_test_handler") {}
+    virtual auto handle()
+        -> aquarius::awaitable<aquarius::error_code> override
+    {
+        this->request() = this->response();
 
-	//auto session = std::make_shared<aquarius::http_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 2s);
+        co_return error_code{};
+    }
+};
 
-	//auto req_ptr = std::make_shared<new_http_login_http_request>();
-	//req_ptr->version(aquarius::virgo::http_version::http1_1);
-	//req_ptr->set_field("Content-Type", "json");
-	//req_ptr->set_field("Server", "Aquarius 0.10.0");
-	//req_ptr->set_field("Connection", "keep-alive");
-	//req_ptr->set_field("Access-Control-Allow-Origin", "*");
+BOOST_AUTO_TEST_CASE(ctor)
+{
+    test_handler test{};
 
-	//aquarius::co_spawn(
-	//	io,
-	//	[&] -> aquarius::awaitable<void>
-	//	{
-	//		co_await h->visit(session, req_ptr);
-
-	//		BOOST_TEST(*req_ptr == *h->request());
-
-	//		BOOST_TEST(h->name() == "__handler_ctx_test_http_hander");
-
-	//		auto& response = h->response();
-
-	//		BOOST_TEST(response.version() == req_ptr->version());
-	//		BOOST_TEST(response.find("Content-Type") == "json");
-	//		BOOST_TEST(response.find("Server") == "Aquarius 0.10.0");
-	//		BOOST_TEST(response.find("Connection") == "keep-alive");
-	//		BOOST_TEST(response.find("Access-Control-Allow-Origin") == "*");
-	//		BOOST_TEST(static_cast<int>(response.result()) == static_cast<int>(aquarius::virgo::http_status::ok));
-	//	},
-	//	aquarius::detached);
-
-	//io.run();
+    BOOST_TEST(test.name() == "__handler_test_handler");
+    BOOST_TEST(!test.request());
+    BOOST_CHECK(test.response() == test_response{});
 }
 
-BOOST_AUTO_TEST_CASE(tcp_handler)
+BOOST_AUTO_TEST_CASE(test_handler_visitor_with_no_regist)
 {
-	//auto h = std::make_shared<ctx_tcp_test>();
-	//aquarius::io_context io{};
-	//auto session = std::make_shared<aquarius::tcp_server_session>(std::move(boost::asio::ip::tcp::socket(io)), 2s);
-	//auto req_ptr = std::make_shared<login_tcp_request>();
+    error_code ec{};
 
-	//aquarius::co_spawn(
-	//	io,
-	//	[&] -> aquarius::awaitable<void>
-	//	{
-	//		co_await h->visit(session, req_ptr);
+    test_handler test{};
 
-	//		BOOST_TEST(h->name() == "__handler_ctx_tcp_test");
+    test.visit(ec);
 
-	//		BOOST_TEST(h->response().result() == aquarius::error_code{}.value());
-	//	},
-	//	aquarius::detached);
-	//io.run();
+    BOOST_TEST(ec == aquarius::error::eof);
 }
+
+BOOST_AUTO_TEST_CASE(test_handler_visitor_with_regist)
+{
+    error_code ec{};
+
+    test_handler test{};
+
+    test.visit(ec);
+
+    BOOST_TEST(!ec);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
