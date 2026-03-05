@@ -202,7 +202,6 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_header.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\url_encode.hpp" />
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\session.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_header.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />

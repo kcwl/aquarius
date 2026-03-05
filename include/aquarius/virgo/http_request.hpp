@@ -64,12 +64,4 @@ namespace aquarius
 	template <detail::string_literal Router, virgo::http_method Method, typename Body, virgo::http_version Version>
 	struct is_message_type<virgo::http_request<Router, Method, Body, Version>> : std::true_type
 	{};
-
-	template <detail::string_literal Router, virgo::http_method Method, typename Body, virgo::http_version Version>
-	struct handler_tag_traits<virgo::http_request<Router, Method, Body, Version>>
-	{
-		using type = http_protocol;
-
-		using selector = http_selector;
-	};
 } // namespace aquarius

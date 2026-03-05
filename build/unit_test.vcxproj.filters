@@ -210,9 +210,6 @@
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\session.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\protocol.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>

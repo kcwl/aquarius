@@ -6,8 +6,8 @@
 
 namespace aquarius
 {
-	template <typename Protocol, template <typename> typename Adaptor>
-	class basic_session
+	template <typename Protocol, template <typename> typename Adaptor, typename Selector>
+	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor, Selector>>
 	{
 	public:
 		using socket = typename Protocol::socket;
@@ -23,7 +23,7 @@ namespace aquarius
 		using adaptor_t = Adaptor<socket>;
 
 	public:
-		explicit basic_session(socket _socket, duration timeout)
+		explicit basic_session(socket _socket, duration timeout, duration timer)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)
@@ -179,6 +179,17 @@ namespace aquarius
 			}
 
 			return !ec;
+		}
+
+		auto accept() -> awaitable<error_code>
+		{
+			co_return co_await Protocol::template accept<Selector>(this->socket_adaptor_, this->timeout_,
+														  this->shared_from_this());
+		}
+
+		auto query(std::size_t seq_number, error_code& ec) -> awaitable<flex_buffer>
+		{
+			co_return co_await Protocol::query(this->shared_from_this(), seq_number, ec);
 		}
 
 	protected:

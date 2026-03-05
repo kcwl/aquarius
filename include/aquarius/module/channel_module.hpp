@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
-#include <aquarius/module/module.hpp>
+#include <aquarius/module/schedule.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
 #include <vector>
 

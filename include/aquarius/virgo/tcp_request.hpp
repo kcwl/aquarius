@@ -44,12 +44,4 @@ namespace aquarius
 	template <detail::string_literal Router, typename Body>
 	struct is_message_type<virgo::tcp_request<Router, Body>> : std::true_type
 	{};
-
-	template <detail::string_literal Router, typename Body>
-	struct handler_tag_traits<virgo::tcp_request<Router, Body>>
-	{
-		using type = tcp_protocol;
-
-		using selector = tcp_selector;
-	};
 } // namespace aquarius

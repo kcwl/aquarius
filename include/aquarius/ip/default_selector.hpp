@@ -11,19 +11,13 @@ namespace aquarius
 {
 	struct tcp_selector
 	{
-		tcp_selector(uint32_t seq)
-			: seq_number(seq)
-		{}
-
-		template <typename Session>
-		auto operator()(std::string_view router_, std::shared_ptr<Session> session_ptr, flex_buffer& buffer)
+		template <typename Session, typename Handler>
+		auto operator()(std::shared_ptr<Session> session_ptr,std::shared_ptr<Handler> handler_ptr, flex_buffer& buffer)
 		{
 			co_spawn(
 				session_ptr->get_executor(),
 				[&]() -> awaitable<void>
 				{
-					auto handler_ptr = co_await mpc_publish(router_);
-
 					auto request_ptr = handler_ptr->request();
 
 					request_ptr->consume_header(buffer);
@@ -46,7 +40,7 @@ namespace aquarius
 	struct http_selector
 	{
 		template <typename Handler, typename Session>
-		auto operator()(std::shared_ptr<Handler> handler_ptr, std::shared_ptr<Session> session_ptr)
+		auto operator()(std::shared_ptr<Session> session_ptr, std::shared_ptr<Handler> handler_ptr, flex_buffer&)
 		{
 			co_spawn(
 				session_ptr->get_executor(), [&]() -> awaitable<void> 
