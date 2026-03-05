@@ -1,216 +1,180 @@
 #pragma once
 #include <aquarius/serialize/http_json_serialize.hpp>
+#include <ranges>
+#include <span>
 
 namespace aquarius
 {
-	class http_request_header : public http_json_serialize
+	class http_header
 	{
-		using base = http_json_serialize;
+		constexpr static auto crlf = "\r\n"sv;
+
+		constexpr static auto seq_number = "Seq-Number"sv;
+		constexpr static auto http_content_length = "Content-Length"sv;
+		constexpr static auto http_content_type = "Content-Type"sv;
+
+		using key_t = std::string;
+
+		using value_t = std::string;
 
 	public:
-		http_request_header()
-			: base()
-			, uuid_()
+		http_header()
+			: fields_()
 		{}
 
-		virtual ~http_request_header() = default;
+		virtual ~http_header() = default;
 
-		http_request_header(const http_request_header& other)
-			: base(other)
-			, uuid_(other.uuid_)
+		http_header(const http_header& other)
+			: fields_(other.fields_)
 		{}
 
-		http_request_header& operator=(const http_request_header& other)
+		http_header& operator=(const http_header& other)
 		{
 			if (this != std::addressof(other))
 			{
-				base::operator=(other);
-				uuid_ = other.uuid_;
+				fields_ = other.fields_;
 			}
 
 			return *this;
 		}
 
-		http_request_header(http_request_header&& other) noexcept
-			: base(std::move(other))
-			, uuid_(std::exchange(other.uuid_, 0))
+		http_header(http_header&& other) noexcept
+			: fields_(std::move(other.fields_))
 		{}
 
-		http_request_header& operator=(http_request_header&& other) noexcept
+		http_header& operator=(http_header&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				base::operator=(std::move(other));
-				uuid_ = std::exchange(other.uuid_, 0);
+				fields_ = std::move(other.fields_);
 			}
 
 			return *this;
 		}
 
-		bool operator==(const http_request_header& other) const
+	public:
+		virtual error_code serialize(flex_buffer& buffer)
 		{
-			return uuid_ == other.uuid_;
+			std::string headline{};
+
+			for (auto& s : fields_)
+			{
+				headline += std::format("{}: {}\r\n", s.first, s.second);
+			}
+
+			buffer.sputn(headline.data(), headline.size());
+
+			return error_code{};
+		}
+
+		virtual error_code deserialize(flex_buffer& buffer)
+		{
+			error_code ec{};
+
+			auto span_buffer = std::span<char>((char*)buffer.data().data(), buffer.size());
+
+			auto headers = span_buffer | std::views::split(crlf);
+
+			for (const auto header : headers)
+			{
+				auto str = std::string_view(header);
+
+				if (str == crlf)
+					break;
+
+				auto pos = str.find(":");
+
+				if (pos == std::string_view::npos)
+				{
+					ec = boost::asio::error::eof;
+
+					break;
+				}
+
+				auto key = str.substr(0, pos);
+				auto value = str.substr(pos + 1, str.size() - pos - 1);
+
+				fields_.emplace(std::string(key), std::string(value));
+			}
+
+			buffer.consume(buffer.size());
+
+			return ec;
 		}
 
 	public:
-		virtual void serialize(flex_buffer& buffer) override
+		bool keep_alive()
 		{
-			this->parse_to(*this, buffer);
+			auto value = this->find("Connection");
+
+			return value == "keep-alive" ? true : false;
 		}
 
-		virtual void deserialize(flex_buffer& buffer) override
+		void keep_alive(bool k)
 		{
-			*this = this->parse_from<http_request_header>(buffer);
+			this->set_field("Connection", k ? "keep-alive" : "close");
 		}
 
-		uint64_t uuid() const
+		std::string content_type() const
 		{
-			return uuid_;
+			return find(std::string(http_content_type));
 		}
 
-		void uuid(uint64_t v)
+		void set_field(const key_t& key, const value_t& v)
 		{
-			uuid_ = v;
+			fields_[key] = v;
+		}
+
+		uint32_t sequence()
+		{
+			return to_integer<uint32_t>(find(std::string(seq_number)));
+		}
+
+		void sequence(uint32_t v)
+		{
+			set_field(std::string(seq_number), std::to_string(v));
+		}
+
+		void content_length(uint64_t len)
+		{
+			set_field(std::string(http_content_length), std::to_string(len));
+		}
+
+		uint64_t content_length()
+		{
+			auto value = find(std::string(http_content_length));
+
+			if (value.empty())
+				return 0;
+
+			return to_integer<uint64_t>(value);
+		}
+
+		value_t find(const key_t& key) const
+		{
+			auto iter = fields_.find(key);
+
+			if (iter == fields_.end())
+				return value_t{};
+
+			return iter->second;
 		}
 
 	private:
-		uint64_t uuid_;
-	};
-
-	class http_response_header : public http_json_serialize
-	{
-		using base = http_json_serialize;
-
-	public:
-		http_response_header()
-			: result_()
-		{}
-
-		virtual ~http_response_header() = default;
-
-		http_response_header(const http_response_header& other)
-			: base(other)
-			, result_(other.result_)
-		{}
-
-		http_response_header& operator=(const http_response_header& other)
+		template <typename T>
+		T to_integer(const std::string& value)
 		{
-			if (this != std::addressof(other))
-			{
-				base::operator=(other);
-				result_ = other.result_;
-			}
+			std::stringstream ss{};
+			ss << value;
 
-			return *this;
-		}
+			T result;
+			ss >> result;
 
-		http_response_header(http_response_header&& other) noexcept
-			: base(std::move(other))
-			, result_(std::exchange(other.result_, 0))
-		{}
-
-		http_response_header& operator=(http_response_header&& other) noexcept
-		{
-			if (this != std::addressof(other))
-			{
-				base::operator=(std::move(other));
-				result_ = std::exchange(other.result_, 0);
-			}
-
-			return *this;
-		}
-
-		bool operator==(const http_response_header& other) const
-		{
-			return result_ == other.result_;
-		}
-
-	public:
-		virtual void serialize(flex_buffer& buffer) override
-		{
-			this->parse_to(*this, buffer);
-		}
-
-		virtual void deserialize(flex_buffer& buffer) override
-		{
-			*this = this->parse_from<http_response_header>(buffer);
-		}
-
-		int32_t result() const
-		{
-			return result_;
-		}
-
-		void result(int32_t v)
-		{
-			result_ = v;
-		}
-
-		uint64_t uuid() const
-		{
-			return uuid_;
-		}
-
-		void uuid(uint64_t v)
-		{
-			uuid_ = v;
+			return result;
 		}
 
 	private:
-		uint64_t uuid_;
-
-		int32_t result_;
+		std::map<std::string, std::string> fields_;
 	};
-
-	inline std::ostream& operator<<(std::ostream& os, const http_request_header& header)
-	{
-		os << "uuid: " << header.uuid();
-
-		return os;
-	}
-
-	inline std::ostream& operator<<(std::ostream& os, const http_response_header& header)
-	{
-		os << "result: " << header.result();
-
-		return os;
-	}
-
-	inline void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_request_header& local)
-	{
-		auto& jv_obj = jv.emplace_object();
-		jv_obj.emplace("uuid", local.uuid());
-	}
-
-	inline http_request_header tag_invoke(const aquarius::json::value_to_tag<http_request_header>&, const aquarius::json::value& jv)
-	{
-		http_request_header result{};
-		auto obj = jv.try_as_object();
-		if (obj->empty())
-			return {};
-		result.uuid(static_cast<uint64_t>(obj->at("uuid").as_int64()));
-
-		return result;
-	}
-
-	inline void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_response_header& local)
-	{
-		auto& jv_obj = jv.emplace_object();
-		jv_obj.emplace("uuid", local.uuid());
-		jv_obj.emplace("result", local.result());
-	}
-
-	inline http_response_header tag_invoke(const aquarius::json::value_to_tag<http_response_header>&, const aquarius::json::value& jv)
-	{
-		http_response_header result{};
-		auto obj = jv.try_as_object();
-		if (obj->empty())
-			return {};
-
-		result.uuid(static_cast<uint64_t>(obj->at("uuid").as_int64()));
-		result.result(static_cast<int32_t>(obj->at("result").as_int64()));
-
-		return result;
-	}
 
 } // namespace aquarius

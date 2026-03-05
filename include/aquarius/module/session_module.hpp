@@ -6,11 +6,11 @@
 namespace aquarius
 {
 	template <typename Session>
-	class session_module : public no_config_module<session_module<Session>>
+	class session_module : public _module<session_module<Session>>
 	{
 	public:
 		session_module(io_context& io, const std::string& name)
-			: no_config_module<session_module<Session>>(io, name)
+			: _module<session_module<Session>>(io, name)
 		{}
 
 	public:

@@ -14,11 +14,11 @@ namespace aquarius
 		virtual ~player_base() = default;
 	};
 
-	class player_module : public no_config_module<player_module>
+	class player_module : public _module<player_module>
 	{
 	public:
 		player_module(io_context& io, const std::string& name)
-			: no_config_module<player_module>(io, name)
+			: _module<player_module>(io, name)
 		{}
 
 	public:

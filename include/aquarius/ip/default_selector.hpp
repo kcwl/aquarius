@@ -22,13 +22,20 @@ namespace aquarius
 				session_ptr->get_executor(),
 				[&]() -> awaitable<void>
 				{
-					auto handler_ptr = co_await mpc_publish<Session>(router_);
+					auto handler_ptr = co_await mpc_publish(router_);
 
 					auto request_ptr = handler_ptr->request();
 
 					request_ptr->consume_header(buffer);
 
-					co_await handler_ptr->visit(session_ptr);
+					error_code ec{};
+
+					auto buffer = co_await handler_ptr->visit(ec);
+
+					if (!ec)
+					{
+						co_await session_ptr->async_send(std::move(buffer));
+					}
 				},
 				detached);
 		};
@@ -42,7 +49,16 @@ namespace aquarius
 		auto operator()(std::shared_ptr<Handler> handler_ptr, std::shared_ptr<Session> session_ptr)
 		{
 			co_spawn(
-				session_ptr->get_executor(), [&]() -> awaitable<void> { co_await handler_ptr->visit(session_ptr); },
+				session_ptr->get_executor(), [&]() -> awaitable<void> 
+				{ 
+					error_code ec{};
+					auto buffer = co_await handler_ptr->visit(ec); 
+
+					if (!ec)
+					{
+						co_await session_ptr->async_send(std::move(buffer));
+					}
+				},
 				detached);
 		};
 	};

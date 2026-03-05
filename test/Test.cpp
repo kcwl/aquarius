@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8100");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8100);
 
 			BOOST_CHECK(is_connect);
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8099");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8099);
 
 			BOOST_TEST(is_connect);
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8080");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8080);
 
 			BOOST_TEST(is_connect);
 

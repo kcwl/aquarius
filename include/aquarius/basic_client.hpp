@@ -14,95 +14,12 @@ namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	class client_base
-	{
-	public:
-		explicit client_base(std::chrono::milliseconds timeout)
-			: host_()
-			, port_()
-			, timeout_(timeout)
-		{}
-
-		virtual ~client_base() = default;
-
-	public:
-		virtual auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code> = 0;
-
-		auto reconnect() -> awaitable<error_code>
-		{
-			co_return co_await async_connect(host_, port_);
-		}
-
-		virtual auto async_send_buffer(flex_buffer&&) -> awaitable<error_code> = 0;
-
-		virtual auto query(uint32_t, error_code&) -> awaitable<flex_buffer> = 0;
-
-		template <typename Response, typename Request>
-		requires(is_message_type<Request>::value)
-		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
-		{
-			flex_buffer buffer{};
-
-			req->commit(buffer);
-
-			auto ec = co_await async_send_buffer(std::move(buffer));
-
-			Response resp{};
-
-			if (make_error(ec))
-			{
-				co_return resp;
-			}
-
-			auto resp_buffer = co_await query(req->seq_number(), ec);
-
-			if (make_error(ec))
-			{
-				co_return resp;
-			}
-
-			resp.consume_header(resp_buffer);
-			resp.consume_body(resp_buffer);
-
-			co_return resp;
-		}
-
-		virtual std::string remote_address() const = 0;
-
-		virtual int remote_port() const = 0;
-
-		virtual void close() = 0;
-
-		virtual bool make_error(error_code& ec) = 0;
-
-		std::chrono::milliseconds get_timeout() const
-		{
-			return timeout_;
-		}
-
-	protected:
-		void set_host_and_port(const std::string& host, const std::string& port)
-		{
-			host_ = host;
-			port_ = port;
-		}
-
-	private:
-		std::string host_;
-
-		std::string port_;
-
-		std::chrono::milliseconds timeout_;
-	};
-
 	template <typename Session, typename Executor = any_io_executor>
-	class basic_client : public client_base
+	class basic_client
 	{
 		using socket = Session::socket;
 
 		using resolver = Session::resolver;
-
-		using base = client_base;
 
 		using callback_t = std::function<void(std::shared_ptr<Session>)>;
 
@@ -114,60 +31,68 @@ namespace aquarius
 		{}
 
 		basic_client(const executor_t& e, std::chrono::milliseconds timeout)
-			: base(timeout)
-			, executor_(e)
+			: executor_(e)
 			, session_ptr_(nullptr)
 			, close_func_()
 			, accept_func_()
+			, host_()
+			, port_()
+			, timeout_(timeout)
 		{}
 
 	public:
-		Executor get_executor() const
+		executor_t get_executor() const
 		{
 			return executor_;
 		}
-		virtual auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code> override
+		auto async_connect(const std::string& host, uint16_t port) -> awaitable<error_code>
 		{
-			this->set_host_and_port(host, port);
-
 			session_ptr_ =
 				std::make_shared<Session>(std::move(socket(this->get_executor())), 30ms, this->get_timeout());
 
-			auto ec = co_await session_ptr_->async_connect(host, port);
+			auto ec = co_await session_ptr_->async_connect(host, std::to_string(port));
 
-			if (make_error(ec))
-				co_return ec;
+			if (!make_error(ec))
+			{
+				host_ = host;
+				port_ = port;
 
-			accept_invoke();
+				accept_invoke();
+			}
 
 			co_return ec;
 		}
 
-		virtual auto async_send_buffer(flex_buffer&& buffer) -> awaitable<error_code> override
+		auto reconnect() -> awaitable<error_code>
+		{
+			co_return co_await async_connect(host_, port_);
+		}
+
+		auto async_send_buffer(flex_buffer&& buffer) -> awaitable<error_code>
 		{
 			co_return co_await session_ptr_->async_send(std::move(buffer));
 		}
 
-		virtual auto query(uint32_t seq, error_code& ec) -> awaitable<flex_buffer> override
-		{
-			co_return co_await session_ptr_->query(seq, ec);
-		}
-
-		virtual std::string remote_address() const override
+		std::string remote_address() const
 		{
 			return session_ptr_->remote_address();
 		}
 
-		virtual int remote_port() const override
+		int remote_port() const
 		{
 			return session_ptr_->remote_port();
 		}
 
-		virtual void close() override
+		void close()
 		{
 			session_ptr_->close();
 
 			std::shared_ptr<Session>().swap(session_ptr_);
+		}
+
+		std::chrono::milliseconds get_timeout() const
+		{
+			return timeout_;
 		}
 
 		template <typename Func>
@@ -198,6 +123,36 @@ namespace aquarius
 			accept_func_(session_ptr_);
 		}
 
+		template <typename Response, typename Request>
+		requires(is_message_type<Request>::value)
+		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
+		{
+			flex_buffer buffer{};
+
+			req->commit(buffer);
+
+			auto ec = co_await async_send_buffer(std::move(buffer));
+
+			Response resp{};
+
+			if (make_error(ec))
+			{
+				co_return resp;
+			}
+
+			auto resp_buffer = co_await session_ptr_->query(req->header().sequence(), ec);
+
+			if (make_error(ec))
+			{
+				co_return resp;
+			}
+
+			resp.consume_header(resp_buffer);
+			resp.consume_body(resp_buffer);
+
+			co_return resp;
+		}
+
 	protected:
 		bool make_error(error_code& ec)
 		{
@@ -217,12 +172,18 @@ namespace aquarius
 		}
 
 	private:
-		Executor executor_;
+		executor_t executor_;
 
 		std::shared_ptr<Session> session_ptr_;
 
 		std::function<void(std::shared_ptr<Session>)> close_func_;
 
 		std::function<void(std::shared_ptr<Session>)> accept_func_;
+
+		std::string host_;
+
+		uint16_t port_;
+
+		std::chrono::milliseconds timeout_;
 	};
 } // namespace aquarius

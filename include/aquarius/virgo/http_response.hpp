@@ -12,10 +12,10 @@ namespace aquarius
 	namespace virgo
 	{
 		template <virgo::http_method Method, typename Body, virgo::http_version Version = virgo::http_version::http1_1>
-		class http_response : public basic_http_protocol<false, Method, http_response_header, Body>
+		class http_response : public basic_http_protocol<false, Method, Body>
 		{
 		public:
-			using base = basic_http_protocol<false, Method, http_response_header, Body>;
+			using base = basic_http_protocol<false, Method, Body>;
 
 			using base::has_request;
 
@@ -30,58 +30,16 @@ namespace aquarius
 			http_response(http_response&&) noexcept = default;
 			http_response& operator=(http_response&&) noexcept = default;
 
-		public:
-			bool operator==(const http_response& other) const
-			{
-				return base::operator==(other);
-			}
-
-			std::ostream& operator<<(std::ostream& os) const
-			{
-				return base::operator<<(os);
-			}
-
-		public:
-			int result() const
-			{
-				return result_;
-			}
-
-			int& result()
-			{
-				return result_;
-			}
-
-			void result(int r)
-			{
-				result_ = r;
-			}
-
-		private:
-			int result_;
-
 		protected:
-			virtual std::string commit_header() override
+			virtual void commit_command_header(flex_buffer& buffer) override
 			{
-				std::string headerline = std::format("{} {} {}\r\n", virgo::from_string_version(Version),
-													 static_cast<int>(this->header().result()),
-													 virgo::from_status_string(this->header().result()));
+				std::string headerline =
+					std::format("{} {} {}\r\n", virgo::from_string_version(Version), static_cast<int>(this->result()),
+								virgo::from_status_string(this->result()));
 
-				headerline += this->header_field();
-
-				headerline += "\r\n";
-
-				return headerline;
+				buffer.sputn(headerline.c_str(), headerline.size());
 			}
 		};
-
-		template <virgo::http_method Method, typename Body, virgo::http_version Version>
-		std::ostream& operator<<(std::ostream& os, const http_response<Method, Body, Version>& req)
-		{
-			req << os;
-
-			return os;
-		}
 	} // namespace virgo
 
 	template <virgo::http_method Method, typename Body, virgo::http_version Version>

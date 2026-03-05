@@ -1,6 +1,6 @@
 #define BOOST_TEST_NO_MAIN
-#include <boost/test/unit_test.hpp>
 #include "test.virgo.h"
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(protocol)
 
@@ -262,39 +262,5 @@ BOOST_AUTO_TEST_CASE(http_protocol)
 	//}
 }
 
-BOOST_AUTO_TEST_CASE(stream)
-{
-	{
-		aquarius::tcp_request_header header{};
-
-		std::cout << header;
-
-		BOOST_TEST(!std::cout.eof());
-	}
-	
-	{
-		aquarius::tcp_response_header header{};
-
-		std::cout << header;
-
-		BOOST_TEST(!std::cout.eof());
-	}
-
-	{
-		aquarius::http_request_header header{};
-
-		std::cout << header;
-
-		BOOST_TEST(!std::cout.eof());
-	}
-	
-	{
-		aquarius::http_response_header header{};
-
-		std::cout << header;
-
-		BOOST_TEST(!std::cout.eof());
-	}
-}
 
 BOOST_AUTO_TEST_SUITE_END()

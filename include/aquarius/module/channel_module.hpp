@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/basic_handler.hpp>
 #include <aquarius/module/module.hpp>
+#include <aquarius/virgo/http_null_protocol.hpp>
 #include <vector>
 
 namespace aquarius
@@ -91,13 +92,12 @@ namespace aquarius
 		std::shared_ptr<node> root_ptr_;
 	};
 
-	template <typename Session>
-	class channel_module : public no_config_module<channel_module<Session>>
+	class channel_module : public _module<channel_module>
 	{
-		using base = no_config_module<channel_module<Session>>;
+		using base = _module<channel_module>;
 
 	public:
-		using subscribe_t = basic_handler<Session>;
+		using subscribe_t = basic_handler<virgo::http_null_request>;
 
 		using subscribe_func_t = std::function<std::shared_ptr<subscribe_t>()>;
 
@@ -135,22 +135,16 @@ namespace aquarius
 		channel_impl<subscribe_func_t> impl_;
 	};
 
-	template <typename Session>
-	inline auto mpc_publish(std::string_view topic)
-		-> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
+	inline auto mpc_publish(std::string_view topic) -> awaitable<std::shared_ptr<channel_module::subscribe_t>>
 	{
-		co_return co_await mpc::call<std::shared_ptr<typename channel_module<Session>::subscribe_t>,
-									 channel_module<Session>>(
-			[&](channel_module<Session>* ptr)
-				-> awaitable<std::shared_ptr<typename channel_module<Session>::subscribe_t>>
+		co_return co_await mpc::call<std::shared_ptr<channel_module::subscribe_t>, channel_module>(
+			[&](channel_module* ptr) -> awaitable<std::shared_ptr<typename channel_module::subscribe_t>>
 			{ co_return ptr->publish(topic); });
 	}
 
-	template <typename Session>
-	inline void mpc_subscribe(std::string_view topic, const typename channel_module<Session>::subscribe_func_t& func)
+	inline void mpc_subscribe(std::string_view topic, const channel_module::subscribe_func_t& func)
 	{
-		return mpc::call_sync<void, channel_module<Session>>([&](channel_module<Session>* ptr)
-															 { return ptr->subscribe(topic, func); });
+		return mpc::call_sync<void, channel_module>([&](channel_module* ptr) { return ptr->subscribe(topic, func); });
 	}
 
 } // namespace aquarius

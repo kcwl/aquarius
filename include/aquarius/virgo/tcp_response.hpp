@@ -8,10 +8,10 @@ namespace aquarius
 	namespace virgo
 	{
 		template <typename Body>
-		class tcp_response : public basic_tcp_protocol<false, tcp_response_header, Body>
+		class tcp_response : public basic_tcp_protocol<false, tcp_header, Body>
 		{
 		public:
-			using base = basic_tcp_protocol<false, tcp_response_header, Body>;
+			using base = basic_tcp_protocol<false, tcp_header, Body>;
 
 			using base::has_request;
 
@@ -28,44 +28,9 @@ namespace aquarius
 
 			tcp_response& operator=(tcp_response&& other) noexcept = default;
 
-		public:
-			bool operator==(const tcp_response& other) const
-			{
-				return base::operator==(other);
-			}
-
-			std::ostream& operator<<(std::ostream& os) const
-			{
-				return base::operator<<(os);
-			}
-
-		public:
-			int result() const
-			{
-				return result_;
-			}
-
-			int& result()
-			{
-				return result_;
-			}
-
-			void result(int r)
-			{
-				result_ = r;
-			}
-
-		private:
-			int result_;
+		protected:
+			virtual void commit_command_header(flex_buffer& buffer) override { return; }
 		};
-
-		template <typename Body>
-		std::ostream& operator<<(std::ostream& os, const tcp_response<Body>& req)
-		{
-			req << os;
-
-			return os;
-		}
 	} // namespace virgo
 
 	template <typename Body>

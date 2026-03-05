@@ -4,16 +4,16 @@
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
+#include <vector>
 
 namespace aquarius
 {
 	using options_request = virgo::http_request<"OPTIONS", virgo::http_method::options, virgo::http_null_body>;
 	using options_response = virgo::http_response<virgo::http_method::options, virgo::http_null_body>;
 
-	template <typename Session>
-	class http_options_method_handler : public handler<Session, options_request, options_response>
+	class http_options_method_handler : public handler<options_request, options_response>
 	{
-		using base = handler<Session, options_request, options_response>;
+		using base = handler<options_request, options_response>;
 
 	public:
 		http_options_method_handler()
@@ -23,11 +23,11 @@ namespace aquarius
 	public:
 		virtual auto handle() -> awaitable<error_code> override
 		{
-			this->response().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
-			this->response().set_field("Access-Control-Request-Method", "POST");
-			this->response().set_field("Access-Control-Allow-Headers", "Aquarius-Header");
-			this->response().set_field("Access-Control-Max-Age", "31536000");
-			this->response().set_field("Access-Control-Allow-Credentials", "true");
+			this->response().header().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
+			this->response().header().set_field("Access-Control-Request-Method", "POST");
+			this->response().header().set_field("Access-Control-Allow-Headers", "Aquarius-Header");
+			this->response().header().set_field("Access-Control-Max-Age", "31536000");
+			this->response().header().set_field("Access-Control-Allow-Credentials", "true");
 
 			co_return virgo::http_status::ok;
 		}
@@ -65,10 +65,9 @@ namespace aquarius
 	using resource_request = virgo::http_request<"GET", virgo::http_method::get, virgo::http_null_body>;
 	using resource_response = virgo::http_response<virgo::http_method::get, http_stream_body>;
 
-	template <typename Session>
-	class http_source_method_handler : public handler<Session, resource_request, resource_response>
+	class http_source_method_handler : public handler<resource_request, resource_response>
 	{
-		using base = handler<Session, resource_request, resource_response>;
+		using base = handler<resource_request, resource_response>;
 
 	public:
 		http_source_method_handler()
@@ -78,7 +77,7 @@ namespace aquarius
 	public:
 		virtual auto handle() -> awaitable<error_code> override
 		{
-			auto router = this->request()->find("router");
+			auto router = this->request()->header().find("router");
 
 			auto file_path = (co_await mpc_http_root()) + std::string(router.data(), router.size());
 
@@ -90,11 +89,11 @@ namespace aquarius
 
 			auto file_size = std::filesystem::file_size(file_path);
 
-			this->response().set_field("Content-Length", std::to_string(file_size));
+			this->response().header().set_field("Content-Length", std::to_string(file_size));
 
 			auto ext = std::filesystem::path(file_path).extension();
 
-			this->response().set_field("Content-Type", this->request()->content_type());
+			this->response().header().set_field("Content-Type", this->request()->header().content_type());
 
 			auto& stream = this->response().body().stream;
 			stream.resize(file_size);
@@ -104,13 +103,8 @@ namespace aquarius
 		}
 	};
 
-#ifndef HTTP_INNER_HANDLER
-#define HTTP_INNER_HANDLER
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
-		http_server_session,
-		http_options_method_handler<http_server_session>> __auto_register_options_handler(__http_options_handler__);
+		http_options_method_handler> __auto_register_options_handler(__http_options_handler__);
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
-		http_server_session,
-		http_source_method_handler<http_server_session>> __auto_register_source_handler(__http_source_handler__);
-#endif
+		http_source_method_handler> __auto_register_source_handler(__http_source_handler__);
 } // namespace aquarius

@@ -10,6 +10,11 @@ namespace aquarius
 	{
 		constexpr static auto path = "mysql"sv;
 
+		bool enable()
+		{
+			return true;
+		}
+
 		std::string host;
 		std::string user;
 		std::string password;

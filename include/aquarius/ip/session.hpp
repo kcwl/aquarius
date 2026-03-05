@@ -309,7 +309,7 @@ namespace aquarius
 			//	router = __http_options_handler__;
 			// }
 
-			auto handler_ptr = co_await mpc_publish<self_type>(router);
+			auto handler_ptr = co_await mpc_publish(router);
 
 			auto request_ptr = handler_ptr->request();
 
@@ -322,7 +322,7 @@ namespace aquarius
 
 			request_ptr->consume_header(buffer);
 
-			auto content_length = request_ptr->content_length();
+			auto content_length = request_ptr->header().content_length();
 
 			if (content_length != 0)
 			{
@@ -371,7 +371,7 @@ namespace aquarius
 
 			resp.consume_header(buffer);
 
-			auto content_length = resp.content_length();
+			auto content_length = resp.header().content_length();
 
 			if (content_length != 0)
 			{
@@ -383,7 +383,7 @@ namespace aquarius
 				}
 			}
 
-			req = resp.seq_number();
+			req = resp.header().sequence();
 		}
 
 		template <bool Server>

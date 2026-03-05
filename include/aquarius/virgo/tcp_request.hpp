@@ -12,10 +12,10 @@ namespace aquarius
 	{
 
 		template <detail::string_literal Router, typename Body>
-		class tcp_request : public basic_tcp_protocol<true, tcp_request_header, Body>
+		class tcp_request : public basic_tcp_protocol<true, tcp_header, Body>
 		{
 		public:
-			using base = basic_tcp_protocol<true, tcp_request_header, Body>;
+			using base = basic_tcp_protocol<true, tcp_header, Body>;
 
 			using base::has_request;
 
@@ -34,31 +34,12 @@ namespace aquarius
 
 			tcp_request& operator=(tcp_request&&) noexcept = default;
 
-		public:
-			bool operator==(const tcp_request& other) const
-			{
-				return base::operator==(other);
-			}
-
-			std::ostream& operator<<(std::ostream& os) const
-			{
-				return base::operator<<(os);
-			}
-
 		protected:
-			virtual std::string router() override
+			virtual void commit_command_header(flex_buffer& buffer) override
 			{
-				return std::string(this_router);
+				binary_parse().to_datas(this_router, buffer);
 			}
 		};
-
-		template <detail::string_literal Router, typename Body>
-		std::ostream& operator<<(std::ostream& os, const tcp_request<Router, Body>& req)
-		{
-			req << os;
-
-			return os;
-		}
 	} // namespace virgo
 	template <detail::string_literal Router, typename Body>
 	struct is_message_type<virgo::tcp_request<Router, Body>> : std::true_type

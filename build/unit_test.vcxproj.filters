@@ -428,13 +428,11 @@
     <ClCompile Include="..\test\session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="test\gpt_test\detail_tests.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
       <Filter>源文件</Filter>
     </Text>
+    <Text Include="test\CMakeLists.txt" />
   </ItemGroup>
 </Project>
