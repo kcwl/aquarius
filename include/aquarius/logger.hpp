@@ -38,8 +38,8 @@ namespace aquarius
 
 		void init_logger()
 		{
-			logging::add_console_log(
-				std::clog, keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
+			logging::add_console_log(std::clog,
+									 keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
 
 			auto file_sink_ptr = boost::make_shared<file_sink>(
 				keywords::file_name = "file.log", keywords::target_file_name = "%Y%m%d_%H%M%S.%5N.log",
@@ -57,7 +57,8 @@ namespace aquarius
 
 			file_sink_ptr->set_filter(trivial::severity >= trivial::info);
 
-			//logging::core::get()->add_sink(console_sink_ptr);
+			// logging::core::get()->add_sink(console_sink_ptr);
+			logging::core::get()->remove_all_sinks();
 			logging::core::get()->add_sink(file_sink_ptr);
 
 			logging::core::get()->add_global_attribute("TimeStamp", attrs::local_clock());
@@ -101,3 +102,5 @@ namespace aquarius
 #define XLOG_WARNING() XLOG_FILE_AND_LINE(warning)
 #define XLOG_ERROR() XLOG_FILE_AND_LINE(error)
 #define XLOG_FATAL() XLOG_FILE_AND_LINE(fatal)
+
+[[maybe_unused]] inline static aquarius::logger __auto_init_log;
