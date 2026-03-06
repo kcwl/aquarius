@@ -120,6 +120,11 @@ namespace aquarius
 			return find(std::string(http_content_type));
 		}
 
+		void content_type(const std::string& type)
+		{
+			return set_field(std::string(http_content_type), type);
+		}
+
 		void set_field(const key_t& key, const value_t& v)
 		{
 			fields_[key] = v;

@@ -3,264 +3,259 @@
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(protocol)
+BOOST_AUTO_TEST_SUITE(test_protocol_suite)
 
-BOOST_AUTO_TEST_CASE(ctor)
+void check_person(const person& lhs, const person& rhs)
 {
-	{
-		auto req = std::make_shared<login_request>();
-		req->header().uuid(1);
-		req->body().per_req.sex = true;
-		req->body().per_req.addr = 2;
-
-		auto req_move = std::move(req);
-
-		BOOST_TEST(req_move->header().uuid() == 1);
-		BOOST_TEST(req_move->body().per_req.sex == true);
-		BOOST_TEST(req_move->body().per_req.addr == 2u);
-
-		BOOST_TEST(!req);
-	}
-
-	{
-		auto resp = std::make_shared<login_response>();
-		resp->header().uuid(1);
-		resp->body().per_resp.sex = true;
-		resp->body().per_resp.addr = 2;
-
-		auto req_move = std::move(resp);
-
-		BOOST_TEST(req_move->header().uuid() == 1);
-		BOOST_TEST(req_move->body().per_resp.sex == true);
-		BOOST_TEST(req_move->body().per_resp.addr == 2u);
-
-		BOOST_TEST(!resp);
-	}
-
-	//{
-	//	auto req = std::make_shared<login_http_request>();
-	//	req->header().uuid_ = 1;
-	//	req->body().per_req.sex = true;
-	//	req->body().per_req.addr = 2;
-
-	//	auto req_move = std::move(req);
-
-	//	BOOST_TEST(req_move->header().uuid_ == 1);
-	//	BOOST_TEST(req_move->body().per_req.sex == true);
-	//	BOOST_TEST(req_move->body().per_req.addr == 2u);
-
-	//	BOOST_TEST(!req);
-	//}
-
-	//{
-	//	auto resp = std::make_shared<login_http_response>();
-	//	resp->header().uuid_ = 1;
-	//	resp->body().per_resp.sex = true;
-	//	resp->body().per_resp.addr = 2;
-
-	//	auto req_move = std::move(resp);
-
-	//	BOOST_TEST(req_move->header().uuid_ == 1);
-	//	BOOST_TEST(req_move->body().per_resp.sex == true);
-	//	BOOST_TEST(req_move->body().per_resp.addr == 2u);
-
-	//	BOOST_TEST(!resp);
-	//}
+    BOOST_TEST(lhs.addr = rhs.addr);
+    BOOST_TEST(lhs.age == rhs.age);
+    BOOST_TEST(lhs.hp == rhs.hp);
+    BOOST_TEST(lhs.mana == rhs.mana);
+    BOOST_TEST(lhs.name == rhs.name);
+    BOOST_TEST(lhs.orders == lhs.orders);
+    BOOST_TEST(lhs.score == rhs.score);
+    BOOST_TEST(lhs.sex == rhs.sex);
+    BOOST_TEST(lhs.telephone == rhs.telephone);
 }
 
-BOOST_AUTO_TEST_CASE(tcp)
+template<typename Request>
+void check_tcp_equal_req(const Request& lhs, const Request& rhs)
 {
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto req = std::make_shared<login_tcp_request>();
-	//	req->header().uuid_ = 1;
-	//	req->body().per_req.sex = true;
-	//	req->body().per_req.addr = 2;
-	//	req->body().per_req.age = 15;
-	//	req->body().per_req.telephone = 15230214856;
-	//	req->body().per_req.score = 100;
-	//	req->body().per_req.hp = 200;
-	//	req->body().per_req.mana = 300;
-	//	req->body().per_req.name = "John";
-	//	req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	req->commit(buffer);
-
-	//	auto req_back = std::make_shared<login_tcp_request>();
-	//	req_back->consume(buffer);
-
-	//	BOOST_CHECK_EQUAL(*req, *req_back);
-	//}
-
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto resp = std::make_shared<login_tcp_response>();
-	//	resp->header().uuid_ = 1;
-	//	resp->body().per_resp.sex = true;
-	//	resp->body().per_resp.addr = 2;
-	//	resp->body().per_resp.age = 15;
-	//	resp->body().per_resp.telephone = 15230214856;
-	//	resp->body().per_resp.score = 100;
-	//	resp->body().per_resp.hp = 200;
-	//	resp->body().per_resp.mana = 300;
-	//	resp->body().per_resp.name = "John";
-	//	resp->body().per_resp.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	resp->commit(buffer);
-
-	//	auto resp_back = std::make_shared<login_tcp_response>();
-	//	resp_back->consume(buffer);
-
-	//	BOOST_TEST(*resp == *resp_back);
-	//}
-
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto req = std::make_shared<login_tcp_request>();
-	//	req->header().uuid_ = 1;
-	//	req->body().per_req.sex = true;
-	//	req->body().per_req.addr = 2;
-	//	req->body().per_req.age = 15;
-	//	req->body().per_req.telephone = 15230214856;
-	//	req->body().per_req.score = 100;
-	//	req->body().per_req.hp = 200;
-	//	req->body().per_req.mana = 300;
-	//	req->body().per_req.name = "John";
-	//	req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	req->commit(buffer);
-
-	//	auto req_back = std::make_shared<login_tcp_request>();
-	//	req_back->consume(buffer);
-
-	//	BOOST_CHECK_EQUAL(*req, *req_back);
-	//}
-
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto resp = std::make_shared<login_tcp_response>();
-	//	resp->header().uuid_ = 1;
-	//	resp->header().result_ = 2;
-	//	resp->body().per_resp.sex = true;
-	//	resp->body().per_resp.addr = 2;
-	//	resp->body().per_resp.age = 15;
-	//	resp->body().per_resp.telephone = 15230214856;
-	//	resp->body().per_resp.score = 100;
-	//	resp->body().per_resp.hp = 200;
-	//	resp->body().per_resp.mana = 300;
-	//	resp->body().per_resp.name = "John";
-	//	resp->body().per_resp.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	resp->commit(buffer);
-
-	//	auto resp_back = std::make_shared<login_tcp_response>();
-	//	resp_back->consume(buffer);
-
-	//	BOOST_TEST(*resp == *resp_back);
-	//}
-}
-BOOST_AUTO_TEST_CASE(http_protocol)
-{
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto req = std::make_shared<http_login_request>();
-	//	req->set_field("Content-Type", "aquarius-json");
-	//	req->header().uuid_ = 1;
-	//	req->body().per_req.sex = true;
-	//	req->body().per_req.addr = 2;
-	//	req->body().per_req.age = 15;
-	//	req->body().per_req.telephone = 15230214856;
-	//	req->body().per_req.score = 100;
-	//	req->body().per_req.hp = 200;
-	//	req->body().per_req.mana = 300;
-	//	req->body().per_req.name = "John";
-	//	req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	req->commit(buffer);
-
-	//	auto req_back = std::make_shared<http_login_request>();
-	//	req_back->set_field("Content-Type", "aquarius-json");
-	//	req_back->consume(buffer);
-
-	//	BOOST_TEST(*req == *req_back);
-	//}
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto req = std::make_shared<new_http_login_http_request>();
-	//	req->version(aquarius::virgo::http_version::http1_1);
-	//	req->body().per_req.sex = true;
-	//	req->body().per_req.addr = 2;
-	//	req->body().per_req.age = 15;
-	//	req->body().per_req.telephone = 15230214856;
-	//	req->body().per_req.score = 100;
-	//	req->body().per_req.hp = 200;
-	//	req->body().per_req.mana = 300;
-	//	req->body().per_req.name = "John";
-	//	req->body().per_req.orders = std::vector<char>{ 1, 2, 3, 4, 5 };
-
-	//	req->commit(buffer);
-
-	//	auto req_back = std::make_shared<new_http_login_http_request>();
-	//	req_back->consume(buffer);
-
-	//	BOOST_TEST(*req == *req_back);
-	//}
-
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto resp = std::make_shared<http_login_http_response>();
-	//	resp->set_field("Content-Type", "aquarius-json");
-	//	resp->header().uuid_ = 1;
-	//	resp->body().per_resp.sex = true;
-	//	resp->body().per_resp.addr = 2;
-	//	resp->body().per_resp.age = 15;
-	//	resp->body().per_resp.telephone = 15230214856;
-	//	resp->body().per_resp.score = 100;
-	//	resp->body().per_resp.hp = 200;
-	//	resp->body().per_resp.mana = 300;
-	//	resp->body().per_resp.name = "John";
-	//	resp->body().per_resp.orders = { 1, 2, 3, 4, 5 };
-
-	//	resp->commit(buffer);
-
-	//	auto resp_back = std::make_shared<http_login_response>();
-	//	resp_back->set_field("Content-Type", "aquarius-json");
-	//	resp_back->consume(buffer);
-
-	//	BOOST_TEST(*resp == *resp_back);
-	//}
-
-	//{
-	//	aquarius::flex_buffer buffer;
-
-	//	auto resp = std::make_shared<new_http_login_response>();
-	//	resp->set_field("Content-Type", "aquarius-json");
-	//	//resp->header().uuid_ = 1;
-	//	resp->body().per_resp.sex = true;
-	//	resp->body().per_resp.addr = 2;
-	//	resp->body().per_resp.age = 15;
-	//	resp->body().per_resp.telephone = 15230214856;
-	//	resp->body().per_resp.score = 100;
-	//	resp->body().per_resp.hp = 200;
-	//	resp->body().per_resp.mana = 300;
-	//	resp->body().per_resp.name = "John";
-	//	resp->body().per_resp.orders = { 1, 2, 3, 4, 5 };
-
-	//	resp->commit(buffer);
-
-	//	auto resp_back = std::make_shared<new_http_login_response>();
-	//	resp_back->set_field("Content-Type", "aquarius-json");
-	//	resp_back->consume(buffer);
-
-	//	BOOST_TEST(*resp == *resp_back);
-	//}
+    BOOST_TEST(lhs.version() == rhs.version());
+    BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
+    BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
+    BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
+    check_person(lhs.body().per_req, rhs.body().per_resp);
 }
 
+template<typename Response>
+void check_tcp_equal_resp(const Response& lhs, const Response& rhs)
+{
+    BOOST_TEST(lhs.version() == rhs.version());
+    BOOST_TEST(lhs.result() == rhs.result());
+    BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
+    BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
+    BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
+    check_person(lhs.body().per_req, rhs.body().per_resp);
+}
+
+template<typename Request>
+void check_http_equal_req(const Request& lhs, const Request& rhs)
+{
+    BOOST_TEST(lhs.version() == rhs.version());
+    BOOST_TEST(lhs.header().keep_alive() == rhs.header().keep_alive());
+    BOOST_TEST(lhs.header().content_type() == rhs.header().content_type());
+    BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
+    BOOST_TEST(lhs.header().content_length() == rhs.header().content_length());
+    check_person(lhs.body().per_req, rhs.body().per_resp);
+}
+
+template<typename Response>
+void check_http_equal_resp(const Response& lhs, const Response& rhs)
+{
+    BOOST_TEST(lhs.version() == rhs.version());
+    BOOST_TEST(lhs.result() == rhs.result());
+    BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
+    BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
+    BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
+    check_person(lhs.body().per_req, rhs.body().per_resp);
+}
+
+BOOST_AUTO_TEST_CASE(test_tcp_request)
+{
+    using test_request = login_request;
+
+    test_request req{};
+
+    req.version(1);
+    req.header().uuid(2);
+    req.header().timestamp(3);
+    req.header().sequence(4);
+    req.body().per_req.addr = 45;
+    req.body().per_req.age = 32;
+    req.body().per_req.hp = 3.2f;
+    req.body().per_req.mana = 7.2;
+    req.body().per_req.name = "test";
+    req.body().per_req.orders = {'h','e','l','l','o'};
+    req.body().per_req.score = 74;
+    req.body().per_req.sex = true;
+    req.body().per_req.telephone = 14589675283;
+
+
+    aquarius::flex_buffer buffer;
+    req.commit(buffer);
+
+    test_request req1{};
+    req1.consume_header(buffer);
+    req1.consume_body(buffer);
+
+    check_tcp_equal_req(req, req1);
+
+    test_request req2 = req;
+
+    check_tcp_equal_req(req, req2);
+
+    test_request req3{};
+    req3 = req;
+
+    check_tcp_equal_req(req, req3);
+
+    test_request req4 = std::move(req);
+
+    check_tcp_equal_req(req3, req4);
+
+    test_request req5{};
+    req5 = std::move(req4);
+
+    check_tcp_equal_req(req5, req3);
+}
+
+BOOST_AUTO_TEST_CASE(test_tcp_response)
+{
+    using test_response = login_response;
+
+    test_response resp{};
+
+    resp.version(1);
+    resp.result(111);
+    resp.header().uuid(2);
+    resp.header().timestamp(3);
+    resp.header().sequence(4);
+    resp.body().per_resp.addr = 45;
+    resp.body().per_resp.age = 32;
+    resp.body().per_resp.hp = 3.2f;
+    resp.body().per_resp.mana = 7.2;
+    resp.body().per_resp.name = "test";
+    resp.body().per_resp.orders = { 'h','e','l','l','o' };
+    resp.body().per_resp.score = 74;
+    resp.body().per_resp.sex = true;
+    resp.body().per_resp.telephone = 14589675283;
+
+    aquarius::flex_buffer buffer;
+    resp.commit(buffer);
+
+    test_response resp1{};
+    resp1.consume_header(buffer);
+    resp1.consume_body(buffer);
+
+    check_tcp_equal_resp(resp, resp1);
+
+    test_response resp2 = resp;
+
+    check_tcp_equal_resp(resp, resp2);
+
+    test_response resp3{};
+    resp3 = resp;
+
+    check_tcp_equal_resp(resp, resp3);
+
+    test_response resp4 = std::move(resp);
+
+    check_tcp_equal_resp(resp3, resp4);
+
+    test_response resp5{};
+    resp5 = std::move(resp4);
+
+    check_tcp_equal_resp(resp5, resp3);
+}
+
+BOOST_AUTO_TEST_CASE(test_http_request)
+{
+    using test_request = new_http_login_request;
+
+    test_request req{};
+
+    req.version(1);
+    req.header().content_type("application/json");
+    req.header().keep_alive(true);
+    req.header().sequence(4);
+    req.body().per_req.addr = 45;
+    req.body().per_req.age = 32;
+    req.body().per_req.hp = 3.2f;
+    req.body().per_req.mana = 7.2;
+    req.body().per_req.name = "test";
+    req.body().per_req.orders = { 'h','e','l','l','o' };
+    req.body().per_req.score = 74;
+    req.body().per_req.sex = true;
+    req.body().per_req.telephone = 14589675283;
+
+
+    aquarius::flex_buffer buffer;
+    req.commit(buffer);
+
+    test_request req1{};
+    req1.consume_header(buffer);
+    req1.consume_body(buffer);
+
+    check_http_equal_req(req, req1);
+
+    test_request req2 = req;
+
+    check_http_equal_req(req, req2);
+
+    test_request req3{};
+    req3 = req;
+
+    check_http_equal_req(req, req3);
+
+    test_request req4 = std::move(req);
+
+    check_http_equal_req(req3, req4);
+
+    test_request req5{};
+    req5 = std::move(req4);
+
+    check_http_equal_req(req5, req3);
+}
+
+BOOST_AUTO_TEST_CASE(test_http_response)
+{
+    using test_response = new_http_login_response;
+
+    test_response resp{};
+
+    resp.version(1);
+    resp.result(200);
+    resp.header().content_type("application/json");
+    resp.header().keep_alive(true);
+    resp.header().sequence(4);
+    resp.body().per_resp.addr = 45;
+    resp.body().per_resp.age = 32;
+    resp.body().per_resp.hp = 3.2f;
+    resp.body().per_resp.mana = 7.2;
+    resp.body().per_resp.name = "test";
+    resp.body().per_resp.orders = { 'h','e','l','l','o' };
+    resp.body().per_resp.score = 74;
+    resp.body().per_resp.sex = true;
+    resp.body().per_resp.telephone = 14589675283;
+
+
+    aquarius::flex_buffer buffer;
+    resp.commit(buffer);
+
+    test_response resp1{};
+    resp1.consume_header(buffer);
+    resp1.consume_body(buffer);
+
+    check_http_equal_resp(resp, resp1);
+
+    test_response resp2 = resp;
+
+    check_http_equal_resp(resp, resp2);
+
+    test_response resp3{};
+    resp3 = resp;
+
+    check_http_equal_resp(resp, resp3);
+
+    test_response resp4 = std::move(resp);
+
+    check_http_equal_resp(resp3, resp4);
+
+    test_response resp5{};
+    resp5 = std::move(resp4);
+
+    check_http_equal_resp(resp5, resp3);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
