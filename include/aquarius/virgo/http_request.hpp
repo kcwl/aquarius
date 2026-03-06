@@ -46,11 +46,11 @@ namespace aquarius
 
 				if constexpr (Method == virgo::http_method::get)
 				{
-					flex_buffer buffer{};
+					flex_buffer buf{};
 
-					this->body().serialize(buffer);
+					this->body().serialize(buf);
 
-					get_url += std::string((char*)buffer.data().data(), buffer.size());
+					get_url += std::string((char*)buf.data().data(), buf.size());
 				}
 
 				auto line = std::format("{} {} {}\r\n", virgo::from_method_string(Method), get_url,

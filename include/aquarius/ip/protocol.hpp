@@ -270,7 +270,7 @@ namespace aquarius
 				for (;;)
 				{
 					auto size = buffer.size();
-					uint32_t seq{};
+
 					ec = co_await session_ptr->async_read_util(buffer, crlf);
 
 					if (ec)
@@ -291,7 +291,7 @@ namespace aquarius
 
 					if (ec)
 					{
-						co_return;
+						co_return flex_buffer{};
 					}
 
 					resp.header().deserialize(buffer);
@@ -307,8 +307,6 @@ namespace aquarius
 							ec = co_await session_ptr->async_read(buffer, remain_size);
 						}
 					}
-
-					;
 
 					if (ec)
 					{

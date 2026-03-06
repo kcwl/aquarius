@@ -103,7 +103,7 @@ namespace aquarius
 		}
 
 	public:
-		bool keep_alive()
+		bool keep_alive() const
 		{
 			auto value = this->find("Connection");
 
@@ -130,7 +130,7 @@ namespace aquarius
 			fields_[key] = v;
 		}
 
-		uint32_t sequence()
+		uint32_t sequence() const
 		{
 			return to_integer<uint32_t>(find(std::string(seq_number)));
 		}
@@ -145,7 +145,7 @@ namespace aquarius
 			set_field(std::string(http_content_length), std::to_string(len));
 		}
 
-		uint64_t content_length()
+		uint64_t content_length() const
 		{
 			auto value = find(std::string(http_content_length));
 
@@ -167,7 +167,7 @@ namespace aquarius
 
 	private:
 		template <typename T>
-		T to_integer(const std::string& value)
+		T to_integer(const std::string& value) const
 		{
 			std::stringstream ss{};
 			ss << value;

@@ -1,15 +1,15 @@
 #define BOOST_TEST_NO_MAIN
-#include <boost/test/unit_test.hpp>
+#include "ctx_handler.hpp"
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/tcp/tcp_server.hpp>
-
+#include <boost/test/unit_test.hpp>
 
 template <typename Server>
 struct test_server_fixture
 {
 	test_server_fixture()
 	{
-		srv = std::make_shared<Server>(3, 8100, "test server");
+		srv = std::make_shared<Server>(8100,3, "test server");
 
 		t = std::make_shared<std::thread>([&] { srv->run(); });
 	}
@@ -32,14 +32,14 @@ BOOST_AUTO_TEST_CASE(ctor)
 	{
 		aquarius::tcp_client client(io, 1000ms);
 
-		BOOST_TEST(client.get_executor() == io.get_executor());
+		BOOST_CHECK(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 
 	{
 		aquarius::tcp_client client(io.get_executor(), 1000ms);
 
-		BOOST_TEST(client.get_executor() == io.get_executor());
+		BOOST_CHECK(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 }
@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_CASE(tcp_client_flow)
 	int acc_success = 0;
 	int clo_success = 0;
 
-	client.set_accept_func([&] { acc_success++; });
-	client.set_close_func([&] { clo_success++; });
+	client.set_accept_func([&](std::shared_ptr<aquarius::tcp_client_session>) { acc_success++; });
+	client.set_close_func([&](std::shared_ptr<aquarius::tcp_client_session>) { clo_success++; });
 
 	aquarius::co_spawn(
 		io,
@@ -71,11 +71,11 @@ BOOST_AUTO_TEST_CASE(tcp_client_flow)
 			BOOST_CHECK_EQUAL(client.remote_address(), "127.0.0.1");
 			BOOST_CHECK_EQUAL(client.remote_port(), 8100);
 
-			auto req = std::make_shared<test_request>();
+			auto req = std::make_shared<login_request>();
 
-			auto resp = co_await client.async_send<test_response>(req);
+			auto resp = co_await client.async_send<login_response>(req);
 
-			BOOST_TEST(req, resp);
+			check_person(req->body().per_req, resp.body().per_resp);
 		},
 		aquarius::detached);
 

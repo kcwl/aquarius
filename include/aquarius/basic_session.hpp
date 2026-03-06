@@ -23,7 +23,7 @@ namespace aquarius
 		using adaptor_t = Adaptor<socket>;
 
 	public:
-		explicit basic_session(socket _socket, duration timeout, duration timer)
+		explicit basic_session(socket _socket, duration timeout, duration)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)

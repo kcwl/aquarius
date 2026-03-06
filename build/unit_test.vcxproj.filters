@@ -249,9 +249,6 @@
     <ClInclude Include="..\include\aquarius\ip\ssl_server_session.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\test_model.tbl.h">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -423,6 +420,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\session.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

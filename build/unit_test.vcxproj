@@ -162,7 +162,6 @@
     <ClInclude Include="..\include\aquarius\ip\default_selector.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_method_define.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_method_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\module.hpp" />
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
@@ -255,6 +254,7 @@
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
+    <ClCompile Include="..\test\module.cpp" />
     <ClCompile Include="..\test\protocol.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />

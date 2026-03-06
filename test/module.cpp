@@ -1,6 +1,8 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius/module/module.hpp>
+#include <aquarius/module/schedule.hpp>
 #include <boost/test/unit_test.hpp>
+
+using namespace std::chrono_literals;
 
 class test_module : public aquarius::_module<test_module>
 {
@@ -43,7 +45,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 	test_module tm(io, "test_module");
 
 	BOOST_TEST(tm.name() == "test_module");
-	BOOST_TEST(tm.get_executor() == io.get_executor());
+	BOOST_CHECK(tm.get_executor() == io.get_executor());
 }
 
 BOOST_AUTO_TEST_CASE(test_module_virsual_func)
@@ -75,13 +77,14 @@ BOOST_AUTO_TEST_CASE(test_async_module)
 
 	int increament = 0;
 
-	auto f = [&](test_module* ptr) mutable -> awaitable<void> { co_return ptr->increament(increament); }
+	auto f = [&](test_module* ptr) mutable -> aquarius::awaitable<void> { co_return ptr->increament(increament); };
 
-	aquarius::co_spawn(io, tm.visit(std::make_shared<module_data<R>>(f)), aquarius::detached);
+	aquarius::co_spawn(io, tm.visit(std::make_shared<aquarius::module_data<void, decltype(f)>>(f)),
+					   aquarius::detached);
 
 	io.run();
 
-	BOOST_TEST(increament == 1)
+	BOOST_TEST(increament == 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_sync_module)
@@ -92,11 +95,11 @@ BOOST_AUTO_TEST_CASE(test_sync_module)
 
 	int increament = 0;
 
-	auto f = [&](test_module* ptr) mutable -> awaitable<void> { co_return ptr->increament(increament); }
+	auto f = [&](test_module* ptr) mutable -> aquarius::awaitable<void> { co_return ptr->increament(increament); };
 
-											  tm.visit(std::make_shared<module_data<R>>(f));
+	tm.visit(std::make_shared<aquarius::module_data<void, decltype(f)>>(f));
 
-	BOOST_TEST(increament == 1)
+	BOOST_TEST(increament == 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

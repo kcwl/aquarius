@@ -1,22 +1,9 @@
 #define BOOST_TEST_NO_MAIN
 #include "test.virgo.h"
 #include <boost/test/unit_test.hpp>
+#include "ctx_handler.hpp"
 
-BOOST_AUTO_TEST_SUITE(protocol)
 BOOST_AUTO_TEST_SUITE(test_protocol_suite)
-
-void check_person(const person& lhs, const person& rhs)
-{
-    BOOST_TEST(lhs.addr = rhs.addr);
-    BOOST_TEST(lhs.age == rhs.age);
-    BOOST_TEST(lhs.hp == rhs.hp);
-    BOOST_TEST(lhs.mana == rhs.mana);
-    BOOST_TEST(lhs.name == rhs.name);
-    BOOST_TEST(lhs.orders == lhs.orders);
-    BOOST_TEST(lhs.score == rhs.score);
-    BOOST_TEST(lhs.sex == rhs.sex);
-    BOOST_TEST(lhs.telephone == rhs.telephone);
-}
 
 template<typename Request>
 void check_tcp_equal_req(const Request& lhs, const Request& rhs)
@@ -25,7 +12,7 @@ void check_tcp_equal_req(const Request& lhs, const Request& rhs)
     BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
     BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
     BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
-    check_person(lhs.body().per_req, rhs.body().per_resp);
+    check_person(lhs.body().per_req, rhs.body().per_req);
 }
 
 template<typename Response>
@@ -36,7 +23,7 @@ void check_tcp_equal_resp(const Response& lhs, const Response& rhs)
     BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
     BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
     BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
-    check_person(lhs.body().per_req, rhs.body().per_resp);
+    check_person(lhs.body().per_resp, rhs.body().per_resp);
 }
 
 template<typename Request>
@@ -47,7 +34,7 @@ void check_http_equal_req(const Request& lhs, const Request& rhs)
     BOOST_TEST(lhs.header().content_type() == rhs.header().content_type());
     BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
     BOOST_TEST(lhs.header().content_length() == rhs.header().content_length());
-    check_person(lhs.body().per_req, rhs.body().per_resp);
+    check_person(lhs.body().per_req, rhs.body().per_req);
 }
 
 template<typename Response>
@@ -55,10 +42,10 @@ void check_http_equal_resp(const Response& lhs, const Response& rhs)
 {
     BOOST_TEST(lhs.version() == rhs.version());
     BOOST_TEST(lhs.result() == rhs.result());
-    BOOST_TEST(lhs.header().uuid() == rhs.header().uuid());
-    BOOST_TEST(lhs.header().timestamp() == rhs.header().timestamp());
+    BOOST_TEST(lhs.header().content_type() == rhs.header().content_type());
     BOOST_TEST(lhs.header().sequence() == rhs.header().sequence());
-    check_person(lhs.body().per_req, rhs.body().per_resp);
+    BOOST_TEST(lhs.header().content_length() == rhs.header().content_length());
+    check_person(lhs.body().per_resp, rhs.body().per_resp);
 }
 
 BOOST_AUTO_TEST_CASE(test_tcp_request)

@@ -24,11 +24,11 @@ namespace aquarius
 
 					error_code ec{};
 
-					auto buffer = co_await handler_ptr->visit(ec);
+					auto buf = co_await handler_ptr->visit(ec);
 
 					if (!ec)
 					{
-						co_await session_ptr->async_send(std::move(buffer));
+						co_await session_ptr->async_send(std::move(buf));
 					}
 				},
 				detached);
