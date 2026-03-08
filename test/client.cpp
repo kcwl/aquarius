@@ -1,8 +1,23 @@
 #define BOOST_TEST_NO_MAIN
-#include "ctx_handler.hpp"
 #include <aquarius/ip/tcp/tcp_client.hpp>
 #include <aquarius/ip/tcp/tcp_server.hpp>
 #include <boost/test/unit_test.hpp>
+#include "test.virgo.h"
+
+
+template<typename Person>
+void check_person(const Person& lhs, const Person& rhs)
+{
+	BOOST_TEST(lhs.addr == rhs.addr);
+	BOOST_TEST(lhs.age == rhs.age);
+	BOOST_TEST(lhs.hp == rhs.hp);
+	BOOST_TEST(lhs.mana == rhs.mana);
+	BOOST_TEST(lhs.name == rhs.name);
+	BOOST_TEST(lhs.orders == lhs.orders);
+	BOOST_TEST(lhs.score == rhs.score);
+	BOOST_TEST(lhs.sex == rhs.sex);
+	BOOST_TEST(lhs.telephone == rhs.telephone);
+}
 
 template <typename Server>
 struct test_server_fixture
@@ -55,7 +70,7 @@ BOOST_AUTO_TEST_CASE(tcp_client_flow)
 	client.set_accept_func([&](std::shared_ptr<aquarius::tcp_client_session>) { acc_success++; });
 	client.set_close_func([&](std::shared_ptr<aquarius::tcp_client_session>) { clo_success++; });
 
-	aquarius::co_spawn(
+	auto future = aquarius::co_spawn(
 		io,
 		[&] -> aquarius::awaitable<void>
 		{
@@ -77,9 +92,19 @@ BOOST_AUTO_TEST_CASE(tcp_client_flow)
 
 			check_person(req->body().per_req, resp.body().per_resp);
 		},
-		aquarius::detached);
+		aquarius::use_future);
 
-	io.run();
+	std::thread t([&] { io.run(); });
+
+	auto status = future.wait_for(3000s);
+
+	BOOST_CHECK(status == std::future_status::ready);
+
+	client.close();
+
+	io.stop();
+
+	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

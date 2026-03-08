@@ -95,9 +95,9 @@ BOOST_AUTO_TEST_CASE(test_sync_module)
 
 	int increament = 0;
 
-	auto f = [&](test_module* ptr) mutable -> aquarius::awaitable<void> { co_return ptr->increament(increament); };
+	auto f = [&](test_module* ptr) { return ptr->increament(increament); };
 
-	tm.visit(std::make_shared<aquarius::module_data<void, decltype(f)>>(f));
+	tm.visit_sync(std::make_shared<aquarius::module_sync_data<void, decltype(f)>>(f));
 
 	BOOST_TEST(increament == 1);
 }

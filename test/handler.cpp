@@ -1,8 +1,7 @@
 #define BOOST_TEST_NO_MAIN
-#include "ctx_handler.hpp"
-#include <aquarius/ip/http/http_server.hpp>
-#include <aquarius/ip/tcp/tcp_server.hpp>
 #include <boost/test/unit_test.hpp>
+#include <aquarius.hpp>
+#include "test.virgo.h"
 
 using namespace std::chrono_literals;
 
@@ -30,7 +29,7 @@ BOOST_AUTO_TEST_CASE(ctor)
     test_handler test{};
 
     BOOST_TEST(test.name() == "__handler_test_handler");
-    BOOST_TEST(!test.request());
+    BOOST_TEST(test.request());
 }
 
 BOOST_AUTO_TEST_CASE(test_handler_visitor_with_no_regist)
@@ -38,10 +37,10 @@ BOOST_AUTO_TEST_CASE(test_handler_visitor_with_no_regist)
     aquarius::error_code ec{};
 
     test_handler test{};
+    aquarius::flex_buffer buf{};
+    test.visit(buf,0, ec);
 
-    test.visit(ec);
-
-    BOOST_TEST(ec == aquarius::error::eof);
+    BOOST_TEST(ec == aquarius::error_code{});
 }
 
 BOOST_AUTO_TEST_CASE(test_handler_visitor_with_regist)
@@ -50,7 +49,8 @@ BOOST_AUTO_TEST_CASE(test_handler_visitor_with_regist)
 
     test_handler test{};
 
-    test.visit(ec);
+    aquarius::flex_buffer buf{};
+    test.visit(buf,0,ec);
 
     BOOST_TEST(!ec);
 }

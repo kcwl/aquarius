@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE UnitTest
 #include <boost/test/unit_test.hpp>
-//#include <aquarius.hpp>
-#include "ctx_handler.hpp"
+#include <aquarius.hpp>
+#include "test.virgo.h"
 
 using namespace std::chrono_literals;
 
