@@ -68,7 +68,7 @@ namespace aquarius
 			co_return co_await async_connect(host_, port_);
 		}
 
-		auto async_send_buffer(flex_buffer&& buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer&& buffer) -> awaitable<error_code>
 		{
 			co_return co_await session_ptr_->async_send(std::move(buffer));
 		}
@@ -124,7 +124,7 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Request>
-		requires(is_message_type<Request>::value)
+		requires(is_message_type<Request>::value && is_message_type<Response>::value)
 		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
 			flex_buffer buffer{};
@@ -140,7 +140,7 @@ namespace aquarius
 
 			buffer.pubseekoff(size, std::ios::cur, std::ios::in);
 
-			auto ec = co_await async_send_buffer(std::move(buffer));
+			auto ec = co_await async_send(std::move(buffer));
 
 			Response resp{};
 

@@ -104,7 +104,7 @@ namespace aquarius
 	};
 
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
-		http_options_method_handler> __auto_register_options_handler(__http_options_handler__);
+		http_options_method_handler> __auto_register_options_handler(std::string(__http_options_handler__));
 	[[maybe_unused]] inline static aquarius::auto_handler_register<
-		http_source_method_handler> __auto_register_source_handler(__http_source_handler__);
+		http_source_method_handler> __auto_register_source_handler(std::string(__http_source_handler__));
 } // namespace aquarius

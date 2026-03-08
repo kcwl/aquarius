@@ -18,8 +18,7 @@ namespace aquarius
 		handler(const std::string& name)
 			: request_ptr_(new Request)
 			, name_(name)
-		{
-		}
+		{}
 
 	public:
 		virtual auto visit(flex_buffer& buffer, int version, error_code& ec) -> awaitable<flex_buffer>
@@ -74,22 +73,22 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [](flex_buffer& buffer, int version)->aquarius::awaitable<std::expected<flex_buffer,error_code>>
-				{ 
-					auto handler_ptr =  std::make_shared<Handler>();
+			auto f = [](flex_buffer& buffer, int version) -> aquarius::awaitable<std::expected<flex_buffer, error_code>>
+			{
+				auto handler_ptr = std::make_shared<Handler>();
 
-					error_code ec{};
+				error_code ec{};
 
-					auto resp_buffer = co_await handler_ptr->visit(buffer, version, ec);
+				auto resp_buffer = co_await handler_ptr->visit(buffer, version, ec);
 
-					if (ec)
-					{
-						co_return std::unexpected(ec);
-					}
+				if (ec)
+				{
+					co_return std::unexpected(ec);
+				}
 
-					co_return resp_buffer;
-				};
-			mpc_subscribe(proto, f);
+				co_return resp_buffer;
+			};
+			mpc_subscribe(std::string(proto), f);
 		}
 	};
 

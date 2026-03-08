@@ -106,12 +106,12 @@ namespace aquarius
 		{}
 
 	public:
-		auto publish(std::string_view topic, flex_buffer& buffer, int version)
+		auto publish(const std::string& topic, flex_buffer& buffer, int version)
 			-> awaitable<std::expected<flex_buffer, error_code>>
 		{
 			std::shared_lock lk(mutex_);
 
-			auto subscribe = impl_.find(std::string(topic));
+			auto subscribe = impl_.find(topic);
 
 			if (!subscribe)
 			{
@@ -121,17 +121,17 @@ namespace aquarius
 			co_return co_await subscribe(buffer, version);
 		}
 
-		void subscribe(std::string_view topic, const subscribe_func_t& func)
+		void subscribe(const std::string& topic, const subscribe_func_t& func)
 		{
 			std::unique_lock lk(mutex_);
 
-			auto subscribe = impl_.find(std::string(topic));
+			auto subscribe = impl_.find(topic);
 			if (subscribe)
 			{
 				return;
 			}
 
-			impl_.add(std::string(topic), func);
+			impl_.add(topic, func);
 		}
 
 	private:
@@ -140,16 +140,18 @@ namespace aquarius
 		channel_impl<subscribe_func_t> impl_;
 	};
 
-	inline auto mpc_publish(std::string_view topic, flex_buffer& buffer, int version = 0)
+	inline auto mpc_publish(const std::string& topic, flex_buffer& buffer, int version = 0)
 		-> awaitable<std::expected<flex_buffer, error_code>>
 	{
 		using returen_type = std::expected<flex_buffer, error_code>;
 		co_return co_await mpc::call<returen_type, channel_module>(
-			[&](channel_module* ptr) -> awaitable<returen_type>
-			{ co_return co_await ptr->publish(topic, buffer, version); });
+			[&, t = std::move(topic)] (channel_module* ptr) -> awaitable<returen_type>
+			{ 
+				co_return co_await ptr->publish(std::move(t), buffer, version);
+			});
 	}
 
-	inline void mpc_subscribe(std::string_view topic, const channel_module::subscribe_func_t& func)
+	inline void mpc_subscribe(const std::string& topic, const channel_module::subscribe_func_t& func)
 	{
 		return mpc::call_sync<void, channel_module>([&](channel_module* ptr) { return ptr->subscribe(topic, func); });
 	}

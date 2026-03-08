@@ -53,9 +53,9 @@ namespace aquarius
 
 					co_spawn(
 						session_ptr->get_executor(),
-						[&] -> awaitable<void>
+						[&, r = std::move(router)] -> awaitable<void>
 						{
-							auto result = co_await mpc_publish(router, buffer);
+							auto result = co_await mpc_publish(std::move(r), buffer);
 
 							if (!result.has_value())
 							{
