@@ -87,9 +87,6 @@
     <ClInclude Include="..\include\aquarius\detail\config.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_handler.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\uuid_generator.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
