@@ -14,6 +14,12 @@
 #include <source_location>
 #include <string>
 
+#ifdef _DEBUG
+#define LOGGER_LEVEL trivial::debug
+#else
+#define LOGGER_LEVEL trivial::info
+#endif
+
 namespace aquarius
 {
 	namespace logging = boost::log;
@@ -38,9 +44,6 @@ namespace aquarius
 
 		void init_logger()
 		{
-			logging::add_console_log(std::clog,
-									 keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
-
 			auto file_sink_ptr = boost::make_shared<file_sink>(
 				keywords::file_name = "file.log", keywords::target_file_name = "%Y%m%d_%H%M%S.%5N.log",
 				keywords::registration = 16384,
@@ -55,10 +58,14 @@ namespace aquarius
 										 expr::attr<std::string>("File") % expr::attr<uint32_t>("Line") %
 										 expr::attr<boost::posix_time::ptime>("TimeStamp") % expr::smessage);
 
-			file_sink_ptr->set_filter(trivial::severity >= trivial::info);
+			file_sink_ptr->set_filter(trivial::severity >= LOGGER_LEVEL);
 
 			// logging::core::get()->add_sink(console_sink_ptr);
 			logging::core::get()->remove_all_sinks();
+
+			logging::add_console_log(std::clog,
+									 keywords::format = "[%Severity%][%File%:%Line%]<%TimeStamp%> %Message%");
+
 			logging::core::get()->add_sink(file_sink_ptr);
 
 			logging::core::get()->add_global_attribute("TimeStamp", attrs::local_clock());
