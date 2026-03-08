@@ -131,6 +131,8 @@ namespace aquarius
 
 			req->commit(buffer);
 
+			XLOG_INFO() << "seq:" << req->sequence() << " send buffer [" << buffer.size() << "]";
+
 			auto ec = co_await async_send(std::move(buffer));
 
 			Response resp{};
@@ -140,7 +142,7 @@ namespace aquarius
 				co_return resp;
 			}
 
-			auto resp_buffer = co_await session_ptr_->query(req->header().sequence(), ec);
+			auto resp_buffer = co_await session_ptr_->query(req->sequence(), ec);
 
 			if (make_error(ec))
 			{

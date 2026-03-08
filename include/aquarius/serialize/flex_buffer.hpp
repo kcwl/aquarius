@@ -15,15 +15,11 @@ namespace aquarius
 		constexpr static std::size_t buffer_delta = 256;
 
 	public:
-		basic_flexbuf(std::size_t max_size = std::numeric_limits<std::size_t>::max(),
-							   Allocator alloc = Allocator{})
+		basic_flexbuf(std::size_t max_size = std::numeric_limits<std::size_t>::max(), Allocator alloc = Allocator{})
 			: max_size_(max_size)
 			, buffer_(alloc)
 		{
-			std::size_t pend = (std::min<std::size_t>)(max_size, buffer_delta);
-			buffer_.resize(pend);
-			setg(&buffer_[0], &buffer_[0], &buffer_[0]);
-			setp(&buffer_[0], &buffer_[0] + pend);
+			reset(max_size);
 		}
 
 		virtual ~basic_flexbuf() = default;
@@ -35,17 +31,21 @@ namespace aquarius
 		{
 			setg(other.eback(), other.gptr(), other.egptr());
 			setp(other.pptr(), other.epptr());
+
+			other.reset(buffer_delta);
 		}
 
 		basic_flexbuf& operator=(basic_flexbuf&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				max_size_ = std::exchange(other.max_size_, 0);
+				max_size_ = std::exchange(other.max_size_, std::numeric_limits<std::size_t>::max());
 				buffer_ = std::move(other.buffer_);
 
 				setg(other.eback(), other.gptr(), other.egptr());
 				setp(other.pbase(), other.pptr());
+
+				other.reset(buffer_delta);
 			}
 
 			return *this;
@@ -60,6 +60,16 @@ namespace aquarius
 		std::size_t max_size() const
 		{
 			return max_size_;
+		}
+
+		std::size_t tellp() const
+		{
+			return pptr() - buffer_.data();
+		}
+
+		std::size_t tellg() const
+		{
+			return gptr() - buffer_.data();
 		}
 
 		std::size_t capacity() const
@@ -98,6 +108,14 @@ namespace aquarius
 			n = std::min<std::size_t>(n, size());
 
 			gbump(static_cast<int>(n));
+		}
+
+		void reset(std::size_t n)
+		{
+			std::size_t pend = (std::min<std::size_t>)(n, buffer_delta);
+			buffer_.resize(pend);
+			setg(&buffer_[0], &buffer_[0], &buffer_[0]);
+			setp(&buffer_[0], &buffer_[0] + pend);
 		}
 
 	protected:
@@ -270,8 +288,7 @@ namespace aquarius
 
 		basic_flexbuf_ref(basic_flexbuf_ref&& other) noexcept
 			: sb_(other.sb_)
-		{
-		}
+		{}
 
 		std::size_t size() const noexcept
 		{

@@ -1,9 +1,9 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
+#include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 #include <boost/core/empty_value.hpp>
-#include <aquarius/serialize/binary.hpp>
 #include <iostream>
 
 namespace aquarius
@@ -18,6 +18,7 @@ namespace aquarius
 		using body_t = std::remove_pointer_t<Body>;
 		using base_body = boost::empty_value<Body>;
 		using version_t = int32_t;
+		using seq_t = uint32_t;
 
 	public:
 		basic_protocol()
@@ -28,6 +29,7 @@ namespace aquarius
 			, header_()
 			, alloc_(alloc)
 			, version_(0)
+			, sequence_(detail::uuid_generator()())
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
@@ -41,6 +43,7 @@ namespace aquarius
 			: header_(std::exchange(other.header_, {}))
 			, alloc_(std::move(other.alloc_))
 			, version_(std::exchange(other.version_, 0))
+			, sequence_(std::exchange(other.sequence_, 0))
 		{
 			this->get() = std::exchange(other.get(), nullptr);
 		}
@@ -52,6 +55,7 @@ namespace aquarius
 				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
 				version_ = std::exchange(other.version_, 0);
+				sequence_ = std::exchange(other.sequence_, 0);
 			}
 			return *this;
 		}
@@ -74,7 +78,7 @@ namespace aquarius
 		{
 			this->version() = binary_parse().from_datas<version_t>(buffer);
 
-			if (!this->header().deserialize(buffer))
+			if (this->header().deserialize(buffer))
 			{
 				return false;
 			}
@@ -118,12 +122,27 @@ namespace aquarius
 			return version_;
 		}
 
+		seq_t sequence() const
+		{
+			return sequence_;
+		}
+		seq_t& sequence()
+		{
+			return sequence_;
+		}
+		void sequence(seq_t value)
+		{
+			sequence_ = value;
+		}
+
 	private:
 		header_t header_;
 
 		Allocator alloc_;
 
 		version_t version_;
+
+		seq_t sequence_;
 	};
 
 	struct null_header

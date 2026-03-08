@@ -6,13 +6,10 @@ namespace aquarius
 {
 	class tcp_header
 	{
-		using seq_t = uint32_t;
-
 	public:
 		tcp_header()
 			: uuid_(0)
 			, timestamp_(0)
-			, seq_number_(detail::uuid_generator()())
 		{}
 
 		virtual ~tcp_header() = default;
@@ -20,7 +17,6 @@ namespace aquarius
 		tcp_header(const tcp_header& other)
 			: uuid_(other.uuid_)
 			, timestamp_(other.timestamp_)
-			, seq_number_(other.seq_number_)
 		{}
 
 		tcp_header& operator=(const tcp_header& other)
@@ -29,7 +25,6 @@ namespace aquarius
 			{
 				uuid_ = other.uuid_;
 				timestamp_ = other.timestamp_;
-				seq_number_ = other.seq_number_;
 			}
 
 			return *this;
@@ -38,7 +33,6 @@ namespace aquarius
 		tcp_header(tcp_header&& other) noexcept
 			: uuid_(std::exchange(other.uuid_, 0))
 			, timestamp_(std::exchange(other.timestamp_, 0))
-			, seq_number_(std::exchange(other.seq_number_, 0))
 		{}
 
 		tcp_header& operator=(tcp_header&& other) noexcept
@@ -47,7 +41,6 @@ namespace aquarius
 			{
 				uuid_ = std::exchange(other.uuid_, 0);
 				timestamp_ = std::exchange(other.timestamp_, 0);
-				seq_number_ = std::exchange(other.seq_number_, 0);
 			}
 
 			return *this;
@@ -60,8 +53,6 @@ namespace aquarius
 
 			parse_.to_datas(timestamp_, buffer);
 
-			parse_.to_datas(seq_number_, buffer);
-
 			return error_code{};
 		}
 
@@ -70,8 +61,6 @@ namespace aquarius
 			uuid_ = parse_.from_datas<uint64_t>(buffer);
 
 			timestamp_ = parse_.from_datas<int64_t>(buffer);
-
-			seq_number_ = parse_.from_datas<seq_t>(buffer);
 
 			return error_code{};
 		}
@@ -103,25 +92,10 @@ namespace aquarius
 			timestamp_ = value;
 		}
 
-		seq_t sequence() const
-		{
-			return seq_number_;
-		}
-		seq_t& sequence()
-		{
-			return seq_number_;
-		}
-		void sequence(seq_t value)
-		{
-			seq_number_ = value;
-		}
-
 	private:
 		uint64_t uuid_;
 
 		int64_t timestamp_;
-
-		seq_t seq_number_;
 
 		binary_parse parse_;
 	};

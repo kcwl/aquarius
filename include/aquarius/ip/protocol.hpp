@@ -38,9 +38,7 @@ namespace aquarius
 				{
 					flex_buffer buffer{};
 
-					uint32_t seq{};
-
-					ec = co_await recv(session_ptr, buffer, seq);
+					ec = co_await recv(session_ptr, buffer);
 
 					if (ec)
 					{
@@ -48,6 +46,12 @@ namespace aquarius
 					}
 
 					auto router = binary_parse{}.from_datas<std::string>(buffer);
+
+					auto pos = buffer.tellg();
+
+					uint32_t seq = binary_parse{}.from_datas<uint32_t>(buffer);
+
+					buffer.pubseekpos(pos, std::ios::out);
 
 					XLOG_INFO() << "[accept] parse protocol router: " << router;
 
@@ -102,19 +106,17 @@ namespace aquarius
 				{
 					flex_buffer buffer{};
 
-					uint32_t seq{};
-					ec = co_await recv(session_ptr, buffer, seq);
+					ec = co_await recv(session_ptr, buffer);
 					if (ec)
 					{
 						break;
 					}
 
+					uint32_t seq = binary_parse{}.from_datas<uint32_t>(buffer);
 					if (seq == seq_number)
 					{
 						co_return buffer;
 					}
-
-					buffer.pubseekoff(sizeof(uint32_t), std::ios::cur);
 
 					XLOG_INFO() << "[query controll buffer] seq_number: " << seq << ", wait seq: " << seq_number;
 
@@ -132,7 +134,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t& req)
+		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer)
 			-> awaitable<error_code>
 		{
 			uint32_t packet_length{};

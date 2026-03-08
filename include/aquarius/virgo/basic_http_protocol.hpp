@@ -68,7 +68,7 @@ namespace aquarius
 			{
 				this->version(ver);
 
-				if (!this->header().deserialize(buffer))
+				if (this->header().deserialize(buffer))
 				{
 					return false;
 				}

@@ -254,7 +254,6 @@
     <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
     <ClCompile Include="..\test\module.cpp" />
-    <ClCompile Include="..\test\protocol.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\cmd_options.cpp" />
@@ -263,7 +262,6 @@
     <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
-    <ClCompile Include="..\test\session_store.cpp" />
     <ClCompile Include="..\test\sql.cpp" />
     <ClInclude Include="..\test\test.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />

@@ -29,9 +29,15 @@ namespace aquarius
 			tcp_response& operator=(tcp_response&& other) noexcept = default;
 
 		protected:
-			virtual void commit_command_header(flex_buffer&) override
+			virtual void commit_command_header(flex_buffer& buffer) override
 			{
-				return;
+				binary_parse parse{};
+
+				parse.to_datas(this->sequence(), buffer);
+
+				parse.to_datas(this->version(), buffer);
+
+				parse.to_datas(this->result(), buffer);
 			}
 		};
 	} // namespace virgo

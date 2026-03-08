@@ -16,6 +16,10 @@ namespace aquarius
 
 			using typename base::body_t;
 
+			using typename base::seq_t;
+
+			using typename base::version_t;
+
 			constexpr static auto has_request = Request;
 
 		public:
@@ -55,6 +59,21 @@ namespace aquarius
 				return error_code{};
 			}
 
+			virtual bool consume(flex_buffer& buffer, int = 0)
+			{
+				this->sequence() = binary_parse().from_datas<seq_t>(buffer);
+				this->version() = binary_parse().from_datas<version_t>(buffer);
+
+				if (this->header().deserialize(buffer))
+				{
+					return false;
+				}
+
+				this->body().deserialize(buffer);
+
+				return true;
+			}
+
 		protected:
 			virtual void commit_command_header(flex_buffer&)
 			{
@@ -72,6 +91,8 @@ namespace aquarius
 			using typename base::header_t;
 
 			using typename base::body_t;
+
+			using typename base::seq_t;
 
 			using version_t = int32_t;
 
@@ -150,10 +171,6 @@ namespace aquarius
 
 				commit_command_header(buffer);
 
-				binary_parse().to_datas(this->version(), buffer);
-
-				binary_parse().to_datas(this->result(), buffer);
-
 				this->header().serialize(buffer);
 
 				this->body().serialize(buffer);
@@ -175,7 +192,7 @@ namespace aquarius
 
 				this->result() = binary_parse().from_datas<result_t>(buffer);
 
-				if (!this->header().deserialize(buffer))
+				if (this->header().deserialize(buffer))
 				{
 					return false;
 				}

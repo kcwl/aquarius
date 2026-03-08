@@ -27,13 +27,13 @@ namespace aquarius
 			}
 
 			template <typename T>
-			void make_sql_condition(std::stringstream& ss, T&& value)
+			void make_sql_condition(std::stringstream& ss, T&& value, const std::string& key = " where ")
 			{
 				int start = 0;
 				auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 				{
 					((has_condition<I, T>(value)
-						  ? (ss << (start++ == 0 ? " where " : " and ") << struct_element_name<I, T>() << "="
+						  ? (ss << (start++ == 0 ? key : " and ") << struct_element_name<I, T>() << "="
 								<< struct_element_value<I, T>(value))
 						  : ss),
 					 ...);
@@ -105,7 +105,7 @@ namespace aquarius
 
 					type_f(std::make_index_sequence<size>{});
 
-					complete_sql << ") values (";
+					complete_sql << ") values(";
 
 					auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 					{ ((complete_sql << struct_element_value<I, T>(value) << (size != I + 1 ? "," : "")), ...); };
@@ -194,7 +194,7 @@ namespace aquarius
 
 					detail::make_value_update(complete_sql, value);
 
-					detail::make_sql_condition(complete_sql, value);
+					detail::make_sql_condition(complete_sql, value, " set ");
 
 					return complete_sql.str();
 				}

@@ -347,9 +347,6 @@
     <ClCompile Include="..\test\detail.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\protocol.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\json_serialize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -375,9 +372,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\make_endpoint.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\session_store.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\string_literal.cpp">

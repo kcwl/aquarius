@@ -83,10 +83,22 @@ namespace aquarius
 					this->value_ = v;
 				}
 
+				void clear()
+				{
+					clear_condition();
+
+					this->value_ = {};
+				}
+
 			protected:
 				void make_condition()
 				{
 					flag_ |= 1;
+				}
+
+				void clear_condition()
+				{
+					flag_ &= 0;
 				}
 
 				void make_value()

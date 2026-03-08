@@ -57,7 +57,7 @@ namespace aquarius
 		{
 			response().result(result.value());
 
-			response().header().sequence(this->request()->header().sequence());
+			response().sequence(this->request()->sequence());
 		}
 
 	private:
