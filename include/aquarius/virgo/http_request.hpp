@@ -33,8 +33,8 @@ namespace aquarius
 
 			virtual ~http_request() = default;
 
-			http_request(const http_request&) = default;
-			http_request& operator=(const http_request&) = default;
+			http_request(const http_request&) = delete;
+			http_request& operator=(const http_request&) = delete;
 
 			http_request(http_request&&) noexcept = default;
 			http_request& operator=(http_request&&) noexcept = default;

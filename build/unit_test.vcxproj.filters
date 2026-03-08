@@ -57,9 +57,6 @@
     <ClInclude Include="..\include\aquarius.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\ctx_handler.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -423,6 +420,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ctx_handler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

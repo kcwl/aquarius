@@ -20,16 +20,19 @@ namespace aquarius
 
 			virtual ~tcp_response() = default;
 
-			tcp_response(const tcp_response& other) = default;
+			tcp_response(const tcp_response& other) = delete;
 
-			tcp_response& operator=(const tcp_response& other) = default;
+			tcp_response& operator=(const tcp_response& other) = delete;
 
 			tcp_response(tcp_response&& other) noexcept = default;
 
 			tcp_response& operator=(tcp_response&& other) noexcept = default;
 
 		protected:
-			virtual void commit_command_header(flex_buffer&) override { return; }
+			virtual void commit_command_header(flex_buffer&) override
+			{
+				return;
+			}
 		};
 	} // namespace virgo
 

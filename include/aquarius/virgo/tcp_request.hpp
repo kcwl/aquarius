@@ -26,9 +26,9 @@ namespace aquarius
 
 			virtual ~tcp_request() = default;
 
-			tcp_request(const tcp_request&) = default;
+			tcp_request(const tcp_request&) = delete;
 
-			tcp_request& operator=(const tcp_request&) = default;
+			tcp_request& operator=(const tcp_request&) = delete;
 
 			tcp_request(tcp_request&&) noexcept = default;
 

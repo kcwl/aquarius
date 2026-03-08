@@ -37,7 +37,7 @@ namespace aquarius
 
 		tcp_header(tcp_header&& other) noexcept
 			: uuid_(std::exchange(other.uuid_, 0))
-			, timestamp_(std::exchange(timestamp_, 0))
+			, timestamp_(std::exchange(other.timestamp_, 0))
 			, seq_number_(std::exchange(other.seq_number_, 0))
 		{}
 
@@ -46,7 +46,7 @@ namespace aquarius
 			if (std::addressof(other) != this)
 			{
 				uuid_ = std::exchange(other.uuid_, 0);
-				timestamp_ = std::exchange(timestamp_, 0);
+				timestamp_ = std::exchange(other.timestamp_, 0);
 				seq_number_ = std::exchange(other.seq_number_, 0);
 			}
 

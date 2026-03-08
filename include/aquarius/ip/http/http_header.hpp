@@ -62,6 +62,8 @@ namespace aquarius
 				headline += std::format("{}: {}\r\n", s.first, s.second);
 			}
 
+			headline += "\r\n";
+
 			buffer.sputn(headline.data(), headline.size());
 
 			return error_code{};
@@ -75,12 +77,16 @@ namespace aquarius
 
 			auto headers = span_buffer | std::views::split(crlf);
 
+			std::size_t length = 0;
+
 			for (const auto header : headers)
 			{
 				auto str = std::string_view(header);
 
-				if (str == crlf)
+				if (str.empty())
 					break;
+
+				length += (str.size() + crlf.size());
 
 				auto pos = str.find(":");
 
@@ -94,10 +100,10 @@ namespace aquarius
 				auto key = str.substr(0, pos);
 				auto value = str.substr(pos + 1, str.size() - pos - 1);
 
-				fields_.emplace(std::string(key), std::string(value));
+				fields_.emplace(std::string(key), value.substr(1));
 			}
 
-			buffer.consume(buffer.size());
+			buffer.consume(length + crlf.size());
 
 			return ec;
 		}

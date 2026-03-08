@@ -245,6 +245,7 @@
     <ClCompile Include="..\test\binary_serialize.cpp" />
     <ClCompile Include="..\test\concat.cpp" />
     <ClCompile Include="..\test\crc.cpp" />
+    <ClCompile Include="..\test\ctx_handler.cpp" />
     <ClCompile Include="..\test\float.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
     <ClCompile Include="..\test\http_method.cpp" />
@@ -260,7 +261,6 @@
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\cmd_options.cpp" />
     <ClCompile Include="..\test\session.cpp" />
-    <ClInclude Include="..\test\ctx_handler.hpp" />
     <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />

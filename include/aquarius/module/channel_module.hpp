@@ -1,7 +1,8 @@
 #pragma once
-#include <aquarius/basic_handler.hpp>
+#include <aquarius/basic_protocol.hpp>
+#include <aquarius/error_code.hpp>
 #include <aquarius/module/schedule.hpp>
-#include <aquarius/virgo/http_null_protocol.hpp>
+#include <expected>
 #include <vector>
 
 namespace aquarius
@@ -97,9 +98,7 @@ namespace aquarius
 		using base = _module<channel_module>;
 
 	public:
-		using subscribe_t = basic_handler<virgo::http_null_request>;
-
-		using subscribe_func_t = std::function<std::shared_ptr<subscribe_t>()>;
+		using subscribe_func_t = std::function<awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, int)>;
 
 	public:
 		channel_module(io_context& io, const std::string& name)
@@ -107,13 +106,19 @@ namespace aquarius
 		{}
 
 	public:
-		auto publish(std::string_view topic)
+		auto publish(std::string_view topic, flex_buffer& buffer, int version)
+			-> awaitable<std::expected<flex_buffer, error_code>>
 		{
 			std::shared_lock lk(mutex_);
 
 			auto subscribe = impl_.find(std::string(topic));
 
-			return !subscribe ? std::make_shared<subscribe_t>("null handler") : subscribe();
+			if (!subscribe)
+			{
+				co_return std::unexpected(error_code{});
+			}
+
+			co_return co_await subscribe(buffer, version);
 		}
 
 		void subscribe(std::string_view topic, const subscribe_func_t& func)
@@ -135,16 +140,17 @@ namespace aquarius
 		channel_impl<subscribe_func_t> impl_;
 	};
 
-	inline auto mpc_publish(std::string_view topic) -> awaitable<std::shared_ptr<channel_module::subscribe_t>>
+	inline auto mpc_publish(std::string_view topic, flex_buffer& buffer, int version = 0)
+		-> awaitable<std::expected<flex_buffer, error_code>>
 	{
-		co_return co_await mpc::call<std::shared_ptr<channel_module::subscribe_t>, channel_module>(
-			[&](channel_module* ptr) -> awaitable<std::shared_ptr<typename channel_module::subscribe_t>>
-			{ co_return ptr->publish(topic); });
+		using returen_type = std::expected<flex_buffer, error_code>;
+		co_return co_await mpc::call<returen_type, channel_module>(
+			[&](channel_module* ptr) -> awaitable<returen_type>
+			{ co_return co_await ptr->publish(topic, buffer, version); });
 	}
 
 	inline void mpc_subscribe(std::string_view topic, const channel_module::subscribe_func_t& func)
 	{
 		return mpc::call_sync<void, channel_module>([&](channel_module* ptr) { return ptr->subscribe(topic, func); });
 	}
-
 } // namespace aquarius

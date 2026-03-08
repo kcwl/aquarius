@@ -128,8 +128,17 @@ namespace aquarius
 		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
 		{
 			flex_buffer buffer{};
+			buffer.commit(sizeof(uint32_t));
 
 			req->commit(buffer);
+
+			auto size = buffer.size() - sizeof(uint32_t);
+
+			buffer.pubseekpos(0, std::ios::in);
+
+			buffer.sputn((char*)&size, sizeof(uint32_t));
+
+			buffer.pubseekoff(size, std::ios::cur, std::ios::in);
 
 			auto ec = co_await async_send_buffer(std::move(buffer));
 
@@ -147,8 +156,7 @@ namespace aquarius
 				co_return resp;
 			}
 
-			resp.consume_header(resp_buffer);
-			resp.consume_body(resp_buffer);
+			resp.consume(resp_buffer);
 
 			co_return resp;
 		}

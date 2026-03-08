@@ -5,6 +5,8 @@
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
 #include <boost/url.hpp>
+#include <ranges>
+#include <span>
 
 namespace aquarius
 {
@@ -49,13 +51,20 @@ namespace aquarius
 
 					XLOG_INFO() << "[accept] parse protocol router: " << router;
 
-					auto handler = co_await mpc_publish(router);
+					co_spawn(
+						session_ptr->get_executor(),
+						[&] -> awaitable<void>
+						{
+							auto result = co_await mpc_publish(router, buffer);
 
-					auto request_ptr = handler->request();
+							if (!result.has_value())
+							{
+								co_return;
+							}
 
-					request_ptr->header().sequence(seq);
-
-					Selector()(session_ptr, handler, buffer);
+							co_await session_ptr->async_send(std::move(*result));
+						},
+						detached);
 				}
 			}
 
@@ -202,12 +211,6 @@ namespace aquarius
 				//    router = __http_options_handler__;
 				// }
 
-				auto handler_ptr = co_await mpc_publish(router);
-
-				auto request_ptr = handler_ptr->request();
-
-				request_ptr->version(virgo::from_int_version(version));
-
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
@@ -215,9 +218,29 @@ namespace aquarius
 					break;
 				}
 
-				request_ptr->consume_header(buffer);
+				std::size_t content_length = 0;
 
-				auto content_length = request_ptr->header().content_length();
+				std::string header_str((char*)buffer.data().data(), buffer.size());
+
+				auto pos = header_str.find("Content-Length");
+				if (pos != std::string::npos)
+				{
+					auto end_pos = header_str.find_first_of("\r\n", pos);
+					if (end_pos != std::string::npos)
+					{
+						auto start = header_str.find_first_of(':', pos);
+
+						if (header_str.substr(pos, end_pos - pos) == "Content-Length")
+						{
+							std::string content_length_str = header_str.substr(start + 1, end_pos - start - 1);
+
+							std::stringstream ss{};
+							ss << content_length_str;
+
+							ss >> content_length;
+						}
+					}
+				}
 
 				if (content_length != 0)
 				{
@@ -234,9 +257,20 @@ namespace aquarius
 					break;
 				}
 
-				request_ptr->consume_body(buffer);
+				co_spawn(
+					session_ptr->get_executor(),
+					[&]->awaitable<void>
+					{
+						auto resp_buf = co_await mpc_publish(router, buffer, static_cast<int>(version));
 
-				Selector()(session_ptr, handler_ptr, buffer);
+						if (!resp_buf.has_value())
+						{
+							co_return;
+						}
+
+						co_await session_ptr->async_send(std::move(*resp_buf));
+					},
+					detached);
 			}
 
 			if (ec != boost::asio::error::eof)

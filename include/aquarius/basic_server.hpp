@@ -4,6 +4,7 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/module/channel_module.hpp>
 #include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
@@ -128,7 +129,7 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
 
-				//co_await mpc_insert_session(session_ptr);
+				// co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
@@ -197,6 +198,8 @@ namespace aquarius
 			module_router::get_mutable_instance().regist<http_config_module>();
 
 			module_router::get_mutable_instance().regist<player_module>();
+
+			module_router::get_mutable_instance().regist<channel_module>();
 		}
 
 	protected:

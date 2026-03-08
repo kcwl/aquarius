@@ -1,44 +1,53 @@
 #pragma once
-#include <aquarius/basic_handler.hpp>
 #include <aquarius/ip/server_session.hpp>
 #include <aquarius/module/channel_module.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
+#include <expected>
 
 namespace aquarius
 {
 	template <typename Request, typename Response>
-	class handler : public basic_handler<Request>
+	class handler
 	{
-		using base = basic_handler<Request>;
-
 	public:
-		using typename base::request_t;
-
+		using request_t = Request;
 		using response_t = Response;
 
 	public:
 		handler(const std::string& name)
-			: base(name)
-		{}
-
-		virtual ~handler() = default;
+			: request_ptr_(new Request)
+			, name_(name)
+		{
+		}
 
 	public:
-		virtual auto visit(error_code& ec) -> awaitable<flex_buffer> override
+		virtual auto visit(flex_buffer& buffer, int version, error_code& ec) -> awaitable<flex_buffer>
 		{
+			request()->consume(buffer, version);
+
 			make_response(co_await this->handle());
 
-			flex_buffer buffer{};
+			flex_buffer resp_buffer{};
 
-			ec = response().commit(buffer);
+			ec = response().commit(resp_buffer);
 
-			co_return std::move(buffer);
+			co_return std::move(resp_buffer);
 		}
 
 		Response& response()
 		{
 			return response_;
+		}
+
+		std::shared_ptr<request_t> request() const
+		{
+			return request_ptr_;
+		}
+
+		std::string name() const
+		{
+			return name_;
 		}
 
 	protected:
@@ -53,6 +62,10 @@ namespace aquarius
 		}
 
 	private:
+		std::shared_ptr<request_t> request_ptr_;
+
+		std::string name_;
+
 		response_t response_;
 	};
 
@@ -61,7 +74,21 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [] { return std::dynamic_pointer_cast<basic_handler<virgo::http_null_request>>(std::make_shared<Handler>()); };
+			auto f = [](flex_buffer& buffer, int version)->aquarius::awaitable<std::expected<flex_buffer,error_code>>
+				{ 
+					auto handler_ptr =  std::make_shared<Handler>();
+
+					error_code ec{};
+
+					auto resp_buffer = co_await handler_ptr->visit(buffer, version, ec);
+
+					if (ec)
+					{
+						co_return std::unexpected(ec);
+					}
+
+					co_return resp_buffer;
+				};
 			mpc_subscribe(proto, f);
 		}
 	};

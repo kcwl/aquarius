@@ -23,18 +23,30 @@ namespace aquarius
 
 			virtual ~basic_http_protocol() = default;
 
-			basic_http_protocol(const basic_http_protocol& other) = default;
+			basic_http_protocol(const basic_http_protocol&) = delete;
 
-			basic_http_protocol& operator=(const basic_http_protocol& other) = default;
+			basic_http_protocol& operator=(const basic_http_protocol&) = delete;
 
-			basic_http_protocol(basic_http_protocol&& other) noexcept = default;
+			basic_http_protocol(basic_http_protocol&&) noexcept = default;
 
-			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept = default;
+			basic_http_protocol& operator=(basic_http_protocol&&) noexcept = default;
 
 		public:
 			virtual error_code commit(flex_buffer& buffer) override
 			{
 				this->commit_command_header(buffer);
+
+				flex_buffer buf{};
+
+				if constexpr (Method != virgo::http_method::get)
+				{
+					this->body().serialize(buf);
+
+					if (buf.size() > 2)
+					{
+						this->header().content_length(buf.size());
+					}
+				}
 
 				auto ec = this->header().serialize(buffer);
 
@@ -42,11 +54,28 @@ namespace aquarius
 				{
 					if constexpr (Method != virgo::http_method::get)
 					{
-						this->body().serialize(buffer);
+						if (this->header().content_length() != 0)
+						{
+							buffer.sputn((char*)buf.data().data(), buf.size());
+						}
 					}
 				}
 
 				return ec;
+			}
+
+			virtual bool consume(flex_buffer& buffer, int ver = 0) override
+			{
+				this->version(ver);
+
+				if (!this->header().deserialize(buffer))
+				{
+					return false;
+				}
+
+				this->body().deserialize(buffer);
+
+				return true;
 			}
 		};
 	} // namespace virgo

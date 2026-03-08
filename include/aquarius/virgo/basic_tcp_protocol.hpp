@@ -16,61 +16,20 @@ namespace aquarius
 
 			using typename base::body_t;
 
-			using version_t = int32_t;
-
 			constexpr static auto has_request = Request;
 
 		public:
-			basic_tcp_protocol()
-				: base()
-				, version_(0)
-			{}
+			basic_tcp_protocol() = default;
 
 			virtual ~basic_tcp_protocol() = default;
 
-			basic_tcp_protocol(const basic_tcp_protocol& other)
-				: version_(other.version_)
-			{}
+			basic_tcp_protocol(const basic_tcp_protocol& other) = delete;
 
-			basic_tcp_protocol& operator=(const basic_tcp_protocol& other)
-			{
-				if (this != std::addressof(other))
-				{
-					version_ = other.version_;
-				}
+			basic_tcp_protocol& operator=(const basic_tcp_protocol& other) = delete;
 
-				return *this;
-			}
+			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept = default;
 
-			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
-				: version_(std::exchange(other.version_, 0))
-			{}
-
-			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
-			{
-				if (this != std::addressof(other))
-				{
-					version_ = std::exchange(other.version_, 0);
-				}
-
-				return *this;
-			}
-
-		public:
-			void version(version_t v)
-			{
-				version_ = v;
-			}
-
-			version_t version() const
-			{
-				return version_;
-			}
-
-			version_t& version()
-			{
-				return version_;
-			}
+			basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept = default;
 
 		public:
 			virtual error_code commit(flex_buffer& buffer) override
@@ -83,7 +42,7 @@ namespace aquarius
 
 				// parse_.to_datas(this->seq_number(), buffer);
 
-				// parse_.to_datas(this->version(), buffer);
+				binary_parse().to_datas(this->version(), buffer);
 
 				this->header().serialize(buffer);
 
@@ -104,9 +63,6 @@ namespace aquarius
 			{
 				return;
 			}
-
-		private:
-			int version_;
 		};
 
 		template <typename Header, typename Body, typename Allocator>
@@ -137,24 +93,13 @@ namespace aquarius
 
 			virtual ~basic_tcp_protocol() = default;
 
-			basic_tcp_protocol(const basic_tcp_protocol& other)
-				: version_(other.version_)
-				, result_(other.result_)
-			{}
+			basic_tcp_protocol(const basic_tcp_protocol& other) = delete;
 
-			basic_tcp_protocol& operator=(const basic_tcp_protocol& other)
-			{
-				if (this != std::addressof(other))
-				{
-					version_ = other.version_;
-					result_ = other.result_;
-				}
-
-				return *this;
-			}
+			basic_tcp_protocol& operator=(const basic_tcp_protocol& other) = delete;
 
 			basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
-				: version_(std::exchange(other.version_, 0))
+				: base(std::move(other))
+				, version_(std::exchange(other.version_, 0))
 				, result_(std::exchange(other.result_, 0))
 			{}
 
@@ -162,6 +107,7 @@ namespace aquarius
 			{
 				if (this != std::addressof(other))
 				{
+					base::operator=(std::move(other));
 					version_ = std::exchange(other.version_, 0);
 					result_ = std::exchange(other.result_, 0);
 				}
@@ -211,7 +157,9 @@ namespace aquarius
 
 				// parse_.to_datas(this->seq_number(), buffer);
 
-				// parse_.to_datas(this->version(), buffer);
+				binary_parse().to_datas(this->version(), buffer);
+
+				binary_parse().to_datas(this->result(), buffer);
 
 				this->header().serialize(buffer);
 
@@ -225,6 +173,22 @@ namespace aquarius
 				// buffer.sputn((char *)&length, length_offset);
 
 				return error_code{};
+			}
+
+			virtual bool consume(flex_buffer& buffer, int=0) override
+			{
+				this->version() = binary_parse().from_datas<version_t>(buffer);
+
+				this->result() = binary_parse().from_datas<result_t>(buffer);
+
+				if (!this->header().deserialize(buffer))
+				{
+					return false;
+				}
+
+				this->body().deserialize(buffer);
+
+				return true;
 			}
 
 		protected:
