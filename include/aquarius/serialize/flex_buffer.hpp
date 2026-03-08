@@ -183,7 +183,7 @@ namespace aquarius
 			case std::ios_base::cur:
 			case std::ios_base::end:
 				{
-					offset = std::min<off_type>(pos + offset, pos);
+					offset = std::max<off_type>(pos + offset, pos);
 				}
 				break;
 			default:
