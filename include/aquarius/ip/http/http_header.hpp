@@ -2,6 +2,9 @@
 #include <aquarius/serialize/http_json_serialize.hpp>
 #include <ranges>
 #include <span>
+#include <string_view>
+
+using namespace std::string_view_literals;
 
 namespace aquarius
 {

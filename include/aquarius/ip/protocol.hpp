@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/channel_module.hpp>
+#include <aquarius/module/handler_channel.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
 #include <boost/url.hpp>
@@ -27,7 +27,7 @@ namespace aquarius
 
 		using keep_alive = boost::asio::socket_base::keep_alive;
 
-		template <typename Selector, typename Socket, typename Dura, typename Session>
+		template <typename Socket, typename Dura, typename Session>
 		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
 			auto ec = co_await socket.accept(timeout);
@@ -80,8 +80,6 @@ namespace aquarius
 		static auto query(std::shared_ptr<Session> session_ptr, std::size_t seq_number, error_code& ec)
 			-> awaitable<flex_buffer>
 		{
-			flex_buffer buffer{};
-
 			ec = error_code{};
 
 			static std::map<std::size_t, flex_buffer> buffer_controller_;
@@ -92,14 +90,18 @@ namespace aquarius
 			{
 				XLOG_INFO() << "[query from controll buffer] seq_number: " << seq_number;
 
-				buffer = std::move(iter->second);
+				auto buffer = std::move(iter->second);
 
 				buffer_controller_.erase(iter);
+
+				co_return buffer;
 			}
 			else
 			{
 				for (;;)
 				{
+					flex_buffer buffer{};
+
 					uint32_t seq{};
 					ec = co_await recv(session_ptr, buffer, seq);
 					if (ec)
@@ -125,7 +127,7 @@ namespace aquarius
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
 			}
 
-			co_return buffer;
+			co_return flex_buffer{};
 		}
 
 	private:
@@ -170,7 +172,7 @@ namespace aquarius
 
 		constexpr static std::size_t header_part = 3;
 
-		template <typename Selector, typename Socket, typename Session, typename Dura>
+		template <typename Socket, typename Session, typename Dura>
 		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
 		{
 			auto ec = co_await socket.accept(timeout);
@@ -178,7 +180,7 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
-				ec = co_await session_ptr->async_read_util(buffer, crlf);
+				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
 				{
@@ -186,6 +188,8 @@ namespace aquarius
 				}
 
 				auto header_line = std::string((char*)buffer.data().data(), buffer.size());
+
+				header_line = header_line.substr(0, header_line.find_first_of("\r\n"));
 
 				auto [method, url, version] = parse_command_line<true>(std::span<char>(header_line), ec);
 
@@ -211,8 +215,6 @@ namespace aquarius
 				//    router = __http_options_handler__;
 				// }
 
-				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
-
 				if (ec)
 				{
 					break;
@@ -229,10 +231,10 @@ namespace aquarius
 					if (end_pos != std::string::npos)
 					{
 						auto start = header_str.find_first_of(':', pos);
-
-						if (header_str.substr(pos, end_pos - pos) == "Content-Length")
+						auto key = header_str.substr(pos, start - pos);
+						if (key == "Content-Length")
 						{
-							std::string content_length_str = header_str.substr(start + 1, end_pos - start - 1);
+							std::string content_length_str = header_str.substr(start + 2, end_pos - start - 2);
 
 							std::stringstream ss{};
 							ss << content_length_str;
@@ -242,7 +244,7 @@ namespace aquarius
 					}
 				}
 
-				if (content_length != 0)
+				if (content_length > 0)
 				{
 					auto remain_size = static_cast<int64_t>(content_length - buffer.size());
 
@@ -259,9 +261,9 @@ namespace aquarius
 
 				co_spawn(
 					session_ptr->get_executor(),
-					[&]->awaitable<void>
+					[&, r = std::move(router)] -> awaitable<void>
 					{
-						auto resp_buf = co_await mpc_publish(router, buffer, static_cast<int>(version));
+						auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
 
 						if (!resp_buf.has_value())
 						{

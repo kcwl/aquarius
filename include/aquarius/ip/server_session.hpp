@@ -4,6 +4,6 @@
 
 namespace aquarius
 {
-	template <typename Protocol, typename Selector>
-	using server_session = basic_session<Protocol, raw_socket_adaptor, Selector>;
+	template <typename Protocol>
+	using server_session = basic_session<Protocol, raw_socket_adaptor>;
 } // namespace aquarius

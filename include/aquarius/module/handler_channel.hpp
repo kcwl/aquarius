@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/basic_protocol.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/module/schedule.hpp>
+#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/singleton.hpp>
 #include <expected>
 #include <vector>
 
 namespace aquarius
 {
 	template <typename Func>
-	class channel_impl
+	class handler_channel_impl
 	{
 		struct node
 		{
@@ -29,11 +29,11 @@ namespace aquarius
 		using key_t = std::string;
 
 	public:
-		channel_impl()
+		handler_channel_impl()
 			: root_ptr_(new node())
 		{}
 
-		virtual ~channel_impl() = default;
+		virtual ~handler_channel_impl() = default;
 
 	public:
 		void add(key_t key, const function_type& func)
@@ -93,17 +93,10 @@ namespace aquarius
 		std::shared_ptr<node> root_ptr_;
 	};
 
-	class channel_module : public _module<channel_module>
+	class handler_channel : public singleton<handler_channel>
 	{
-		using base = _module<channel_module>;
-
 	public:
 		using subscribe_func_t = std::function<awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, int)>;
-
-	public:
-		channel_module(const std::string& name)
-			: base(name)
-		{}
 
 	public:
 		auto publish(const std::string& topic, flex_buffer& buffer, int version)
@@ -137,20 +130,17 @@ namespace aquarius
 	private:
 		std::shared_mutex mutex_;
 
-		channel_impl<subscribe_func_t> impl_;
+		handler_channel_impl<subscribe_func_t> impl_;
 	};
 
 	inline auto mpc_publish(const std::string& topic, flex_buffer& buffer, int version = 0)
 		-> awaitable<std::expected<flex_buffer, error_code>>
 	{
-		using returen_type = std::expected<flex_buffer, error_code>;
-		co_return co_await mpc::call<returen_type, channel_module>(
-			[&, t = std::move(topic)](channel_module* ptr) -> awaitable<returen_type>
-			{ co_return co_await ptr->publish(std::move(t), buffer, version); });
+		co_return co_await handler_channel::get_mutable_instance().publish(topic, buffer, version);
 	}
 
-	inline void mpc_subscribe(const std::string& topic, const channel_module::subscribe_func_t& func)
+	inline void mpc_subscribe(const std::string& topic, const handler_channel::subscribe_func_t& func)
 	{
-		return mpc::call_sync<void, channel_module>([&](channel_module* ptr) { return ptr->subscribe(topic, func); });
+		return handler_channel::get_mutable_instance().subscribe(topic, func);
 	}
 } // namespace aquarius

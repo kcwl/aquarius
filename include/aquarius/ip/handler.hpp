@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/ip/server_session.hpp>
-#include <aquarius/module/channel_module.hpp>
+#include <aquarius/module/handler_channel.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 #include <expected>

@@ -34,13 +34,9 @@ namespace aquarius
 		public:
 			virtual error_code commit(flex_buffer& buffer) override
 			{
-				// constexpr auto length_offset = sizeof(length_offset_t);
-
-				// buffer.commit(length_offset);
+				buffer.commit(sizeof(uint32_t));
 
 				commit_command_header(buffer);
-
-				// parse_.to_datas(this->seq_number(), buffer);
 
 				binary_parse().to_datas(this->version(), buffer);
 
@@ -48,12 +44,13 @@ namespace aquarius
 
 				this->body().serialize(buffer);
 
-				// buffer.pubseekpos(0, std::ios::in);
+				auto size = buffer.size() - sizeof(uint32_t);
 
-				// length_offset_t length =
-				//     static_cast<length_offset_t>(buffer.size() - length_offset);
+				buffer.pubseekpos(0, std::ios::in);
 
-				// buffer.sputn((char *)&length, length_offset);
+				buffer.sputn((char*)&size, sizeof(uint32_t));
+
+				buffer.pubseekoff(size, std::ios::cur, std::ios::in);
 
 				return error_code{};
 			}
@@ -149,13 +146,9 @@ namespace aquarius
 		public:
 			virtual error_code commit(flex_buffer& buffer) override
 			{
-				// constexpr auto length_offset = sizeof(length_offset_t);
-
-				// buffer.commit(length_offset);
+				buffer.commit(sizeof(uint32_t));
 
 				commit_command_header(buffer);
-
-				// parse_.to_datas(this->seq_number(), buffer);
 
 				binary_parse().to_datas(this->version(), buffer);
 
@@ -165,17 +158,18 @@ namespace aquarius
 
 				this->body().serialize(buffer);
 
-				// buffer.pubseekpos(0, std::ios::in);
+				auto size = buffer.size() - sizeof(uint32_t);
 
-				// length_offset_t length =
-				//     static_cast<length_offset_t>(buffer.size() - length_offset);
+				buffer.pubseekpos(0, std::ios::in);
 
-				// buffer.sputn((char *)&length, length_offset);
+				buffer.sputn((char*)&size, sizeof(uint32_t));
+
+				buffer.pubseekoff(size, std::ios::cur, std::ios::in);
 
 				return error_code{};
 			}
 
-			virtual bool consume(flex_buffer& buffer, int=0) override
+			virtual bool consume(flex_buffer& buffer, int = 0) override
 			{
 				this->version() = binary_parse().from_datas<version_t>(buffer);
 
