@@ -101,8 +101,8 @@ namespace aquarius
 		using subscribe_func_t = std::function<awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, int)>;
 
 	public:
-		channel_module(io_context& io, const std::string& name)
-			: base(io, name)
+		channel_module(const std::string& name)
+			: base(name)
 		{}
 
 	public:
@@ -145,10 +145,8 @@ namespace aquarius
 	{
 		using returen_type = std::expected<flex_buffer, error_code>;
 		co_return co_await mpc::call<returen_type, channel_module>(
-			[&, t = std::move(topic)] (channel_module* ptr) -> awaitable<returen_type>
-			{ 
-				co_return co_await ptr->publish(std::move(t), buffer, version);
-			});
+			[&, t = std::move(topic)](channel_module* ptr) -> awaitable<returen_type>
+			{ co_return co_await ptr->publish(std::move(t), buffer, version); });
 	}
 
 	inline void mpc_subscribe(const std::string& topic, const channel_module::subscribe_func_t& func)

@@ -22,8 +22,8 @@ namespace aquarius
 	class http_config_module : public aquarius::_module<http_config_module, aquarius::http_param>
 	{
 	public:
-		http_config_module(io_context& io, const std::string& name)
-			: _module<http_config_module, aquarius::http_param>(io, name)
+		http_config_module(const std::string& name)
+			: _module<http_config_module, aquarius::http_param>(name)
 		{}
 
 	public:

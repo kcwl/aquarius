@@ -25,6 +25,8 @@ namespace aquarius
 				, enable_transaction_(true)
 			{}
 
+			~mysql() = default;
+
 		public:
 			void async_run()
 			{

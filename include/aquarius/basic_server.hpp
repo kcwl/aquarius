@@ -48,10 +48,13 @@ namespace aquarius
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
-			module_router::get_mutable_instance().run();
+			module_router::get_mutable_instance().run(io_service_pool_);
 		}
 
-		~basic_server() = default;
+		~basic_server()
+		{
+			module_router::get_mutable_instance().close();
+		}
 
 	public:
 		void run()

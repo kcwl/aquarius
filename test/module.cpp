@@ -9,8 +9,8 @@ class test_module : public aquarius::_module<test_module>
 	using base = aquarius::_module<test_module>;
 
 public:
-	test_module(aquarius::io_context& io, const std::string& name)
-		: base(io, name)
+	test_module(const std::string& name)
+		: base(name)
 		, test_increament_(0)
 	{}
 
@@ -42,17 +42,14 @@ BOOST_AUTO_TEST_CASE(ctor)
 {
 	aquarius::io_context io{};
 
-	test_module tm(io, "test_module");
+	test_module tm("test_module");
 
 	BOOST_TEST(tm.name() == "test_module");
-	BOOST_CHECK(tm.get_executor() == io.get_executor());
 }
 
 BOOST_AUTO_TEST_CASE(test_module_virsual_func)
 {
-	aquarius::io_context io{};
-
-	test_module tm(io, "test_module");
+	test_module tm("test_module");
 
 	BOOST_TEST(tm.config());
 
@@ -73,7 +70,7 @@ BOOST_AUTO_TEST_CASE(test_async_module)
 {
 	aquarius::io_context io{};
 
-	test_module tm(io, "test_module");
+	test_module tm("test_module");
 
 	int increament = 0;
 
@@ -89,9 +86,7 @@ BOOST_AUTO_TEST_CASE(test_async_module)
 
 BOOST_AUTO_TEST_CASE(test_sync_module)
 {
-	aquarius::io_context io{};
-
-	test_module tm(io, "test_module");
+	test_module tm("test_module");
 
 	int increament = 0;
 

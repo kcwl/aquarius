@@ -16,16 +16,9 @@ namespace aquarius
 		module_router()
 			: mutex_()
 			, routers_()
-			, pool_(std::thread::hardware_concurrency() / 2)
-			, pool_run_thread_ptr_(nullptr)
 		{}
 
-		~module_router()
-		{
-			pool_.stop();
-
-			pool_run_thread_ptr_->join();
-		}
+		~module_router() = default;
 
 	public:
 		template <typename Module>
@@ -35,11 +28,10 @@ namespace aquarius
 
 			constexpr auto module_name = detail::struct_name<Module>();
 
-			routers_.insert({ std::string(module_name),
-							  std::make_shared<Module>(pool_.get_io_service(), std::string(module_name)) });
+			routers_.insert({ std::string(module_name), std::make_shared<Module>(std::string(module_name)) });
 		}
 
-		void run()
+		void run(io_service_pool& pool)
 		{
 			for (auto& f : routers_)
 			{
@@ -59,10 +51,8 @@ namespace aquarius
 					continue;
 				}
 
-				co_spawn(f.second->get_executor(), [&]() -> awaitable<void> { co_await f.second->run(); }, detached);
+				co_spawn(pool.get_io_service(), [&]() -> awaitable<void> { co_await f.second->run(); }, detached);
 			}
-
-			pool_run_thread_ptr_ = std::make_shared<std::thread>([&] { pool_.run(); });
 		}
 
 		template <typename T, typename Task>
@@ -88,9 +78,7 @@ namespace aquarius
 				co_return return_type{};
 			}
 
-			co_return co_await co_spawn(
-				temp_module->get_executor(),
-				[&]() -> awaitable<return_type> { co_return co_await temp_module->visit(task); }, use_awaitable);
+			co_return co_await temp_module->visit(task);
 		}
 
 		template <typename T, typename Task>
@@ -125,9 +113,7 @@ namespace aquarius
 			if (iter == routers_.end())
 				return;
 
-			iter->second->stop();
-
-			run();
+			// iter->second->stop();
 		}
 
 		void timer(std::chrono::milliseconds ms)
@@ -142,15 +128,18 @@ namespace aquarius
 				f.second->timer(ms);
 			}
 		}
+		
+		void close()
+		{
+			std::unique_lock lk(mutex_);
+
+			routers_.clear();
+		}
 
 	private:
 		std::shared_mutex mutex_;
 
 		std::map<std::string, std::shared_ptr<module_base>> routers_;
-
-		io_service_pool pool_;
-
-		std::shared_ptr<std::thread> pool_run_thread_ptr_;
 	};
 
 	template <typename Module>

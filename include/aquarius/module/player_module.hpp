@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/module/schedule.hpp>
 #include <aquarius/module/module.hpp>
+#include <aquarius/module/schedule.hpp>
 #include <map>
 #include <mutex>
 
@@ -17,8 +17,8 @@ namespace aquarius
 	class player_module : public _module<player_module>
 	{
 	public:
-		player_module(io_context& io, const std::string& name)
-			: _module<player_module>(io, name)
+		player_module(const std::string& name)
+			: _module<player_module>(name)
 		{}
 
 	public:

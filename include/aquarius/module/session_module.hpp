@@ -9,8 +9,8 @@ namespace aquarius
 	class session_module : public _module<session_module<Session>>
 	{
 	public:
-		session_module(io_context& io, const std::string& name)
-			: _module<session_module<Session>>(io, name)
+		session_module(const std::string& name)
+			: _module<session_module<Session>>(name)
 		{}
 
 	public:

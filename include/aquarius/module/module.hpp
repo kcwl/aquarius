@@ -26,8 +26,8 @@ namespace aquarius
 		constexpr static std::string_view config_path = config_type::path;
 
 	public:
-		_module(io_context& io, const std::string& name)
-			: base(io, name)
+		_module(const std::string& name)
+			: base(name)
 		{}
 
 		virtual ~_module() = default;
