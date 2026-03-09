@@ -32,7 +32,7 @@ namespace aquarius
 			setg(other.eback(), other.gptr(), other.egptr());
 			setp(other.pptr(), other.epptr());
 
-			other.reset(buffer_delta);
+			//other.reset(buffer_delta);
 		}
 
 		basic_flexbuf& operator=(basic_flexbuf&& other) noexcept
@@ -45,7 +45,7 @@ namespace aquarius
 				setg(other.eback(), other.gptr(), other.egptr());
 				setp(other.pbase(), other.pptr());
 
-				other.reset(buffer_delta);
+				//other.reset(buffer_delta);
 			}
 
 			return *this;

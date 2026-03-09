@@ -56,8 +56,6 @@ namespace aquarius
 		void make_response(error_code result)
 		{
 			response().result(result.value());
-
-			response().sequence(this->request()->sequence());
 		}
 
 	private:

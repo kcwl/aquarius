@@ -99,7 +99,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
+			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
 												   redirect_error(use_awaitable, ec));
 
 			if (ec)
@@ -183,13 +183,12 @@ namespace aquarius
 
 		auto accept() -> awaitable<error_code>
 		{
-			co_return co_await Protocol::accept(this->socket_adaptor_, this->timeout_,
-														  this->shared_from_this());
+			co_return co_await Protocol::accept(this->socket_adaptor_, this->timeout_, this->shared_from_this());
 		}
 
-		auto query(std::size_t seq_number, error_code& ec) -> awaitable<flex_buffer>
+		auto query(error_code& ec) -> awaitable<flex_buffer>
 		{
-			co_return co_await Protocol::query(this->shared_from_this(), seq_number, ec);
+			co_return co_await Protocol::query(this->shared_from_this(), ec);
 		}
 
 	protected:

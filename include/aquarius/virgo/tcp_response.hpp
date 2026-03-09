@@ -33,8 +33,6 @@ namespace aquarius
 			{
 				binary_parse parse{};
 
-				parse.to_datas(this->sequence(), buffer);
-
 				parse.to_datas(this->version(), buffer);
 
 				parse.to_datas(this->result(), buffer);

@@ -16,8 +16,6 @@ namespace aquarius
 
 			using typename base::body_t;
 
-			using typename base::seq_t;
-
 			using typename base::version_t;
 
 			constexpr static auto has_request = Request;
@@ -61,7 +59,6 @@ namespace aquarius
 
 			virtual bool consume(flex_buffer& buffer, int = 0)
 			{
-				this->sequence() = binary_parse().from_datas<seq_t>(buffer);
 				this->version() = binary_parse().from_datas<version_t>(buffer);
 
 				if (this->header().deserialize(buffer))
@@ -91,8 +88,6 @@ namespace aquarius
 			using typename base::header_t;
 
 			using typename base::body_t;
-
-			using typename base::seq_t;
 
 			using version_t = int32_t;
 

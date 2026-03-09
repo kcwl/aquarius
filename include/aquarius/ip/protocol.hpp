@@ -81,47 +81,21 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto query(std::shared_ptr<Session> session_ptr, std::size_t seq_number, error_code& ec)
-			-> awaitable<flex_buffer>
+		static auto query(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<flex_buffer>
 		{
 			ec = error_code{};
 
-			static std::map<std::size_t, flex_buffer> buffer_controller_;
-
-			auto iter = buffer_controller_.find(seq_number);
-
-			if (iter != buffer_controller_.end())
+			for (;;)
 			{
-				XLOG_INFO() << "[query from controll buffer] seq_number: " << seq_number;
+				flex_buffer buffer{};
 
-				auto buffer = std::move(iter->second);
-
-				buffer_controller_.erase(iter);
-
-				co_return buffer;
-			}
-			else
-			{
-				for (;;)
+				ec = co_await recv(session_ptr, buffer);
+				if (ec)
 				{
-					flex_buffer buffer{};
-
-					ec = co_await recv(session_ptr, buffer);
-					if (ec)
-					{
-						break;
-					}
-
-					uint32_t seq = binary_parse{}.from_datas<uint32_t>(buffer);
-					if (seq == seq_number)
-					{
-						co_return buffer;
-					}
-
-					XLOG_INFO() << "[query controll buffer] seq_number: " << seq << ", wait seq: " << seq_number;
-
-					buffer_controller_.emplace(seq, std::move(buffer));
+					break;
 				}
+
+				co_return std::move(buffer);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -134,8 +108,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer)
-			-> awaitable<error_code>
+		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
 		{
 			uint32_t packet_length{};
 
@@ -182,6 +155,7 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
+
 				ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
 				if (ec)
@@ -191,75 +165,15 @@ namespace aquarius
 
 				auto header_line = std::string((char*)buffer.data().data(), buffer.size());
 
-				header_line = header_line.substr(0, header_line.find_first_of("\r\n"));
+				header_line = header_line.substr(0, header_line.find_first_of(crlf));
+
+				buffer.consume(header_line.size() + crlf.size());
 
 				auto [method, url, version] = parse_command_line<true>(std::span<char>(header_line), ec);
 
 				std::string router(std::string_view(url->path().data(), url->path().size()));
 
-				// auto content_type = hf.find("content-type");
-
-				// if (!content_type.empty() && content_type != "application/json" &&
-				// method
-				// == virgo::http_method::get)
-				//{
-				//    router = __http_source_handler__;
-				// }
-				// else if (method == virgo::http_method::get)
-				//{
-				//    if (!path.empty())
-				//    {
-				//        buffer.sputn(path.data(), path.size());
-				//    }
-				// }
-				// else if (method == virgo::http_method::options)
-				//{
-				//    router = __http_options_handler__;
-				// }
-
-				if (ec)
-				{
-					break;
-				}
-
-				std::size_t content_length = 0;
-
-				std::string header_str((char*)buffer.data().data(), buffer.size());
-
-				auto pos = header_str.find("Content-Length");
-				if (pos != std::string::npos)
-				{
-					auto end_pos = header_str.find_first_of("\r\n", pos);
-					if (end_pos != std::string::npos)
-					{
-						auto start = header_str.find_first_of(':', pos);
-						auto key = header_str.substr(pos, start - pos);
-						if (key == "Content-Length")
-						{
-							std::string content_length_str = header_str.substr(start + 2, end_pos - start - 2);
-
-							std::stringstream ss{};
-							ss << content_length_str;
-
-							ss >> content_length;
-						}
-					}
-				}
-
-				if (content_length > 0)
-				{
-					auto remain_size = static_cast<int64_t>(content_length - buffer.size());
-
-					if (remain_size > 0)
-					{
-						ec = co_await session_ptr->async_read(buffer, remain_size);
-					}
-				}
-
-				if (ec)
-				{
-					break;
-				}
+				auto ec = co_await recv(session_ptr, buffer);
 
 				co_spawn(
 					session_ptr->get_executor(),
@@ -286,85 +200,27 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto query(std::shared_ptr<Session> session_ptr, std::size_t seq_number, error_code& ec)
+		static auto query(std::shared_ptr<Session> session_ptr, error_code& ec, std::size_t seq = 0)
 			-> awaitable<flex_buffer>
 		{
 			flex_buffer buffer{};
 
-			static std::map<std::size_t, flex_buffer> buffer_controller_;
+			ec = co_await session_ptr->async_read_util(buffer, two_crlf);
 
-			auto iter = buffer_controller_.find(seq_number);
-
-			if (iter != buffer_controller_.end())
+			if (ec)
 			{
-				XLOG_INFO() << "[query from controll buffer] seq_number: " << seq_number;
-
-				buffer = std::move(iter->second);
-
-				buffer_controller_.erase(iter);
+				co_return buffer;
 			}
-			else
-			{
-				for (;;)
-				{
-					auto size = buffer.size();
 
-					ec = co_await session_ptr->async_read_util(buffer, crlf);
+			auto header_line = std::string((char*)buffer.data().data(), buffer.size());
 
-					if (ec)
-					{
-						break;
-					}
+			header_line = header_line.substr(0, header_line.find_first_of(crlf));
 
-					auto header_line = std::string((char*)buffer.data().data(), buffer.size());
+			buffer.consume(header_line.size() + crlf.size());
 
-					auto [version, status] = parse_command_line<false>(std::span<char>(header_line), ec);
+			auto [version, status] = parse_command_line<false>(std::span<char>(header_line), ec);
 
-					virgo::http_null_response resp{};
-
-					resp.version(static_cast<int32_t>(version));
-					resp.result(static_cast<int32_t>(status));
-
-					ec = co_await session_ptr->async_read_util(buffer, two_crlf);
-
-					if (ec)
-					{
-						co_return flex_buffer{};
-					}
-
-					resp.header().deserialize(buffer);
-
-					auto content_length = resp.header().content_length();
-
-					if (content_length != 0)
-					{
-						auto remain_size = static_cast<int64_t>(content_length - buffer.size());
-
-						if (remain_size > 0)
-						{
-							ec = co_await session_ptr->async_read(buffer, remain_size);
-						}
-					}
-
-					if (ec)
-					{
-						break;
-					}
-
-					if (resp.header().sequence() != seq_number)
-					{
-						XLOG_INFO() << "[query controll buffer] seq_number: " << resp.header().sequence()
-									<< ", wait seq: " << seq_number;
-
-						buffer.pubseekoff(size, std::ios::beg);
-
-						buffer_controller_.emplace(resp.header().sequence(), std::move(buffer));
-						continue;
-					}
-
-					break;
-				}
-			}
+			ec = co_await recv(session_ptr, buffer);
 
 			if (ec != boost::asio::error::eof)
 			{
@@ -375,6 +231,73 @@ namespace aquarius
 		}
 
 	private:
+		template <typename Session>
+		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
+		{
+			// auto content_type = hf.find("content-type");
+
+			// if (!content_type.empty() && content_type != "application/json" &&
+			// method
+			// == virgo::http_method::get)
+			//{
+			//    router = __http_source_handler__;
+			// }
+			// else if (method == virgo::http_method::get)
+			//{
+			//    if (!path.empty())
+			//    {
+			//        buffer.sputn(path.data(), path.size());
+			//    }
+			// }
+			// else if (method == virgo::http_method::options)
+			//{
+			//    router = __http_options_handler__;
+			// }
+
+			// if (ec)
+			//{
+			//	break;
+			// }
+
+			error_code ec{};
+
+			std::size_t content_length = 0;
+
+			std::string header_str((char*)buffer.data().data(), buffer.size());
+
+			auto pos = header_str.find("Content-Length");
+			if (pos != std::string::npos)
+			{
+				auto end_pos = header_str.find_first_of("\r\n", pos);
+				if (end_pos != std::string::npos)
+				{
+					auto start = header_str.find_first_of(':', pos);
+					auto key = header_str.substr(pos, start - pos);
+					if (key == "Content-Length")
+					{
+						std::string content_length_str = header_str.substr(start + 2, end_pos - start - 2);
+
+						std::stringstream ss{};
+						ss << content_length_str;
+
+						ss >> content_length;
+					}
+				}
+			}
+
+			if (content_length > 0)
+			{
+				auto remain_size = static_cast<int64_t>(content_length - buffer.size());
+
+				if (remain_size > 0)
+				{
+					ec = co_await session_ptr->async_read(buffer, remain_size);
+				}
+			}
+
+			co_return ec;
+		}
+
 		template <bool Server>
 		static auto parse_command_line(std::span<char> header_span, error_code& ec)
 		{

@@ -36,7 +36,6 @@ namespace aquarius
 			virtual void commit_command_header(flex_buffer& buffer) override
 			{
 				binary_parse().to_datas(this_router, buffer);
-				binary_parse().to_datas(this->sequence(), buffer);
 			}
 		};
 	} // namespace virgo
