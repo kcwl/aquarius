@@ -36,16 +36,21 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 	auto sql1 = aquarius::tbl::insert(p);
 
-	BOOST_TEST(sql1 == "insert into personal values(1,1)");
+	BOOST_TEST(sql1 == "insert into personal(age,sex) values(1,1)");
 
 	auto sql3 = aquarius::tbl::remove(p);
 
 	BOOST_TEST(sql3 == "delete from personal");
 
+	p.age.set_condition(1);
+	p.sex.set_condition(1);
+
 	auto sql2 = aquarius::tbl::update(p);
 
 	BOOST_TEST(sql2 == "update personal set age=1 and sex=1");
 
+	p.age.clear();
+	p.sex.clear();
 	auto sql = aquarius::tbl::select<personal>(p);
 
 	BOOST_TEST(sql == "select * from personal");

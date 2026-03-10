@@ -30,12 +30,12 @@ namespace aquarius
 		using callback_func = std::function<aquarius::awaitable<void>(std::shared_ptr<Session>)>;
 
 	public:
-		explicit basic_server(uint16_t port, int32_t io_service_pool_size, const std::string& name = {},
+		explicit basic_server(int32_t port, int32_t io_service_pool_size, const std::string& name = {},
 							  std::chrono::milliseconds global_time_dura = 30ms)
 			: io_service_pool_size_(io_service_pool_size)
 			, io_service_pool_(io_service_pool_size_)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), detail::make_v4_endpoint(port))
+			, acceptor_(io_service_pool_.get_io_service(), detail::make_v4_endpoint(static_cast<uint16_t>(port)))
 			, server_name_(name)
 			, global_timer_(io_service_pool_.get_io_service(), global_time_dura)
 		{
@@ -47,12 +47,13 @@ namespace aquarius
 
 			co_spawn(acceptor_.get_executor(), start_accept(), detached);
 
-			module_router::get_mutable_instance().run();
-
-			[[maybe_unused]] static aquarius::logger __auto_init_log;
+			module_router::get_mutable_instance().run(io_service_pool_);
 		}
 
-		~basic_server() = default;
+		~basic_server()
+		{
+			module_router::get_mutable_instance().close();
+		}
 
 	public:
 		void run()
@@ -130,7 +131,7 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
 
-				//co_await mpc_insert_session(session_ptr);
+				// co_await mpc_insert_session(session_ptr);
 
 				co_spawn(
 					acceptor_.get_executor(),
@@ -151,7 +152,6 @@ namespace aquarius
 							close_func(session_ptr);
 						}
 
-						session_ptr->shutdown();
 						session_ptr->close();
 					},
 					detached);

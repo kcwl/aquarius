@@ -1,15 +1,15 @@
 #pragma once
 #include "default_selector.hpp"
-#include "transfer_handler.hpp"
 #include <aquarius/basic_server.hpp>
 #include <aquarius/ip/handler.hpp>
+#include <aquarius/ip/protocol.hpp>
 #include <aquarius/ip/server_session.hpp>
 
 namespace aquarius
 {
 	namespace gateway
 	{
-		using transfer_server_session = custom_server_session<proto::http, transfer_selector>;
+		using transfer_server_session = server_session<http_protocol, transfer_selector>;
 
 		using server = aquarius::basic_server<transfer_server_session>;
 	} // namespace gateway

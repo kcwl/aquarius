@@ -16,11 +16,4 @@ BOOST_AUTO_TEST_CASE(errors)
 	BOOST_TEST(aquarius::virgo::from_method_string(aquarius::virgo::http_method(-1)) == "UNKNOWN");
 }
 
-BOOST_AUTO_TEST_CASE(method_streams)
-{
-	std::cout << aquarius::virgo::http_method::get;
-
-	BOOST_TEST(!std::cout.eof());
-}
-
 BOOST_AUTO_TEST_SUITE_END()

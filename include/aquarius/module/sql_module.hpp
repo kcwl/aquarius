@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/module/module.hpp>
+#include <aquarius/module/schedule.hpp>
 #include <aquarius/tbl/generate_view.hpp>
 #include <aquarius/tbl/mysql.hpp>
 
@@ -10,12 +11,14 @@ namespace aquarius
 		using service = tbl::mysql;
 
 	public:
-		sql_module(io_context& io, const std::string& name)
-			: _module<sql_module, database_param>(io, name)
+		sql_module(const std::string& name)
+			: _module<sql_module, database_param>(name)
 			, index_(0)
 			, mutex_()
 			, connector_(nullptr)
 		{}
+
+		virtual ~sql_module() = default;
 
 	public:
 		virtual bool init() override
@@ -32,7 +35,9 @@ namespace aquarius
 			params.database = configs().db;
 			params.ssl = boost::mysql::ssl_mode::disable;
 
-			connector_ = std::make_shared<service>(this->get_executor(), std::move(params));
+			auto executor = co_await this_coro::executor;
+
+			connector_ = std::make_shared<service>(executor, std::move(params));
 
 			connector_->async_run();
 

@@ -2,29 +2,28 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/protocol.hpp>
 #include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
-	template <auto Tag, template<bool,typename,typename>typename Adaptor>
-	class basic_session
+	template <typename Protocol, template <typename> typename Adaptor>
+	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
 	{
 	public:
-		using socket = typename protocol<Tag>::socket;
+		using socket = typename Protocol::socket;
 
-		using endpoint = typename protocol<Tag>::endpoint;
+		using endpoint = typename Protocol::endpoint;
 
-		using acceptor = typename protocol<Tag>::acceptor;
+		using acceptor = typename Protocol::acceptor;
 
-		using resolver = typename protocol<Tag>::resolver;
+		using resolver = typename Protocol::resolver;
 
 		using duration = std::chrono::system_clock::duration;
 
-		using adaptor_t = Adaptor<true, socket, resolver>;
+		using adaptor_t = Adaptor<socket>;
 
 	public:
-		explicit basic_session(socket _socket, duration timeout)
+		explicit basic_session(socket _socket, duration timeout, duration)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)
@@ -46,7 +45,9 @@ namespace aquarius
 
 		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
 		{
-			auto ec = co_await socket_adaptor_.async_connect(host, port, timeout_);
+			resolver resolve(this->get_executor());
+
+			auto ec = co_await socket_adaptor_.async_connect(resolve.resolve(host, port), timeout_);
 
 			if (ec)
 			{
@@ -78,7 +79,7 @@ namespace aquarius
 			auto mutable_buffer = buffer.prepare(length);
 
 			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-									  redirect_error(use_awaitable, ec));
+											 redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{
@@ -98,7 +99,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
+			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
 												   redirect_error(use_awaitable, ec));
 
 			if (ec)
@@ -113,7 +114,7 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto async_send(const flex_buffer& buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer&& buffer) -> awaitable<error_code>
 		{
 			error_code ec{};
 
@@ -131,7 +132,7 @@ namespace aquarius
 			co_return ec;
 		}
 
-		bool shutdown()
+		bool close()
 		{
 			error_code ec;
 
@@ -141,13 +142,6 @@ namespace aquarius
 			{
 				XLOG_ERROR() << "[shutdown] error: " << ec.what();
 			}
-
-			return !ec;
-		}
-
-		bool close()
-		{
-			error_code ec;
 
 			socket_.close(ec);
 
@@ -163,7 +157,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<Tag>::keep_alive(enable), ec);
+			socket_.set_option(typename Protocol::keep_alive(enable), ec);
 
 			if (ec)
 			{
@@ -177,7 +171,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.set_option(typename protocol<Tag>::no_delay(enable), ec);
+			socket_.set_option(typename Protocol::no_delay(enable), ec);
 
 			if (ec)
 			{
@@ -185,6 +179,16 @@ namespace aquarius
 			}
 
 			return !ec;
+		}
+
+		auto accept() -> awaitable<error_code>
+		{
+			co_return co_await Protocol::accept(this->socket_adaptor_, this->timeout_, this->shared_from_this());
+		}
+
+		auto query(error_code& ec) -> awaitable<flex_buffer>
+		{
+			co_return co_await Protocol::query(this->shared_from_this(), ec);
 		}
 
 	protected:

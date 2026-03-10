@@ -5,11 +5,9 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		firewall_module::firewall_module(const std::string& name)
-			: no_config_module<firewall_module>(name)
-		{
-
-		}
+		firewall_module::firewall_module(io_context& io, const std::string& name)
+			: no_config_module<firewall_module>(io, name)
+		{}
 
 		bool firewall_module::init()
 		{

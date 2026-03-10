@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE UnitTest
 #include <boost/test/unit_test.hpp>
-//#include <aquarius.hpp>
-#include "ctx_handler.hpp"
+#include <aquarius.hpp>
+#include "test.virgo.h"
 
 using namespace std::chrono_literals;
 
@@ -24,9 +24,9 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8100");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8100);
 
-			BOOST_CHECK(is_connect);
+			BOOST_CHECK(!is_connect);
 
 			auto req = std::make_shared<login_request>();
 			req->header().uuid(1);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 	std::thread t1([&] { io.run(); });
 
-	auto status = future.wait_for(20s);
+	auto status = future.wait_for(10s);
 
 	BOOST_CHECK(status == std::future_status::ready);
 
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8099");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8099);
 
-			BOOST_TEST(is_connect);
+			BOOST_TEST(!is_connect);
 
 			auto req = std::make_shared<new_http_login_request>();
 			req->body().uuid = 1;
@@ -109,7 +109,9 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 	std::thread t1([&] { io.run(); });
 
-	future.get();
+	auto status = future.wait_for(10s);
+
+	BOOST_CHECK(status == std::future_status::ready);
 
 	io.stop();
 
@@ -136,9 +138,9 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 		io,
 		[cli] -> aquarius::awaitable<void>
 		{
-			auto is_connect = co_await cli->async_connect("127.0.0.1", "8080");
+			auto is_connect = co_await cli->async_connect("127.0.0.1", 8080);
 
-			BOOST_TEST(is_connect);
+			BOOST_TEST(!is_connect);
 
 			auto req = std::make_shared<http_test_get_request>();
 			req->body().user = 12345;
@@ -154,7 +156,9 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 	std::thread t1([&] { io.run(); });
 
-	future.get();
+	auto status = future.wait_for(10s);
+
+	BOOST_CHECK(status == std::future_status::ready);
 
 	io.stop();
 

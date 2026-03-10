@@ -6,10 +6,10 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		auto mpc_auth(std::string_view module_name, const std::string& user, const std::string& passwd)
+		auto mpc_auth(const std::string& user, const std::string& passwd)
 			-> awaitable<bool>
 		{
-			co_return co_await mpc::call<bool, auth_module>(module_name, [&](auth_module* op_ptr) -> awaitable<bool>
+			co_return co_await mpc::call<bool, auth_module>([&](auth_module* op_ptr) -> awaitable<bool>
 															{ co_return co_await op_ptr->auth(user, passwd); });
 		}
 	} // namespace gateway

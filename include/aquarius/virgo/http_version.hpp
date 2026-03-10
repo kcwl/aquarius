@@ -42,6 +42,25 @@ namespace aquarius
 
 			return "Unknown";
 		}
+		
+		inline int32_t from_int_version(http_version v)
+		{
+			switch (v)
+			{
+				case http_version::http1_0:
+					return 1010;
+				case http_version::http1_1:
+					return 1011;
+				case http_version::http2:
+					return 2000;
+				case http_version::http3:
+					return 3000;
+				default:
+					break;
+			}
+
+			return 0;
+		}
 
 		inline http_version from_version_string(std::string_view s)
 		{

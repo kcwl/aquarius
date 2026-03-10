@@ -7,8 +7,7 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		auto mpc_auth(std::string_view module_name, const std::string& user, const std::string& passwd)
-			-> awaitable<bool>;
+		auto mpc_auth(const std::string& user, const std::string& passwd) -> awaitable<bool>;
 
 	} // namespace gateway
 } // namespace aquarius

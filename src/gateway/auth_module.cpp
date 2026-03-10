@@ -1,14 +1,14 @@
 #include "auth_module.h"
-#include "table/account_table.h"
+#include "table/account.tbl.h"
 #include <aquarius/module/module_router.hpp>
-#include <aquarius/module/sql_schedule.hpp>
+#include <aquarius/module/sql_module.hpp>
 
 namespace aquarius
 {
 	namespace gateway
 	{
-		auth_module::auth_module(const std::string& name)
-			: no_config_module<auth_module>(name)
+		auth_module::auth_module(io_context& io, const std::string& name)
+			: no_config_module<auth_module>(io, name)
 		{}
 
 		auto auth_module::auth(const std::string& username, const std::string& password) -> awaitable<bool>

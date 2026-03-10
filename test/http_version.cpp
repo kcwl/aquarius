@@ -12,11 +12,4 @@ BOOST_AUTO_TEST_CASE(version)
 	BOOST_TEST(aquarius::virgo::from_string_version(aquarius::virgo::http_version::http3) == "HTTP/3");
 }
 
-BOOST_AUTO_TEST_CASE(version_streams)
-{
-	std::cout << aquarius::virgo::http_version::http1_0;
-
-	BOOST_TEST(!std::cout.eof());
-}
-
 BOOST_AUTO_TEST_SUITE_END()

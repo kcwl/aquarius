@@ -6,7 +6,16 @@
 
 namespace aquarius
 {
-	template <typename T, typename Config>
+	struct no_config
+	{
+		constexpr static std::string_view path = "empty"sv;
+
+		bool enable()
+		{
+			return true;
+		}
+	};
+	template <typename T, typename Config = no_config>
 	class _module : public basic_module<T>
 	{
 		using base = basic_module<T>;
@@ -17,8 +26,8 @@ namespace aquarius
 		constexpr static std::string_view config_path = config_type::path;
 
 	public:
-		_module(io_context& io, const std::string& name)
-			: base(io, name)
+		_module(const std::string& name)
+			: base(name)
 		{}
 
 		virtual ~_module() = default;
@@ -33,9 +42,9 @@ namespace aquarius
 
 			if (!std::filesystem::exists(path))
 			{
-				XLOG_ERROR() << "module[" << this->name() << "] config file not exsit! path:" << path;
+				XLOG_INFO() << "module[" << this->name() << "] config file not exsit and then skip! path:" << path;
 
-				return false;
+				return true;
 			}
 
 			try
@@ -69,7 +78,7 @@ namespace aquarius
 
 		virtual bool enable() override
 		{
-			return true;
+			return config_.enable();
 		}
 
 		virtual void timer(std::chrono::milliseconds) override
@@ -84,25 +93,5 @@ namespace aquarius
 
 	private:
 		Config config_;
-	};
-
-	struct no_config
-	{
-		constexpr static std::string_view path = "empty"sv;
-	};
-
-	template <typename Core>
-	class no_config_module : public _module<Core, no_config>
-	{
-	public:
-		no_config_module(io_context& io, const std::string& name)
-			: _module<Core, no_config>(io, name)
-		{}
-
-	public:
-		virtual bool config() override
-		{
-			return true;
-		}
 	};
 } // namespace aquarius

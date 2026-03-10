@@ -1,99 +1,81 @@
 #pragma once
-#include <aquarius/basic_protocol.hpp>
+#include <aquarius/virgo/basic_tcp_protocol.hpp>
+#include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <aquarius/virgo/http_version.hpp>
+#include <ranges>
+#include <span>
 
 namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
-		class basic_http_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>,
-									public header_fields
+		template <bool Request, virgo::http_method Method, typename Body, typename Allocator = std::allocator<Body>>
+		class basic_http_protocol : public basic_tcp_protocol<Request, http_header, Body, Allocator>
 		{
 		public:
-			using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+			using base = basic_tcp_protocol<Request, http_header, Body, Allocator>;
 
-			using header_field_type = header_fields;
-
-			constexpr static auto has_request = Request;
+			using base::has_request;
 
 		public:
 			basic_http_protocol() = default;
 
 			virtual ~basic_http_protocol() = default;
 
-			basic_http_protocol(const basic_http_protocol& other) = default;
+			basic_http_protocol(const basic_http_protocol&) = delete;
 
-			basic_http_protocol& operator=(const basic_http_protocol& other) = default;
+			basic_http_protocol& operator=(const basic_http_protocol&) = delete;
 
-			basic_http_protocol(basic_http_protocol&& other) noexcept = default;
+			basic_http_protocol(basic_http_protocol&&) noexcept = default;
 
-			basic_http_protocol& operator=(basic_http_protocol&& other) noexcept = default;
-
-		public:
-			bool operator==(const basic_http_protocol& other) const
-			{
-				return base::operator==(other) && header_field_type::operator==(other);
-			}
-
-			std::ostream& operator<<(std::ostream& os) const
-			{
-				os << this->header() << " " << this->body();
-
-				return os;
-			}
+			basic_http_protocol& operator=(basic_http_protocol&&) noexcept = default;
 
 		public:
-			bool keep_alive()
+			virtual error_code commit(flex_buffer& buffer) override
 			{
-				auto value = this->find("Connection");
+				this->commit_command_header(buffer);
 
-				return value == "keep-alive" ? true : false;
-			}
+				flex_buffer buf{};
 
-			void keep_alive(bool k)
-			{
-				this->set_field("Connection", k ? "keep-alive" : "close");
-			}
-
-			std::string header_field() const
-			{
-				std::string headline{};
-
-				for (auto& s : this->fields_)
+				if constexpr (Method != virgo::http_method::get)
 				{
-					headline += std::format("{}: {}\r\n", s.first, s.second);
+					this->body().serialize(buf);
+
+					if (buf.size() > 2)
+					{
+						this->header().content_length(buf.size());
+					}
 				}
 
-				return headline;
+				auto ec = this->header().serialize(buffer);
+
+				if (!ec)
+				{
+					if constexpr (Method != virgo::http_method::get)
+					{
+						if (this->header().content_length() != 0)
+						{
+							buffer.sputn((char*)buf.data().data(), buf.size());
+						}
+					}
+				}
+
+				return ec;
 			}
 
-			void set_header(const std::string& key, const std::string& value)
+			virtual bool consume(flex_buffer& buffer, int ver = 0) override
 			{
-				this->set_field(key, value);
-			}
+				this->version(ver);
 
-			std::string content_type() const
-			{
-				return this->find("Content-Type");
-			}
+				if (this->header().deserialize(buffer))
+				{
+					return false;
+				}
 
-		protected:
-			void serialize_custom_header(flex_buffer& value)
-			{
-				this->set_field("Aquarius-Header", std::string((char*)value.data().data(), value.size()));
-			}
+				this->body().deserialize(buffer);
 
-			flex_buffer deserialize_custom_header() const
-			{
-				flex_buffer buffer{};
-
-				auto value = find("Aquarius-Header");
-
-				buffer.sputn(value.data(), value.size());
-
-				return std::move(buffer);
+				return true;
 			}
 		};
 	} // namespace virgo

@@ -1,9 +1,9 @@
 #pragma once
-#include <aquarius/ip/raw_socket_adaptor.hpp>
-#include <aquarius/ip/session.hpp>
+#include <aquarius/basic_session.hpp>
+#include <aquarius/ip/adaptor/raw_socket_adaptor.hpp>
 
 namespace aquarius
 {
-	template <auto Tag, typename Selector>
-	using server_session = session<Tag, raw_socket_adaptor, Selector>;
+	template <typename Protocol>
+	using server_session = basic_session<Protocol, raw_socket_adaptor>;
 } // namespace aquarius

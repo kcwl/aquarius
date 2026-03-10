@@ -8,6 +8,11 @@ namespace aquarius
 	{
 		constexpr static auto path = "http"sv;
 
+		bool enable()
+		{
+			return true;
+		}
+
 		std::string root_dir;
 		std::string control_allow_origin;
 		// virgo::http_version version = virgo::http_version::http1_1;
@@ -17,8 +22,8 @@ namespace aquarius
 	class http_config_module : public aquarius::_module<http_config_module, aquarius::http_param>
 	{
 	public:
-		http_config_module(io_context& io, const std::string& name)
-			: _module<http_config_module, aquarius::http_param>(io, name)
+		http_config_module(const std::string& name)
+			: _module<http_config_module, aquarius::http_param>(name)
 		{}
 
 	public:
@@ -40,18 +45,18 @@ namespace aquarius
 
 	inline auto mpc_http_version() -> awaitable<std::string>
 	{
-		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
-														 { co_return ptr->get_version(); });
+		co_return co_await mpc::call<std::string, http_config_module>(
+			[](http_config_module* ptr) -> awaitable<std::string> { co_return ptr->get_version(); });
 	}
 
 	inline auto mpc_http_origin() -> awaitable<std::string>
 	{
-		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
-														 { co_return ptr->get_origin(); });
+		co_return co_await mpc::call<std::string, http_config_module>(
+			[](http_config_module* ptr) -> awaitable<std::string> { co_return ptr->get_origin(); });
 	}
 	inline auto mpc_http_root() -> awaitable<std::string>
 	{
-		co_return co_await mpc::call<std::string, http_config_module>([](http_config_module* ptr) -> awaitable<std::string>
-														 { co_return ptr->get_root_dir(); });
+		co_return co_await mpc::call<std::string, http_config_module>(
+			[](http_config_module* ptr) -> awaitable<std::string> { co_return ptr->get_root_dir(); });
 	}
 } // namespace aquarius

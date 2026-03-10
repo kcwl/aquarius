@@ -1,0 +1,5 @@
+model account
+{
+	string account;
+	string passwd;
+}

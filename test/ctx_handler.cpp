@@ -1,11 +1,4 @@
-#pragma once
-#include <cstdint>
-#include <string>
-#include <vector>
-#include <string_view>
 #include "test.virgo.h"
-
-using namespace std::string_view_literals;
 
 AQUARIUS_HANDLER(login_request, login_response, ctx_tcp_test)
 {
@@ -19,6 +12,7 @@ AQUARIUS_HANDLER(login_request, login_response, ctx_tcp_test)
 
 AQUARIUS_HANDLER(new_http_login_request, new_http_login_response, ctx_test_http_hander)
 {
+	response().body().uuid = request()->body().uuid;
 	response().body().per_resp = request()->body().per_req;
 
 	co_return aquarius::virgo::http_status::ok;

@@ -9,7 +9,7 @@ namespace aquarius
 		class auth_module : public no_config_module<auth_module>
 		{
 		public:
-			auth_module(const std::string& name);
+			auth_module(io_context& io, const std::string& name);
 
 		public:
 			auto auth(const std::string& username, const std::string& password) ->awaitable<bool>;

@@ -1,13 +1,10 @@
-﻿#include "player_schedule.h"
-#include "server.hpp"
-#include "transfer_module.h"
+﻿#include "server.hpp"
 #include "transfer_module.h"
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/ip/http/http_client.hpp>
 #include <aquarius/logger.hpp>
 #include <iostream>
-
-TRANSFER_HANDLER(aquarius::gateway::transfer_server_session, aquarius::gateway::transfer_module)
+#include "player.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,11 +23,11 @@ int main(int argc, char* argv[])
 
 	srv.set_accept_func(
 		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
-		{ co_await aquarius::gateway::mpc_insert_player(session_ptr->uuid()); });
+		{ co_await aquarius::mpc_player_insert(session_ptr->uuid(), std::make_shared<aquarius::gateway::player>(session_ptr->uuid())); });
 
 	srv.set_close_func(
 		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
-		{ co_await aquarius::gateway::mpc_erase_player(session_ptr->uuid()); });
+		{ co_await aquarius::mpc_player_erase<aquarius::gateway::server::session_type>(session_ptr->uuid()); });
 
 	srv.run();
 

@@ -66,14 +66,3 @@ login_resp_body tag_invoke(const aquarius::json::value_to_tag<login_resp_body>&,
 		return {};
 	return result;
 }
-
-std::ostream& operator<<(std::ostream& os, const login_req_body& other)
-{
-	os << other.user<< other.passwd;
-	return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const login_resp_body& other)
-{
-	return os;
-}
