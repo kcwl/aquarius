@@ -221,9 +221,10 @@ namespace aquarius
 
 			ec = co_await recv(session_ptr, buffer);
 
-			if (ec != boost::asio::error::eof)
+			if (ec)
 			{
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
+				co_return flex_buffer{};
 			}
 
 			co_return std::move(buffer);
