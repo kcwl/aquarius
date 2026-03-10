@@ -30,6 +30,33 @@ namespace aquarius
 			http_response(http_response&&) noexcept = default;
 			http_response& operator=(http_response&&) noexcept = default;
 
+		public:
+			virtual error_code commit(flex_buffer& buffer) override
+			{
+				this->commit_command_header(buffer);
+
+				flex_buffer buf{};
+
+				this->body().serialize(buf);
+
+				if (buf.size() > 2)
+				{
+					this->header().content_length(buf.size());
+				}
+
+				auto ec = this->header().serialize(buffer);
+
+				if (!ec)
+				{
+					if (this->header().content_length() != 0)
+					{
+						buffer.sputn((char*)buf.data().data(), buf.size());
+					}
+				}
+
+				return ec;
+			}
+
 		protected:
 			virtual void commit_command_header(flex_buffer& buffer) override
 			{

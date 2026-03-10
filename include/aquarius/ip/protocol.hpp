@@ -47,12 +47,6 @@ namespace aquarius
 
 					auto router = binary_parse{}.from_datas<std::string>(buffer);
 
-					auto pos = buffer.tellg();
-
-					uint32_t seq = binary_parse{}.from_datas<uint32_t>(buffer);
-
-					buffer.pubseekpos(pos, std::ios::out);
-
 					XLOG_INFO() << "[accept] parse protocol router: " << router;
 
 					co_spawn(
@@ -171,9 +165,14 @@ namespace aquarius
 
 				auto [method, url, version] = parse_command_line<true>(std::span<char>(header_line), ec);
 
+				if (method == virgo::http_method::get)
+				{
+					buffer.sputn(url->params().buffer().data(), url->params().buffer().size());
+				}
+
 				std::string router(std::string_view(url->path().data(), url->path().size()));
 
-				auto ec = co_await recv(session_ptr, buffer);
+				ec = co_await recv(session_ptr, buffer);
 
 				co_spawn(
 					session_ptr->get_executor(),
