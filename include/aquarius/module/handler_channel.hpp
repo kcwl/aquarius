@@ -4,6 +4,7 @@
 #include <aquarius/singleton.hpp>
 #include <expected>
 #include <vector>
+#include <shared_mutex>
 
 namespace aquarius
 {
