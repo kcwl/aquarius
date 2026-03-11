@@ -4,6 +4,8 @@
 #include <functional>
 #include <map>
 
+using namespace std::string_view_literals;
+
 namespace aquarius
 {
 	namespace lazytool
@@ -11,6 +13,9 @@ namespace aquarius
 		class protocol_schema : public schema_parser
 		{
 			using func_t = std::function<void(std::fstream&, const std::string&)>;
+
+			constexpr static auto req_body_suffix = "_req_body"sv;
+			constexpr static auto resp_body_suffix = "_resp_body"sv;
 
 		public:
 			protocol_schema();

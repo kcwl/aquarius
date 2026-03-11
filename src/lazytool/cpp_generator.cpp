@@ -9,8 +9,13 @@ namespace aquarius
 		{
 			bool result = true;
 
+			header << "#pragma once;\n";
+			header << "#include <aquarius.hpp>\n";
+
 			for (const auto& field : fields)
 			{
+				header << "\n";
+
 				if (field->type() == struct_type::message)
 				{
 					result = generate_message(header, source, std::dynamic_pointer_cast<message_field>(field));
@@ -58,6 +63,8 @@ namespace aquarius
 
 			generate_member_variable_define(header, field_ptr, end);
 
+			header << "};\n";
+
 			return true;
 		}
 
@@ -83,6 +90,8 @@ namespace aquarius
 
 			scope_public(ofs);
 			generate_member_variable_define(ofs, field_ptr, ';');
+
+			ofs << "};\n";
 
 			return true;
 		}

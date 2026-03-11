@@ -1,3 +1,6 @@
+#pragma once;
+#include <aquarius.hpp>
+
 struct person
 {
 	bool operator==(const person & other) const; 
@@ -11,14 +14,16 @@ struct person
 	double mana;
 	string name;
 	bytes orders;
-struct login : public aquarius::tcp_binary_serialize
+};
+
+struct login_req_body : public aquarius::tcp_binary_serialize
 {
 public:
-	login();
-	virtual ~login() = default;
+	login_req_body();
+	virtual ~login_req_body() = default;
 
 public:
-	bool operator==(const login & other) const; 
+	bool operator==(const login_req_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -27,14 +32,15 @@ public:
 
 public:
 	person per_req;
-struct login : public aquarius::tcp_binary_serialize
+};
+struct login_resp_body : public aquarius::tcp_binary_serialize
 {
 public:
-	login();
-	virtual ~login() = default;
+	login_resp_body();
+	virtual ~login_resp_body() = default;
 
 public:
-	bool operator==(const login & other) const; 
+	bool operator==(const login_resp_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -43,14 +49,16 @@ public:
 
 public:
 	person per_resp;
-struct http_test_post : public aquarius::http_json_serialize
+};
+
+struct http_test_post_req_body : public aquarius::http_json_serialize
 {
 public:
-	http_test_post();
-	virtual ~http_test_post() = default;
+	http_test_post_req_body();
+	virtual ~http_test_post_req_body() = default;
 
 public:
-	bool operator==(const http_test_post & other) const; 
+	bool operator==(const http_test_post_req_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -60,14 +68,15 @@ public:
 public:
 	int32 uuid;
 	person per_req;
-struct http_test_post : public aquarius::http_json_serialize
+};
+struct http_test_post_resp_body : public aquarius::http_json_serialize
 {
 public:
-	http_test_post();
-	virtual ~http_test_post() = default;
+	http_test_post_resp_body();
+	virtual ~http_test_post_resp_body() = default;
 
 public:
-	bool operator==(const http_test_post & other) const; 
+	bool operator==(const http_test_post_resp_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -77,14 +86,16 @@ public:
 public:
 	int32 uuid;
 	person per_resp;
-struct http_test_get : public aquarius::http_kv_serialize
+};
+
+struct http_test_get_req_body : public aquarius::http_kv_serialize
 {
 public:
-	http_test_get();
-	virtual ~http_test_get() = default;
+	http_test_get_req_body();
+	virtual ~http_test_get_req_body() = default;
 
 public:
-	bool operator==(const http_test_get & other) const; 
+	bool operator==(const http_test_get_req_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -94,14 +105,15 @@ public:
 public:
 	int32 user;
 	string passwd;
-struct http_test_get : public aquarius::http_json_serialize
+};
+struct http_test_get_resp_body : public aquarius::http_json_serialize
 {
 public:
-	http_test_get();
-	virtual ~http_test_get() = default;
+	http_test_get_resp_body();
+	virtual ~http_test_get_resp_body() = default;
 
 public:
-	bool operator==(const http_test_get & other) const; 
+	bool operator==(const http_test_get_resp_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -111,3 +123,4 @@ public:
 public:
 	int32 user;
 	string passwd;
+};

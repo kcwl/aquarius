@@ -233,12 +233,12 @@ namespace aquarius
 
 				if (value == "request")
 				{
-					field_ptr->request()->set_name(field_ptr->name());
+					field_ptr->request()->set_name(field_ptr->name() + req_body_suffix.data());
 					result = parse_data_field(ifs, field_ptr->request(), true);
 				}
 				else if (value == "response")
 				{
-					field_ptr->response()->set_name(field_ptr->name());
+					field_ptr->response()->set_name(field_ptr->name() + resp_body_suffix.data());
 					result = parse_data_field(ifs, field_ptr->response(), true);
 				}
 				else
@@ -295,7 +295,7 @@ namespace aquarius
 					return false;
 				}
 
-				auto value = read_value<token::name, ' ', ';'>(ifs, end);
+				value = read_value<token::name, ' ', ';'>(ifs, end);
 
 				field_ptr->add_field(type, value);
 			}

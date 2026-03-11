@@ -19,9 +19,6 @@ namespace aquarius
 				object
 			};
 
-			constexpr static auto req_body_suffix = "_req_body"sv;
-			constexpr static auto resp_body_suffix = "_resp_body"sv;
-
 		public:
 			cpp_generator() = default;
 			virtual ~cpp_generator() = default;
