@@ -11,7 +11,7 @@ struct person
 	bytes orders;
 }
 
-message login:tcp -> 10001
+message login -> 10001
 {
 	request
 	{
@@ -23,7 +23,7 @@ message login:tcp -> 10001
 	}
 }
 
-message new_http_login:http[post] -> /login/new
+message http_test_post[post] -> /login/new
 {
 	request
 	{
@@ -37,7 +37,7 @@ message new_http_login:http[post] -> /login/new
 	}
 }
 
-message http_test_get:http[get] -> /login
+message http_test_get[get] -> /login
 {
 	request
 	{
