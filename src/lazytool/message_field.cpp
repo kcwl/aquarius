@@ -6,8 +6,8 @@ namespace aquarius
 	{
 		message_field::message_field(struct_type s)
 			: field(s)
-			, request_ptr_(new data_field(struct_type::structure))
-			, response_ptr_(new data_field(struct_type::structure))
+			, request_ptr_(new data_field(struct_type::message))
+			, response_ptr_(new data_field(struct_type::message))
 			, router_()
 			, method_()
 		{}

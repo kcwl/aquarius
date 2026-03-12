@@ -16,7 +16,7 @@ struct person
 	bytes orders;
 };
 
-struct login_req_body : public aquarius::tcp_binary_serialize
+class login_req_body : public aquarius::tcp_binary_serialize
 {
 public:
 	login_req_body();
@@ -33,7 +33,7 @@ public:
 public:
 	person per_req;
 };
-struct login_resp_body : public aquarius::tcp_binary_serialize
+class login_resp_body : public aquarius::tcp_binary_serialize
 {
 public:
 	login_resp_body();
@@ -51,7 +51,7 @@ public:
 	person per_resp;
 };
 
-struct http_test_post_req_body : public aquarius::http_json_serialize
+class http_test_post_req_body : public aquarius::http_json_serialize
 {
 public:
 	http_test_post_req_body();
@@ -69,7 +69,7 @@ public:
 	int32 uuid;
 	person per_req;
 };
-struct http_test_post_resp_body : public aquarius::http_json_serialize
+class http_test_post_resp_body : public aquarius::http_json_serialize
 {
 public:
 	http_test_post_resp_body();
@@ -88,7 +88,7 @@ public:
 	person per_resp;
 };
 
-struct http_test_get_req_body : public aquarius::http_kv_serialize
+class http_test_get_req_body : public aquarius::http_kv_serialize
 {
 public:
 	http_test_get_req_body();
@@ -106,7 +106,7 @@ public:
 	int32 user;
 	string passwd;
 };
-struct http_test_get_resp_body : public aquarius::http_json_serialize
+class http_test_get_resp_body : public aquarius::http_json_serialize
 {
 public:
 	http_test_get_resp_body();
