@@ -70,6 +70,11 @@ namespace aquarius
 					return false;
 				}
 
+				header << "#pragma once\n";
+				header << "#include <aquarius.hpp>\n";
+
+				source << "#include \"" << target_path.filename().string() << ".h\"\n";
+
 				it->second->run(header, source, datas);
 			}
 

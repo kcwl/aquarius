@@ -2,6 +2,7 @@
 #include "code_generator.h"
 #include "message_field.h"
 #include <string_view>
+#include <set>
 
 using namespace std::string_view_literals;
 
@@ -38,7 +39,7 @@ namespace aquarius
 
 			bool generate_header(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
-			bool generate_inheritance_serialize_define(std::fstream& ofs, const std::string& method,
+			bool generate_inheritance_serialize_define(std::fstream& ofs, const std::string& method, bool& has_json,
 													   bool has_response = false);
 
 			bool generate_construction_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
@@ -74,9 +75,9 @@ namespace aquarius
 
 			void generate_from_tag(std::fstream& ofs, std::shared_ptr<data_field> parser);
 
-			void generate_json_from_define(std::fstream& ofs, std::shared_ptr<data_field> data_ptr);
+			void generate_json_from_define(std::fstream& ofs, const std::string& field_name);
 
-			void generate_json_to_define(std::fstream& ofs, std::shared_ptr<data_field> data_ptr);
+			void generate_json_to_define(std::fstream& ofs, const std::string& field_name);
 
 			bool generator_array_stream(std::fstream& ofs, const std::string& type, const std::string& name);
 
@@ -106,6 +107,9 @@ namespace aquarius
 			void generate_model_member_func(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
 			void generate_model_member_name_func(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
+
+		private:
+			std::set<std::string> json_generator_;
 		};
 	} // namespace lazytool
 } // namespace aquarius

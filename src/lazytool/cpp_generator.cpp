@@ -32,6 +32,23 @@ namespace aquarius
 
 			header << "\n";
 
+			for (auto& name : json_generator_)
+			{
+				generate_json_from_define(header, name);
+				generate_json_to_define(header, name);
+
+				auto iter = std::find_if(fields.begin(), fields.end(),
+										 [&](std::shared_ptr<field> field_ptr) { return name == field_ptr->name(); });
+
+				if (iter == fields.end())
+				{
+					continue;
+				}
+
+				generate_from_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
+				generate_to_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
+			}
+
 			for (const auto& field : fields)
 			{
 				if (field->type() == struct_type::message)
@@ -43,6 +60,26 @@ namespace aquarius
 					}
 
 					generate_protocol_alias_define(header, message_field_ptr);
+				}
+			}
+
+			for (const auto& field : fields)
+			{
+				generate_json_from_define(header, field->name());
+				generate_json_to_define(header, field->name());
+
+				if (field->type() == struct_type::message)
+				{
+					auto field_ptr = std::dynamic_pointer_cast<message_field>(field);
+
+					if (field_ptr->method() != "get")
+					{
+						generate_from_tag(source, field_ptr->request());
+						generate_to_tag(source, field_ptr->request());
+					}
+
+					generate_from_tag(source, field_ptr->response());
+					generate_to_tag(source, field_ptr->response());
 				}
 			}
 
@@ -89,7 +126,8 @@ namespace aquarius
 		{
 			generate_header(ofs, field_ptr);
 
-			generate_inheritance_serialize_define(ofs, method, has_response);
+			bool has_json = false;
+			generate_inheritance_serialize_define(ofs, method, has_json, has_response);
 
 			ofs << "{" << std::endl;
 
@@ -134,8 +172,8 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::generate_inheritance_serialize_define(std::fstream& ofs,
-																  const std::string& method, bool has_response)
+		bool cpp_generator::generate_inheritance_serialize_define(std::fstream& ofs, const std::string& method,
+																  bool& has_json, bool has_response)
 		{
 			constexpr static auto json_serialize_inheritance = "aquarius::http_json_serialize"sv;
 			constexpr static auto kv_serialize_inheritance = "aquarius::http_kv_serialize"sv;
@@ -151,6 +189,7 @@ namespace aquarius
 			if (m == "post")
 			{
 				ofs << " : public " << json_serialize_inheritance << std::endl;
+				has_json = true;
 			}
 			else if (m == "get")
 			{
@@ -209,6 +248,11 @@ namespace aquarius
 			for (auto& [type, name] : field_ptr->fields())
 			{
 				ofs << "\t" << type << " " << name << end << std::endl;
+
+				if (check_type(type) == json_type::object)
+				{
+					json_generator_.insert(type);
+				}
 			}
 
 			return true;
@@ -216,7 +260,8 @@ namespace aquarius
 
 		bool cpp_generator::generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<message_field> field_ptr)
 		{
-			generate_request_alias_define(ofs, field_ptr->request(), field_ptr->protocol(), field_ptr->router(), field_ptr->method());
+			generate_request_alias_define(ofs, field_ptr->request(), field_ptr->protocol(), field_ptr->router(),
+										  field_ptr->method());
 			generate_response_alias_define(ofs, field_ptr->response(), field_ptr->protocol(), field_ptr->method());
 
 			return true;
@@ -483,21 +528,15 @@ namespace aquarius
 			ofs << "}" << std::endl;
 		}
 
-		void cpp_generator::generate_json_from_define(std::fstream& ofs, std::shared_ptr<data_field> data_ptr)
+		void cpp_generator::generate_json_from_define(std::fstream& ofs, const std::string& field_name)
 		{
-			if (!data_ptr)
-				return;
-
 			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
-				<< data_ptr->name() << "& local);" << std::endl;
+				<< field_name << "& local);" << std::endl;
 		}
 
-		void cpp_generator::generate_json_to_define(std::fstream& ofs, std::shared_ptr<data_field> data_ptr)
+		void cpp_generator::generate_json_to_define(std::fstream& ofs, const std::string& field_name)
 		{
-			if (!data_ptr)
-				return;
-
-			ofs << data_ptr->name() << " tag_invoke(const aquarius::json::value_to_tag<" << data_ptr->name()
+			ofs << field_name << " tag_invoke(const aquarius::json::value_to_tag<" << field_name
 				<< ">&, const aquarius::json::value& jv);" << std::endl;
 		}
 
@@ -710,7 +749,7 @@ namespace aquarius
 		}
 
 		void cpp_generator::generate_model_member_name_func(std::fstream& ofs,
-														 std::shared_ptr<data_field> model_field_ptr)
+															std::shared_ptr<data_field> model_field_ptr)
 		{
 			ofs << "\tconstexpr static auto member_name()\n";
 			ofs << "\t{\n";

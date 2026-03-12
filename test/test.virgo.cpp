@@ -1,3 +1,4 @@
+#include "test.virgo.h"
 login_req_body::login_req_body()
 	: per_req()
 {}
@@ -113,4 +114,122 @@ void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 void http_test_get_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	*this = this->parse_from<http_test_get_resp_body>(buffer); 
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const person& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("sex", local.sex);
+	jv_obj.emplace("addr", local.addr);
+	jv_obj.emplace("age", local.age);
+	jv_obj.emplace("telephone", local.telephone);
+	jv_obj.emplace("score", local.score);
+	jv_obj.emplace("hp", local.hp);
+	jv_obj.emplace("mana", local.mana);
+	jv_obj.emplace("name", local.name);
+	jv_obj.emplace("orders", aquarius::json_value_from_array(local.orders));
+}
+
+person tag_invoke(const aquarius::json::value_to_tag<person>&, const aquarius::json::value& jv)
+{
+	person result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.sex = obj->at("sex").as_bool();
+	result.addr = static_cast<uint32>(obj->at("addr").as_int64());
+	result.age = static_cast<int32>(obj->at("age").as_int64());
+	result.telephone = static_cast<uint64>(obj->at("telephone").as_int64());
+	result.score = obj->at("score").as_int64();
+	result.hp = static_cast<float>(obj->at("hp").as_double());
+	result.mana = obj->at("mana").as_double();
+	result.name = static_cast<string>(obj->at("name").as_string());
+	result.orders = aquarius::json_value_to_array(obj->at("orders"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_req_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
+}
+
+login_req_body tag_invoke(const aquarius::json::value_to_tag<login_req_body>&, const aquarius::json::value& jv)
+{
+	login_req_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.per_req = aquarius::json::value_to<person>(obj->at("per_req"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const login_resp_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
+}
+
+login_resp_body tag_invoke(const aquarius::json::value_to_tag<login_resp_body>&, const aquarius::json::value& jv)
+{
+	login_resp_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_post_req_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid);
+	jv_obj.emplace("per_req", aquarius::json_value_from_object<person>(local.per_req));
+}
+
+http_test_post_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_req_body>&, const aquarius::json::value& jv)
+{
+	http_test_post_req_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	result.per_req = aquarius::json::value_to<person>(obj->at("per_req"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_post_resp_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("uuid", local.uuid);
+	jv_obj.emplace("per_resp", aquarius::json_value_from_object<person>(local.per_resp));
+}
+
+http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_resp_body>&, const aquarius::json::value& jv)
+{
+	http_test_post_resp_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.uuid = static_cast<int32>(obj->at("uuid").as_int64());
+	result.per_resp = aquarius::json::value_to<person>(obj->at("per_resp"));
+	return result;
+}
+
+void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_resp_body& local)
+{
+	auto& jv_obj = jv.emplace_object();
+	jv_obj.emplace("user", local.user);
+	jv_obj.emplace("passwd", local.passwd);
+}
+
+http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&, const aquarius::json::value& jv)
+{
+	http_test_get_resp_body result{};
+	auto obj = jv.try_as_object();
+	if(obj->empty())
+		return {};
+	result.user = static_cast<int32>(obj->at("user").as_int64());
+	result.passwd = static_cast<string>(obj->at("passwd").as_string());
+	return result;
 }
