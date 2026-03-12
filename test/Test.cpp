@@ -1,12 +1,12 @@
 #define BOOST_TEST_MODULE UnitTest
 #include <boost/test/unit_test.hpp>
 #include <aquarius.hpp>
-#include "test.virgo.h"
+#include "test_http.virgo.h"
+#include "test_tcp.virgo.h"
 
 using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE(framework)
-
 
 BOOST_AUTO_TEST_CASE(tcp_flow)
 {
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 			BOOST_TEST(!is_connect);
 
-			auto req = std::make_shared<new_http_login_request>();
+			auto req = std::make_shared<http_test_post_request>();
 			req->body().uuid = 1;
 			req->body().per_req.sex = true;
 			req->body().per_req.addr = 2;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			req->body().per_req.name = "John";
 			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<new_http_login_response>(req);
+			auto resp = co_await cli->async_send<http_test_post_response>(req);
 
 			BOOST_TEST(resp.body().uuid == req->body().uuid);
 

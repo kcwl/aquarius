@@ -1,4 +1,4 @@
-struct person
+struct http_person
 {
 	bool sex;
 	uint32 addr;
@@ -11,29 +11,17 @@ struct person
 	bytes orders;
 }
 
-message login -> 10001
-{
-	request
-	{
-		person per_req;
-	}
-	response
-	{
-		person per_resp;
-	}
-}
-
 message http_test_post[post] -> /login/new
 {
 	request
 	{
 		int32 uuid;
-		person per_req;
+		http_person per_req;
 	}
 	response
 	{
 		int32 uuid;
-		person per_resp;
+		http_person per_resp;
 	}
 }
 

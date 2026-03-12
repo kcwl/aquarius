@@ -1,13 +1,13 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius/serialize/binary.hpp>
-#include "test.virgo.h"
+#include "test_tcp.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
 
 BOOST_AUTO_TEST_CASE(binary)
 {
-	person p{};
+	tcp_person p{};
 
 	aquarius::binary_parse bp{};
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(binary)
 
 	bp.to_datas(p, buffer);
 
-	person p1 = bp.from_datas<person>(buffer);
+	tcp_person p1 = bp.from_datas<tcp_person>(buffer);
 
 	BOOST_CHECK(p1 == p);
 }

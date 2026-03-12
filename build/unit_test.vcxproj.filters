@@ -138,9 +138,6 @@
     <ClInclude Include="..\include\aquarius\tbl.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\test.virgo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\concat.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -327,21 +324,18 @@
     <ClInclude Include="..\include\aquarius\module\handler_channel.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
+    <ClInclude Include="..\test\test_http.virgo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\test_tcp.virgo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\test.virgo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\url.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\client.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\cmd_options.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\detail.cpp">
@@ -411,6 +405,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\ctx_handler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\test_tcp.virgo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\test_http.virgo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

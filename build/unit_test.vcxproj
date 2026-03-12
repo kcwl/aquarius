@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\test_http.virgo.cpp" />
+    <ClCompile Include="..\test\test_tcp.virgo.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
@@ -256,22 +258,20 @@
     <ClCompile Include="..\test\module.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
-    <ClCompile Include="..\test\cmd_options.cpp" />
     <ClCompile Include="..\test\session.cpp" />
     <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
     <ClCompile Include="..\test\sql.cpp" />
-    <ClInclude Include="..\test\test.virgo.h" />
+    <ClInclude Include="..\test\test_http.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />
+    <ClInclude Include="..\test\test_tcp.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\string_literal.cpp" />
     <ClCompile Include="..\test\struct_name.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
-    <ClCompile Include="..\test\test.virgo.cpp" />
-    <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />

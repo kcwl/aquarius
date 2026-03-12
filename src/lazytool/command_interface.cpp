@@ -75,7 +75,7 @@ namespace aquarius
 
 				source << "#include \"" << target_path.filename().string() << ".h\"\n";
 
-				it->second->run(header, source, datas);
+				it->second->run(header, source, datas, protocol_);
 			}
 
 			return 0;

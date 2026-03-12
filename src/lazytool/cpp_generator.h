@@ -26,7 +26,7 @@ namespace aquarius
 
 		public:
 			virtual bool run(std::fstream& header, std::fstream& source,
-							 const std::vector<std::shared_ptr<field>>& fields) override;
+							 const std::vector<std::shared_ptr<field>>& fields, const std::string& protocol) override;
 
 		private:
 			bool generate_message(std::fstream& header, std::fstream& source, std::shared_ptr<message_field> field_ptr);
@@ -52,11 +52,11 @@ namespace aquarius
 
 			bool generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<message_field> field_ptr);
 
-			bool generate_request_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
+			bool generate_request_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr, const std::string& message_name,
 											   const std::string protocol, const std::string& router,
 											   const std::string& method);
 
-			bool generate_response_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
+			bool generate_response_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr, const std::string& message_name,
 												const std::string protocol, const std::string& method);
 
 			bool scope_public(std::fstream& ofs);
@@ -78,10 +78,6 @@ namespace aquarius
 			void generate_json_from_define(std::fstream& ofs, const std::string& field_name);
 
 			void generate_json_to_define(std::fstream& ofs, const std::string& field_name);
-
-			bool generator_array_stream(std::fstream& ofs, const std::string& type, const std::string& name);
-
-			void generator_normal_stream(std::fstream& ofs, const std::string& name);
 
 			bool generate_to_int(std::fstream& ofs, const std::string& type, const std::string& value);
 

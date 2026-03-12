@@ -1,7 +1,7 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius/serialize/json.hpp>
-#include "test.virgo.h"
+#include "test_http.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
 
@@ -9,12 +9,12 @@ BOOST_AUTO_TEST_CASE(json)
 {
 	aquarius::json_parse jp{};
 
-	person p{};
+	http_person p{};
 
 	aquarius::flex_buffer buffer{};
 
 	{
-		auto p1 = jp.from_datas<person>(buffer);
+		auto p1 = jp.from_datas<http_person>(buffer);
 
 		BOOST_CHECK(p1 == p);
 	}
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(json)
 
 		jp.to_datas(p, buffer);
 
-		person p2 = jp.from_datas<person>(buffer);
+		http_person p2 = jp.from_datas<http_person>(buffer);
 
 		BOOST_CHECK(p2 == p);
 	}

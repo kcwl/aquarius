@@ -1,7 +1,7 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius.hpp>
-#include "test.virgo.h"
+#include "test_tcp.virgo.h"
 
 using namespace std::chrono_literals;
 

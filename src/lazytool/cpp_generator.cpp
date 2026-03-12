@@ -5,16 +5,14 @@ namespace aquarius
 	namespace lazytool
 	{
 		bool cpp_generator::run(std::fstream& header, std::fstream& source,
-								const std::vector<std::shared_ptr<field>>& fields)
+								const std::vector<std::shared_ptr<field>>& fields, const std::string& protocol)
 		{
 			bool result = true;
-
-			header << "#pragma once;\n";
-			header << "#include <aquarius.hpp>\n";
 
 			for (const auto& field : fields)
 			{
 				header << "\n";
+				source << "\n";
 
 				if (field->type() == struct_type::message)
 				{
@@ -32,22 +30,47 @@ namespace aquarius
 
 			header << "\n";
 
-			for (auto& name : json_generator_)
+			if (protocol == "http")
 			{
-				generate_json_from_define(header, name);
-				generate_json_to_define(header, name);
-
-				auto iter = std::find_if(fields.begin(), fields.end(),
-										 [&](std::shared_ptr<field> field_ptr) { return name == field_ptr->name(); });
-
-				if (iter == fields.end())
+				for (auto& name : json_generator_)
 				{
-					continue;
+					generate_json_from_define(header, name);
+					generate_json_to_define(header, name);
+
+					auto iter = std::find_if(fields.begin(), fields.end(),
+											 [&] (std::shared_ptr<field> field_ptr) { return name == field_ptr->name(); });
+
+					if (iter == fields.end())
+					{
+						continue;
+					}
+
+					generate_from_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
+					generate_to_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
 				}
 
-				generate_from_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
-				generate_to_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
+				for (const auto& field : fields)
+				{
+					if (field->type() == struct_type::message)
+					{
+						auto field_ptr = std::dynamic_pointer_cast<message_field>(field);
+
+						generate_json_from_define(header, field_ptr->request()->name());
+						generate_json_to_define(header, field_ptr->response()->name());
+
+						if (field_ptr->method() != "get")
+						{
+							generate_from_tag(source, field_ptr->request());
+							generate_to_tag(source, field_ptr->request());
+						}
+
+						generate_from_tag(source, field_ptr->response());
+						generate_to_tag(source, field_ptr->response());
+					}
+				}
 			}
+			
+			header << "\n";
 
 			for (const auto& field : fields)
 			{
@@ -60,26 +83,6 @@ namespace aquarius
 					}
 
 					generate_protocol_alias_define(header, message_field_ptr);
-				}
-			}
-
-			for (const auto& field : fields)
-			{
-				generate_json_from_define(header, field->name());
-				generate_json_to_define(header, field->name());
-
-				if (field->type() == struct_type::message)
-				{
-					auto field_ptr = std::dynamic_pointer_cast<message_field>(field);
-
-					if (field_ptr->method() != "get")
-					{
-						generate_from_tag(source, field_ptr->request());
-						generate_to_tag(source, field_ptr->request());
-					}
-
-					generate_from_tag(source, field_ptr->response());
-					generate_to_tag(source, field_ptr->response());
 				}
 			}
 
@@ -97,7 +100,7 @@ namespace aquarius
 
 			return true;
 		}
-		bool cpp_generator::generate_normal_data(std::fstream& header, std::fstream&,
+		bool cpp_generator::generate_normal_data(std::fstream& header, std::fstream& source,
 												 std::shared_ptr<data_field> field_ptr)
 		{
 			generate_header(header, field_ptr);
@@ -117,6 +120,8 @@ namespace aquarius
 			generate_member_variable_define(header, field_ptr, end);
 
 			header << "};\n";
+
+			generate_equal_src(source, field_ptr);
 
 			return true;
 		}
@@ -260,18 +265,18 @@ namespace aquarius
 
 		bool cpp_generator::generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<message_field> field_ptr)
 		{
-			generate_request_alias_define(ofs, field_ptr->request(), field_ptr->protocol(), field_ptr->router(),
+			generate_request_alias_define(ofs, field_ptr->request(),field_ptr->name(), field_ptr->protocol(), field_ptr->router(),
 										  field_ptr->method());
-			generate_response_alias_define(ofs, field_ptr->response(), field_ptr->protocol(), field_ptr->method());
+			generate_response_alias_define(ofs, field_ptr->response(), field_ptr->name(), field_ptr->protocol(), field_ptr->method());
 
 			return true;
 		}
 
-		bool cpp_generator::generate_request_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
+		bool cpp_generator::generate_request_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr, const std::string& message_name,
 														  const std::string protocol, const std::string& router,
 														  const std::string& method)
 		{
-			ofs << "using " << field_ptr->name() << "_request = aquarius::virgo::" << protocol << "_request<\""
+			ofs << "using " << message_name << "_request = aquarius::virgo::" << protocol << "_request<\""
 				<< router << "\", ";
 
 			if (protocol == "http")
@@ -284,10 +289,10 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::generate_response_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
+		bool cpp_generator::generate_response_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr, const std::string& message_name,
 														   const std::string protocol, const std::string& method)
 		{
-			ofs << "using " << field_ptr->name() << "_response = aquarius::virgo::" << protocol << "_response<";
+			ofs << "using " << message_name << "_response = aquarius::virgo::" << protocol << "_response<";
 
 			if (protocol == "http")
 			{
@@ -538,28 +543,6 @@ namespace aquarius
 		{
 			ofs << field_name << " tag_invoke(const aquarius::json::value_to_tag<" << field_name
 				<< ">&, const aquarius::json::value& jv);" << std::endl;
-		}
-
-		bool cpp_generator::generator_array_stream(std::fstream& ofs, const std::string& type, const std::string& name)
-		{
-			if (!type.contains("bytes"))
-				return false;
-
-			ofs << "\"[\";\n";
-			ofs << "\tfor (auto& s : other." << name << ")\n";
-			ofs << "\t{\n";
-			ofs << "\t\tos << s << \", \";\n";
-			ofs << "\t}\n";
-
-			ofs << "\tos.seekp(-2, std::ios::cur);\n";
-			ofs << "\tos << \"]\";\n";
-
-			return true;
-		}
-
-		void cpp_generator::generator_normal_stream(std::fstream& ofs, const std::string& name)
-		{
-			ofs << "other." << name;
 		}
 
 		bool cpp_generator::generate_to_int(std::fstream& ofs, const std::string& type, const std::string& value)
