@@ -30,6 +30,22 @@ namespace aquarius
 				}
 			}
 
+			header << "\n";
+
+			for (const auto& field : fields)
+			{
+				if (field->type() == struct_type::message)
+				{
+					auto message_field_ptr = std::dynamic_pointer_cast<message_field>(field);
+					if (!message_field_ptr)
+					{
+						continue;
+					}
+
+					generate_protocol_alias_define(header, message_field_ptr);
+				}
+			}
+
 			return result;
 		}
 
@@ -198,12 +214,10 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
-														   const std::string protocol, const std::string& router,
-														   const std::string& method)
+		bool cpp_generator::generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<message_field> field_ptr)
 		{
-			generate_request_alias_define(ofs, field_ptr, protocol, router, method);
-			generate_response_alias_define(ofs, field_ptr, protocol, method);
+			generate_request_alias_define(ofs, field_ptr->request(), field_ptr->protocol(), field_ptr->router(), field_ptr->method());
+			generate_response_alias_define(ofs, field_ptr->response(), field_ptr->protocol(), field_ptr->method());
 
 			return true;
 		}

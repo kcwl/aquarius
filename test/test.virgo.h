@@ -124,3 +124,10 @@ public:
 	int32 user;
 	string passwd;
 };
+
+using login_req_body_request = aquarius::virgo::tcp_request<"10001", login_req_body>;
+using login_resp_body_response = aquarius::virgo::tcp_response<login_resp_body>;
+using http_test_post_req_body_request = aquarius::virgo::tcp_request<"/login/new", http_test_post_req_body>;
+using http_test_post_resp_body_response = aquarius::virgo::tcp_response<http_test_post_resp_body>;
+using http_test_get_req_body_request = aquarius::virgo::tcp_request<"/login", http_test_get_req_body>;
+using http_test_get_resp_body_response = aquarius::virgo::tcp_response<http_test_get_resp_body>;

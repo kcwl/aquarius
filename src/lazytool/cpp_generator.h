@@ -49,9 +49,7 @@ namespace aquarius
 
 			bool generate_member_variable_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr, char end);
 
-			bool generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
-												const std::string protocol, const std::string& router,
-												const std::string& method);
+			bool generate_protocol_alias_define(std::fstream& ofs, std::shared_ptr<message_field> field_ptr);
 
 			bool generate_request_alias_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
 											   const std::string protocol, const std::string& router,
