@@ -21,6 +21,7 @@ struct tcp_person
 	double mana;
 	string name;
 	bytes orders;
+	std::map<int32, int32> seqs;
 };
 
 class login_req_body : public aquarius::tcp_binary_serialize
