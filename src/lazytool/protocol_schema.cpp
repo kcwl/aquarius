@@ -154,6 +154,21 @@ namespace aquarius
 
 						k = "std::vector<" + t + ">";
 					}
+					else if (k == "map")
+					{
+						auto key = read_value<token::name, ','>(ifs, end);
+						if (end != ',')
+						{
+							return false;
+						}
+						auto value = read_value<token::name, ' '>(ifs, end);
+						if (end != ' ')
+						{
+							return false;
+						}
+
+						k = "std::map<" + key + ", " + value + ">";
+					}
 				}
 
 				auto v = read_value<token::name, ';'>(ifs, end);
