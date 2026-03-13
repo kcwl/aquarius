@@ -59,7 +59,6 @@ namespace aquarius
 								  fields_.push_back(field);
 
 								  put_custom_type(field->name());
-
 								  ifs.get();
 							  } });
 
@@ -73,7 +72,6 @@ namespace aquarius
 									  throw std::runtime_error(
 										  std::format("enum parse error! row: {}, column: {}", row_ + 1, column_));
 								  fields_.push_back(enums);
-
 								  ifs.get();
 							  } });
 
@@ -87,8 +85,6 @@ namespace aquarius
 									  throw std::runtime_error(
 										  std::format("model parse error! row: {}, column: {}", row_ + 1, column_));
 								  fields_.push_back(models);
-
-								  ifs.get();
 							  } });
 		}
 
@@ -147,11 +143,6 @@ namespace aquarius
 				{
 					k = read_value<token::name, ' '>(ifs, end);
 
-					if (end == '{')
-					{
-						continue;
-					}
-
 					if (k.empty())
 						return false;
 
@@ -170,8 +161,6 @@ namespace aquarius
 					return false;
 
 				field_ptr->add_field(k, v);
-
-				ifs.get();
 			}
 
 			return true;
@@ -214,8 +203,6 @@ namespace aquarius
 				}
 
 				field_ptr->method(method);
-
-				ifs.get();
 			}
 
 			field_ptr->set_name(value);

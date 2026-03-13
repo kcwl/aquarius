@@ -1,6 +1,12 @@
 #include "test_tcp.virgo.h"
 
 
+bool color::operator==(const color& other) const
+{
+	return red == other.red && yellow == other.yellow && green == other.green;
+}
+
+
 bool tcp_person::operator==(const tcp_person& other) const
 {
 	return sex == other.sex && addr == other.addr && age == other.age && telephone == other.telephone && score == other.score && hp == other.hp && mana == other.mana && name == other.name && orders == other.orders;

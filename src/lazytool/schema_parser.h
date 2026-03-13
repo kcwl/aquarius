@@ -58,8 +58,6 @@ namespace aquarius
 					column_++;
 					if (((ends == end) || ...))
 					{
-						int64_t pos = ifs.tellg() > 0 ? ifs.tellg() : (std::ios::pos_type)0;
-						ifs.seekg(pos - 1);
 						return value;
 					}
 

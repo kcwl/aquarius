@@ -1,6 +1,13 @@
 #pragma once
 #include <aquarius.hpp>
 
+enum color
+{
+	 red,
+	 yellow,
+	 green,
+};
+
 struct tcp_person
 {
 	bool operator==(const tcp_person & other) const; 

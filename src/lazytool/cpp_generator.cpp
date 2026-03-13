@@ -109,9 +109,8 @@ namespace aquarius
 			if (field_ptr->type() == struct_type::structure)
 			{
 				generate_equal_define(header, field_ptr);
+				header << std::endl;
 			}
-
-			header << std::endl;
 
 			char end = ';';
 			if (field_ptr->type() == struct_type::enumture)

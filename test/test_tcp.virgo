@@ -1,3 +1,10 @@
+enum color
+{
+	red;
+	yellow;
+	green;
+}
+
 struct tcp_person
 {
 	bool sex;
