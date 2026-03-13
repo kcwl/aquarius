@@ -15,13 +15,22 @@ struct tcp_person
 	bool sex;
 	uint32 addr;
 	int32 age;
+	sint32 sage;
 	uint64 telephone;
 	int64 score;
+	sint64 scores;
+	fixed32 f;
+	fixed64 g;
+	bool aa;
 	float hp;
 	double mana;
 	string name;
 	bytes orders;
 	std::map<int32, int32> seqs;
+	std::vector<int32> ves;
+	date day;
+	time t;
+	datetime dt;
 };
 
 class login_req_body : public aquarius::tcp_binary_serialize

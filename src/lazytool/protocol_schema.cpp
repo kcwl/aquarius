@@ -7,10 +7,10 @@ namespace
 															 { "struct", "struct" },
 															 { "enum", "enum class" } };
 
-	std::set<std::string> keywords = { "bool", "uint32", "int32", "uint64", "float", "double", "string", "bytes" };
-
-	std::set<std::string> model_keywords = { "float",  "double",   "date", "timestamp", "integer",
-											 "string", "datetime", "time", "binary" };
+	std::set<std::string> keywords = {
+		"int32", "uint32", "sint32", "int64",  "uint64", "sint64", "fixed32", "fixed64",
+		"bool",	 "float",  "double", "string", "bytes",	 "date",   "time",	  "datetime"
+	};
 
 	std::string from_type_string(const std::string& target)
 	{
@@ -46,7 +46,7 @@ namespace aquarius
 								  ifs.get();
 							  } });
 
-			invokes_.insert({ "struct", [&](std::fstream& ifs,const std::string&)
+			invokes_.insert({ "struct", [&](std::fstream& ifs, const std::string&)
 							  {
 								  auto field = std::make_shared<data_field>(struct_type::structure);
 
@@ -62,7 +62,7 @@ namespace aquarius
 								  ifs.get();
 							  } });
 
-			invokes_.insert({ "enum", [&](std::fstream& ifs,const std::string&)
+			invokes_.insert({ "enum", [&](std::fstream& ifs, const std::string&)
 							  {
 								  auto enums = std::make_shared<data_field>(struct_type::enumture);
 
@@ -75,7 +75,7 @@ namespace aquarius
 								  ifs.get();
 							  } });
 
-			invokes_.insert({ "model", [&](std::fstream& ifs,const std::string&)
+			invokes_.insert({ "model", [&](std::fstream& ifs, const std::string&)
 							  {
 								  auto models = std::make_shared<data_field>(struct_type::model);
 
@@ -307,7 +307,7 @@ namespace aquarius
 
 		bool protocol_schema::check_type(const std::string& value)
 		{
-			return model_keywords.find(value) != model_keywords.end();
+			return keywords.find(value) != keywords.end();
 		}
 
 		auto protocol_schema::invoke(const std::string& struct_name) -> func_t

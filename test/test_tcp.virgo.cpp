@@ -9,7 +9,7 @@ bool color::operator==(const color& other) const
 
 bool tcp_person::operator==(const tcp_person& other) const
 {
-	return sex == other.sex && addr == other.addr && age == other.age && telephone == other.telephone && score == other.score && hp == other.hp && mana == other.mana && name == other.name && orders == other.orders && seqs == other.seqs;
+	return sex == other.sex && addr == other.addr && age == other.age && sage == other.sage && telephone == other.telephone && score == other.score && scores == other.scores && f == other.f && g == other.g && aa == other.aa && hp == other.hp && mana == other.mana && name == other.name && orders == other.orders && seqs == other.seqs && ves == other.ves && day == other.day && t == other.t && dt == other.dt;
 }
 
 login_req_body::login_req_body()
