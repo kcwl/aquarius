@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/serialize/concept.hpp>
-#include <aquarius/serialize/error.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/virgo/serialize/concept.hpp>
+#include <aquarius/virgo/serialize/error.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 #include <boost/pfr.hpp>
 
 namespace aquarius
@@ -46,6 +46,18 @@ namespace aquarius
 			for (auto& c : value)
 			{
 				to_datas(c, buff);
+			}
+		}
+
+		template<map_t T>
+		void to_datas(const T& value, flex_buffer& buffer)
+		{
+			to_datas(value.size(), buff);
+
+			for (const auto& v : value)
+			{
+				to_datas(v.first);
+				to_datas(v.second);
 			}
 		}
 
@@ -142,6 +154,27 @@ namespace aquarius
 			for (std::size_t i = 0; i < size; ++i)
 			{
 				value[i] = from_datas<typename T::value_type>(buff);
+			}
+
+			return value;
+		}
+
+		template<map_t T>
+		auto from_datas(flex_buffer& buff) -> T
+		{
+			T value{};
+
+			auto size = from_datas<std::size_t>(buff);
+
+			if (size == 0)
+				return value;
+
+			for (std::size_t i = 0; i < size; ++i)
+			{
+				auto frist =  from_datas<typename T::value_type::first_type>(buff);
+				auto second =  from_datas<typename T::value_type::second_type>(buff);
+
+				value.insert({ first, second });
 			}
 
 			return value;
