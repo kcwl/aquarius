@@ -42,10 +42,7 @@ namespace aquarius
 				{
 					this->body().serialize(buf);
 
-					if (buf.size() > 2)
-					{
-						this->header().content_length(buf.size());
-					}
+					this->header().content_length(buf.size());
 				}
 
 				auto ec = this->header().serialize(buffer);
