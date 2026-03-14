@@ -58,6 +58,58 @@ namespace aquarius
 
 				buffer.sputn(line.c_str(), line.size());
 			}
+
+			virtual bool commit_cookie(flex_buffer& buffer) override
+			{
+				std::string line="Cookie: ";
+
+				for (const auto& cookie : this->header().cookies())
+				{
+					line += cookie.first;
+
+					if (!cookie.second.empty())
+					{
+						line += "=";
+						line += cookie.second;
+					}
+					line += ";";
+				}
+
+				buffer.sputn(line.c_str(), line.size());
+
+				return true;
+			}
+
+			virtual bool consume_cookie() override
+			{
+				auto cookie_value = this->header().find("Cookie");
+
+				auto cookie_pairs = std::span<char>(cookie_value) | std::views::split(";"sv);
+
+				for (const auto& cookie : cookie_pairs)
+				{
+					auto str = std::string_view(cookie);
+
+					if (str.empty())
+						break;
+
+					auto pos = str.find("=");
+
+					if (pos == std::string_view::npos)
+					{
+						this->header().set_cookie(std::string(str));
+					}
+					else
+					{
+						auto key = str.substr(0, pos);
+						auto value = str.substr(pos + 1, str.size() - pos - 1);
+
+						this->header().set_cookie(std::string(key), std::string(value));
+					}
+				}
+
+				return true;
+			}
 		};
 	} // namespace virgo
 

@@ -73,4 +73,16 @@ namespace aquarius
 		co_return co_await mpc::call<std::shared_ptr<T>, player_module>(
 			[&](player_module* ptr) -> awaitable<std::shared_ptr<T>> { co_return ptr->get<T>(id); });
 	}
+
+	template <typename T>
+	inline auto mpc_player_get(const std::string& id) -> awaitable<std::shared_ptr<T>>
+	{
+		std::stringstream ss{};
+		ss << id;
+
+		std::size_t uuid{};
+		ss >> uuid;
+
+		co_return co_await mpc_player_get<T>(uuid);
+	}
 } // namespace aquarius

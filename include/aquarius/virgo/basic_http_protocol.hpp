@@ -77,6 +77,9 @@ namespace aquarius
 
 				return true;
 			}
+
+			virtual bool commit_cookie(flex_buffer&) = 0;
+			virtual bool consume_cookie() = 0;
 		};
 	} // namespace virgo
 } // namespace aquarius

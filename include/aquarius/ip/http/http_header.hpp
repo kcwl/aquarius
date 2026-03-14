@@ -174,6 +174,27 @@ namespace aquarius
 			return iter->second;
 		}
 
+		std::string find_cookie(const std::string& key)
+		{
+			auto iter = cookies_.find(key);
+			if (iter == cookies_.end())
+			{
+				return {};
+			}
+
+			return iter->second;
+		}
+
+		void set_cookie(const std::string& key, const std::string& value = {})
+		{
+			cookies_.emplace(key, value);
+		}
+
+		std::map<std::string, std::string> cookies()
+		{
+			return cookies_;
+		}
+
 	private:
 		template <typename T>
 		T to_integer(const std::string& value) const
@@ -189,6 +210,8 @@ namespace aquarius
 
 	private:
 		std::map<std::string, std::string> fields_;
+
+		std::map<std::string, std::string> cookies_;
 	};
 
 } // namespace aquarius
