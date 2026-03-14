@@ -78,6 +78,12 @@ namespace aquarius
 			}
 			else
 			{
+				if (!value.valid())
+				{
+					to_datas(0, buffer);
+					return;
+				}
+
 				return to_datas(value.get_time_point().time_since_epoch().count(), buffer);
 			}
 		}
@@ -233,15 +239,24 @@ namespace aquarius
 		template<datetime_t T>
 		T from_datas(flex_buffer& buffer)
 		{
-			auto timestamp = from_datas<time_t>(buffer);
+			auto values = from_datas<int64_t>(buffer);
+
+			if (values == 0)
+			{
+				return T{};
+			}
 
 			if constexpr (std::same_as<T, times>)
 			{
-				return T(timestamp);
+				return T(values);
+			}
+			else if constexpr (std::same_as<T, datetime>)
+			{
+				return T{ typename T::time_point(std::chrono::microseconds(values)) };
 			}
 			else
 			{
-				return T(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::from_time_t(timestamp)));
+				return T{ typename T::time_point(std::chrono::days(values)) };
 			}
 		}
 

@@ -16,12 +16,21 @@ BOOST_AUTO_TEST_CASE(binary)
 	p.sex = true;
 	p.addr = 2;
 	p.age = 15;
+	p.sage = -2;
 	p.telephone = 15230214856;
 	p.score = 100;
+	p.scores = -3;
+	p.f.value = 3;
+	p.g.value = 4;
 	p.hp = 200;
 	p.mana = 300;
 	p.name = "John";
 	p.orders = { 1, 2, 3, 4, 5 };
+	p.seqs = { {1,2,},{3,4} };
+	p.ves = { 2,3,4,5 };
+	p.day = aquarius::date(2026, 3, 14);
+	p.t = 1000ms;
+	p.dt = aquarius::datetime(2026, 3, 14, 8, 45, 0);
 
 	bp.to_datas(p, buffer);
 
