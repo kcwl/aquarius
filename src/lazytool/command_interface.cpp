@@ -72,6 +72,7 @@ namespace aquarius
 
 				header << "#pragma once\n";
 				header << "#include <aquarius.hpp>\n";
+				header << "using namespace aquarius;\n";
 
 				source << "#include \"" << target_path.filename().string() << ".h\"\n";
 

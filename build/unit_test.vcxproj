@@ -259,7 +259,6 @@
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
-    <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />

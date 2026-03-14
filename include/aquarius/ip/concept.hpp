@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/asio.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
 #include <type_traits>
 
 namespace aquarius

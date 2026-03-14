@@ -6,22 +6,29 @@
 #include <string>
 #include <vector>
 
-template <typename T>
-class fixed : public T
-{};
+namespace aquarius
+{
+	template <typename T>
+	struct fixed
+	{
+		using value_type = T;
 
-using int32 = uint32_t;
-using uint32 = uint32_t;
-using sint32 = int32_t;
-using int64 = uint64_t;
-using uint64 = uint64_t;
-using sint64 = int64_t;
-using fixed32 = fixed<uint32_t>;
-using fixed64 = fixed<uint64_t>;
+		T value;
+	};
 
-using string = std::string;
-using bytes = std::vector<char>;
+	using int32 = uint32_t;
+	using uint32 = uint32_t;
+	using sint32 = int32_t;
+	using int64 = uint64_t;
+	using uint64 = uint64_t;
+	using sint64 = int64_t;
+	using fixed32 = fixed<uint32_t>;
+	using fixed64 = fixed<uint64_t>;
 
-using date = boost::mysql::date;
-using datetime = boost::mysql::datetime;
-using time = boost::mysql::time;
+	using string = std::string;
+	using bytes = std::vector<char>;
+
+	using date = boost::mysql::date;
+	using datetime = boost::mysql::datetime;
+	using times = boost::mysql::time;
+} // namespace aquarius

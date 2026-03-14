@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {

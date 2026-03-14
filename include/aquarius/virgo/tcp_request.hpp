@@ -2,8 +2,8 @@
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/ip/tcp/tcp_header.hpp>
-#include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 
 namespace aquarius
 {

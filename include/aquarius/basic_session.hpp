@@ -1,8 +1,8 @@
 #pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
 
 namespace aquarius
 {
@@ -99,8 +99,8 @@ namespace aquarius
 		{
 			error_code ec;
 
-			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer), delm,
-												   redirect_error(use_awaitable, ec));
+			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer),
+															   delm, redirect_error(use_awaitable, ec));
 
 			if (ec)
 			{

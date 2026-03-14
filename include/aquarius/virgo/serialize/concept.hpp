@@ -44,11 +44,14 @@ namespace aquarius
 	template <typename T>
 	concept zig_zag = disjunction_same_as<T, int32_t, int64_t>;
 
-	template <typename T>
-	concept pod_t = disjunction_same_as<std::remove_cvref_t<T>, char, bool, float, double, fixed32, fixed64>;
+	template<typename T>
+	concept fixed_t = disjunction_same_as<T, fixed32, fixed64>;
 
 	template <typename T>
-	concept reflectable = std::is_aggregate_v<std::remove_cvref_t<T>>;
+	concept pod_t = disjunction_same_as<std::remove_cvref_t<T>, char, bool, float, double>;
+
+	template <typename T>
+	concept reflectable = std::is_aggregate_v<std::remove_cvref_t<T>> && !fixed_t<T>;
 
 	template <typename T>
 	struct is_map : std::false_type
@@ -60,4 +63,7 @@ namespace aquarius
 
 	template <typename T>
 	concept map_t = is_map<T>::value;
+
+	template<typename T>
+	concept datetime_t = disjunction_same_as<T, date, times, datetime>;
 } // namespace aquarius

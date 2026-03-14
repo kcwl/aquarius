@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius.hpp>
+using namespace aquarius;
 
 enum color
 {
@@ -10,8 +11,6 @@ enum color
 
 struct tcp_person
 {
-	bool operator==(const tcp_person & other) const; 
-
 	bool sex;
 	uint32 addr;
 	int32 age;
@@ -29,7 +28,7 @@ struct tcp_person
 	std::map<int32, int32> seqs;
 	std::vector<int32> ves;
 	date day;
-	time t;
+	times t;
 	datetime dt;
 };
 

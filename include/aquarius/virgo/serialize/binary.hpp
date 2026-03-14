@@ -52,12 +52,33 @@ namespace aquarius
 		template<map_t T>
 		void to_datas(const T& value, flex_buffer& buffer)
 		{
-			to_datas(value.size(), buff);
+			to_datas(value.size(), buffer);
 
 			for (const auto& v : value)
 			{
-				to_datas(v.first);
-				to_datas(v.second);
+				to_datas(v.first, buffer);
+				to_datas(v.second, buffer);
+			}
+		}
+
+		template<fixed_t T>
+		void to_datas(const T& v, flex_buffer& buffer)
+		{
+			auto size = sizeof(v.value);
+
+			buffer.sputn((char*)&v.value, size);
+		}
+
+		template<datetime_t T>
+		void to_datas(const T& value, flex_buffer& buffer)
+		{
+			if constexpr (std::same_as<T, times>)
+			{
+				return to_datas(value.count(), buffer);
+			}
+			else
+			{
+				return to_datas(value.get_time_point().time_since_epoch().count(), buffer);
 			}
 		}
 
@@ -81,7 +102,7 @@ namespace aquarius
 		template <integer_t T>
 		auto from_datas(flex_buffer& buff) -> T
 		{
-			T value{};
+			std::remove_cvref_t<T> value{};
 
 			uint8_t temp{};
 			buff.sgetn((char*)&temp, sizeof(temp));
@@ -171,10 +192,11 @@ namespace aquarius
 
 			for (std::size_t i = 0; i < size; ++i)
 			{
-				auto frist =  from_datas<typename T::value_type::first_type>(buff);
+				auto first =  from_datas<typename T::value_type::first_type>(buff);
 				auto second =  from_datas<typename T::value_type::second_type>(buff);
 
-				value.insert({ first, second });
+				//value.insert({ first, second });
+				value[first] = second;
 			}
 
 			return value;
@@ -194,6 +216,33 @@ namespace aquarius
 				throw serialize_error::not_enough_space;
 
 			return value;
+		}
+
+		template<fixed_t T>
+		T from_datas(flex_buffer& buffer)
+		{
+			T v{};
+
+			auto size = sizeof(typename T::value_type);
+
+			buffer.sgetn((char*)&v.value, size);
+
+			return v;
+		}
+
+		template<datetime_t T>
+		T from_datas(flex_buffer& buffer)
+		{
+			auto timestamp = from_datas<time_t>(buffer);
+
+			if constexpr (std::same_as<T, times>)
+			{
+				return T(timestamp);
+			}
+			else
+			{
+				return T(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::from_time_t(timestamp)));
+			}
 		}
 
 		template <reflectable T>

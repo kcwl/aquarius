@@ -1,6 +1,6 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include <aquarius/serialize/binary.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 #include "test_tcp.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
@@ -27,7 +27,25 @@ BOOST_AUTO_TEST_CASE(binary)
 
 	tcp_person p1 = bp.from_datas<tcp_person>(buffer);
 
-	BOOST_CHECK(p1 == p);
+	BOOST_TEST(p1.sex == p.sex);
+	BOOST_TEST(p1.addr == p.addr);
+	BOOST_TEST(p1.age == p.age);
+	BOOST_TEST(p1.sage == p.sage);
+	BOOST_TEST(p1.telephone == p.telephone);
+	BOOST_TEST(p1.score == p.score);
+	BOOST_TEST(p1.scores == p.scores);
+	BOOST_TEST(p1.f.value == p.f.value);
+	BOOST_TEST(p1.g.value == p.g.value);
+	BOOST_TEST(p1.aa == p.aa);
+	BOOST_TEST(p1.hp == p.hp);
+	BOOST_TEST(p1.mana == p.mana);
+	BOOST_TEST(p1.name == p.name);
+	BOOST_TEST(p1.orders == p.orders);
+	BOOST_TEST(p1.seqs == p.seqs);
+	BOOST_TEST(p1.ves == p.ves);
+	BOOST_TEST(p1.day == p.day);
+	BOOST_TEST(p1.t == p.t);
+	BOOST_TEST(p1.dt == p.dt);
 }
 
 BOOST_AUTO_TEST_CASE(integer_limit)

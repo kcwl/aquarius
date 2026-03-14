@@ -24,7 +24,7 @@ struct tcp_person
 	map int32,int32 seqs;
 	repeated int32 ves;
 	date day;
-	time t;
+	times t;
 	datetime dt;
 }
 

@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/serialize/tcp_binary_serialize.hpp>
 #include <cstdint>
 
 namespace aquarius

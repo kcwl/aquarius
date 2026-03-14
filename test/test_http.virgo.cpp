@@ -1,20 +1,10 @@
 #include "test_http.virgo.h"
 
 
-bool http_person::operator==(const http_person& other) const
-{
-	return sex == other.sex && addr == other.addr && age == other.age && telephone == other.telephone && score == other.score && hp == other.hp && mana == other.mana && name == other.name && orders == other.orders;
-}
-
 http_test_post_req_body::http_test_post_req_body()
 	: uuid()
 	, per_req()
 {}
-
-bool http_test_post_req_body::operator==(const http_test_post_req_body& other) const
-{
-	return uuid == other.uuid && per_req == other.per_req;
-}
 
 void http_test_post_req_body::serialize(aquarius::flex_buffer& buffer)
 {
@@ -30,11 +20,6 @@ http_test_post_resp_body::http_test_post_resp_body()
 	, per_resp()
 {}
 
-bool http_test_post_resp_body::operator==(const http_test_post_resp_body& other) const
-{
-	return uuid == other.uuid && per_resp == other.per_resp;
-}
-
 void http_test_post_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(*this, buffer);
@@ -49,11 +34,6 @@ http_test_get_req_body::http_test_get_req_body()
 	: user()
 	, passwd()
 {}
-
-bool http_test_get_req_body::operator==(const http_test_get_req_body& other) const
-{
-	return user == other.user && passwd == other.passwd;
-}
 
 void http_test_get_req_body::serialize(aquarius::flex_buffer& buffer)
 {
@@ -72,11 +52,6 @@ http_test_get_resp_body::http_test_get_resp_body()
 	: user()
 	, passwd()
 {}
-
-bool http_test_get_resp_body::operator==(const http_test_get_resp_body& other) const
-{
-	return user == other.user && passwd == other.passwd;
-}
 
 void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 {

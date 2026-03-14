@@ -24,7 +24,7 @@ As of now, the scalar types support all of following types. The table shows the 
 |string|A string must always contain 7-bit ASCII text|Json String|corresponding to sql char,varchar,text(text group)|
 |bytes|May contain any arbitrary sequence of bytes|Json Array|corresponding to sql blob(blob group)|
 |date|Turn to timestamp and use int64 ot encoding|Turn to timestamp and then use json number|Describe a date, its format is 'YYYY-MM-DD', corresponding to sql date|
-|time|Turn to timestamp and use int64 ot encoding|Turn to timestamp and then use json number|Describe a date, its format is 'YYYY-MM-DD', corresponding to sql time|
+|times|Turn to timestamp and use int64 ot encoding|Turn to timestamp and then use json number|Describe a date, its format is 'YYYY-MM-DD', corresponding to sql time|
 |datetime|Turn to timestamp and use int64 ot encoding|Turn to timestamp and then use json number|Describe a date, its format is 'YYYY-MM-DD', corresponding to sql datetime|
 
 |Type|c++|
@@ -43,7 +43,7 @@ As of now, the scalar types support all of following types. The table shows the 
 |string|std::string|
 |bytes|std::vector<char>|
 |date|std::chrono::time_point|
-|time|std::chrono::time_point|
+|times|std::chrono::time_point|
 |datetime|std::chrono::time_point|
 
 ### Composite Type

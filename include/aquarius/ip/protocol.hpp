@@ -2,8 +2,8 @@
 #include <aquarius/asio.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/handler_channel.hpp>
-#include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 #include <boost/url.hpp>
 #include <ranges>
 #include <span>

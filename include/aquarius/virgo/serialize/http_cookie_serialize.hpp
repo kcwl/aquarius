@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/basic_serialize.hpp>
-#include <aquarius/serialize/cookie.hpp>
+#include <aquarius/virgo/serialize/cookie.hpp>
 
 namespace aquarius
 {

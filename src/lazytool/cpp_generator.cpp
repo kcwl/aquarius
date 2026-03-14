@@ -106,11 +106,12 @@ namespace aquarius
 			generate_header(header, field_ptr);
 			header << std::endl << "{" << std::endl;
 
-			if (field_ptr->type() == struct_type::structure)
-			{
-				generate_equal_define(header, field_ptr);
-				header << std::endl;
-			}
+			//if (field_ptr->type() != struct_type::enumture)
+			//{
+			//	generate_equal_define(header, field_ptr);
+			//	header << std::endl;
+			//	generate_equal_src(source, field_ptr);
+			//}
 
 			char end = ';';
 			if (field_ptr->type() == struct_type::enumture)
@@ -119,8 +120,6 @@ namespace aquarius
 			generate_member_variable_define(header, field_ptr, end);
 
 			header << "};\n";
-
-			generate_equal_src(source, field_ptr);
 
 			return true;
 		}
@@ -315,7 +314,7 @@ namespace aquarius
 		{
 			generate_construction_src(ofs, field_ptr);
 
-			generate_equal_src(ofs, field_ptr);
+			//generate_equal_src(ofs, field_ptr);
 
 			generate_serialize_method_src(ofs, field_ptr, method, has_response);
 

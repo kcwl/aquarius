@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/serialize/concept.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/virgo/serialize/concept.hpp>
 #include <span>
 
 namespace aquarius

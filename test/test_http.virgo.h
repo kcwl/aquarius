@@ -1,10 +1,9 @@
 #pragma once
 #include <aquarius.hpp>
+using namespace aquarius;
 
 struct http_person
 {
-	bool operator==(const http_person & other) const; 
-
 	bool sex;
 	uint32 addr;
 	int32 age;

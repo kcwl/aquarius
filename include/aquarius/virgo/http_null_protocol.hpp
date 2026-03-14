@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/serialize/http_json_serialize.hpp>
+#include <aquarius/ip/http/http_header.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
-#include <aquarius/ip/http/http_header.hpp>
+#include <aquarius/virgo/serialize/http_json_serialize.hpp>
 
 namespace aquarius
 {
@@ -32,7 +32,9 @@ namespace aquarius
 			flex_buffer buf_;
 		};
 
-		class http_null_request : public http_request<"", http_method::post, http_null_body> {};
-		class http_null_response : public http_response<http_method::post, http_null_body> {};
+		class http_null_request : public http_request<"", http_method::post, http_null_body>
+		{};
+		class http_null_response : public http_response<http_method::post, http_null_body>
+		{};
 	} // namespace virgo
 } // namespace aquarius

@@ -9,7 +9,7 @@ namespace
 
 	std::set<std::string> keywords = {
 		"int32", "uint32", "sint32", "int64",  "uint64", "sint64", "fixed32", "fixed64",
-		"bool",	 "float",  "double", "string", "bytes",	 "date",   "time",	  "datetime"
+		"bool",	 "float",  "double", "string", "bytes",	 "date",   "times",	  "datetime"
 	};
 
 	std::string from_type_string(const std::string& target)

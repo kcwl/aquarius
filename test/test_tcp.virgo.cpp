@@ -1,25 +1,10 @@
 #include "test_tcp.virgo.h"
 
 
-bool color::operator==(const color& other) const
-{
-	return red == other.red && yellow == other.yellow && green == other.green;
-}
-
-
-bool tcp_person::operator==(const tcp_person& other) const
-{
-	return sex == other.sex && addr == other.addr && age == other.age && sage == other.sage && telephone == other.telephone && score == other.score && scores == other.scores && f == other.f && g == other.g && aa == other.aa && hp == other.hp && mana == other.mana && name == other.name && orders == other.orders && seqs == other.seqs && ves == other.ves && day == other.day && t == other.t && dt == other.dt;
-}
 
 login_req_body::login_req_body()
 	: per_req()
 {}
-
-bool login_req_body::operator==(const login_req_body& other) const
-{
-	return per_req == other.per_req;
-}
 
 void login_req_body::serialize(aquarius::flex_buffer& buffer)
 {
@@ -33,11 +18,6 @@ void login_req_body::deserialize(aquarius::flex_buffer& buffer)
 login_resp_body::login_resp_body()
 	: per_resp()
 {}
-
-bool login_resp_body::operator==(const login_resp_body& other) const
-{
-	return per_resp == other.per_resp;
-}
 
 void login_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
