@@ -75,6 +75,8 @@ namespace aquarius
 					line += ";";
 				}
 
+				line += "\r\n";
+
 				buffer.sputn(line.c_str(), line.size());
 
 				return true;

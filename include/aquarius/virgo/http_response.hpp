@@ -79,8 +79,10 @@ namespace aquarius
 						line += "=";
 						line += cookie.second;
 					}
-					line += ";\r\n";
+					line += ";";
 				}
+
+				line += "\r\n";
 
 				buffer.sputn(line.c_str(), line.size());
 
