@@ -45,6 +45,8 @@ namespace aquarius
 					this->header().content_length(buf.size());
 				}
 
+				commit_cookie(buffer);
+
 				auto ec = this->header().serialize(buffer);
 
 				if (!ec)
@@ -64,6 +66,8 @@ namespace aquarius
 			virtual bool consume(flex_buffer& buffer, int ver = 0) override
 			{
 				this->version(ver);
+
+				consume_cookie();
 
 				if (this->header().deserialize(buffer))
 				{

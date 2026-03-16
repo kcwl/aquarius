@@ -163,6 +163,11 @@ namespace aquarius
 
 					this->value_ = std::chrono::system_clock::from_time_t(std::mktime(&t));
 				}
+
+				time_t to_time_t() const
+				{
+					return this->value_.time_since_epoch().count();
+				}
 			};
 		} // namespace detail
 

@@ -41,6 +41,8 @@ namespace aquarius
 
 				this->header().content_length(buf.size());
 
+				commit_cookie(buffer);
+
 				auto ec = this->header().serialize(buffer);
 
 				if (!ec)
@@ -77,7 +79,7 @@ namespace aquarius
 						line += "=";
 						line += cookie.second;
 					}
-					line += ";";
+					line += ";\r\n";
 				}
 
 				buffer.sputn(line.c_str(), line.size());
