@@ -44,7 +44,7 @@ namespace aquarius
 
 			bool generate_construction_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
-			bool generate_equal_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
+			//bool generate_equal_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
 			bool generate_serialize_method_define(std::fstream& ofs);
 
@@ -66,7 +66,7 @@ namespace aquarius
 
 			bool generate_construction_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
-			bool generate_equal_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
+			//bool generate_equal_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
 			bool generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
 											   const std::string& method, bool has_response);

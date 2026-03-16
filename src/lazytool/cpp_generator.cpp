@@ -128,8 +128,8 @@ namespace aquarius
 			scope_public(ofs);
 			generate_construction_define(ofs, field_ptr);
 
-			scope_public(ofs);
-			generate_equal_define(ofs, field_ptr);
+			//scope_public(ofs);
+			//generate_equal_define(ofs, field_ptr);
 
 			ofs << std::endl;
 
@@ -219,12 +219,12 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::generate_equal_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr)
-		{
-			ofs << "\tbool operator==(const " << field_ptr->name() << " & other) const; " << std::endl;
+		//bool cpp_generator::generate_equal_define(std::fstream& ofs, std::shared_ptr<data_field> field_ptr)
+		//{
+		//	ofs << "\tbool operator==(const " << field_ptr->name() << " & other) const; " << std::endl;
 
-			return true;
-		}
+		//	return true;
+		//}
 
 		bool cpp_generator::generate_serialize_method_define(std::fstream& ofs)
 		{
@@ -300,7 +300,7 @@ namespace aquarius
 		{
 			generate_construction_src(ofs, field_ptr);
 
-			generate_equal_src(ofs, field_ptr);
+			//generate_equal_src(ofs, field_ptr);
 
 			generate_serialize_method_src(ofs, field_ptr, method, has_response);
 
@@ -336,43 +336,43 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::generate_equal_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr)
-		{
-			ofs << std::endl;
+		//bool cpp_generator::generate_equal_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr)
+		//{
+		//	ofs << std::endl;
 
-			ofs << "bool " << field_ptr->name() << "::operator==(const " << field_ptr->name() << "& other) const"
-				<< std::endl;
-			ofs << "{" << std::endl;
+		//	ofs << "bool " << field_ptr->name() << "::operator==(const " << field_ptr->name() << "& other) const"
+		//		<< std::endl;
+		//	ofs << "{" << std::endl;
 
-			bool start = false;
+		//	bool start = false;
 
-			auto start_sp = "";
+		//	auto start_sp = "";
 
-			ofs << "\treturn ";
+		//	ofs << "\treturn ";
 
-			if (field_ptr->fields().empty())
-			{
-				ofs << "true";
-			}
-			else
-			{
-				for (auto& s : field_ptr->fields())
-				{
-					ofs << start_sp << s.second << " == other." << s.second;
+		//	if (field_ptr->fields().empty())
+		//	{
+		//		ofs << "true";
+		//	}
+		//	else
+		//	{
+		//		for (auto& s : field_ptr->fields())
+		//		{
+		//			ofs << start_sp << s.second << " == other." << s.second;
 
-					if (!start)
-					{
-						start_sp = " && ";
-						start = !start;
-					}
-				}
-			}
+		//			if (!start)
+		//			{
+		//				start_sp = " && ";
+		//				start = !start;
+		//			}
+		//		}
+		//	}
 
-			ofs << ";" << std::endl;
-			ofs << "}" << std::endl;
+		//	ofs << ";" << std::endl;
+		//	ofs << "}" << std::endl;
 
-			return true;
-		}
+		//	return true;
+		//}
 
 		bool cpp_generator::generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr,
 														  const std::string& method, bool has_response)
