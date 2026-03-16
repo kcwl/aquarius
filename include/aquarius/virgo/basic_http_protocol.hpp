@@ -67,12 +67,12 @@ namespace aquarius
 			{
 				this->version(ver);
 
-				consume_cookie();
-
 				if (this->header().deserialize(buffer))
 				{
 					return false;
 				}
+
+				consume_cookie();
 
 				this->body().deserialize(buffer);
 

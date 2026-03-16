@@ -178,14 +178,33 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[&, r = std::move(router)] -> awaitable<void>
 					{
-						auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
+						
 
-						if (!resp_buf.has_value())
+						if (method == virgo::http_method::options)
 						{
-							co_return;
-						}
+							flex_buffer resp_buf{};
+							virgo::http_null_response resp{};
+							resp.header().set_field("Access-Control-Allow-Origin", "*");
+							resp.header().set_field("Access-Control-Allow-Method", "POST,GET,PUT,DELETE,OPTIONS");
+							resp.header().set_field("Access-Control-Max-Age", "3600");
+							resp.header().set_field("Access-Control-Allow-Headers", "*");
+							resp.header().set_field("Access-Control-Allow-Credentials", "true");
+							resp.result(static_cast<int>(virgo::http_status::ok));
 
-						co_await session_ptr->async_send(std::move(*resp_buf));
+							resp.commit(resp_buf);
+							co_await session_ptr->async_send(std::move(resp_buf));
+						}
+						else
+						{
+							auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
+
+							if (!resp_buf.has_value())
+							{
+								co_return;
+							}
+
+							co_await session_ptr->async_send(std::move(*resp_buf));
+						}
 					},
 					detached);
 			}
