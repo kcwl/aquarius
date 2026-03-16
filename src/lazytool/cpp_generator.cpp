@@ -32,40 +32,31 @@ namespace aquarius
 
 			if (protocol == "http")
 			{
-				for (auto& name : json_generator_)
-				{
-					generate_json_from_define(header, name);
-					generate_json_to_define(header, name);
-
-					auto iter = std::find_if(fields.begin(), fields.end(),
-											 [&] (std::shared_ptr<field> field_ptr) { return name == field_ptr->name(); });
-
-					if (iter == fields.end())
-					{
-						continue;
-					}
-
-					generate_from_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
-					generate_to_tag(source, std::dynamic_pointer_cast<data_field>(*iter));
-				}
-
 				for (const auto& field : fields)
 				{
 					if (field->type() == struct_type::message)
 					{
 						auto field_ptr = std::dynamic_pointer_cast<message_field>(field);
 
-						generate_json_from_define(header, field_ptr->request()->name());
 						generate_json_to_define(header, field_ptr->response()->name());
 
 						if (field_ptr->method() != "get")
 						{
+							generate_json_from_define(header, field_ptr->request()->name());
 							generate_from_tag(source, field_ptr->request());
 							generate_to_tag(source, field_ptr->request());
 						}
 
 						generate_from_tag(source, field_ptr->response());
 						generate_to_tag(source, field_ptr->response());
+					}
+					else if (field->type() == struct_type::structure)
+					{
+						generate_json_from_define(header, field->name());
+						generate_json_to_define(header, field->name());
+
+						generate_from_tag(source, std::dynamic_pointer_cast<data_field>(field));
+						generate_to_tag(source, std::dynamic_pointer_cast<data_field>(field));
 					}
 				}
 			}
@@ -251,11 +242,6 @@ namespace aquarius
 			for (auto& [type, name] : field_ptr->fields())
 			{
 				ofs << "\t" << type << " " << name << end << std::endl;
-
-				if (check_type(type) == json_type::object)
-				{
-					json_generator_.insert(type);
-				}
 			}
 
 			return true;
@@ -314,7 +300,7 @@ namespace aquarius
 		{
 			generate_construction_src(ofs, field_ptr);
 
-			//generate_equal_src(ofs, field_ptr);
+			generate_equal_src(ofs, field_ptr);
 
 			generate_serialize_method_src(ofs, field_ptr, method, has_response);
 

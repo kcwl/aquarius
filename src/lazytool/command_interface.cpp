@@ -61,8 +61,8 @@ namespace aquarius
 				auto target_path = target.parent_path();
 				target_path.append(target.filename().string());
 
-				std::fstream header(target_path.string() + ".h", std::ios::out | std::ios::binary | std::ios::ate);
-				std::fstream source(target_path.string() + ".cpp", std::ios::out | std::ios::binary | std::ios::ate);
+				std::fstream header(target_path.string() + ".h", std::ios::out | std::ios::binary);
+				std::fstream source(target_path.string() + ".cpp", std::ios::out | std::ios::binary);
 
 				if (!header.is_open() || !source.is_open())
 				{

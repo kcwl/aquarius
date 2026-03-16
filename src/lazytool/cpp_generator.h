@@ -103,9 +103,6 @@ namespace aquarius
 			void generate_model_member_func(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
 			void generate_model_member_name_func(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
-
-		private:
-			std::set<std::string> json_generator_;
 		};
 	} // namespace lazytool
 } // namespace aquarius
