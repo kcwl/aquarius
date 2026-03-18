@@ -1,0 +1,49 @@
+enum color
+{
+	red;
+	yellow;
+	green;
+}
+
+struct tcp_person
+{
+	bool sex;
+	uint32 addr;
+	int32 age;
+	sint32 sage;
+	uint64 telephone;
+	int64 score;
+	sint64 scores;
+	fixed32 f;
+	fixed64 g;
+	bool aa;
+	float hp;
+	double mana;
+	string name;
+	bytes orders;
+	map int32,int32 seqs;
+	repeated int32 ves;
+	date day;
+	times t;
+	datetime dt;
+}
+
+message login -> 10001
+{
+	request
+	{
+		tcp_person per_req;
+	}
+	response
+	{
+		tcp_person per_resp;
+	}
+}
+
+model test_table
+{
+	int64 id;
+	date day;
+	datetime tt;
+	times tts;
+}

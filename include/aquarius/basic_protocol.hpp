@@ -1,7 +1,7 @@
 #pragma once
+#include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/string_literal.hpp>
-#include <aquarius/serialize/binary.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 #include <boost/core/empty_value.hpp>
 #include <iostream>
 

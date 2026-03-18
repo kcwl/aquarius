@@ -1,4 +1,5 @@
-#include "test.virgo.h"
+#include "test_tcp.virgo.h"
+#include "test_http.virgo.h"
 
 AQUARIUS_HANDLER(login_request, login_response, ctx_tcp_test)
 {
@@ -10,7 +11,7 @@ AQUARIUS_HANDLER(login_request, login_response, ctx_tcp_test)
 }
 
 
-AQUARIUS_HANDLER(new_http_login_request, new_http_login_response, ctx_test_http_hander)
+AQUARIUS_HANDLER(http_test_post_request, http_test_post_response, ctx_test_http_hander)
 {
 	response().body().uuid = request()->body().uuid;
 	response().body().per_resp = request()->body().per_req;

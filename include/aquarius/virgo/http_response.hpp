@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/ip/http/http_header.hpp>
-#include <aquarius/serialize/json.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>

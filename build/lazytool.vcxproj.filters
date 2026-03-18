@@ -18,54 +18,51 @@
     <ClCompile Include="..\src\lazytool\lazytool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\log.cpp">
+    <ClCompile Include="..\src\lazytool\field.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\registor.cpp">
+    <ClCompile Include="..\src\lazytool\data_field.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\file_parse.cpp">
+    <ClCompile Include="..\src\lazytool\message_field.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\custom_type.cpp">
+    <ClCompile Include="..\src\lazytool\cpp_generator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\cpp_generater.cpp">
+    <ClCompile Include="..\src\lazytool\schema_parser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\model_parse.cpp">
+    <ClCompile Include="..\src\lazytool\protocol_schema.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\cpp_db_generate.cpp">
+    <ClCompile Include="..\src\lazytool\command_interface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\lazytool\file_parse.h">
+    <ClInclude Include="..\src\lazytool\field.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\log.h">
+    <ClInclude Include="..\src\lazytool\data_field.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\registor.h">
+    <ClInclude Include="..\src\lazytool\message_field.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\custom_type.h">
+    <ClInclude Include="..\src\lazytool\code_generator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\struct_type.hpp">
+    <ClInclude Include="..\src\lazytool\cpp_generator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\cpp_generater.h">
+    <ClInclude Include="..\src\lazytool\schema_parser.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\parse_helper.hpp">
+    <ClInclude Include="..\src\lazytool\protocol_schema.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\model_parse.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\cpp_db_generate.h">
+    <ClInclude Include="..\src\lazytool\command_interface.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

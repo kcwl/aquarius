@@ -151,9 +151,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\test_http.virgo.cpp" />
+    <ClCompile Include="..\test\test_tcp.virgo.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\detail\ssl_context_base.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_socket_adaptor.hpp" />
@@ -204,20 +207,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\cpp_type.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\html.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_cookie_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_html_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
@@ -237,6 +226,19 @@
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_status.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\binary.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\concept.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\cookie.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\scalar_type.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\error.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\html.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_cookie_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_html_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_json_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\http_kv_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\json.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\kv.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\serialize\tcp_binary_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
@@ -256,22 +258,19 @@
     <ClCompile Include="..\test\module.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
-    <ClCompile Include="..\test\cmd_options.cpp" />
     <ClCompile Include="..\test\session.cpp" />
-    <ClCompile Include="..\test\detail.cpp" />
     <ClCompile Include="..\test\router.cpp" />
     <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
     <ClCompile Include="..\test\sql.cpp" />
-    <ClInclude Include="..\test\test.virgo.h" />
+    <ClInclude Include="..\test\test_http.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />
+    <ClInclude Include="..\test\test_tcp.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\string_literal.cpp" />
     <ClCompile Include="..\test\struct_name.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
-    <ClCompile Include="..\test\test.virgo.cpp" />
-    <ClCompile Include="..\test\url.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />

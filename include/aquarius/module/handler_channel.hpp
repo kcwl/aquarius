@@ -1,10 +1,10 @@
 #pragma once
+#include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/singleton.hpp>
 #include <expected>
-#include <vector>
 #include <shared_mutex>
+#include <vector>
 
 namespace aquarius
 {

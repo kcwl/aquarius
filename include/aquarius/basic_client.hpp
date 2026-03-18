@@ -6,7 +6,6 @@
 #include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_module.hpp>
-#include <aquarius/serialize/flex_buffer.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <functional>
 
