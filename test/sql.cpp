@@ -5,11 +5,12 @@
 BOOST_AUTO_TEST_SUITE(sql)
 
 using namespace aquarius::tbl;
+using namespace aquarius;
 
 struct personal
 {
-	integer age;
-	integer sex;
+	fields<int64> age;
+	fields<int64> sex;
 
 	constexpr static auto member()
 	{

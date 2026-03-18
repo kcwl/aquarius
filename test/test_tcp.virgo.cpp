@@ -28,3 +28,4 @@ void login_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	per_resp = this->parse_from<tcp_person>(buffer);
 }
+

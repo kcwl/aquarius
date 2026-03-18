@@ -26,6 +26,10 @@ namespace aquarius
 				{
 					result = generate_normal_data(header, source, std::dynamic_pointer_cast<data_field>(field));
 				}
+				else if (field->type() == struct_type::model)
+				{
+					result = generate_model(header, std::dynamic_pointer_cast<data_field>(field));
+				}
 			}
 
 			header << "\n";
@@ -663,7 +667,7 @@ namespace aquarius
 			return json_type::object;
 		}
 
-		void cpp_generator::generate_model(std::fstream& ofs, std::shared_ptr<field> field_ptr)
+		bool cpp_generator::generate_model(std::fstream& ofs, std::shared_ptr<field> field_ptr)
 		{
 			ofs << "struct " << field_ptr->name() << std::endl;
 			ofs << "{" << std::endl;
@@ -677,6 +681,8 @@ namespace aquarius
 			generate_model_member_name_func(ofs, data_field_ptr);
 
 			ofs << "};";
+
+			return true;
 		}
 
 		void cpp_generator::generate_model_field(std::fstream& ofs, std::shared_ptr<data_field> model_field_ptr)
@@ -686,7 +692,7 @@ namespace aquarius
 				if (field.first.empty())
 					continue;
 
-				ofs << "\taquarius::tbl::" << field.first << " ";
+				ofs << "\taquarius::tbl::fields<" << field.first << "> ";
 
 				ofs << field.second << ";" << std::endl;
 			}

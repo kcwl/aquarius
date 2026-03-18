@@ -38,8 +38,6 @@ public:
 	login_req_body();
 	virtual ~login_req_body() = default;
 
-public:
-	bool operator==(const login_req_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -55,8 +53,6 @@ public:
 	login_resp_body();
 	virtual ~login_resp_body() = default;
 
-public:
-	bool operator==(const login_resp_body & other) const; 
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -67,6 +63,31 @@ public:
 	tcp_person per_resp;
 };
 
+struct test_table
+{
+	aquarius::tbl::fields<int64> id;
+	aquarius::tbl::fields<date> day;
+	aquarius::tbl::fields<datetime> tt;
+	aquarius::tbl::fields<times> tts;
+	constexpr static auto member()
+	{
+		return std::make_tuple(
+			&test_table::id,
+			&test_table::day,
+			&test_table::tt,
+			&test_table::tts
+		);
+	}
+	constexpr static auto member_name()
+	{
+		return std::array{
+			"id"sv,
+			"day"sv,
+			"tt"sv,
+			"tts"sv
+		};
+	}
+};
 
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_body>;
 using login_response = aquarius::virgo::tcp_response<login_resp_body>;

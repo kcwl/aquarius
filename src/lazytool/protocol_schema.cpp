@@ -269,14 +269,6 @@ namespace aquarius
 		{
 			char end{};
 
-			auto value = read_value<token::name, ' '>(ifs, end);
-
-			if (value.empty())
-				return false;
-
-			if (value != "model")
-				return false;
-
 			field_ptr->name() = read_value<token::name, '{'>(ifs, end);
 
 			if (field_ptr->name().empty())
@@ -297,7 +289,7 @@ namespace aquarius
 					return false;
 				}
 
-				value = read_value<token::name, ' ', ';'>(ifs, end);
+				auto value = read_value<token::name, ' ', ';'>(ifs, end);
 
 				field_ptr->add_field(type, value);
 			}

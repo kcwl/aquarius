@@ -137,7 +137,7 @@ namespace aquarius
 
 				std::remove_cvref_t<T> value{};
 
-				value.serialize(ss);
+				ss >> value;
 
 				return value;
 			}

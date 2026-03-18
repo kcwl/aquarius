@@ -96,7 +96,7 @@ namespace aquarius
 
 			json_type check_type(const std::string& type);
 
-			void generate_model(std::fstream& ofs, std::shared_ptr<field> field_ptr);
+			bool generate_model(std::fstream& ofs, std::shared_ptr<field> field_ptr);
 
 			void generate_model_field(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 

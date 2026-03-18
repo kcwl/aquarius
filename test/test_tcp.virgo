@@ -39,3 +39,11 @@ message login -> 10001
 		tcp_person per_resp;
 	}
 }
+
+model test_table
+{
+	int64 id;
+	date day;
+	datetime tt;
+	times tts;
+}
