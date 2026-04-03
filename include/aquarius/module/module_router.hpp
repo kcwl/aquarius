@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/detail/string_literal.hpp>
+#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module.hpp>
@@ -40,23 +41,18 @@ namespace aquarius
 					continue;
 				}
 
-				if (!f.second->config())
-				{
-					continue;
-				}
-
 				if (!f.second->init())
 				{
 					XLOG_WARNING() << "[" << f.second->name() << "] init error";
 					continue;
 				}
 
-				co_spawn(pool.get_io_service(), [&]() -> awaitable<void> { co_await f.second->run(); }, detached);
+				co_spawn(pool.get_io_service(), [&]() -> asio::awaitable<void> { co_await f.second->run(); }, asio::detached);
 			}
 		}
 
 		template <typename T, typename Task>
-		auto schedule(std::shared_ptr<Task> task) -> awaitable<typename Task::return_type>
+		auto schedule(std::shared_ptr<Task> task) -> asio::awaitable<typename Task::return_type>
 		{
 			std::shared_lock lock(mutex_);
 
@@ -128,7 +124,7 @@ namespace aquarius
 				f.second->timer(ms);
 			}
 		}
-		
+
 		void close()
 		{
 			std::unique_lock lk(mutex_);

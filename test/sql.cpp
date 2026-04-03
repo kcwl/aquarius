@@ -9,24 +9,8 @@ using namespace aquarius;
 
 struct personal
 {
-	fields<int64> age;
-	fields<int64> sex;
-
-	constexpr static auto member()
-	{
-		return std::make_tuple(
-			&personal::age,
-			&personal::sex
-		);
-	}
-
-	constexpr static auto member_name()
-	{
-		return std::make_tuple(
-			"age"sv,
-			"sex"sv
-		);
-	}
+	int64 age;
+	int64 sex;
 };
 
 
@@ -35,24 +19,19 @@ BOOST_AUTO_TEST_CASE(sql_)
 {
 	personal p{ 1, true };
 
-	auto sql1 = aquarius::tbl::insert(p);
+	auto sql1 = static_cast<std::string>(aquarius::insert(p));
 
 	BOOST_TEST(sql1 == "insert into personal(age,sex) values(1,1)");
 
-	auto sql3 = aquarius::tbl::remove(p);
+	auto sql3 = static_cast<std::string>(aquarius::remove(p));
 
 	BOOST_TEST(sql3 == "delete from personal");
 
-	p.age.set_condition(1);
-	p.sex.set_condition(1);
-
-	auto sql2 = aquarius::tbl::update(p);
+	auto sql2 = static_cast<std::string>(aquarius::update(p));
 
 	BOOST_TEST(sql2 == "update personal set age=1 and sex=1");
 
-	p.age.clear();
-	p.sex.clear();
-	auto sql = aquarius::tbl::select<personal>(p);
+	auto sql = static_cast<std::string>(aquarius::select<personal>);
 
 	BOOST_TEST(sql == "select * from personal");
 
@@ -64,19 +43,20 @@ BOOST_AUTO_TEST_CASE(sql_)
 
 using namespace std::chrono_literals;
 
+AQUARIUS_MSYQL_CONFIG()
+{
+	mysql.host = "localhost";
+	mysql.user = "root";
+	mysql.db = "unittest";
+}
+
 BOOST_AUTO_TEST_CASE(connecting)
 {
 	personal p{ 1, 1 };
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
-	boost::mysql::pool_params params{};
-	params.server_address.emplace_host_and_port("localhost");
-	params.username = "root";
-	params.database = "unittest";
-	params.ssl = boost::mysql::ssl_mode::disable;
-
-	aquarius::tbl::mysql connector(io, std::move(params));
+	aquarius::sql_op<asio::any_io_executor> connector(io);
 
 	boost::mysql::any_connection conn(io);
 
@@ -84,21 +64,23 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 	aquarius::error_code ec{};
 
-	auto fur = aquarius::co_spawn(
+	auto fur = aquarius::asio::co_spawn(
 		io,
-		[&] -> aquarius::awaitable<void>
+		[&] -> aquarius::asio::awaitable<void>
 		{
 			try
 			{
 				connector.async_run();
 
-				auto res = co_await connector.async_execute("insert into personal values(1,1)", ec);
+				std::size_t affected = co_await connector.async_execute("insert into personal values(1,1)"sv, ec);
 
-				BOOST_TEST(res != 0);
+				BOOST_TEST(affected != 0);
 
-				auto select_res = co_await connector.async_query<personal>("select * from personal", ec);
+				std::vector<personal> results{};
 
-				BOOST_TEST(select_res.size() != 0);
+				results = co_await connector.async_query<personal>("select * from personal", ec);
+
+				BOOST_TEST(results.size() != 0);
 			}
 			catch (const boost::mysql::error_with_diagnostics& err)
 			{
@@ -107,7 +89,7 @@ BOOST_AUTO_TEST_CASE(connecting)
 			}
 
 		},
-		aquarius::use_future);
+		aquarius::asio::use_future);
 
 	std::thread t([&] { io.run(); });
 

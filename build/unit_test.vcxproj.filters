@@ -52,6 +52,12 @@
     <Filter Include="include\aquarius\virgo\serialize">
       <UniqueIdentifier>{8f0dbbaa-0d5f-4054-8083-be21d74c883a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\resource">
+      <UniqueIdentifier>{562069c2-b9ea-44b2-9d68-d038d9fef5a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\tbl\detail">
+      <UniqueIdentifier>{4b56a2f6-a429-480d-a91a-bc95b35b1cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -210,9 +216,6 @@
     <ClInclude Include="..\test\test_model.tbl.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\add_string.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -231,23 +234,14 @@
     <ClInclude Include="..\include\aquarius\ini\parse.hpp">
       <Filter>include\aquarius\ini</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\empty.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\session_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\sql_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\player_module.hpp">
       <Filter>include\aquarius\module</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\database_param.hpp">
-      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_method_handler.hpp">
       <Filter>include\aquarius\ip\http</Filter>
@@ -256,15 +250,6 @@
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\generate_view.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\mysql.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\reflect.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_client_socket_adaptor.hpp">
@@ -329,6 +314,51 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resource\global_resource.hpp">
+      <Filter>include\aquarius\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resource\config_register.hpp">
+      <Filter>include\aquarius\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\select_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\operator.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\sql_op.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\detail\mysql_io_service.hpp">
+      <Filter>include\aquarius\tbl\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\module\sql_module.hpp">
+      <Filter>include\aquarius\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\tbl\update_view.hpp">
+      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

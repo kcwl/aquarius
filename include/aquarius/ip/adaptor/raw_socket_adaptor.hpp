@@ -24,18 +24,18 @@ namespace aquarius
 		}
 
 		template <typename Endpoint, typename Dura>
-		auto async_connect(const Endpoint& endpoint, Dura timeout) -> awaitable<error_code>
+		auto async_connect(const Endpoint& endpoint, Dura timeout) -> asio::awaitable<error_code>
 		{
 			error_code ec;
 
 			co_await boost::asio::async_connect(socket_, endpoint,
-												cancel_after(timeout, redirect_error(use_awaitable, ec)));
+												asio::cancel_after(timeout, asio::redirect_error(asio::use_awaitable, ec)));
 
 			co_return ec;
 		}
 
 		template <typename Dura>
-		auto accept(Dura) -> awaitable<error_code>
+		auto accept(Dura) -> asio::awaitable<error_code>
 		{
 			co_return error_code{};
 		}

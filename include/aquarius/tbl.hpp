@@ -1,5 +1,10 @@
 #pragma once
-#include <aquarius/tbl/database_param.hpp>
-#include <aquarius/tbl/generate_view.hpp>
-#include <aquarius/tbl/mysql.hpp>
+#include <aquarius/tbl/enter_view.hpp>
+#include <aquarius/tbl/insert_view.hpp>
+#include <aquarius/tbl/mysql_config_register.hpp>
 #include <aquarius/tbl/mysql_type.hpp>
+#include <aquarius/tbl/operator.hpp>
+#include <aquarius/tbl/remove_view.hpp>
+#include <aquarius/tbl/select_view.hpp>
+#include <aquarius/tbl/sql_op.hpp>
+#include <aquarius/tbl/update_view.hpp>

@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;MYSQL_OP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -207,16 +207,24 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
+    <ClInclude Include="..\include\aquarius\resource\config_register.hpp" />
+    <ClInclude Include="..\include\aquarius\resource\global_resource.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\database_param.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\empty.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\generate_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\mysql.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\detail\mysql_io_service.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\reflect.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\operator.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\sql_op.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />

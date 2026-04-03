@@ -5,7 +5,7 @@
 namespace aquarius
 {
 	template <typename Allocator = std::allocator<char>>
-	class basic_flexbuf : public std::streambuf, private noncopyable
+	class basic_flexbuf : public std::streambuf, private asio::noncopyable
 	{
 	public:
 		using const_buffers_type = boost::asio::const_buffer;

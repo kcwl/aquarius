@@ -4,6 +4,7 @@
 #include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
+#include <fstream>
 #include <vector>
 
 namespace aquarius
@@ -21,7 +22,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto handle() -> awaitable<error_code> override
+		virtual auto handle() -> asio::awaitable<error_code> override
 		{
 			this->response().header().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 			this->response().header().set_field("Access-Control-Request-Method", "POST");
@@ -75,7 +76,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto handle() -> awaitable<error_code> override
+		virtual auto handle() -> asio::awaitable<error_code> override
 		{
 			auto router = this->request()->header().find("router");
 

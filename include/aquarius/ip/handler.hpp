@@ -21,7 +21,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto visit(flex_buffer& buffer, int version, error_code& ec) -> awaitable<flex_buffer>
+		virtual auto visit(flex_buffer& buffer, int version, error_code& ec) -> asio::awaitable<flex_buffer>
 		{
 			request()->consume(buffer, version);
 
@@ -50,7 +50,7 @@ namespace aquarius
 		}
 
 	protected:
-		virtual auto handle() -> awaitable<error_code> = 0;
+		virtual auto handle() -> asio::awaitable<error_code> = 0;
 
 	private:
 		void make_response(error_code result)
@@ -71,7 +71,7 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [](flex_buffer& buffer, int version) -> aquarius::awaitable<std::expected<flex_buffer, error_code>>
+			auto f = [](flex_buffer& buffer, int version) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 			{
 				auto handler_ptr = std::make_shared<Handler>();
 
@@ -104,9 +104,9 @@ namespace aquarius
 		__handler()                                                                                                    \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##__handler))                                                 \
 		{}                                                                                                             \
-		virtual auto handle() -> aquarius::awaitable<aquarius::error_code> override;                                   \
+		virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override;                                   \
 	};                                                                                                                 \
-	inline auto __handler::handle() -> aquarius::awaitable<aquarius::error_code>
+	inline auto __handler::handle() -> aquarius::asio::awaitable<aquarius::error_code>
 
 #define AQUARIUS_HANDLER(__request, __response, __handler)                                                             \
 	class __handler;                                                                                                   \

@@ -15,20 +15,20 @@ namespace aquarius
 
 	struct tcp_protocol
 	{
-		using socket = boost::asio::ip::tcp::socket;
+		using socket = asio::ip::tcp::socket;
 
-		using endpoint = boost::asio::ip::tcp::endpoint;
+		using endpoint = asio::ip::tcp::endpoint;
 
-		using acceptor = boost::asio::ip::tcp::acceptor;
+		using acceptor = asio::ip::tcp::acceptor;
 
-		using resolver = boost::asio::ip::tcp::resolver;
+		using resolver = asio::ip::tcp::resolver;
 
-		using no_delay = boost::asio::ip::tcp::no_delay;
+		using no_delay = asio::ip::tcp::no_delay;
 
-		using keep_alive = boost::asio::socket_base::keep_alive;
+		using keep_alive = asio::socket_base::keep_alive;
 
 		template <typename Socket, typename Dura, typename Session>
-		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
 			auto ec = co_await socket.accept(timeout);
 
@@ -49,9 +49,9 @@ namespace aquarius
 
 					XLOG_INFO() << "[accept] parse protocol router: " << router;
 
-					co_spawn(
+					asio::co_spawn(
 						session_ptr->get_executor(),
-						[&, r = std::move(router)] -> awaitable<void>
+						[&, r = std::move(router)] -> asio::awaitable<void>
 						{
 							auto result = co_await mpc_publish(std::move(r), buffer);
 
@@ -62,11 +62,11 @@ namespace aquarius
 
 							co_await session_ptr->async_send(std::move(*result));
 						},
-						detached);
+						asio::detached);
 				}
 			}
 
-			if (ec != boost::asio::error::eof)
+			if (ec != asio::error::eof)
 			{
 				XLOG_ERROR() << "[accept] error: " << ec.what();
 			}
@@ -75,7 +75,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto query(std::shared_ptr<Session> session_ptr, error_code& ec) -> awaitable<flex_buffer>
+		static auto query(std::shared_ptr<Session> session_ptr, error_code& ec) -> asio::awaitable<flex_buffer>
 		{
 			ec = error_code{};
 
@@ -92,7 +92,7 @@ namespace aquarius
 				co_return std::move(buffer);
 			}
 
-			if (ec != boost::asio::error::eof)
+			if (ec != asio::error::eof)
 			{
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
 			}
@@ -102,7 +102,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
+		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
 			uint32_t packet_length{};
 
@@ -123,17 +123,17 @@ namespace aquarius
 
 	struct http_protocol
 	{
-		using socket = boost::asio::ip::tcp::socket;
+		using socket = asio::ip::tcp::socket;
 
-		using endpoint = boost::asio::ip::tcp::endpoint;
+		using endpoint = asio::ip::tcp::endpoint;
 
-		using acceptor = boost::asio::ip::tcp::acceptor;
+		using acceptor = asio::ip::tcp::acceptor;
 
-		using resolver = boost::asio::ip::tcp::resolver;
+		using resolver = asio::ip::tcp::resolver;
 
-		using no_delay = boost::asio::ip::tcp::no_delay;
+		using no_delay = asio::ip::tcp::no_delay;
 
-		using keep_alive = boost::asio::socket_base::keep_alive;
+		using keep_alive = asio::socket_base::keep_alive;
 
 		constexpr static auto two_crlf = "\r\n\r\n"sv;
 
@@ -142,7 +142,7 @@ namespace aquarius
 		constexpr static std::size_t header_part = 3;
 
 		template <typename Socket, typename Session, typename Dura>
-		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> awaitable<error_code>
+		static auto accept(Socket& socket, Dura timeout, std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
 			auto ec = co_await socket.accept(timeout);
 
@@ -174,9 +174,9 @@ namespace aquarius
 
 				ec = co_await recv(session_ptr, buffer);
 
-				co_spawn(
+				asio::co_spawn(
 					session_ptr->get_executor(),
-					[&, r = std::move(router)] -> awaitable<void>
+					[&, r = std::move(router)] -> asio::awaitable<void>
 					{
 						auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
 
@@ -187,7 +187,7 @@ namespace aquarius
 
 						co_await session_ptr->async_send(std::move(*resp_buf));
 					},
-					detached);
+					asio::detached);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -200,7 +200,7 @@ namespace aquarius
 
 		template <typename Session>
 		static auto query(std::shared_ptr<Session> session_ptr, error_code& ec, std::size_t seq = 0)
-			-> awaitable<flex_buffer>
+			-> asio::awaitable<flex_buffer>
 		{
 			flex_buffer buffer{};
 
@@ -232,7 +232,7 @@ namespace aquarius
 
 	private:
 		template <typename Session>
-		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> awaitable<error_code>
+		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
 			// auto content_type = hf.find("content-type");
 
@@ -306,7 +306,7 @@ namespace aquarius
 				std::tuple<virgo::http_method, boost::system::result<boost::urls::url_view>, virgo::http_version>,
 				std::tuple<virgo::http_version, virgo::http_status>>;
 
-			ec = boost::asio::error::eof;
+			ec = asio::error::eof;
 
 			auto sp = header_span | std::views::split(' ');
 
@@ -371,16 +371,16 @@ namespace aquarius
 			}
 		};
 
-		using socket = boost::asio::ip::udp::socket;
+		using socket = asio::ip::udp::socket;
 
-		using endpoint = boost::asio::ip::udp::endpoint;
+		using endpoint = asio::ip::udp::endpoint;
 
 		using acceptor = null_acceptor;
 
-		using resolver = boost::asio::ip::udp::resolver;
+		using resolver = asio::ip::udp::resolver;
 
 		using no_delay = null_delay;
 
-		using keep_alive = boost::asio::socket_base::keep_alive;
+		using keep_alive = asio::socket_base::keep_alive;
 	};
 } // namespace aquarius

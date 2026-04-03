@@ -51,23 +51,23 @@ namespace aquarius
 	};
 
 	template <typename Session>
-	inline auto mpc_insert_session(std::shared_ptr<Session> session_ptr) -> awaitable<bool>
+	inline auto mpc_insert_session(std::shared_ptr<Session> session_ptr) -> asio::awaitable<bool>
 	{
-		co_return co_await mpc::call<bool, session_module<Session>>([&](session_module<Session>* ptr) -> awaitable<bool>
+		co_return co_await mpc::call<bool, session_module<Session>>([&](session_module<Session>* ptr) -> asio::awaitable<bool>
 																	{ co_return ptr->insert(session_ptr); });
 	}
 
 	template <typename Session>
-	inline auto mpc_erase_session(std::size_t id) -> awaitable<void>
+	inline auto mpc_erase_session(std::size_t id) -> asio::awaitable<void>
 	{
-		co_return co_await mpc::call<void, session_module<Session>>([&](session_module<Session>* ptr) -> awaitable<void>
+		co_return co_await mpc::call<void, session_module<Session>>([&](session_module<Session>* ptr) -> asio::awaitable<void>
 																	{ co_return ptr->erase(id); });
 	}
 
 	template <typename Session>
-	inline auto mpc_find_session(std::size_t id) -> awaitable<std::shared_ptr<Session>>
+	inline auto mpc_find_session(std::size_t id) -> asio::awaitable<std::shared_ptr<Session>>
 	{
 		co_return co_await mpc::call<std::shared_ptr<Session>, session_module<Session>>(
-			[&](session_module<Session>* ptr) -> awaitable<std::shared_ptr<Session>> { co_return ptr->find(id); });
+			[&](session_module<Session>* ptr) -> asio::awaitable<std::shared_ptr<Session>> { co_return ptr->find(id); });
 	}
 } // namespace aquarius

@@ -13,7 +13,7 @@ namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	template <typename Session, typename Executor = any_io_executor>
+	template <typename Session, typename Executor = asio::any_io_executor>
 	class basic_client
 	{
 		using socket = Session::socket;
@@ -25,7 +25,7 @@ namespace aquarius
 		using executor_t = Executor;
 
 	public:
-		basic_client(io_context& context, std::chrono::milliseconds timeout)
+		basic_client(asio::io_context& context, std::chrono::milliseconds timeout)
 			: basic_client(context.get_executor(), timeout)
 		{}
 
@@ -44,7 +44,7 @@ namespace aquarius
 		{
 			return executor_;
 		}
-		auto async_connect(const std::string& host, uint16_t port) -> awaitable<error_code>
+		auto async_connect(const std::string& host, uint16_t port) -> asio::awaitable<error_code>
 		{
 			session_ptr_ =
 				std::make_shared<Session>(std::move(socket(this->get_executor())), 30ms, this->get_timeout());
@@ -62,12 +62,12 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto reconnect() -> awaitable<error_code>
+		auto reconnect() -> asio::awaitable<error_code>
 		{
 			co_return co_await async_connect(host_, port_);
 		}
 
-		auto async_send(flex_buffer&& buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
 		{
 			co_return co_await session_ptr_->async_send(std::move(buffer));
 		}
@@ -124,7 +124,7 @@ namespace aquarius
 
 		template <typename Response, typename Request>
 		requires(is_message_type<Request>::value && is_message_type<Response>::value)
-		auto async_send(std::shared_ptr<Request> req) -> awaitable<Response>
+		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 		{
 			flex_buffer buffer{};
 

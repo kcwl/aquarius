@@ -43,7 +43,7 @@ namespace aquarius
 			return uuid_;
 		}
 
-		auto async_connect(const std::string& host, const std::string& port) -> awaitable<error_code>
+		auto async_connect(const std::string& host, const std::string& port) -> asio::awaitable<error_code>
 		{
 			resolver resolve(this->get_executor());
 
@@ -72,14 +72,14 @@ namespace aquarius
 			return socket_.remote_endpoint().port();
 		}
 
-		auto async_read(flex_buffer& buffer, std::size_t length) -> awaitable<error_code>
+		auto async_read(flex_buffer& buffer, std::size_t length) -> asio::awaitable<error_code>
 		{
 			error_code ec;
 
 			auto mutable_buffer = buffer.prepare(length);
 
 			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-											 redirect_error(use_awaitable, ec));
+											 asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -95,12 +95,12 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto async_read_util(flex_buffer& buffer, std::string_view delm) -> awaitable<error_code>
+		auto async_read_util(flex_buffer& buffer, std::string_view delm) -> asio::awaitable<error_code>
 		{
 			error_code ec;
 
 			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer),
-															   delm, redirect_error(use_awaitable, ec));
+															   delm, asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -114,11 +114,11 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto async_send(flex_buffer&& buffer) -> awaitable<error_code>
+		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
-			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), redirect_error(use_awaitable, ec));
+			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -136,7 +136,7 @@ namespace aquarius
 		{
 			error_code ec;
 
-			socket_.shutdown(boost::asio::socket_base::shutdown_both, ec);
+			socket_.shutdown(asio::socket_base::shutdown_both, ec);
 
 			if (ec)
 			{
@@ -181,12 +181,12 @@ namespace aquarius
 			return !ec;
 		}
 
-		auto accept() -> awaitable<error_code>
+		auto accept() -> asio::awaitable<error_code>
 		{
 			co_return co_await Protocol::accept(this->socket_adaptor_, this->timeout_, this->shared_from_this());
 		}
 
-		auto query(error_code& ec) -> awaitable<flex_buffer>
+		auto query(error_code& ec) -> asio::awaitable<flex_buffer>
 		{
 			co_return co_await Protocol::query(this->shared_from_this(), ec);
 		}

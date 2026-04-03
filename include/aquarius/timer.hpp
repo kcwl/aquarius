@@ -10,7 +10,7 @@ namespace aquarius
 		using duration = typename Timer::duration;
 
 	public:
-		explicit timer(io_context& ctx, duration timeout)
+		explicit timer(asio::io_context& ctx, duration timeout)
 			: timer(ctx.get_executor(), timeout)
 		{}
 
@@ -22,7 +22,7 @@ namespace aquarius
 
 	public:
 		template <typename Func>
-		auto async_wait(Func&& f) -> awaitable<void>
+		auto async_wait(Func&& f) -> asio::awaitable<void>
 		{
 			error_code ec{};
 
@@ -30,7 +30,7 @@ namespace aquarius
 			{
 				timer_.expires_after(timeout_);
 
-				co_await timer_.async_wait(redirect_error(use_awaitable, ec));
+				co_await timer_.async_wait(asio::redirect_error(asio::use_awaitable, ec));
 
 				std::forward<Func>(f)(ec);
 			}

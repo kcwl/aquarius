@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_SUITE(tcp_client_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_tcp_ctor)
 {
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 	{
 		aquarius::tcp_client client(io, 1000ms);
 
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(test_tcp_ctor)
 
 BOOST_AUTO_TEST_CASE(test_http_ctor)
 {
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 	{
 		aquarius::http_client client(io, 1000ms);
 

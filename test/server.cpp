@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(filter)
 {
 	aquarius::tcp_server server(8000, 1);
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
 	BOOST_TEST(server.ip_filter(""));
 
@@ -59,25 +59,25 @@ BOOST_AUTO_TEST_CASE(callback)
 {
 	aquarius::tcp_server server(8000, 1);
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
-	auto future = aquarius::co_spawn(
+	auto future = aquarius::asio::co_spawn(
 		io,
-		[&]() -> aquarius::awaitable<void>
+		[&]() -> aquarius::asio::awaitable<void>
 		{
 			co_await server.accept_func(nullptr);
 
-			server.set_accept_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::awaitable<void> { BOOST_TEST(true); co_return; });
+			server.set_accept_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
 
 			co_await server.accept_func(nullptr);
 
 			co_await server.close_func(nullptr);
 
-			server.set_close_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::awaitable<void> { BOOST_TEST(true); co_return; });
+			server.set_close_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
 
 			co_await server.close_func(nullptr);
 		},
-		aquarius::use_future);
+		aquarius::asio::use_future);
 
 	io.run();
 
