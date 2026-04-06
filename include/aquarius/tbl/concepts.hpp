@@ -25,4 +25,18 @@ namespace aquarius
 	{
 		using type = R;
 	};
+
+	template <typename T>
+	concept iterator_t = requires() {
+		std::begin(std::declval<T>());
+		std::end(std::declval<T>());
+	};
+
+	template <typename T>
+	concept push_t = requires() {
+		std::declval<T>().begin();
+		std::declval<T>().end();
+		std::back_inserter(std::declval<std::add_lvalue_reference_t<T>>());
+	};
+
 } // namespace aquarius
