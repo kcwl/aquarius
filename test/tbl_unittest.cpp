@@ -627,6 +627,11 @@ BOOST_AUTO_TEST_CASE(connecting)
 
     aquarius::io_service_pool pool(1);
 
+    aquarius::global_resource::get_mutable_instance().mysql().host = "localhost";
+    aquarius::global_resource::get_mutable_instance().mysql().port = 3306;
+    aquarius::global_resource::get_mutable_instance().mysql().db = "unittest";
+    aquarius::global_resource::get_mutable_instance().mysql().user = "root";
+
     aquarius::module_router::get_mutable_instance().regist<aquarius::sql_module<>>();
 
     aquarius::module_router::get_mutable_instance().run(pool);
@@ -647,6 +652,8 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 
     std::thread t([&] { pool.run(); });
+
+    std::this_thread::sleep_for(2s);
 
     future.get();
 
