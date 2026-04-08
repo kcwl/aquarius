@@ -37,7 +37,7 @@ namespace aquarius
 			return true;
 		}
 
-		auto async_run() -> asio::awaitable<void>
+		void async_run()
 		{
 			auto& mysql = global_resource::get_mutable_instance().mysql();
 			boost::mysql::pool_params params{};
@@ -49,9 +49,7 @@ namespace aquarius
 
 			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(executor_, std::move(params));
 
-			pool_ptr_->async_run(asio::deferred);
-
-			co_return;
+			pool_ptr_->async_run(asio::detached);
 		}
 
 		template <typename T, typename Task>
@@ -92,11 +90,18 @@ namespace aquarius
 			auto conn_ptr = co_await pool_ptr_->async_get_connection(
 				asio::cancel_after(1s, asio::redirect_error(asio::use_awaitable, ec)));
 
+			std::vector<T> results{};
+
+			if (ec)
+			{
+				co_return results;
+			}
+
 			boost::mysql::results result{};
 
 			co_await conn_ptr->async_execute(sql, result,
 											 asio::cancel_after(1s, asio::redirect_error(asio::use_awaitable, ec)));
-			std::vector<T> results{};
+			
 			if (!ec)
 			{
 				for (const auto r : result.rows())

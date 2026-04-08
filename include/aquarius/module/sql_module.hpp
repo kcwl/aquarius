@@ -54,7 +54,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto results = co_await connector_->async_query<T>(sql, ec);
+			auto results = co_await connector_->template async_query<T>(sql, ec);
 
 			if (ec)
 			{

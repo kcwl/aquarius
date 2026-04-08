@@ -10,8 +10,7 @@ namespace aquarius
 		template <typename T>
 		remove_view& operator()(T&& value)
 		{
-			// constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
-			constexpr auto struct_name = "person"sv;
+			constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
 
 			complete_sql_.str("");
 
@@ -51,5 +50,14 @@ namespace aquarius
 
 		bool has_condition_;
 	};
-	static remove_view remove_;
+
+	template <auto Ptr>
+	inline remove_view& operator|(remove_view& up, const grep_view<Ptr>& g)
+	{
+		up.merge(g);
+
+		return up;
+	};
+
+	static remove_view remove;
 } // namespace aquarius

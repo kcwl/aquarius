@@ -11,17 +11,19 @@ namespace aquarius
 		constexpr static auto make_member_names()
 		{
 			constexpr static auto sp = ","sv;
-			auto f = [] { return ((concat_v<get_member_pointer_name<T, Args>(), sp>), ...); };
+			auto f = [] { return concat_v<(member_pointer_name<T, Args>::value, sp)...>; };
 
-			constexpr static auto result = f();
+			//constexpr static auto result = f();
+			auto result = f();
 
 			return result.substr(0, result.size() - 1);
 		}
 
+		constexpr static auto membes = make_member_names();
+
 		constexpr static auto make_content()
 		{
-			// constexpr static auto name = struct_name<T>();
-			constexpr static auto name = "person"sv;
+			constexpr static auto name = detail::struct_name<T>();
 			constexpr static auto sel = "select * from "sv;
 
 			constexpr static auto part_sel = "select "sv;
@@ -33,7 +35,7 @@ namespace aquarius
 			}
 			else
 			{
-				return concat_v<part_sel, make_member_names(), from, name>;
+				return concat_v<part_sel, membes, from, name>;
 			}
 		}
 

@@ -25,22 +25,22 @@ namespace aquarius
 	}
 
 	template <typename T, auto... Args>
-	inline auto operator|(const select_view<T, Args...>& v, enter_view& etv) ->asio::awaitable<T>
+	inline auto operator|(const select_view<T, Args...>& v, const enter_view& etv) ->asio::awaitable<std::vector<T>>
 	{
 		co_return co_await etv.select<T>(static_cast<std::string>(v));
 	}
 
-	inline auto operator|(const insert_view& v, enter_view& etv) ->asio::awaitable<std::size_t>
+	inline auto operator|(const insert_view& v, const enter_view& etv) ->asio::awaitable<std::size_t>
 	{
 		co_return co_await etv.insert(static_cast<std::string>(v));
 	}
 
-	inline auto operator|(const update_view& v, enter_view& etv)->asio::awaitable<std::size_t>
+	inline auto operator|(const update_view& v, const enter_view& etv)->asio::awaitable<std::size_t>
 	{
 		co_return co_await etv.update(static_cast<std::string>(v));
 	}
 
-	inline auto operator|(const remove_view& v, enter_view& etv)->asio::awaitable<std::size_t>
+	inline auto operator|(const remove_view& v, const enter_view& etv)->asio::awaitable<std::size_t>
 	{
 		co_return co_await etv.remove(static_cast<std::string>(v));
 	}

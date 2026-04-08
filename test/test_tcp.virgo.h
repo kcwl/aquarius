@@ -65,28 +65,10 @@ public:
 
 struct test_table
 {
-	aquarius::tbl::fields<int64> id;
-	aquarius::tbl::fields<date> day;
-	aquarius::tbl::fields<datetime> tt;
-	aquarius::tbl::fields<times> tts;
-	constexpr static auto member()
-	{
-		return std::make_tuple(
-			&test_table::id,
-			&test_table::day,
-			&test_table::tt,
-			&test_table::tts
-		);
-	}
-	constexpr static auto member_name()
-	{
-		return std::array{
-			"id"sv,
-			"day"sv,
-			"tt"sv,
-			"tts"sv
-		};
-	}
+	int64 id;
+	date day;
+	datetime tt;
+	times tts;
 };
 
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_body>;

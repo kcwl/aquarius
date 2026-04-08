@@ -8,3 +8,4 @@
 #include <aquarius/tbl/select_view.hpp>
 #include <aquarius/tbl/sql_op.hpp>
 #include <aquarius/tbl/update_view.hpp>
+#include <aquarius/tbl/transaction.hpp>

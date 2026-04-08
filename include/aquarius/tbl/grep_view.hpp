@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/tbl/concepts.hpp>
+#include <aquarius/tbl/member_pointer.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -153,8 +154,6 @@ namespace aquarius
 
 		bool has_aggr_;
 	};
-
-	
 
 	template <auto Ptr>
 	inline grep_view<Ptr> grep;

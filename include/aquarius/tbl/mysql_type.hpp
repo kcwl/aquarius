@@ -19,7 +19,7 @@ namespace aquarius
 	} // namespace mysql
 
 	template <typename T, typename U>
-	requires(std::same_as<T, U>)
+	requires(std::same_as<T, U> && !push_t<T> && !push_t<U>)
 	T type_cast(U value)
 	{
 		return value;
