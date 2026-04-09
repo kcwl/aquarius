@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/error_code.hpp>
 #include <chrono>
 #include <string>
@@ -9,22 +10,9 @@ namespace aquarius
 	class module_base
 	{
 	public:
-		module_base(const std::string& name)
-			: name_(name)
-		{}
+		virtual std::string name() const = 0;
 
-		virtual ~module_base() = default;
-
-	public:
-		const std::string& name() const
-		{
-			return name_;
-		}
-
-	public:
 		virtual bool init() = 0;
-
-		virtual auto run() -> asio::awaitable<void> = 0;
 
 		virtual void stop() = 0;
 
@@ -32,43 +20,61 @@ namespace aquarius
 
 		virtual void timer(std::chrono::milliseconds) = 0;
 
-	private:
-		std::string name_;
+		virtual auto run() -> asio::awaitable<bool> = 0;
 	};
 
 	template <typename T>
 	class basic_module : public module_base
 	{
 	public:
-		using core_type = T;
+		basic_module() = default;
 
 	public:
-		basic_module(const std::string& name)
-			: module_base(name)
-		{}
+		template <typename R, typename Func>
+		auto async_visit(Func&& f) -> asio::awaitable<R>
+		{
+			co_return co_await std::forward<Func>(f)(_this());
+		}
+
+		template <typename R, typename Func>
+		auto visit(Func&& f) -> R
+		{
+			return std::forward<Func>(f)(_this());
+		}
 
 	public:
-		template <typename Task>
-		auto visit(std::shared_ptr<Task> task_ptr) -> asio::awaitable<typename Task::return_type>
+		virtual std::string name() const final
 		{
-			using return_type = typename Task::return_type;
-			if (!task_ptr)
-				co_return return_type{};
+			constexpr auto module_name = detail::struct_name<T>();
 
-			co_return co_await (*task_ptr)(_this());
+			return std::string(module_name);
+		}
+		virtual bool init() override
+		{
+			return true;
 		}
 
-		template <typename Task>
-		auto visit_sync(std::shared_ptr<Task> task_ptr) -> typename Task::return_type
+		virtual void stop() override
 		{
-			using return_type = typename Task::return_type;
-			if (!task_ptr)
-				return return_type{};
-
-			return (*task_ptr)(_this());
+			return;
 		}
 
-	protected:
+		virtual bool enable() override
+		{
+			return true;
+		}
+
+		virtual void timer(std::chrono::milliseconds) override
+		{
+			return;
+		}
+
+		virtual auto run() -> asio::awaitable<bool> override
+		{
+			co_return true;
+		}
+
+	private:
 		T* _this()
 		{
 			return static_cast<T*>(this);

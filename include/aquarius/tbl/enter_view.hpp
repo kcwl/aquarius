@@ -1,29 +1,30 @@
 #pragma once
+#include <aquarius/module/schedule.hpp>
 #include <aquarius/module/sql_module.hpp>
 
 namespace aquarius
 {
 	struct enter_view
 	{
-		template<typename T>
-		auto select(const std::string& sql) const ->asio::awaitable<std::vector<T>>
+		template <typename T>
+		auto select(const std::string& sql) const -> asio::awaitable<std::vector<T>>
 		{
-			co_return co_await mpc_select<T>(sql);
+			co_return co_await mpc_async_call<&mysql_module::async_query<T>>(std::string_view(sql));
 		}
 
-		auto insert(const std::string& sql) const ->asio::awaitable<std::size_t>
+		auto insert(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_insert(sql);
+			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
 		}
 
-		auto remove(const std::string& sql) const ->asio::awaitable<std::size_t>
+		auto remove(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_delete(sql);
+			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
 		}
 
-		auto update(const std::string& sql) const ->asio::awaitable<std::size_t>
+		auto update(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_update(sql);
+			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
 		}
 	};
 
