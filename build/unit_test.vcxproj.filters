@@ -37,9 +37,6 @@
     <Filter Include="include\aquarius\module">
       <UniqueIdentifier>{682e5ada-f82d-4f5b-bace-8e54531bf769}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\ini">
-      <UniqueIdentifier>{5a72fa1f-ac88-420a-9a16-98bef9228ba5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\ip\adaptor">
       <UniqueIdentifier>{86f7649e-b223-4e63-89f9-30f505bdf254}</UniqueIdentifier>
     </Filter>
@@ -48,9 +45,6 @@
     </Filter>
     <Filter Include="include\aquarius\resource">
       <UniqueIdentifier>{562069c2-b9ea-44b2-9d68-d038d9fef5a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aquarius\tbl\detail">
-      <UniqueIdentifier>{4b56a2f6-a429-480d-a91a-bc95b35b1cc2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -174,19 +168,10 @@
     <ClInclude Include="..\include\aquarius\basic_module.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\module_router.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\schedule.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ini\parse.hpp">
-      <Filter>include\aquarius\ini</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\session_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp">
@@ -203,12 +188,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp">
       <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\handler_channel.hpp">
       <Filter>include\aquarius\module</Filter>
@@ -285,12 +264,6 @@
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\sql_op.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\detail\mysql_io_service.hpp">
-      <Filter>include\aquarius\tbl\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -306,10 +279,13 @@
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
-      <Filter>include\aquarius\ip</Filter>
+    <ClInclude Include="..\include\aquarius\module\module_register.hpp">
+      <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http.hpp">
+    <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp">
+      <Filter>include\aquarius\tbl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\udp.hpp">
@@ -320,6 +296,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\tcp_header.hpp">
       <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -386,9 +368,6 @@
     <ClCompile Include="..\test\session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\module.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\ctx_handler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -401,11 +380,13 @@
     <ClCompile Include="..\test\tbl_unittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\module_uniittest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
       <Filter>源文件</Filter>
     </Text>
-    <Text Include="test\CMakeLists.txt" />
   </ItemGroup>
 </Project>

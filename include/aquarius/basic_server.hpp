@@ -7,7 +7,6 @@
 #include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
-#include <aquarius/module/session_module.hpp>
 #include <aquarius/module/sql_module.hpp>
 #include <aquarius/timer.hpp>
 
@@ -43,17 +42,12 @@ namespace aquarius
 
 			init_global_timer();
 
-			regist_module();
-
 			asio::co_spawn(acceptor_.get_executor(), start_accept(), asio::detached);
 
 			module_router::get_mutable_instance().run(io_service_pool_);
 		}
 
-		~basic_server()
-		{
-			module_router::get_mutable_instance().close();
-		}
+		~basic_server() = default;
 
 	public:
 		void run()
@@ -189,17 +183,6 @@ namespace aquarius
 
 					module_router::get_mutable_instance().timer(global_timer_.dura());
 				});
-		}
-
-		void regist_module()
-		{
-			module_router::get_mutable_instance().regist<session_module<Session>>();
-
-			module_router::get_mutable_instance().regist<sql_module<>>();
-
-			module_router::get_mutable_instance().regist<http_config_module>();
-
-			module_router::get_mutable_instance().regist<player_module>();
 		}
 
 	protected:

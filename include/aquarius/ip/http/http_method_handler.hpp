@@ -23,7 +23,7 @@ namespace aquarius
 	public:
 		virtual auto handle() -> asio::awaitable<error_code> override
 		{
-			this->response().header().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
+			//this->response().header().set_field("Access-Control-Allow-Origin", co_await mpc_http_origin());
 			this->response().header().set_field("Access-Control-Request-Method", "POST");
 			this->response().header().set_field("Access-Control-Allow-Headers", "Aquarius-Header");
 			this->response().header().set_field("Access-Control-Max-Age", "31536000");
@@ -79,7 +79,8 @@ namespace aquarius
 		{
 			auto router = this->request()->header().find("router");
 
-			auto file_path = (co_await mpc_http_root()) + std::string(router.data(), router.size());
+			//auto file_path = (co_await mpc_http_root()) + std::string(router.data(), router.size());
+			auto file_path = std::string(router.data(), router.size());
 
 			std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 			if (!ifs.is_open())

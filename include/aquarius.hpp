@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/asio.hpp>
 #include <aquarius/basic_client.hpp>
+#include <aquarius/basic_module.hpp>
 #include <aquarius/basic_pool.hpp>
 #include <aquarius/basic_serialize.hpp>
 #include <aquarius/basic_server.hpp>
@@ -15,7 +16,9 @@
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/ip/udp.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/module.hpp>
+#include <aquarius/module/module_register.hpp>
+#include <aquarius/module/module_router.hpp>
+#include <aquarius/module/schedule.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl.hpp>
 #include <aquarius/virgo/http_header.hpp>

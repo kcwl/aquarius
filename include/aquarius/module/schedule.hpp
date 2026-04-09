@@ -3,60 +3,53 @@
 
 namespace aquarius
 {
-	template <typename R, typename Signature>
-	struct module_data
+	template <typename T>
+	struct member_func_pointer;
+
+	template <typename R, typename T, typename... Args>
+	struct member_func_pointer<R (T::*)(Args...)>
 	{
 		using return_type = R;
-
-		module_data(const Signature& func)
-			: func_(func)
-		{}
-
-		template <typename T>
-		auto operator()(T* ptr) -> asio::awaitable<return_type>
-		{
-			co_return co_await func_(ptr);
-		}
-
-	private:
-		Signature func_;
+		using class_type = T;
 	};
-
-	template <typename R, typename Signature>
-	struct module_sync_data
+	template <typename R, typename T, typename... Args>
+	struct member_func_pointer<R (T::*)(Args...) const>
 	{
 		using return_type = R;
-
-		module_sync_data(const Signature& f)
-			: func(f)
-		{}
-
-		template <typename T>
-		auto operator()(T* ptr)
-		{
-			return func(ptr);
-		}
-
-		Signature func;
+		using class_type = T;
 	};
 
-	struct mpc
+	template <auto MemberFunc, typename... Args>
+	inline auto mpc_async_call(Args&&... args)
+		-> typename member_func_pointer<decltype(MemberFunc)>::return_type
 	{
-		template <typename R, typename T, typename Func>
-		static auto call(Func&& f) -> asio::awaitable<R>
+		using return_type = typename member_func_pointer<decltype(MemberFunc)>::return_type::value_type;
+		using class_type = typename member_func_pointer<decltype(MemberFunc)>::class_type;
+
+		auto f = [&](class_type* m) -> asio::awaitable<return_type>
 		{
-			auto task = std::make_shared<module_data<R, Func>>(f);
+			auto func = std::bind(MemberFunc, m, std::forward<Args>(args)...);
 
-			co_return co_await module_router::get_mutable_instance().schedule<T>(task);
-		}
+			co_return co_await func();
+		};
 
-		template <typename R, typename T, typename Func>
-		static auto call_sync(Func&& f) -> R
+		co_return co_await module_router::get_mutable_instance().async_schedule<class_type, return_type>(/*task*/ f);
+	}
+
+	template <auto MemberFunc, typename... Args>
+	inline auto mpc_call(Args&&... args) -> typename member_func_pointer<decltype(MemberFunc)>::return_type
+	{
+		using return_type = typename member_func_pointer<decltype(MemberFunc)>::return_type;
+		using class_type = typename member_func_pointer<decltype(MemberFunc)>::class_type;
+
+		auto f = [&](class_type* m)
 		{
-			auto task = std::make_shared<module_sync_data<R, Func>>(f);
+			auto func = std::bind(MemberFunc, m, std::forward<Args>(args)...);
 
-			return module_router::get_mutable_instance().sync_schedule<T>(task);
-		}
-	};
+			return func();
+		};
+
+		return module_router::get_mutable_instance().schedule<class_type, return_type>(/*task*/ f);
+	}
 
 } // namespace aquarius
