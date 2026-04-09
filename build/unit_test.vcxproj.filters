@@ -422,11 +422,13 @@
     <ClCompile Include="..\test\tbl_unittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\module_uniittest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
       <Filter>源文件</Filter>
     </Text>
-    <Text Include="test\CMakeLists.txt" />
   </ItemGroup>
 </Project>

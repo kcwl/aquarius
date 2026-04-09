@@ -113,7 +113,7 @@ namespace aquarius
 				return;
 			}
 
-			co_spawn(io, [&]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); }, asio::detached);
+			co_spawn(io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); }, asio::detached);
 		}
 
 	private:

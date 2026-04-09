@@ -77,7 +77,7 @@ namespace aquarius
 	private:
 		T* _this()
 		{
-			return static_cast<T*>(this);
+           return reinterpret_cast<T*>(this);
 		}
 	};
 } // namespace aquarius

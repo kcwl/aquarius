@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\module_uniittest.cpp" />
     <ClCompile Include="..\test\tbl_unittest.cpp" />
     <ClCompile Include="..\test\test_http.virgo.cpp" />
     <ClCompile Include="..\test\test_tcp.virgo.cpp" />
@@ -278,7 +279,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />
-    <Text Include="test\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
