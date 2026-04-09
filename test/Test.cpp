@@ -16,13 +16,13 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
 	auto cli = std::make_shared<aquarius::tcp_client>(io, 10s);
 
-	auto future = aquarius::co_spawn(
+	auto future = aquarius::asio::co_spawn(
 		io,
-		[cli] -> aquarius::awaitable<void>
+		[cli] -> aquarius::asio::awaitable<void>
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", 8100);
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8100);
 		},
-		aquarius::use_future);
+		aquarius::asio::use_future);
 
 	std::thread t1([&] { io.run(); });
 
@@ -90,13 +90,13 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
 	auto cli = std::make_shared<aquarius::http_client>(io, 10s);
 
-	auto future = aquarius::co_spawn(
+	auto future = aquarius::asio::co_spawn(
 		io,
-		[cli] -> aquarius::awaitable<void>
+		[cli] -> aquarius::asio::awaitable<void>
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", 8099);
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8099);
 		},
-		aquarius::use_future);
+		aquarius::asio::use_future);
 
 	std::thread t1([&] { io.run(); });
 
@@ -156,13 +156,13 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 	std::this_thread::sleep_for(2s);
 
-	aquarius::io_context io;
+	aquarius::asio::io_context io;
 
 	auto cli = std::make_shared<aquarius::http_client>(io, 10s);
 
-	auto future = aquarius::co_spawn(
+	auto future = aquarius::asio::co_spawn(
 		io,
-		[cli] -> aquarius::awaitable<void>
+		[cli] -> aquarius::asio::awaitable<void>
 		{
 			auto is_connect = co_await cli->async_connect("127.0.0.1", 8080);
 
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 			BOOST_TEST(resp.body().passwd == req->body().passwd);
 		},
-		aquarius::use_future);
+		aquarius::asio::use_future);
 
 	std::thread t1([&] { io.run(); });
 

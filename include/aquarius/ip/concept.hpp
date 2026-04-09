@@ -43,6 +43,6 @@ namespace aquarius
 
 	template <typename Func>
 	concept is_awaitable_func = requires(Func&& f) {
-		{ f() } -> std::convertible_to<awaitable<void>>;
+		{ f() } -> std::convertible_to<asio::awaitable<void>>;
 	};
 } // namespace aquarius

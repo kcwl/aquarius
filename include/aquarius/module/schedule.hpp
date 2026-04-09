@@ -13,7 +13,7 @@ namespace aquarius
 		{}
 
 		template <typename T>
-		auto operator()(T* ptr) -> awaitable<return_type>
+		auto operator()(T* ptr) -> asio::awaitable<return_type>
 		{
 			co_return co_await func_(ptr);
 		}
@@ -43,7 +43,7 @@ namespace aquarius
 	struct mpc
 	{
 		template <typename R, typename T, typename Func>
-		static auto call(Func&& f) -> awaitable<R>
+		static auto call(Func&& f) -> asio::awaitable<R>
 		{
 			auto task = std::make_shared<module_data<R, Func>>(f);
 

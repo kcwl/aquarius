@@ -9,7 +9,7 @@ namespace aquarius
 	concept enable_pool_task = requires {
 		typename T::return_type;
 
-		{ std::declval<T>()(std::shared_ptr<Core>{}) } -> std::same_as<awaitable<typename T::return_type>>;
+		{ std::declval<T>()(std::shared_ptr<Core>{}) } -> std::same_as<asio::awaitable<typename T::return_type>>;
 	};
 
 	template <typename T>
@@ -23,7 +23,7 @@ namespace aquarius
 
 	public:
 		template <typename... Args>
-		auto run(std::size_t size, Args&&... args) -> awaitable<bool>
+		auto run(std::size_t size, Args&&... args) -> asio::awaitable<bool>
 		{
 			for (std::size_t i = 0; i < size; ++i)
 			{

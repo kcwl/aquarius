@@ -27,7 +27,7 @@ namespace aquarius
 
 		using ip_filter_func = std::function<bool(const std::string&)>;
 
-		using callback_func = std::function<aquarius::awaitable<void>(std::shared_ptr<Session>)>;
+		using callback_func = std::function<asio::awaitable<void>(std::shared_ptr<Session>)>;
 
 	public:
 		explicit basic_server(int32_t port, int32_t io_service_pool_size, const std::string& name = {},
@@ -45,7 +45,7 @@ namespace aquarius
 
 			regist_module();
 
-			co_spawn(acceptor_.get_executor(), start_accept(), detached);
+			asio::co_spawn(acceptor_.get_executor(), start_accept(), asio::detached);
 
 			module_router::get_mutable_instance().run(io_service_pool_);
 		}
@@ -91,7 +91,7 @@ namespace aquarius
 			accept_func_ = func;
 		}
 
-		auto accept_func(std::shared_ptr<session_type> session) -> awaitable<void>
+		auto accept_func(std::shared_ptr<session_type> session) -> asio::awaitable<void>
 		{
 			if (!accept_func_)
 				co_return;
@@ -104,7 +104,7 @@ namespace aquarius
 			close_func_ = func;
 		}
 
-		auto close_func(std::shared_ptr<session_type> session) -> awaitable<void>
+		auto close_func(std::shared_ptr<session_type> session) -> asio::awaitable<void>
 		{
 			if (!close_func_)
 				co_return;
@@ -113,17 +113,17 @@ namespace aquarius
 		}
 
 	private:
-		auto start_accept() -> awaitable<void>
+		auto start_accept() -> asio::awaitable<void>
 		{
 			error_code ec;
 
 			for (;;)
 			{
-				auto sock = co_await acceptor_.async_accept(redirect_error(use_awaitable, ec));
+				auto sock = co_await acceptor_.async_accept(asio::redirect_error(asio::use_awaitable, ec));
 
 				if (!acceptor_.is_open())
 				{
-					ec = error::bad_descriptor;
+					ec = asio::error::bad_descriptor;
 				}
 
 				if (ec)
@@ -133,9 +133,9 @@ namespace aquarius
 
 				// co_await mpc_insert_session(session_ptr);
 
-				co_spawn(
+				asio::co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr, this] -> awaitable<void>
+					[session_ptr, this] -> asio::awaitable<void>
 					{
 						if (!ip_filter(session_ptr->remote_address()))
 						{
@@ -154,7 +154,7 @@ namespace aquarius
 
 						session_ptr->close();
 					},
-					detached);
+					asio::detached);
 			}
 		}
 
@@ -195,7 +195,7 @@ namespace aquarius
 		{
 			module_router::get_mutable_instance().regist<session_module<Session>>();
 
-			module_router::get_mutable_instance().regist<sql_module>();
+			module_router::get_mutable_instance().regist<sql_module<>>();
 
 			module_router::get_mutable_instance().regist<http_config_module>();
 
@@ -207,13 +207,13 @@ namespace aquarius
 
 		io_service_pool io_service_pool_;
 
-		signal_set signals_;
+		asio::signal_set signals_;
 
 		acceptor acceptor_;
 
 		std::string server_name_;
 
-		timer<steady_timer> global_timer_;
+		timer<asio::steady_timer> global_timer_;
 
 		ip_filter_func ip_filter_;
 

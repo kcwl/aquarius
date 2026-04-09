@@ -2,29 +2,26 @@
 
 namespace aquarius
 {
-	namespace tbl
+	template <typename T>
+	class trans_guard
 	{
-		template <typename T>
-		class trans_guard
+	public:
+		trans_guard(T* service)
+			: service_(service)
 		{
-		public:
-			trans_guard(T* service)
-				: service_(service)
-			{
-				service_->begin();
-			}
+			service_->begin();
+		}
 
-			~trans_guard()
-			{
-				service_->end();
-			}
+		~trans_guard()
+		{
+			service_->end();
+		}
 
-		private:
-			T* service_;
-		};
+	private:
+		T* service_;
+	};
 
-		template <typename T>
-		trans_guard(T*) -> trans_guard<T>;
+	template <typename T>
+	trans_guard(T*) -> trans_guard<T>;
 
-	} // namespace sql
 } // namespace aquarius

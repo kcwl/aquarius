@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(test_module_suite)
 
 BOOST_AUTO_TEST_CASE(ctor)
 {
-	aquarius::io_context io{};
+	aquarius::asio::io_context io{};
 
 	test_module tm("test_module");
 
@@ -50,8 +50,6 @@ BOOST_AUTO_TEST_CASE(ctor)
 BOOST_AUTO_TEST_CASE(test_module_virsual_func)
 {
 	test_module tm("test_module");
-
-	BOOST_TEST(tm.config());
 
 	BOOST_TEST(tm.init());
 
@@ -68,16 +66,16 @@ BOOST_AUTO_TEST_CASE(test_module_virsual_func)
 
 BOOST_AUTO_TEST_CASE(test_async_module)
 {
-	aquarius::io_context io{};
+	aquarius::asio::io_context io{};
 
 	test_module tm("test_module");
 
 	int increament = 0;
 
-	auto f = [&](test_module* ptr) mutable -> aquarius::awaitable<void> { co_return ptr->increament(increament); };
+	auto f = [&](test_module* ptr) mutable -> aquarius::asio::awaitable<void> { co_return ptr->increament(increament); };
 
-	aquarius::co_spawn(io, tm.visit(std::make_shared<aquarius::module_data<void, decltype(f)>>(f)),
-					   aquarius::detached);
+	aquarius::asio::co_spawn(io, tm.visit(std::make_shared<aquarius::module_data<void, decltype(f)>>(f)),
+					   aquarius::asio::detached);
 
 	io.run();
 

@@ -97,11 +97,11 @@ namespace aquarius
 	class handler_channel : public singleton<handler_channel>
 	{
 	public:
-		using subscribe_func_t = std::function<awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, int)>;
+		using subscribe_func_t = std::function<asio::awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, int)>;
 
 	public:
 		auto publish(const std::string& topic, flex_buffer& buffer, int version)
-			-> awaitable<std::expected<flex_buffer, error_code>>
+			-> asio::awaitable<std::expected<flex_buffer, error_code>>
 		{
 			std::shared_lock lk(mutex_);
 
@@ -135,7 +135,7 @@ namespace aquarius
 	};
 
 	inline auto mpc_publish(const std::string& topic, flex_buffer& buffer, int version = 0)
-		-> awaitable<std::expected<flex_buffer, error_code>>
+		-> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{
 		co_return co_await handler_channel::get_mutable_instance().publish(topic, buffer, version);
 	}

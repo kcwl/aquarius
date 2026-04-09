@@ -16,7 +16,7 @@ public:
 public:
     test_handler() : base_type("__handler_test_handler") {}
     virtual auto handle()
-        -> aquarius::awaitable<aquarius::error_code> override
+        -> aquarius::asio::awaitable<aquarius::error_code> override
     {
         //this->request() = this->response();
 

@@ -22,11 +22,9 @@ namespace aquarius
 		}
 
 	public:
-		virtual bool config() = 0;
-
 		virtual bool init() = 0;
 
-		virtual auto run() -> awaitable<void> = 0;
+		virtual auto run() -> asio::awaitable<void> = 0;
 
 		virtual void stop() = 0;
 
@@ -51,7 +49,7 @@ namespace aquarius
 
 	public:
 		template <typename Task>
-		auto visit(std::shared_ptr<Task> task_ptr) -> awaitable<typename Task::return_type>
+		auto visit(std::shared_ptr<Task> task_ptr) -> asio::awaitable<typename Task::return_type>
 		{
 			using return_type = typename Task::return_type;
 			if (!task_ptr)

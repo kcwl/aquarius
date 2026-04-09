@@ -54,23 +54,23 @@ namespace aquarius
 		std::map<std::size_t, std::shared_ptr<player_base>> players_;
 	};
 
-	inline auto mpc_player_insert(std::size_t id, std::shared_ptr<player_base> player) -> awaitable<void>
+	inline auto mpc_player_insert(std::size_t id, std::shared_ptr<player_base> player) -> asio::awaitable<void>
 	{
-		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) mutable -> awaitable<void>
+		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) mutable -> asio::awaitable<void>
 														  { co_return ptr->insert(id, player); });
 	}
 
 	template <typename T>
-	inline auto mpc_player_erase(std::size_t id) -> awaitable<void>
+	inline auto mpc_player_erase(std::size_t id) -> asio::awaitable<void>
 	{
-		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) -> awaitable<void>
+		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) -> asio::awaitable<void>
 														  { co_return ptr->erase(id); });
 	}
 
 	template <typename T>
-	inline auto mpc_player_get(std::size_t id) -> awaitable<std::shared_ptr<T>>
+	inline auto mpc_player_get(std::size_t id) -> asio::awaitable<std::shared_ptr<T>>
 	{
 		co_return co_await mpc::call<std::shared_ptr<T>, player_module>(
-			[&](player_module* ptr) -> awaitable<std::shared_ptr<T>> { co_return ptr->get<T>(id); });
+			[&](player_module* ptr) -> asio::awaitable<std::shared_ptr<T>> { co_return ptr->get<T>(id); });
 	}
 } // namespace aquarius
