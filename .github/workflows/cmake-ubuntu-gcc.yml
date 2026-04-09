@@ -81,7 +81,7 @@ jobs:
 
     - name: create unittest table
       run: |
-        sudo mysql -D unittest -e 'create table if not exists person(id int, sex int)'
+        sudo mysql -D unittest -e 'create table if not exists person(id int, age int)'
         
     - name: setup lcov
       shell: bash
