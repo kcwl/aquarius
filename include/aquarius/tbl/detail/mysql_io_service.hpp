@@ -124,9 +124,12 @@ namespace aquarius
 			{
 				boost::mysql::results result{};
 
-				co_await conn_ptr->async_execute(sql, result);
+				co_await conn_ptr->async_execute(sql, result, asio::redirect_error(asio::use_awaitable, ec));
 
-				affected = result.affected_rows();
+				if (!ec)
+				{
+					affected = result.affected_rows();
+				}
 			}
 
 			co_return affected;
