@@ -1,13 +1,11 @@
 #pragma once
-#include <aquarius/module/module.hpp>
-#include <aquarius/module/schedule.hpp>
+#include <aquarius/basic_module.hpp>
+#include <aquarius/module/module_register.hpp>
 
 namespace aquarius
 {
 	struct http_param
 	{
-		constexpr static auto path = "http"sv;
-
 		bool enable()
 		{
 			return true;
@@ -19,12 +17,10 @@ namespace aquarius
 		std::string version;
 	};
 
-	class http_config_module : public aquarius::_module<http_config_module>
+	AQUARIUS_MODULE(http_config_module)
 	{
 	public:
-		http_config_module(const std::string& name)
-			: _module<http_config_module>(name)
-		{}
+		http_config_module() = default;
 
 	public:
 		std::string get_version() const
@@ -45,21 +41,4 @@ namespace aquarius
 	private:
 		http_param config_;
 	};
-
-	inline auto mpc_http_version() -> asio::awaitable<std::string>
-	{
-		co_return co_await mpc::call<std::string, http_config_module>(
-			[](http_config_module* ptr) -> asio::awaitable<std::string> { co_return ptr->get_version(); });
-	}
-
-	inline auto mpc_http_origin() -> asio::awaitable<std::string>
-	{
-		co_return co_await mpc::call<std::string, http_config_module>(
-			[](http_config_module* ptr) -> asio::awaitable<std::string> { co_return ptr->get_origin(); });
-	}
-	inline auto mpc_http_root() -> asio::awaitable<std::string>
-	{
-		co_return co_await mpc::call<std::string, http_config_module>(
-			[](http_config_module* ptr) -> asio::awaitable<std::string> { co_return ptr->get_root_dir(); });
-	}
 } // namespace aquarius

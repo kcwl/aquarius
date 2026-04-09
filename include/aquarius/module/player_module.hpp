@@ -1,6 +1,8 @@
 #pragma once
-#include <aquarius/module/module.hpp>
+#include <aquarius/basic_module.hpp>
+#include <aquarius/module/module_register.hpp>
 #include <aquarius/module/schedule.hpp>
+#include <memory>
 #include <map>
 #include <mutex>
 
@@ -14,12 +16,10 @@ namespace aquarius
 		virtual ~player_base() = default;
 	};
 
-	class player_module : public _module<player_module>
+	AQUARIUS_MODULE(player_module)
 	{
 	public:
-		player_module(const std::string& name)
-			: _module<player_module>(name)
-		{}
+		player_module() = default;
 
 	public:
 		void insert(std::size_t id, std::shared_ptr<player_base> player_ptr)
@@ -53,24 +53,4 @@ namespace aquarius
 
 		std::map<std::size_t, std::shared_ptr<player_base>> players_;
 	};
-
-	inline auto mpc_player_insert(std::size_t id, std::shared_ptr<player_base> player) -> asio::awaitable<void>
-	{
-		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) mutable -> asio::awaitable<void>
-														  { co_return ptr->insert(id, player); });
-	}
-
-	template <typename T>
-	inline auto mpc_player_erase(std::size_t id) -> asio::awaitable<void>
-	{
-		co_return co_await mpc::call<void, player_module>([&](player_module* ptr) -> asio::awaitable<void>
-														  { co_return ptr->erase(id); });
-	}
-
-	template <typename T>
-	inline auto mpc_player_get(std::size_t id) -> asio::awaitable<std::shared_ptr<T>>
-	{
-		co_return co_await mpc::call<std::shared_ptr<T>, player_module>(
-			[&](player_module* ptr) -> asio::awaitable<std::shared_ptr<T>> { co_return ptr->get<T>(id); });
-	}
 } // namespace aquarius

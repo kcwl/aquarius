@@ -10,18 +10,11 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename Executor>
 	class mysql_io_service
 	{
-		using executor_type = Executor;
-
 	public:
-		explicit mysql_io_service(const executor_type& executor)
+		explicit mysql_io_service(const asio::any_io_executor& executor)
 			: executor_(executor)
-		{}
-
-		explicit mysql_io_service(asio::io_context& context)
-			: executor_(context.get_executor())
 		{}
 
 		~mysql_io_service() = default;
@@ -101,7 +94,7 @@ namespace aquarius
 
 			co_await conn_ptr->async_execute(sql, result,
 											 asio::cancel_after(1s, asio::redirect_error(asio::use_awaitable, ec)));
-			
+
 			if (!ec)
 			{
 				for (const auto r : result.rows())
@@ -215,7 +208,7 @@ namespace aquarius
 		}
 
 	private:
-		executor_type executor_;
+		asio::any_io_executor executor_;
 
 		std::shared_ptr<boost::mysql::connection_pool> pool_ptr_;
 

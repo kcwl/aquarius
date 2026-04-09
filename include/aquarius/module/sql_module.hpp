@@ -1,27 +1,24 @@
 #pragma once
-#include <aquarius/module/module.hpp>
+#include <aquarius/basic_module.hpp>
+#include <aquarius/module/module_register.hpp>
 #include <aquarius/module/schedule.hpp>
 #include <aquarius/resource/global_resource.hpp>
-#include <aquarius/tbl/sql_op.hpp>
+#include <aquarius/tbl/mysql_io_service.hpp>
 
 namespace aquarius
 {
-	template <typename Executor = asio::any_io_executor>
-	class sql_module : public _module<sql_module<Executor>>
+	AQUARIUS_MODULE(mysql_module)
 	{
-		using executor_type = Executor;
-
-		using sql_op_t = sql_op<executor_type>;
+		using sql_op_t = mysql_io_service;
 
 	public:
-		sql_module(const std::string& name)
-			: _module<sql_module>(name)
-			, index_(0)
+		mysql_module()
+			: index_(0)
 			, mutex_()
 			, connector_(nullptr)
 		{}
 
-		virtual ~sql_module() = default;
+		virtual ~mysql_module() = default;
 
 	public:
 		virtual bool init() override
@@ -29,7 +26,7 @@ namespace aquarius
 			return true;
 		}
 
-		virtual auto run() -> asio::awaitable<void> override
+		virtual auto run() -> asio::awaitable<bool> override
 		{
 			auto& config = global_resource::get_mutable_instance().mysql();
 
@@ -46,7 +43,7 @@ namespace aquarius
 
 			connector_->async_run();
 
-			co_return;
+			co_return true;
 		}
 
 		template <typename T>
@@ -78,7 +75,7 @@ namespace aquarius
 			co_return results;
 		}
 
-		auto async_execute(const std::vector<std::string>& sqls) -> asio::awaitable<std::size_t>
+		auto async_multi_execute(const std::vector<std::string>& sqls) -> asio::awaitable<std::size_t>
 		{
 			error_code ec{};
 
@@ -107,46 +104,4 @@ namespace aquarius
 
 		std::shared_ptr<sql_op_t> connector_;
 	};
-
-	template <typename T>
-	inline auto mpc_query(std::string_view sql) -> asio::awaitable<std::vector<T>>
-	{
-		co_return co_await mpc::call<std::vector<T>, sql_module<>>(
-			[&](sql_module<>* ptr) -> asio::awaitable<std::vector<T>>
-			{ co_return co_await ptr->template async_query<T>(sql); });
-	}
-
-	inline auto mpc_execute(std::string_view sql) -> asio::awaitable<std::size_t>
-	{
-		co_return co_await mpc::call<std::size_t, sql_module<>>(
-			[&](sql_module<>* ptr) -> asio::awaitable<std::size_t>
-			{ co_return co_await ptr->async_execute(sql); });
-	}
-
-	inline auto mpc_execute(const std::vector<std::string>& sqls) -> asio::awaitable<bool>
-	{
-		co_return co_await mpc::call<std::size_t, sql_module<>>(
-			[&](sql_module<>* ptr) -> asio::awaitable<bool> { co_return co_await ptr->async_execute(sqls); });
-	}
-
-	inline auto mpc_insert(std::string_view sql) -> asio::awaitable<std::size_t>
-	{
-		co_return co_await mpc_execute(sql);
-	}
-
-	inline auto mpc_delete(std::string_view sql) -> asio::awaitable<std::size_t>
-	{
-		co_return co_await mpc_execute(sql);
-	}
-
-	inline auto mpc_update(std::string_view sql) -> asio::awaitable<std::size_t>
-	{
-		co_return co_await mpc_execute(sql);
-	}
-
-	template<typename T>
-	inline auto mpc_select(std::string_view sql) -> asio::awaitable<std::vector<T>>
-	{
-		co_return co_await mpc_query<T>(sql);
-	}
 } // namespace aquarius

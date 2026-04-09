@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE(connecting)
     aquarius::global_resource::get_mutable_instance().mysql().db = "unittest";
     aquarius::global_resource::get_mutable_instance().mysql().user = "root";
 
-    aquarius::module_router::get_mutable_instance().regist<aquarius::sql_module<>>();
+    aquarius::module_router::get_mutable_instance().regist<aquarius::mysql_module>();
 
     aquarius::module_router::get_mutable_instance().run(pool);
 

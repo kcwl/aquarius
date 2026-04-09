@@ -6,6 +6,6 @@
 #include <aquarius/tbl/operator.hpp>
 #include <aquarius/tbl/remove_view.hpp>
 #include <aquarius/tbl/select_view.hpp>
-#include <aquarius/tbl/sql_op.hpp>
 #include <aquarius/tbl/update_view.hpp>
 #include <aquarius/tbl/transaction.hpp>
+#include <aquarius/tbl/mysql_config_register.hpp>

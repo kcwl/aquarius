@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\module_uniittest.cpp" />
     <ClCompile Include="..\test\tbl_unittest.cpp" />
     <ClCompile Include="..\test\test_http.virgo.cpp" />
     <ClCompile Include="..\test\test_tcp.virgo.cpp" />
@@ -158,7 +159,6 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
-    <ClInclude Include="..\include\aquarius\ini\parse.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\detail\ssl_context_base.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_socket_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_client_socket_adaptor.hpp" />
@@ -181,11 +181,10 @@
     <ClInclude Include="..\include\aquarius\ip\tcp\tcp_ssl_server.hpp" />
     <ClInclude Include="..\include\aquarius\module\handler_channel.hpp" />
     <ClInclude Include="..\include\aquarius\module\http_config_module.hpp" />
-    <ClInclude Include="..\include\aquarius\module\module.hpp" />
+    <ClInclude Include="..\include\aquarius\module\module_register.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\schedule.hpp" />
-    <ClInclude Include="..\include\aquarius\module\session_module.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
     <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
@@ -213,17 +212,16 @@
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\detail\mysql_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\operator.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\sql_op.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\timer.hpp" />
@@ -264,7 +262,6 @@
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\kv_serialize.cpp" />
     <ClCompile Include="..\test\make_endpoint.cpp" />
-    <ClCompile Include="..\test\module.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
@@ -282,7 +279,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />
-    <Text Include="test\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
