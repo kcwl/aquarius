@@ -120,6 +120,20 @@ namespace aquarius
 				co_return flex_buffer{};
 			}
 
+
+
+			std::string_view header_line((char*)buffer.data().data(), buffer.size());
+			auto pos = header_line.find_first_of(crlf);
+
+			auto [version, status] = parse_command_line<false>(header_line.substr(0, pos), ec);
+
+			if (status != http_status::ok)
+			{
+				co_return flex_buffer{};
+			}
+
+			buffer.consume(pos);
+
 			co_return std::move(buffer);
 		}
 
