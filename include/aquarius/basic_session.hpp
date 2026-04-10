@@ -89,6 +89,8 @@ namespace aquarius
 			else
 			{
 				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
+
+				buffer.commit(length);
 			}
 
 			co_return ec;

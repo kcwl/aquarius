@@ -9,6 +9,7 @@
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/handler_channel.hpp>
+#include <aquarius/virgo/serialize/binary.hpp>
 #include <expected>
 #include <type_traits>
 
@@ -30,7 +31,7 @@ namespace aquarius
 
 		struct raw_header
 		{
-			uint16_t length;
+			uint32_t length;
 		};
 
 		template <typename Session>
@@ -49,8 +50,7 @@ namespace aquarius
 					break;
 				}
 
-				// auto router = binary_parse{}.from_datas<std::string>(buffer);
-				auto router = "router";
+				auto router = binary_parse{}.from_datas<std::string>(buffer);
 
 				XLOG_INFO() << "[accept] parse protocol router: " << router;
 
