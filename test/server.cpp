@@ -1,5 +1,5 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius/ip/tcp/tcp_server.hpp>
+#include <aquarius/ip/tcp.hpp>
 #include <boost/test/unit_test.hpp>
 #include <csignal>
 
@@ -67,13 +67,13 @@ BOOST_AUTO_TEST_CASE(callback)
 		{
 			co_await server.accept_func(nullptr);
 
-			server.set_accept_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
+			server.set_accept_func([] (auto)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
 
 			co_await server.accept_func(nullptr);
 
 			co_await server.close_func(nullptr);
 
-			server.set_close_func([] (std::shared_ptr<aquarius::tcp_server_session>)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
+			server.set_close_func([] (auto)->aquarius::asio::awaitable<void> { BOOST_TEST(true); co_return; });
 
 			co_await server.close_func(nullptr);
 		},

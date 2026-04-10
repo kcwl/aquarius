@@ -16,19 +16,19 @@ AQUARIUS_HANDLER(http_test_post_request, http_test_post_response, ctx_test_http_
 	response().body().uuid = request()->body().uuid;
 	response().body().per_resp = request()->body().per_req;
 
-	co_return aquarius::virgo::http_status::ok;
+	co_return aquarius::http_status::ok;
 }
 
 AQUARIUS_HANDLER(http_test_get_request, http_test_get_response, ctx_http_test_get_request)
 {
 	if (!request())
 	{
-		co_return aquarius::virgo::http_status::bad_request;
+		co_return aquarius::http_status::bad_request;
 	}
 
 	response().body().user = request()->body().user;
 
 	response().body().passwd = request()->body().passwd;
 
-	co_return aquarius::virgo::http_status::ok;
+	co_return aquarius::http_status::ok;
 }

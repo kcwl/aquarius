@@ -129,7 +129,7 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura(), 3s);
+				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura());
 
 				// co_await mpc_insert_session(session_ptr);
 

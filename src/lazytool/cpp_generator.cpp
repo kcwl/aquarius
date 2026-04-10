@@ -269,7 +269,7 @@ namespace aquarius
 
 			if (protocol == "http")
 			{
-				ofs << "aquarius::virgo::http_method::" << method << ", ";
+				ofs << "aquarius::http_method::" << method << ", ";
 			}
 
 			ofs << field_ptr->name() << ">;" << std::endl;
@@ -284,7 +284,7 @@ namespace aquarius
 
 			if (protocol == "http")
 			{
-				ofs << "aquarius::virgo::http_method::" << method << ", ";
+				ofs << "aquarius::http_method::" << method << ", ";
 			}
 
 			ofs << field_ptr->name() << ">;" << std::endl;

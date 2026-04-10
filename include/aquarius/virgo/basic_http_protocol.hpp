@@ -10,7 +10,7 @@ namespace aquarius
 {
 	namespace virgo
 	{
-		template <bool Request, virgo::http_method Method, typename Body, typename Allocator = std::allocator<Body>>
+		template <bool Request, http_method Method, typename Body, typename Allocator = std::allocator<Body>>
 		class basic_http_protocol : public basic_tcp_protocol<Request, http_header, Body, Allocator>
 		{
 		public:
@@ -38,7 +38,7 @@ namespace aquarius
 
 				flex_buffer buf{};
 
-				if constexpr (Method != virgo::http_method::get)
+				if constexpr (Method != http_method::get)
 				{
 					this->body().serialize(buf);
 
@@ -52,7 +52,7 @@ namespace aquarius
 
 				if (!ec)
 				{
-					if constexpr (Method != virgo::http_method::get)
+					if constexpr (Method != http_method::get)
 					{
 						if (this->header().content_length() != 0)
 						{
