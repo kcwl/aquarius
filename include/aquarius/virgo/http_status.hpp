@@ -81,7 +81,7 @@ namespace aquarius
 		network_authentication_required = 511
 	};
 
-	inline std::string_view from_status_string(http_status s)
+	inline std::string_view status_to_string(http_status s)
 	{
 		static std::map<http_status, std::string_view> statuses = {
 			{ http_status::unknown, "Unknown" },
@@ -156,9 +156,9 @@ namespace aquarius
 		return iter->second;
 	}
 
-	inline std::string_view from_status_string(int s)
+	inline std::string_view status_to_string(int s)
 	{
-		return from_status_string(static_cast<http_status>(s));
+		return status_to_string(static_cast<http_status>(s));
 	}
 
 	class http_status_category : public boost::system::error_category
@@ -173,7 +173,7 @@ namespace aquarius
 
 		[[nodiscard]] std::string message(int err_code) const override
 		{
-			return std::string(from_status_string(static_cast<http_status>(err_code)).data());
+			return std::string(status_to_string(static_cast<http_status>(err_code)).data());
 		}
 	};
 

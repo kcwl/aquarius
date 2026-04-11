@@ -58,7 +58,7 @@ namespace aquarius
 		virtual void commit_command_header(flex_buffer& buffer) override
 		{
 			std::string headerline = std::format("{} {} {}\r\n", version_to_string(Version),
-												 static_cast<int>(this->result()), from_status_string(this->result()));
+												 static_cast<int>(this->result()), status_to_string(this->result()));
 
 			buffer.sputn(headerline.c_str(), headerline.size());
 		}
