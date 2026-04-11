@@ -20,9 +20,6 @@
 #include <aquarius/module/schedule.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/cookie.hpp>
-#include <aquarius/serialize/html.hpp>
-#include <aquarius/serialize/http_cookie_serialize.hpp>
-#include <aquarius/serialize/http_html_serialize.hpp>
 #include <aquarius/serialize/http_json_serialize.hpp>
 #include <aquarius/serialize/http_kv_serialize.hpp>
 #include <aquarius/serialize/json.hpp>
