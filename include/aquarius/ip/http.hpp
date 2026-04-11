@@ -207,26 +207,26 @@ namespace aquarius
 					return result_t{};
 				}
 
-				auto version = from_version_string(std::string_view(*iter));
+				auto version = string_to_version(std::string_view(*iter));
 
-				if (version == http_version::unknown)
+				if (!version.has_value())
 				{
 					return result_t{};
 				}
 
 				ec = error_code{};
 
-				return std::make_tuple(*method, url_result, version);
+				return std::make_tuple(*method, url_result, *version);
 			}
 			else
 			{
-				auto version = from_version_string(std::string_view(*iter++));
+				auto version = string_to_version(std::string_view(*iter++));
 
 				auto status = static_cast<http_status>(std::atoi(std::string_view(*iter++).data()));
 
 				ec = error_code{};
 
-				return std::make_tuple(version, status);
+				return std::make_tuple(*version, status);
 			}
 		}
 

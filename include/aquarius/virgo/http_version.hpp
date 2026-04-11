@@ -1,4 +1,6 @@
 #pragma once
+#include <aquarius/virgo/http_status.hpp>
+#include <expected>
 #include <ostream>
 #include <string_view>
 
@@ -9,74 +11,46 @@ namespace aquarius
 	enum class http_version
 	{
 		http1_0,
-		http1_1,
-		http2,
-		http3,
-		unknown
+		http1_1
 	};
+
+	inline static std::map<http_version, std::string_view> http_versions = { { http_version::http1_0, "HTTP/1.0"sv },
+																			 { http_version::http1_1, "HTTP/1.1"sv } };
+
+	inline std::string_view version_to_string(http_version v)
+	{
+		auto iter = http_versions.find(v);
+
+		return iter != http_versions.end() ? iter->second : "Unknown"sv;
+	}
+
+	inline auto string_to_version(std::string_view s) -> std::expected<http_version, error_code>
+	{
+		auto iter = std::find_if(http_versions.begin(), http_versions.end(), [&](auto v) { return v.second == s; });
+
+		if (iter == http_versions.end())
+		{
+			return std::unexpected(http_status::http_version_not_supported);
+		}
+
+		return iter->first;
+	}
 
 	inline std::ostream& operator<<(std::ostream& os, http_version v)
 	{
-		os << static_cast<int>(v);
+		os << version_to_string(v);
 
 		return os;
 	}
 
-	inline std::string_view from_string_version(http_version v)
+	inline std::istream& operator>>(std::istream& is, http_version& v)
 	{
-		switch (v)
-		{
-		case http_version::http1_0:
-			return "HTTP/1.0"sv;
-		case http_version::http1_1:
-			return "HTTP/1.1"sv;
-		case http_version::http2:
-			return "HTTP/2"sv;
-		case http_version::http3:
-			return "HTTP/3"sv;
-		default:
-			break;
-		}
+		std::string result{};
+		is >> result;
 
-		return "Unknown";
-	}
+		[[maybe_unused]] auto res =
+			string_to_version(result).and_then([&](auto ver) -> std::expected<void, error_code> { v = ver; });
 
-	inline int32_t from_int_version(http_version v)
-	{
-		switch (v)
-		{
-		case http_version::http1_0:
-			return 1010;
-		case http_version::http1_1:
-			return 1011;
-		case http_version::http2:
-			return 2000;
-		case http_version::http3:
-			return 3000;
-		default:
-			break;
-		}
-
-		return 0;
-	}
-
-	inline http_version from_version_string(std::string_view s)
-	{
-		if (s.empty())
-			return http_version::unknown;
-
-		if (s.back() == '\n')
-			s.remove_suffix(2);
-
-		if (s == "HTTP/1.0")
-			return http_version::http1_0;
-		else if (s == "HTTP/1.1")
-			return http_version::http1_1;
-		else if (s == "HTTP/2")
-			return http_version::http2;
-		else if (s == "HTTP/3")
-			return http_version::http3;
-
-		return http_version::unknown;
+		return is;
 	}
 } // namespace aquarius
