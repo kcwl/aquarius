@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 	auto status = future.wait_for(10s);
 
-	BOOST_CHECK(status == std::future_status::ready);
+	BOOST_REQUIRE(status == std::future_status::ready);
 
 	io.stop();
 
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 	auto status = future.wait_for(10s);
 
-	BOOST_CHECK(status == std::future_status::ready);
+	BOOST_REQUIRE(status == std::future_status::ready);
 
 	io.stop();
 
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 	auto status = future.wait_for(10s);
 
-	BOOST_CHECK(status == std::future_status::ready);
+	BOOST_REQUIRE(status == std::future_status::ready);
 
 	io.stop();
 

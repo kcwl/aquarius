@@ -3,10 +3,11 @@
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
+#include <expected>
 
 namespace aquarius
 {
-	template <typename Protocol, template <typename> typename Adaptor>
+	template <typename Protocol, typename Adaptor>
 	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
 	{
 	public:
@@ -20,10 +21,10 @@ namespace aquarius
 
 		using duration = std::chrono::system_clock::duration;
 
-		using adaptor_t = Adaptor<socket>;
+		using adaptor_t = Adaptor;
 
 	public:
-		explicit basic_session(socket _socket, duration timeout, duration)
+		explicit basic_session(socket _socket, duration timeout)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)
@@ -78,8 +79,8 @@ namespace aquarius
 
 			auto mutable_buffer = buffer.prepare(length);
 
-			co_await boost::asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-											 asio::redirect_error(asio::use_awaitable, ec));
+			co_await asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
+									  asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -87,19 +88,19 @@ namespace aquarius
 			}
 			else
 			{
-				buffer.commit(length);
-
 				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
+
+				buffer.commit(length);
 			}
 
 			co_return ec;
 		}
 
-		auto async_read_util(flex_buffer& buffer, std::string_view delm) -> asio::awaitable<error_code>
+		auto async_read_util(flex_buffer& buffer, std::string_view delm, std::size_t& end_pos) -> asio::awaitable<error_code>
 		{
 			error_code ec;
 
-			auto size = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer),
+			end_pos = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer),
 															   delm, asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
@@ -118,7 +119,8 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(), asio::redirect_error(asio::use_awaitable, ec));
+			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(),
+																	  asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -183,12 +185,19 @@ namespace aquarius
 
 		auto accept() -> asio::awaitable<error_code>
 		{
-			co_return co_await Protocol::accept(this->socket_adaptor_, this->timeout_, this->shared_from_this());
+			auto ec = co_await this->socket_adaptor_.async_handshake(timeout_);
+
+			if (ec)
+			{
+				co_return ec;
+			}
+
+			co_return co_await Protocol::accept(this->shared_from_this());
 		}
 
-		auto query(error_code& ec) -> asio::awaitable<flex_buffer>
+		auto query() -> asio::awaitable<std::expected<flex_buffer, error_code>>
 		{
-			co_return co_await Protocol::query(this->shared_from_this(), ec);
+			co_return co_await Protocol::query(this->shared_from_this());
 		}
 
 	protected:

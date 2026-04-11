@@ -6,80 +6,77 @@ using namespace std::string_view_literals;
 
 namespace aquarius
 {
-	namespace virgo
+	enum class http_version
 	{
-		enum class http_version
-		{
-			http1_0,
-			http1_1,
-			http2,
-			http3,
-			unknown
-		};
+		http1_0,
+		http1_1,
+		http2,
+		http3,
+		unknown
+	};
 
-		inline std::ostream& operator<<(std::ostream& os, http_version v)
-		{
-			os << static_cast<int>(v);
+	inline std::ostream& operator<<(std::ostream& os, http_version v)
+	{
+		os << static_cast<int>(v);
 
-			return os;
+		return os;
+	}
+
+	inline std::string_view from_string_version(http_version v)
+	{
+		switch (v)
+		{
+		case http_version::http1_0:
+			return "HTTP/1.0"sv;
+		case http_version::http1_1:
+			return "HTTP/1.1"sv;
+		case http_version::http2:
+			return "HTTP/2"sv;
+		case http_version::http3:
+			return "HTTP/3"sv;
+		default:
+			break;
 		}
 
-		inline std::string_view from_string_version(http_version v)
-		{
-			switch (v)
-			{
-			case http_version::http1_0:
-				return "HTTP/1.0"sv;
-			case http_version::http1_1:
-				return "HTTP/1.1"sv;
-			case http_version::http2:
-				return "HTTP/2"sv;
-			case http_version::http3:
-				return "HTTP/3"sv;
-			default:
-				break;
-			}
+		return "Unknown";
+	}
 
-			return "Unknown";
-		}
-		
-		inline int32_t from_int_version(http_version v)
+	inline int32_t from_int_version(http_version v)
+	{
+		switch (v)
 		{
-			switch (v)
-			{
-				case http_version::http1_0:
-					return 1010;
-				case http_version::http1_1:
-					return 1011;
-				case http_version::http2:
-					return 2000;
-				case http_version::http3:
-					return 3000;
-				default:
-					break;
-			}
-
-			return 0;
+		case http_version::http1_0:
+			return 1010;
+		case http_version::http1_1:
+			return 1011;
+		case http_version::http2:
+			return 2000;
+		case http_version::http3:
+			return 3000;
+		default:
+			break;
 		}
 
-		inline http_version from_version_string(std::string_view s)
-		{
-			if (s.empty())
-				return http_version::unknown;
+		return 0;
+	}
 
-			if (s.back() == '\n')
-				s.remove_suffix(2);
-
-			if (s == "HTTP/1.0")
-				return http_version::http1_0;
-			else if (s == "HTTP/1.1")
-				return http_version::http1_1;
-			else if (s == "HTTP/2")
-				return http_version::http2;
-			else if (s == "HTTP/3")
-				return http_version::http3;
-
+	inline http_version from_version_string(std::string_view s)
+	{
+		if (s.empty())
 			return http_version::unknown;
-		}
-	} // namespace virgo
+
+		if (s.back() == '\n')
+			s.remove_suffix(2);
+
+		if (s == "HTTP/1.0")
+			return http_version::http1_0;
+		else if (s == "HTTP/1.1")
+			return http_version::http1_1;
+		else if (s == "HTTP/2")
+			return http_version::http2;
+		else if (s == "HTTP/3")
+			return http_version::http3;
+
+		return http_version::unknown;
+	}
 } // namespace aquarius

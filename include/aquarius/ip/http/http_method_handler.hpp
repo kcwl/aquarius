@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/ip/handler.hpp>
 #include <aquarius/ip/http/http_method_define.hpp>
-#include <aquarius/ip/http/http_server.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_null_protocol.hpp>
 #include <fstream>
@@ -9,8 +8,8 @@
 
 namespace aquarius
 {
-	using options_request = virgo::http_request<"OPTIONS", virgo::http_method::options, virgo::http_null_body>;
-	using options_response = virgo::http_response<virgo::http_method::options, virgo::http_null_body>;
+	using options_request = virgo::http_request<"OPTIONS", http_method::options, virgo::http_null_body>;
+	using options_response = virgo::http_response<http_method::options, virgo::http_null_body>;
 
 	class http_options_method_handler : public handler<options_request, options_response>
 	{
@@ -30,7 +29,7 @@ namespace aquarius
 			this->response().header().set_field("Access-Control-Max-Age", "31536000");
 			this->response().header().set_field("Access-Control-Allow-Credentials", "true");
 
-			co_return virgo::http_status::ok;
+			co_return http_status::ok;
 		}
 	};
 
@@ -63,8 +62,8 @@ namespace aquarius
 		std::vector<char> stream;
 	};
 
-	using resource_request = virgo::http_request<"GET", virgo::http_method::get, virgo::http_null_body>;
-	using resource_response = virgo::http_response<virgo::http_method::get, http_stream_body>;
+	using resource_request = virgo::http_request<"GET", http_method::get, virgo::http_null_body>;
+	using resource_response = virgo::http_response<http_method::get, http_stream_body>;
 
 	class http_source_method_handler : public handler<resource_request, resource_response>
 	{
@@ -86,7 +85,7 @@ namespace aquarius
 			std::fstream ifs(file_path, std::ios::in | std::ios::binary);
 			if (!ifs.is_open())
 			{
-				co_return virgo::http_status::not_found;
+				co_return http_status::not_found;
 			}
 
 			auto file_size = std::filesystem::file_size(file_path);
@@ -101,7 +100,7 @@ namespace aquarius
 			stream.resize(file_size);
 			ifs.read(stream.data(), stream.size());
 
-			co_return virgo::http_status::ok;
+			co_return http_status::ok;
 		}
 	};
 

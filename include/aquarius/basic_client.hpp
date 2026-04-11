@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <aquarius/asio.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
-#include <aquarius/ip/protocol.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/http_config_module.hpp>
 #include <aquarius/virgo/http_version.hpp>
@@ -47,7 +47,7 @@ namespace aquarius
 		auto async_connect(const std::string& host, uint16_t port) -> asio::awaitable<error_code>
 		{
 			session_ptr_ =
-				std::make_shared<Session>(std::move(socket(this->get_executor())), 30ms, this->get_timeout());
+				std::make_shared<Session>(std::move(socket(this->get_executor())), this->get_timeout());
 
 			auto ec = co_await session_ptr_->async_connect(host, std::to_string(port));
 
@@ -139,14 +139,17 @@ namespace aquarius
 				co_return resp;
 			}
 
-			auto resp_buffer = co_await session_ptr_->query(ec);
+			auto result = co_await session_ptr_->query();
 
-			if (make_error(ec))
+			if (!result.has_value())
 			{
-				co_return resp;
+				if (make_error(result.error()))
+				{
+					co_return resp;
+				}
 			}
 
-			resp.consume(resp_buffer);
+			resp.consume(*result);
 
 			co_return resp;
 		}

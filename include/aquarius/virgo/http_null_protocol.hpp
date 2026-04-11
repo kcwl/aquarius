@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/ip/http/http_header.hpp>
+#include <aquarius/virgo/http_header.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/serialize/http_json_serialize.hpp>
