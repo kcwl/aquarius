@@ -16,7 +16,6 @@ namespace aquarius
 		using header_t = Header;
 		using body_t = std::remove_pointer_t<Body>;
 		using base_body = boost::empty_value<Body>;
-		using version_t = int32_t;
 
 	public:
 		basic_protocol()
@@ -26,7 +25,6 @@ namespace aquarius
 			: base_body()
 			, header_()
 			, alloc_(alloc)
-			, version_(0)
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
@@ -39,7 +37,6 @@ namespace aquarius
 		basic_protocol(basic_protocol&& other) noexcept
 			: header_(std::exchange(other.header_, {}))
 			, alloc_(std::move(other.alloc_))
-			, version_(std::exchange(other.version_, 0))
 		{
 			this->get() = std::exchange(other.get(), nullptr);
 		}
@@ -50,7 +47,6 @@ namespace aquarius
 				header_ = std::move(other.header_);
 				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
-				version_ = std::exchange(other.version_, 0);
 			}
 			return *this;
 		}
@@ -69,10 +65,8 @@ namespace aquarius
 			return error_code{};
 		}
 
-		virtual bool consume(flex_buffer& buffer, int = 0)
+		virtual bool consume(flex_buffer& buffer)
 		{
-			this->version() = binary_parse().from_datas<version_t>(buffer);
-
 			if (this->header().deserialize(buffer))
 			{
 				return false;
@@ -101,28 +95,10 @@ namespace aquarius
 			return *this->get();
 		}
 
-	public:
-		void version(version_t v)
-		{
-			version_ = v;
-		}
-
-		version_t version() const
-		{
-			return version_;
-		}
-
-		version_t& version()
-		{
-			return version_;
-		}
-
 	private:
 		header_t header_;
 
 		Allocator alloc_;
-
-		version_t version_;
 	};
 
 	struct null_header

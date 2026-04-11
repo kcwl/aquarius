@@ -13,8 +13,6 @@ namespace aquarius
 
 		using typename base::body_t;
 
-		using typename base::version_t;
-
 		constexpr static auto has_request = Request;
 
 	public:
@@ -37,8 +35,6 @@ namespace aquarius
 
 			commit_command_header(buffer);
 
-			binary_parse().to_datas(this->version(), buffer);
-
 			this->header().serialize(buffer);
 
 			this->body().serialize(buffer);
@@ -54,10 +50,8 @@ namespace aquarius
 			return error_code{};
 		}
 
-		virtual bool consume(flex_buffer& buffer, int = 0)
+		virtual bool consume(flex_buffer& buffer)
 		{
-			this->version() = binary_parse().from_datas<version_t>(buffer);
-
 			if (this->header().deserialize(buffer))
 			{
 				return false;
@@ -97,7 +91,6 @@ namespace aquarius
 	public:
 		basic_tcp_protocol()
 			: base()
-			, version_(0)
 			, result_()
 		{}
 
@@ -109,7 +102,6 @@ namespace aquarius
 
 		basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
 			: base(std::move(other))
-			, version_(std::exchange(other.version_, 0))
 			, result_(std::exchange(other.result_, 0))
 		{}
 
@@ -118,7 +110,6 @@ namespace aquarius
 			if (this != std::addressof(other))
 			{
 				base::operator=(std::move(other));
-				version_ = std::exchange(other.version_, 0);
 				result_ = std::exchange(other.result_, 0);
 			}
 
@@ -126,21 +117,6 @@ namespace aquarius
 		}
 
 	public:
-		void version(version_t v)
-		{
-			version_ = v;
-		}
-
-		version_t version() const
-		{
-			return version_;
-		}
-
-		version_t& version()
-		{
-			return version_;
-		}
-
 		void result(result_t v)
 		{
 			result_ = v;
@@ -178,10 +154,8 @@ namespace aquarius
 			return error_code{};
 		}
 
-		virtual bool consume(flex_buffer& buffer, int = 0) override
+		virtual bool consume(flex_buffer& buffer) override
 		{
-			this->version() = binary_parse().from_datas<version_t>(buffer);
-
 			this->result() = binary_parse().from_datas<result_t>(buffer);
 
 			if (this->header().deserialize(buffer))
@@ -198,8 +172,6 @@ namespace aquarius
 		virtual void commit_command_header(flex_buffer&) = 0;
 
 	private:
-		version_t version_;
-
 		result_t result_;
 	};
 } // namespace aquarius

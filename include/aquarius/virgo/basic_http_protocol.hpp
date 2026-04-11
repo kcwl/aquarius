@@ -63,10 +63,8 @@ namespace aquarius
 			return ec;
 		}
 
-		virtual bool consume(flex_buffer& buffer, int ver = 0) override
+		virtual bool consume(flex_buffer& buffer) override
 		{
-			this->version(ver);
-
 			if (this->header().deserialize(buffer))
 			{
 				return false;

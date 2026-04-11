@@ -64,6 +64,11 @@ namespace aquarius
 
 				auto [method, url, version] = parse_command_line<true>(header_line, ec);
 
+				if (ec)
+				{
+					co_return ec;
+				}
+
 				if (method == http_method::get)
 				{
 					buffer.sputn(url->params().buffer().data(), url->params().buffer().size());
@@ -77,7 +82,7 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[&, r = std::move(router)] -> asio::awaitable<void>
 					{
-						auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
+						auto resp_buf = co_await mpc_publish(std::move(r), buffer);
 
 						if (!resp_buf.has_value())
 						{
@@ -126,6 +131,11 @@ namespace aquarius
 			auto pos = header_line.find_first_of(crlf);
 
 			auto [version, status] = parse_command_line<false>(header_line.substr(0, pos), ec);
+
+			if (ec)
+			{
+				co_return flex_buffer{};
+			}
 
 			if (status != http_status::ok)
 			{

@@ -1,7 +1,7 @@
 #define BOOST_TEST_NO_MAIN
-#include <boost/test/unit_test.hpp>
-#include <aquarius.hpp>
 #include "test_tcp.virgo.h"
+#include <aquarius.hpp>
+#include <boost/test/unit_test.hpp>
 
 using namespace std::chrono_literals;
 
@@ -11,48 +11,49 @@ class test_handler : public aquarius::handler<login_request, login_response>
 {
 public:
 public:
-    using base_type = aquarius::handler<login_request, login_response>;
+	using base_type = aquarius::handler<login_request, login_response>;
 
 public:
-    test_handler() : base_type("__handler_test_handler") {}
-    virtual auto handle()
-        -> aquarius::asio::awaitable<aquarius::error_code> override
-    {
-        //this->request() = this->response();
+	test_handler()
+		: base_type("__handler_test_handler")
+	{}
+	virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override
+	{
+		// this->request() = this->response();
 
-        co_return aquarius::error_code{};
-    }
+		co_return aquarius::error_code{};
+	}
 };
 
 BOOST_AUTO_TEST_CASE(ctor)
 {
-    test_handler test{};
+	test_handler test{};
 
-    BOOST_TEST(test.name() == "__handler_test_handler");
-    BOOST_TEST(test.request());
+	BOOST_TEST(test.name() == "__handler_test_handler");
+	BOOST_TEST(test.request());
 }
 
 BOOST_AUTO_TEST_CASE(test_handler_visitor_with_no_regist)
 {
-    aquarius::error_code ec{};
+	aquarius::error_code ec{};
 
-    test_handler test{};
-    aquarius::flex_buffer buf{};
-    test.visit(buf,0, ec);
+	test_handler test{};
+	aquarius::flex_buffer buf{};
+	test.visit(buf, ec);
 
-    BOOST_TEST(ec == aquarius::error_code{});
+	BOOST_TEST(ec == aquarius::error_code{});
 }
 
 BOOST_AUTO_TEST_CASE(test_handler_visitor_with_regist)
 {
-    aquarius::error_code ec{};
+	aquarius::error_code ec{};
 
-    test_handler test{};
+	test_handler test{};
 
-    aquarius::flex_buffer buf{};
-    test.visit(buf,0,ec);
+	aquarius::flex_buffer buf{};
+	test.visit(buf, ec);
 
-    BOOST_TEST(!ec);
+	BOOST_TEST(!ec);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
