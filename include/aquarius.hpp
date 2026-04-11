@@ -12,7 +12,6 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
 #include <aquarius/ip/http.hpp>
-#include <aquarius/ip/http/http_method_handler.hpp>
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/ip/udp.hpp>
 #include <aquarius/logger.hpp>

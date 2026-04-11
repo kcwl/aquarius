@@ -5,7 +5,6 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/concept.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/http_config_module.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <functional>
 
@@ -46,8 +45,7 @@ namespace aquarius
 		}
 		auto async_connect(const std::string& host, uint16_t port) -> asio::awaitable<error_code>
 		{
-			session_ptr_ =
-				std::make_shared<Session>(std::move(socket(this->get_executor())), this->get_timeout());
+			session_ptr_ = std::make_shared<Session>(std::move(socket(this->get_executor())), this->get_timeout());
 
 			auto ec = co_await session_ptr_->async_connect(host, std::to_string(port));
 

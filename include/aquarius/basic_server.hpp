@@ -4,7 +4,6 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/http_config_module.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
 #include <aquarius/module/sql_module.hpp>

@@ -174,16 +174,10 @@
     <ClInclude Include="..\include\aquarius\module\schedule.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\http_config_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\module\player_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_method_handler.hpp">
-      <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\http\http_method_define.hpp">
+    <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp">
@@ -329,6 +323,15 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp">
+      <Filter>include\aquarius\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resource\http_config.hpp">
+      <Filter>include\aquarius\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
