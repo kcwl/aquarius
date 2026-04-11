@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\flex_buffer.cpp" />
     <ClCompile Include="..\test\module_uniittest.cpp" />
     <ClCompile Include="..\test\tbl_unittest.cpp" />
     <ClCompile Include="..\test\test_http.virgo.cpp" />

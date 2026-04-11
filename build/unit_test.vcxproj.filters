@@ -398,6 +398,9 @@
     <ClCompile Include="..\test\module_uniittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\flex_buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
