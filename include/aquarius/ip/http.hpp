@@ -194,9 +194,9 @@ namespace aquarius
 
 			if constexpr (Server)
 			{
-				auto method = from_string_method(std::string_view(*iter++));
+				auto method = string_to_method(std::string_view(*iter++));
 
-				if (method == http_method::none)
+				if (!method.has_value())
 				{
 					return result_t{};
 				}
@@ -216,7 +216,7 @@ namespace aquarius
 
 				ec = error_code{};
 
-				return std::make_tuple(method, url_result, version);
+				return std::make_tuple(*method, url_result, version);
 			}
 			else
 			{

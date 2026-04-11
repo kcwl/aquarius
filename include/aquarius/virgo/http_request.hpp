@@ -44,7 +44,7 @@ namespace aquarius
 				get_url += std::string((char*)buf.data().data(), buf.size());
 			}
 
-			auto line = std::format("{} {} {}\r\n", from_method_string(Method), get_url, from_string_version(Version));
+			auto line = std::format("{} {} {}\r\n", method_to_string(Method), get_url, from_string_version(Version));
 
 			buffer.sputn(line.c_str(), line.size());
 		}
