@@ -51,7 +51,7 @@ namespace aquarius
 
 				buffer.sputn((char*)&size, sizeof(uint32_t));
 
-				buffer.pubseekoff(size + sizeof(uint32_t), std::ios::cur, std::ios::in);
+				buffer.pubseekoff(size, std::ios::cur, std::ios::in);
 
 				return error_code{};
 			}
