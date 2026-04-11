@@ -177,7 +177,6 @@
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\schedule.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />
@@ -239,7 +238,6 @@
     <ClCompile Include="..\test\concat.cpp" />
     <ClCompile Include="..\test\crc.cpp" />
     <ClCompile Include="..\test\ctx_handler.cpp" />
-    <ClCompile Include="..\test\float.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
     <ClCompile Include="..\test\http_method.cpp" />
     <ClCompile Include="..\test\http_status.cpp" />

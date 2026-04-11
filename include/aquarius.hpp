@@ -7,7 +7,6 @@
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/cmd_options.hpp>
-#include <aquarius/detail/float.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
