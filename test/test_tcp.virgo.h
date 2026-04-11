@@ -27,9 +27,6 @@ struct tcp_person
 	bytes orders;
 	std::map<int32, int32> seqs;
 	std::vector<int32> ves;
-	date day;
-	times t;
-	datetime dt;
 };
 
 class login_req_body : public aquarius::tcp_binary_serialize
@@ -66,9 +63,6 @@ public:
 struct test_table
 {
 	int64 id;
-	date day;
-	datetime tt;
-	times tts;
 };
 
 using login_request = aquarius::virgo::tcp_request<"10001", login_req_body>;

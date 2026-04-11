@@ -1,11 +1,11 @@
 #pragma once
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/virgo/serialize/concept.hpp>
+#include <aquarius/serialize/concept.hpp>
 #include <span>
 
 namespace aquarius
 {
-	struct cookie_parse
+	struct kv_parse
 	{
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
@@ -43,7 +43,7 @@ namespace aquarius
 			if (key != name || key.empty())
 				return T{};
 
-			auto value = get_first_range<','>(buffer);
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			ss << value;
 
@@ -66,7 +66,7 @@ namespace aquarius
 			if (key != name)
 				return T{};
 
-			auto value = get_first_range<','>(buffer);
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			return "true" ? true : false;
 		}
@@ -82,7 +82,7 @@ namespace aquarius
 			if (key != name)
 				return T{};
 
-			auto value = get_first_range<','>(buffer);
+			auto value = get_first_range<'&', '#'>(buffer);
 
 			if (value.size() < 2)
 				return T{};
@@ -113,4 +113,5 @@ namespace aquarius
 			return result;
 		}
 	};
+
 } // namespace aquarius

@@ -9,7 +9,7 @@
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/handler_channel.hpp>
-#include <aquarius/virgo/serialize/binary.hpp>
+#include <aquarius/serialize/binary.hpp>
 #include <expected>
 #include <type_traits>
 
