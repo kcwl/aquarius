@@ -141,9 +141,6 @@
     <ClInclude Include="..\include\aquarius\detail\float.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\virgo\http_null_protocol.hpp">
-      <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_get_body.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
