@@ -5,42 +5,39 @@
 
 namespace aquarius
 {
-	namespace virgo
+	template <typename Body>
+	class tcp_response : public basic_tcp_protocol<false, tcp_header, Body>
 	{
-		template <typename Body>
-		class tcp_response : public basic_tcp_protocol<false, tcp_header, Body>
+	public:
+		using base = basic_tcp_protocol<false, tcp_header, Body>;
+
+		using base::has_request;
+
+	public:
+		tcp_response() = default;
+
+		virtual ~tcp_response() = default;
+
+		tcp_response(const tcp_response& other) = delete;
+
+		tcp_response& operator=(const tcp_response& other) = delete;
+
+		tcp_response(tcp_response&& other) noexcept = default;
+
+		tcp_response& operator=(tcp_response&& other) noexcept = default;
+
+	protected:
+		virtual void commit_command_header(flex_buffer& buffer) override
 		{
-		public:
-			using base = basic_tcp_protocol<false, tcp_header, Body>;
+			binary_parse parse{};
 
-			using base::has_request;
+			parse.to_datas(this->version(), buffer);
 
-		public:
-			tcp_response() = default;
-
-			virtual ~tcp_response() = default;
-
-			tcp_response(const tcp_response& other) = delete;
-
-			tcp_response& operator=(const tcp_response& other) = delete;
-
-			tcp_response(tcp_response&& other) noexcept = default;
-
-			tcp_response& operator=(tcp_response&& other) noexcept = default;
-
-		protected:
-			virtual void commit_command_header(flex_buffer& buffer) override
-			{
-				binary_parse parse{};
-
-				parse.to_datas(this->version(), buffer);
-
-				parse.to_datas(this->result(), buffer);
-			}
-		};
-	} // namespace virgo
+			parse.to_datas(this->result(), buffer);
+		}
+	};
 
 	template <typename Body>
-	struct is_message_type<virgo::tcp_response<Body>> : std::true_type
+	struct is_message_type<tcp_response<Body>> : std::true_type
 	{};
 } // namespace aquarius

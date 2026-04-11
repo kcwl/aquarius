@@ -8,8 +8,8 @@
 
 namespace aquarius
 {
-	using options_request = virgo::http_request<"OPTIONS", http_method::options, virgo::http_null_body>;
-	using options_response = virgo::http_response<http_method::options, virgo::http_null_body>;
+	using options_request = http_request<"OPTIONS", http_method::options, http_null_body>;
+	using options_response = http_response<http_method::options, http_null_body>;
 
 	class http_options_method_handler : public handler<options_request, options_response>
 	{
@@ -62,8 +62,8 @@ namespace aquarius
 		std::vector<char> stream;
 	};
 
-	using resource_request = virgo::http_request<"GET", http_method::get, virgo::http_null_body>;
-	using resource_response = virgo::http_response<http_method::get, http_stream_body>;
+	using resource_request = http_request<"GET", http_method::get, http_null_body>;
+	using resource_response = http_response<http_method::get, http_stream_body>;
 
 	class http_source_method_handler : public handler<resource_request, resource_response>
 	{

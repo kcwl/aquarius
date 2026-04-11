@@ -65,5 +65,5 @@ struct test_table
 	int64 id;
 };
 
-using login_request = aquarius::virgo::tcp_request<"10001", login_req_body>;
-using login_response = aquarius::virgo::tcp_response<login_resp_body>;
+using login_request = aquarius::tcp_request<"10001", login_req_body>;
+using login_response = aquarius::tcp_response<login_resp_body>;

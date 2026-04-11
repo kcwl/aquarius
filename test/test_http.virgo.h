@@ -96,7 +96,7 @@ http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test
 void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_req_body& local);
 http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&, const aquarius::json::value& jv);
 
-using http_test_post_request = aquarius::virgo::http_request<"/login/new", aquarius::http_method::post, http_test_post_req_body>;
-using http_test_post_response = aquarius::virgo::http_response<aquarius::http_method::post, http_test_post_resp_body>;
-using http_test_get_request = aquarius::virgo::http_request<"/login", aquarius::http_method::get, http_test_get_req_body>;
-using http_test_get_response = aquarius::virgo::http_response<aquarius::http_method::get, http_test_get_resp_body>;
+using http_test_post_request = aquarius::http_request<"/login/new", aquarius::http_method::post, http_test_post_req_body>;
+using http_test_post_response = aquarius::http_response<aquarius::http_method::post, http_test_post_resp_body>;
+using http_test_get_request = aquarius::http_request<"/login", aquarius::http_method::get, http_test_get_req_body>;
+using http_test_get_response = aquarius::http_response<aquarius::http_method::get, http_test_get_resp_body>;
