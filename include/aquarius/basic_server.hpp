@@ -33,7 +33,7 @@ namespace aquarius
 			: io_service_pool_size_(io_service_pool_size)
 			, io_service_pool_(io_service_pool_size_)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
-			, acceptor_(io_service_pool_.get_io_service(), detail::make_v4_endpoint(static_cast<uint16_t>(port)))
+			, acceptor_(io_service_pool_.get_io_service(), detail::make_endpoint<typename session_type::protocol_type>(static_cast<uint16_t>(port)))
 			, server_name_(name)
 			, global_timer_(io_service_pool_.get_io_service(), global_time_dura)
 		{

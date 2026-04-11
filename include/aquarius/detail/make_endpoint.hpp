@@ -5,16 +5,15 @@ namespace aquarius
 {
 	namespace detail
 	{
-		using endpoint = boost::asio::ip::tcp::endpoint;
-
-		inline endpoint make_v4_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v4(), port);
-		}
-
-		inline endpoint make_v6_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v6(), port);
-		}
+        template<typename Protocol>
+        inline typename Protocol::endpoint make_endpoint(uint16_t port)
+        {
+            using endpoint = typename Protocol::endpoint;
+#ifdef USE_IPV6
+            return endpoint(Protocol::v6(), port);
+#else
+            return endpoint(Protocol::v4(), port);
+#endif
+        }
 	} // namespace detail
 } // namespace aquarius
