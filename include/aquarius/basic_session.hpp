@@ -11,15 +11,13 @@ namespace aquarius
 	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
 	{
 	public:
-		using protocol_type = Protocol;
+		using socket = typename Protocol::socket;
 
-		using socket = typename protocol_type::socket;
+		using endpoint = typename Protocol::endpoint;
 
-		using endpoint = typename protocol_type::endpoint;
+		using acceptor = typename Protocol::acceptor;
 
-		using acceptor = typename protocol_type::acceptor;
-
-		using resolver = typename protocol_type::resolver;
+		using resolver = typename Protocol::resolver;
 
 		using duration = std::chrono::system_clock::duration;
 

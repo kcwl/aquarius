@@ -5,14 +5,13 @@ namespace aquarius
 {
 	namespace detail
 	{
-        template<typename Protocol>
-        inline typename Protocol::endpoint make_endpoint(uint16_t port)
+        inline typename asio::ip::tcp::endpoint make_endpoint(uint16_t port)
         {
-            using endpoint = typename Protocol::endpoint;
+            using endpoint = asio::ip::tcp::endpoint;
 #ifdef USE_IPV6
-            return endpoint(Protocol::v6(), port);
+            return endpoint(asio::ip::tcp::v6(), port);
 #else
-            return endpoint(Protocol::v4(), port);
+            return endpoint(asio::ip::tcp::v4(), port);
 #endif
         }
 	} // namespace detail

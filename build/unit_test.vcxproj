@@ -245,7 +245,6 @@
     <ClCompile Include="..\test\int_to_string.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
     <ClCompile Include="..\test\kv_serialize.cpp" />
-    <ClCompile Include="..\test\make_endpoint.cpp" />
     <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
