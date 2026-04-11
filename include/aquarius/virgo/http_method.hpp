@@ -1,4 +1,7 @@
 #pragma once
+#include <aquarius/virgo/http_status.hpp>
+#include <expected>
+#include <map>
 #include <ostream>
 #include <string_view>
 
@@ -8,65 +11,56 @@ namespace aquarius
 {
 	enum class http_method
 	{
-		none,
 		get,
 		post,
 		options,
 		head,
 		put,
-		delete_,
-		redirect
+		delete_
 	};
+
+	inline static std::map<http_method, std::string_view> http_methods = {
+		{ http_method::get, "GET"sv },	 { http_method::post, "POST"sv }, { http_method::options, "OPTIONS"sv },
+		{ http_method::head, "HEAD"sv }, { http_method::put, "PUT"sv },	  { http_method::delete_, "DELETE"sv }
+	};
+
+	inline std::string_view method_to_string(http_method m)
+	{
+		auto iter = http_methods.find(m);
+
+		return iter != http_methods.end() ? iter->second : "UNKNOWN"sv;
+	}
+
+	inline auto string_to_method(std::string_view s) -> std::expected<http_method, error_code>
+	{
+		auto iter = std::find_if(http_methods.begin(), http_methods.end(), [&](auto m) { return m.second == s; });
+
+		if (iter == http_methods.end())
+		{
+			return std::unexpected(http_status::method_not_allowed);
+		}
+
+		auto dist = std::distance(http_methods.begin(), iter);
+
+		return static_cast<http_method>(dist);
+	}
 
 	inline std::ostream& operator<<(std::ostream& os, http_method m)
 	{
-		os << static_cast<int>(m);
+		os << method_to_string(m);
 
 		return os;
 	}
 
-	inline std::string_view from_method_string(http_method m)
+	inline std::istream& operator>>(std::istream& is, http_method& m)
 	{
-		switch (m)
-		{
-		case http_method::get:
-			return "GET"sv;
-		case http_method::post:
-			return "POST"sv;
-		case http_method::options:
-			return "OPTIONS"sv;
-		case http_method::head:
-			return "HEAD"sv;
-		case http_method::put:
-			return "PUT"sv;
-		case http_method::delete_:
-			return "DELETE"sv;
-		case http_method::redirect:
-			return "REDIRECT"sv;
-		default:
-			break;
-		}
+		std::string method{};
 
-		return "UNKNOWN"sv;
-	}
+		is >> method;
 
-	inline http_method from_string_method(std::string_view s)
-	{
-		if (s == "GET"sv)
-			return http_method::get;
-		else if (s == "POST"sv)
-			return http_method::post;
-		else if (s == "OPTIONS"sv)
-			return http_method::options;
-		else if (s == "HEAD"sv)
-			return http_method::head;
-		else if (s == "PUT"sv)
-			return http_method::put;
-		else if (s == "DELETE"sv)
-			return http_method::delete_;
-		else if (s == "REDIRECT"sv)
-			return http_method::redirect;
+		[[maybe_unused]] auto res =
+			string_to_method(method).and_then([&](auto method) -> std::expected<void, error_code> { m = method; });
 
-		return http_method::none;
+		return is;
 	}
 } // namespace aquarius

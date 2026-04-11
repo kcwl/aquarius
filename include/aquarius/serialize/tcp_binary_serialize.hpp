@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/basic_serialize.hpp>
-#include <aquarius/virgo/serialize/binary.hpp>
+#include <aquarius/serialize/binary.hpp>
 
 namespace aquarius
 {

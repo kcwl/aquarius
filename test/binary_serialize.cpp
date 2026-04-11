@@ -1,6 +1,6 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include <aquarius/virgo/serialize/binary.hpp>
+#include <aquarius/serialize/binary.hpp>
 #include "test_tcp.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
@@ -28,9 +28,6 @@ BOOST_AUTO_TEST_CASE(binary)
 	p.orders = { 1, 2, 3, 4, 5 };
 	p.seqs = { {1,2,},{3,4} };
 	p.ves = { 2,3,4,5 };
-	p.day = aquarius::date(2026, 3, 14);
-	p.t = 1000ms;
-	p.dt = aquarius::datetime(2026, 3, 14, 8, 45, 0);
 
 	bp.to_datas(p, buffer);
 
@@ -52,9 +49,6 @@ BOOST_AUTO_TEST_CASE(binary)
 	BOOST_TEST(p1.orders == p.orders);
 	BOOST_TEST(p1.seqs == p.seqs);
 	BOOST_TEST(p1.ves == p.ves);
-	BOOST_TEST(p1.day == p.day);
-	BOOST_TEST(p1.t == p.t);
-	BOOST_TEST(p1.dt == p.dt);
 }
 
 BOOST_AUTO_TEST_CASE(integer_limit)

@@ -6,10 +6,10 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
+#include <aquarius/ip/http/http_options_handler.hpp>
 #include <aquarius/module/handler_channel.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
-#include <aquarius/virgo/http_version.hpp>
 #include <boost/url.hpp>
 #include <ranges>
 #include <string_view>
@@ -64,29 +64,43 @@ namespace aquarius
 
 				auto [method, url, version] = parse_command_line<true>(header_line, ec);
 
-				if (method == http_method::get)
+				if (ec)
 				{
-					buffer.sputn(url->params().buffer().data(), url->params().buffer().size());
+					co_return ec;
 				}
 
-				std::string router(std::string_view(url->path().data(), url->path().size()));
+				if (method == http_method::options)
+				{
+					auto resp = co_await mpc_http_options(buffer);
 
-				ec = co_await recv(session_ptr, buffer);
-
-				asio::co_spawn(
-					session_ptr->get_executor(),
-					[&, r = std::move(router)] -> asio::awaitable<void>
+					co_await session_ptr->async_send(std::move(*resp));
+				}
+				else
+				{
+					if (method == http_method::get)
 					{
-						auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(version));
+						buffer.sputn(url->params().buffer().data(), url->params().buffer().size());
+					}
 
-						if (!resp_buf.has_value())
+					std::string router(std::string_view(url->path().data(), url->path().size()));
+
+					ec = co_await recv(session_ptr, buffer);
+
+					asio::co_spawn(
+						session_ptr->get_executor(),
+						[&, r = std::move(router)] -> asio::awaitable<void>
 						{
-							co_return;
-						}
+							auto resp_buf = co_await mpc_publish(std::move(r), buffer);
 
-						co_await session_ptr->async_send(std::move(*resp_buf));
-					},
-					asio::detached);
+							if (!resp_buf.has_value())
+							{
+								co_return;
+							}
+
+							co_await session_ptr->async_send(std::move(*resp_buf));
+						},
+						asio::detached);
+				}
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -120,12 +134,15 @@ namespace aquarius
 				co_return flex_buffer{};
 			}
 
-
-
 			std::string_view header_line((char*)buffer.data().data(), buffer.size());
 			auto pos = header_line.find_first_of(crlf);
 
 			auto [version, status] = parse_command_line<false>(header_line.substr(0, pos), ec);
+
+			if (ec)
+			{
+				co_return flex_buffer{};
+			}
 
 			if (status != http_status::ok)
 			{
@@ -194,9 +211,9 @@ namespace aquarius
 
 			if constexpr (Server)
 			{
-				auto method = from_string_method(std::string_view(*iter++));
+				auto method = string_to_method(std::string_view(*iter++));
 
-				if (method == http_method::none)
+				if (!method.has_value())
 				{
 					return result_t{};
 				}
@@ -207,26 +224,26 @@ namespace aquarius
 					return result_t{};
 				}
 
-				auto version = from_version_string(std::string_view(*iter));
+				auto version = string_to_version(std::string_view(*iter));
 
-				if (version == http_version::unknown)
+				if (!version.has_value())
 				{
 					return result_t{};
 				}
 
 				ec = error_code{};
 
-				return std::make_tuple(method, url_result, version);
+				return std::make_tuple(*method, url_result, *version);
 			}
 			else
 			{
-				auto version = from_version_string(std::string_view(*iter++));
+				auto version = string_to_version(std::string_view(*iter++));
 
 				auto status = static_cast<http_status>(std::atoi(std::string_view(*iter++).data()));
 
 				ec = error_code{};
 
-				return std::make_tuple(version, status);
+				return std::make_tuple(*version, status);
 			}
 		}
 

@@ -1,7 +1,4 @@
 #pragma once
-#include <boost/mysql/date.hpp>
-#include <boost/mysql/datetime.hpp>
-#include <boost/mysql/time.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -27,8 +24,4 @@ namespace aquarius
 
 	using string = std::string;
 	using bytes = std::vector<char>;
-
-	using date = boost::mysql::date;
-	using datetime = boost::mysql::datetime;
-	using times = boost::mysql::time;
 } // namespace aquarius

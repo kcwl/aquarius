@@ -1,7 +1,7 @@
 #pragma once
-#include <aquarius/virgo/serialize/concept.hpp>
-#include <aquarius/virgo/serialize/error.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/serialize/concept.hpp>
+#include <aquarius/serialize/error.hpp>
 #include <boost/pfr.hpp>
 
 namespace aquarius
@@ -49,7 +49,7 @@ namespace aquarius
 			}
 		}
 
-		template<map_t T>
+		template <map_t T>
 		void to_datas(const T& value, flex_buffer& buffer)
 		{
 			to_datas(value.size(), buffer);
@@ -61,31 +61,12 @@ namespace aquarius
 			}
 		}
 
-		template<fixed_t T>
+		template <fixed_t T>
 		void to_datas(const T& v, flex_buffer& buffer)
 		{
 			auto size = sizeof(v.value);
 
 			buffer.sputn((char*)&v.value, size);
-		}
-
-		template<datetime_t T>
-		void to_datas(const T& value, flex_buffer& buffer)
-		{
-			if constexpr (std::same_as<T, times>)
-			{
-				return to_datas(value.count(), buffer);
-			}
-			else
-			{
-				if (!value.valid())
-				{
-					to_datas(0, buffer);
-					return;
-				}
-
-				return to_datas(value.get_time_point().time_since_epoch().count(), buffer);
-			}
 		}
 
 		template <string_t T>
@@ -186,7 +167,7 @@ namespace aquarius
 			return value;
 		}
 
-		template<map_t T>
+		template <map_t T>
 		auto from_datas(flex_buffer& buff) -> T
 		{
 			T value{};
@@ -198,10 +179,10 @@ namespace aquarius
 
 			for (std::size_t i = 0; i < size; ++i)
 			{
-				auto first =  from_datas<typename T::value_type::first_type>(buff);
-				auto second =  from_datas<typename T::value_type::second_type>(buff);
+				auto first = from_datas<typename T::value_type::first_type>(buff);
+				auto second = from_datas<typename T::value_type::second_type>(buff);
 
-				//value.insert({ first, second });
+				// value.insert({ first, second });
 				value[first] = second;
 			}
 
@@ -224,7 +205,7 @@ namespace aquarius
 			return value;
 		}
 
-		template<fixed_t T>
+		template <fixed_t T>
 		T from_datas(flex_buffer& buffer)
 		{
 			T v{};
@@ -234,30 +215,6 @@ namespace aquarius
 			buffer.sgetn((char*)&v.value, size);
 
 			return v;
-		}
-
-		template<datetime_t T>
-		T from_datas(flex_buffer& buffer)
-		{
-			auto values = from_datas<int64_t>(buffer);
-
-			if (values == 0)
-			{
-				return T{};
-			}
-
-			if constexpr (std::same_as<T, times>)
-			{
-				return T(values);
-			}
-			else if constexpr (std::same_as<T, datetime>)
-			{
-				return T{ typename T::time_point(std::chrono::microseconds(values)) };
-			}
-			else
-			{
-				return T{ typename T::time_point(std::chrono::days(values)) };
-			}
 		}
 
 		template <reflectable T>

@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/virgo/serialize/scalar_type.hpp>
+#include <aquarius/serialize/scalar_type.hpp>
 #include <concepts>
 #include <string>
 #include <string_view>
@@ -44,7 +44,7 @@ namespace aquarius
 	template <typename T>
 	concept zig_zag = disjunction_same_as<T, int32_t, int64_t>;
 
-	template<typename T>
+	template <typename T>
 	concept fixed_t = disjunction_same_as<T, fixed32, fixed64>;
 
 	template <typename T>
@@ -63,7 +63,4 @@ namespace aquarius
 
 	template <typename T>
 	concept map_t = is_map<T>::value;
-
-	template<typename T>
-	concept datetime_t = disjunction_same_as<T, date, times, datetime>;
 } // namespace aquarius

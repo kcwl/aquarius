@@ -59,9 +59,6 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			BOOST_TEST(resp.body().per_resp.orders == req->body().per_req.orders);
 			BOOST_TEST(resp.body().per_resp.seqs == req->body().per_req.seqs);
 			BOOST_TEST(resp.body().per_resp.ves == req->body().per_req.ves);
-			BOOST_TEST(resp.body().per_resp.day == req->body().per_req.day);
-			BOOST_TEST(resp.body().per_resp.t == req->body().per_req.t);
-			BOOST_TEST(resp.body().per_resp.dt == req->body().per_req.dt);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8100);
