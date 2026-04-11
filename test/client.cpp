@@ -13,14 +13,14 @@ BOOST_AUTO_TEST_CASE(test_tcp_ctor)
 	{
 		aquarius::tcp_client client(io, 1000ms);
 
-		BOOST_CHECK(client.get_executor() == io.get_executor());
+		BOOST_REQUIRE(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 
 	{
 		aquarius::tcp_client client(io.get_executor(), 1000ms);
 
-		BOOST_CHECK(client.get_executor() == io.get_executor());
+		BOOST_REQUIRE(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 }
@@ -31,14 +31,14 @@ BOOST_AUTO_TEST_CASE(test_http_ctor)
 	{
 		aquarius::http_client client(io, 1000ms);
 
-		BOOST_CHECK(client.get_executor() == io.get_executor());
+		BOOST_REQUIRE(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 
 	{
 		aquarius::tcp_client client(io.get_executor(), 1000ms);
 
-		BOOST_CHECK(client.get_executor() == io.get_executor());
+		BOOST_REQUIRE(client.get_executor() == io.get_executor());
 		BOOST_TEST(client.get_timeout() == 1000ms);
 	}
 }
