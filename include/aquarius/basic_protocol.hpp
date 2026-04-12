@@ -134,7 +134,4 @@ namespace aquarius
 			return true;
 		}
 	};
-
-	using null_protocol = basic_protocol<null_header, null_body*, std::allocator<null_body>>;
-
 } // namespace aquarius
