@@ -135,9 +135,6 @@
     <ClInclude Include="..\include\aquarius\ip\concept.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\timer.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
