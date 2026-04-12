@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>

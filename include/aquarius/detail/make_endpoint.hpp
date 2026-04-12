@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 
 namespace aquarius
 {

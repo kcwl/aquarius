@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/logger.hpp>
 
 namespace aquarius
@@ -144,7 +144,8 @@ namespace aquarius
 
 				if (pptr() == epptr())
 				{
-					buffer_size < max_size_&& max_size_ - buffer_size < buffer_delta ? result = reserve(max_size_ - buffer_size)
+					buffer_size < max_size_&& max_size_ - buffer_size < buffer_delta
+						? result = reserve(max_size_ - buffer_size)
 						: result = reserve(buffer_delta);
 				}
 
@@ -188,7 +189,7 @@ namespace aquarius
 					{
 						// max then max_size and not allocate space and not receive data
 						XLOG_ERROR() << "buffer overflow! current size:" << size() << ", max_size:" << max_size()
-							<< ", reserve size:" << n;
+									 << ", reserve size:" << n;
 						return false;
 					}
 				}
@@ -204,51 +205,52 @@ namespace aquarius
 			{
 				auto dist = pptr() - eback();
 
-				int64_t new_off{};
+				uint64_t new_off{};
 
 				switch (dir)
 				{
-					case std::ios_base::beg:
-						{
-							new_off = 0;
-						}
-						break;
-					case std::ios_base::cur:
-						{
-							auto both = std::ios_base::in | std::ios_base::out;
+				case std::ios_base::beg:
+					{
+						new_off = 0;
+					}
+					break;
+				case std::ios_base::cur:
+					{
+						auto both = std::ios_base::in | std::ios_base::out;
 
-							if ((mode & both) != both)
+						if ((mode & both) != both)
+						{
+							if (mode & std::ios::in)
 							{
-								if (mode & std::ios::in)
-								{
-									new_off = pptr() - eback();
-								}
-								else if (mode & std::ios::out)
-								{
-									new_off = gptr() - eback();
-								}
+								new_off = pptr() - eback();
+							}
+							else if (mode & std::ios::out)
+							{
+								new_off = gptr() - eback();
 							}
 						}
-						break;
-					case std::ios_base::end:
-						{
-							new_off = dist;
-						}
-						break;
-					default:
-						break;
+					}
+					break;
+				case std::ios_base::end:
+					{
+						new_off = dist;
+					}
+					break;
+				default:
+					break;
 				}
 
-				if ((static_cast<unsigned long long>(offset) + new_off > static_cast<unsigned long long>(dist)) || (static_cast<unsigned long long>(offset) + new_off > (epptr() - pptr())))
+				if ((static_cast<unsigned long long>(offset) + new_off > static_cast<unsigned long long>(dist)) ||
+					(static_cast<unsigned long long>(offset) + new_off > (epptr() - pptr())))
 				{
-					return pos_type{ off_type{-1} };
+					return pos_type{ off_type{ -1 } };
 				}
 
 				offset += new_off;
 
-				if (static_cast<int64_t>(offset) < 0 )
+				if (static_cast<int64_t>(offset) < 0)
 				{
-					return pos_type{ off_type{-1} };
+					return pos_type{ off_type{ -1 } };
 				}
 
 				if ((mode & std::ios::in) == std::ios::in)
@@ -264,8 +266,7 @@ namespace aquarius
 				return offset;
 			}
 
-			virtual pos_type seekpos(pos_type pos,
-									 std::ios_base::openmode mode = std::ios::in | std::ios::out) override
+			virtual pos_type seekpos(pos_type pos, std::ios_base::openmode mode = std::ios::in | std::ios::out) override
 			{
 				if (mode & std::ios::in)
 				{
@@ -279,7 +280,6 @@ namespace aquarius
 					setg(&buffer_[0], &buffer_[0] + pos, pptr());
 				}
 
-
 				if (mode & std::ios::out)
 				{
 					auto dist = static_cast<off_type>(epptr() - eback());
@@ -292,7 +292,7 @@ namespace aquarius
 					setp(&buffer_[0] + pos, epptr());
 				}
 
-				return pos_type{pos};
+				return pos_type{ pos };
 			}
 
 		private:

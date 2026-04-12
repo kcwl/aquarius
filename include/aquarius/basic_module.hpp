@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/struct_name.hpp>
 #include <aquarius/error_code.hpp>
 #include <chrono>
@@ -77,7 +77,7 @@ namespace aquarius
 	private:
 		T* _this()
 		{
-           return reinterpret_cast<T*>(this);
+			return reinterpret_cast<T*>(this);
 		}
 	};
 } // namespace aquarius

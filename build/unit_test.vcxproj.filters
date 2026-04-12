@@ -114,9 +114,6 @@
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\asio.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -314,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp">
       <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\asio.hpp">
+      <Filter>include\aquarius\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

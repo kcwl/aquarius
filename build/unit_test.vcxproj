@@ -159,6 +159,7 @@
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
@@ -168,7 +169,6 @@
     <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\asio.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
     <ClInclude Include="..\include\aquarius\module\handler_channel.hpp" />
