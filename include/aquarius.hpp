@@ -22,7 +22,7 @@
 #include <aquarius/serialize/http_serialize.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/serialize/kv.hpp>
-#include <aquarius/serialize/tcp_binary_serialize.hpp>
+#include <aquarius/serialize/tcp_serialize.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl/enter_view.hpp>
 #include <aquarius/tbl/insert_view.hpp>

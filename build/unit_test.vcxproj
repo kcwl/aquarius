@@ -204,7 +204,7 @@
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\scalar_type.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />

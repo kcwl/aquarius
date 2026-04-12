@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius.hpp>
 
-class regist_req_body : public aquarius::tcp_binary_serialize
+class regist_req_body : public aquarius::tcp_serialize
 {
 public:
 	regist_req_body();
@@ -21,7 +21,7 @@ public:
 	int32 port;
 };
 
-class regist_resp_body : public aquarius::tcp_binary_serialize
+class regist_resp_body : public aquarius::tcp_serialize
 {
 public:
 	regist_resp_body() = default;

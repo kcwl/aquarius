@@ -4,10 +4,10 @@
 
 namespace aquarius
 {
-	class tcp_binary_serialize : public basic_serialize<binary_parse>
+	class tcp_serialize : public basic_serialize<binary_parse>
 	{
 	public:
-		tcp_binary_serialize() = default;
-		virtual ~tcp_binary_serialize() = default;
+		tcp_serialize() = default;
+		virtual ~tcp_serialize() = default;
 	};
 } // namespace aquarius

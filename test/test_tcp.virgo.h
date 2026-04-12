@@ -29,7 +29,7 @@ struct tcp_person
 	std::vector<int32> ves;
 };
 
-class login_req_body : public aquarius::tcp_binary_serialize
+class login_req_body : public aquarius::tcp_serialize
 {
 public:
 	login_req_body();
@@ -44,7 +44,7 @@ public:
 public:
 	tcp_person per_req;
 };
-class login_resp_body : public aquarius::tcp_binary_serialize
+class login_resp_body : public aquarius::tcp_serialize
 {
 public:
 	login_resp_body();

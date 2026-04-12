@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius.hpp>
 
-class subscribe_req_body : public aquarius::tcp_binary_serialize
+class subscribe_req_body : public aquarius::tcp_serialize
 {
 public:
 	subscribe_req_body();
@@ -20,7 +20,7 @@ public:
 	string payload;
 };
 
-class subscribe_resp_body : public aquarius::tcp_binary_serialize
+class subscribe_resp_body : public aquarius::tcp_serialize
 {
 public:
 	subscribe_resp_body() = default;
@@ -37,7 +37,7 @@ public:
 public:
 };
 
-class transfer_req_body : public aquarius::tcp_binary_serialize
+class transfer_req_body : public aquarius::tcp_serialize
 {
 public:
 	transfer_req_body();
@@ -56,7 +56,7 @@ public:
 	bytes feedbuf;
 };
 
-class transfer_resp_body : public aquarius::tcp_binary_serialize
+class transfer_resp_body : public aquarius::tcp_serialize
 {
 public:
 	transfer_resp_body();

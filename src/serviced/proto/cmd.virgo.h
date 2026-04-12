@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius.hpp>
 
-class cmd_op_req_body : public aquarius::tcp_binary_serialize
+class cmd_op_req_body : public aquarius::tcp_serialize
 {
 public:
 	cmd_op_req_body();
@@ -19,7 +19,7 @@ public:
 	bytes input;
 };
 
-class cmd_op_resp_body : public aquarius::tcp_binary_serialize
+class cmd_op_resp_body : public aquarius::tcp_serialize
 {
 public:
 	cmd_op_resp_body();
