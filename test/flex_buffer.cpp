@@ -4,6 +4,7 @@
 #include "../include/aquarius/detail/flex_buffer.hpp"
 #include <boost/asio/buffer.hpp>
 #include <iostream>
+#include <cstring>
 
 using aquarius::flex_buffer;
 // use fully-qualified boost::asio::buffer_cast where needed
@@ -129,6 +130,124 @@ BOOST_AUTO_TEST_CASE(reserve_behavior_with_max_size)
 
     // ensure we didn't exceed the max_size
     BOOST_CHECK_LE(fb.size(), fb.max_size());
+}
+
+BOOST_AUTO_TEST_CASE(consume_beyond_size_and_zero_commit)
+{
+    flex_buffer fb;
+    auto mb = fb.prepare(5);
+    char* p = reinterpret_cast<char*>(mb.data());
+    std::memcpy(p, "abcde", 5);
+    fb.commit(5);
+
+    // consuming more than size should clamp to zero
+    fb.consume(100);
+    BOOST_CHECK_EQUAL(fb.size(), 0u);
+
+    // prepare with zero and commit zero should not change size
+    auto mb2 = fb.prepare(4);
+    BOOST_CHECK_NE(mb2.data(), nullptr);
+    fb.commit(0);
+    BOOST_CHECK_EQUAL(fb.size(), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(seekoff_cur_mode_variations)
+{
+    flex_buffer fb;
+    auto mb = fb.prepare(6);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "123456", 6);
+    fb.commit(6);
+
+    // seekoff with cur and mode in only
+    auto res1 = fb.pubseekoff(1, std::ios_base::cur, std::ios_base::in);
+    BOOST_CHECK(res1 == std::streampos(std::streamoff(-1)));
+
+    // seekoff with cur and mode out only
+    auto res2 = fb.pubseekoff(1, std::ios_base::cur, std::ios_base::out);
+    BOOST_CHECK(res2 != std::streampos(std::streamoff(-1)));
+
+    // seekoff with both should still allow moving within range
+    auto res3 = fb.pubseekoff(2, std::ios_base::beg, std::ios_base::in | std::ios_base::out);
+    BOOST_CHECK(res3 == std::streampos(std::streamoff(-1)));
+}
+
+BOOST_AUTO_TEST_CASE(data_byte_size_matches_chars)
+{
+    flex_buffer fb;
+    auto mb = fb.prepare(7);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "testing", 7);
+    fb.commit(7);
+
+    auto cb = fb.data();
+    // buffer_size returns bytes; should equal fb.size() * sizeof(char)
+    BOOST_CHECK_EQUAL(boost::asio::buffer_size(cb), static_cast<std::size_t>(fb.size() * sizeof(char)));
+}
+
+BOOST_AUTO_TEST_CASE(flexbuf_ref_copy_and_move)
+{
+    flex_buffer fb;
+    auto mb = fb.prepare(3);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "ok!", 3);
+    fb.commit(3);
+
+    aquarius::detail::basic_flexbuf_ref<std::allocator<char>> r1(fb);
+    // copy-construct
+    aquarius::detail::basic_flexbuf_ref<std::allocator<char>> r2(r1);
+    BOOST_CHECK_EQUAL(r2.size(), r1.size());
+
+    // move-construct
+    aquarius::detail::basic_flexbuf_ref<std::allocator<char>> r3(std::move(r2));
+    BOOST_CHECK_EQUAL(r3.size(), 3u);
+}
+
+// expose protected members for direct testing
+struct test_flexbuf : public aquarius::detail::basic_flexbuf<>
+{
+    using base = aquarius::detail::basic_flexbuf<>;
+    using base::underflow;
+    using base::overflow;
+
+    test_flexbuf(std::size_t m = std::numeric_limits<std::size_t>::max()) : base(m) {}
+};
+
+BOOST_AUTO_TEST_CASE(underflow_and_overflow_direct)
+{
+    test_flexbuf tf(4);
+
+    // underflow on empty buffer -> EOF
+    BOOST_CHECK_EQUAL(tf.underflow(), std::char_traits<char>::eof());
+
+    // prepare and commit one byte then underflow should return that byte
+    auto mb = tf.prepare(2);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "Z", 1);
+    tf.commit(1);
+    BOOST_CHECK_EQUAL(tf.underflow(), std::char_traits<char>::to_int_type('Z'));
+
+    // overflow with EOF should return not_eof
+    BOOST_CHECK_EQUAL(tf.overflow(std::char_traits<char>::eof()),
+                      std::char_traits<char>::not_eof(std::char_traits<char>::eof()));
+
+    // make a very small buffer to force reserve failure in overflow
+    test_flexbuf small(1);
+    auto mb2 = small.prepare(1);
+    std::memcpy(reinterpret_cast<char*>(mb2.data()), "A", 1);
+    small.commit(1);
+
+    auto r = small.overflow(std::char_traits<char>::to_int_type('X'));
+    BOOST_CHECK_EQUAL(r, std::char_traits<char>::eof());
+}
+
+BOOST_AUTO_TEST_CASE(seekoff_fails_when_put_capacity_insufficient)
+{
+    // create buffer with small capacity
+    flex_buffer fb(2);
+    auto mb = fb.prepare(1);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "x", 1);
+    fb.commit(1);
+
+    // try to seekbeg beyond available put space -> should fail
+    auto res = fb.pubseekoff(10, std::ios_base::beg, std::ios_base::out);
+    BOOST_CHECK(res == std::streampos(std::streamoff(-1)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

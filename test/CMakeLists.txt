@@ -51,7 +51,8 @@ endif()
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius
 	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -r coverage.info "*/boost/*" -o coverage-no-boost.info
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
 	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch coverage-aquarius.info -o test-aquarius
 )
 

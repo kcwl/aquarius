@@ -239,7 +239,7 @@ namespace aquarius
 						break;
 				}
 
-				if (static_cast<unsigned long long>(offset) + new_off > static_cast<unsigned long long>(dist))
+				if ((static_cast<unsigned long long>(offset) + new_off > static_cast<unsigned long long>(dist)) || (static_cast<unsigned long long>(offset) + new_off > (epptr() - pptr())))
 				{
 					return pos_type{ off_type{-1} };
 				}
