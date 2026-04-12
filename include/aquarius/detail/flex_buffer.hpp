@@ -140,10 +140,17 @@ namespace aquarius
 
 				auto buffer_size = size();
 
+				bool result = true;
+
 				if (pptr() == epptr())
 				{
-					buffer_size < max_size_&& max_size_ - buffer_size < buffer_delta ? reserve(max_size_ - buffer_size)
-																					 : reserve(buffer_delta);
+					buffer_size < max_size_&& max_size_ - buffer_size < buffer_delta ? result = reserve(max_size_ - buffer_size)
+						: result = reserve(buffer_delta);
+				}
+
+				if (!result)
+				{
+					return traits_type::eof();
 				}
 
 				*pptr() = traits_type::to_char_type(c);
@@ -154,14 +161,14 @@ namespace aquarius
 			}
 
 		private:
-			void reserve(std::size_t n)
+			bool reserve(std::size_t n)
 			{
 				std::size_t pnext = pptr() - &buffer_[0];
 				std::size_t gnext = gptr() - &buffer_[0];
 				std::size_t pend = epptr() - &buffer_[0];
 
 				if (n <= pend - pnext)
-					return;
+					return false;
 
 				if (gnext > 0)
 				{
@@ -181,89 +188,111 @@ namespace aquarius
 					{
 						// max then max_size and not allocate space and not receive data
 						XLOG_ERROR() << "buffer overflow! current size:" << size() << ", max_size:" << max_size()
-									 << ", reserve size:" << n;
+							<< ", reserve size:" << n;
+						return false;
 					}
 				}
 
 				setg(&buffer_[0], &buffer_[0], &buffer_[0] + pnext);
 				setp(&buffer_[0] + pnext, &buffer_[0] + pend);
+
+				return true;
 			}
 
 			virtual pos_type seekoff(off_type offset, std::ios_base::seekdir dir,
-									 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) override
+									 std::ios_base::openmode mode = std::ios::in | std::ios::out) override
 			{
-				auto pos = static_cast<int32_t>(calc_pos(mode));
+				auto dist = pptr() - eback();
+
+				int64_t new_off{};
+
 				switch (dir)
 				{
-				case std::ios_base::beg:
-					{
-						offset = std::min<off_type>(offset, pos);
-					}
-					break;
-				case std::ios_base::cur:
-				case std::ios_base::end:
-					{
-						offset = std::max<off_type>(pos + offset, pos);
-					}
-					break;
-				default:
-					break;
+					case std::ios_base::beg:
+						{
+							new_off = 0;
+						}
+						break;
+					case std::ios_base::cur:
+						{
+							auto both = std::ios_base::in | std::ios_base::out;
+
+							if ((mode & both) != both)
+							{
+								if (mode & std::ios::in)
+								{
+									new_off = pptr() - eback();
+								}
+								else if (mode & std::ios::out)
+								{
+									new_off = gptr() - eback();
+								}
+							}
+						}
+						break;
+					case std::ios_base::end:
+						{
+							new_off = dist;
+						}
+						break;
+					default:
+						break;
 				}
 
-				set_pos(offset, mode);
+				if (static_cast<unsigned long long>(offset) + new_off > static_cast<unsigned long long>(dist))
+				{
+					return pos_type{ off_type{-1} };
+				}
+
+				offset += new_off;
+
+				if (static_cast<int64_t>(offset) < 0 )
+				{
+					return pos_type{ off_type{-1} };
+				}
+
+				if ((mode & std::ios::in) == std::ios::in)
+				{
+					setg(&buffer_[0], &buffer_[0] + offset, pptr());
+				}
+
+				if ((mode & std::ios::out) == std::ios::out)
+				{
+					setp(&buffer_[0] + offset, pptr());
+				}
 
 				return offset;
-			}
-
-			std::size_t calc_pos(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-			{
-				switch (mode)
-				{
-				case std::ios_base::in:
-					{
-						return pptr() - (&buffer_[0]);
-					}
-					break;
-				case std::ios_base::out:
-					{
-						return gptr() - (&buffer_[0]);
-					}
-					break;
-				default:
-					break;
-				}
-
-				return static_cast<std::size_t>(-1);
-			}
-
-			void set_pos(off_type offset, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-			{
-				switch (mode)
-				{
-				case std::ios_base::in:
-					{
-						setp(&buffer_[0] + offset, epptr());
-						setg(&buffer_[0], gptr(), pptr());
-					}
-					break;
-				case std::ios_base::out:
-					{
-						setg(&buffer_[0], &buffer_[0] + offset, pptr());
-					}
-					break;
-				default:
-					break;
-				}
 			}
 
 			virtual pos_type seekpos(pos_type pos,
-									 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) override
+									 std::ios_base::openmode mode = std::ios::in | std::ios::out) override
 			{
-				int32_t offset = static_cast<std::size_t>(pos) < calc_pos(mode) ? static_cast<int>(pos) : 0;
+				if (mode & std::ios::in)
+				{
+					auto dist = static_cast<off_type>(pptr() - eback());
 
-				set_pos(offset, mode);
+					if (pos > dist)
+					{
+						return pos_type(off_type(-1));
+					}
 
-				return offset;
+					setg(&buffer_[0], &buffer_[0] + pos, pptr());
+				}
+
+
+				if (mode & std::ios::out)
+				{
+					auto dist = static_cast<off_type>(epptr() - eback());
+
+					if (pos > dist)
+					{
+						return pos_type(off_type(-1));
+					}
+
+					setp(&buffer_[0] + pos, epptr());
+				}
+
+				return pos_type{pos};
 			}
 
 		private:
