@@ -7,7 +7,6 @@
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/player_module.hpp>
 #include <aquarius/module/sql_module.hpp>
-#include <aquarius/timer.hpp>
 
 using namespace std::chrono_literals;
 
@@ -35,7 +34,8 @@ namespace aquarius
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
 			, acceptor_(io_service_pool_.get_io_service(), detail::make_endpoint(static_cast<uint16_t>(port)))
 			, server_name_(name)
-			, global_timer_(io_service_pool_.get_io_service(), global_time_dura)
+			, global_time_dura_(global_time_dura)
+			, global_timer_(io_service_pool_.get_io_service(), global_time_dura_)
 		{
 			init_signal();
 
@@ -122,7 +122,7 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_timer_.dura());
+				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
 
 				// co_await mpc_insert_session(session_ptr);
 
@@ -180,7 +180,7 @@ namespace aquarius
 						return;
 					}
 
-					module_router::get_mutable_instance().timer(global_timer_.dura());
+					module_router::get_mutable_instance().timer(global_time_dura_);
 				});
 		}
 
@@ -195,7 +195,9 @@ namespace aquarius
 
 		std::string server_name_;
 
-		timer<asio::steady_timer> global_timer_;
+		std::chrono::milliseconds global_time_dura_;
+
+		asio::steady_timer global_timer_;
 
 		ip_filter_func ip_filter_;
 
