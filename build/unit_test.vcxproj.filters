@@ -249,9 +249,6 @@
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\error.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\json.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
@@ -327,9 +324,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\kv_serialize.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\serialize_error.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\handler.cpp">

@@ -198,7 +198,6 @@
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
@@ -241,7 +240,6 @@
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
     <ClCompile Include="..\test\router.cpp" />
-    <ClCompile Include="..\test\serialize_error.cpp" />
     <ClCompile Include="..\test\server.cpp" />
     <ClInclude Include="..\test\test_http.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />
