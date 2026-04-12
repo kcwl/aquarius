@@ -208,7 +208,6 @@
     <ClInclude Include="..\include\aquarius\serialize\scalar_type.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />

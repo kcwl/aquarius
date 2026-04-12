@@ -24,7 +24,15 @@
 #include <aquarius/serialize/kv.hpp>
 #include <aquarius/serialize/tcp_binary_serialize.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/tbl.hpp>
+#include <aquarius/tbl/enter_view.hpp>
+#include <aquarius/tbl/insert_view.hpp>
+#include <aquarius/tbl/mysql_config_register.hpp>
+#include <aquarius/tbl/mysql_type.hpp>
+#include <aquarius/tbl/operator.hpp>
+#include <aquarius/tbl/remove_view.hpp>
+#include <aquarius/tbl/select_view.hpp>
+#include <aquarius/tbl/transaction.hpp>
+#include <aquarius/tbl/update_view.hpp>
 #include <aquarius/virgo/http_header.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
