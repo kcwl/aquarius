@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
 #include <aquarius/module/module_register.hpp>
-#include <aquarius/module/schedule.hpp>
 #include <aquarius/resource/global_resource.hpp>
 #include <aquarius/tbl/mysql_io_service.hpp>
 

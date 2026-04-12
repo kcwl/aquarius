@@ -1,8 +1,7 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
-#include <aquarius/detail/string_literal.hpp>
-#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/io_service_pool.hpp>
+#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/singleton.hpp>
 #include <map>
@@ -113,7 +112,9 @@ namespace aquarius
 				return;
 			}
 
-			co_spawn(io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); }, asio::detached);
+			co_spawn(
+				io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); },
+				asio::detached);
 		}
 
 	private:
