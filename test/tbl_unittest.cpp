@@ -618,16 +618,19 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(tbl_remote_tests)
 
+MYSQL_CONFIG_INVOKE(mysql)
+{
+    mysql.host = "localhost";
+    mysql.port = 3306;
+    mysql.db = "unittest";
+    mysql.user = "root";
+}
+
 BOOST_AUTO_TEST_CASE(connecting)
 {
     person p{ 1, 1 };
 
     aquarius::io_service_pool pool(1);
-
-    aquarius::global_resource::get_mutable_instance().mysql().host = "localhost";
-    aquarius::global_resource::get_mutable_instance().mysql().port = 3306;
-    aquarius::global_resource::get_mutable_instance().mysql().db = "unittest";
-    aquarius::global_resource::get_mutable_instance().mysql().user = "root";
 
     aquarius::module_router::get_mutable_instance().regist<aquarius::mysql_module>();
 
