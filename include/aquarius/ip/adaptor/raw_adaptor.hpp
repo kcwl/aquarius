@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/logger.hpp>
 
 namespace aquarius

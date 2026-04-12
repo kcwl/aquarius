@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_header.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -63,8 +62,4 @@ namespace aquarius
 			buffer.sputn(headerline.c_str(), headerline.size());
 		}
 	};
-
-	template <http_method Method, typename Body, http_version Version>
-	struct is_message_type<http_response<Method, Body, Version>> : std::true_type
-	{};
 } // namespace aquarius

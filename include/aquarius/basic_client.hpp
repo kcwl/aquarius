@@ -3,7 +3,6 @@
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/virgo/http_version.hpp>
 #include <functional>
@@ -121,7 +120,6 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Request>
-		requires(is_message_type<Request>::value && is_message_type<Response>::value)
 		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 		{
 			flex_buffer buffer{};

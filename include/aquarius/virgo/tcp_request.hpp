@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
 #include <aquarius/virgo/tcp_header.hpp>
@@ -35,8 +34,4 @@ namespace aquarius
 			binary_parse().to_datas(this_router, buffer);
 		}
 	};
-
-	template <detail::string_literal Router, typename Body>
-	struct is_message_type<tcp_request<Router, Body>> : std::true_type
-	{};
 } // namespace aquarius

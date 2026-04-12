@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/detail/uuid_generator.hpp>
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_header.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -49,8 +48,4 @@ namespace aquarius
 			buffer.sputn(line.c_str(), line.size());
 		}
 	};
-
-	template <detail::string_literal Router, http_method Method, typename Body, http_version Version>
-	struct is_message_type<http_request<Router, Method, Body, Version>> : std::true_type
-	{};
 } // namespace aquarius
