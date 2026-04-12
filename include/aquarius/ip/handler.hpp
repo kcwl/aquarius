@@ -1,7 +1,5 @@
 #pragma once
 #include <aquarius/module/handler_channel.hpp>
-#include <aquarius/virgo/http_request.hpp>
-#include <aquarius/virgo/tcp_request.hpp>
 #include <expected>
 
 namespace aquarius
@@ -103,7 +101,7 @@ namespace aquarius
 		__handler()                                                                                                    \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##__handler))                                                 \
 		{}                                                                                                             \
-		virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override;                                   \
+		virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override;                             \
 	};                                                                                                                 \
 	inline auto __handler::handle() -> aquarius::asio::awaitable<aquarius::error_code>
 
