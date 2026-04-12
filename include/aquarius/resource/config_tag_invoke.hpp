@@ -16,4 +16,4 @@ void config_tag_invoke(const aquarius::config::value_from<T>&, T& a)
 }
 
 #define CONFIG_MICRO(kind, a) \
-void config_tag_invoke(const aquarius::config::value_from<kind>&, kind& a) \
+void config_tag_invoke(const aquarius::config::value_from<kind>&, kind& a)

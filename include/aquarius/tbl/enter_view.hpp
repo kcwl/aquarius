@@ -1,6 +1,6 @@
 #pragma once
+#include <aquarius/module/mysql_module.hpp>
 #include <aquarius/module/schedule.hpp>
-#include <aquarius/module/sql_module.hpp>
 
 namespace aquarius
 {

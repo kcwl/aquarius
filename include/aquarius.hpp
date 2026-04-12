@@ -15,6 +15,8 @@
 #include <aquarius/module/module_register.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/schedule.hpp>
+#include <aquarius/resource/http_config.hpp>
+#include <aquarius/resource/mysql_config.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/cookie.hpp>
 #include <aquarius/serialize/http_json_serialize.hpp>
@@ -25,7 +27,6 @@
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl/enter_view.hpp>
 #include <aquarius/tbl/insert_view.hpp>
-#include <aquarius/tbl/mysql_config_register.hpp>
 #include <aquarius/tbl/mysql_type.hpp>
 #include <aquarius/tbl/operator.hpp>
 #include <aquarius/tbl/remove_view.hpp>

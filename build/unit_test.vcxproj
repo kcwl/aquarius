@@ -190,11 +190,10 @@
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\config_register.hpp" />
+    <ClInclude Include="..\include\aquarius\module\mysql_module.hpp" />
     <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\global_resource.hpp" />
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
+    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
@@ -211,7 +210,6 @@
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\operator.hpp" />

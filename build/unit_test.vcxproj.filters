@@ -177,12 +177,6 @@
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\resource\global_resource.hpp">
-      <Filter>include\aquarius\resource</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\resource\config_register.hpp">
-      <Filter>include\aquarius\resource</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -201,10 +195,7 @@
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\sql_module.hpp">
+    <ClInclude Include="..\include\aquarius\module\mysql_module.hpp">
       <Filter>include\aquarius\module</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp">
@@ -302,6 +293,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
       <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp">
+      <Filter>include\aquarius\resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,10 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/pfr.hpp>
-#include <aquarius/detail/concat.hpp>
-#include <aquarius/detail/struct_name.hpp>
 #include <vector>
 #include <string>
 #include <type_traits>
-#include <aquarius/tbl.hpp>
-#include <aquarius/io_service_pool.hpp>
+#include <aquarius.hpp>
 
 using namespace std::string_view_literals;
 
@@ -610,7 +607,7 @@ BOOST_AUTO_TEST_CASE(trans_guard_ctad_deduction)
     BOOST_TEST(svc.ended);
 }
 
-AQUARIUS_MSYQL_CONFIG()
+MYSQL_CONFIG_INVOKE(mysql)
 {
     mysql.host = "localhost";
     mysql.user = "root";

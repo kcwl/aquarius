@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
 #include <aquarius/module/module_register.hpp>
-#include <aquarius/resource/global_resource.hpp>
+#include <aquarius/resource/mysql_config.hpp>
 #include <aquarius/tbl/mysql_io_service.hpp>
 
 namespace aquarius
@@ -27,18 +27,20 @@ namespace aquarius
 
 		virtual auto run() -> asio::awaitable<bool> override
 		{
-			auto& config = global_resource::get_mutable_instance().mysql();
+			mysql_config cfg{};
+
+			config_tag_invoke(aquarius::config::value_from<mysql_config>(), cfg);
 
 			boost::mysql::pool_params params{};
-			params.server_address.emplace_host_and_port(config.host, static_cast<uint16_t>(config.port));
-			params.username = config.user;
-			params.password = config.password;
-			params.database = config.db;
+			params.server_address.emplace_host_and_port(cfg.host, static_cast<uint16_t>(cfg.port));
+			params.username = cfg.user;
+			params.password = cfg.password;
+			params.database = cfg.db;
 			params.ssl = boost::mysql::ssl_mode::disable;
 
 			auto executor = co_await asio::this_coro::executor;
 
-			connector_ = std::make_shared<sql_op_t>(executor);
+			connector_ = std::make_shared<sql_op_t>(executor, std::move(params));
 
 			connector_->async_run();
 
