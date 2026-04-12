@@ -38,15 +38,15 @@ http_test_get_req_body::http_test_get_req_body()
 void http_test_get_req_body::serialize(aquarius::flex_buffer& buffer)
 {
 	buffer.sputc('?');
-	this->parse_to(user, buffer, "user");
+	this->parse_to(user, buffer);
 	buffer.sputc('&');
-	this->parse_to(passwd, buffer, "passwd");
+	this->parse_to(passwd, buffer);
 }
 
 void http_test_get_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	user = this->parse_from<int32>(buffer, "user");
-	passwd = this->parse_from<string>(buffer, "passwd");
+	user = this->parse_from<int32>(buffer);
+	passwd = this->parse_from<string>(buffer);
 }
 http_test_get_resp_body::http_test_get_resp_body()
 	: user()

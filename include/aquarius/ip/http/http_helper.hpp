@@ -17,4 +17,6 @@ namespace aquarius
 		return std::format("{} {} {}\r\n", version_to_string(global_http_version), static_cast<int32_t>(s),
 						   status_to_string(s));
 	}
+
+	
 } // namespace aquarius

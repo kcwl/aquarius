@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/tbl/member_pointer.hpp>
+#include <aquarius/detail/member_pointer.hpp>
 
 namespace aquarius
 {

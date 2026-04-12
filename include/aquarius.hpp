@@ -19,8 +19,7 @@
 #include <aquarius/resource/mysql_config.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/cookie.hpp>
-#include <aquarius/serialize/http_json_serialize.hpp>
-#include <aquarius/serialize/http_kv_serialize.hpp>
+#include <aquarius/serialize/http_serialize.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/serialize/kv.hpp>
 #include <aquarius/serialize/tcp_binary_serialize.hpp>

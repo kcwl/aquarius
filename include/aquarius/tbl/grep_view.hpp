@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/tbl/concepts.hpp>
-#include <aquarius/tbl/member_pointer.hpp>
+#include <aquarius/concepts.hpp>
+#include <aquarius/detail/member_pointer.hpp>
 #include <sstream>
 
 namespace aquarius

@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/tbl/concepts.hpp>
+#include <aquarius/concepts.hpp>
 #include <chrono>
 #include <ostream>
 #include <sstream>

@@ -135,9 +135,6 @@
     <ClInclude Include="..\include\aquarius\ip\handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\test_model.tbl.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\transaction.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -176,12 +173,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\concepts.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp">
-      <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
@@ -264,12 +255,6 @@
     <ClInclude Include="..\include\aquarius\serialize\error.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\json.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
@@ -296,6 +281,18 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp">
       <Filter>include\aquarius\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp">
+      <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\concepts.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp">
+      <Filter>include\aquarius\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\test_model.tbl.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
