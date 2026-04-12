@@ -166,7 +166,6 @@
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />

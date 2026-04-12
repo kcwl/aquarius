@@ -138,9 +138,6 @@
     <ClInclude Include="..\include\aquarius\ip\handler.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_pool.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\test_model.tbl.h">
       <Filter>源文件</Filter>
     </ClInclude>
