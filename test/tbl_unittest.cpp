@@ -574,48 +574,6 @@ struct mock_service
     void end() { ended = true; }
 };
 
-BOOST_AUTO_TEST_SUITE(tbl_transaction_tests)
-
-BOOST_AUTO_TEST_CASE(trans_guard_calls_begin_on_construction)
-{
-    mock_service svc;
-    BOOST_TEST(!svc.began);
-    {
-        aquarius::trans_guard guard(&svc);
-        BOOST_TEST(svc.began);
-        BOOST_TEST(!svc.ended);
-    }
-}
-
-BOOST_AUTO_TEST_CASE(trans_guard_calls_end_on_destruction)
-{
-    mock_service svc;
-    {
-        aquarius::trans_guard guard(&svc);
-    }
-    BOOST_TEST(svc.began);
-    BOOST_TEST(svc.ended);
-}
-
-BOOST_AUTO_TEST_CASE(trans_guard_ctad_deduction)
-{
-    mock_service svc;
-    {
-        aquarius::trans_guard guard(&svc);
-        BOOST_TEST(svc.began);
-    }
-    BOOST_TEST(svc.ended);
-}
-
-MYSQL_CONFIG_INVOKE(mysql)
-{
-    mysql.host = "localhost";
-    mysql.user = "root";
-    mysql.db = "unittest";
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
 BOOST_AUTO_TEST_SUITE(tbl_remote_tests)
 
 MYSQL_CONFIG_INVOKE(mysql)

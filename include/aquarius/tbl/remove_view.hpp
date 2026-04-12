@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/detail/struct_name.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -59,5 +60,5 @@ namespace aquarius
 		return up;
 	};
 
-	static remove_view remove;
+	inline static remove_view remove;
 } // namespace aquarius

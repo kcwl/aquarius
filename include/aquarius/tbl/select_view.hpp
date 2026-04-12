@@ -13,8 +13,7 @@ namespace aquarius
 			constexpr static auto sp = ","sv;
 			auto f = [] { return concat_v<(member_pointer_name<T, Args>::value, sp)...>; };
 
-			//constexpr static auto result = f();
-			auto result = f();
+			constexpr static auto result = f();
 
 			return result.substr(0, result.size() - 1);
 		}

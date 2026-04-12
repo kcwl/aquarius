@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <boost/mysql.hpp>
+#include <aquarius/tbl/mysql_type.hpp>
 #include <boost/pfr.hpp>
 #include <chrono>
 

@@ -1,4 +1,6 @@
 #pragma once
+#include <aquarius/detail/struct_name.hpp>
+#include <boost/pfr.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -45,5 +47,5 @@ namespace aquarius
 		std::stringstream complete_sql_;
 	};
 
-	static insert_view insert;
+	inline static insert_view insert;
 } // namespace aquarius
