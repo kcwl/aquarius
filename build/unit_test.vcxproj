@@ -197,7 +197,6 @@
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />

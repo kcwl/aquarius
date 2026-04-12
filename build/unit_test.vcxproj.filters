@@ -246,9 +246,6 @@
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\concept.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>

@@ -1,6 +1,6 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/serialize/concept.hpp>
 #include <aquarius/serialize/error.hpp>
 #include <boost/pfr.hpp>
 
