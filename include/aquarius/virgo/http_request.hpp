@@ -2,7 +2,6 @@
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_header.hpp>
-#include <aquarius/virgo/http_method.hpp>
 #include <format>
 
 namespace aquarius
