@@ -12,12 +12,12 @@ http_test_post_req_body::http_test_post_req_body()
 
 void http_test_post_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this->impl_ptr_, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_test_post_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this->impl_ptr_ = this->parse_from<http_test_post_req_body::impl>(buffer); 
+	*this = this->parse_from<http_test_post_req_body>(buffer); 
 }
 int32 http_test_post_req_body::uuid() const
 {
@@ -46,12 +46,12 @@ http_test_post_resp_body::http_test_post_resp_body()
 
 void http_test_post_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this->impl_ptr_, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_test_post_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this->impl_ptr_ = this->parse_from<http_test_post_resp_body::impl>(buffer); 
+	*this = this->parse_from<http_test_post_resp_body>(buffer); 
 }
 int32 http_test_post_resp_body::uuid() const
 {
@@ -81,12 +81,12 @@ http_test_get_req_body::http_test_get_req_body()
 
 void http_test_get_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this->impl_ptr_, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_test_get_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this->impl_ptr_ = this->parse_from<http_test_get_req_body::impl>(buffer); 
+	*this = this->parse_from<http_test_get_req_body>(buffer); 
 }
 int32 http_test_get_req_body::user() const
 {
@@ -115,12 +115,12 @@ http_test_get_resp_body::http_test_get_resp_body()
 
 void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this->impl_ptr_, buffer);
+	this->parse_to(*this, buffer);
 }
 
 void http_test_get_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this->impl_ptr_ = this->parse_from<http_test_get_resp_body::impl>(buffer); 
+	*this = this->parse_from<http_test_get_resp_body>(buffer); 
 }
 int32 http_test_get_resp_body::user() const
 {

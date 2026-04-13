@@ -406,12 +406,12 @@ namespace aquarius
 			{
 				if (has_type)
 				{
-					ofs << "\t*this->impl_ptr_ = this->parse_" << direction << "<" << data_ptr->name()
-						<< "::impl>(buffer); " << std::endl;
+					ofs << "\t*this = this->parse_" << direction << "<" << data_ptr->name()
+						<< ">(buffer); " << std::endl;
 				}
 				else
 				{
-					ofs << "\tthis->parse_" << direction << "(*this->impl_ptr_, buffer);" << std::endl;
+					ofs << "\tthis->parse_" << direction << "(*this, buffer);" << std::endl;
 				}
 			};
 
