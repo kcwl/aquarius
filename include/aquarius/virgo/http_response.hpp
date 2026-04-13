@@ -4,11 +4,11 @@
 
 namespace aquarius
 {
-	template <http_method Method, typename Body, http_version Version = http_version::http1_1>
-	class http_response : public basic_http_protocol<false, Method, Body>
+	template <typename Body, http_version Version = http_version::http1_1>
+	class http_response : public basic_http_protocol<false, Body>
 	{
 	public:
-		using base = basic_http_protocol<false, Method, Body>;
+		using base = basic_http_protocol<false, Body>;
 
 		using base::has_request;
 

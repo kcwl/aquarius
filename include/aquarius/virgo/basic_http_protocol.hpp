@@ -9,7 +9,7 @@
 
 namespace aquarius
 {
-	template <bool Request, http_method Method, typename Body, typename Allocator = std::allocator<Body>>
+	template <bool Request,typename Body, typename Allocator = std::allocator<Body>>
 	class basic_http_protocol : public basic_tcp_protocol<Request, http_header, Body, Allocator>
 	{
 	public:
@@ -37,9 +37,7 @@ namespace aquarius
 
 			flex_buffer buf{};
 
-			this->body().set_method(Method);
-
-			if constexpr (Method != http_method::get)
+			if (this->method() != static_cast<int>(http_method::get))
 			{
 				this->body().serialize(buf);
 
@@ -53,7 +51,7 @@ namespace aquarius
 
 			if (!ec)
 			{
-				if constexpr (Method != http_method::get)
+				if (this->method() != static_cast<int>(http_method::get))
 				{
 					if (this->header().content_length() != 0)
 					{
@@ -67,8 +65,6 @@ namespace aquarius
 
 		virtual bool consume(flex_buffer& buffer) override
 		{
-			this->body().set_method(Method);
-
 			if (this->header().deserialize(buffer))
 			{
 				return false;

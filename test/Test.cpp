@@ -28,37 +28,36 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 			BOOST_CHECK(!is_connect);
 
-			auto req = std::make_shared<login_request>();
+			auto req = std::make_shared<login_tcp_request>();
 			req->header().uuid(1);
-			req->body().per_req.sex = true;
-			req->body().per_req.addr = 2;
-			req->body().per_req.age = 15;
-			req->body().per_req.telephone = 15230214856;
-			req->body().per_req.score = 100;
-			req->body().per_req.hp = 200;
-			req->body().per_req.mana = 300;
-			req->body().per_req.name = "John";
-			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
+			req->body().per_req().sex = true;
+			req->body().per_req().addr = 2;
+			req->body().per_req().age = 15;
+			req->body().per_req().telephone = 15230214856;
+			req->body().per_req().score = 100;
+			req->body().per_req().hp = 200;
+			req->body().per_req().mana = 300;
+			req->body().per_req().name = "John";
+			req->body().per_req().orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<login_response>(req);
+			auto resp = co_await cli->async_send<login_tcp_response>(req);
 
 			BOOST_TEST(resp.header().uuid() == req->header().uuid());
-			BOOST_TEST(resp.body().per_resp.sex == req->body().per_req.sex);
-			BOOST_TEST(resp.body().per_resp.addr == req->body().per_req.addr);
-			BOOST_TEST(resp.body().per_resp.age == req->body().per_req.age);
-			BOOST_TEST(resp.body().per_resp.sage == req->body().per_req.sage);
-			BOOST_TEST(resp.body().per_resp.telephone == req->body().per_req.telephone);
-			BOOST_TEST(resp.body().per_resp.score == req->body().per_req.score);
-			BOOST_TEST(resp.body().per_resp.scores == req->body().per_req.scores);
-			BOOST_TEST(resp.body().per_resp.f.value == req->body().per_req.f.value);
-			BOOST_TEST(resp.body().per_resp.g.value == req->body().per_req.g.value);
-			BOOST_TEST(resp.body().per_resp.aa == req->body().per_req.aa);
-			BOOST_TEST(resp.body().per_resp.hp == req->body().per_req.hp);
-			BOOST_TEST(resp.body().per_resp.mana == req->body().per_req.mana);
-			BOOST_TEST(resp.body().per_resp.name == req->body().per_req.name);
-			BOOST_TEST(resp.body().per_resp.orders == req->body().per_req.orders);
-			BOOST_TEST(resp.body().per_resp.seqs == req->body().per_req.seqs);
-			BOOST_TEST(resp.body().per_resp.ves == req->body().per_req.ves);
+			BOOST_TEST(resp.body().per_resp().sex == req->body().per_req().sex);
+			BOOST_TEST(resp.body().per_resp().addr == req->body().per_req().addr);
+			BOOST_TEST(resp.body().per_resp().age == req->body().per_req().age);
+			BOOST_TEST(resp.body().per_resp().sage == req->body().per_req().sage);
+			BOOST_TEST(resp.body().per_resp().telephone == req->body().per_req().telephone);
+			BOOST_TEST(resp.body().per_resp().score == req->body().per_req().score);
+			BOOST_TEST(resp.body().per_resp().scores == req->body().per_req().scores);
+			BOOST_TEST(resp.body().per_resp().f.value == req->body().per_req().f.value);
+			BOOST_TEST(resp.body().per_resp().g.value == req->body().per_req().g.value);
+			BOOST_TEST(resp.body().per_resp().aa == req->body().per_req().aa);
+			BOOST_TEST(resp.body().per_resp().hp == req->body().per_req().hp);
+			BOOST_TEST(resp.body().per_resp().mana == req->body().per_req().mana);
+			BOOST_TEST(resp.body().per_resp().name == req->body().per_req().name);
+			BOOST_TEST(resp.body().per_resp().orders == req->body().per_req().orders);
+			BOOST_TEST(resp.body().per_resp().ves == req->body().per_req().ves);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8100);
@@ -99,31 +98,31 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 			BOOST_TEST(!is_connect);
 
-			auto req = std::make_shared<http_test_post_request>();
-			req->body().uuid = 1;
-			req->body().per_req.sex = true;
-			req->body().per_req.addr = 2;
-			req->body().per_req.age = 15;
-			req->body().per_req.telephone = 15230214856;
-			req->body().per_req.score = 100;
-			req->body().per_req.hp = 200;
-			req->body().per_req.mana = 300;
-			req->body().per_req.name = "John";
-			req->body().per_req.orders = { 1, 2, 3, 4, 5 };
+			auto req = std::make_shared<http_test_post_http_request>();
+			req->body().uuid() = 1;
+			req->body().per_req().sex = true;
+			req->body().per_req().addr = 2;
+			req->body().per_req().age = 15;
+			req->body().per_req().telephone = 15230214856;
+			req->body().per_req().score = 100;
+			req->body().per_req().hp = 200;
+			req->body().per_req().mana = 300;
+			req->body().per_req().name = "John";
+			req->body().per_req().orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<http_test_post_response>(req);
+			auto resp = co_await cli->async_send<http_test_post_http_response>(req);
 
-			BOOST_TEST(resp.body().uuid == req->body().uuid);
+			BOOST_TEST(resp.body().uuid() == req->body().uuid());
 
-			BOOST_TEST(resp.body().per_resp.sex == req->body().per_req.sex);
-			BOOST_TEST(resp.body().per_resp.addr == req->body().per_req.addr);
-			BOOST_TEST(resp.body().per_resp.age == req->body().per_req.age);
-			BOOST_TEST(resp.body().per_resp.telephone == req->body().per_req.telephone);
-			BOOST_TEST(resp.body().per_resp.score == req->body().per_req.score);
-			BOOST_TEST(resp.body().per_resp.hp == req->body().per_req.hp);
-			BOOST_TEST(resp.body().per_resp.mana == req->body().per_req.mana);
-			BOOST_TEST(resp.body().per_resp.name == req->body().per_req.name);
-			BOOST_TEST(resp.body().per_resp.orders == req->body().per_req.orders);
+			BOOST_TEST(resp.body().per_resp().sex == req->body().per_req().sex);
+			BOOST_TEST(resp.body().per_resp().addr == req->body().per_req().addr);
+			BOOST_TEST(resp.body().per_resp().age == req->body().per_req().age);
+			BOOST_TEST(resp.body().per_resp().telephone == req->body().per_req().telephone);
+			BOOST_TEST(resp.body().per_resp().score == req->body().per_req().score);
+			BOOST_TEST(resp.body().per_resp().hp == req->body().per_req().hp);
+			BOOST_TEST(resp.body().per_resp().mana == req->body().per_req().mana);
+			BOOST_TEST(resp.body().per_resp().name == req->body().per_req().name);
+			BOOST_TEST(resp.body().per_resp().orders == req->body().per_req().orders);
 
 			BOOST_TEST(cli->remote_address() == "127.0.0.1");
 			BOOST_TEST(cli->remote_port() == 8099);
@@ -165,15 +164,15 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 			BOOST_TEST(!is_connect);
 
-			auto req = std::make_shared<http_test_get_request>();
-			req->body().user = 12345;
-			req->body().passwd = "passwd123";
+			auto req = std::make_shared<http_test_get_http_request>();
+			req->body().user() = 12345;
+			req->body().passwd() = "passwd123";
 
-			auto resp = co_await cli->async_send<http_test_get_response>(req);
+			auto resp = co_await cli->async_send<http_test_get_http_response>(req);
 
-			BOOST_TEST(resp.body().user == req->body().user);
+			BOOST_TEST(resp.body().user() == req->body().user());
 
-			BOOST_TEST(resp.body().passwd == req->body().passwd);
+			BOOST_TEST(resp.body().passwd() == req->body().passwd());
 		},
 		aquarius::asio::use_future);
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "code_generator.h"
-#include "schema_parser.h"
+#include "schema.h"
 #include <filesystem>
 #include <map>
 #include <string_view>
@@ -38,7 +38,7 @@ namespace aquarius
 		private:
 			std::map<std::string, code_generator*> generators_;
 
-			std::map<std::string_view, std::shared_ptr<schema_parser>> schemas_;
+			std::map<std::string_view, std::shared_ptr<schema>> schemas_;
 
 			std::vector<std::string> input_files_;
 

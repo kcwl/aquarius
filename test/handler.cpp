@@ -7,11 +7,11 @@ using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE(test_handler_suite)
 
-class test_handler : public aquarius::handler<login_request, login_response>
+class test_handler : public aquarius::handler<login_tcp_request, login_tcp_response>
 {
 public:
 public:
-	using base_type = aquarius::handler<login_request, login_response>;
+	using base_type = aquarius::handler<login_tcp_request, login_tcp_response>;
 
 public:
 	test_handler()
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test_handler_visitor_with_no_regist)
 
 	test_handler test{};
 	aquarius::flex_buffer buf{};
-	test.visit(buf, ec);
+	test.visit(buf, 0, ec);
 
 	BOOST_TEST(ec == aquarius::error_code{});
 }
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_handler_visitor_with_regist)
 	test_handler test{};
 
 	aquarius::flex_buffer buf{};
-	test.visit(buf, ec);
+	test.visit(buf, 0, ec);
 
 	BOOST_TEST(!ec);
 }

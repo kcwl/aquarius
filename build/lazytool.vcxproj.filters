@@ -18,36 +18,21 @@
     <ClCompile Include="..\src\lazytool\lazytool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\field.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lazytool\data_field.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lazytool\message_field.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lazytool\cpp_generator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lazytool\schema_parser.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lazytool\protocol_schema.cpp">
+    <ClCompile Include="..\src\lazytool\schema.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lazytool\command_interface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lazytool\field.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\field.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\data_field.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\message_field.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\code_generator.h">
@@ -56,10 +41,7 @@
     <ClInclude Include="..\src\lazytool\cpp_generator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lazytool\schema_parser.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lazytool\protocol_schema.h">
+    <ClInclude Include="..\src\lazytool\schema.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lazytool\command_interface.h">

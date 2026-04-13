@@ -25,45 +25,54 @@ struct tcp_person
 	double mana;
 	string name;
 	bytes orders;
-	std::map<int32, int32> seqs;
 	std::vector<int32> ves;
 };
 
-class login_req_body : public aquarius::tcp_serialize
+class login_req_body: public aquarius::tcp_serialize
 {
 public:
 	login_req_body();
 	virtual ~login_req_body() = default;
 
+	login_req_body(login_req_body&&) = default;
+	login_req_body& operator=(login_req_body&&) = default;
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
-public:
-	tcp_person per_req;
+
+	tcp_person per_req() const;
+	tcp_person& per_req();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
 };
-class login_resp_body : public aquarius::tcp_serialize
+class login_resp_body: public aquarius::tcp_serialize
 {
 public:
 	login_resp_body();
 	virtual ~login_resp_body() = default;
 
+	login_resp_body(login_resp_body&&) = default;
+	login_resp_body& operator=(login_resp_body&&) = default;
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
-public:
-	tcp_person per_resp;
+
+	tcp_person per_resp() const;
+	tcp_person& per_resp();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
 };
 
-struct test_table
-{
-	int64 id;
-};
 
-using login_request = aquarius::tcp_request<"10001", login_req_body>;
-using login_response = aquarius::tcp_response<login_resp_body>;
+using login_tcp_request = aquarius::tcp_request<"10001", login_req_body>;
+using login_tcp_response = aquarius::tcp_response<login_resp_body>;

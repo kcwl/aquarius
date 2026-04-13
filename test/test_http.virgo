@@ -11,7 +11,7 @@ struct http_person
 	bytes orders;
 }
 
-message http_test_post[post] -> /login/new
+message http_test_post -> /login/new
 {
 	request
 	{
@@ -25,7 +25,7 @@ message http_test_post[post] -> /login/new
 	}
 }
 
-message http_test_get[get] -> /login
+message http_test_get -> /login
 {
 	request
 	{

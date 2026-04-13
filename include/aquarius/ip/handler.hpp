@@ -18,9 +18,11 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto visit(flex_buffer& buffer, error_code& ec) -> asio::awaitable<flex_buffer>
+		virtual auto visit(flex_buffer& buffer, int method, error_code& ec) -> asio::awaitable<flex_buffer>
 		{
 			request()->consume(buffer);
+
+			request()->method(method);
 
 			make_response(co_await this->handle());
 
@@ -68,13 +70,13 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [](flex_buffer& buffer) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			auto f = [](flex_buffer& buffer, int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 			{
 				auto handler_ptr = std::make_shared<Handler>();
 
 				error_code ec{};
 
-				auto resp_buffer = co_await handler_ptr->visit(buffer, ec);
+				auto resp_buffer = co_await handler_ptr->visit(buffer, method, ec);
 
 				if (ec)
 				{

@@ -25,7 +25,6 @@ BOOST_AUTO_TEST_CASE(binary)
 	p.mana = 300;
 	p.name = "John";
 	p.orders = { 1, 2, 3, 4, 5 };
-	p.seqs = { {1,2,},{3,4} };
 	p.ves = { 2,3,4,5 };
 
 	bp.to_datas(p, buffer);
@@ -46,7 +45,6 @@ BOOST_AUTO_TEST_CASE(binary)
 	BOOST_TEST(p1.mana == p.mana);
 	BOOST_TEST(p1.name == p.name);
 	BOOST_TEST(p1.orders == p.orders);
-	BOOST_TEST(p1.seqs == p.seqs);
 	BOOST_TEST(p1.ves == p.ves);
 }
 
