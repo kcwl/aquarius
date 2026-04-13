@@ -33,6 +33,12 @@ namespace aquarius
 		}
 
 		template <typename T>
+		void to_datas(const T&, flex_buffer&, const std::string&)
+		{
+			return;
+		}
+
+		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
 		T from_datas(flex_buffer& buffer, const std::string& name)
 		{
@@ -88,6 +94,12 @@ namespace aquarius
 				return T{};
 
 			return value;
+		}
+
+		template<typename T>
+		T from_datas(flex_buffer& buffer, const std::string& name)
+		{
+			return T{};
 		}
 
 	private:

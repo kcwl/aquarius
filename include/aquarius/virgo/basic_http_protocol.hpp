@@ -37,6 +37,8 @@ namespace aquarius
 
 			flex_buffer buf{};
 
+			this->body().set_method(Method);
+
 			if constexpr (Method != http_method::get)
 			{
 				this->body().serialize(buf);
@@ -65,6 +67,8 @@ namespace aquarius
 
 		virtual bool consume(flex_buffer& buffer) override
 		{
+			this->body().set_method(Method);
+
 			if (this->header().deserialize(buffer))
 			{
 				return false;

@@ -15,14 +15,26 @@ namespace aquarius
 		using kv_base = basic_serialize<kv_parse>;
 
 	public:
-		template <typename T, auto Ptr = nullptr, auto Method = http_method::post>
+		http_serialize()
+			: method_(http_method::post)
+		{
+
+		}
+
+	public:
+		void set_method(http_method m)
+		{
+			method_ = m;
+		}
+
+		template <typename T, auto Ptr = nullptr>
 		void parse_to(T&& value, flex_buffer& buffer)
 		{
-			if constexpr (Method == http_method::get)
+			if (method_ == http_method::get)
 			{
 				constexpr auto col_name = member_pointer_name<T, Ptr>::value;
 
-				return kv_base::parse_.to_datas(std::forward<T>(value), buffer, col_name);
+				return kv_base::parse_.to_datas(std::forward<T>(value), buffer, std::string(col_name));
 			}
 			else
 			{
@@ -30,18 +42,21 @@ namespace aquarius
 			}
 		}
 
-		template <typename T, auto Ptr = nullptr, auto Method = http_method::post>
+		template <typename T, auto Ptr = nullptr>
 		auto parse_from(flex_buffer& buffer) -> T
 		{
-			if constexpr (Method == http_method::get)
+			if (method_ == http_method::get)
 			{
 				constexpr auto col_name = member_pointer_name<T, Ptr>::value;
-				return kv_base::parse_.from_datas<T>(buffer, col_name);
+				return kv_base::parse_.from_datas<T>(buffer, std::string(col_name));
 			}
 			else
 			{
 				return json_base::parse_.from_datas<T>(buffer);
 			}
 		}
+
+	private:
+		http_method method_;
 	};
 } // namespace aquarius
