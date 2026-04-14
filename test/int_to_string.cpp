@@ -25,6 +25,19 @@ BOOST_AUTO_TEST_CASE(to_string_empty_pack)
 	BOOST_TEST(s.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(to_string_value_member)
+{
+	// directly access the static constexpr value member
+	constexpr auto &arr = aquarius::detail::to_string<'x','y'>::value;
+	BOOST_TEST(arr.size() == 2);
+	BOOST_TEST(arr[0] == 'x');
+	BOOST_TEST(arr[1] == 'y');
+
+	// empty pack value
+	constexpr auto &earr = aquarius::detail::to_string<>::value;
+	BOOST_TEST(earr.size() == 0);
+}
+
 BOOST_AUTO_TEST_CASE(int_single_digits)
 {
 	BOOST_TEST(aquarius::detail::int_to_string<0>() == "0"sv);

@@ -1,8 +1,7 @@
 #define BOOST_NO_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "../include/aquarius/detail/flex_buffer.hpp"
-#include <boost/asio/buffer.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 #include <iostream>
 #include <cstring>
 
@@ -198,6 +197,67 @@ BOOST_AUTO_TEST_CASE(flexbuf_ref_copy_and_move)
     // move-construct
     aquarius::detail::basic_flexbuf_ref<std::allocator<char>> r3(std::move(r2));
     BOOST_CHECK_EQUAL(r3.size(), 3u);
+}
+
+BOOST_AUTO_TEST_CASE(flexbuf_ref_methods)
+{
+    flex_buffer fb;
+    auto mb = fb.prepare(4);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "data", 4);
+    fb.commit(4);
+
+    aquarius::detail::basic_flexbuf_ref<std::allocator<char>> ref(fb);
+    BOOST_CHECK_EQUAL(ref.size(), fb.size());
+    BOOST_CHECK_EQUAL(ref.max_size(), fb.max_size());
+    BOOST_CHECK_EQUAL(ref.capacity(), fb.capacity());
+
+    auto cb = ref.data();
+    const char* rp = reinterpret_cast<const char*>(cb.data());
+    BOOST_CHECK_EQUAL(rp[0], 'd');
+
+    auto mut = ref.prepare(2);
+    char* w = reinterpret_cast<char*>(mut.data());
+    w[0] = 'X'; w[1] = 'Y';
+    ref.commit(2);
+    BOOST_CHECK(ref.size() >= 4u);
+
+    ref.consume(100);
+    BOOST_CHECK_EQUAL(ref.size(), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(reserve_shift_when_gptr_nonzero)
+{
+    // make a buffer and advance gptr to simulate consumed bytes
+    flex_buffer fb(1024);
+    auto mb = fb.prepare(10);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "ABCDEFGHIJ", 10);
+    fb.commit(10);
+
+    // consume 5 bytes so gptr() > 0
+    fb.consume(5);
+    BOOST_CHECK_EQUAL(fb.size(), 5u);
+
+    // now force reserve to be needed by preparing a large write
+    auto mb2 = fb.prepare(300);
+    // write something then commit small amount so reserve path that shifts is taken
+    char* wp = reinterpret_cast<char*>(mb2.data());
+    for (int i = 0; i < 10; ++i) wp[i] = '0' + i;
+    fb.commit(10);
+
+    // ensure data still intact and size increased
+    BOOST_CHECK(fb.size() >= 15u);
+}
+
+BOOST_AUTO_TEST_CASE(pubseekpos_out_of_range)
+{
+    flex_buffer fb(4);
+    auto mb = fb.prepare(2);
+    std::memcpy(reinterpret_cast<char*>(mb.data()), "zz", 2);
+    fb.commit(2);
+
+    // attempt to seek put pointer beyond capacity
+    auto res = fb.pubseekpos(10, std::ios_base::out);
+    BOOST_CHECK(res == std::streampos(std::streamoff(-1)));
 }
 
 // expose protected members for direct testing

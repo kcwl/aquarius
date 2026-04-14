@@ -70,4 +70,21 @@ BOOST_AUTO_TEST_CASE(multiple_bind_params)
 	BOOST_TEST(s2 == "12345"sv);
 }
 
+BOOST_AUTO_TEST_CASE(size_static_and_bind_length)
+{
+	// Ensure the static size member is available at compile time and via the type
+	static_assert(aquarius::detail::string_literal<6>::size == 6);
+	BOOST_TEST(aquarius::detail::string_literal<6>::size == 6);
+
+	// bind_param should construct the string_view with explicit length (exclude null)
+	constexpr auto sv = aquarius::detail::bind_param<"hello">::value;
+	static_assert(sv.size() == 5);
+	BOOST_TEST(sv.size() == 5);
+
+	// Single character literal
+	constexpr auto s_single = aquarius::detail::bind_param<"x">::value;
+	static_assert(s_single == "x"sv);
+	BOOST_TEST(s_single == "x"sv);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

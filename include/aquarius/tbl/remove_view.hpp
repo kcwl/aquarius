@@ -25,8 +25,8 @@ namespace aquarius
 		}
 
 	private:
-		template <auto Ptr, typename T>
-		friend remove_view<T>& operator|(remove_view<T>& up, const grep_view<Ptr>& g);
+		template <auto Ptr, typename U>
+		friend remove_view<U>& operator|(remove_view<U>& up, const grep_view<Ptr>& g);
 
 		template <auto Ptr>
 		void merge(const grep_view<Ptr>& g)

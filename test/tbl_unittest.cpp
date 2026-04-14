@@ -565,40 +565,6 @@ MYSQL_CONFIG_INVOKE(mysql)
     mysql.user = "root";
 }
 
-//BOOST_AUTO_TEST_CASE(connecting)
-//{
-//    person p{ 1, 1 };
-//
-//    aquarius::io_service_pool pool(1);
-//
-//    aquarius::module_router::get_mutable_instance().regist<aquarius::mysql_module>();
-//
-//    aquarius::module_router::get_mutable_instance().run(pool);
-//
-//    std::this_thread::sleep_for(2s);
-//
-//    auto future = aquarius::asio::co_spawn(pool.get_io_service(), [&] ()-> aquarius::asio::awaitable<void>
-//                                           {
-//                                               auto res = co_await(aquarius::insert(p) | aquarius::enter);
-//
-//                                               BOOST_TEST(res != 0);
-//
-//                                               auto select_res = co_await(aquarius::select<person> | aquarius::enter);
-//
-//                                               BOOST_TEST(select_res.size() != 0);
-//
-//                                           }, aquarius::asio::use_future);
-//
-//
-//    std::thread t([&] { pool.run(); });
-//
-//    std::this_thread::sleep_for(2s);
-//
-//    future.get();
-//
-//    pool.stop();
-//
-//    t.join();
-//}
+
 
 BOOST_AUTO_TEST_SUITE_END()

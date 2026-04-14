@@ -42,4 +42,29 @@ BOOST_AUTO_TEST_CASE(concats)
 	BOOST_TEST(nul_concat == "a\0bc"sv);
 }
 
+BOOST_AUTO_TEST_CASE(impl_and_arr_inspection)
+{
+	// Explicitly call impl() for a two-part concat and inspect the returned array
+	auto arr = aquarius::detail::concat<value1, value2>::impl();
+	// The returned array contains the characters plus a trailing NUL
+	constexpr auto expected = "hello world"sv;
+	// check size: expected chars + terminating NUL
+	BOOST_TEST(arr.size() == expected.size() + 1);
+	// verify content up to terminating NUL
+	for (std::size_t i = 0; i < expected.size(); ++i)
+		BOOST_TEST(arr[i] == expected[i]);
+	BOOST_TEST(arr[expected.size()] == '\0');
+
+	// Access the static arr member and the value string_view for single and empty packs
+	auto single_arr = aquarius::detail::concat<single>::arr;
+	BOOST_TEST(single_arr.size() == single.size() + 1);
+	BOOST_TEST(aquarius::concat_v<single> == "single"sv);
+
+	auto empty_arr = aquarius::detail::concat<>::impl();
+	// empty pack -> array with only terminating NUL
+	BOOST_TEST(empty_arr.size() == 1u);
+	BOOST_TEST(empty_arr[0] == '\0');
+	BOOST_TEST((aquarius::concat_v<>).empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

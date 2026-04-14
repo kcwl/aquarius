@@ -299,22 +299,10 @@
     <ClCompile Include="..\test\server.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\concat.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\crc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\int_to_string.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\io_service_pool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\string_literal.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\struct_name.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\binary_serialize.cpp">
@@ -356,7 +344,25 @@
     <ClCompile Include="..\test\module_uniittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\concat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="..\test\flex_buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\int_to_string.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\string_literal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\struct_name.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\member_pointer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\uuid_generator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -364,5 +370,16 @@
     <Text Include="..\test\CMakeLists.txt">
       <Filter>源文件</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\test\test_http.virgo">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="..\test\test_model.tbl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="..\test\test_tcp.virgo">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
