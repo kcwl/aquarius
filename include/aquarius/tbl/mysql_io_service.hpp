@@ -59,12 +59,12 @@ namespace aquarius
 			co_return;
 		}
 
-		void wait(std::chrono::milliseconds ms)
+		void wait(std::chrono::milliseconds)
 		{
 			return;
 		}
 
-		auto async_wait(std::chrono::milliseconds ms) -> asio::awaitable<void>
+		auto async_wait(std::chrono::milliseconds) -> asio::awaitable<void>
 		{
 			co_return;
 		}

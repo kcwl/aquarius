@@ -467,32 +467,14 @@ BOOST_AUTO_TEST_SUITE(tbl_remove_view_tests)
 
 BOOST_AUTO_TEST_CASE(remove_generates_delete_sql)
 {
-    aquarius::remove_view rv{};
-    rv(person{});
-    std::string sql = static_cast<std::string>(rv);
-    BOOST_TEST(sql == "delete from person");
-}
-
-BOOST_AUTO_TEST_CASE(remove_returns_self)
-{
-    aquarius::remove_view rv{};
-    auto& ref = rv(person{});
-    BOOST_TEST(&ref == &rv);
-}
-
-BOOST_AUTO_TEST_CASE(remove_overwrite_same_output)
-{
-    aquarius::remove_view rv{};
-    rv(person{1, 25});
-    rv(person{2, 30});
+    auto& rv = aquarius::remove<person>();
     std::string sql = static_cast<std::string>(rv);
     BOOST_TEST(sql == "delete from person");
 }
 
 BOOST_AUTO_TEST_CASE(remove_with_grep_adds_where)
 {
-    aquarius::remove_view rv{};
-    rv(person{});
+    auto&rv = aquarius::remove<person>;
     aquarius::grep_view<&person::id> g;
     g.equal(1);
     rv | g;
@@ -503,8 +485,7 @@ BOOST_AUTO_TEST_CASE(remove_with_grep_adds_where)
 
 BOOST_AUTO_TEST_CASE(remove_with_two_grep_adds_and)
 {
-    aquarius::remove_view rv{};
-    rv(person{});
+    auto& rv = aquarius::remove<person>;
     aquarius::grep_view<&person::id> g1;
     g1.equal(1);
     aquarius::grep_view<&person::age> g2;

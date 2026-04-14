@@ -4,12 +4,11 @@
 
 namespace aquarius
 {
-
+	template <typename T>
 	class remove_view
 	{
 	public:
-		template <typename T>
-		remove_view& operator()(T&& value)
+		remove_view& operator()()
 		{
 			constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
 
@@ -26,8 +25,8 @@ namespace aquarius
 		}
 
 	private:
-		template <auto Ptr>
-		friend remove_view& operator|(remove_view& up, const grep_view<Ptr>& g);
+		template <auto Ptr, typename T>
+		friend remove_view<T>& operator|(remove_view<T>& up, const grep_view<Ptr>& g);
 
 		template <auto Ptr>
 		void merge(const grep_view<Ptr>& g)
@@ -52,13 +51,6 @@ namespace aquarius
 		bool has_condition_;
 	};
 
-	template <auto Ptr>
-	inline remove_view& operator|(remove_view& up, const grep_view<Ptr>& g)
-	{
-		up.merge(g);
-
-		return up;
-	};
-
-	inline static remove_view remove;
+	template<typename T>
+	inline static remove_view<T> remove;
 } // namespace aquarius

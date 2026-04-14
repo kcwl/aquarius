@@ -16,6 +16,20 @@ namespace aquarius
 		return sel;
 	}
 
+	template <auto Ptr, typename T>
+	inline remove_view<T>& operator|(remove_view<T>& rv, const grep_view<Ptr>& g)
+	{
+		rv.merge(g);
+		return rv;
+	}
+
+	template <auto Ptr>
+	inline update_view& operator|(update_view& rv, const grep_view<Ptr>& g)
+	{
+		rv.merge(g);
+		return rv;
+	}
+
 	template <auto Ptr1, auto Ptr2>
 	inline grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2)
 	{
@@ -40,7 +54,8 @@ namespace aquarius
 		co_return co_await etv.update(static_cast<std::string>(v));
 	}
 
-	inline auto operator|(const remove_view& v, const enter_view& etv)->asio::awaitable<std::size_t>
+	template<typename T>
+	inline auto operator|(const remove_view<T>& v, const enter_view& etv)->asio::awaitable<std::size_t>
 	{
 		co_return co_await etv.remove(static_cast<std::string>(v));
 	}

@@ -10,7 +10,7 @@ namespace aquarius
 }
 
 template<typename T>
-void config_tag_invoke(const aquarius::config::value_from<T>&, T& a)
+void config_tag_invoke(const aquarius::config::value_from<T>&, T&)
 {
 	return;
 }
