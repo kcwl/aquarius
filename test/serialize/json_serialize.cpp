@@ -1,6 +1,6 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
-#include "test_http.virgo.h"
+#include "../test_http.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
 

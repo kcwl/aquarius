@@ -46,6 +46,27 @@
     <Filter Include="include\aquarius\serialize">
       <UniqueIdentifier>{51e04bbb-4aac-4a44-836e-3e2e6fd1c8ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\detail">
+      <UniqueIdentifier>{d87f2c58-6ae3-409a-b5a2-1f86af145f38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\serialize">
+      <UniqueIdentifier>{5b4b50de-f482-4492-a43d-fdea78c34677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\virgo">
+      <UniqueIdentifier>{b2b59b4b-0cfa-4d83-827c-5ab8dcdf0540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ip">
+      <UniqueIdentifier>{5819bfb3-9a6f-4185-bd33-98dc34d2f5f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\module">
+      <UniqueIdentifier>{df698ff2-4b2b-45fc-a49b-a81c63f34dca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tbl">
+      <UniqueIdentifier>{d18ba868-bf48-44c1-b004-9cb7fd66cc8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\resource">
+      <UniqueIdentifier>{09b2d17c-0361-4c78-b204-f19ef932e55d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -293,37 +314,16 @@
     <ClCompile Include="..\test\client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\json_serialize.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\server.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\crc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\io_service_pool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\binary_serialize.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\kv_serialize.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\handler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\router.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\http_method.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\http_status.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\http_version.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\session.cpp">
@@ -344,26 +344,47 @@
     <ClCompile Include="..\test\module_uniittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\concat.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\concat.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\flex_buffer.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\crc.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\int_to_string.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\flex_buffer.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\string_literal.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\int_to_string.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\struct_name.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\member_pointer.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\member_pointer.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\string_literal.cpp">
+      <Filter>源文件\detail</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\uuid_generator.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\test\detail\struct_name.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\uuid_generator.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\http_method.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\http_status.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\http_version.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\binary.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\json_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\kv_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

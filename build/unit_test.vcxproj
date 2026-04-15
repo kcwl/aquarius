@@ -151,17 +151,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\concat.cpp" />
-    <ClCompile Include="..\test\flex_buffer.cpp" />
-    <ClCompile Include="..\test\int_to_string.cpp" />
-    <ClCompile Include="..\test\member_pointer.cpp" />
+    <ClCompile Include="..\test\detail\concat.cpp" />
+    <ClCompile Include="..\test\detail\crc.cpp" />
+    <ClCompile Include="..\test\detail\flex_buffer.cpp" />
+    <ClCompile Include="..\test\detail\int_to_string.cpp" />
+    <ClCompile Include="..\test\detail\member_pointer.cpp" />
+    <ClCompile Include="..\test\detail\string_literal.cpp" />
+    <ClCompile Include="..\test\detail\struct_name.cpp" />
+    <ClCompile Include="..\test\detail\uuid_generator.cpp" />
     <ClCompile Include="..\test\module_uniittest.cpp" />
-    <ClCompile Include="..\test\string_literal.cpp" />
-    <ClCompile Include="..\test\struct_name.cpp" />
+    <ClCompile Include="..\test\serialize\binary.cpp" />
+    <ClCompile Include="..\test\serialize\json_serialize.cpp" />
+    <ClCompile Include="..\test\serialize\kv_serialize.cpp" />
     <ClCompile Include="..\test\tbl_unittest.cpp" />
     <ClCompile Include="..\test\test_http.virgo.cpp" />
     <ClCompile Include="..\test\test_tcp.virgo.cpp" />
-    <ClCompile Include="..\test\uuid_generator.cpp" />
+    <ClCompile Include="..\test\virgo\http_method.cpp" />
+    <ClCompile Include="..\test\virgo\http_status.cpp" />
+    <ClCompile Include="..\test\virgo\http_version.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
@@ -230,16 +237,9 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
-    <ClCompile Include="..\test\binary_serialize.cpp" />
-    <ClCompile Include="..\test\crc.cpp" />
     <ClCompile Include="..\test\ctx_handler.cpp" />
     <ClCompile Include="..\test\handler.cpp" />
-    <ClCompile Include="..\test\http_method.cpp" />
-    <ClCompile Include="..\test\http_status.cpp" />
-    <ClCompile Include="..\test\http_version.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
-    <ClCompile Include="..\test\kv_serialize.cpp" />
-    <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
     <ClCompile Include="..\test\router.cpp" />
