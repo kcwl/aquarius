@@ -274,6 +274,6 @@ namespace aquarius
 	using http_client = basic_client<http_session>;
 	using http_server = basic_server<http_session>;
 
-	using https_client_session = basic_session<http, ssl_adaptor<false>>;
-	using https_server_session = basic_session<http, ssl_adaptor<true>>;
+	using https_client_session = basic_session<http, ssl_client_adaptor>;
+	using https_server_session = basic_session<http, ssl_server_adaptor>;
 } // namespace aquarius

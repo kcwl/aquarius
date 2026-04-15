@@ -5,9 +5,10 @@
 
 namespace aquarius
 {
+	template<typename T>
 	class raw_adaptor
 	{
-		using socket_t = asio::ip::tcp::socket;
+		using socket_t = T;
 
 	public:
 		raw_adaptor(socket_t& socket)

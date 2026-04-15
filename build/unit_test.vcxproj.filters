@@ -306,6 +306,9 @@
     <ClInclude Include="..\test\test_model.tbl.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\aquarius\ip\adaptor\ssl_adaptor.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp">
@@ -385,6 +388,12 @@
     </ClCompile>
     <ClCompile Include="..\test\serialize\kv_serialize.cpp">
       <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\raw_adaptor_test.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp">
+      <Filter>源文件\ip</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

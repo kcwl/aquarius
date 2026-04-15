@@ -37,11 +37,11 @@ namespace aquarius
         }
     };
 
-    template<bool Server, auto SSLVersion = asio::ssl::context::tlsv13>
+    template<bool Server, typename T, auto SSLVersion = asio::ssl::context::tlsv13>
     class ssl_adaptor : public basic_ssl_context<SSLVersion, Server>
     {
     public:
-        using socket = asio::ip::tcp::socket;
+        using socket = T;
 
         using ssl_socket = asio::ssl::stream<socket&>;
 
@@ -109,4 +109,10 @@ namespace aquarius
     private:
         ssl_socket socket_;
     };
+
+    template<typename T>
+    using ssl_client_adaptor = ssl_adaptor<false, T>;
+
+    template<typename T>
+    using ssl_server_adaptor = ssl_adaptor<true, T>;
 } // namespace aquarius

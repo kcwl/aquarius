@@ -159,6 +159,8 @@
     <ClCompile Include="..\test\detail\string_literal.cpp" />
     <ClCompile Include="..\test\detail\struct_name.cpp" />
     <ClCompile Include="..\test\detail\uuid_generator.cpp" />
+    <ClCompile Include="..\test\ip\raw_adaptor_test.cpp" />
+    <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp" />
     <ClCompile Include="..\test\module_uniittest.cpp" />
     <ClCompile Include="..\test\serialize\binary.cpp" />
     <ClCompile Include="..\test\serialize\json_serialize.cpp" />
@@ -247,6 +249,7 @@
     <ClInclude Include="..\test\test_http.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />
     <ClInclude Include="..\test\test_tcp.virgo.h" />
+    <ClInclude Include="include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\Test.cpp" />

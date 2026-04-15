@@ -7,7 +7,7 @@
 
 namespace aquarius
 {
-	template <typename Protocol, typename Adaptor>
+	template <typename Protocol, template<typename>typename Adaptor>
 	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
 	{
 	public:
@@ -21,7 +21,7 @@ namespace aquarius
 
 		using duration = std::chrono::system_clock::duration;
 
-		using adaptor_t = Adaptor;
+		using adaptor_t = Adaptor<socket>;
 
 	public:
 		explicit basic_session(socket _socket, duration timeout)
