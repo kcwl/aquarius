@@ -317,16 +317,7 @@
     <ClCompile Include="..\test\client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\server.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\io_service_pool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\handler.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\router.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\session.cpp">
@@ -339,12 +330,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\test_http.virgo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl_unittest.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\module_uniittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\detail\concat.cpp">
@@ -383,10 +368,10 @@
     <ClCompile Include="..\test\serialize\binary.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\serialize\json_serialize.cpp">
+    <ClCompile Include="..\test\serialize\json.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\serialize\kv_serialize.cpp">
+    <ClCompile Include="..\test\serialize\kv.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
     <ClCompile Include="..\test\ip\raw_adaptor_test.cpp">
@@ -394,6 +379,51 @@
     </ClCompile>
     <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp">
       <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\handler.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\http.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\tcp.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\channel.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\router.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\resource\invoke.cpp">
+      <Filter>源文件\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\grep.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\select.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\insert.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\update.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\remove.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\tcp_protocol.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\http_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\tcp_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\protocol.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,9 +433,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\test\test_http.virgo">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="..\test\test_model.tbl">
       <Filter>源文件</Filter>
     </None>
     <None Include="..\test\test_tcp.virgo">

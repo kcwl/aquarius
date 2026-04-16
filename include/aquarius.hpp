@@ -25,6 +25,7 @@
 #include <aquarius/serialize/tcp_serialize.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl/enter_view.hpp>
+#include <aquarius/tbl/grep_view.hpp>
 #include <aquarius/tbl/insert_view.hpp>
 #include <aquarius/tbl/mysql_type.hpp>
 #include <aquarius/tbl/operator.hpp>

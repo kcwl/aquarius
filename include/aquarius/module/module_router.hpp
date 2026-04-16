@@ -21,7 +21,7 @@ namespace aquarius
 
 	public:
 		template <typename Module>
-		void regist()
+		bool regist()
 		{
 			auto module_ptr = std::make_shared<Module>();
 
@@ -29,10 +29,12 @@ namespace aquarius
 
 			if (iter != routers_.end())
 			{
-				return;
+				return false;
 			}
 
 			routers_.insert({ module_ptr->name(), module_ptr });
+
+			return true;
 		}
 
 		void run(io_service_pool& pool)

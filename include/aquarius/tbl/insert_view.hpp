@@ -47,5 +47,5 @@ namespace aquarius
 		std::stringstream complete_sql_;
 	};
 
-	inline static insert_view insert;
+	inline static insert_view insert_v;
 } // namespace aquarius

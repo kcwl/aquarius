@@ -77,5 +77,5 @@ namespace aquarius
 	};
 
 	template <typename T, auto... Args>
-	inline static select_view<T, Args...> select;
+	inline static select_view<T, Args...> select_v;
 } // namespace aquarius

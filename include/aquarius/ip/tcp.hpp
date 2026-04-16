@@ -145,6 +145,6 @@ namespace aquarius
 	using tcp_server = basic_server<tcp_session>;
 	using tcp_client = basic_client<tcp_session>;
 
-	using ssl_tcp_server = basic_server<basic_session<tcp, ssl_adaptor<true>>>;
-	using ssl_tcp_client = basic_client<basic_session<tcp, ssl_adaptor<false>>>;
+	using ssl_tcp_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
+	using ssl_tcp_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
 } // namespace aquarius

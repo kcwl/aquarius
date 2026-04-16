@@ -173,7 +173,10 @@ namespace aquarius
 		}
 
 	protected:
-		virtual void commit_command_header(flex_buffer&) = 0;
+		virtual void commit_command_header(flex_buffer&)
+		{
+			return;
+		}
 
 	private:
 		result_t result_;

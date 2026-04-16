@@ -70,5 +70,5 @@ namespace aquarius
 		bool has_condition_;
 	};
 
-	inline static update_view update;
+	inline static update_view update_v;
 } // namespace aquarius

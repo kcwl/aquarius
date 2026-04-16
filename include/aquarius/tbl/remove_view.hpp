@@ -52,5 +52,5 @@ namespace aquarius
 	};
 
 	template<typename T>
-	inline static remove_view<T> remove;
+	inline static remove_view<T> remove_v;
 } // namespace aquarius

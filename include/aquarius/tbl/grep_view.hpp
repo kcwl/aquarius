@@ -39,8 +39,7 @@ namespace aquarius
 			return *this;
 		}
 
-		template <auto Ptr1>
-		grep_view& operator>(const grep_view<Ptr1>& g)
+		grep_view& operator>(const value_type& g)
 		{
 			greater(g);
 			return *this;
