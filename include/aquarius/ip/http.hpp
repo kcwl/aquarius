@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/detail/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
@@ -11,6 +11,7 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
+#include <format>
 #include <ranges>
 #include <string_view>
 
@@ -66,7 +67,8 @@ namespace aquarius
 
 				if (ec)
 				{
-					co_return ec;
+					co_await make_error_response(session_ptr, ec);
+					continue;
 				}
 
 				if (method == http_method::options)
@@ -273,6 +275,16 @@ namespace aquarius
 			}
 
 			return result;
+		}
+
+		template <typename Session>
+		static auto make_error_response(std::shared_ptr<Session> session_ptr, error_code ec) -> asio::awaitable<void>
+		{
+			auto resp_header =
+				std::format("{} {} {}", version_to_string(global_http_version), ec.value(), status_to_string(ec.value()));
+			flex_buffer error_buffer{};
+			error_buffer.sputn(resp_header.c_str(), resp_header.size());
+			co_await session_ptr->async_send(std::move(error_buffer));
 		}
 	};
 
