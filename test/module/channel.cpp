@@ -17,6 +17,7 @@ BOOST_AUTO_TEST_CASE(normal_flow)
 	auto f = [](flex_buffer& buffer, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{
 		flex_buffer resp;
+		resp.sputn((char*)buffer.data().data(), buffer.size());
 		co_return resp;
 	};
 
