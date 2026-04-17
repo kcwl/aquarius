@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(commit_and_consume)
 
 	flex_buffer buffer{};
 
-	BOOST_TEST(pt.commit(buffer));
+	BOOST_TEST(!pt.commit(buffer));
 	BOOST_TEST(pt.consume(buffer));
 }
 
