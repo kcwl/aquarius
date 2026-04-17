@@ -49,7 +49,7 @@ mock_json tag_invoke(const boost::json::value_to_tag<mock_json>&, const boost::j
 	result.c = static_cast<int64_t>(obj->at("c").as_int64());
 	result.d = static_cast<float>(obj->at("d").as_double());
 	result.vec = aquarius::json_value_to_array(obj->at("vec"));
-	result.e.value = static_cast<uint32_t>(obj->at("b").as_int64());
+	result.e.value = static_cast<uint32_t>(obj->at("e").as_int64());
 	result.f = obj->at("f").as_string();
 	return result;
 }
@@ -66,11 +66,11 @@ BOOST_AUTO_TEST_CASE(serialize_and_deserialize)
 
 	mock_json bin1 = jp.from_datas<mock_json>(buffer);
 
-	auto result = bin == bin1;
+	auto result = (bin == bin1);
 
 	BOOST_TEST(result);
 
-	buffer.consume(1);
+	buffer.pubseekpos(1,std::ios::in);
 
 	BOOST_CHECK_THROW(jp.from_datas<mock_json>(buffer), std::out_of_range);
 }
