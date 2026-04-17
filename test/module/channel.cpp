@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(publish_no_exist)
 
 	auto cnt = future.get().error();
 
-	BOOST_TEST(cnt = error_code{});
+	BOOST_TEST(cnt == error_code{});
 }
 
 BOOST_AUTO_TEST_CASE(multi_subscribe)
