@@ -4,6 +4,10 @@
 
 using namespace aquarius;
 
+
+BOOST_AUTO_TEST_SUITE(ut_http)
+
+
 struct mock_read_error_session
 {
 	mock_read_error_session(asio::io_context& context)
@@ -312,7 +316,7 @@ struct test_acceptor_session
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session]() -> asio::awaitable<error_code> { co_return co_await http::accept(session); },
+			io, [session] () -> asio::awaitable<error_code> { co_return co_await http::accept(session); },
 			asio::use_future);
 
 		io.run();
@@ -380,6 +384,11 @@ struct mock_query_error_version_session
 
 	auto async_read_util(flex_buffer& buffer, std::string_view delm, std::size_t& endpos) -> asio::awaitable<error_code>
 	{
+		if (has_run)
+		{
+			co_return asio::error::eof;
+		}
+
 		std::string headline = "HTTP/2.1 200 OK";
 
 		buffer.sputn(headline.c_str(), headline.size());
@@ -460,8 +469,10 @@ struct test_query_session
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-			{ co_return co_await http::query(session); }, asio::use_future);
+			io, [session] () -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			{
+				co_return co_await http::query(session);
+			}, asio::use_future);
 
 		io.run();
 
@@ -477,8 +488,6 @@ struct test_query_session
 		}
 	}
 };
-
-BOOST_AUTO_TEST_SUITE(ut_http)
 
 BOOST_AUTO_TEST_CASE(accepts_read_error)
 {

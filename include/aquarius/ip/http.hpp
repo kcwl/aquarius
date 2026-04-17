@@ -221,6 +221,7 @@ namespace aquarius
 				auto url_result = boost::urls::parse_origin_form(std::string_view(*iter++));
 				if (url_result.has_error())
 				{
+					ec = url_result.error();
 					return result_t{};
 				}
 
@@ -228,6 +229,7 @@ namespace aquarius
 
 				if (!version.has_value())
 				{
+					ec = version.error();
 					return result_t{};
 				}
 
@@ -239,9 +241,13 @@ namespace aquarius
 			{
 				auto version = string_to_version(std::string_view(*iter++));
 
-				auto status = static_cast<http_status>(std::atoi(std::string_view(*iter++).data()));
+				if (!version.has_value())
+				{
+					ec = version.error();
+					return result_t{};
+				}
 
-				ec = error_code{};
+				auto status = string_to_status(std::string_view(*iter++));
 
 				return std::make_tuple(*version, status);
 			}

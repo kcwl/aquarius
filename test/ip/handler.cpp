@@ -70,6 +70,8 @@ BOOST_AUTO_TEST_CASE(visit)
 		io, [&]() -> asio::awaitable<flex_buffer> { co_return co_await handle.visit(buffer, 0, ec); },
 		asio::use_future);
 
+	io.run();
+
 	auto buf = future.get();
 
 	BOOST_TEST(std::string((char*)buf.data().data(), buf.size()) == std::string(mock_response::resp));

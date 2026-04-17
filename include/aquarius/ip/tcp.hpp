@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/detail/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
@@ -90,17 +90,12 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			for (;;)
+			flex_buffer buffer{};
+
+			ec = co_await recv(session_ptr, buffer);
+			if (ec)
 			{
-				flex_buffer buffer{};
-
-				ec = co_await recv(session_ptr, buffer);
-				if (ec)
-				{
-					break;
-				}
-
-				co_return std::move(buffer);
+				co_return std::unexpected(ec);
 			}
 
 			if (ec != boost::asio::error::eof)
@@ -108,7 +103,7 @@ namespace aquarius
 				XLOG_ERROR() << "[query buffer] error: " << ec.what();
 			}
 
-			co_return std::unexpected(ec);
+			co_return buffer;
 		}
 
 	private:

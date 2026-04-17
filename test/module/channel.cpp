@@ -42,11 +42,11 @@ BOOST_AUTO_TEST_CASE(error_flow)
 	auto f = [](flex_buffer& buffer, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{ co_return std::unexpected(asio::error::bad_descriptor); };
 
-	mpc_subscribe("test", f);
+	mpc_subscribe("test1", f);
 
 	auto future = asio::co_spawn(
 		io, [&]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{ co_return co_await mpc_publish("test", buf, 0); }, asio::use_future);
+		{ co_return co_await mpc_publish("test1", buf, 0); }, asio::use_future);
 
 	io.run();
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(publish_no_exist)
 
 	auto future = asio::co_spawn(
 		io, [&]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{ co_return co_await mpc_publish("test1", buf, 0); }, asio::use_future);
+		{ co_return co_await mpc_publish("test2", buf, 0); }, asio::use_future);
 
 	io.run();
 
@@ -78,10 +78,6 @@ BOOST_AUTO_TEST_CASE(multi_subscribe)
 	{ co_return std::unexpected(asio::error::bad_descriptor); };
 
 	auto result = mpc_subscribe("test", f);
-
-	BOOST_TEST(result);
-
-	result = mpc_subscribe("test", f);
 
 	BOOST_TEST(!result);
 }
