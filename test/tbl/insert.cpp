@@ -1,5 +1,5 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/tbl/insert_view.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
