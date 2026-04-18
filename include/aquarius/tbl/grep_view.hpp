@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/concepts.hpp>
 #include <aquarius/detail/member_pointer.hpp>
+#include <aquarius/tbl/add_string.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -62,7 +63,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " < " << g;
+			content_stream_ << struct_member_name << " < " << add_string(g);
 
 			return *this;
 		}
@@ -71,7 +72,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " <= " << g;
+			content_stream_ << struct_member_name << " <= " << add_string(g);
 
 			return *this;
 		}
@@ -80,7 +81,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " > " << g;
+			content_stream_ << struct_member_name << " > " << add_string(g);
 			return *this;
 		}
 
@@ -88,7 +89,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " >= " << g;
+			content_stream_ << struct_member_name << " >= " << add_string(g);
 
 			return *this;
 		}
@@ -97,7 +98,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " = " << g;
+			content_stream_ << struct_member_name << " = " << add_string(g);
 
 			return *this;
 		}

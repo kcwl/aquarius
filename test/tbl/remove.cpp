@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(remove_condition)
 	BOOST_CHECK_EQUAL(static_cast<std::string>(result), "delete from mock_tbl where a > 3");
 
 	auto& res =
-		remove_v<mock_tbl>() | grep<&mock_tbl::a> > 3 | (grep<&mock_tbl::b> == "test" || grep<&mock_tbl::b> == "test1");
+		remove_v<mock_tbl>() | grep<&mock_tbl::a>() > 3 | (grep<&mock_tbl::b>() == "test" || grep<&mock_tbl::b>() == "test1");
 
 	BOOST_CHECK_EQUAL(static_cast<std::string>(res),
 					  "delete from mock_tbl where a > 3 and (b = \"test\" or b = \"test1\")");

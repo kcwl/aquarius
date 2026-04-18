@@ -1,8 +1,9 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/detail/struct_name.hpp>
+#include <aquarius/tbl/add_string.hpp>
 #include <boost/pfr.hpp>
 #include <sstream>
-#include <aquarius/concepts.hpp>
 
 namespace aquarius
 {
@@ -23,18 +24,14 @@ namespace aquarius
 			constexpr static auto size = boost::pfr::tuple_size_v<type>;
 
 			auto type_f = [&]<std::size_t... I>(std::index_sequence<I...>)
-			{
-				((complete_sql_ << boost::pfr::get_name<I, type>() << (size != I + 1 ? "," : "")), ...);
-			};
+			{ ((complete_sql_ << boost::pfr::get_name<I, type>() << (size != I + 1 ? "," : "")), ...); };
 
 			type_f(std::make_index_sequence<size>{});
 
 			complete_sql_ << ") values(";
 
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
-			{
-				((complete_sql_ << add_string(boost::pfr::get<I, type>(value)) << (size != I + 1 ? "," : "")), ...);
-			};
+			{ ((complete_sql_ << add_string(boost::pfr::get<I, type>(value)) << (size != I + 1 ? "," : "")), ...); };
 
 			f(std::make_index_sequence<size>{});
 
@@ -46,22 +43,6 @@ namespace aquarius
 		operator std::string() const
 		{
 			return complete_sql_.str();
-		}
-
-	private:
-		template<typename T>
-		T add_string(const T& value)
-		{
-			using type = std::remove_cvref_t<T>;
-
-			if constexpr (string_t<type>)
-			{
-				return std::string("\"") + value + std::string("\"");
-			}
-			else
-			{
-				return value;
-			}
 		}
 
 	private:

@@ -10,6 +10,8 @@ namespace aquarius
 	public:
 		remove_view& operator()()
 		{
+			reset();
+
 			constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
 
 			complete_sql_.str("");
@@ -45,12 +47,19 @@ namespace aquarius
 			complete_sql_ << static_cast<std::string>(g);
 		}
 
+		void reset()
+		{
+			complete_sql_.str("");
+
+			has_condition_ = false;
+		}
+
 	private:
 		std::stringstream complete_sql_;
 
 		bool has_condition_;
 	};
 
-	template<typename T>
+	template <typename T>
 	inline static remove_view<T> remove_v;
 } // namespace aquarius
