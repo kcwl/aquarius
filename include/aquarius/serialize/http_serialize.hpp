@@ -27,33 +27,14 @@ namespace aquarius
 			method_ = m;
 		}
 
-		template <typename T, auto Ptr = nullptr>
-		void parse_to(T&& value, flex_buffer& buffer)
+		void set_method(int m)
 		{
-			if (method_ == http_method::get)
-			{
-				constexpr auto col_name = member_pointer_name<T, Ptr>::value;
-
-				return kv_base::parse_.to_datas(std::forward<T>(value), buffer, std::string(col_name));
-			}
-			else
-			{
-				return json_base::parse_.to_datas(std::forward<T>(value), buffer);
-			}
+			set_method(static_cast<http_method>(m));
 		}
 
-		template <typename T, auto Ptr = nullptr>
-		auto parse_from(flex_buffer& buffer) -> T
+		http_method method() const
 		{
-			if (method_ == http_method::get)
-			{
-				constexpr auto col_name = member_pointer_name<T, Ptr>::value;
-				return kv_base::parse_.from_datas<T>(buffer, std::string(col_name));
-			}
-			else
-			{
-				return json_base::parse_.from_datas<T>(buffer);
-			}
+			return method_;
 		}
 
 	private:

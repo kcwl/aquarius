@@ -10,10 +10,14 @@ BOOST_AUTO_TEST_SUITE(ut_handler)
 
 struct mock_request
 {
+	struct body_t { void set_method(int) {} };
+
 	void consume(flex_buffer&)
 	{}
 	void method(int)
 	{}
+
+	body_t body() { return body_t(); }
 };
 
 struct mock_response
@@ -31,6 +35,8 @@ struct mock_response
 
 		return error_code{};
 	}
+
+	void set_method(int) {}
 
 	int _result;
 };

@@ -102,4 +102,9 @@ namespace aquarius
 
 	template <typename T>
 	concept map_t = is_map<T>::value;
+
+	template<typename T>
+	concept has_set_method = requires{
+		std::declval<T>().set_method(std::declval<int>());
+	};
 } // namespace aquarius

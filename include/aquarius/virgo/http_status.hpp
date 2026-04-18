@@ -165,7 +165,7 @@ namespace aquarius
 	inline http_status string_to_status(std::string_view str)
 	{
 		auto iter =
-			std::find_if(statuses.begin(), statuses.end(), [&](auto s) { return s.second == std::string(str); });
+			std::find_if(statuses.begin(), statuses.end(), [&](auto s) { return std::to_string((int)s.first) == std::string(str); });
 
 		if (iter == statuses.end())
 		{

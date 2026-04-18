@@ -84,7 +84,7 @@ namespace aquarius
 
 			std::size_t length = 0;
 
-			for (const auto header : headers)
+			for (const auto& header : headers)
 			{
 				auto str = std::string_view(header);
 

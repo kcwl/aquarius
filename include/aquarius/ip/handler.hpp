@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/module/handler_channel.hpp>
 #include <expected>
 
@@ -20,9 +21,16 @@ namespace aquarius
 	public:
 		virtual auto visit(flex_buffer& buffer, int method, error_code& ec) -> asio::awaitable<flex_buffer>
 		{
-			request()->consume(buffer);
-
 			request()->method(method);
+
+			using type = decltype(request()->body());
+
+			if constexpr (has_set_method<type>)
+			{
+				request()->body().set_method(method);
+			}
+
+			request()->consume(buffer);
 
 			make_response(co_await this->handle());
 

@@ -251,6 +251,8 @@ namespace aquarius
 
 				auto status = string_to_status(std::string_view(*iter++));
 
+				ec = error_code{};
+
 				return std::make_tuple(*version, status);
 			}
 		}

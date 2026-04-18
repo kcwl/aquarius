@@ -1,6 +1,5 @@
 #include "test_http.virgo.h"
 
-
 struct http_test_post_req_body::impl
 {
 	int32 uuid;
@@ -12,12 +11,18 @@ http_test_post_req_body::http_test_post_req_body()
 
 void http_test_post_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	if (this->method() == http_method::post)
+	{
+		json_base::parse_to(*this, buffer);
+	}
 }
 
 void http_test_post_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<http_test_post_req_body>(buffer); 
+	if (this->method() == http_method::post)
+	{
+		*this = json_base::parse_from<http_test_post_req_body>(buffer);
+	}
 }
 int32 http_test_post_req_body::uuid() const
 {
@@ -46,12 +51,27 @@ http_test_post_resp_body::http_test_post_resp_body()
 
 void http_test_post_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	if (this->method() == http_method::post)
+	{
+		json_base::parse_to(*this, buffer);
+	}
+	else
+	{
+		
+	}
 }
 
 void http_test_post_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<http_test_post_resp_body>(buffer); 
+	
+	if (this->method() == http_method::post)
+	{
+		*this = json_base::parse_from<http_test_post_resp_body>(buffer);
+	}
+	else
+	{
+		
+	}
 }
 int32 http_test_post_resp_body::uuid() const
 {
@@ -81,12 +101,29 @@ http_test_get_req_body::http_test_get_req_body()
 
 void http_test_get_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	if (this->method() == http_method::post)
+	{
+		json_base::parse_to(*this, buffer);
+	}
+	else
+	{
+		buffer.sputc('?');
+		kv_base::parse_to(impl_ptr_->user, buffer, "user");
+		buffer.sputc('&');
+		kv_base::parse_to(impl_ptr_->passwd, buffer, "passwd");
+	}
 }
 
 void http_test_get_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<http_test_get_req_body>(buffer); 
+	if (this->method() == http_method::post)
+	{
+	}
+	else
+	{
+		impl_ptr_->user = kv_base::parse_from<int32>(buffer, "user");
+		impl_ptr_->passwd = kv_base::parse_from<string>(buffer, "passwd");
+	}
 }
 int32 http_test_get_req_body::user() const
 {
@@ -115,12 +152,30 @@ http_test_get_resp_body::http_test_get_resp_body()
 
 void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	if (this->method() == http_method::post)
+	{
+		json_base::parse_to(*this, buffer);
+	}
+	else
+	{
+		buffer.sputc('?');
+		kv_base::parse_to(impl_ptr_->user, buffer, "user");
+		buffer.sputc('&');
+		kv_base::parse_to(impl_ptr_->passwd, buffer, "passwd");
+	}
 }
 
 void http_test_get_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<http_test_get_resp_body>(buffer); 
+	if (this->method() == http_method::post)
+	{
+		*this = json_base::parse_from<http_test_get_resp_body>(buffer);
+	}
+	else
+	{
+		impl_ptr_->user = kv_base::parse_from<int32>(buffer, "user");
+		impl_ptr_->passwd = kv_base::parse_from<string>(buffer, "passwd");
+	}
 }
 int32 http_test_get_resp_body::user() const
 {
@@ -157,7 +212,7 @@ http_person tag_invoke(const aquarius::json::value_to_tag<http_person>&, const a
 {
 	http_person result{};
 	auto obj = jv.try_as_object();
-	if(obj->empty())
+	if (obj->empty())
 		return {};
 	result.sex = obj->at("sex").as_bool();
 	result.addr = static_cast<uint32>(obj->at("addr").as_int64());
@@ -178,11 +233,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 	jv_obj.emplace("per_req", aquarius::json_value_from_object<http_person>(local.impl_ptr_->per_req));
 }
 
-http_test_post_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_req_body>&, const aquarius::json::value& jv)
+http_test_post_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_req_body>&,
+								   const aquarius::json::value& jv)
 {
 	http_test_post_req_body result{};
 	auto obj = jv.try_as_object();
-	if(obj->empty())
+	if (obj->empty())
 		return {};
 	result.impl_ptr_->uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	result.impl_ptr_->per_req = aquarius::json::value_to<http_person>(obj->at("per_req"));
@@ -196,11 +252,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 	jv_obj.emplace("per_resp", aquarius::json_value_from_object<http_person>(local.impl_ptr_->per_resp));
 }
 
-http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_resp_body>&, const aquarius::json::value& jv)
+http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_resp_body>&,
+									const aquarius::json::value& jv)
 {
 	http_test_post_resp_body result{};
 	auto obj = jv.try_as_object();
-	if(obj->empty())
+	if (obj->empty())
 		return {};
 	result.impl_ptr_->uuid = static_cast<int32>(obj->at("uuid").as_int64());
 	result.impl_ptr_->per_resp = aquarius::json::value_to<http_person>(obj->at("per_resp"));
@@ -214,11 +271,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 	jv_obj.emplace("passwd", local.impl_ptr_->passwd);
 }
 
-http_test_get_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_req_body>&, const aquarius::json::value& jv)
+http_test_get_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_req_body>&,
+								  const aquarius::json::value& jv)
 {
 	http_test_get_req_body result{};
 	auto obj = jv.try_as_object();
-	if(obj->empty())
+	if (obj->empty())
 		return {};
 	result.impl_ptr_->user = static_cast<int32>(obj->at("user").as_int64());
 	result.impl_ptr_->passwd = static_cast<string>(obj->at("passwd").as_string());
@@ -232,11 +290,12 @@ void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv
 	jv_obj.emplace("passwd", local.impl_ptr_->passwd);
 }
 
-http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&, const aquarius::json::value& jv)
+http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&,
+								   const aquarius::json::value& jv)
 {
 	http_test_get_resp_body result{};
 	auto obj = jv.try_as_object();
-	if(obj->empty())
+	if (obj->empty())
 		return {};
 	result.impl_ptr_->user = static_cast<int32>(obj->at("user").as_int64());
 	result.impl_ptr_->passwd = static_cast<string>(obj->at("passwd").as_string());

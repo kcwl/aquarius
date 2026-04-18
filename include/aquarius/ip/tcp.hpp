@@ -95,15 +95,15 @@ namespace aquarius
 			ec = co_await recv(session_ptr, buffer);
 			if (ec)
 			{
+				if (ec != boost::asio::error::eof)
+				{
+					XLOG_ERROR() << "[query buffer] error: " << ec.what();
+				}
+
 				co_return std::unexpected(ec);
 			}
 
-			if (ec != boost::asio::error::eof)
-			{
-				XLOG_ERROR() << "[query buffer] error: " << ec.what();
-			}
-
-			co_return buffer;
+			co_return std::move(buffer);
 		}
 
 	private:
