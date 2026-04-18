@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(member_func)
 	http_header header{};
 	BOOST_CHECK_EQUAL(header.keep_alive(), false);
 
-	header.keep_alive();
+	header.keep_alive(true);
 
 	BOOST_CHECK_EQUAL(header.keep_alive(), true);
 
