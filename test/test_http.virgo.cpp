@@ -27,7 +27,15 @@ void http_test_post_req_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_post_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = json_base::parse_from<http_test_post_req_body>(buffer); 
+	if(this->method() == http_method::post)
+	{
+		*this = json_base::parse_.from_datas<http_test_post_req_body>(buffer); 
+	}
+	else
+	{
+		impl_ptr_->uuid = kv_base::parse_from<int32>(buffer, "uuid");
+		impl_ptr_->per_req = kv_base::parse_from<http_person>(buffer, "per_req");
+	}
 }
 int32 http_test_post_req_body::uuid() const
 {
@@ -71,7 +79,15 @@ void http_test_post_resp_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_post_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = json_base::parse_from<http_test_post_resp_body>(buffer); 
+	if(this->method() == http_method::post)
+	{
+		*this = json_base::parse_.from_datas<http_test_post_resp_body>(buffer); 
+	}
+	else
+	{
+		impl_ptr_->uuid = kv_base::parse_from<int32>(buffer, "uuid");
+		impl_ptr_->per_resp = kv_base::parse_from<http_person>(buffer, "per_resp");
+	}
 }
 int32 http_test_post_resp_body::uuid() const
 {
@@ -116,7 +132,15 @@ void http_test_get_req_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = json_base::parse_from<http_test_get_req_body>(buffer); 
+	if(this->method() == http_method::post)
+	{
+		*this = json_base::parse_.from_datas<http_test_get_req_body>(buffer); 
+	}
+	else
+	{
+		impl_ptr_->user = kv_base::parse_from<int32>(buffer, "user");
+		impl_ptr_->passwd = kv_base::parse_from<string>(buffer, "passwd");
+	}
 }
 int32 http_test_get_req_body::user() const
 {
@@ -160,7 +184,15 @@ void http_test_get_resp_body::serialize(aquarius::flex_buffer& buffer)
 
 void http_test_get_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = json_base::parse_from<http_test_get_resp_body>(buffer); 
+	if(this->method() == http_method::post)
+	{
+		*this = json_base::parse_.from_datas<http_test_get_resp_body>(buffer); 
+	}
+	else
+	{
+		impl_ptr_->user = kv_base::parse_from<int32>(buffer, "user");
+		impl_ptr_->passwd = kv_base::parse_from<string>(buffer, "passwd");
+	}
 }
 int32 http_test_get_resp_body::user() const
 {

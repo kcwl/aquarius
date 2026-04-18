@@ -450,8 +450,21 @@ namespace aquarius
 					}
 					else
 					{
-						ofs << "\t*this = json_base::parse_" << direction << "<" << data_ptr->name()
-							<< ">(buffer); " << std::endl;
+						ofs << "\tif(this->method() == http_method::post)" << std::endl;
+						ofs << "\t{" << std::endl;
+						ofs << "\t\t*this = json_base::parse_." << direction << "_datas<" << data_ptr->name() << ">(buffer); " << std::endl;
+						ofs << "\t}" << std::endl;
+						ofs << "\telse" << std::endl;
+						ofs << "\t{" << std::endl;
+
+						bool first = true;
+
+						for (auto& m : field_ptr->fields())
+						{
+							ofs << "\t\timpl_ptr_->"<<m.second << " = kv_base::parse_" << direction << "<"<< m.first << ">(buffer, \""<< m.second << "\");" << std::endl;
+						}
+
+						ofs << "\t}" << std::endl;
 					}
 				};
 
