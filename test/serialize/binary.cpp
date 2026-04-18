@@ -1,8 +1,30 @@
 #define BOOST_TEST_NO_MAIN
+#include <aquarius/serialize/binary.hpp>
+#include <aquarius/serialize/scalar_type.hpp>
 #include <boost/test/unit_test.hpp>
-#include "../test_tcp.virgo.h"
 
 BOOST_AUTO_TEST_SUITE(serialize)
+
+using namespace aquarius;
+
+struct tcp_person
+{
+	bool sex;
+	uint32 addr;
+	int32 age;
+	sint32 sage;
+	uint64 telephone;
+	int64 score;
+	sint64 scores;
+	fixed32 f;
+	fixed64 g;
+	bool aa;
+	float hp;
+	double mana;
+	string name;
+	bytes orders;
+	std::vector<int32> ves;
+};
 
 BOOST_AUTO_TEST_CASE(binary)
 {
@@ -25,7 +47,7 @@ BOOST_AUTO_TEST_CASE(binary)
 	p.mana = 300;
 	p.name = "John";
 	p.orders = { 1, 2, 3, 4, 5 };
-	p.ves = { 2,3,4,5 };
+	p.ves = { 2, 3, 4, 5 };
 
 	bp.to_datas(p, buffer);
 

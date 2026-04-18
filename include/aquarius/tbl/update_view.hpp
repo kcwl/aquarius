@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/pfr.hpp>
 #include <sstream>
 
 namespace aquarius

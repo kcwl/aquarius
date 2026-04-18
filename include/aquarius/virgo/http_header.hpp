@@ -1,6 +1,9 @@
 #pragma once
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/error_code.hpp>
 #include <ranges>
 #include <span>
+#include <string>
 #include <string_view>
 
 using namespace std::string_view_literals;

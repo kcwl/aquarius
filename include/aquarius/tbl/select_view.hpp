@@ -1,6 +1,8 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/member_pointer.hpp>
+#include <aquarius/detail/struct_name.hpp>
+#include <string>
 
 namespace aquarius
 {
@@ -64,8 +66,6 @@ namespace aquarius
 
 				has_condition_ = true;
 			}
-
-			std::cout << "debug:" << static_cast<std::string>(g) << std::endl;
 
 			content_stream_ << " and " << static_cast<std::string>(g);
 		}

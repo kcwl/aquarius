@@ -1,6 +1,7 @@
 #define BOOST_TEST_NO_MAIN
+#include <aquarius/serialize/json.hpp>
+#include <aquarius/serialize/scalar_type.hpp>
 #include <boost/test/unit_test.hpp>
-#include <aquarius.hpp>
 
 using namespace aquarius;
 
@@ -17,13 +18,8 @@ struct mock_json
 
 bool operator==(const mock_json& left, const mock_json& right)
 {
-	return left.a == right.a
-		&& left.b == right.b
-		&& left.c == right.c
-		&& left.d == right.d
-		&& left.vec == right.vec
-		&& left.e.value == right.e.value
-		&& left.f == right.f;
+	return left.a == right.a && left.b == right.b && left.c == right.c && left.d == right.d && left.vec == right.vec &&
+		   left.e.value == right.e.value && left.f == right.f;
 }
 
 void tag_invoke(const boost::json::value_from_tag, boost::json::value& jv, const mock_json& local)
@@ -70,7 +66,7 @@ BOOST_AUTO_TEST_CASE(serialize_and_deserialize)
 
 	BOOST_TEST(result);
 
-	buffer.pubseekpos(1,std::ios::in);
+	buffer.pubseekpos(1, std::ios::in);
 
 	BOOST_CHECK_THROW(jp.from_datas<mock_json>(buffer), std::out_of_range);
 }

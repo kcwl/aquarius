@@ -4,6 +4,9 @@
 
 namespace aquarius
 {
+	template<auto Ptr>
+	class grep_view;
+
 	template <typename T>
 	class remove_view
 	{

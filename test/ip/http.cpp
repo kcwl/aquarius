@@ -1,20 +1,16 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/ip/http.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
 
-
 BOOST_AUTO_TEST_SUITE(ut_http)
-
 
 struct mock_read_error_session
 {
 	mock_read_error_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -42,9 +38,7 @@ struct mock_error_method_session
 {
 	mock_error_method_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -87,9 +81,7 @@ struct mock_error_url_session
 {
 	mock_error_url_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -131,9 +123,7 @@ struct mock_error_version_session
 {
 	mock_error_version_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -175,9 +165,7 @@ struct mock_complete_no_recv_session
 {
 	mock_complete_no_recv_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -219,9 +207,7 @@ struct mock_no_length_session
 {
 	mock_no_length_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -263,9 +249,7 @@ struct mock_normal_session
 {
 	mock_normal_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -316,7 +300,7 @@ struct test_acceptor_session
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session] () -> asio::awaitable<error_code> { co_return co_await http::accept(session); },
+			io, [session]() -> asio::awaitable<error_code> { co_return co_await http::accept(session); },
 			asio::use_future);
 
 		io.run();
@@ -329,9 +313,7 @@ struct mock_query_error_status_session
 {
 	mock_query_error_status_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -373,9 +355,7 @@ struct mock_query_error_version_session
 {
 	mock_query_error_version_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -417,9 +397,7 @@ struct mock_query_normal_session
 {
 	mock_query_normal_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -469,10 +447,8 @@ struct test_query_session
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session] () -> asio::awaitable<std::expected<flex_buffer, error_code>>
-			{
-				co_return co_await http::query(session);
-			}, asio::use_future);
+			io, [session]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			{ co_return co_await http::query(session); }, asio::use_future);
 
 		io.run();
 

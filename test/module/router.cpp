@@ -1,8 +1,9 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/module/module_router.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
+using namespace std::chrono_literals;
 
 class mock_module : public basic_module<mock_module>
 {
@@ -119,13 +120,13 @@ BOOST_AUTO_TEST_CASE(async_schedules)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			auto f = [&](mock_module* m)->asio::awaitable<bool> { co_return m->say(); };
+			auto f = [&](mock_module* m) -> asio::awaitable<bool> { co_return m->say(); };
 
 			BOOST_TEST(co_await (router.async_schedule<mock_module, bool>(f)));
 
 			router.regist<mock_direct_base_module>();
 
-			auto f1 = [](mock_direct_base_module* m) ->asio::awaitable<bool> { co_return true; };
+			auto f1 = [](mock_direct_base_module* m) -> asio::awaitable<bool> { co_return true; };
 
 			BOOST_TEST(!co_await (router.async_schedule<mock_direct_base_module, bool>(f1)));
 		},

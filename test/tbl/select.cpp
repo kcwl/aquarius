@@ -1,5 +1,7 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/tbl/grep_view.hpp>
+#include <aquarius/tbl/operator.hpp>
+#include <aquarius/tbl/select_view.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
@@ -33,7 +35,7 @@ BOOST_AUTO_TEST_CASE(select_and)
 BOOST_AUTO_TEST_CASE(select_and_or)
 {
 	auto& result = select_v<mock_tbl, &mock_tbl::b> | grep<&mock_tbl::a> > 3 |
-				  (grep<&mock_tbl::b> == "test" || grep<&mock_tbl::b> == "test1");
+				   (grep<&mock_tbl::b> == "test" || grep<&mock_tbl::b> == "test1");
 
 	BOOST_CHECK_EQUAL(static_cast<std::string>(result),
 					  "select b from mock_tbl where a > 3 and (b = \"test\" or b = \"test1\")");

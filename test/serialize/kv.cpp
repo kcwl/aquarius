@@ -1,6 +1,6 @@
 #define BOOST_TEST_NO_MAIN
-#include <boost/test/unit_test.hpp>
 #include <aquarius/serialize/kv.hpp>
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(serialize)
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(get_method)
 		std::string result = "id=123";
 		aquarius::flex_buffer buffer{};
 		buffer.sputn(result.data(), result.size());
-		auto res = pr.from_datas<int>(buffer,"id");
+		auto res = pr.from_datas<int>(buffer, "id");
 
 		BOOST_TEST(res == 123);
 	}

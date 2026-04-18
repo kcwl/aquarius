@@ -1,10 +1,12 @@
 #define BOOST_TEST_NO_MAIN
+#include <aquarius/ip/adaptor/ssl_adaptor.hpp>
 #include <boost/test/unit_test.hpp>
-#include <aquarius.hpp>
 
 using namespace aquarius;
+using namespace std::string_view_literals;
+using namespace std::chrono_literals;
 
-template<typename Protocol, typename Executor = asio::any_io_executor>
+template <typename Protocol, typename Executor = asio::any_io_executor>
 struct mock_socket : public asio::basic_socket<Protocol, Executor>
 {
 	mock_socket(asio::io_context& io)
@@ -12,29 +14,27 @@ struct mock_socket : public asio::basic_socket<Protocol, Executor>
 	{}
 	struct initiate_async_connect
 	{
-		initiate_async_connect(initiate_async_connect*) {}
+		initiate_async_connect(initiate_async_connect*)
+		{}
 	};
 
-	template<typename Token, typename Endpoint>
-	auto async_connect(const Token& peer_endpoint,
-					   Token&& token)
-		-> decltype(
-			asio::async_initiate<Token, void(error_code)>(
-				std::declval<initiate_async_connect>(), token,
-				peer_endpoint, std::declval<error_code&>()))
+	template <typename Token, typename Endpoint>
+	auto async_connect(const Token& peer_endpoint, Token&& token)
+		-> decltype(asio::async_initiate<Token, void(error_code)>(std::declval<initiate_async_connect>(), token,
+																  peer_endpoint, std::declval<error_code&>()))
 	{
 		boost::system::error_code open_ec;
-		return async_initiate<Token, void(boost::system::error_code)>(
-			initiate_async_connect(this), token, peer_endpoint, open_ec);
+		return async_initiate<Token, void(boost::system::error_code)>(initiate_async_connect(this), token,
+																	  peer_endpoint, open_ec);
 	}
 
-	template<typename Buffer, typename Token>
+	template <typename Buffer, typename Token>
 	auto async_read_some(Buffer, Token) -> asio::awaitable<error_code>
 	{
 		co_return error_code{};
 	}
 
-	template<typename Buffer, typename Token>
+	template <typename Buffer, typename Token>
 	auto async_write_some(Buffer, Token) -> asio::awaitable<error_code>
 	{
 		co_return error_code{};
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(connect)
 
 	auto future = asio::co_spawn(
 		io,
-		[&] () -> asio::awaitable<void>
+		[&]() -> asio::awaitable<void>
 		{
 			asio::ip::tcp::resolver resolve{ io };
 
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(handshake)
 
 	auto future = asio::co_spawn(
 		io,
-		[&] () -> asio::awaitable<void>
+		[&]() -> asio::awaitable<void>
 		{
 			asio::ip::tcp::resolver resolve{ io };
 
@@ -94,7 +94,6 @@ BOOST_AUTO_TEST_CASE(handshake)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(server_ssls)
 
@@ -116,7 +115,7 @@ BOOST_AUTO_TEST_CASE(connect)
 
 	auto future = asio::co_spawn(
 		io,
-		[&] () -> asio::awaitable<void>
+		[&]() -> asio::awaitable<void>
 		{
 			asio::ip::tcp::resolver resolve{ io };
 
@@ -138,7 +137,7 @@ BOOST_AUTO_TEST_CASE(handshake)
 
 	auto future = asio::co_spawn(
 		io,
-		[&] () -> asio::awaitable<void>
+		[&]() -> asio::awaitable<void>
 		{
 			asio::ip::tcp::resolver resolve{ io };
 

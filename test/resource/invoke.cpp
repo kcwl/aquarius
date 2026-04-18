@@ -1,5 +1,5 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/resource/config_tag_invoke.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;

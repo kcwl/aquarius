@@ -1,20 +1,16 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/ip/tcp.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
 
-
 BOOST_AUTO_TEST_SUITE(ut_tcp)
-
 
 struct mock_read_error_session
 {
 	mock_read_error_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -38,9 +34,7 @@ struct mock_second_read_error_session
 {
 	mock_second_read_error_session(asio::io_context& context)
 		: io(context)
-	{
-
-	}
+	{}
 
 	auto get_executor()
 	{
@@ -82,7 +76,7 @@ struct tcp_accept_session_test
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session] () -> asio::awaitable<error_code> { co_return co_await tcp::accept(session); },
+			io, [session]() -> asio::awaitable<error_code> { co_return co_await tcp::accept(session); },
 			asio::use_future);
 
 		io.run();
@@ -100,8 +94,8 @@ struct tcp_query_session_test
 		auto session = std::make_shared<T>(io);
 
 		auto future = asio::co_spawn(
-			io, [session] () -> asio::awaitable<std::expected<flex_buffer, error_code>> { co_return co_await tcp::query(session); },
-			asio::use_future);
+			io, [session]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			{ co_return co_await tcp::query(session); }, asio::use_future);
 
 		io.run();
 

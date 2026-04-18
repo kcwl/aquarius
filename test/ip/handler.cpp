@@ -1,9 +1,12 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius.hpp>
+#include <aquarius/ip/handler.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace std::chrono_literals;
 using namespace aquarius;
+using namespace std::string_view_literals;
+
+BOOST_AUTO_TEST_SUITE(ut_handler)
 
 struct mock_request
 {
@@ -46,8 +49,6 @@ public:
 		co_return error_code{};
 	}
 };
-
-BOOST_AUTO_TEST_SUITE(ut_handler)
 
 BOOST_AUTO_TEST_CASE(ctor)
 {

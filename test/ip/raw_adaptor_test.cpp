@@ -1,35 +1,30 @@
 #define BOOST_TEST_NO_MAIN
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <boost/test/unit_test.hpp>
-#include <chrono>
-#include <thread>
 
 using namespace aquarius;
 using namespace std::chrono_literals;
 
-
-template<typename Protocol, typename Executor = asio::any_io_executor>
+template <typename Protocol, typename Executor = asio::any_io_executor>
 struct mock_socket : public asio::basic_socket<Protocol, Executor>
 {
 	mock_socket(asio::io_context& io)
 		: asio::basic_socket<Protocol, Executor>(io)
 	{}
-	struct initiate_async_connect 
+	struct initiate_async_connect
 	{
-		initiate_async_connect(initiate_async_connect*) {}
+		initiate_async_connect(initiate_async_connect*)
+		{}
 	};
 
-		template<typename Token, typename Endpoint>
-		auto async_connect(const Endpoint& peer_endpoint,
-						   Token&& token)
-		-> decltype(
-			asio::async_initiate<Token, void(error_code)>(
-				std::declval<initiate_async_connect>(), token,
-				peer_endpoint, std::declval<error_code&>()))
+	template <typename Token, typename Endpoint>
+	auto async_connect(const Endpoint& peer_endpoint, Token&& token)
+		-> decltype(asio::async_initiate<Token, void(error_code)>(std::declval<initiate_async_connect>(), token,
+																  peer_endpoint, std::declval<error_code&>()))
 	{
-			boost::system::error_code open_ec;
-		return async_initiate<Token, void(boost::system::error_code)>(
-			initiate_async_connect(this), token, peer_endpoint, open_ec);
+		boost::system::error_code open_ec;
+		return async_initiate<Token, void(boost::system::error_code)>(initiate_async_connect(this), token,
+																	  peer_endpoint, open_ec);
 	}
 };
 
