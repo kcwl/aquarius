@@ -2,7 +2,16 @@ project(unittest)
 
 file(GLOB TEST_SRCS "*.h")
 
-file(GLOB TEST_MAIN "*.cpp")
+file(GLOB TEST_MAIN
+	"*.cpp"
+	"./detail/*.cpp"
+	"./ip/*.cpp"
+	"./module/*.cpp"
+	"./resouce/*.cpp"
+	"./serialize/*.cpp"
+	"./tbl/*.cpp"
+	"./virgo/*.cpp"
+)
 
 include_directories(${AQUARIUS_INCLUDE})
 
