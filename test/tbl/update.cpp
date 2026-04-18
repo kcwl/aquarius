@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(update)
 	tbl.b = "test";
 	auto& result = update_v(tbl);
 
-	BOOST_CHECK_EQUAL(static_cast<std::string>(result), "update mock_select set a = 3 and b = \"test\"");
+	BOOST_CHECK_EQUAL(static_cast<std::string>(result), "update mock_tbl set a = 3 and b = \"test\"");
 }
 
 BOOST_AUTO_TEST_CASE(upate_condition)
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(upate_condition)
 	BOOST_CHECK_EQUAL(static_cast<std::string>(result), "update mock_tbl set a = 3 and b = \"test\" where a > 3");
 
 	auto& res =
-		update_v(tbl) | grep<&mock_tbl::a> > 3 | (grep<&mock_tbl::b> == "test" || grep<&mock_tbl::b> == "test1");
+		update_v(tbl) | grep<&mock_tbl::a>() > 3 | (grep<&mock_tbl::b>() == "test" || grep<&mock_tbl::b>() == "test1");
 
 	BOOST_CHECK_EQUAL(static_cast<std::string>(res),
 					  "update mock_tbl set a = 3 and b = \"test\" where a > 3 and (b = \"test\" or b = \"test1\")");
