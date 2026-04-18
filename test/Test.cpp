@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 	t.join();
 }
 
-
+#ifdef ENABLE_MYSQL_TEST
 
 BOOST_AUTO_TEST_CASE(connecting)
 {
@@ -245,5 +245,7 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 	t.join();
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
