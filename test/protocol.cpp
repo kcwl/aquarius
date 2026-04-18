@@ -41,17 +41,18 @@ BOOST_AUTO_TEST_CASE(ctor)
 	protocol pt{};
 	pt.header().a = 1;
 	pt.body().b = 2;
+	pt.method(3);
 
 	auto pt1 = std::move(pt);
 
 	BOOST_CHECK_EQUAL(pt1.header().a, 1);
 	BOOST_CHECK_EQUAL(pt1.body().b, 2);
-	BOOST_CHECK_EQUAL(pt1.method(), 0);
+	BOOST_CHECK_EQUAL(pt1.method(), 3);
 
 	auto pt2(std::move(pt1));
 	BOOST_CHECK_EQUAL(pt2.header().a, 1);
 	BOOST_CHECK_EQUAL(pt2.body().b, 2);
-	BOOST_CHECK_EQUAL(pt2.method(), 0);
+	BOOST_CHECK_EQUAL(pt2.method(), 3);
 }
 
 BOOST_AUTO_TEST_CASE(method)

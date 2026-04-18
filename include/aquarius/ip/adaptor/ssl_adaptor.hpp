@@ -2,6 +2,7 @@
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
+#include <aquarius/resource/ssl_config.hpp>
 #include <filesystem>
 
 namespace aquarius
@@ -14,23 +15,21 @@ namespace aquarius
 		{
 			static asio::ssl::context ssl_context(SSLVersion);
 
+			ssl_config cfg{};
+			config_tag_invoke(config::value_from<ssl_config>(), cfg);
+
 			if constexpr (Server)
 			{
 				ssl_context.set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 |
 										asio::ssl::context::single_dh_use);
 
-				ssl_context.use_certificate_chain_file("crt/server.crt");
-				ssl_context.use_private_key_file("crt/server.key", asio::ssl::context::pem);
-				ssl_context.use_tmp_dh_file("crt/dh2048.pem");
+				ssl_context.use_certificate_chain_file(cfg.crt);
+				ssl_context.use_private_key_file(cfg.key, asio::ssl::context::pem);
+				ssl_context.use_tmp_dh_file(cfg.pem);
 			}
 			else
 			{
-				auto path = std::filesystem::current_path();
-
-				path.append("crt");
-				path.append("server.crt");
-
-				ssl_context.load_verify_file(path.string());
+				ssl_context.load_verify_file(cfg.crt);
 			}
 
 			return ssl_context;

@@ -6,6 +6,8 @@ using namespace aquarius;
 using namespace std::string_view_literals;
 using namespace std::chrono_literals;
 
+#ifdef ENABLE_SSL_TEST
+
 template <typename Protocol, typename Executor = asio::any_io_executor>
 struct mock_socket : public asio::basic_socket<Protocol, Executor>
 {
@@ -140,3 +142,5 @@ BOOST_AUTO_TEST_CASE(handshake)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+#endif

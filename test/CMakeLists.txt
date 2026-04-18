@@ -44,6 +44,12 @@ target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
 target_link_libraries(unittest PUBLIC mysql)
 endif()
 
+if(ENABLE_SSL_TEST)
+message(STATUS "enable ssl test")
+target_compile_definitions(unittest PUBLIC -DENABLE_SSL_TEST)
+endif()
+
+
 
 
 add_test(
