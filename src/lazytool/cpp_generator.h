@@ -70,13 +70,13 @@ namespace aquarius
 
 			bool scope_private(std::fstream& ofs);
 
-			bool genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr);
+			bool genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol);
 
 			bool generate_construction_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr);
 
 			// bool generate_equal_src(std::fstream& ofs, std::shared_ptr<data_field> field_ptr);
 
-			bool generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr);
+			bool generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol);
 
 			bool generate_member_func_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr);
 

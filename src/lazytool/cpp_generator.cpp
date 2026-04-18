@@ -85,14 +85,14 @@ namespace aquarius
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{
 				(generate_data_field_define(header, field_ptr->get<I>(), protocol), ...);
-				(genetate_source(source, field_ptr->get<I>()), ...);
+				(genetate_source(source, field_ptr->get<I>(), protocol), ...);
 			};
 
 			f(std::make_index_sequence<message_field::message_part>{});
 
 			return true;
 		}
-		bool cpp_generator::generate_normal_data(std::fstream& header, std::fstream& source,
+		bool cpp_generator::generate_normal_data(std::fstream& header, std::fstream&,
 												 std::shared_ptr<field_base> field_ptr, const std::string& suffix)
 		{
 			generate_header(header, field_ptr, suffix);
@@ -262,10 +262,12 @@ namespace aquarius
 				ofs << "\t" << f.first << "& " << f.second << "();" << std::endl;
 				ofs << std::endl;
 			}
+
+			return true;
 		}
 
 		void cpp_generator::generate_impl_member_variable_define(std::fstream& ofs,
-																 std::shared_ptr<field_base> field_ptr)
+																 std::shared_ptr<field_base>)
 		{
 			ofs << "\tstruct impl;" << std::endl;
 			ofs << "\tstd::unique_ptr<impl> impl_ptr_;" << std::endl;
@@ -329,7 +331,7 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
+		bool cpp_generator::genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol)
 		{
 			generate_normal_data(ofs, ofs, field_ptr, "::impl");
 
@@ -337,7 +339,7 @@ namespace aquarius
 
 			// generate_equal_src(ofs, field_ptr);
 
-			generate_serialize_method_src(ofs, field_ptr);
+			generate_serialize_method_src(ofs, field_ptr, protocol);
 
 			generate_member_func_src(ofs, field_ptr);
 
@@ -398,11 +400,11 @@ namespace aquarius
 		//  return true;
 		//}
 
-		bool cpp_generator::generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
+		bool cpp_generator::generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol)
 		{
 			ofs << std::endl;
 
-			auto f = [&](const std::string& direction, std::shared_ptr<field_base> data_ptr, bool has_type = false)
+			auto tcp_f = [&](const std::string& direction, std::shared_ptr<field_base> data_ptr, bool has_type = false)
 			{
 				if (has_type)
 				{
@@ -415,10 +417,48 @@ namespace aquarius
 				}
 			};
 
+			auto http_f = [&] (const std::string& direction, std::shared_ptr<field_base> data_ptr, bool has_type = false)
+				{
+					if (!has_type)
+					{
+						ofs << "\tif(this->method() == http_method::post)" << std::endl;
+						ofs << "\t{" << std::endl;
+						ofs <<"\t\tjson_base::parse_." << direction<< "_datas<" << data_ptr->name() << ">(*this, buffer); " << std::endl;
+						ofs << "\t}" << std::endl;
+						ofs << "\telse" << std::endl;
+						ofs << "\t{" << std::endl;
+						
+						bool first = true;
+
+						for (auto& m : field_ptr->fields())
+						{
+							if (first)
+							{
+								ofs << "\t\tbuffer.sputc('?');";
+								first = false;
+							}
+							else
+							{
+								ofs << "\t\tbuffer.sputc('&');";
+							}
+
+							ofs << std::endl;
+							ofs << "\t\tkv_base::parse_" << direction << "(impl_ptr_->" << m.second << ", buffer,\"" << m.second << "\");" << std::endl;
+						}
+
+						ofs << "\t}" << std::endl;
+					}
+					else
+					{
+						ofs << "\t*this = json_base::parse_" << direction << "<" << data_ptr->name()
+							<< ">(buffer); " << std::endl;
+					}
+				};
+
 			ofs << "void " << field_ptr->name() << "::serialize(aquarius::flex_buffer& buffer)" << std::endl;
 			ofs << "{" << std::endl;
 
-			f("to", field_ptr);
+			protocol == "tcp" ? tcp_f("to", field_ptr):http_f("to", field_ptr);
 
 			ofs << "}" << std::endl;
 
@@ -426,7 +466,7 @@ namespace aquarius
 			ofs << "void " << field_ptr->name() << "::deserialize(aquarius::flex_buffer& buffer)" << std::endl;
 			ofs << "{" << std::endl;
 
-			f("from", field_ptr, true);
+			protocol == "tcp" ? tcp_f("from", field_ptr, true) : http_f("from", field_ptr, true);
 
 			ofs << "}" << std::endl;
 
@@ -453,6 +493,8 @@ namespace aquarius
 				ofs << "}";
 				ofs << std::endl;
 			}
+
+			return true;
 		}
 
 		void cpp_generator::generate_to_tag(std::fstream& ofs, std::shared_ptr<field_base> parser, bool has_impl)
