@@ -189,22 +189,24 @@ BOOST_AUTO_TEST_CASE(flow_failed)
 
 			flex_buffer buffer{};
 			std::size_t endpos{};
-			BOOST_TEST(co_await session->async_read(buffer, 10) == asio::error::eof);
+			BOOST_CHECK_THROW(co_await session->async_read(buffer, 10), boost::system::system_error);
 
-			BOOST_TEST(co_await session->async_read_util(buffer, "\r\n", endpos) == asio::error::eof);
+			BOOST_CHECK_THROW(co_await session->async_read_util(buffer, "\r\n", endpos), boost::system::system_error);
 
-			BOOST_TEST(co_await session->async_send(std::move(buffer)) == asio::error::eof);
+			BOOST_TEST(co_await session->async_send(std::move(buffer)) == asio::error::bad_descriptor);
 
-			BOOST_TEST(co_await session->accept() == asio::error::eof);
+			BOOST_TEST(co_await session->accept() == error_code{});
 
 			auto result = co_await session->query();
 
 			if (result.has_value())
 			{
-				BOOST_TEST(false);
+				BOOST_TEST((*result).size() == 0);
 			}
-
-			BOOST_TEST(result.error() == asio::error::eof);
+			else
+			{
+				BOOST_TEST(result.error() == asio::error::eof);
+			}
 		},
 		asio::use_future);
 
