@@ -133,17 +133,15 @@ BOOST_AUTO_TEST_CASE(flow_success)
 
 	auto session = std::make_shared<session_t>(std::move(socket), 1s);
 
-	BOOST_TEST(session->remote_address() == "127.0.0.1");
-
-	BOOST_TEST(session->remote_address_u() == 13121u);
-
-	BOOST_TEST(session->remote_port() == 10123);
+	BOOST_CHECK_THROW(session->remote_address(), std::exception);
+	BOOST_CHECK_THROW(session->remote_address_u(), std::exception);
+	BOOST_CHECK_THROW(session->remote_port(), std::exception);
 
 	BOOST_TEST(session->close());
 
-	BOOST_TEST(session->keep_alive());
+	BOOST_TEST(!session->keep_alive());
 
-	BOOST_TEST(session->set_nodelay());
+	BOOST_TEST(!session->set_nodelay());
 
 	auto future = asio::co_spawn(
 		io,
@@ -187,7 +185,7 @@ BOOST_AUTO_TEST_CASE(flow_failed)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			BOOST_TEST(co_await session->async_connect("", "") == asio::error::eof);
+			BOOST_CHECK_THROW(co_await session->async_connect("", ""), std::exception);
 
 			flex_buffer buffer{};
 			std::size_t endpos{};

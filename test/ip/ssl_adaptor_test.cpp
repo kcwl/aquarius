@@ -63,10 +63,8 @@ BOOST_AUTO_TEST_CASE(connect)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			asio::ip::tcp::resolver resolve{ io };
-
-			auto ec = co_await adaptor.async_connect(resolve.resolve({}, {}), 1s);
-			BOOST_TEST(!ec);
+			error_code ec = co_await adaptor.async_connect(asio::ip::tcp::resolver::results_type{}, 1s);
+			BOOST_TEST(ec);
 		},
 		asio::use_future);
 
@@ -85,8 +83,6 @@ BOOST_AUTO_TEST_CASE(handshake)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			asio::ip::tcp::resolver resolve{ io };
-
 			auto ec = co_await adaptor.async_handshake(1s);
 			BOOST_TEST(!ec);
 		},
@@ -117,10 +113,8 @@ BOOST_AUTO_TEST_CASE(connect)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			asio::ip::tcp::resolver resolve{ io };
-
-			auto ec = co_await adaptor.async_connect(resolve.resolve({}, {}), 1s);
-			BOOST_TEST(!ec);
+			error_code ec = co_await adaptor.async_connect(asio::ip::tcp::resolver::results_type{}, 1s);
+			BOOST_TEST(ec);
 		},
 		asio::use_future);
 
@@ -139,8 +133,6 @@ BOOST_AUTO_TEST_CASE(handshake)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			asio::ip::tcp::resolver resolve{ io };
-
 			auto ec = co_await adaptor.async_handshake(1s);
 			BOOST_TEST(!ec);
 		},

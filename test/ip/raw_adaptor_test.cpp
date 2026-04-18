@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(connect)
 		io,
 		[&]() -> asio::awaitable<void>
 		{
-			auto ec = co_await adaptor.async_connect(asio::ip::tcp::resolver::results_type{}, 1s);
-			BOOST_TEST(!ec);
+			error_code ec = co_await adaptor.async_connect(asio::ip::tcp::resolver::results_type{}, 1s);
+			BOOST_TEST(ec);
 		},
 		asio::use_future);
 

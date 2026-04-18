@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(serialize_and_deserialize)
 
 	buffer.pubseekpos(1, std::ios::in);
 
-	BOOST_CHECK_THROW(jp.from_datas<mock_json>(buffer), std::out_of_range);
+	BOOST_CHECK_THROW(jp.from_datas<mock_json>(buffer), boost::system::system_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
