@@ -13,7 +13,7 @@ namespace aquarius
 		constexpr static auto make_member_names()
 		{
 			constexpr static auto sp = ","sv;
-			auto f = [] { return concat_v<(member_pointer_name<T, Args>::value, sp)...>; };
+			auto f = [] { return concat_v<concat_v<member_pointer_name<T, Args>::value, sp>...>; };
 
 			constexpr static auto result = f();
 
@@ -45,7 +45,17 @@ namespace aquarius
 	public:
 		select_view()
 			: has_condition_(false)
-		{}
+		{
+			
+		}
+
+		select_view& operator()()
+		{
+			content_stream_.str("");
+			has_condition_ = false;
+
+			return *this;
+		}
 
 		operator std::string() const
 		{
@@ -66,8 +76,12 @@ namespace aquarius
 
 				has_condition_ = true;
 			}
+			else
+			{
+				content_stream_ << " and";
+			}
 
-			content_stream_ << " and " << static_cast<std::string>(g);
+			content_stream_ << " " << static_cast<std::string>(g);
 		}
 
 	private:
