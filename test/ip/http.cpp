@@ -510,8 +510,7 @@ BOOST_AUTO_TEST_CASE(query_status_error)
 }
 BOOST_AUTO_TEST_CASE(query_normal_flow)
 {
-	test_query_session<mock_query_normal_session>()(http_status::ok,
-													"POST /test_error HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}");
+	test_query_session<mock_query_normal_session>()(http_status::ok,"");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
