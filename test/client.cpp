@@ -30,9 +30,9 @@ struct mock_normal_session
 		co_return buffer;
 	}
 
-	int remote_port() { return 0; }
+	int remote_port() { return 7890; }
 
-	std::string remote_address() { return ""; }
+	std::string remote_address() { return "127.0.0.1"; }
 
 	void close() {}
 };
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 	client cli{ io, 2s };
 
 	BOOST_REQUIRE(cli.get_executor() == io.get_executor());
-	BOOST_TEST(cli.get_timeout() == 2ms);
+	BOOST_TEST(cli.get_timeout() == 2s);
 }
 
 BOOST_AUTO_TEST_CASE(connect_success)
@@ -193,6 +193,7 @@ BOOST_AUTO_TEST_CASE(callback)
 	BOOST_TEST(value == 0);
 
 	cli.set_accept_func([&](auto) { value++; });
+	cli.accept_invoke();
 
 	BOOST_TEST(value == 1);
 
@@ -201,6 +202,7 @@ BOOST_AUTO_TEST_CASE(callback)
 	BOOST_TEST(value == 1);
 
 	cli.set_close_func([&](auto) { value--; });
+	cli.close_invoke();
 
 	BOOST_TEST(value == 0);
 }
