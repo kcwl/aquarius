@@ -1,15 +1,20 @@
 #pragma once
+#include <aquarius/detail/struct_name.hpp>
 #include <sstream>
 
 namespace aquarius
 {
+	template<auto Ptr>
+	class grep_view;
 
+	template <typename T>
 	class remove_view
 	{
 	public:
-		template <typename T>
-		remove_view& operator()(T&& value)
+		remove_view& operator()()
 		{
+			reset();
+
 			constexpr auto struct_name = aquarius::detail::struct_name<std::decay_t<T>>();
 
 			complete_sql_.str("");
@@ -25,8 +30,8 @@ namespace aquarius
 		}
 
 	private:
-		template <auto Ptr>
-		friend remove_view& operator|(remove_view& up, const grep_view<Ptr>& g);
+		template <auto Ptr, typename U>
+		friend remove_view<U>& operator|(remove_view<U>& rv, const grep_view<Ptr>& g);
 
 		template <auto Ptr>
 		void merge(const grep_view<Ptr>& g)
@@ -45,19 +50,26 @@ namespace aquarius
 			complete_sql_ << static_cast<std::string>(g);
 		}
 
+		void reset()
+		{
+			complete_sql_.str("");
+
+			has_condition_ = false;
+		}
+
 	private:
 		std::stringstream complete_sql_;
 
 		bool has_condition_;
 	};
 
-	template <auto Ptr>
-	inline remove_view& operator|(remove_view& up, const grep_view<Ptr>& g)
+	template <auto Ptr, typename U>
+	inline remove_view<U>& operator|(remove_view<U>& rv, const grep_view<Ptr>& g)
 	{
-		up.merge(g);
+		rv.merge(g);
+		return rv;
+	}
 
-		return up;
-	};
-
-	static remove_view remove;
+	template <typename T>
+	inline static remove_view<T> remove_v;
 } // namespace aquarius

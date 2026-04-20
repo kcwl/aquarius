@@ -21,22 +21,16 @@
   <ItemGroup>
     <ClCompile Include="..\src\lazytool\command_interface.cpp" />
     <ClCompile Include="..\src\lazytool\cpp_generator.cpp" />
-    <ClCompile Include="..\src\lazytool\data_field.cpp" />
     <ClCompile Include="..\src\lazytool\field.cpp" />
     <ClCompile Include="..\src\lazytool\lazytool.cpp" />
-    <ClCompile Include="..\src\lazytool\message_field.cpp" />
-    <ClCompile Include="..\src\lazytool\protocol_schema.cpp" />
-    <ClCompile Include="..\src\lazytool\schema_parser.cpp" />
+    <ClCompile Include="..\src\lazytool\schema.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lazytool\code_generator.h" />
     <ClInclude Include="..\src\lazytool\command_interface.h" />
     <ClInclude Include="..\src\lazytool\cpp_generator.h" />
-    <ClInclude Include="..\src\lazytool\data_field.h" />
     <ClInclude Include="..\src\lazytool\field.h" />
-    <ClInclude Include="..\src\lazytool\message_field.h" />
-    <ClInclude Include="..\src\lazytool\protocol_schema.h" />
-    <ClInclude Include="..\src\lazytool\schema_parser.h" />
+    <ClInclude Include="..\src\lazytool\schema.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

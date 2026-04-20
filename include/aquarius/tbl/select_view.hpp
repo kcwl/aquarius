@@ -1,6 +1,8 @@
 #pragma once
 #include <aquarius/detail/concat.hpp>
-#include <aquarius/tbl/member_pointer.hpp>
+#include <aquarius/detail/member_pointer.hpp>
+#include <aquarius/detail/struct_name.hpp>
+#include <string>
 
 namespace aquarius
 {
@@ -11,10 +13,9 @@ namespace aquarius
 		constexpr static auto make_member_names()
 		{
 			constexpr static auto sp = ","sv;
-			auto f = [] { return concat_v<(member_pointer_name<T, Args>::value, sp)...>; };
+			auto f = [] { return concat_v<concat_v<member_pointer_name<T, Args>::value, sp>...>; };
 
-			//constexpr static auto result = f();
-			auto result = f();
+			constexpr static auto result = f();
 
 			return result.substr(0, result.size() - 1);
 		}
@@ -44,7 +45,17 @@ namespace aquarius
 	public:
 		select_view()
 			: has_condition_(false)
-		{}
+		{
+			
+		}
+
+		select_view& operator()()
+		{
+			content_stream_.str("");
+			has_condition_ = false;
+
+			return *this;
+		}
 
 		operator std::string() const
 		{
@@ -65,10 +76,12 @@ namespace aquarius
 
 				has_condition_ = true;
 			}
+			else
+			{
+				content_stream_ << " and";
+			}
 
-			std::cout << "debug:" << static_cast<std::string>(g) << std::endl;
-
-			content_stream_ << " and " << static_cast<std::string>(g);
+			content_stream_ << " " << static_cast<std::string>(g);
 		}
 
 	private:
@@ -77,6 +90,14 @@ namespace aquarius
 		std::stringstream content_stream_;
 	};
 
+	template <typename T1, auto Ptr, auto... Args1>
+	inline select_view<T1, Args1...>& operator|(select_view<T1, Args1...>& sel, const grep_view<Ptr>& g)
+	{
+		sel.merge(g);
+
+		return sel;
+	}
+
 	template <typename T, auto... Args>
-	inline static select_view<T, Args...> select;
+	inline static select_view<T, Args...> select_v;
 } // namespace aquarius

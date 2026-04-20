@@ -1,5 +1,6 @@
 #pragma once
-#include <aquarius/tbl/concepts.hpp>
+#include <aquarius/concepts.hpp>
+#include <boost/mysql.hpp>
 #include <chrono>
 #include <ostream>
 #include <sstream>

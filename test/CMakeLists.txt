@@ -2,7 +2,16 @@ project(unittest)
 
 file(GLOB TEST_SRCS "*.h")
 
-file(GLOB TEST_MAIN "*.cpp")
+file(GLOB TEST_MAIN
+	"*.cpp"
+	"./detail/*.cpp"
+	"./ip/*.cpp"
+	"./module/*.cpp"
+	"./resouce/*.cpp"
+	"./serialize/*.cpp"
+	"./tbl/*.cpp"
+	"./virgo/*.cpp"
+)
 
 include_directories(${AQUARIUS_INCLUDE})
 
@@ -35,6 +44,12 @@ target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
 target_link_libraries(unittest PUBLIC mysql)
 endif()
 
+if(ENABLE_SSL_TEST)
+message(STATUS "enable ssl test")
+target_compile_definitions(unittest PUBLIC -DENABLE_SSL_TEST)
+endif()
+
+
 
 
 add_test(
@@ -51,7 +66,8 @@ endif()
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius
 	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -r coverage.info "*/boost/*" -o coverage-no-boost.info
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
 	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch coverage-aquarius.info -o test-aquarius
 )
 

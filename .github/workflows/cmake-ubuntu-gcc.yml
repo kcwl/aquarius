@@ -99,7 +99,7 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=true
-        -DENABLE_MYSQL=true
+        -DENABLE_MYSQL_TEST=true
         -S ${{ github.workspace }}
 
     - name: Build

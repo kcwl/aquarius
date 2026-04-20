@@ -1,8 +1,7 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/resource/global_resource.hpp>
-#include <boost/mysql.hpp>
+#include <aquarius/tbl/mysql_type.hpp>
 #include <boost/pfr.hpp>
 #include <chrono>
 
@@ -13,8 +12,9 @@ namespace aquarius
 	class mysql_io_service
 	{
 	public:
-		explicit mysql_io_service(const asio::any_io_executor& executor)
+		explicit mysql_io_service(const asio::any_io_executor& executor, boost::mysql::pool_params param)
 			: executor_(executor)
+			, param_(std::move(param))
 		{}
 
 		~mysql_io_service() = default;
@@ -32,15 +32,7 @@ namespace aquarius
 
 		void async_run()
 		{
-			auto& mysql = global_resource::get_mutable_instance().mysql();
-			boost::mysql::pool_params params{};
-			params.server_address.emplace_host_and_port(mysql.host, static_cast<uint16_t>(mysql.port));
-			params.username = mysql.user;
-			params.password = mysql.password;
-			params.database = mysql.db;
-			params.ssl = boost::mysql::ssl_mode::disable;
-
-			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(executor_, std::move(params));
+			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(executor_, std::move(param_));
 
 			pool_ptr_->async_run(asio::detached);
 		}
@@ -67,12 +59,12 @@ namespace aquarius
 			co_return;
 		}
 
-		void wait(std::chrono::milliseconds ms)
+		void wait(std::chrono::milliseconds)
 		{
 			return;
 		}
 
-		auto async_wait(std::chrono::milliseconds ms) -> asio::awaitable<void>
+		auto async_wait(std::chrono::milliseconds) -> asio::awaitable<void>
 		{
 			co_return;
 		}
@@ -209,6 +201,8 @@ namespace aquarius
 
 	private:
 		asio::any_io_executor executor_;
+
+		boost::mysql::pool_params param_;
 
 		std::shared_ptr<boost::mysql::connection_pool> pool_ptr_;
 

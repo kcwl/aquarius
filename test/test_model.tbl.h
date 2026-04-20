@@ -1,4 +1,4 @@
-#include <aquarius/tbl.hpp>
+#include <aquarius.hpp>
 
 using namespace aquarius::tbl;
 

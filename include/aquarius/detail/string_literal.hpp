@@ -1,6 +1,6 @@
 #pragma once
 #include <string_view>
-#include <algorithm>
+#include <cstddef>
 
 namespace aquarius
 {
@@ -11,20 +11,19 @@ namespace aquarius
 		{
 			constexpr string_literal(const char (&arr)[N])
 			{
-				std::copy_n(arr, N, value);
-
-				size = N;
+				for (std::size_t i = 0; i < N; ++i)
+					value[i] = arr[i];
 			}
 
 			char value[N];
 
-			int size;
+			static constexpr std::size_t size = N;
 		};
 
 		template <string_literal param>
 		struct bind_param
 		{
-			static constexpr std::string_view value = param.value;
+			static constexpr std::string_view value{param.value, param.size - 1};
 		};
 	} // namespace detail
 } // namespace aquarius

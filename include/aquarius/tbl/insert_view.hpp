@@ -1,4 +1,8 @@
 #pragma once
+#include <aquarius/concepts.hpp>
+#include <aquarius/detail/struct_name.hpp>
+#include <aquarius/tbl/add_string.hpp>
+#include <boost/pfr.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -27,7 +31,7 @@ namespace aquarius
 			complete_sql_ << ") values(";
 
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
-			{ ((complete_sql_ << boost::pfr::get<I, type>(value) << (size != I + 1 ? "," : "")), ...); };
+			{ ((complete_sql_ << add_string(boost::pfr::get<I, type>(value)) << (size != I + 1 ? "," : "")), ...); };
 
 			f(std::make_index_sequence<size>{});
 
@@ -45,5 +49,5 @@ namespace aquarius
 		std::stringstream complete_sql_;
 	};
 
-	static insert_view insert;
+	inline static insert_view insert_v;
 } // namespace aquarius

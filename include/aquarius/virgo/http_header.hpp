@@ -1,6 +1,9 @@
 #pragma once
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/error_code.hpp>
 #include <ranges>
 #include <span>
+#include <string>
 #include <string_view>
 
 using namespace std::string_view_literals;
@@ -81,7 +84,7 @@ namespace aquarius
 
 			std::size_t length = 0;
 
-			for (const auto header : headers)
+			for (const auto& header : headers)
 			{
 				auto str = std::string_view(header);
 

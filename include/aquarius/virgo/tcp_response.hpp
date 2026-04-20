@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
 
@@ -34,8 +33,4 @@ namespace aquarius
 			parse.to_datas(this->result(), buffer);
 		}
 	};
-
-	template <typename Body>
-	struct is_message_type<tcp_response<Body>> : std::true_type
-	{};
 } // namespace aquarius

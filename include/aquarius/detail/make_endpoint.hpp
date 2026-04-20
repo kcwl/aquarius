@@ -1,20 +1,18 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 
 namespace aquarius
 {
 	namespace detail
 	{
-		using endpoint = boost::asio::ip::tcp::endpoint;
-
-		inline endpoint make_v4_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v4(), port);
-		}
-
-		inline endpoint make_v6_endpoint(uint16_t port)
-		{
-			return endpoint(boost::asio::ip::tcp::v6(), port);
-		}
+        inline typename asio::ip::tcp::endpoint make_endpoint(uint16_t port)
+        {
+            using endpoint = asio::ip::tcp::endpoint;
+#ifdef USE_IPV6
+            return endpoint(asio::ip::tcp::v6(), port);
+#else
+            return endpoint(asio::ip::tcp::v4(), port);
+#endif
+        }
 	} // namespace detail
 } // namespace aquarius

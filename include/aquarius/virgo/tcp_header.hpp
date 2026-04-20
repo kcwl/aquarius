@@ -1,4 +1,7 @@
 #pragma once
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/error_code.hpp>
+#include <aquarius/serialize/binary.hpp>
 #include <cstdint>
 
 namespace aquarius

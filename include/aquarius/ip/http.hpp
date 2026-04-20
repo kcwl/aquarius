@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
@@ -11,6 +11,7 @@
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
+#include <format>
 #include <ranges>
 #include <string_view>
 
@@ -66,7 +67,8 @@ namespace aquarius
 
 				if (ec)
 				{
-					co_return ec;
+					co_await make_error_response(session_ptr, ec);
+					continue;
 				}
 
 				if (method == http_method::options)
@@ -90,7 +92,7 @@ namespace aquarius
 						session_ptr->get_executor(),
 						[&, r = std::move(router)] -> asio::awaitable<void>
 						{
-							auto resp_buf = co_await mpc_publish(std::move(r), buffer);
+							auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(method));
 
 							if (!resp_buf.has_value())
 							{
@@ -221,6 +223,7 @@ namespace aquarius
 				auto url_result = boost::urls::parse_origin_form(std::string_view(*iter++));
 				if (url_result.has_error())
 				{
+					ec = url_result.error();
 					return result_t{};
 				}
 
@@ -228,6 +231,7 @@ namespace aquarius
 
 				if (!version.has_value())
 				{
+					ec = version.error();
 					return result_t{};
 				}
 
@@ -239,7 +243,13 @@ namespace aquarius
 			{
 				auto version = string_to_version(std::string_view(*iter++));
 
-				auto status = static_cast<http_status>(std::atoi(std::string_view(*iter++).data()));
+				if (!version.has_value())
+				{
+					ec = version.error();
+					return result_t{};
+				}
+
+				auto status = string_to_status(std::string_view(*iter++));
 
 				ec = error_code{};
 
@@ -268,12 +278,22 @@ namespace aquarius
 
 			return result;
 		}
+
+		template <typename Session>
+		static auto make_error_response(std::shared_ptr<Session> session_ptr, error_code ec) -> asio::awaitable<void>
+		{
+			auto resp_header = std::format("{} {} {}", version_to_string(global_http_version), ec.value(),
+										   status_to_string(ec.value()));
+			flex_buffer error_buffer{};
+			error_buffer.sputn(resp_header.c_str(), resp_header.size());
+			co_await session_ptr->async_send(std::move(error_buffer));
+		}
 	};
 
 	using http_session = basic_session<http, raw_adaptor>;
 	using http_client = basic_client<http_session>;
 	using http_server = basic_server<http_session>;
 
-	using https_client_session = basic_session<http, ssl_adaptor<false>>;
-	using https_server_session = basic_session<http, ssl_adaptor<true>>;
+	using https_client_session = basic_session<http, ssl_client_adaptor>;
+	using https_server_session = basic_session<http, ssl_server_adaptor>;
 } // namespace aquarius

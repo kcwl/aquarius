@@ -1,6 +1,7 @@
 #pragma once
-#include <aquarius/tbl/concepts.hpp>
-#include <aquarius/tbl/member_pointer.hpp>
+#include <aquarius/concepts.hpp>
+#include <aquarius/detail/member_pointer.hpp>
+#include <aquarius/tbl/add_string.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -39,8 +40,7 @@ namespace aquarius
 			return *this;
 		}
 
-		template <auto Ptr1>
-		grep_view& operator>(const grep_view<Ptr1>& g)
+		grep_view& operator>(const value_type& g)
 		{
 			greater(g);
 			return *this;
@@ -63,7 +63,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " < " << g;
+			content_stream_ << struct_member_name << " < " << add_string(g);
 
 			return *this;
 		}
@@ -72,7 +72,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " <= " << g;
+			content_stream_ << struct_member_name << " <= " << add_string(g);
 
 			return *this;
 		}
@@ -81,7 +81,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " > " << g;
+			content_stream_ << struct_member_name << " > " << add_string(g);
 			return *this;
 		}
 
@@ -89,7 +89,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " >= " << g;
+			content_stream_ << struct_member_name << " >= " << add_string(g);
 
 			return *this;
 		}
@@ -98,7 +98,7 @@ namespace aquarius
 		{
 			content_stream_.str("");
 
-			content_stream_ << struct_member_name << " = " << g;
+			content_stream_ << struct_member_name << " = " << add_string(g);
 
 			return *this;
 		}
@@ -117,7 +117,7 @@ namespace aquarius
 
 	private:
 		template <auto Ptr1, auto Ptr2>
-		friend grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2);
+		inline friend grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2);
 
 		template <auto Ptr1>
 		void _or(const grep_view<Ptr1>& g)
@@ -154,6 +154,14 @@ namespace aquarius
 
 		bool has_aggr_;
 	};
+
+	template <auto Ptr1, auto Ptr2>
+	inline grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2)
+	{
+		g1._or(g2);
+
+		return g1;
+	}
 
 	template <auto Ptr>
 	inline grep_view<Ptr> grep;

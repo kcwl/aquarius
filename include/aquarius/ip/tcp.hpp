@@ -1,8 +1,8 @@
 #pragma once
-#include <aquarius/asio.hpp>
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
@@ -58,7 +58,7 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[&, r = std::move(router)] -> asio::awaitable<void>
 					{
-						auto result = co_await mpc_publish(std::move(r), buffer);
+						auto result = co_await mpc_publish(std::move(r), buffer, 0);
 
 						if (!result.has_value())
 						{
@@ -90,25 +90,20 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			for (;;)
-			{
-				flex_buffer buffer{};
+			flex_buffer buffer{};
 
-				ec = co_await recv(session_ptr, buffer);
-				if (ec)
+			ec = co_await recv(session_ptr, buffer);
+			if (ec)
+			{
+				if (ec != boost::asio::error::eof)
 				{
-					break;
+					XLOG_ERROR() << "[query buffer] error: " << ec.what();
 				}
 
-				co_return std::move(buffer);
+				co_return std::unexpected(ec);
 			}
 
-			if (ec != boost::asio::error::eof)
-			{
-				XLOG_ERROR() << "[query buffer] error: " << ec.what();
-			}
-
-			co_return std::unexpected(ec);
+			co_return std::move(buffer);
 		}
 
 	private:
@@ -145,6 +140,6 @@ namespace aquarius
 	using tcp_server = basic_server<tcp_session>;
 	using tcp_client = basic_client<tcp_session>;
 
-	using ssl_tcp_server = basic_server<basic_session<tcp, ssl_adaptor<true>>>;
-	using ssl_tcp_client = basic_client<basic_session<tcp, ssl_adaptor<false>>>;
+	using ssl_tcp_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
+	using ssl_tcp_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
 } // namespace aquarius

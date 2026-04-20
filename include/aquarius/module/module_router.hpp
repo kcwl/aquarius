@@ -1,8 +1,7 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
-#include <aquarius/detail/string_literal.hpp>
-#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/io_service_pool.hpp>
+#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/singleton.hpp>
 #include <map>
@@ -22,7 +21,7 @@ namespace aquarius
 
 	public:
 		template <typename Module>
-		void regist()
+		bool regist()
 		{
 			auto module_ptr = std::make_shared<Module>();
 
@@ -30,10 +29,12 @@ namespace aquarius
 
 			if (iter != routers_.end())
 			{
-				return;
+				return false;
 			}
 
 			routers_.insert({ module_ptr->name(), module_ptr });
+
+			return true;
 		}
 
 		void run(io_service_pool& pool)
@@ -113,7 +114,9 @@ namespace aquarius
 				return;
 			}
 
-			co_spawn(io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); }, asio::detached);
+			co_spawn(
+				io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); },
+				asio::detached);
 		}
 
 	private:

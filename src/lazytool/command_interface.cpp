@@ -1,5 +1,5 @@
 #include "command_interface.h"
-#include "protocol_schema.h"
+#include "schema.h"
 #include <iostream>
 
 namespace aquarius
@@ -14,7 +14,7 @@ namespace aquarius
 			, input_dir_()
 			, protocol_()
 		{
-			schemas_.insert({ __virgo__, std::make_shared<protocol_schema>() });
+			schemas_.insert({ __virgo__, std::make_shared<schema>() });
 		}
 
 		void command_interface::regist(const std::string& command, code_generator* generator)
@@ -71,7 +71,9 @@ namespace aquarius
 				}
 
 				header << "#pragma once\n";
-				header << "#include <aquarius.hpp>\n";
+				header << "#include <aquarius/serialize/"<<protocol_<<"_serialize.hpp>\n";
+				header << "#include <aquarius/virgo/"<<protocol_<<"_request.hpp>\n";
+				header << "#include <aquarius/virgo/"<<protocol_<<"_response.hpp>\n";
 				header << "using namespace aquarius;\n";
 
 				source << "#include \"" << target_path.filename().string() << ".h\"\n";

@@ -39,13 +39,15 @@ namespace aquarius
 
 			this->body().serialize(buffer);
 
-			auto size = buffer.size() - sizeof(uint32_t);
+			auto pos = buffer.tellp();
 
-			buffer.pubseekpos(0, std::ios::in);
+			auto size = pos - sizeof(uint32_t);
+
+			buffer.pubseekpos(0, std::ios::out);
 
 			buffer.sputn((char*)&size, sizeof(uint32_t));
 
-			buffer.pubseekoff(size, std::ios::cur, std::ios::in);
+			buffer.pubseekpos(pos, std::ios::out);
 
 			return error_code{};
 		}
@@ -143,13 +145,15 @@ namespace aquarius
 
 			this->body().serialize(buffer);
 
-			auto size = buffer.size() - sizeof(uint32_t);
+			auto pos = buffer.tellp();
 
-			buffer.pubseekpos(0, std::ios::in);
+			auto size = pos - sizeof(uint32_t);
+
+			buffer.pubseekpos(0, std::ios::out);
 
 			buffer.sputn((char*)&size, sizeof(uint32_t));
 
-			buffer.pubseekoff(size, std::ios::cur, std::ios::in);
+			buffer.pubseekpos(pos, std::ios::out);
 
 			return error_code{};
 		}
@@ -169,7 +173,10 @@ namespace aquarius
 		}
 
 	protected:
-		virtual void commit_command_header(flex_buffer&) = 0;
+		virtual void commit_command_header(flex_buffer&)
+		{
+			return;
+		}
 
 	private:
 		result_t result_;

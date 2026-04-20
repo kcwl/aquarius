@@ -1,19 +1,16 @@
 #pragma once
 #include <aquarius/detail/uuid_generator.hpp>
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_header.hpp>
-#include <aquarius/virgo/http_method.hpp>
 #include <format>
 
 namespace aquarius
 {
-	template <detail::string_literal Router, http_method Method, typename Body,
-			  http_version Version = http_version::http1_1>
-	class http_request : public basic_http_protocol<true, Method, Body>
+	template <detail::string_literal Router, typename Body, http_version Version = http_version::http1_1>
+	class http_request : public basic_http_protocol<true, Body>
 	{
 	public:
-		using base = basic_http_protocol<true, Method, Body>;
+		using base = basic_http_protocol<true, Body>;
 
 		using base::has_request;
 
@@ -35,8 +32,10 @@ namespace aquarius
 		{
 			std::string get_url(this_router);
 
-			if constexpr (Method == http_method::get)
+			if (this->method() == static_cast<int>(http_method::get))
 			{
+				this->body().set_method(static_cast<http_method>(this->method()));
+
 				flex_buffer buf{};
 
 				this->body().serialize(buf);
@@ -44,13 +43,9 @@ namespace aquarius
 				get_url += std::string((char*)buf.data().data(), buf.size());
 			}
 
-			auto line = std::format("{} {} {}\r\n", method_to_string(Method), get_url, version_to_string(Version));
+			auto line = std::format("{} {} {}\r\n", method_to_string(static_cast<http_method>(this->method())), get_url, version_to_string(Version));
 
 			buffer.sputn(line.c_str(), line.size());
 		}
 	};
-
-	template <detail::string_literal Router, http_method Method, typename Body, http_version Version>
-	struct is_message_type<http_request<Router, Method, Body, Version>> : std::true_type
-	{};
 } // namespace aquarius

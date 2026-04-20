@@ -1,7 +1,6 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
 #include <aquarius/module/module_register.hpp>
-#include <aquarius/module/schedule.hpp>
 #include <memory>
 #include <map>
 #include <mutex>

@@ -1,7 +1,6 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/module/handler_channel.hpp>
-#include <aquarius/virgo/http_request.hpp>
-#include <aquarius/virgo/tcp_request.hpp>
 #include <expected>
 
 namespace aquarius
@@ -20,8 +19,17 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto visit(flex_buffer& buffer, error_code& ec) -> asio::awaitable<flex_buffer>
+		virtual auto visit(flex_buffer& buffer, int method, error_code& ec) -> asio::awaitable<flex_buffer>
 		{
+			request()->method(method);
+
+			using type = decltype(request()->body());
+
+			if constexpr (has_set_method<type>)
+			{
+				request()->body().set_method(method);
+			}
+
 			request()->consume(buffer);
 
 			make_response(co_await this->handle());
@@ -70,13 +78,13 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [](flex_buffer& buffer) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			auto f = [](flex_buffer& buffer, int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 			{
 				auto handler_ptr = std::make_shared<Handler>();
 
 				error_code ec{};
 
-				auto resp_buffer = co_await handler_ptr->visit(buffer, ec);
+				auto resp_buffer = co_await handler_ptr->visit(buffer, method, ec);
 
 				if (ec)
 				{
@@ -103,7 +111,7 @@ namespace aquarius
 		__handler()                                                                                                    \
 			: base_type(AQUARIUS_GLOBAL_STR_ID(__handler_##__handler))                                                 \
 		{}                                                                                                             \
-		virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override;                                   \
+		virtual auto handle() -> aquarius::asio::awaitable<aquarius::error_code> override;                             \
 	};                                                                                                                 \
 	inline auto __handler::handle() -> aquarius::asio::awaitable<aquarius::error_code>
 

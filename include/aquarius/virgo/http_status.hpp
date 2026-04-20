@@ -2,6 +2,7 @@
 #include <aquarius/error_code.hpp>
 #include <boost/system/error_category.hpp>
 #include <cstdint>
+#include <expected>
 #include <map>
 #include <string>
 #include <string_view>
@@ -81,74 +82,74 @@ namespace aquarius
 		network_authentication_required = 511
 	};
 
+	static std::map<http_status, std::string_view> statuses = {
+		{ http_status::unknown, "Unknown" },
+		{ http_status::continue_, "Continue" },
+		{ http_status::switching_protocols, "Switching Protocols" },
+		{ http_status::processing, "Processing" },
+		{ http_status::early_hints, "Early Hints" },
+		{ http_status::ok, "OK" },
+		{ http_status::created, "Created" },
+		{ http_status::accepted, "Accepted" },
+		{ http_status::non_authoritative_information, "Non Authoritative Information" },
+		{ http_status::no_content, "No Content" },
+		{ http_status::reset_content, "Reset Content" },
+		{ http_status::partial_content, "Partial Content" },
+		{ http_status::multi_status, "Multi Status" },
+		{ http_status::already_reported, "Already Reported" },
+		{ http_status::im_used, "IM Used" },
+		{ http_status::multiple_choices, "Multiple Choices" },
+		{ http_status::moved_permanently, "Moved Permanently" },
+		{ http_status::found, "Found" },
+		{ http_status::see_other, "See Other" },
+		{ http_status::not_modified, "Not Modified" },
+		{ http_status::use_proxy, "Use Proxy" },
+		{ http_status::temporary_redirect, "Temporary Redirect" },
+		{ http_status::permanent_redirect, "Permanent Redirect" },
+		{ http_status::bad_request, "Bad Request" },
+		{ http_status::unauthorized, "Unauthorized" },
+		{ http_status::payment_required, "Payment Required" },
+		{ http_status::forbidden, "Forbidden" },
+		{ http_status::not_found, "Not Found" },
+		{ http_status::method_not_allowed, "Method Not Allowed" },
+		{ http_status::not_acceptable, "Not Acceptable" },
+		{ http_status::proxy_authentication_required, "Proxy Authentication Required" },
+		{ http_status::request_timeout, "Request Timeout" },
+		{ http_status::conflict, "Conflict" },
+		{ http_status::gone, "Gone" },
+		{ http_status::length_required, "Length Required" },
+		{ http_status::precondition_failed, "Precondition Failed" },
+		{ http_status::payload_too_large, "Payload Too Large" },
+		{ http_status::uri_too_long, "Uri Too Long" },
+		{ http_status::unsupported_media_type, "Unsupported Media Type" },
+		{ http_status::range_not_satisfiable, "Range Not Satisfiable" },
+		{ http_status::expectation_failed, "Expectation Failed" },
+		{ http_status::i_am_a_teapot, "I'm a teapot" },
+		{ http_status::misdirected_request, "Misdirected Request" },
+		{ http_status::unprocessable_entity, "Unprocessable Entity" },
+		{ http_status::locked, "Locked" },
+		{ http_status::failed_dependency, "Failed Dependency" },
+		{ http_status::too_early, "Too Early" },
+		{ http_status::upgrade_required, "Upgrade Required" },
+		{ http_status::precondition_required, "Precondition Required" },
+		{ http_status::too_many_requests, "Too Many Requests" },
+		{ http_status::request_header_fields_too_large, "Request Header Fields Too Large" },
+		{ http_status::unavailable_for_legal_reasons, "Unavailable For Legal Reasons" },
+		{ http_status::internal_server_error, "Internal Server Error" },
+		{ http_status::not_implemented, "Not Implemented" },
+		{ http_status::bad_gateway, "Bad Gateway" },
+		{ http_status::service_unavailable, "Service Unavailable" },
+		{ http_status::gateway_timeout, "Gateway Timeout" },
+		{ http_status::http_version_not_supported, "Http Version Not Supported" },
+		{ http_status::variant_also_negotiates, "Variant Also Negotiates" },
+		{ http_status::insufficient_storage, "Insufficient Storage" },
+		{ http_status::loop_detected, "Loop Detected" },
+		{ http_status::not_extended, "Not Extended" },
+		{ http_status::network_authentication_required, "Network Authentication Required" }
+	};
+
 	inline std::string_view status_to_string(http_status s)
 	{
-		static std::map<http_status, std::string_view> statuses = {
-			{ http_status::unknown, "Unknown" },
-			{ http_status::continue_, "Continue" },
-			{ http_status::switching_protocols, "Switching Protocols" },
-			{ http_status::processing, "Processing" },
-			{ http_status::early_hints, "Early Hints" },
-			{ http_status::ok, "OK" },
-			{ http_status::created, "Created" },
-			{ http_status::accepted, "Accepted" },
-			{ http_status::non_authoritative_information, "Non Authoritative Information" },
-			{ http_status::no_content, "No Content" },
-			{ http_status::reset_content, "Reset Content" },
-			{ http_status::partial_content, "Partial Content" },
-			{ http_status::multi_status, "Multi Status" },
-			{ http_status::already_reported, "Already Reported" },
-			{ http_status::im_used, "IM Used" },
-			{ http_status::multiple_choices, "Multiple Choices" },
-			{ http_status::moved_permanently, "Moved Permanently" },
-			{ http_status::found, "Found" },
-			{ http_status::see_other, "See Other" },
-			{ http_status::not_modified, "Not Modified" },
-			{ http_status::use_proxy, "Use Proxy" },
-			{ http_status::temporary_redirect, "Temporary Redirect" },
-			{ http_status::permanent_redirect, "Permanent Redirect" },
-			{ http_status::bad_request, "Bad Request" },
-			{ http_status::unauthorized, "Unauthorized" },
-			{ http_status::payment_required, "Payment Required" },
-			{ http_status::forbidden, "Forbidden" },
-			{ http_status::not_found, "Not Found" },
-			{ http_status::method_not_allowed, "Method Not Allowed" },
-			{ http_status::not_acceptable, "Not Acceptable" },
-			{ http_status::proxy_authentication_required, "Proxy Authentication Required" },
-			{ http_status::request_timeout, "Request Timeout" },
-			{ http_status::conflict, "Conflict" },
-			{ http_status::gone, "Gone" },
-			{ http_status::length_required, "Length Required" },
-			{ http_status::precondition_failed, "Precondition Failed" },
-			{ http_status::payload_too_large, "Payload Too Large" },
-			{ http_status::uri_too_long, "Uri Too Long" },
-			{ http_status::unsupported_media_type, "Unsupported Media Type" },
-			{ http_status::range_not_satisfiable, "Range Not Satisfiable" },
-			{ http_status::expectation_failed, "Expectation Failed" },
-			{ http_status::i_am_a_teapot, "I'm a teapot" },
-			{ http_status::misdirected_request, "Misdirected Request" },
-			{ http_status::unprocessable_entity, "Unprocessable Entity" },
-			{ http_status::locked, "Locked" },
-			{ http_status::failed_dependency, "Failed Dependency" },
-			{ http_status::too_early, "Too Early" },
-			{ http_status::upgrade_required, "Upgrade Required" },
-			{ http_status::precondition_required, "Precondition Required" },
-			{ http_status::too_many_requests, "Too Many Requests" },
-			{ http_status::request_header_fields_too_large, "Request Header Fields Too Large" },
-			{ http_status::unavailable_for_legal_reasons, "Unavailable For Legal Reasons" },
-			{ http_status::internal_server_error, "Internal Server Error" },
-			{ http_status::not_implemented, "Not Implemented" },
-			{ http_status::bad_gateway, "Bad Gateway" },
-			{ http_status::service_unavailable, "Service Unavailable" },
-			{ http_status::gateway_timeout, "Gateway Timeout" },
-			{ http_status::http_version_not_supported, "Http Version Not Supported" },
-			{ http_status::variant_also_negotiates, "Variant Also Negotiates" },
-			{ http_status::insufficient_storage, "Insufficient Storage" },
-			{ http_status::loop_detected, "Loop Detected" },
-			{ http_status::not_extended, "Not Extended" },
-			{ http_status::network_authentication_required, "Network Authentication Required" }
-		};
-
 		auto iter = statuses.find(s);
 		if (iter == statuses.end())
 			return "Unknown";
@@ -159,6 +160,19 @@ namespace aquarius
 	inline std::string_view status_to_string(int s)
 	{
 		return status_to_string(static_cast<http_status>(s));
+	}
+
+	inline http_status string_to_status(std::string_view str)
+	{
+		auto iter =
+			std::find_if(statuses.begin(), statuses.end(), [&](auto s) { return std::to_string((int)s.first) == std::string(str); });
+
+		if (iter == statuses.end())
+		{
+			return http_status::internal_server_error;
+		}
+
+		return iter->first;
 	}
 
 	class http_status_category : public boost::system::error_category

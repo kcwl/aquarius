@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -151,23 +151,53 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\module_uniittest.cpp" />
-    <ClCompile Include="..\test\tbl_unittest.cpp" />
+    <ClCompile Include="..\test\protocol.cpp" />
+    <ClCompile Include="..\test\detail\concat.cpp" />
+    <ClCompile Include="..\test\detail\crc.cpp" />
+    <ClCompile Include="..\test\detail\flex_buffer.cpp" />
+    <ClCompile Include="..\test\detail\int_to_string.cpp" />
+    <ClCompile Include="..\test\detail\member_pointer.cpp" />
+    <ClCompile Include="..\test\detail\string_literal.cpp" />
+    <ClCompile Include="..\test\detail\struct_name.cpp" />
+    <ClCompile Include="..\test\detail\uuid_generator.cpp" />
+    <ClCompile Include="..\test\ip\handler.cpp" />
+    <ClCompile Include="..\test\ip\http.cpp" />
+    <ClCompile Include="..\test\ip\raw_adaptor_test.cpp" />
+    <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp" />
+    <ClCompile Include="..\test\ip\tcp.cpp" />
+    <ClCompile Include="..\test\module\channel.cpp" />
+    <ClCompile Include="..\test\module\router.cpp" />
+    <ClCompile Include="..\test\resource\invoke.cpp" />
+    <ClCompile Include="..\test\serialize\binary.cpp" />
+    <ClCompile Include="..\test\serialize\json.cpp" />
+    <ClCompile Include="..\test\serialize\kv.cpp" />
+    <ClCompile Include="..\test\tbl\grep.cpp" />
+    <ClCompile Include="..\test\tbl\insert.cpp" />
+    <ClCompile Include="..\test\tbl\remove.cpp" />
+    <ClCompile Include="..\test\tbl\select.cpp" />
+    <ClCompile Include="..\test\tbl\update.cpp" />
     <ClCompile Include="..\test\test_http.virgo.cpp" />
     <ClCompile Include="..\test\test_tcp.virgo.cpp" />
+    <ClCompile Include="..\test\virgo\http_header.cpp" />
+    <ClCompile Include="..\test\virgo\http_method.cpp" />
+    <ClCompile Include="..\test\virgo\http_status.cpp" />
+    <ClCompile Include="..\test\virgo\http_version.cpp" />
+    <ClCompile Include="..\test\virgo\tcp_header.cpp" />
+    <ClCompile Include="..\test\virgo\tcp_protocol.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
+    <ClInclude Include="..\include\aquarius\concepts.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
+    <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_pool.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\asio.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
     <ClInclude Include="..\include\aquarius\module\handler_channel.hpp" />
@@ -176,7 +206,6 @@
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
     <ClInclude Include="..\include\aquarius\module\schedule.hpp" />
     <ClInclude Include="..\include\aquarius\detail\concat.hpp" />
-    <ClInclude Include="..\include\aquarius\detail\float.hpp" />
     <ClInclude Include="..\include\aquarius\detail\int_to_string.hpp" />
     <ClInclude Include="..\include\aquarius\detail\make_endpoint.hpp" />
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp" />
@@ -187,42 +216,32 @@
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\concept.hpp" />
     <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
-    <ClInclude Include="..\include\aquarius\module\sql_module.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\config_register.hpp" />
+    <ClInclude Include="..\include\aquarius\module\mysql_module.hpp" />
     <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\global_resource.hpp" />
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
+    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
+    <ClInclude Include="..\include\aquarius\resource\ssl_config.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\concept.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\error.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_json_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_kv_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\scalar_type.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\tcp_binary_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\concepts.hpp" />
+    <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\grep_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\member_pointer.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\mysql_config_register.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\operator.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\transaction.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
-    <ClInclude Include="..\include\aquarius\timer.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />
@@ -234,36 +253,24 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
-    <ClCompile Include="..\test\binary_serialize.cpp" />
-    <ClCompile Include="..\test\concat.cpp" />
-    <ClCompile Include="..\test\crc.cpp" />
     <ClCompile Include="..\test\ctx_handler.cpp" />
-    <ClCompile Include="..\test\float.cpp" />
-    <ClCompile Include="..\test\handler.cpp" />
-    <ClCompile Include="..\test\http_method.cpp" />
-    <ClCompile Include="..\test\http_status.cpp" />
-    <ClCompile Include="..\test\http_version.cpp" />
-    <ClCompile Include="..\test\int_to_string.cpp" />
     <ClCompile Include="..\test\io_service_pool.cpp" />
-    <ClCompile Include="..\test\kv_serialize.cpp" />
-    <ClCompile Include="..\test\make_endpoint.cpp" />
-    <ClCompile Include="..\test\json_serialize.cpp" />
     <ClCompile Include="..\test\client.cpp" />
     <ClCompile Include="..\test\session.cpp" />
-    <ClCompile Include="..\test\router.cpp" />
-    <ClCompile Include="..\test\serialize_error.cpp" />
-    <ClCompile Include="..\test\server.cpp" />
     <ClInclude Include="..\test\test_http.virgo.h" />
     <ClInclude Include="..\test\test_model.tbl.h" />
     <ClInclude Include="..\test\test_tcp.virgo.h" />
+    <ClInclude Include="include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\string_literal.cpp" />
-    <ClCompile Include="..\test\struct_name.cpp" />
     <ClCompile Include="..\test\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\test\test_http.virgo" />
+    <None Include="..\test\test_tcp.virgo" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

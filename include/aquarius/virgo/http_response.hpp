@@ -1,18 +1,14 @@
 #pragma once
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/virgo/basic_http_protocol.hpp>
 #include <aquarius/virgo/http_header.hpp>
-#include <aquarius/virgo/http_method.hpp>
-#include <aquarius/virgo/http_status.hpp>
-#include <aquarius/virgo/http_version.hpp>
 
 namespace aquarius
 {
-	template <http_method Method, typename Body, http_version Version = http_version::http1_1>
-	class http_response : public basic_http_protocol<false, Method, Body>
+	template <typename Body, http_version Version = http_version::http1_1>
+	class http_response : public basic_http_protocol<false, Body>
 	{
 	public:
-		using base = basic_http_protocol<false, Method, Body>;
+		using base = basic_http_protocol<false, Body>;
 
 		using base::has_request;
 
@@ -63,8 +59,4 @@ namespace aquarius
 			buffer.sputn(headerline.c_str(), headerline.size());
 		}
 	};
-
-	template <http_method Method, typename Body, http_version Version>
-	struct is_message_type<http_response<Method, Body, Version>> : std::true_type
-	{};
 } // namespace aquarius

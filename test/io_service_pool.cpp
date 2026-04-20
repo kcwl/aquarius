@@ -1,7 +1,7 @@
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius/io_service_pool.hpp>
-#include <aquarius/timer.hpp>
+#include <aquarius/error_code.hpp>
 
 BOOST_AUTO_TEST_SUITE(io_pool)
 
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 
 	BOOST_CHECK(io1.get_executor() == io2.get_executor());
 
-	aquarius::timer<aquarius::asio::steady_timer> _timer(io1, 1s);
+	aquarius::asio::steady_timer _timer(io1, 1s);
 	_timer.async_wait([&] (aquarius::error_code) { BOOST_TEST(true); });
 
 	std::thread t([&] { pool.run(); });

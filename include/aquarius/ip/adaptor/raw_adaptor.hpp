@@ -1,14 +1,14 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/concept.hpp>
 #include <aquarius/logger.hpp>
 
 namespace aquarius
 {
+	template<typename T>
 	class raw_adaptor
 	{
-		using socket_t = asio::ip::tcp::socket;
+		using socket_t = T;
 
 	public:
 		raw_adaptor(socket_t& socket)

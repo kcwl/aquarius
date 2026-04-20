@@ -1,7 +1,6 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/serialize/concept.hpp>
-#include <aquarius/serialize/error.hpp>
 #include <boost/pfr.hpp>
 
 namespace aquarius
@@ -97,7 +96,9 @@ namespace aquarius
 			value = temp;
 
 			if (value == static_cast<T>(flex_buffer::traits_type::eof()))
-				throw serialize_error::not_enough_space;
+			{
+				throw std::out_of_range("buffer is not enough space");
+			}
 
 			if (value >= 0x80)
 			{
@@ -116,7 +117,9 @@ namespace aquarius
 				}
 
 				if (temp == flex_buffer::traits_type::eof())
-					throw serialize_error::not_enough_space;
+				{
+					throw std::out_of_range("buffer is not enough space");
+				}
 
 				value += (static_cast<T>(temp) << temp_bit);
 			}
@@ -142,7 +145,9 @@ namespace aquarius
 			auto len = buff.sgetn((char*)&value, value_size);
 
 			if (len != value_size)
-				throw serialize_error::not_enough_space;
+			{
+				throw std::out_of_range("buffer is not enough space");
+			}
 
 			return value;
 		}
@@ -200,7 +205,9 @@ namespace aquarius
 			std::size_t sz = buff.sgetn(value.data(), value.size());
 
 			if (sz != size)
-				throw serialize_error::not_enough_space;
+			{
+				throw std::out_of_range("buffer is not enough space");
+			}
 
 			return value;
 		}

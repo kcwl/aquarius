@@ -1,4 +1,7 @@
 #pragma once
+#include <aquarius/detail/struct_name.hpp>
+#include <aquarius/tbl/add_string.hpp>
+#include <boost/pfr.hpp>
 #include <sstream>
 
 namespace aquarius
@@ -16,11 +19,11 @@ namespace aquarius
 		update_view& operator()(T&& value)
 		{
 			complete_sql_.str("");
+			has_condition_ = false;
 
 			using type = std::remove_cvref_t<T>;
 
-			// constexpr auto struct_name = detail::struct_name<type>();
-			constexpr auto struct_name = "person"sv;
+			constexpr auto struct_name = detail::struct_name<type>();
 
 			complete_sql_ << "update " << struct_name;
 
@@ -28,8 +31,8 @@ namespace aquarius
 
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{
-				((complete_sql_ << (I == 0 ? " set " : " and ") << boost::pfr::get_name<I, type>() << "="
-								<< boost::pfr::get<I, type>(value)),
+				((complete_sql_ << (I == 0 ? " set " : " and ") << boost::pfr::get_name<I, type>() << " = "
+								<< add_string(boost::pfr::get<I, type>(value))),
 				 ...);
 			};
 
@@ -74,9 +77,8 @@ namespace aquarius
 	inline update_view& operator|(update_view& up, const grep_view<Ptr>& g)
 	{
 		up.merge(g);
-
 		return up;
-	};
+	}
 
-	static update_view update;
+	inline static update_view update_v;
 } // namespace aquarius

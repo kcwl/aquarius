@@ -1,6 +1,7 @@
 #pragma once
+#include <aquarius/concepts.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
-#include <aquarius/serialize/concept.hpp>
+#include <boost/pfr.hpp>
 #include <span>
 
 namespace aquarius
@@ -30,6 +31,12 @@ namespace aquarius
 			auto str = name + "=" + value;
 
 			buffer.sputn(str.c_str(), str.size());
+		}
+
+		template<typename T>
+		void to_datas(const T&, flex_buffer&, const std::string& = {})
+		{
+			return;
 		}
 
 		template <typename T>
@@ -88,6 +95,12 @@ namespace aquarius
 				return T{};
 
 			return value;
+		}
+
+		template<typename T>
+		T from_datas(flex_buffer&, const std::string&)
+		{
+			return T{};
 		}
 
 	private:

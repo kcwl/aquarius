@@ -1,5 +1,5 @@
 #pragma once
-#include <aquarius/asio.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/http/http_helper.hpp>
@@ -35,7 +35,7 @@ namespace aquarius
 
 			http_config cfg{};
 
-			config_tag_invoke(config::value_from<http_config>{}, cfg);
+			cfg_value_from<http_config>(cfg);
 
 			if (!cfg.check_origin(origin))
 			{
