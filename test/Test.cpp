@@ -6,13 +6,21 @@
 
 using namespace std::chrono_literals;
 
-void config_tag_invoke(aquarius::config::value_from<aquarius::mysql_config>, aquarius::mysql_config& mysql)
+namespace aquarius
 {
-	mysql.db = "unittest";
-	mysql.host = "localhost";
-	mysql.user = "root";
-	mysql.password = "NN0705lwl1217&";
+	HTTP_CONFIG_INVOKE(cfg)
+	{
+		cfg.control_allow_headers = "";
+	}
+
+	MYSQL_CONFIG_INVOKE(mysql)
+	{
+		mysql.db = "unittest";
+		mysql.host = "localhost";
+		mysql.user = "root";
+	}
 }
+
 
 BOOST_AUTO_TEST_SUITE(framework)
 

@@ -35,7 +35,7 @@ namespace aquarius
 
 			http_config cfg{};
 
-			config_tag_invoke(config::value_from<http_config>{}, cfg);
+			cfg_value_from<http_config>(cfg);
 
 			if (!cfg.check_origin(origin))
 			{

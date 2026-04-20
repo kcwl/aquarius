@@ -31,7 +31,7 @@ namespace aquarius
 
 	private:
 		template <auto Ptr, typename U>
-		friend remove_view<U>& operator|(remove_view<U>& up, const grep_view<Ptr>& g);
+		friend remove_view<U>& operator|(remove_view<U>& rv, const grep_view<Ptr>& g);
 
 		template <auto Ptr>
 		void merge(const grep_view<Ptr>& g)
@@ -62,6 +62,13 @@ namespace aquarius
 
 		bool has_condition_;
 	};
+
+	template <auto Ptr, typename U>
+	inline remove_view<U>& operator|(remove_view<U>& rv, const grep_view<Ptr>& g)
+	{
+		rv.merge(g);
+		return rv;
+	}
 
 	template <typename T>
 	inline static remove_view<T> remove_v;

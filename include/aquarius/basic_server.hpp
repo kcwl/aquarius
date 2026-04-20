@@ -5,8 +5,6 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_router.hpp>
-#include <aquarius/module/mysql_module.hpp>
-#include <aquarius/module/player_module.hpp>
 
 using namespace std::chrono_literals;
 

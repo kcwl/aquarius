@@ -1,6 +1,5 @@
 #define BOOST_TEST_NO_MAIN
 #include <aquarius/tbl/grep_view.hpp>
-#include <aquarius/tbl/operator.hpp>
 #include <aquarius/tbl/select_view.hpp>
 #include <boost/test/unit_test.hpp>
 

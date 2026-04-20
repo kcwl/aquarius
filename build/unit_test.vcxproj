@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -239,7 +239,6 @@
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp" />
-    <ClInclude Include="..\include\aquarius\tbl\operator.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />

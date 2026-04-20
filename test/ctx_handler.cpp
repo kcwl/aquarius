@@ -1,5 +1,6 @@
 #include "test_tcp.virgo.h"
 #include "test_http.virgo.h"
+#include <aquarius/ip/handler.hpp>
 
 AQUARIUS_HANDLER(login_tcp_request, login_tcp_response, ctx_tcp_test)
 {

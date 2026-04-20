@@ -117,7 +117,7 @@ namespace aquarius
 
 	private:
 		template <auto Ptr1, auto Ptr2>
-		friend grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2);
+		inline friend grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2);
 
 		template <auto Ptr1>
 		void _or(const grep_view<Ptr1>& g)
@@ -154,6 +154,14 @@ namespace aquarius
 
 		bool has_aggr_;
 	};
+
+	template <auto Ptr1, auto Ptr2>
+	inline grep_view<Ptr1>& operator||(grep_view<Ptr1>& g1, const grep_view<Ptr2>& g2)
+	{
+		g1._or(g2);
+
+		return g1;
+	}
 
 	template <auto Ptr>
 	inline grep_view<Ptr> grep;

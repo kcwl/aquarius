@@ -16,7 +16,7 @@ namespace aquarius
 			static asio::ssl::context ssl_context(SSLVersion);
 
 			ssl_config cfg{};
-			config_tag_invoke(config::value_from<ssl_config>(), cfg);
+			cfg_value_from<ssl_config>(cfg);
 
 			if constexpr (Server)
 			{

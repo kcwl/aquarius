@@ -282,8 +282,8 @@ namespace aquarius
 		template <typename Session>
 		static auto make_error_response(std::shared_ptr<Session> session_ptr, error_code ec) -> asio::awaitable<void>
 		{
-			auto resp_header =
-				std::format("{} {} {}", version_to_string(global_http_version), ec.value(), status_to_string(ec.value()));
+			auto resp_header = std::format("{} {} {}", version_to_string(global_http_version), ec.value(),
+										   status_to_string(ec.value()));
 			flex_buffer error_buffer{};
 			error_buffer.sputn(resp_header.c_str(), resp_header.size());
 			co_await session_ptr->async_send(std::move(error_buffer));

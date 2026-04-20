@@ -90,6 +90,14 @@ namespace aquarius
 		std::stringstream content_stream_;
 	};
 
+	template <typename T1, auto Ptr, auto... Args1>
+	inline select_view<T1, Args1...>& operator|(select_view<T1, Args1...>& sel, const grep_view<Ptr>& g)
+	{
+		sel.merge(g);
+
+		return sel;
+	}
+
 	template <typename T, auto... Args>
 	inline static select_view<T, Args...> select_v;
 } // namespace aquarius

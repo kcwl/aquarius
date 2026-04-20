@@ -10,7 +10,8 @@ struct mock_config
 	std::string b;
 };
 
-void config_tag_invoke(const config::value_from<mock_config>&, mock_config& cfg)
+
+CONFIG_MICRO(mock_config, cfg)
 {
 	cfg.a = 1;
 	cfg.b = "test";
@@ -21,13 +22,11 @@ BOOST_AUTO_TEST_SUITE(ut_resource)
 BOOST_AUTO_TEST_CASE(invoke)
 {
 	mock_config cfg{};
-	config_tag_invoke(config::value_from<mock_config>(), cfg);
+
+	cfg_value_from<mock_config>(cfg);
 
 	BOOST_TEST(cfg.a == 1);
 	BOOST_TEST(cfg.b == "test");
-
-	int temp_cfg = 0;
-	BOOST_CHECK_NO_THROW(config_tag_invoke(config::value_from<int>(), temp_cfg));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,7 @@
 #pragma once
-#include <aquarius.hpp>
+#include <aquarius/serialize/http_serialize.hpp>
+#include <aquarius/virgo/http_request.hpp>
+#include <aquarius/virgo/http_response.hpp>
 using namespace aquarius;
 
 struct http_person
@@ -15,7 +17,7 @@ struct http_person
 	bytes orders;
 };
 
-class http_test_post_req_body: public aquarius::http_serialize
+class http_test_post_req_body : public aquarius::http_serialize
 {
 public:
 	http_test_post_req_body();
@@ -23,15 +25,17 @@ public:
 
 	http_test_post_req_body(http_test_post_req_body&&) = default;
 	http_test_post_req_body& operator=(http_test_post_req_body&&) = default;
+
 private:
-	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_post_req_body& local);
-	friend http_test_post_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_req_body>&, const aquarius::json::value& jv);
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv,
+						   const http_test_post_req_body& local);
+	friend http_test_post_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_req_body>&,
+											  const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
 
 	int32 uuid() const;
 	int32& uuid();
@@ -43,7 +47,7 @@ private:
 	struct impl;
 	std::unique_ptr<impl> impl_ptr_;
 };
-class http_test_post_resp_body: public aquarius::http_serialize
+class http_test_post_resp_body : public aquarius::http_serialize
 {
 public:
 	http_test_post_resp_body();
@@ -51,15 +55,17 @@ public:
 
 	http_test_post_resp_body(http_test_post_resp_body&&) = default;
 	http_test_post_resp_body& operator=(http_test_post_resp_body&&) = default;
+
 private:
-	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_post_resp_body& local);
-	friend http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_resp_body>&, const aquarius::json::value& jv);
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv,
+						   const http_test_post_resp_body& local);
+	friend http_test_post_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_post_resp_body>&,
+											   const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
 
 	int32 uuid() const;
 	int32& uuid();
@@ -72,7 +78,7 @@ private:
 	std::unique_ptr<impl> impl_ptr_;
 };
 
-class http_test_get_req_body: public aquarius::http_serialize
+class http_test_get_req_body : public aquarius::http_serialize
 {
 public:
 	http_test_get_req_body();
@@ -80,15 +86,17 @@ public:
 
 	http_test_get_req_body(http_test_get_req_body&&) = default;
 	http_test_get_req_body& operator=(http_test_get_req_body&&) = default;
+
 private:
-	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_req_body& local);
-	friend http_test_get_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_req_body>&, const aquarius::json::value& jv);
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv,
+						   const http_test_get_req_body& local);
+	friend http_test_get_req_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_req_body>&,
+											 const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
 
 	int32 user() const;
 	int32& user();
@@ -100,7 +108,7 @@ private:
 	struct impl;
 	std::unique_ptr<impl> impl_ptr_;
 };
-class http_test_get_resp_body: public aquarius::http_serialize
+class http_test_get_resp_body : public aquarius::http_serialize
 {
 public:
 	http_test_get_resp_body();
@@ -108,15 +116,17 @@ public:
 
 	http_test_get_resp_body(http_test_get_resp_body&&) = default;
 	http_test_get_resp_body& operator=(http_test_get_resp_body&&) = default;
+
 private:
-	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const http_test_get_resp_body& local);
-	friend http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&, const aquarius::json::value& jv);
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv,
+						   const http_test_get_resp_body& local);
+	friend http_test_get_resp_body tag_invoke(const aquarius::json::value_to_tag<http_test_get_resp_body>&,
+											  const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
 
 	int32 user() const;
 	int32& user();

@@ -2,18 +2,21 @@
 
 namespace aquarius
 {
-	namespace config
+	template<class T>
+	struct cfg_from_tag {};
+
+	template<typename T>
+	void value_from_impl(cfg_from_tag<T> tag, T& v)
 	{
-		template<typename T>
-		struct value_from {};
+		return cfg_invoke(tag, v);
+	}
+
+	template<typename T>
+	void cfg_value_from(T& v)
+	{
+		return value_from_impl(cfg_from_tag<T>(), v);
 	}
 }
 
-template<typename T>
-void config_tag_invoke(const aquarius::config::value_from<T>&, T&)
-{
-	return;
-}
-
 #define CONFIG_MICRO(kind, a) \
-void config_tag_invoke(const aquarius::config::value_from<kind>&, kind& a)
+inline void cfg_invoke(aquarius::cfg_from_tag<kind>, kind& a)

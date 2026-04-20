@@ -29,7 +29,7 @@ namespace aquarius
 		{
 			mysql_config cfg{};
 
-			config_tag_invoke(aquarius::config::value_from<mysql_config>(), cfg);
+			cfg_value_from<mysql_config>(cfg);
 
 			boost::mysql::pool_params params{};
 			params.server_address.emplace_host_and_port(cfg.host, static_cast<uint16_t>(cfg.port));

@@ -1,4 +1,5 @@
 #pragma once
+#include <aquarius/detail/struct_name.hpp>
 #include <aquarius/tbl/add_string.hpp>
 #include <boost/pfr.hpp>
 #include <sstream>
@@ -71,6 +72,13 @@ namespace aquarius
 
 		bool has_condition_;
 	};
+
+	template <auto Ptr>
+	inline update_view& operator|(update_view& up, const grep_view<Ptr>& g)
+	{
+		up.merge(g);
+		return up;
+	}
 
 	inline static update_view update_v;
 } // namespace aquarius

@@ -198,9 +198,6 @@
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\operator.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>

@@ -1,5 +1,7 @@
 #pragma once
-#include <aquarius.hpp>
+#include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/virgo/tcp_request.hpp>
+#include <aquarius/virgo/tcp_response.hpp>
 using namespace aquarius;
 
 enum color

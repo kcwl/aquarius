@@ -4,6 +4,15 @@
 
 using namespace aquarius;
 
+namespace aquarius
+{
+	HTTP_CONFIG_INVOKE(cfg)
+	{
+		cfg.control_allow_headers = "";
+	}
+}
+
+
 BOOST_AUTO_TEST_SUITE(ut_http)
 
 struct mock_read_error_session
