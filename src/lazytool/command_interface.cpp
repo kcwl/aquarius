@@ -71,7 +71,9 @@ namespace aquarius
 				}
 
 				header << "#pragma once\n";
-				header << "#include <aquarius.hpp>\n";
+				header << "#include <aquarius/serialize/"<<protocol_<<"_serialize.hpp>\n";
+				header << "#include <aquarius/virgo/"<<protocol_<<"_request.hpp>\n";
+				header << "#include <aquarius/virgo/"<<protocol_<<"_response.hpp>\n";
 				header << "using namespace aquarius;\n";
 
 				source << "#include \"" << target_path.filename().string() << ".h\"\n";
