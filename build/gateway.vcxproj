@@ -20,13 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gateway\auth_module.cpp" />
-    <ClCompile Include="..\src\gateway\ctx_login.cpp" />
     <ClCompile Include="..\src\gateway\firewall_module.cpp" />
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
-    <ClCompile Include="..\src\gateway\transfer_module.cpp" />
-    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
@@ -34,9 +31,6 @@
     <ClInclude Include="..\src\gateway\gate_error_code.h" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />
     <ClInclude Include="..\src\gateway\player.h" />
-    <ClInclude Include="..\src\gateway\transfer_module.h" />
-    <ClInclude Include="..\src\gateway\transfer_schedule.hpp" />
-    <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
