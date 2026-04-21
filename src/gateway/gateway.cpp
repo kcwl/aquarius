@@ -1,10 +1,19 @@
-﻿#include "server.hpp"
-#include "transfer_module.h"
-#include <aquarius/cmd_options.hpp>
-#include <aquarius/ip/http/http_client.hpp>
-#include <aquarius/logger.hpp>
+﻿#include <aquarius.hpp>
 #include <iostream>
-#include "player.h"
+
+namespace aquarius
+{
+	HTTP_CONFIG_INVOKE(cfg)
+	{
+
+	}
+
+	MYSQL_CONFIG_INVOKE(cfg)
+	{
+
+	}
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -18,18 +27,18 @@ int main(int argc, char* argv[])
 
 	cmd.load_options(argc, argv);
 
-	aquarius::gateway::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+	aquarius::tcp_server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
 								  cmd.option<std::string>("name"));
 
-	srv.set_accept_func(
-		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
-		{ co_await aquarius::mpc_player_insert(session_ptr->uuid(), std::make_shared<aquarius::gateway::player>(session_ptr->uuid())); });
+	std::thread t([&] { srv.run(); });
 
-	srv.set_close_func(
-		[&](std::shared_ptr<aquarius::gateway::server::session_type> session_ptr) -> aquarius::awaitable<void>
-		{ co_await aquarius::mpc_player_erase<aquarius::gateway::server::session_type>(session_ptr->uuid()); });
+	aquarius::http_server http_srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+							 cmd.option<std::string>("name"));
 
-	srv.run();
+	std::thread t1([&] { http_srv.run(); });
+
+	t.join();
+	t1.join();
 
 	return 0;
 }
