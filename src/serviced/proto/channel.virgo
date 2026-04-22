@@ -1,24 +1,10 @@
-message subscribe:tcp -> 10000
+message subscribe -> 9100
 {
 	request
 	{
 		string topic;
-		string payload;
 	}
 	response
 	{
-	}
-}
-
-message transfer:tcp ->10001
-{
-	request
-	{
-		string topic;
-		bytes feedbuf;
-	}
-	response
-	{
-		bytes feedbuf;
 	}
 }

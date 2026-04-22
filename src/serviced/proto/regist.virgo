@@ -1,10 +1,14 @@
-message regist:tcp -> 11000
+message regist -> 9000
 {
 	request
 	{
-		int32 protocol;
-		string ip_addr;
+		string name;
+		uint32 host;
 		int32 port;
+		bool healthy;
+		string group;
+		int32 weight;
+		string version;
 	}
 	response
 	{
