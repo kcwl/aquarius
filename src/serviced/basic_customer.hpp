@@ -54,6 +54,12 @@ namespace aquarius
 				co_return co_await client_ptr_->async_send(std::move(buffer));
 			}
 
+			template<typename Response, typename Request>
+			auto async_call(std::shared_ptr<Request> req) ->asio::awaitable<Response>
+			{
+				co_return co_await client_ptr_->async_send(req);
+			}
+
 		private:
 			std::shared_ptr<client_t> client_ptr_;
 

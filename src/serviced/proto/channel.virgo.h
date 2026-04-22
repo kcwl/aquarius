@@ -4,36 +4,14 @@
 #include <aquarius/virgo/tcp_response.hpp>
 using namespace aquarius;
 
-class subscribe_req_body: public aquarius::tcp_serialize
+class subs_list_req_body: public aquarius::tcp_serialize
 {
 public:
-	subscribe_req_body();
-	virtual ~subscribe_req_body() = default;
+	subs_list_req_body() = default;
+	virtual ~subs_list_req_body() = default;
 
-	subscribe_req_body(subscribe_req_body&&) = default;
-	subscribe_req_body& operator=(subscribe_req_body&&) = default;
-
-public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
-
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
-
-	string topic() const;
-	string& topic();
-
-private:
-	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
-};
-class subscribe_resp_body: public aquarius::tcp_serialize
-{
-public:
-	subscribe_resp_body() = default;
-	virtual ~subscribe_resp_body() = default;
-
-	subscribe_resp_body(subscribe_resp_body&&) = default;
-	subscribe_resp_body& operator=(subscribe_resp_body&&) = default;
+	subs_list_req_body(subs_list_req_body&&) = default;
+	subs_list_req_body& operator=(subs_list_req_body&&) = default;
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -45,7 +23,29 @@ private:
 	struct impl;
 	std::unique_ptr<impl> impl_ptr_;
 };
+class subs_list_resp_body: public aquarius::tcp_serialize
+{
+public:
+	subs_list_resp_body();
+	virtual ~subs_list_resp_body() = default;
+
+	subs_list_resp_body(subs_list_resp_body&&) = default;
+	subs_list_resp_body& operator=(subs_list_resp_body&&) = default;
+
+public:
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
+
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 
-using subscribe_tcp_request = aquarius::tcp_request<"9100", subscribe_req_body>;
-using subscribe_tcp_response = aquarius::tcp_response<subscribe_resp_body>;
+	std::vector<string> keys() const;
+	std::vector<string>& keys();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
+};
+
+
+using subs_list_tcp_request = aquarius::tcp_request<"9100", subs_list_req_body>;
+using subs_list_tcp_response = aquarius::tcp_response<subs_list_resp_body>;

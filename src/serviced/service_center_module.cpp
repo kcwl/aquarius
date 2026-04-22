@@ -8,22 +8,6 @@ namespace aquarius
 		{
 			std::unique_lock lk(mutex_);
 
-			auto f = [&, this, customer_ptr](flex_buffer& buffer,
-											 int32_t method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
-			{
-				auto srv = get_service(customer_ptr->group());
-				if (!srv)
-				{
-					co_return std::unexpected(error_code{});
-				}
-
-				auto func = srv->subscribe();
-
-				co_return co_await func(buffer, method);
-			};
-
-			mpc_subscribe(customer_ptr->group(), f);
-
 			auto& group = services_[customer_ptr->group()];
 
 			group.push_back(customer_ptr);

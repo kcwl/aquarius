@@ -1,40 +1,40 @@
 #include "channel.virgo.h"
 
-struct subscribe_req_body::impl
+struct subs_list_req_body::impl
 {
-	string topic;
 };
-subscribe_req_body::subscribe_req_body()
+
+void subs_list_req_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this, buffer);
+}
+
+void subs_list_req_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this = this->parse_from<subs_list_req_body>(buffer); 
+}
+struct subs_list_resp_body::impl
+{
+	std::vector<string> keys;
+};
+subs_list_resp_body::subs_list_resp_body()
 	: impl_ptr_(std::make_unique<impl>())
 {}
 
-void subscribe_req_body::serialize(aquarius::flex_buffer& buffer)
+void subs_list_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(*this, buffer);
 }
 
-void subscribe_req_body::deserialize(aquarius::flex_buffer& buffer)
+void subs_list_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<subscribe_req_body>(buffer); 
+	*this = this->parse_from<subs_list_resp_body>(buffer); 
 }
-string subscribe_req_body::topic() const
+std::vector<string> subs_list_resp_body::keys() const
 {
-	return impl_ptr_->topic;
+	return impl_ptr_->keys;
 }
-string& subscribe_req_body::topic()
+std::vector<string>& subs_list_resp_body::keys()
 {
-	return impl_ptr_->topic;
-}
-struct subscribe_resp_body::impl
-{
-};
-
-void subscribe_resp_body::serialize(aquarius::flex_buffer& buffer)
-{
-	this->parse_to(*this, buffer);
-}
-
-void subscribe_resp_body::deserialize(aquarius::flex_buffer& buffer)
-{
-	*this = this->parse_from<subscribe_resp_body>(buffer); 
+	return impl_ptr_->keys;
 }

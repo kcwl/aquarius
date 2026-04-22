@@ -1,10 +1,11 @@
-message subscribe -> 9100
+message subs_list -> 9100
 {
 	request
 	{
-		string topic;
+		
 	}
 	response
 	{
+		repeated string keys;
 	}
 }
