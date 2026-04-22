@@ -106,6 +106,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,7 +137,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\serviced\player.h" />
     <ClInclude Include="..\src\serviced\cmd_register.h" />
-    <ClInclude Include="..\src\serviced\cmd_store.h" />
     <ClInclude Include="..\src\serviced\error.hpp" />
     <ClInclude Include="..\src\serviced\payload.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
@@ -146,9 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\cmd_register.cpp" />
-    <ClCompile Include="..\src\serviced\cmd_store.cpp" />
     <ClCompile Include="..\src\serviced\ctx_channel.cpp" />
-    <ClCompile Include="..\src\serviced\ctx_cmd.cpp" />
     <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
     <ClCompile Include="..\src\serviced\player.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />

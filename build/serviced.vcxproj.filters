@@ -21,9 +21,6 @@
     <ClInclude Include="..\src\serviced\server.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\cmd_store.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\serviced\error.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -48,12 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\serviced.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\serviced\cmd_store.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\serviced\ctx_cmd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\cmd_register.cpp">
