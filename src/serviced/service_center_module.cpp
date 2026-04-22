@@ -1,4 +1,5 @@
 #include "service_center_module.h"
+#include "payload.hpp"
 
 namespace aquarius
 {
@@ -32,8 +33,7 @@ namespace aquarius
 			}
 
 			// 负载均衡
-
-			return iter->second.back();
+			return round_robin().invoke(iter->second);
 		}
 
 		auto service_center_module::timer(std::chrono::milliseconds ms) -> asio::awaitable<void>

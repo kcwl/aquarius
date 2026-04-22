@@ -20,6 +20,8 @@ namespace aquarius
 			virtual auto heart() -> asio::awaitable<void> = 0;
 
 			virtual func_t subscribe() = 0;
+
+			virtual int32_t weight() const = 0;
 		};
 	} // namespace serviced
 } // namespace aquarius
