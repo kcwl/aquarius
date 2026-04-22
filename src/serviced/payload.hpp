@@ -84,7 +84,7 @@ namespace aquarius
 			{
 				if (customers.empty())
 				{
-					return nullptr
+					return nullptr;
 				}
 
 				int index = 0;
@@ -106,7 +106,7 @@ namespace aquarius
 				if (target >= customers.size())
 					return nullptr;
 
-				return subscribers[target];
+				return customers[target];
 			}
 		};
 	} // namespace serviced

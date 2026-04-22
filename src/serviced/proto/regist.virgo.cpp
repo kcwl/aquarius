@@ -16,12 +16,12 @@ regist_req_body::regist_req_body()
 
 void regist_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void regist_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<regist_req_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<regist_req_body::impl>(buffer); 
 }
 string regist_req_body::name() const
 {
@@ -85,10 +85,10 @@ struct regist_resp_body::impl
 
 void regist_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void regist_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<regist_resp_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<regist_resp_body::impl>(buffer); 
 }

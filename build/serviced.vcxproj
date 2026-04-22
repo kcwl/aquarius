@@ -138,7 +138,6 @@
     <ClInclude Include="..\src\serviced\basic_customer.hpp" />
     <ClInclude Include="..\src\serviced\customer.hpp" />
     <ClInclude Include="..\src\serviced\customer_base.h" />
-    <ClInclude Include="..\src\serviced\cmd_register.h" />
     <ClInclude Include="..\src\serviced\error.hpp" />
     <ClInclude Include="..\src\serviced\payload.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
@@ -147,7 +146,6 @@
     <ClInclude Include="..\src\serviced\service_center_module.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\serviced\cmd_register.cpp" />
     <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp" />

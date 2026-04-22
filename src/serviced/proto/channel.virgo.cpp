@@ -6,12 +6,12 @@ struct subs_list_req_body::impl
 
 void subs_list_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void subs_list_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<subs_list_req_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<subs_list_req_body::impl>(buffer); 
 }
 struct subs_list_resp_body::impl
 {
@@ -23,12 +23,12 @@ subs_list_resp_body::subs_list_resp_body()
 
 void subs_list_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void subs_list_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<subs_list_resp_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<subs_list_resp_body::impl>(buffer); 
 }
 std::vector<string> subs_list_resp_body::keys() const
 {

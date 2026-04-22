@@ -408,12 +408,12 @@ namespace aquarius
 			{
 				if (has_type)
 				{
-					ofs << "\t*this = this->parse_" << direction << "<" << data_ptr->name()
+					ofs << "\t*this->impl_ptr_ = this->parse_" << direction << "<" << data_ptr->name() <<"::impl"
 						<< ">(buffer); " << std::endl;
 				}
 				else
 				{
-					ofs << "\tthis->parse_" << direction << "(*this, buffer);" << std::endl;
+					ofs << "\tthis->parse_" << direction << "(*this->impl_ptr_, buffer);" << std::endl;
 				}
 			};
 
@@ -456,8 +456,6 @@ namespace aquarius
 						ofs << "\t}" << std::endl;
 						ofs << "\telse" << std::endl;
 						ofs << "\t{" << std::endl;
-
-						bool first = true;
 
 						for (auto& m : field_ptr->fields())
 						{

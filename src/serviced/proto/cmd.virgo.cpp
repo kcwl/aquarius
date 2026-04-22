@@ -11,12 +11,12 @@ cmd_op_req_body::cmd_op_req_body()
 
 void cmd_op_req_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void cmd_op_req_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<cmd_op_req_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<cmd_op_req_body::impl>(buffer); 
 }
 string cmd_op_req_body::command() const
 {
@@ -44,12 +44,12 @@ cmd_op_resp_body::cmd_op_resp_body()
 
 void cmd_op_resp_body::serialize(aquarius::flex_buffer& buffer)
 {
-	this->parse_to(*this, buffer);
+	this->parse_to(*this->impl_ptr_, buffer);
 }
 
 void cmd_op_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
-	*this = this->parse_from<cmd_op_resp_body>(buffer); 
+	*this->impl_ptr_ = this->parse_from<cmd_op_resp_body::impl>(buffer); 
 }
 string cmd_op_resp_body::output() const
 {

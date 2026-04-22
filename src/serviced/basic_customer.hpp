@@ -41,7 +41,7 @@ namespace aquarius
 			{
 				client_ptr_ = std::make_shared<client_t>(ex);
 
-				co_return co_await client_ptr_->async_connect(ip_addr_, std::to_string(port_));
+				co_return co_await client_ptr_->async_connect(ip_addr_, static_cast<uint16_t>(port_));
 			}
 
 			auto async_send(flex_buffer& buffer, int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
@@ -57,7 +57,7 @@ namespace aquarius
 			template<typename Response, typename Request>
 			auto async_call(std::shared_ptr<Request> req) ->asio::awaitable<Response>
 			{
-				co_return co_await client_ptr_->async_send(req);
+				co_return co_await client_ptr_->template async_send<Response>(req);
 			}
 
 		private:
