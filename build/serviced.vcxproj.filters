@@ -56,9 +56,6 @@
     <ClCompile Include="..\src\serviced\cmd_register.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\ctx_channel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\serviced\ctx_regist.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

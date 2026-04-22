@@ -148,7 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\cmd_register.cpp" />
-    <ClCompile Include="..\src\serviced\ctx_channel.cpp" />
     <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp" />
