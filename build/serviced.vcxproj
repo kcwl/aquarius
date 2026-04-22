@@ -134,11 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\serviced\basic_channel.hpp" />
-    <ClInclude Include="..\src\serviced\channel.hpp" />
-    <ClInclude Include="..\src\serviced\channel_module.h" />
     <ClInclude Include="..\src\serviced\player.h" />
-    <ClInclude Include="..\src\serviced\channel_schedule.h" />
     <ClInclude Include="..\src\serviced\cmd_register.h" />
     <ClInclude Include="..\src\serviced\cmd_store.h" />
     <ClInclude Include="..\src\serviced\error.hpp" />
@@ -149,8 +145,6 @@
     <ClInclude Include="..\src\serviced\server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\serviced\channel_module.cpp" />
-    <ClCompile Include="..\src\serviced\channel_schedule.cpp" />
     <ClCompile Include="..\src\serviced\cmd_register.cpp" />
     <ClCompile Include="..\src\serviced\cmd_store.cpp" />
     <ClCompile Include="..\src\serviced\ctx_channel.cpp" />
