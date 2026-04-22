@@ -22,8 +22,8 @@ public:
 	string name() const;
 	string& name();
 
-	uint32 host() const;
-	uint32& host();
+	string host() const;
+	string& host();
 
 	int32 port() const;
 	int32& port();

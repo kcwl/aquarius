@@ -1,7 +1,8 @@
 #include "error.hpp"
-#include "player.h"
 #include "proto/regist.virgo.h"
-#include <aquarius/module/player_schedule.hpp>
+#include <aquarius.hpp>
+#include "customer.hpp"
+#include "service_center_module.h"
 
 namespace aquarius
 {
@@ -9,14 +10,17 @@ namespace aquarius
 	{
 		AQUARIUS_HANDLER(regist_tcp_request, regist_tcp_response, ctx_regist)
 		{
-			auto player_ptr = co_await mpc_player_get<player>("player_module"sv, session()->uuid());
+			auto customer_ptr = std::make_shared<customer<tcp_client>>();
 
-			if (!player_ptr)
-				co_return errc::no_player;
+			customer_ptr->name(request()->body().name());
+			customer_ptr->host(request()->body().host());
+			customer_ptr->port(request()->body().port());
+			customer_ptr->healthy(request()->body().healthy());
+			customer_ptr->group(request()->body().group());
+			customer_ptr->weight(request()->body().weight());
+			customer_ptr->version(request()->body().version());
 
-			player_ptr->set_addr(request()->body().ip_addr, request()->body().port);
-
-			player_ptr->set_protocol(request()->body().protocol);
+			mpc_call<&service_center_module::regist>(customer_ptr);
 
 			co_return errc::success;
 		}

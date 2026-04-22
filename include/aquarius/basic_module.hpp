@@ -18,7 +18,7 @@ namespace aquarius
 
 		virtual bool enable() = 0;
 
-		virtual void timer(std::chrono::milliseconds) = 0;
+		virtual auto timer(std::chrono::milliseconds) -> asio::awaitable<void> = 0;
 
 		virtual auto run() -> asio::awaitable<bool> = 0;
 	};
@@ -64,9 +64,9 @@ namespace aquarius
 			return true;
 		}
 
-		virtual void timer(std::chrono::milliseconds) override
+		virtual auto timer(std::chrono::milliseconds) -> asio::awaitable<void> override
 		{
-			return;
+			co_return;
 		}
 
 		virtual auto run() -> asio::awaitable<bool> override

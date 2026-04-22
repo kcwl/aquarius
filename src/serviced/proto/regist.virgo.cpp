@@ -3,7 +3,7 @@
 struct regist_req_body::impl
 {
 	string name;
-	uint32 host;
+	string host;
 	int32 port;
 	bool healthy;
 	string group;
@@ -31,11 +31,11 @@ string& regist_req_body::name()
 {
 	return impl_ptr_->name;
 }
-uint32 regist_req_body::host() const
+string regist_req_body::host() const
 {
 	return impl_ptr_->host;
 }
-uint32& regist_req_body::host()
+string& regist_req_body::host()
 {
 	return impl_ptr_->host;
 }

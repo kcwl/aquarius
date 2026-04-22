@@ -3,7 +3,7 @@ message regist -> 9000
 	request
 	{
 		string name;
-		uint32 host;
+		string host;
 		int32 port;
 		bool healthy;
 		string group;
