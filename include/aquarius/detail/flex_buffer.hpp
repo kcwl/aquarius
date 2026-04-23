@@ -363,5 +363,7 @@ namespace aquarius
 
 	using flex_buffer = detail::basic_flexbuf<>;
 
+	using flex_buffer_view = std::string_view;
+
 	using flex_buffer_ref = detail::basic_flexbuf_ref<std::allocator<char>>;
 } // namespace aquarius

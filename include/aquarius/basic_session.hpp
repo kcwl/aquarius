@@ -134,6 +134,25 @@ namespace aquarius
 			co_return ec;
 		}
 
+		auto async_send(flex_buffer_view buffer_view) -> asio::awaitable<error_code>
+		{
+			error_code ec{};
+
+			co_await socket_adaptor_.get_implement().async_write_some(asio::buffer(buffer_view.data(), buffer_view.size()),
+																	  asio::redirect_error(asio::use_awaitable, ec));
+
+			if (ec)
+			{
+				XLOG_ERROR() << "[async send view] error: " << ec.what();
+			}
+			else
+			{
+				XLOG_DEBUG() << "[async send view] send " << buffer_view.size() << " bytes";
+			}
+
+			co_return ec;
+		}
+
 		bool close()
 		{
 			error_code ec;

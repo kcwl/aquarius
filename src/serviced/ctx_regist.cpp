@@ -1,4 +1,4 @@
-#include "customer.hpp"
+#include "customer.h"
 #include "error.hpp"
 #include "proto/channel.virgo.h"
 #include "proto/regist.virgo.h"
@@ -11,7 +11,7 @@ namespace aquarius
 	{
 		AQUARIUS_HANDLER(regist_tcp_request, regist_tcp_response, ctx_regist)
 		{
-			auto customer_ptr = std::make_shared<customer<tcp_client>>();
+			auto customer_ptr = std::make_shared<customer>();
 
 			customer_ptr->name(request()->body().name());
 			customer_ptr->host(request()->body().host());
@@ -22,36 +22,6 @@ namespace aquarius
 			customer_ptr->version(request()->body().version());
 
 			mpc_call<&service_center_module::regist>(customer_ptr);
-
-			auto res = co_await customer_ptr->create_client(co_await asio::this_coro::executor);
-
-			if (!res)
-			{
-				co_return errc::create_client_error;
-			}
-
-			auto req = std::make_shared<subs_list_tcp_request>();
-
-			auto resp = co_await customer_ptr->async_call<subs_list_tcp_response>(req);
-
-			for (auto& topic : resp.body().keys())
-			{
-				auto f = [&, this, customer_ptr] (flex_buffer& buffer,
-												  int32_t method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
-					{
-						auto srv = mpc_call<&service_center_module::get_service>(customer_ptr->group());
-						if (!srv)
-						{
-							co_return std::unexpected(error_code{});
-						}
-
-						auto func = srv->subscribe();
-
-						co_return co_await func(buffer, method);
-					};
-
-				mpc_subscribe(customer_ptr->group(), f);
-			}
 
 			co_return errc::success;
 		}

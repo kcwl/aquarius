@@ -135,23 +135,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\serviced\basic_customer.hpp" />
-    <ClInclude Include="..\src\serviced\customer.hpp" />
-    <ClInclude Include="..\src\serviced\customer_base.h" />
+    <ClInclude Include="..\src\serviced\channel.h" />
+    <ClInclude Include="..\src\serviced\customer.h" />
     <ClInclude Include="..\src\serviced\error.hpp" />
-    <ClInclude Include="..\src\serviced\payload.hpp" />
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
     <ClInclude Include="..\src\serviced\service_center_module.h" />
+    <ClInclude Include="..\src\serviced\subscriber.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\serviced\channel.cpp" />
     <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
+    <ClCompile Include="..\src\serviced\customer.cpp" />
     <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
     <ClCompile Include="..\src\serviced\serviced.cpp" />
     <ClCompile Include="..\src\serviced\service_center_module.cpp" />
+    <ClCompile Include="..\src\serviced\subscriber.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\serviced\proto\channel.virgo" />

@@ -21,9 +21,6 @@
     <ClInclude Include="..\src\serviced\error.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\payload.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
@@ -33,16 +30,16 @@
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\customer_base.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\basic_customer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\customer.hpp">
+    <ClInclude Include="..\src\serviced\customer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\serviced\service_center_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\subscriber.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\channel.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -63,6 +60,15 @@
       <Filter>proto</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\service_center_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\customer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\subscriber.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\channel.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

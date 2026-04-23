@@ -5,6 +5,8 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_router.hpp>
+#include <aquarius/module/schedule.hpp>
+#include <aquarius/module/session_store_module.hpp>
 
 using namespace std::chrono_literals;
 
@@ -122,7 +124,7 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
 
-				// co_await mpc_insert_session(session_ptr);
+				mpc_call<&session_store_module::attach>(std::make_shared<session_impl<session_type>>(session_ptr));
 
 				asio::co_spawn(
 					acceptor_.get_executor(),

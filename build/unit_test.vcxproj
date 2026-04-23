@@ -221,6 +221,7 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\module\mysql_module.hpp" />
+    <ClInclude Include="..\include\aquarius\module\session_store_module.hpp" />
     <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp" />
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />

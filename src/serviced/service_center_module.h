@@ -1,5 +1,5 @@
 #pragma once
-#include "customer_base.h"
+#include "channel.h"
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/module/module_register.hpp>
 #include <map>
@@ -15,18 +15,23 @@ namespace aquarius
 			service_center_module() = default;
 
 		public:
-			void regist(std::shared_ptr<customer_base> customer_ptr);
+			void regist(std::shared_ptr<customer> customer_ptr);
 
-			void remove(std::shared_ptr<customer_base> service_ptr);
+			void remove(std::shared_ptr<customer> customer_ptr);
 
-			std::shared_ptr<customer_base> get_service(const std::string& group);
+			auto get_services(const std::string& group, const std::string& topic)
+				-> std::expected<std::vector<std::shared_ptr<customer>>, bool>;
 
-			auto timer(std::chrono::milliseconds ms) -> asio::awaitable<void> override;
+			void subscribe(const std::string& group, const std::string& topic,
+						   std::shared_ptr<subscriber> subscriber_ptr);
+
+			auto publish(const std::string& group, const std::string& topic, flex_buffer& buffer)
+				-> asio::awaitable<error_code>;
 
 		private:
 			std::shared_mutex mutex_;
 
-			std::map<std::string, std::vector<std::shared_ptr<customer_base>>> services_;
+			std::map<std::string, std::shared_ptr<channel>> channel_groups_;
 		};
 	} // namespace serviced
 } // namespace aquarius
