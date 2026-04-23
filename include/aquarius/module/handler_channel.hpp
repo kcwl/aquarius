@@ -97,10 +97,11 @@ namespace aquarius
 	class handler_channel : public singleton<handler_channel>
 	{
 	public:
-		using subscribe_func_t = std::function<asio::awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&,int)>;
+		using subscribe_func_t =
+			std::function<asio::awaitable<std::expected<flex_buffer, error_code>>(flex_buffer&, std::size_t, int)>;
 
 	public:
-		auto publish(const std::string& topic, flex_buffer& buffer, int method)
+		auto publish(const std::string& topic, flex_buffer& buffer, std::size_t session_id, int method)
 			-> asio::awaitable<std::expected<flex_buffer, error_code>>
 		{
 			std::shared_lock lk(mutex_);
@@ -112,7 +113,7 @@ namespace aquarius
 				co_return std::unexpected(error_code{});
 			}
 
-			co_return co_await subscribe(buffer, method);
+			co_return co_await subscribe(buffer, session_id, method);
 		}
 
 		bool subscribe(const std::string& topic, const subscribe_func_t& func)
@@ -136,11 +137,12 @@ namespace aquarius
 		handler_channel_impl<subscribe_func_t> impl_;
 	};
 
-	template<typename... Args>
-	inline auto mpc_publish(const std::string& topic, flex_buffer& buffer, Args&&... args)
+	template <typename... Args>
+	inline auto mpc_publish(const std::string& topic, flex_buffer& buffer, std::size_t session_id, Args&&... args)
 		-> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{
-		co_return co_await handler_channel::get_mutable_instance().publish(topic, buffer, std::forward<Args>(args)...);
+		co_return co_await handler_channel::get_mutable_instance().publish(topic, buffer, session_id,
+																		   std::forward<Args>(args)...);
 	}
 
 	inline bool mpc_subscribe(const std::string& topic, const handler_channel::subscribe_func_t& func)

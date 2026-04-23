@@ -58,7 +58,7 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[&, r = std::move(router)] -> asio::awaitable<void>
 					{
-						auto result = co_await mpc_publish(std::move(r), buffer, 0);
+						auto result = co_await mpc_publish(std::move(r), buffer, session_ptr->uuid(), 0);
 
 						if (!result.has_value())
 						{

@@ -13,22 +13,38 @@ namespace aquarius
 		template <typename T>
 		auto select(const std::string& sql) const -> asio::awaitable<std::vector<T>>
 		{
-			co_return co_await mpc_async_call<&mysql_module::async_query<T>>(std::string_view(sql));
+			std::vector<T> result{};
+#ifdef ENABLE_MYSQL
+			result = co_await mpc_async_call<&mysql_module::async_query<T>>(std::string_view(sql));
+#endif
+			co_return result;
 		}
 
 		auto insert(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+			std::size_t result{};
+#ifdef ENABLE_MYSQL
+			result = co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+#endif
+			co_return result;
 		}
 
 		auto remove(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+			std::size_t result{};
+#ifdef ENABLE_MYSQL
+			result = co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+#endif
+			co_return result;
 		}
 
 		auto update(const std::string& sql) const -> asio::awaitable<std::size_t>
 		{
-			co_return co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+			std::size_t result{};
+#ifdef ENABLE_MYSQL
+			result = co_await mpc_async_call<&mysql_module::async_execute>(std::string_view(sql));
+#endif
+			co_return result;
 		}
 	};
 

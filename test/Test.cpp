@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 	t.join();
 }
 
-#ifdef ENABLE_MYSQL_TEST
+#ifdef ENABLE_MYSQL
 
 BOOST_AUTO_TEST_CASE(connecting)
 {

@@ -56,6 +56,16 @@ namespace aquarius
 			return name_;
 		}
 
+		void session(std::size_t uid)
+		{
+			session_id_ = uid;
+		}
+
+		std::size_t session() const
+		{
+			return session_id_;
+		}
+
 	protected:
 		virtual auto handle() -> asio::awaitable<error_code> = 0;
 
@@ -71,6 +81,8 @@ namespace aquarius
 		std::string name_;
 
 		response_t response_;
+
+		std::size_t session_id_;
 	};
 
 	template <typename Handler>
@@ -78,9 +90,11 @@ namespace aquarius
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			auto f = [](flex_buffer& buffer, int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+			auto f = [](flex_buffer& buffer, std::size_t session_id, int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 			{
 				auto handler_ptr = std::make_shared<Handler>();
+
+				handler_ptr->session(session_id);
 
 				error_code ec{};
 

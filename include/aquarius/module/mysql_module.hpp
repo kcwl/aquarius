@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_MYSQL
 #include <aquarius/basic_module.hpp>
 #include <aquarius/module/module_register.hpp>
 #include <aquarius/resource/mysql_config.hpp>
@@ -106,3 +107,4 @@ namespace aquarius
 		std::shared_ptr<sql_op_t> connector_;
 	};
 } // namespace aquarius
+#endif
