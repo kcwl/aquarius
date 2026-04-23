@@ -209,20 +209,9 @@ namespace aquarius
 
 		bool cpp_generator::generate_construction_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
-			ofs << "\t" << field_ptr->name() << "()";
+			ofs << "\t" << field_ptr->name() << "();" << std::endl;
 
-			if (field_ptr->fields().empty())
-			{
-				ofs << " = default;";
-			}
-			else
-			{
-				ofs << ";";
-			}
-
-			ofs << std::endl;
-
-			ofs << "\t" << "virtual ~" << field_ptr->name() << "() = default;" << std::endl;
+			ofs << "\t" << "virtual ~" << field_ptr->name() << "();" << std::endl;
 
 			ofs << std::endl;
 
@@ -348,9 +337,6 @@ namespace aquarius
 
 		bool cpp_generator::generate_construction_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
-			if (field_ptr->fields().empty() || !field_ptr)
-				return false;
-
 			auto name = field_ptr->name();
 
 			ofs << name << "::" << name << "()" << std::endl;
@@ -358,6 +344,10 @@ namespace aquarius
 			ofs << "\t: impl_ptr_(std::make_unique<impl>())" << std::endl;
 
 			ofs << "{}" << std::endl;
+
+			ofs << std::endl;
+
+			ofs << name << "::~" << name << "(){}" << std::endl;
 
 			return true;
 		}

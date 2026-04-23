@@ -14,6 +14,8 @@ regist_req_body::regist_req_body()
 	: impl_ptr_(std::make_unique<impl>())
 {}
 
+regist_req_body::~regist_req_body(){}
+
 void regist_req_body::serialize(aquarius::flex_buffer& buffer)
 {
 	this->parse_to(*this->impl_ptr_, buffer);
@@ -82,6 +84,11 @@ string& regist_req_body::version()
 struct regist_resp_body::impl
 {
 };
+regist_resp_body::regist_resp_body()
+	: impl_ptr_(std::make_unique<impl>())
+{}
+
+regist_resp_body::~regist_resp_body(){}
 
 void regist_resp_body::serialize(aquarius::flex_buffer& buffer)
 {

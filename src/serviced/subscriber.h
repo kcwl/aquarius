@@ -13,8 +13,6 @@ namespace aquarius
 		public:
 			std::size_t id() const;
 
-			std::size_t& id();
-
 			void id(std::size_t v);
 
 		private:

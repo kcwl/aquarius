@@ -8,7 +8,7 @@ class regist_req_body: public aquarius::tcp_serialize
 {
 public:
 	regist_req_body();
-	virtual ~regist_req_body() = default;
+	virtual ~regist_req_body();
 
 	regist_req_body(regist_req_body&&) = default;
 	regist_req_body& operator=(regist_req_body&&) = default;
@@ -47,8 +47,8 @@ private:
 class regist_resp_body: public aquarius::tcp_serialize
 {
 public:
-	regist_resp_body() = default;
-	virtual ~regist_resp_body() = default;
+	regist_resp_body();
+	virtual ~regist_resp_body();
 
 	regist_resp_body(regist_resp_body&&) = default;
 	regist_resp_body& operator=(regist_resp_body&&) = default;
