@@ -1,19 +1,13 @@
 ﻿#include <aquarius.hpp>
+#include <aquarius/http.hpp>
+#include <aquarius/tcp.hpp>
 #include <iostream>
 
 namespace aquarius
 {
 	HTTP_CONFIG_INVOKE(cfg)
-	{
-
-	}
-
-	MYSQL_CONFIG_INVOKE(cfg)
-	{
-
-	}
-}
-
+	{}
+} // namespace aquarius
 
 int main(int argc, char* argv[])
 {
@@ -28,12 +22,12 @@ int main(int argc, char* argv[])
 	cmd.load_options(argc, argv);
 
 	aquarius::tcp_server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
-								  cmd.option<std::string>("name"));
+							 cmd.option<std::string>("name"));
 
 	std::thread t([&] { srv.run(); });
 
 	aquarius::http_server http_srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
-							 cmd.option<std::string>("name"));
+								   cmd.option<std::string>("name"));
 
 	std::thread t1([&] { http_srv.run(); });
 
