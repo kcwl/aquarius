@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(normal_flow)
 	std::string content = "normal channel flow";
 	buf.sputn(content.c_str(), content.size());
 
-	auto f = [](flex_buffer& buffer, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	auto f = [](flex_buffer& buffer,std::size_t, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{
 		flex_buffer resp;
 		resp.sputn((char*)buffer.data().data(), buffer.size());
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(normal_flow)
 
 	auto future = asio::co_spawn(
 		io, [&]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{ co_return co_await mpc_publish("test", buf, 0); }, asio::use_future);
+		{ co_return co_await mpc_publish("test", buf,0, 0); }, asio::use_future);
 
 	io.run();
 
@@ -40,14 +40,14 @@ BOOST_AUTO_TEST_CASE(error_flow)
 
 	flex_buffer buf{};
 
-	auto f = [](flex_buffer& buffer, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	auto f = [](flex_buffer& buffer,std::size_t, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{ co_return std::unexpected(asio::error::bad_descriptor); };
 
 	mpc_subscribe("test1", f);
 
 	auto future = asio::co_spawn(
 		io, [&]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{ co_return co_await mpc_publish("test1", buf, 0); }, asio::use_future);
+		{ co_return co_await mpc_publish("test1", buf,0, 0); }, asio::use_future);
 
 	io.run();
 
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(publish_no_exist)
 
 	auto future = asio::co_spawn(
 		io, [&]() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{ co_return co_await mpc_publish("test2", buf, 0); }, asio::use_future);
+		{ co_return co_await mpc_publish("test2", buf, 0, 0); }, asio::use_future);
 
 	io.run();
 
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(publish_no_exist)
 
 BOOST_AUTO_TEST_CASE(multi_subscribe)
 {
-	auto f = [](flex_buffer& buffer, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	auto f = [](flex_buffer& buffer,std::size_t, int) -> asio::awaitable<std::expected<flex_buffer, error_code>>
 	{ co_return std::unexpected(asio::error::bad_descriptor); };
 
 	auto result = mpc_subscribe("test", f);

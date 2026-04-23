@@ -12,6 +12,11 @@ struct mock_read_error_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -35,6 +40,11 @@ struct mock_second_read_error_session
 	mock_second_read_error_session(asio::io_context& context)
 		: io(context)
 	{}
+
+	std::size_t uuid() const
+	{
+		return 0;
+	}
 
 	auto get_executor()
 	{

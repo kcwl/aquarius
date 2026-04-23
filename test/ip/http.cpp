@@ -21,6 +21,11 @@ struct mock_read_error_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -48,6 +53,11 @@ struct mock_error_method_session
 	mock_error_method_session(asio::io_context& context)
 		: io(context)
 	{}
+
+	std::size_t uuid() const
+	{
+		return 0;
+	}
 
 	auto get_executor()
 	{
@@ -92,6 +102,11 @@ struct mock_error_url_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -133,6 +148,11 @@ struct mock_error_version_session
 	mock_error_version_session(asio::io_context& context)
 		: io(context)
 	{}
+
+	std::size_t uuid() const
+	{
+		return 0;
+	}
 
 	auto get_executor()
 	{
@@ -176,6 +196,11 @@ struct mock_complete_no_recv_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -214,6 +239,11 @@ struct mock_complete_no_recv_session
 
 struct mock_no_length_session
 {
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	mock_no_length_session(asio::io_context& context)
 		: io(context)
 	{}
@@ -259,6 +289,11 @@ struct mock_normal_session
 	mock_normal_session(asio::io_context& context)
 		: io(context)
 	{}
+
+	std::size_t uuid() const
+	{
+		return 0;
+	}
 
 	auto get_executor()
 	{
@@ -324,6 +359,11 @@ struct mock_query_error_status_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -366,6 +406,11 @@ struct mock_query_error_version_session
 		: io(context)
 	{}
 
+	std::size_t uuid() const
+	{
+		return 0;
+	}
+
 	auto get_executor()
 	{
 		return io.get_executor();
@@ -407,6 +452,11 @@ struct mock_query_normal_session
 	mock_query_normal_session(asio::io_context& context)
 		: io(context)
 	{}
+
+	std::size_t uuid() const
+	{
+		return 0;
+	}
 
 	auto get_executor()
 	{
