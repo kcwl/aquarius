@@ -1,5 +1,5 @@
 #define BOOST_TEST_NO_MAIN
-#include <aquarius/ip/http.hpp>
+#include <aquarius/http.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace aquarius;

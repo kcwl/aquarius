@@ -44,8 +44,10 @@ public:
 		return true;
 	}
 
-	virtual void timer(std::chrono::milliseconds) override
-	{}
+	virtual auto timer(std::chrono::milliseconds) -> asio::awaitable<void> override
+	{
+		co_return;
+	}
 
 	virtual auto run() -> asio::awaitable<bool> override
 	{
