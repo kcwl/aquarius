@@ -39,9 +39,6 @@
     <ClInclude Include="..\src\serviced\subscriber.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\channel.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\serviced.cpp">
@@ -66,9 +63,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\serviced\subscriber.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\serviced\channel.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -110,7 +110,26 @@ namespace aquarius
 			co_return error_code{};
 		}
 
-		auto invoke(std::size_t uid, flex_buffer_view buffer) -> asio::awaitable<error_code>
+		//auto invoke_v(std::size_t uid, flex_buffer_view buffer) -> asio::awaitable<error_code>
+		//{
+		//	std::lock_guard lk(mutex_);
+
+		//	auto iter = sessions_.find(uid);
+
+		//	if (iter == sessions_.end())
+		//	{
+		//		co_return error_code();
+		//	}
+
+		//	if (!iter->second)
+		//	{
+		//		co_return error_code();
+		//	}
+
+		//	co_return co_await iter->second->async_send(buffer);
+		//}
+
+		auto invoke(const std::size_t uid, flex_buffer buffer) -> asio::awaitable<error_code>
 		{
 			std::lock_guard lk(mutex_);
 
@@ -126,7 +145,7 @@ namespace aquarius
 				co_return error_code();
 			}
 
-			co_return co_await iter->second->async_send(buffer);
+			co_return co_await iter->second->async_send(std::move(buffer));
 		}
 
 	private:

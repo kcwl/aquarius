@@ -1,5 +1,7 @@
 #pragma once
-#include "channel.h"
+#include "customer.h"
+#include "proto/regist.virgo.h"
+#include "subscriber.h"
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/module/module_register.hpp>
 #include <map>
@@ -11,27 +13,51 @@ namespace aquarius
 	{
 		AQUARIUS_MODULE(service_center_module)
 		{
+			class channel
+			{
+				friend class service_center_module;
+
+			public:
+				channel() = default;
+
+			public:
+				auto subscribe(std::shared_ptr<subscriber> subscriber_ptr) -> asio::awaitable<std::vector<instance>>;
+
+				auto publish(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>;
+
+				bool empty() const;
+
+				std::shared_ptr<customer> get_service(std::size_t id);
+
+			private:
+				void unsubscribe(std::shared_ptr<subscriber> subscriber_ptr);
+
+				auto unpublish(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>;
+
+			private:
+				std::map<std::size_t, std::shared_ptr<subscriber>> subscribers_;
+
+				std::map<std::size_t, std::weak_ptr<customer>> customers_;
+			};
+
 		public:
 			service_center_module() = default;
 
 		public:
-			void regist(std::shared_ptr<customer> customer_ptr);
+			auto publish(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>;
 
-			void remove(std::shared_ptr<customer> customer_ptr);
+			auto subscribe(const std::string& group, std::shared_ptr<subscriber> subscriber_ptr)
+				-> asio::awaitable<std::vector<instance>>;
 
-			auto get_services(const std::string& group, const std::string& topic)
-				-> std::expected<std::vector<std::shared_ptr<customer>>, bool>;
-
-			void subscribe(const std::string& group, const std::string& topic,
-						   std::shared_ptr<subscriber> subscriber_ptr);
-
-			auto publish(const std::string& group, const std::string& topic, flex_buffer& buffer)
-				-> asio::awaitable<error_code>;
+		private:
+			auto remove(std::shared_ptr<customer> customer_ptr)->asio::awaitable<void>;
 
 		private:
 			std::shared_mutex mutex_;
 
 			std::map<std::string, std::shared_ptr<channel>> channel_groups_;
+
+			std::map<std::size_t, std::shared_ptr<customer>> customers_;
 		};
 	} // namespace serviced
 } // namespace aquarius

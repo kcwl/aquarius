@@ -20,18 +20,14 @@ namespace aquarius
 	};
 
 	template <auto MemberFunc, typename... Args>
-	inline auto mpc_async_call(Args&&... args)
-		-> typename member_func_pointer<decltype(MemberFunc)>::return_type
+	inline auto mpc_async_call(Args&&... args) -> typename member_func_pointer<decltype(MemberFunc)>::return_type
 	{
 		using return_type = typename member_func_pointer<decltype(MemberFunc)>::return_type::value_type;
 		using class_type = typename member_func_pointer<decltype(MemberFunc)>::class_type;
 
-		auto f = [&](class_type* m) -> asio::awaitable<return_type>
-		{
-			auto func = std::bind(MemberFunc, m, std::forward<Args>(args)...);
-
-			co_return co_await func();
-		};
+		auto f = [tp = std::move(std::make_tuple(std::forward_like<Args>(args)...))](
+					 class_type* m) mutable -> asio::awaitable<return_type>
+		{ co_return co_await std::apply(std::bind_front(MemberFunc, m), std::move(tp)); };
 
 		co_return co_await module_router::get_mutable_instance().async_schedule<class_type, return_type>(/*task*/ f);
 	}
@@ -42,12 +38,8 @@ namespace aquarius
 		using return_type = typename member_func_pointer<decltype(MemberFunc)>::return_type;
 		using class_type = typename member_func_pointer<decltype(MemberFunc)>::class_type;
 
-		auto f = [&](class_type* m)
-		{
-			auto func = std::bind(MemberFunc, m, std::forward<Args>(args)...);
-
-			return func();
-		};
+		auto f = [tp = std::move(std::make_tuple(std::forward_like<Args>(args)...))](class_type* m) mutable
+		{ return std::apply(std::bind_front(MemberFunc, m), tp); };
 
 		return module_router::get_mutable_instance().schedule<class_type, return_type>(/*task*/ f);
 	}

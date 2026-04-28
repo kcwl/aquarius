@@ -14,3 +14,32 @@ message regist -> 9000
 	{
 	}
 }
+
+struct instance
+{
+	string host;
+	int32 port;
+}
+
+message subscribe_service -> 9001
+{
+	request
+	{
+		string group;
+	}
+	response
+	{
+		repeated instance instances;
+	}
+}
+
+message broad_service_status -> 9002
+{
+	request{}
+	response
+	{
+		string host;
+		int32 port;
+		bool healty;
+	}
+}

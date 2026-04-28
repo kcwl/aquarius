@@ -99,3 +99,123 @@ void regist_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	*this->impl_ptr_ = this->parse_from<regist_resp_body::impl>(buffer); 
 }
+
+
+struct subscribe_service_req_body::impl
+{
+	string group;
+};
+subscribe_service_req_body::subscribe_service_req_body()
+	: impl_ptr_(std::make_unique<impl>())
+{}
+
+subscribe_service_req_body::~subscribe_service_req_body(){}
+
+void subscribe_service_req_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this->impl_ptr_, buffer);
+}
+
+void subscribe_service_req_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this->impl_ptr_ = this->parse_from<subscribe_service_req_body::impl>(buffer); 
+}
+string subscribe_service_req_body::group() const
+{
+	return impl_ptr_->group;
+}
+string& subscribe_service_req_body::group()
+{
+	return impl_ptr_->group;
+}
+struct subscribe_service_resp_body::impl
+{
+	std::vector<instance> instances;
+};
+subscribe_service_resp_body::subscribe_service_resp_body()
+	: impl_ptr_(std::make_unique<impl>())
+{}
+
+subscribe_service_resp_body::~subscribe_service_resp_body(){}
+
+void subscribe_service_resp_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this->impl_ptr_, buffer);
+}
+
+void subscribe_service_resp_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this->impl_ptr_ = this->parse_from<subscribe_service_resp_body::impl>(buffer); 
+}
+std::vector<instance> subscribe_service_resp_body::instances() const
+{
+	return impl_ptr_->instances;
+}
+std::vector<instance>& subscribe_service_resp_body::instances()
+{
+	return impl_ptr_->instances;
+}
+
+struct broad_service_status_req_body::impl
+{
+};
+broad_service_status_req_body::broad_service_status_req_body()
+	: impl_ptr_(std::make_unique<impl>())
+{}
+
+broad_service_status_req_body::~broad_service_status_req_body(){}
+
+void broad_service_status_req_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this->impl_ptr_, buffer);
+}
+
+void broad_service_status_req_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this->impl_ptr_ = this->parse_from<broad_service_status_req_body::impl>(buffer); 
+}
+struct broad_service_status_resp_body::impl
+{
+	string host;
+	int32 port;
+	bool healty;
+};
+broad_service_status_resp_body::broad_service_status_resp_body()
+	: impl_ptr_(std::make_unique<impl>())
+{}
+
+broad_service_status_resp_body::~broad_service_status_resp_body(){}
+
+void broad_service_status_resp_body::serialize(aquarius::flex_buffer& buffer)
+{
+	this->parse_to(*this->impl_ptr_, buffer);
+}
+
+void broad_service_status_resp_body::deserialize(aquarius::flex_buffer& buffer)
+{
+	*this->impl_ptr_ = this->parse_from<broad_service_status_resp_body::impl>(buffer); 
+}
+string broad_service_status_resp_body::host() const
+{
+	return impl_ptr_->host;
+}
+string& broad_service_status_resp_body::host()
+{
+	return impl_ptr_->host;
+}
+int32 broad_service_status_resp_body::port() const
+{
+	return impl_ptr_->port;
+}
+int32& broad_service_status_resp_body::port()
+{
+	return impl_ptr_->port;
+}
+bool broad_service_status_resp_body::healty() const
+{
+	return impl_ptr_->healty;
+}
+bool& broad_service_status_resp_body::healty()
+{
+	return impl_ptr_->healty;
+}

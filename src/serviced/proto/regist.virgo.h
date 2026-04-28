@@ -64,6 +64,109 @@ private:
 	std::unique_ptr<impl> impl_ptr_;
 };
 
+struct instance
+{
+	string host;
+	int32 port;
+};
+
+class subscribe_service_req_body: public aquarius::tcp_serialize
+{
+public:
+	subscribe_service_req_body();
+	virtual ~subscribe_service_req_body();
+
+	subscribe_service_req_body(subscribe_service_req_body&&) = default;
+	subscribe_service_req_body& operator=(subscribe_service_req_body&&) = default;
+
+public:
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
+
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+
+
+	string group() const;
+	string& group();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
+};
+class subscribe_service_resp_body: public aquarius::tcp_serialize
+{
+public:
+	subscribe_service_resp_body();
+	virtual ~subscribe_service_resp_body();
+
+	subscribe_service_resp_body(subscribe_service_resp_body&&) = default;
+	subscribe_service_resp_body& operator=(subscribe_service_resp_body&&) = default;
+
+public:
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
+
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+
+
+	std::vector<instance> instances() const;
+	std::vector<instance>& instances();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
+};
+
+class broad_service_status_req_body: public aquarius::tcp_serialize
+{
+public:
+	broad_service_status_req_body();
+	virtual ~broad_service_status_req_body();
+
+	broad_service_status_req_body(broad_service_status_req_body&&) = default;
+	broad_service_status_req_body& operator=(broad_service_status_req_body&&) = default;
+
+public:
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
+
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
+};
+class broad_service_status_resp_body: public aquarius::tcp_serialize
+{
+public:
+	broad_service_status_resp_body();
+	virtual ~broad_service_status_resp_body();
+
+	broad_service_status_resp_body(broad_service_status_resp_body&&) = default;
+	broad_service_status_resp_body& operator=(broad_service_status_resp_body&&) = default;
+
+public:
+	virtual void serialize(aquarius::flex_buffer& buffer) override;
+
+	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+
+
+	string host() const;
+	string& host();
+
+	int32 port() const;
+	int32& port();
+
+	bool healty() const;
+	bool& healty();
+
+private:
+	struct impl;
+	std::unique_ptr<impl> impl_ptr_;
+};
+
 
 using regist_tcp_request = aquarius::tcp_request<"9000", regist_req_body>;
 using regist_tcp_response = aquarius::tcp_response<regist_resp_body>;
+using subscribe_service_tcp_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
+using subscribe_service_tcp_response = aquarius::tcp_response<subscribe_service_resp_body>;
+using broad_service_status_tcp_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
+using broad_service_status_tcp_response = aquarius::tcp_response<broad_service_status_resp_body>;
