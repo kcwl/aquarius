@@ -11,6 +11,7 @@ namespace aquarius
 		{
 			success,
 			auth_failed,
+			pedding,
 		};
 
 		std::string_view from_error_string(gate_op e);

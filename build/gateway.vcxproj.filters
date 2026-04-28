@@ -33,6 +33,12 @@
     <ClCompile Include="..\src\gateway\gate_error_code.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gateway\client_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h">
@@ -50,5 +56,19 @@
     <ClInclude Include="..\src\gateway\gate_error_code.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\gateway\client_pool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\proto\shake.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\payload.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\gateway\proto\shake.virgo">
+      <Filter>proto</Filter>
+    </None>
   </ItemGroup>
 </Project>

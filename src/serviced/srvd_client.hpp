@@ -2,7 +2,7 @@
 #include <aquarius/module/module_register.hpp>
 #include <aquarius/resource/config_tag_invoke.hpp>
 #include <aquarius/tcp.hpp>
-#include <serviced/proto/regist.virgo.h>
+#include <proto/regist.virgo.h>
 
 #define HEALTHY_CHECK_TOKEN(args) typename
 
@@ -18,7 +18,9 @@ namespace aquarius
 	{
 		AQUARIUS_MODULE(srvd_client)
 		{
-			using healty_check_func_t = std::function<void(const std::string&, int32_t, bool)>;
+			using healty_check_func_t = std::function<asio::awaitable<void>(const std::string&, int32_t, bool)>;
+
+			using subscribe_func_t = std::function<void(const std::vector<instance>&)>;
 
 		public:
 			virtual bool init() override
@@ -35,7 +37,7 @@ namespace aquarius
 
 			virtual auto run() -> asio::awaitable<bool> override
 			{
-				co_return (!co_await client_ptr_->async_connect(host_, port_));
+				co_return (!co_await client_ptr_->async_connect(host_, static_cast<uint16_t>(port_)));
 			}
 
 			auto timer(std::chrono::milliseconds) -> asio::awaitable<void>
@@ -58,20 +60,19 @@ namespace aquarius
 				co_return !co_await client_ptr_->async_send(std::move(buffer));
 			}
 
-			template <typename Func>
-			auto subscribe(const std::string& group, Func&& func) -> asio::awaitable<void>
+			auto subscribe(const std::string& group, const subscribe_func_t& func) -> asio::awaitable<void>
 			{
-				auto ptr = std::make_shared<subscribe_request>();
+				auto req = std::make_shared<subscribe_service_tcp_request>();
 
-				ptr->body().group(group);
+				req->body().group() = group;
 
-				client_ptr_->async_send(ptr, [&](subscribe_resp& resp) { func(resp.body().instances()); });
+				client_ptr_->async_send(req,
+										[&](subscribe_service_tcp_response& resp) { func(resp.body().instances()); });
 			}
 
-			template <HEALTHY_CHECK_TOKEN(void(const std::string&, int32_t, bool)) Func>
-			void set_healty_check(Func && func)
+			void set_healty_check(const healty_check_func_t& func)
 			{
-				healthy_check_func_ = std::forward<Func>(func);
+				healthy_check_func_ = func;
 			}
 
 			template <typename... Args>

@@ -22,6 +22,41 @@ namespace aquarius
 
 		using executor_t = Executor;
 
+		struct awaitable
+		{
+			basic_client* self;
+
+			std::size_t src;
+
+			bool await_ready()
+			{
+				return self->buffers_.find(src) != self->buffers_.end();
+			}
+
+			void await_suspend(std::coroutine_handle<void> h)
+			{
+				asio::co_spawn(
+					co_await asio::this_coro::executor,
+					[handle = std::move(h)]() -> asio::awaitable<void> { handle.resume(); }, asio::detached);
+			}
+
+			void await_resume()
+			{}
+
+			awaitable get_return_objec()
+			{
+				return *this;
+			}
+		};
+
+		struct callback
+		{
+			using func_t = std::function<void(flex_buffer)>;
+
+			flex_buffer buffer;
+			func_t func;
+		};
+
 	public:
 		basic_client(asio::io_context& context, std::chrono::milliseconds timeout)
 			: basic_client(context.get_executor(), timeout)
@@ -120,7 +155,7 @@ namespace aquarius
 		}
 
 		template <typename Response, typename Request>
-		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<Response>
+		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 		{
 			flex_buffer buffer{};
 
@@ -150,6 +185,20 @@ namespace aquarius
 			co_return resp;
 		}
 
+		template <typename Request>
+		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<bool>
+		{
+			flex_buffer buffer{};
+
+			req->commit(buffer);
+
+			auto ec = co_await async_send(std::move(buffer));
+
+			make_error(ec);
+
+			co_return !ec;
+		}
+
 	protected:
 		bool make_error(error_code& ec)
 		{
@@ -169,6 +218,58 @@ namespace aquarius
 		}
 
 	private:
+		bool regist_resp_buffer(std::size_t src, flex_buffer buffer)
+		{
+			std::lock_guard lk(buf_mutex_);
+
+			auto iter = buffers_.find(src);
+			if (iter == buffers_.end())
+			{
+				return false;
+			}
+
+			iter->second.buffer = std::move(buffer);
+
+			return true;
+		}
+
+		void regist_resp_func(std::size_t src, const callback::func_t& func)
+		{
+			std::lock_guard lk(buf_mutex_);
+
+			auto iter = buffers_.find(src);
+			if (iter != buffers_.end())
+			{
+				return;
+			}
+
+			auto ptr = std::make_shared<callback>();
+
+			ptr->func = func;
+		}
+
+		auto wait_buffer(std::size_t src) -> awaitable
+		{
+			co_return awaitable(this, src);
+		}
+
+		void make_response(std::size_t src)
+		{
+			std::lock_guard lk(buf_mutex_);
+
+			auto iter = buffers_.find(src);
+
+			if (iter == buffers_.end())
+			{
+				return;
+			}
+
+			iter->second.func(iter->second.buffer);
+
+			buffers_.erase(iter);
+		}
+
+	private:
 		executor_t executor_;
 
 		std::shared_ptr<Session> session_ptr_;
@@ -182,5 +283,9 @@ namespace aquarius
 		uint16_t port_;
 
 		std::chrono::milliseconds timeout_;
+
+		std::mutex buf_mutex_;
+
+		std::map<std::size_t, std::shared_ptr<callback>> buffers_;
 	};
 } // namespace aquarius

@@ -1,43 +1,45 @@
 #pragma once
-#include "error.hpp"
 #include <random>
 #include <set>
+#include <aquarius/detail/uuid_generator.hpp>
 
 namespace aquarius
 {
-	namespace serviced
+	namespace gateway
 	{
+		template<typename T>
 		struct round_robin
 		{
 			round_robin()
 				: index(0)
 			{}
 
-			std::shared_ptr<customer_base> invoke(const std::vector<std::shared_ptr<customer_base>>& customers)
+			std::shared_ptr<T> invoke(const std::vector<std::shared_ptr<T>>& entities)
 			{
-				if (customers.empty())
+				if (entities.empty())
 				{
 					return nullptr;
 				}
 
-				if (index >= customers.size())
+				if (index >= entities.size())
 				{
 					index = 0;
 				}
 
-				return customers[index++];
+				return entities[index++];
 			}
 
 			std::size_t index;
 		};
 
+		template<typename T>
 		struct weight_first
 		{
 			constexpr static std::size_t max_weigth = 100;
 
-			std::shared_ptr<customer_base> invoke(const std::vector<std::shared_ptr<customer_base>>& customers)
+			std::shared_ptr<T> invoke(const std::vector<std::shared_ptr<T>>& entities)
 			{
-				if (customers.empty())
+				if (entities.empty())
 				{
 					return nullptr;
 				}
@@ -49,7 +51,7 @@ namespace aquarius
 
 				auto weight = distrib(gen);
 
-				for (auto& subscriber : customers)
+				for (auto& subscriber : entities)
 				{
 					if (weight < subscriber->weight())
 					{
@@ -61,28 +63,28 @@ namespace aquarius
 			}
 		};
 
-		template <typename UUID>
+		template <typename T>
 		struct uuid_hash
 		{
-			std::shared_ptr<customer_base> invoke(const std::vector<std::shared_ptr<customer_base>>& customers)
+			std::shared_ptr<T> invoke(const std::vector<std::shared_ptr<T>>& entities)
 			{
-				if (customers.empty())
+				if (entities.empty())
 				{
 					return nullptr;
 				}
 
-				auto index = UUID()() % customers.size();
+				auto index = detail::uuid_generator()() % entities.size();
 
-				return customers[index];
+				return entities[index];
 			}
 		};
 
-		template <typename Invoke>
+		template <typename Invoke, typename T>
 		struct some_min
 		{
-			std::shared_ptr<customer_base> invoke(const std::vector<std::shared_ptr<customer_base>>& customers)
+			std::shared_ptr<T> invoke(const std::vector<std::shared_ptr<T>>& entities)
 			{
-				if (customers.empty())
+				if (entities.empty())
 				{
 					return nullptr;
 				}
@@ -90,7 +92,7 @@ namespace aquarius
 				int index = 0;
 				int target = index;
 				std::size_t max_total = std::numeric_limits<std::size_t>::max();
-				for (auto& subscriber : customers)
+				for (auto& subscriber : entities)
 				{
 					auto min = Invoke(subscriber)();
 
@@ -103,10 +105,10 @@ namespace aquarius
 					index++;
 				}
 
-				if (target >= customers.size())
+				if (target >= entities.size())
 					return nullptr;
 
-				return customers[target];
+				return entities[target];
 			}
 		};
 	} // namespace serviced
