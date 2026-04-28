@@ -141,6 +141,7 @@
     <ClInclude Include="..\src\serviced\proto\cmd.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
     <ClInclude Include="..\src\serviced\service_center_module.h" />
+    <ClInclude Include="..\src\serviced\srvd_client.hpp" />
     <ClInclude Include="..\src\serviced\subscriber.h" />
   </ItemGroup>
   <ItemGroup>
