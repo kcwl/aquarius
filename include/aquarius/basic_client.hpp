@@ -12,7 +12,7 @@ namespace aquarius
 	using namespace std::chrono_literals;
 
 	template <typename Session, typename Executor = asio::any_io_executor>
-	class basic_client
+	class basic_client : public std::enable_shared_from_this<basic_client<Session, Executor>>
 	{
 		using socket = Session::socket;
 
@@ -21,41 +21,6 @@ namespace aquarius
 		using callback_t = std::function<void(std::shared_ptr<Session>)>;
 
 		using executor_t = Executor;
-
-		struct awaitable
-		{
-			basic_client* self;
-
-			std::size_t src;
-
-			bool await_ready()
-			{
-				return self->buffers_.find(src) != self->buffers_.end();
-			}
-
-			void await_suspend(std::coroutine_handle<void> h)
-			{
-				asio::co_spawn(
-					co_await asio::this_coro::executor,
-					[handle = std::move(h)]() -> asio::awaitable<void> { handle.resume(); }, asio::detached);
-			}
-
-			void await_resume()
-			{}
-
-			awaitable get_return_objec()
-			{
-				return *this;
-			}
-		};
-
-		struct callback
-		{
-			using func_t = std::function<void(flex_buffer)>;
-
-			flex_buffer buffer;
-			func_t func;
-		};
 
 	public:
 		basic_client(asio::io_context& context, std::chrono::milliseconds timeout)
@@ -89,14 +54,22 @@ namespace aquarius
 				port_ = port;
 
 				accept_invoke();
+
+				auto self = this->shared_from_this();
+
+				asio::co_spawn(
+					executor_,
+					[&, this, self]() -> asio::awaitable<void>
+					{
+						for (;;)
+						{
+							co_await session_ptr_->query();
+						}
+					},
+					asio::detached);
 			}
 
 			co_return ec;
-		}
-
-		auto reconnect() -> asio::awaitable<error_code>
-		{
-			co_return co_await async_connect(host_, port_);
 		}
 
 		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
@@ -104,21 +77,10 @@ namespace aquarius
 			co_return co_await session_ptr_->async_send(std::move(buffer));
 		}
 
-		std::string remote_address() const
-		{
-			return session_ptr_->remote_address();
-		}
-
-		int remote_port() const
-		{
-			return session_ptr_->remote_port();
-		}
-
 		void close()
 		{
 			session_ptr_->close();
-
-			std::shared_ptr<Session>().swap(session_ptr_);
+			session_ptr_.reset();
 		}
 
 		std::chrono::milliseconds get_timeout() const
@@ -157,6 +119,7 @@ namespace aquarius
 		template <typename Response, typename Request>
 		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 		{
+			req->src() = detail::uuid_generator()();
 			flex_buffer buffer{};
 
 			req->commit(buffer);
@@ -170,23 +133,17 @@ namespace aquarius
 				co_return resp;
 			}
 
-			auto result = co_await session_ptr_->query();
+			auto f = [&](flex_buffer buffer) { resp.consume(buffer); };
 
-			if (!result.has_value())
-			{
-				if (make_error(result.error()))
-				{
-					co_return resp;
-				}
-			}
+			ec = co_await session_ptr_->wait(req->src(), f);
 
-			resp.consume(*result);
+			make_error(ec);
 
 			co_return resp;
 		}
 
 		template <typename Request>
-		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<bool>
+		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<bool>
 		{
 			flex_buffer buffer{};
 
@@ -218,58 +175,6 @@ namespace aquarius
 		}
 
 	private:
-		bool regist_resp_buffer(std::size_t src, flex_buffer buffer)
-		{
-			std::lock_guard lk(buf_mutex_);
-
-			auto iter = buffers_.find(src);
-			if (iter == buffers_.end())
-			{
-				return false;
-			}
-
-			iter->second.buffer = std::move(buffer);
-
-			return true;
-		}
-
-		void regist_resp_func(std::size_t src, const callback::func_t& func)
-		{
-			std::lock_guard lk(buf_mutex_);
-
-			auto iter = buffers_.find(src);
-			if (iter != buffers_.end())
-			{
-				return;
-			}
-
-			auto ptr = std::make_shared<callback>();
-
-			ptr->func = func;
-		}
-
-		auto wait_buffer(std::size_t src) -> awaitable
-		{
-			co_return awaitable(this, src);
-		}
-
-		void make_response(std::size_t src)
-		{
-			std::lock_guard lk(buf_mutex_);
-
-			auto iter = buffers_.find(src);
-
-			if (iter == buffers_.end())
-			{
-				return;
-			}
-
-			iter->second.func(iter->second.buffer);
-
-			buffers_.erase(iter);
-		}
-
-	private:
 		executor_t executor_;
 
 		std::shared_ptr<Session> session_ptr_;
@@ -283,9 +188,5 @@ namespace aquarius
 		uint16_t port_;
 
 		std::chrono::milliseconds timeout_;
-
-		std::mutex buf_mutex_;
-
-		std::map<std::size_t, std::shared_ptr<callback>> buffers_;
 	};
 } // namespace aquarius

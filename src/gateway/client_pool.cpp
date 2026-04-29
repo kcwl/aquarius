@@ -5,6 +5,12 @@
 
 namespace aquarius
 {
+	CONFIG_MICRO(srv_config, cfg)
+	{
+		cfg.host = "127.0.0.1";
+		cfg.port = 3399;
+	}
+
 	namespace gateway
 	{
 		bool client_pool::init()
@@ -87,7 +93,7 @@ namespace aquarius
 					invoke(instance, std::move(buffer), [session_id](flex_buffer resp) -> asio::awaitable<void>
 						   { co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
 
-					co_return gate_op::pedding;
+					co_return std::unexpected(gate_op::pedding);
 				};
 
 				for (auto& topic : resp.body().topics())

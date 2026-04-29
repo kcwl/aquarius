@@ -1,4 +1,5 @@
 #pragma once
+#include "gate_error_code.h"
 #include "payload.hpp"
 #include <aquarius.hpp>
 #include <aquarius/tcp.hpp>
@@ -30,7 +31,7 @@ namespace aquarius
 
 				if (iter == pool_.end())
 				{
-					co_return std::unexpected(error_code::bad_op);
+					co_return Response{};
 				}
 
 				auto ptr = round_.invoke(iter->second);
@@ -40,7 +41,7 @@ namespace aquarius
 			}
 
 			template <typename Func>
-			auto invoke(const std::string& instance, flex_buffer buffer, Func&& func)
+			auto invoke(const std::string& instance, flex_buffer buffer, Func&& func) -> asio::awaitable<error_code>
 			{
 				std::shared_lock lk(mutex_);
 
@@ -48,12 +49,14 @@ namespace aquarius
 
 				if (iter == pool_.end())
 				{
-					return;
+					co_return gate_op::not_exist_in_pool;
 				}
 
 				auto ptr = round_.invoke(iter->second);
+
 				// 负载
-				ptr->async_send(std::move(buffer), std::forward<Func>(func));
+				//co_return co_await ptr->async_send(std::move(buffer), std::forward<Func>(func));
+				co_return co_await ptr->async_send(std::move(buffer));
 			}
 
 		private:

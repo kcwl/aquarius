@@ -191,6 +191,7 @@
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp" />
+    <ClInclude Include="..\include\aquarius\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
@@ -243,6 +244,8 @@
     <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
+    <ClInclude Include="..\include\aquarius\tcp.hpp" />
+    <ClInclude Include="..\include\aquarius\udp.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />

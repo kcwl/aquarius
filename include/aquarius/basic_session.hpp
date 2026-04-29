@@ -29,6 +29,7 @@ namespace aquarius
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
+			, proto_()
 		{}
 
 		virtual ~basic_session() = default;
@@ -211,12 +212,18 @@ namespace aquarius
 				co_return ec;
 			}
 
-			co_return co_await Protocol::accept(this->shared_from_this());
+			co_return co_await proto_.accept(this->shared_from_this());
 		}
 
 		auto query() -> asio::awaitable<std::expected<flex_buffer, error_code>>
 		{
 			co_return co_await Protocol::query(this->shared_from_this());
+		}
+
+		template<typename Func>
+		auto wait(std::size_t src, Func&& f)
+		{
+			return proto_.wait(src, std::forward<Func>(f));
 		}
 
 	protected:
@@ -227,5 +234,7 @@ namespace aquarius
 		std::size_t uuid_;
 
 		duration timeout_;
+
+		Protocol proto_;
 	};
 } // namespace aquarius

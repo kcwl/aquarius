@@ -66,8 +66,9 @@ namespace aquarius
 
 				req->body().group() = group;
 
-				client_ptr_->async_send(req,
-										[&](subscribe_service_tcp_response& resp) { func(resp.body().instances()); });
+				auto resp = co_await client_ptr_->async_call<subscribe_service_tcp_response>(req);
+
+				func(resp.body().instances());
 			}
 
 			void set_healty_check(const healty_check_func_t& func)

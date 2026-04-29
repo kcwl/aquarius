@@ -8,7 +8,9 @@ namespace aquarius
 		{
 			static const std::map<gate_op, std::string_view> desc = { { gate_op::success, "success" },
 																	  { gate_op::auth_failed, "auth_failed" },
-																	  { gate_op::pedding, "op pedding" } };
+																	  { gate_op::pedding, "op pedding" },
+																	  { gate_op::not_exist_in_pool,
+																		"not_exist_in_pool" } };
 
 			auto iter = desc.find(e);
 

@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(connect_success)
 
 			auto req_ptr = std::make_shared<mock_request>();
 
-			BOOST_CHECK_NO_THROW(co_await cli.async_send<mock_response>(req_ptr));
+			BOOST_CHECK_NO_THROW(co_await cli.async_call<mock_response>(req_ptr));
 		},
 		asio::use_future);
 
@@ -153,27 +153,9 @@ BOOST_AUTO_TEST_CASE(connect_failed)
 
 			auto req_ptr = std::make_shared<mock_request>();
 
-			BOOST_CHECK_NO_THROW(co_await cli.async_send<mock_response>(req_ptr));
+			BOOST_CHECK_NO_THROW(co_await cli.async_call<mock_response>(req_ptr));
 		},
 		asio::use_future);
-
-	io.run();
-
-	future.get();
-}
-
-BOOST_AUTO_TEST_CASE(remote_info)
-{
-	asio::io_context io{};
-
-	client cli(io, 2s);
-
-	BOOST_TEST(cli.remote_address() == "127.0.0.1");
-
-	BOOST_TEST(cli.remote_port() == 7890);
-
-	auto future =
-		asio::co_spawn(io, [&]() -> asio::awaitable<void> { BOOST_TEST(!co_await cli.reconnect()); }, asio::use_future);
 
 	io.run();
 
