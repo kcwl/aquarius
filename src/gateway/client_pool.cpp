@@ -16,6 +16,8 @@ namespace aquarius
 		bool client_pool::init()
 		{
 			group_ = "gateway";
+
+			return true;
 		}
 
 		auto client_pool::run() -> asio::awaitable<bool>
@@ -48,7 +50,7 @@ namespace aquarius
 
 			for (auto& c : iter->second)
 			{
-				c = std::make_shared<tcp_client>();
+				c = std::make_shared<tcp_client>(co_await asio::this_coro::executor, 30ms);
 
 				auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
 

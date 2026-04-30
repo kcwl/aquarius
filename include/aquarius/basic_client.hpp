@@ -135,7 +135,7 @@ namespace aquarius
 
 			auto f = [&](flex_buffer buffer) { resp.consume(buffer); };
 
-			ec = co_await session_ptr_->wait(req->src(), f);
+			co_await session_ptr_->wait(req->src(), f);
 
 			make_error(ec);
 

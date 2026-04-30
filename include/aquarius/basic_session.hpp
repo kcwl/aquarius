@@ -29,7 +29,7 @@ namespace aquarius
 			, timeout_(timeout)
 			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
-			, proto_()
+			, proto_(get_executor())
 		{}
 
 		virtual ~basic_session() = default;
@@ -215,9 +215,9 @@ namespace aquarius
 			co_return co_await proto_.accept(this->shared_from_this());
 		}
 
-		auto query() -> asio::awaitable<std::expected<flex_buffer, error_code>>
+		auto query() -> asio::awaitable<error_code>
 		{
-			co_return co_await Protocol::query(this->shared_from_this());
+			co_return co_await proto_.query(this->shared_from_this());
 		}
 
 		template<typename Func>

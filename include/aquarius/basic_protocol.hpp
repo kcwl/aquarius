@@ -98,17 +98,17 @@ namespace aquarius
 		{
 			return method_;
 		}
-		void src(int m)
+		void src(uint32_t m)
 		{
 			src_ = m;
 		}
 
-		int src() const
+		uint32_t src() const
 		{
 			return src_;
 		}
 
-		int& src()
+		uint32_t& src()
 		{
 			return src_;
 		}

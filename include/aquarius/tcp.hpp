@@ -15,8 +15,10 @@
 
 namespace aquarius
 {
-	struct tcp
+	template<typename Executor = asio::any_io_executor>
+	class tcp
 	{
+	public:
 		using socket = asio::ip::tcp::socket;
 
 		using endpoint = asio::ip::tcp::endpoint;
@@ -38,54 +40,23 @@ namespace aquarius
 			bool complete;
 		};
 
-		template <typename T, typename Protocol>
-		struct awaitable
-		{
-			std::size_t src;
-
-			Protocol& self;
-
-			T buffer;
-
-			bool await_ready()
-			{
-				auto iter = self->buffers.find(src);
-				if (iter != self->buffers.end())
-				{
-					if (iter->second.complete)
-					{
-						buffer = std::move(iter->second.buffer);
-					}
-
-					return iter->second.complete;
-				}
-
-				return true;
-			}
-
-			void await_suspend(std::coroutine_handle<void> h)
-			{
-				asio::co_spawn(
-					co_await asio::this_coro::executor,
-					[handle = std::move(h)]() -> asio::awaitable<void> { handle.resume(); }, asio::detached);
-			}
-
-			T await_resume()
-			{
-				return buffer;
-			}
-
-			awaitable get_return_objec()
-			{
-				return *this;
-			}
-		};
-
 		struct raw_header
 		{
 			uint32_t length;
+			uint32_t src;
 		};
 
+	public:
+		tcp(const Executor& ex)
+			: executor_(ex)
+			, mutex_()
+			, buffers_()
+			, buffer_channel_(executor_)
+		{
+
+		}
+
+	public:
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
@@ -151,7 +122,7 @@ namespace aquarius
 					break;
 				}
 
-				std::size_t src = 0;
+				std::size_t src = read_src(buffer);
 
 				if (!filling_buffer(src, std::move(buffer)))
 				{
@@ -174,11 +145,19 @@ namespace aquarius
 		}
 
 		template <typename Func>
-		auto wait(std::size_t src, Func&& f) -> awaitable<flex_buffer, tcp>
+		auto wait(std::size_t src, Func&& f) -> asio::awaitable<void>
 		{
 			regist_resp_func(src, std::forward<Func>(f));
 
-			co_return co_await awaitable<flex_buffer, tcp>(src, *this);
+			for (;;)
+			{
+				auto next_src = co_await buffer_channel_.async_receive(asio::use_awaitable);
+
+				if (next_src == src)
+				{
+					break;
+				}
+			}
 		}
 
 	private:
@@ -218,12 +197,16 @@ namespace aquarius
 
 			if (iter == buffers_.end())
 			{
+				buffer_channel_.try_send(error_code{}, 0);
+
 				return false;
 			}
 
 			iter->second->func(std::move(buffer));
 
 			iter->second->complete = true;
+
+			buffer_channel_.try_send(error_code{}, src);
 
 			return true;
 		}
@@ -243,16 +226,27 @@ namespace aquarius
 			ptr->func = func;
 		}
 
+		std::size_t read_src(flex_buffer& buffer)
+		{
+			std::size_t src = 0;
+			buffer.sgetn((char*)&src, sizeof(uint32_t));
+			return src;
+		}
+
 	private:
+		Executor executor_;
+
 		std::mutex mutex_;
 
 		std::map<std::size_t, std::shared_ptr<callback>> buffers_;
+
+		asio::experimental::channel<void(error_code ec, std::size_t)> buffer_channel_;
 	};
 
-	using tcp_session = basic_session<tcp, raw_adaptor>;
+	using tcp_session = basic_session<tcp<>, raw_adaptor>;
 	using tcp_server = basic_server<tcp_session>;
 	using tcp_client = basic_client<tcp_session>;
 
-	using ssl_tcp_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
-	using ssl_tcp_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
+	using ssl_tcp_server = basic_server<basic_session<tcp<>, ssl_client_adaptor>>;
+	using ssl_tcp_client = basic_client<basic_session<tcp<>, ssl_server_adaptor>>;
 } // namespace aquarius
