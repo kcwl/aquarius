@@ -26,6 +26,7 @@
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="..\src\gateway\payload.hpp" />
     <ClInclude Include="..\src\gateway\player.h" />
     <ClInclude Include="..\src\gateway\proto\shake.virgo.h" />
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\gateway\proto\shake.virgo" />

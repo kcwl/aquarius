@@ -39,6 +39,9 @@
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="..\src\gateway\payload.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
+      <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
