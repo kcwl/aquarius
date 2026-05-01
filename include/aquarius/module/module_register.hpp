@@ -15,5 +15,5 @@ namespace aquarius
 
 #define AQUARIUS_MODULE(m)                                                                                             \
 	class m;                                                                                                           \
-	[[maybe_unused]] static aquarius::auto_module_register<m> __auto_register_##m();                                   \
+	[[maybe_unused]] inline static aquarius::auto_module_register<m> __auto_register_##m;                              \
 	class m : public basic_module<m>

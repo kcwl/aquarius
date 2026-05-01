@@ -24,15 +24,7 @@ int main(int argc, char* argv[])
 	aquarius::tcp_server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
 							 cmd.option<std::string>("name"));
 
-	std::thread t([&] { srv.run(); });
-
-	aquarius::http_server http_srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
-								   cmd.option<std::string>("name"));
-
-	std::thread t1([&] { http_srv.run(); });
-
-	t.join();
-	t1.join();
+	srv.run();
 
 	return 0;
 }
