@@ -16,7 +16,7 @@ namespace aquarius
 
 	namespace serviced
 	{
-		AQUARIUS_MODULE(srvd_client)
+		AQUARIUS_MODULE_TOP(srvd_client)
 		{
 			using healty_check_func_t = std::function<asio::awaitable<void>(const std::string&, int32_t, bool)>;
 

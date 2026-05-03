@@ -1,12 +1,15 @@
 #pragma once
 #include <aquarius/basic_module.hpp>
-#include <aquarius/io_service_pool.hpp>
 #include <aquarius/detail/struct_name.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/singleton.hpp>
+#include <functional>
 #include <map>
 #include <mutex>
 #include <shared_mutex>
+#include <unordered_map>
+#include <vector>
 
 namespace aquarius
 {
@@ -14,34 +17,42 @@ namespace aquarius
 	{
 	public:
 		module_router()
-			: routers_()
+			: routers_by_name_()
+			, routers_by_priority_()
 		{}
 
 		~module_router() = default;
 
 	public:
 		template <typename Module>
-		bool regist()
+		bool regist(int priority = 0)
 		{
 			auto module_ptr = std::make_shared<Module>();
 
-			auto iter = routers_.find(module_ptr->name());
+			auto name = module_ptr->name();
 
-			if (iter != routers_.end())
+			auto iter = routers_by_name_.find(name);
+
+			if (iter != routers_by_name_.end())
 			{
 				return false;
 			}
 
-			routers_.insert({ module_ptr->name(), module_ptr });
+			routers_by_name_.insert({ name, module_ptr });
+			routers_by_priority_[priority].push_back(module_ptr);
 
 			return true;
 		}
 
 		void run(io_service_pool& pool)
 		{
-			for (auto& f : routers_)
+			// run modules by priority (higher priority first)
+			for (auto& pr : routers_by_priority_)
 			{
-				run_one(pool.get_io_service(), f.second);
+				for (auto& module_ptr : pr.second)
+				{
+					run_one(pool.get_io_service(), module_ptr);
+				}
 			}
 		}
 
@@ -50,8 +61,8 @@ namespace aquarius
 		{
 			constexpr auto module_name = detail::struct_name<T>();
 
-			auto iter = routers_.find(std::string(module_name));
-			if (iter == routers_.end())
+			auto iter = routers_by_name_.find(std::string(module_name));
+			if (iter == routers_by_name_.end())
 			{
 				XLOG_WARNING() << "[" << module_name << "] module not found";
 				co_return R{};
@@ -72,8 +83,8 @@ namespace aquarius
 		{
 			constexpr auto module_name = detail::struct_name<T>();
 
-			auto iter = routers_.find(std::string(module_name));
-			if (iter == routers_.end())
+			auto iter = routers_by_name_.find(std::string(module_name));
+			if (iter == routers_by_name_.end())
 			{
 				XLOG_WARNING() << "[" << module_name << "] module not found";
 				return R{};
@@ -91,12 +102,16 @@ namespace aquarius
 
 		void timer(std::chrono::milliseconds ms)
 		{
-			for (auto& f : routers_)
+			for (auto& pr : routers_by_priority_)
 			{
-				if (!f.second)
-					continue;
+				for (auto& module_ptr : pr.second)
+				{
+					if (!module_ptr)
+						continue;
 
-				f.second->timer(ms);
+					// call timer coroutine (return awaitable) and ignore it to mimic previous behavior
+					module_ptr->timer(ms);
+				}
 			}
 		}
 
@@ -120,6 +135,8 @@ namespace aquarius
 		}
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<module_base>> routers_;
+		std::unordered_map<std::string, std::shared_ptr<module_base>> routers_by_name_;
+
+		std::map<int, std::vector<std::shared_ptr<module_base>>, std::greater<int>> routers_by_priority_;
 	};
 } // namespace aquarius
