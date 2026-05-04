@@ -20,7 +20,7 @@ namespace aquarius
 		{
 			using healty_check_func_t = std::function<asio::awaitable<void>(const std::string&, int32_t, bool)>;
 
-			using subscribe_func_t = std::function<void(const std::vector<instance>&)>;
+			using subscribe_func_t = std::function<asio::awaitable<void>(const std::vector<instance>&)>;
 
 		public:
 			virtual bool init() override
@@ -62,15 +62,16 @@ namespace aquarius
 				co_return !co_await client_ptr_->async_send(std::move(buffer));
 			}
 
-			auto subscribe(const std::string& group, const subscribe_func_t& func) -> asio::awaitable<void>
+			auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
 			{
+				auto f = std::move(func);
 				auto req = std::make_shared<subscribe_service_tcp_request>();
 
 				req->body().group() = group;
 
 				auto resp = co_await client_ptr_->async_call<subscribe_service_tcp_response>(req);
 
-				func(resp.body().instances());
+				co_await f(resp.body().instances());
 			}
 
 			void set_healty_check(const healty_check_func_t& func)

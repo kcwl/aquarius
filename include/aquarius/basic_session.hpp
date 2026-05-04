@@ -220,16 +220,15 @@ namespace aquarius
 			co_return co_await proto_.query(this->shared_from_this());
 		}
 
-		template<typename Func>
-		auto wait(std::size_t src, Func&& f)
+		auto wait(std::size_t src)
 		{
-			return proto_.wait(src, std::forward<Func>(f));
+			return proto_.wait(src);
 		}
 
-		template<typename Request>
-		bool make_request(std::shared_ptr<Request> request, flex_buffer& buffer)
+		template<typename Request, typename Func>
+		uint32_t make_request(std::shared_ptr<Request> request, flex_buffer& buffer, Func&& func)
 		{
-			return proto_.make_request(request, buffer);
+			return proto_.make_request(request, buffer, std::forward<Func>(func));
 		}
 
 	protected:

@@ -1,7 +1,7 @@
 #include "client_pool.h"
+#include "gate_error_code.h"
 #include "proto/shake.virgo.h"
 #include <srvd_client.hpp>
-#include "gate_error_code.h"
 
 namespace aquarius
 {
@@ -27,8 +27,8 @@ namespace aquarius
 				{ !healthy ? this->remove(host, port) : co_await this->add(host, port); });
 
 			co_await mpc_async_call<&serviced::srvd_client::subscribe>(
-				group_, [&](const std::vector<instance>& instances) -> asio::awaitable<void>
-				{ co_await this->make_instance_pool(instances); });
+				group_, std::move([&](const std::vector<instance>& instances) -> asio::awaitable<void>
+								  { co_await this->make_instance_pool(instances); }));
 
 			co_return true;
 		}

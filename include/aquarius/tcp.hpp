@@ -151,11 +151,8 @@ namespace aquarius
 			co_return ec;
 		}
 
-		template <typename Func>
-		auto wait(std::size_t src, Func&& f) -> asio::awaitable<void>
+		auto wait(std::size_t src) -> asio::awaitable<void>
 		{
-			regist_resp_func(src, std::forward<Func>(f));
-
 			for (;;)
 			{
 				auto next_src = co_await buffer_channel_.async_receive(asio::use_awaitable);
@@ -167,8 +164,8 @@ namespace aquarius
 			}
 		}
 
-		template <typename Request>
-		std::size_t make_request(std::shared_ptr<Request> request, flex_buffer& buffer)
+		template <typename Request, typename Func>
+		std::size_t make_request(std::shared_ptr<Request> request, flex_buffer& buffer, Func&& func)
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
@@ -186,6 +183,8 @@ namespace aquarius
 			buffer.sputn((char*)&header, sizeof(raw_header));
 
 			buffer.pubseekpos(pos, std::ios::out);
+
+			regist_resp_func(header.src, std::forward<Func>(func));
 
 			return header.src;
 		}
@@ -248,22 +247,13 @@ namespace aquarius
 		{
 			std::lock_guard lk(mutex_);
 
-			auto iter = buffers_.find(src);
-			if (iter != buffers_.end())
+			auto& cb = buffers_[src];
+			if (!cb)
 			{
-				return;
+				cb = std::make_shared<callback>();
 			}
 
-			auto ptr = std::make_shared<callback>();
-
-			ptr->func = func;
-		}
-
-		std::size_t read_src(flex_buffer& buffer)
-		{
-			std::size_t src = 0;
-			buffer.sgetn((char*)&src, sizeof(uint32_t));
-			return src;
+			cb->func = func;
 		}
 
 	private:
