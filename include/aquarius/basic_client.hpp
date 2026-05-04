@@ -119,10 +119,9 @@ namespace aquarius
 		template <typename Response, typename Request>
 		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 		{
-			req->src() = detail::uuid_generator()();
 			flex_buffer buffer{};
 
-			req->commit(buffer);
+			auto src = session_ptr_->make_request(req, buffer);
 
 			auto ec = co_await async_send(std::move(buffer));
 
@@ -135,7 +134,7 @@ namespace aquarius
 
 			auto f = [&](flex_buffer buffer) { resp.consume(buffer); };
 
-			co_await session_ptr_->wait(req->src(), f);
+			co_await session_ptr_->wait(src, f);
 
 			make_error(ec);
 

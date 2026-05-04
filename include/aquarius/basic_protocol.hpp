@@ -27,7 +27,6 @@ namespace aquarius
 			, header_()
 			, alloc_(alloc)
 			, method_(0)
-			, src_(0)
 		{
 			this->get() = alloc_.allocate(1);
 			::new (static_cast<void*>(this->get())) body_t();
@@ -41,7 +40,6 @@ namespace aquarius
 			: header_(std::exchange(other.header_, {}))
 			, alloc_(std::move(other.alloc_))
 			, method_(std::exchange(other.method_, 0))
-			, src_(std::exchange(other.src_, 0))
 		{
 			this->get() = std::exchange(other.get(), nullptr);
 		}
@@ -53,7 +51,6 @@ namespace aquarius
 				this->get() = std::exchange(other.get(), nullptr);
 				alloc_ = std::move(other.alloc_);
 				method_ = std::exchange(other.method_, 0);
-				src_ = std::exchange(other.src_, 0);
 			}
 			return *this;
 		}
@@ -98,20 +95,6 @@ namespace aquarius
 		{
 			return method_;
 		}
-		void src(uint32_t m)
-		{
-			src_ = m;
-		}
-
-		uint32_t src() const
-		{
-			return src_;
-		}
-
-		uint32_t& src()
-		{
-			return src_;
-		}
 
 	public:
 		header_t& header()
@@ -137,8 +120,6 @@ namespace aquarius
 		Allocator alloc_;
 
 		int method_;
-
-		uint32_t src_;
 	};
 
 	struct null_header

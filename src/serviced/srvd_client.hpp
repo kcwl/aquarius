@@ -32,8 +32,6 @@ namespace aquarius
 				host_ = srv.host;
 				port_ = srv.port;
 
-				
-
 				return true;
 			}
 

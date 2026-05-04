@@ -31,23 +31,11 @@ namespace aquarius
 	public:
 		virtual error_code commit(flex_buffer& buffer) override
 		{
-			buffer.commit(sizeof(uint32_t));
-
 			commit_command_header(buffer);
 
 			this->header().serialize(buffer);
 
 			this->body().serialize(buffer);
-
-			auto pos = buffer.tellp();
-
-			auto size = pos - sizeof(uint32_t);
-
-			buffer.pubseekpos(0, std::ios::out);
-
-			buffer.sputn((char*)&size, sizeof(uint32_t));
-
-			buffer.pubseekpos(pos, std::ios::out);
 
 			return error_code{};
 		}
@@ -137,23 +125,11 @@ namespace aquarius
 	public:
 		virtual error_code commit(flex_buffer& buffer) override
 		{
-			buffer.commit(sizeof(uint32_t));
-
 			commit_command_header(buffer);
 
 			this->header().serialize(buffer);
 
 			this->body().serialize(buffer);
-
-			auto pos = buffer.tellp();
-
-			auto size = pos - sizeof(uint32_t);
-
-			buffer.pubseekpos(0, std::ios::out);
-
-			buffer.sputn((char*)&size, sizeof(uint32_t));
-
-			buffer.pubseekpos(pos, std::ios::out);
 
 			return error_code{};
 		}

@@ -15,7 +15,7 @@
 
 namespace aquarius
 {
-	template<typename Executor = asio::any_io_executor>
+	template <typename Executor = asio::any_io_executor>
 	class tcp
 	{
 	public:
@@ -52,9 +52,7 @@ namespace aquarius
 			, mutex_()
 			, buffers_()
 			, buffer_channel_(executor_)
-		{
-
-		}
+		{}
 
 	public:
 		template <typename Session>
@@ -65,8 +63,8 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
-
-				ec = co_await recv(session_ptr, buffer);
+				uint32_t src{};
+				ec = co_await recv(session_ptr, buffer, src);
 
 				if (ec)
 				{
@@ -79,7 +77,7 @@ namespace aquarius
 
 				asio::co_spawn(
 					session_ptr->get_executor(),
-					[&, r = std::move(router)] -> asio::awaitable<void>
+					[&, r = std::move(router), src] -> asio::awaitable<void>
 					{
 						auto result = co_await mpc_publish(std::move(r), buffer, session_ptr->uuid(), 0);
 
@@ -89,11 +87,22 @@ namespace aquarius
 							co_return;
 						}
 
-						auto res = co_await session_ptr->async_send(std::move(*result));
+						raw_header header{ .length = static_cast<uint32_t>((*result).size()), .src = src };
+
+						auto res = co_await session_ptr->async_send(flex_buffer_view((char*)&header, sizeof(header)));
 
 						if (res)
 						{
 							XLOG_ERROR() << "[tcp accept] async_send error:" << ec.what();
+							co_return;
+						}
+
+						res = co_await session_ptr->async_send(std::move(*result));
+
+						if (res)
+						{
+							XLOG_ERROR() << "[tcp accept] async_send error:" << ec.what();
+							co_return;
 						}
 					},
 					asio::detached);
@@ -115,14 +124,12 @@ namespace aquarius
 			for (;;)
 			{
 				flex_buffer buffer{};
-
-				ec = co_await recv(session_ptr, buffer);
+				uint32_t src{};
+				ec = co_await recv(session_ptr, buffer, src);
 				if (ec)
 				{
 					break;
 				}
-
-				std::size_t src = read_src(buffer);
 
 				if (!filling_buffer(src, std::move(buffer)))
 				{
@@ -160,9 +167,33 @@ namespace aquarius
 			}
 		}
 
+		template <typename Request>
+		std::size_t make_request(std::shared_ptr<Request> request, flex_buffer& buffer)
+		{
+			raw_header header{};
+			header.src = detail::uuid_generator()();
+
+			buffer.commit(sizeof(raw_header));
+
+			request->commit(buffer);
+
+			auto pos = buffer.tellp();
+
+			header.length = static_cast<uint32_t>(pos - sizeof(raw_header));
+
+			buffer.pubseekpos(0, std::ios::out);
+
+			buffer.sputn((char*)&header, sizeof(raw_header));
+
+			buffer.pubseekpos(pos, std::ios::out);
+
+			return header.src;
+		}
+
 	private:
 		template <typename Session>
-		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t& src)
+			-> asio::awaitable<error_code>
 		{
 			if (!session_ptr)
 			{
@@ -182,6 +213,8 @@ namespace aquarius
 			if (!ec)
 			{
 				buffer.sgetn((char*)&header, len);
+
+				src = header.src;
 
 				ec = co_await session_ptr->async_read(buffer, header.length);
 			}

@@ -46,14 +46,16 @@ namespace aquarius
 
 		void run(io_service_pool& pool)
 		{
-			// run modules by priority (higher priority first)
-			for (auto& pr : routers_by_priority_)
-			{
-				for (auto& module_ptr : pr.second)
-				{
-					run_one(pool.get_io_service(), module_ptr);
-				}
-			}
+			asio::co_spawn(pool.get_io_service(), [&] ()->asio::awaitable<void> 
+						   {
+							   for (auto& pr : routers_by_priority_)
+							   {
+								   for (auto& module_ptr : pr.second)
+								   {
+									   co_await run_one(pool.get_io_service(), module_ptr);
+								   }
+							   }
+						   }, asio::detached);
 		}
 
 		template <typename T, typename R, typename Func>
@@ -116,22 +118,20 @@ namespace aquarius
 		}
 
 	private:
-		void run_one(asio::io_context& io, std::shared_ptr<module_base> module_ptr)
+		auto run_one(asio::io_context& io, std::shared_ptr<module_base> module_ptr) ->asio::awaitable<bool>
 		{
 			if (!module_ptr)
 			{
-				return;
+				co_return false;
 			}
 
 			if (!module_ptr->init())
 			{
 				XLOG_WARNING() << "[" << module_ptr->name() << "] init error";
-				return;
+				co_return false;
 			}
 
-			co_spawn(
-				io, [&, module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); },
-				asio::detached);
+			co_return co_await module_ptr->run();
 		}
 
 	private:

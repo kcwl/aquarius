@@ -119,14 +119,14 @@ namespace aquarius
 		{
 			std::unique_lock lk(mutex_);
 
-			auto iter = channel_groups_.find(group);
+			auto& chan = channel_groups_[group];
 
-			if (iter == channel_groups_.end())
+			if (!chan)
 			{
-				co_return co_await channel_groups_[group]->subscribe(subscriber_ptr);
+				chan = std::make_shared<channel>();
 			}
 
-			co_return co_await iter->second->subscribe(subscriber_ptr);
+			co_return co_await chan->subscribe(subscriber_ptr);
 		}
 
 		auto service_center_module::remove(std::shared_ptr<customer> customer_ptr) ->asio::awaitable<void>

@@ -226,6 +226,12 @@ namespace aquarius
 			return proto_.wait(src, std::forward<Func>(f));
 		}
 
+		template<typename Request>
+		bool make_request(std::shared_ptr<Request> request, flex_buffer& buffer)
+		{
+			return proto_.make_request(request, buffer);
+		}
+
 	protected:
 		socket socket_;
 
