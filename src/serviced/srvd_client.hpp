@@ -49,12 +49,13 @@ namespace aquarius
 				co_await client_ptr_->async_send(req_ping);
 			}
 
-			auto publish(const std::string& host, int32_t port) -> asio::awaitable<bool>
+			auto publish(const std::string& group, const std::string& host, int32_t port) -> asio::awaitable<bool>
 			{
 				auto req = std::make_shared<regist_tcp_request>();
 
 				req->body().host() = host;
 				req->body().port() = port;
+				req->body().group() = group;
 
 				flex_buffer buffer{};
 				req->commit(buffer);
