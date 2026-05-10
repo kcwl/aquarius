@@ -49,7 +49,7 @@ public:
 		co_return;
 	}
 
-	virtual auto run() -> asio::awaitable<bool> override
+	virtual auto run(aquarius::io_service_pool&) -> asio::awaitable<bool> override
 	{
 		co_return true;
 	}

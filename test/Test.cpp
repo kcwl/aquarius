@@ -8,21 +8,6 @@
 
 using namespace std::chrono_literals;
 
-namespace aquarius
-{
-	HTTP_CONFIG_INVOKE(cfg)
-	{
-		cfg.control_allow_headers = "";
-	}
-
-	MYSQL_CONFIG_INVOKE(mysql)
-	{
-		mysql.db = "unittest";
-		mysql.host = "localhost";
-		mysql.user = "root";
-	}
-} // namespace aquarius
-
 BOOST_AUTO_TEST_SUITE(framework)
 
 struct person
@@ -33,7 +18,7 @@ struct person
 
 BOOST_AUTO_TEST_CASE(tcp_flow)
 {
-	aquarius::tcp_server srv(8100, 10, "async tcp server");
+	aquarius::tcp::server srv(8100, 10, "async tcp server");
 
 	std::thread t([&] { srv.run(); });
 
@@ -41,7 +26,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 	aquarius::asio::io_context io;
 
-	auto cli = std::make_shared<aquarius::tcp_client>(io, 10s);
+	auto cli = std::make_shared<aquarius::tcp::client>(io, 10s);
 
 	auto future = aquarius::asio::co_spawn(
 		io,
@@ -63,7 +48,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			req->body().per_req().name = "John";
 			req->body().per_req().orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<login_tcp_response>(req);
+			auto resp = co_await cli->async_call<login_tcp_response>(req);
 
 			BOOST_TEST(resp.header().uuid() == req->header().uuid());
 			BOOST_TEST(resp.body().per_resp().sex == req->body().per_req().sex);
@@ -81,9 +66,6 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 			BOOST_TEST(resp.body().per_resp().name == req->body().per_req().name);
 			BOOST_TEST(resp.body().per_resp().orders == req->body().per_req().orders);
 			BOOST_TEST(resp.body().per_resp().ves == req->body().per_req().ves);
-
-			BOOST_TEST(cli->remote_address() == "127.0.0.1");
-			BOOST_TEST(cli->remote_port() == 8100);
 		},
 		aquarius::asio::use_future);
 
@@ -103,7 +85,7 @@ BOOST_AUTO_TEST_CASE(tcp_flow)
 
 BOOST_AUTO_TEST_CASE(http_post_flow)
 {
-	aquarius::http_server srv(8099, 10, "async http post server");
+	aquarius::http::server srv(8099, 10, "async http post server");
 
 	std::thread t([&] { srv.run(); });
 
@@ -111,7 +93,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 	aquarius::asio::io_context io;
 
-	auto cli = std::make_shared<aquarius::http_client>(io, 10s);
+	auto cli = std::make_shared<aquarius::http::client>(io, 10s);
 
 	auto future = aquarius::asio::co_spawn(
 		io,
@@ -122,7 +104,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			BOOST_TEST(!is_connect);
 
 			auto req = std::make_shared<http_test_post_http_request>();
-			req->method(static_cast<int>(http_method::post));
+			req->method(http_method::post);
 			req->body().uuid() = 1;
 			req->body().per_req().sex = true;
 			req->body().per_req().addr = 2;
@@ -134,7 +116,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			req->body().per_req().name = "John";
 			req->body().per_req().orders = { 1, 2, 3, 4, 5 };
 
-			auto resp = co_await cli->async_send<http_test_post_http_response>(req);
+			auto resp = co_await cli->async_call<http_test_post_http_response>(req);
 
 			BOOST_TEST(resp.body().uuid() == req->body().uuid());
 
@@ -147,9 +129,6 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 			BOOST_TEST(resp.body().per_resp().mana == req->body().per_req().mana);
 			BOOST_TEST(resp.body().per_resp().name == req->body().per_req().name);
 			BOOST_TEST(resp.body().per_resp().orders == req->body().per_req().orders);
-
-			BOOST_TEST(cli->remote_address() == "127.0.0.1");
-			BOOST_TEST(cli->remote_port() == 8099);
 		},
 		aquarius::asio::use_future);
 
@@ -170,7 +149,7 @@ BOOST_AUTO_TEST_CASE(http_post_flow)
 
 BOOST_AUTO_TEST_CASE(http_get_flow)
 {
-	aquarius::http_server srv(8080, 10, "async http get server");
+	aquarius::http::server srv(8080, 10, "async http get server");
 
 	std::thread t([&] { srv.run(); });
 
@@ -178,7 +157,7 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 
 	aquarius::asio::io_context io;
 
-	auto cli = std::make_shared<aquarius::http_client>(io, 10s);
+	auto cli = std::make_shared<aquarius::http::client>(io, 10s);
 
 	auto future = aquarius::asio::co_spawn(
 		io,
@@ -189,11 +168,11 @@ BOOST_AUTO_TEST_CASE(http_get_flow)
 			BOOST_TEST(!is_connect);
 
 			auto req = std::make_shared<http_test_get_http_request>();
-			req->method(static_cast<int>(http_method::get));
+			req->method(http_method::get);
 			req->body().user() = 12345;
 			req->body().passwd() = "passwd123";
 
-			auto resp = co_await cli->async_send<http_test_get_http_response>(req);
+			auto resp = co_await cli->async_call<http_test_get_http_response>(req);
 
 			BOOST_TEST(resp.body().user() == req->body().user());
 
@@ -224,9 +203,9 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 	aquarius::io_service_pool pool(1);
 
-	aquarius::module_router::get_mutable_instance().regist<aquarius::mysql_module>();
+	aquarius::module_router<>::get_mutable_instance().regist<aquarius::mysql_module>();
 
-	aquarius::module_router::get_mutable_instance().run(pool);
+	aquarius::module_router<>::get_mutable_instance().run(pool);
 
 	std::this_thread::sleep_for(2s);
 

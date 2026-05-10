@@ -58,7 +58,7 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto visit(flex_buffer& buffer, int method) -> asio::awaitable<error_code>
+		virtual auto visit(flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
 			request()->consume(buffer);
 

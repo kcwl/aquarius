@@ -77,4 +77,4 @@ private:
 
 
 using login_tcp_request = aquarius::tcp_request<"10001", login_req_body>;
-using login_tcp_response = aquarius::tcp_response<login_resp_body>;
+using login_tcp_response = aquarius::tcp_response<"10001", login_resp_body>;

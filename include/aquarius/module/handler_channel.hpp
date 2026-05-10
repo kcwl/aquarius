@@ -95,6 +95,8 @@ namespace aquarius
 		std::shared_ptr<node> root_ptr_;
 	};
 
+	class context_base;
+
 	class handler_channel : public singleton<handler_channel>
 	{
 	public:

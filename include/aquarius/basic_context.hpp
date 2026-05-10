@@ -1,5 +1,7 @@
 #pragma once
-#include <aquarius.hpp>
+#include <aquarius/detail/asio.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/error_code.hpp>
 
 namespace aquarius
 {

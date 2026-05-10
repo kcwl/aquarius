@@ -37,7 +37,7 @@ namespace aquarius
 
 			flex_buffer buf{};
 
-			if (this->method() != static_cast<int>(http_method::get))
+			if (this->method() != http_method::get)
 			{
 				this->body().serialize(buf);
 
@@ -51,7 +51,7 @@ namespace aquarius
 
 			if (!ec)
 			{
-				if (this->method() != static_cast<int>(http_method::get))
+				if (this->method() != http_method::get)
 				{
 					if (this->header().content_length() != 0)
 					{
@@ -74,5 +74,19 @@ namespace aquarius
 
 			return true;
 		}
+
+	public:
+		void method(http_method m)
+		{
+			method_ = m;
+		}
+
+		http_method& method()
+		{
+			return method_;
+		}
+
+	private:
+		http_method method_;
 	};
 } // namespace aquarius

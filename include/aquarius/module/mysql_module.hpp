@@ -26,11 +26,9 @@ namespace aquarius
 			return true;
 		}
 
-		virtual auto run() -> asio::awaitable<bool> override
+		virtual auto run(io_service_pool& pool) -> asio::awaitable<bool> override
 		{
-			mysql_config cfg{};
-
-			cfg_value_from<mysql_config>(cfg);
+			mysql_config& cfg = create_mysql();
 
 			boost::mysql::pool_params params{};
 			params.server_address.emplace_host_and_port(cfg.host, static_cast<uint16_t>(cfg.port));
@@ -39,9 +37,7 @@ namespace aquarius
 			params.database = cfg.db;
 			params.ssl = boost::mysql::ssl_mode::disable;
 
-			auto executor = co_await asio::this_coro::executor;
-
-			connector_ = std::make_shared<sql_op_t>(executor, std::move(params));
+			connector_ = std::make_shared<sql_op_t>(pool.get_io_service().get_executor(), std::move(params));
 
 			connector_->async_run();
 

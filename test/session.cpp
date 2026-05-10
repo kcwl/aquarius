@@ -16,10 +16,9 @@ struct mock_protocol
 
 	using keep_alive = asio::socket_base::keep_alive;
 
-	static auto query(auto) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	static auto query(auto) -> asio::awaitable<error_code>
 	{
-		flex_buffer buffer{};
-		co_return buffer;
+		co_return error_code{};
 	}
 
 	static auto accept(auto) -> asio::awaitable<error_code>
@@ -57,7 +56,7 @@ struct mock_adaptor
 		co_return error_code{};
 	}
 
-	auto async_send(flex_buffer) -> asio::awaitable<error_code>
+	auto async_send(flex_buffer&) -> asio::awaitable<error_code>
 	{
 		co_return error_code{};
 	}
@@ -72,10 +71,9 @@ struct mock_error_protocol
 	using acceptor = asio::ip::tcp::acceptor;
 	using resolver = asio::ip::tcp::resolver;
 
-	static auto query(auto) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	static auto query(auto) -> asio::awaitable<error_code>
 	{
-		flex_buffer buffer{};
-		co_return buffer;
+		co_return error_code{};
 	}
 
 	static auto accept(auto) -> asio::awaitable<error_code>
@@ -113,7 +111,7 @@ struct mock_error_adaptor
 		co_return error_code{};
 	}
 
-	auto async_send(flex_buffer) -> asio::awaitable<error_code>
+	auto async_send(flex_buffer&) -> asio::awaitable<error_code>
 	{
 		co_return error_code{};
 	}

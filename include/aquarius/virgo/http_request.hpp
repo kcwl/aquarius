@@ -32,7 +32,7 @@ namespace aquarius
 		{
 			std::string get_url(this_router);
 
-			if (this->method() == static_cast<int>(http_method::get))
+			if (this->method() == http_method::get)
 			{
 				this->body().set_method(static_cast<http_method>(this->method()));
 

@@ -3,7 +3,9 @@
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/logger.hpp>
 #include <expected>
+#include <map>
 
 namespace aquarius
 {
@@ -132,7 +134,8 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			co_await asio::async_write(socket_adaptor_.get_implement(), buffers, asio::redirect_error(asio::use_awaitable, ec));
+			co_await asio::async_write(socket_adaptor_.get_implement(), buffers,
+									   asio::redirect_error(asio::use_awaitable, ec));
 
 			if (ec)
 			{
@@ -251,7 +254,7 @@ namespace aquarius
 			return true;
 		}
 
-		template<typename Func>
+		template <typename Func>
 		void regist_resp_func(std::size_t src, Func&& func)
 		{
 			auto& cb = buffers_[src];

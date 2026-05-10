@@ -64,9 +64,6 @@
     <Filter Include="源文件\tbl">
       <UniqueIdentifier>{d18ba868-bf48-44c1-b004-9cb7fd66cc8e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\resource">
-      <UniqueIdentifier>{09b2d17c-0361-4c78-b204-f19ef932e55d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -323,9 +320,6 @@
     <ClCompile Include="..\test\Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\client.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\io_service_pool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -345,9 +339,6 @@
       <Filter>源文件\detail</Filter>
     </ClCompile>
     <ClCompile Include="..\test\detail\crc.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\flex_buffer.cpp">
       <Filter>源文件\detail</Filter>
     </ClCompile>
     <ClCompile Include="..\test\detail\int_to_string.cpp">
@@ -389,23 +380,8 @@
     <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp">
       <Filter>源文件\ip</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\ip\handler.cpp">
-      <Filter>源文件\ip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\ip\http.cpp">
-      <Filter>源文件\ip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\ip\tcp.cpp">
-      <Filter>源文件\ip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\module\channel.cpp">
-      <Filter>源文件\module</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\module\router.cpp">
       <Filter>源文件\module</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\resource\invoke.cpp">
-      <Filter>源文件\resource</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tbl\grep.cpp">
       <Filter>源文件\tbl</Filter>

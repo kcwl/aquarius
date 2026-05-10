@@ -38,17 +38,17 @@ namespace aquarius
 
 			if (!cfg.check_origin(origin))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			if (!cfg.check_method(request_methods))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			if (!cfg.check_headers(request_headers))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			resp_header.set_field("Access-Control-Allow-Origin", cfg.control_allow_origin);

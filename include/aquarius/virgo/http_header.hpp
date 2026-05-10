@@ -1,6 +1,7 @@
 #pragma once
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>
+#include <map>
 #include <ranges>
 #include <span>
 #include <string>
