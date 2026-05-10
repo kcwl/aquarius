@@ -149,6 +149,9 @@ public:
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 
+	string group() const;
+	string& group();
+
 	string host() const;
 	string& host();
 
@@ -165,8 +168,8 @@ private:
 
 
 using regist_tcp_request = aquarius::tcp_request<"9000", regist_req_body>;
-using regist_tcp_response = aquarius::tcp_response<regist_resp_body>;
+using regist_tcp_response = aquarius::tcp_response<"9000", regist_resp_body>;
 using subscribe_service_tcp_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
-using subscribe_service_tcp_response = aquarius::tcp_response<subscribe_service_resp_body>;
+using subscribe_service_tcp_response = aquarius::tcp_response<"9001", subscribe_service_resp_body>;
 using broad_service_status_tcp_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
-using broad_service_status_tcp_response = aquarius::tcp_response<broad_service_status_resp_body>;
+using broad_service_status_tcp_response = aquarius::tcp_response<"9002", broad_service_status_resp_body>;

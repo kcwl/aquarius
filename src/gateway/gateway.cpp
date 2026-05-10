@@ -1,16 +1,14 @@
 ﻿#include <aquarius.hpp>
-#include <aquarius/http.hpp>
-#include <aquarius/tcp.hpp>
 #include <iostream>
+#include <srvd_client.hpp>
 
-namespace aquarius
-{
-	HTTP_CONFIG_INVOKE(cfg)
-	{}
-} // namespace aquarius
 
 int main(int argc, char* argv[])
 {
+	auto& srvd = aquarius::serviced::create_srv();
+	srvd.host = "127.0.0.1";
+	srvd.port = 3399;
+
 	aquarius::cmd_options cmd("gateway");
 
 	cmd.add_option<std::string>("help", "print help message");
@@ -21,7 +19,7 @@ int main(int argc, char* argv[])
 
 	cmd.load_options(argc, argv);
 
-	aquarius::tcp_server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+	aquarius::tcp::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
 							 cmd.option<std::string>("name"));
 
 	srv.run();

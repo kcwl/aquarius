@@ -176,6 +176,7 @@ void broad_service_status_req_body::deserialize(aquarius::flex_buffer& buffer)
 }
 struct broad_service_status_resp_body::impl
 {
+	string group;
 	string host;
 	int32 port;
 	bool healty;
@@ -194,6 +195,14 @@ void broad_service_status_resp_body::serialize(aquarius::flex_buffer& buffer)
 void broad_service_status_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	*this->impl_ptr_ = this->parse_from<broad_service_status_resp_body::impl>(buffer); 
+}
+string broad_service_status_resp_body::group() const
+{
+	return impl_ptr_->group;
+}
+string& broad_service_status_resp_body::group()
+{
+	return impl_ptr_->group;
 }
 string broad_service_status_resp_body::host() const
 {

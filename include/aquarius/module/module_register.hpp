@@ -8,7 +8,7 @@ namespace aquarius
 	{
 		auto_module_register(int priority = 0)
 		{
-			module_router::get_mutable_instance().regist<Module>(priority);
+			module_router<>::get_mutable_instance().regist<Module>(priority);
 		}
 	};
 } // namespace aquarius

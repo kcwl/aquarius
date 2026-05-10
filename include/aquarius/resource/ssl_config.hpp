@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/resource/config_tag_invoke.hpp>
 #include <string>
 
 namespace aquarius
@@ -10,6 +9,12 @@ namespace aquarius
 		std::string key;
 		std::string pem;
 	};
+
+	inline static ssl_config& create_ssl()
+	{
+		static ssl_config ssl;
+		return ssl;
+	}
 } // namespace aquarius
 
 #define SSL_CONFIG_INVOKE(cfg) CONFIG_MICRO(aquarius::ssl_config, cfg)

@@ -213,9 +213,6 @@
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
@@ -233,9 +230,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp">
       <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
-      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\udp.hpp">
       <Filter>include\aquarius\ip</Filter>
@@ -276,9 +270,6 @@
     <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp">
-      <Filter>include\aquarius\resource</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp">
       <Filter>include\aquarius\resource</Filter>
     </ClInclude>
@@ -312,9 +303,6 @@
     <ClInclude Include="..\include\aquarius\resource\ssl_config.hpp">
       <Filter>include\aquarius\resource</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\session_store_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\http.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -323,6 +311,12 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\udp.hpp">
       <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_context.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\context_traits.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

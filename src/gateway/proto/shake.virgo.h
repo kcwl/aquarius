@@ -48,4 +48,4 @@ private:
 
 
 using shake_tcp_request = aquarius::tcp_request<"8000", shake_req_body>;
-using shake_tcp_response = aquarius::tcp_response<shake_resp_body>;
+using shake_tcp_response = aquarius::tcp_response<"8000", shake_resp_body>;

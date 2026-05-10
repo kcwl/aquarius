@@ -1,16 +1,11 @@
 #include "client_pool.h"
+#include "basic_transfer_context.hpp"
 #include "gate_error_code.h"
 #include "proto/shake.virgo.h"
 #include <srvd_client.hpp>
 
 namespace aquarius
 {
-	CONFIG_MICRO(srv_config, cfg)
-	{
-		cfg.host = "127.0.0.1";
-		cfg.port = 3399;
-	}
-
 	namespace gateway
 	{
 		bool client_pool::init()
@@ -20,17 +15,66 @@ namespace aquarius
 			return true;
 		}
 
-		auto client_pool::run() -> asio::awaitable<bool>
+		auto client_pool::run(io_service_pool& pool) -> asio::awaitable<bool>
 		{
-			mpc_call<&serviced::srvd_client::set_healty_check>(
-				[&](const std::string& host, int32_t port, bool healthy) -> asio::awaitable<void>
-				{ !healthy ? this->remove(host, port) : co_await this->add(host, port); });
+			// auto healthy_callback = [this](const std::string& host, int32_t port, bool healthy)
+			//{
+			//	if (!healthy)
+			//	{
+			//		this->remove(host, port);
+			//	}
+			//	else
+			//	{
+			//		asio::co_spawn(
+			//			get_executor(), [this, host, port]() -> asio::awaitable<void>
+			//			{ co_await this->add(host, port); }, asio::detached);
+			//	}
+			// };
+
+			// co_await
+			// mpc_call<&serviced::srvd_client::set_healty_check<decltype(healthy_callback)>>(healthy_callback);
 
 			co_await mpc_async_call<&serviced::srvd_client::subscribe>(
 				group_, std::move([&](const std::vector<instance>& instances) -> asio::awaitable<void>
 								  { co_await this->make_instance_pool(instances); }));
 
 			co_return true;
+		}
+
+		auto client_pool::make_one_instance(const instance& c) -> asio::awaitable<void>
+		{
+			co_return co_await make_one_instance_by_host(c.host, c.port);
+		}
+
+		auto client_pool::make_one_instance_by_host(const std::string& host, int32_t port) -> asio::awaitable<void>
+		{
+			flex_buffer req_buffer{};
+			auto inst = make_instance(host, port);
+
+			auto request = std::make_shared<shake_tcp_request>();
+
+			auto resp = co_await shake<shake_tcp_response>(host, port, request);
+
+			auto f = [inst = std::move(inst), this](flex_buffer& buffer,
+													std::size_t session_id) -> asio::awaitable<error_code>
+			{
+				// buffer.pubseekpos(0, std::ios::in);
+				// raw_header* header = (raw_header*)buffer.data().data();
+				// regist_resp_func(
+				//	header->src, [session_id](flex_buffer resp) -> asio::awaitable<void>
+				//	{ co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
+				co_await this->invoke(inst, buffer);
+
+				co_return gate_op::success;
+			};
+
+			std::shared_ptr<context_base> ctx =
+				std::make_shared<basic_transfer_context<decltype(f), tcp, std::size_t>>(std::move(f));
+
+			for (auto& topic : resp.body().topics())
+			{
+				mpc_subscribe(topic, ctx);
+			}
 		}
 
 		auto client_pool::add(const std::string& host, int32_t port) -> asio::awaitable<void>
@@ -50,7 +94,7 @@ namespace aquarius
 
 			for (auto& c : iter->second)
 			{
-				c = std::make_shared<tcp_client>(co_await asio::this_coro::executor, 30ms);
+				c = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 
 				auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
 
@@ -81,27 +125,7 @@ namespace aquarius
 		{
 			for (auto& c : instances)
 			{
-				flex_buffer req_buffer{};
-				auto instance = make_instance(c.host, c.port);
-
-				auto request = std::make_shared<shake_tcp_request>();
-
-				auto resp = co_await shake<shake_tcp_response>(c.host, c.port, request);
-
-				auto f = [instance = std::move(instance),
-						  this](flex_buffer& buffer, std::size_t session_id,
-								int method) -> asio::awaitable<std::expected<flex_buffer, error_code>>
-				{
-					invoke(instance, std::move(buffer), [session_id](flex_buffer resp) -> asio::awaitable<void>
-						   { co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
-
-					co_return std::unexpected(gate_op::pedding);
-				};
-
-				for (auto& topic : resp.body().topics())
-				{
-					mpc_subscribe(topic, f);
-				}
+				co_await make_one_instance(c);
 			}
 		}
 

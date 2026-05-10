@@ -63,7 +63,12 @@ namespace aquarius
 					{
 						for (;;)
 						{
-							co_await session_ptr_->query();
+							auto ec = co_await session_ptr_->query();
+
+							if (ec)
+							{
+								break;
+							}
 						}
 					},
 					asio::detached);
@@ -72,9 +77,9 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
+		auto async_send(flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
-			co_return co_await session_ptr_->async_send(std::move(buffer));
+			co_return co_await session_ptr_->async_send(buffer);
 		}
 
 		void close()
@@ -121,13 +126,11 @@ namespace aquarius
 		{
 			Response resp{};
 
-			auto f = [&] (flex_buffer buffer) { resp.consume(buffer); };
+			auto f = [&] (flex_buffer& buffer) { resp.consume(buffer); };
 
-			flex_buffer buffer{};
+			error_code ec{};
 
-			auto src = session_ptr_->make_request(req, buffer, f);
-
-			auto ec = co_await async_send(std::move(buffer));
+			auto src = co_await session_ptr_->send_request(req, f, ec);
 
 			if (make_error(ec))
 			{

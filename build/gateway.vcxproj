@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\gateway\auth_module.cpp" />
     <ClCompile Include="..\src\gateway\client_pool.cpp" />
+    <ClCompile Include="..\src\gateway\ctx_serviced.cpp" />
     <ClCompile Include="..\src\gateway\firewall_module.cpp" />
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
+    <ClInclude Include="..\src\gateway\basic_transfer_context.hpp" />
     <ClInclude Include="..\src\gateway\client_pool.h" />
     <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\gate_error_code.h" />

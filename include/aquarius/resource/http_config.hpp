@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <ranges>
-#include <aquarius/resource/config_tag_invoke.hpp>
 
 namespace aquarius
 {
@@ -66,6 +65,13 @@ namespace aquarius
 			return true;
 		}
 	};
+
+	inline static http_config& create_http()
+	{
+		static http_config http;
+
+		return http;
+	}
 } // namespace aquarius
 
 #define HTTP_CONFIG_INVOKE(cfg) CONFIG_MICRO(aquarius::http_config, cfg)

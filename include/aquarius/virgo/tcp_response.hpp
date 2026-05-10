@@ -4,13 +4,15 @@
 
 namespace aquarius
 {
-	template <typename Body>
+	template <detail::string_literal Router, typename Body>
 	class tcp_response : public basic_tcp_protocol<false, tcp_header, Body>
 	{
 	public:
 		using base = basic_tcp_protocol<false, tcp_header, Body>;
 
 		using base::has_request;
+
+		constexpr static auto this_router = detail::bind_param<Router>::value;
 
 	public:
 		tcp_response() = default;

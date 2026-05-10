@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/basic_client.hpp>
+#include <aquarius/basic_context.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/asio.hpp>
@@ -15,10 +16,8 @@
 
 namespace aquarius
 {
-	template <typename Executor = asio::any_io_executor>
-	class tcp
+	struct tcp
 	{
-	public:
 		using socket = asio::ip::tcp::socket;
 
 		using endpoint = asio::ip::tcp::endpoint;
@@ -31,14 +30,18 @@ namespace aquarius
 
 		using keep_alive = asio::socket_base::keep_alive;
 
-		struct callback
-		{
-			using func_t = std::function<void(flex_buffer)>;
+		using session = basic_session<tcp, raw_adaptor>;
 
-			func_t func;
+		using server = basic_server<session>;
+		using client = basic_client<session>;
 
-			bool complete;
-		};
+		using ssl_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
+		using ssl_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
+
+		using session_callback = std::function<asio::awaitable<error_code>(asio::const_buffer)>;
+
+		template <typename Handler>
+		using context = basic_context<Handler, tcp, uint32_t, session_callback>;
 
 		struct raw_header
 		{
@@ -46,15 +49,6 @@ namespace aquarius
 			uint32_t src;
 		};
 
-	public:
-		tcp(const Executor& ex)
-			: executor_(ex)
-			, mutex_()
-			, buffers_()
-			, buffer_channel_(executor_)
-		{}
-
-	public:
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
@@ -77,31 +71,30 @@ namespace aquarius
 
 				asio::co_spawn(
 					session_ptr->get_executor(),
-					[&, r = std::move(router), src] -> asio::awaitable<void>
+					[&, this, r = std::move(router), src, session_ptr]() mutable -> asio::awaitable<void>
 					{
-						auto result = co_await mpc_publish(std::move(r), buffer, session_ptr->uuid(), 0);
+						auto context = mpc_publish(r);
 
-						if (!result.has_value())
+						if (!context)
+						{
+							co_return;
+						}
+
+						auto ptr = std::dynamic_pointer_cast<
+							basic_protocol_context<tcp, uint32_t, session_callback>>(context);
+						if (!ptr)
+						{
+							co_return;
+						}
+
+						auto ec = co_await ptr->complete(
+							this, buffer, std::move(src),
+							[session_ptr](asio::const_buffer buffer) -> asio::awaitable<error_code>
+							{ co_return co_await session_ptr->async_send(buffer); });
+
+						if (!ec)
 						{
 							XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
-							co_return;
-						}
-
-						raw_header header{ .length = static_cast<uint32_t>((*result).size()), .src = src };
-
-						auto res = co_await session_ptr->async_send(flex_buffer_view((char*)&header, sizeof(header)));
-
-						if (res)
-						{
-							XLOG_ERROR() << "[tcp accept] async_send error:" << ec.what();
-							co_return;
-						}
-
-						res = co_await session_ptr->async_send(std::move(*result));
-
-						if (res)
-						{
-							XLOG_ERROR() << "[tcp accept] async_send error:" << ec.what();
 							co_return;
 						}
 					},
@@ -131,15 +124,34 @@ namespace aquarius
 					break;
 				}
 
-				if (!filling_buffer(src, std::move(buffer)))
+				if (!session_ptr->filling_buffer(src, buffer))
 				{
 					auto router = binary_parse{}.from_datas<std::string>(buffer);
 
 					XLOG_INFO() << "[query] parse protocol router: " << router;
 
 					asio::co_spawn(
-						session_ptr->get_executor(), [&, r = std::move(router)] -> asio::awaitable<void>
-						{ co_await mpc_publish(std::move(r), buffer, session_ptr->uuid(), 0); }, asio::detached);
+						session_ptr->get_executor(),
+						[&, session_ptr, r = std::move(router), src]() mutable -> asio::awaitable<void>
+						{
+							auto context = mpc_publish(r);
+
+							if (!context)
+							{
+								co_return;
+							}
+
+							auto ptr = std::dynamic_pointer_cast<
+								basic_protocol_context<tcp, uint32_t, session_callback>>(context);
+							if (!ptr)
+							{
+								co_return;
+							}
+
+							[[maybe_unused]] auto result =
+								co_await ptr->complete(this, buffer, std::move(src), session_callback{});
+						},
+						asio::detached);
 				}
 			}
 
@@ -151,45 +163,31 @@ namespace aquarius
 			co_return ec;
 		}
 
-		auto wait(std::size_t src) -> asio::awaitable<void>
-		{
-			for (;;)
-			{
-				auto next_src = co_await buffer_channel_.async_receive(asio::use_awaitable);
-
-				if (next_src == src)
-				{
-					break;
-				}
-			}
-		}
-
-		template <typename Request, typename Func>
-		std::size_t make_request(std::shared_ptr<Request> request, flex_buffer& buffer, Func&& func)
+		template <typename Session, typename Request, typename Func>
+		auto send_request(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request, Func&& func,
+						  error_code& ec) -> asio::awaitable<std::size_t>
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
+
+			flex_buffer buffer{};
 
 			buffer.commit(sizeof(raw_header));
 
 			request->commit(buffer);
 
-			auto pos = buffer.tellp();
+			header.length = static_cast<uint32_t>(buffer.size());
 
-			header.length = static_cast<uint32_t>(pos - sizeof(raw_header));
+			session_ptr->regist_resp_func(header.src, func);
 
-			buffer.pubseekpos(0, std::ios::out);
+			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
+													   buffer.data() };
 
-			buffer.sputn((char*)&header, sizeof(raw_header));
+			ec = co_await session_ptr->async_send(buffers);
 
-			buffer.pubseekpos(pos, std::ios::out);
-
-			regist_resp_func(header.src, std::forward<Func>(func));
-
-			return header.src;
+			co_return header.src;
 		}
 
-	private:
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t& src)
 			-> asio::awaitable<error_code>
@@ -221,55 +219,35 @@ namespace aquarius
 			co_return ec;
 		}
 
-		bool filling_buffer(std::size_t src, flex_buffer buffer)
+		template <typename Handler, typename Func>
+		auto handle_request(flex_buffer& buffer, uint32_t src, Func&& func)
+			-> asio::awaitable<error_code>
 		{
-			std::lock_guard lk(mutex_);
+			auto handler_ptr = std::make_shared<Handler>();
 
-			auto iter = buffers_.find(src);
+			auto ec = co_await handler_ptr->visit(buffer);
 
-			if (iter == buffers_.end())
+			if (ec)
 			{
-				buffer_channel_.try_send(error_code{}, 0);
-
-				return false;
+				co_return ec;
 			}
 
-			iter->second->func(std::move(buffer));
+			flex_buffer resp_buffer{};
+			handler_ptr->response().commit(resp_buffer);
 
-			iter->second->complete = true;
+			raw_header header{ .length = static_cast<uint32_t>(resp_buffer.size()), .src = src };
 
-			buffer_channel_.try_send(error_code{}, src);
+			std::array<asio::const_buffer, 2> buffers = { asio::buffer((char*)&header, sizeof(header)),
+														  resp_buffer.data() };
 
-			return true;
-		}
+			auto res = co_await func(asio::buffer(buffers.data(), buffers.size()));
 
-		void regist_resp_func(std::size_t src, const callback::func_t& func)
-		{
-			std::lock_guard lk(mutex_);
-
-			auto& cb = buffers_[src];
-			if (!cb)
+			if (res)
 			{
-				cb = std::make_shared<callback>();
+				XLOG_ERROR() << "[tcp accept] async_send error:" << ec.what();
 			}
 
-			cb->func = func;
+			co_return res;
 		}
-
-	private:
-		Executor executor_;
-
-		std::mutex mutex_;
-
-		std::map<std::size_t, std::shared_ptr<callback>> buffers_;
-
-		asio::experimental::channel<void(error_code ec, std::size_t)> buffer_channel_;
 	};
-
-	using tcp_session = basic_session<tcp<>, raw_adaptor>;
-	using tcp_server = basic_server<tcp_session>;
-	using tcp_client = basic_client<tcp_session>;
-
-	using ssl_tcp_server = basic_server<basic_session<tcp<>, ssl_client_adaptor>>;
-	using ssl_tcp_client = basic_client<basic_session<tcp<>, ssl_server_adaptor>>;
 } // namespace aquarius

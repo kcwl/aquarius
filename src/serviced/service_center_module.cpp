@@ -51,7 +51,8 @@ namespace aquarius
 			{
 				flex_buffer buf{};
 				broad_service_status_tcp_response resp{};
-				resp.body().host()=customer_ptr->host();
+				resp.body().group() = customer_ptr->group();
+				resp.body().host() = customer_ptr->host();
 				resp.body().port() = customer_ptr->port();
 				resp.commit(buf);
 

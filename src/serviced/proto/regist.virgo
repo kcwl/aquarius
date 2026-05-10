@@ -38,6 +38,7 @@ message broad_service_status -> 9002
 	request{}
 	response
 	{
+		string group;
 		string host;
 		int32 port;
 		bool healty;

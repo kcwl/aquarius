@@ -19,7 +19,7 @@ namespace aquarius
 		public:
 			virtual bool init() override;
 
-			virtual auto run() -> asio::awaitable<bool> override;
+			virtual auto run(io_service_pool& pool) -> asio::awaitable<bool> override;
 
 		public:
 			template <typename Response, typename Request>
@@ -40,8 +40,7 @@ namespace aquarius
 				co_return co_await ptr->template async_call<Response>(request);
 			}
 
-			template <typename Func>
-			auto invoke(const std::string& instance, flex_buffer buffer, Func&& func) -> asio::awaitable<error_code>
+			auto invoke(const std::string& instance, flex_buffer& buffer) -> asio::awaitable<error_code>
 			{
 				std::shared_lock lk(mutex_);
 
@@ -54,10 +53,12 @@ namespace aquarius
 
 				auto ptr = round_.invoke(iter->second);
 
-				// 负载
-				//co_return co_await ptr->async_send(std::move(buffer), std::forward<Func>(func));
-				co_return co_await ptr->async_send(std::move(buffer));
+				co_return co_await ptr->async_send(buffer);
 			}
+
+			auto make_one_instance(const instance& c) ->asio::awaitable<void>;
+
+			auto make_one_instance_by_host(const std::string& host, int32_t port) ->asio::awaitable<void>;
 
 		private:
 			auto add(const std::string& host, int32_t port) -> asio::awaitable<void>;
@@ -80,11 +81,11 @@ namespace aquarius
 		private:
 			std::shared_mutex mutex_;
 
-			std::map<std::string, std::vector<std::shared_ptr<tcp_client>>> pool_;
+			std::map<std::string, std::vector<std::shared_ptr<tcp::client>>> pool_;
 
 			std::string group_;
 
-			round_robin<tcp_client> round_;
+			round_robin<tcp::client> round_;
 		};
 	} // namespace gateway
 } // namespace aquarius

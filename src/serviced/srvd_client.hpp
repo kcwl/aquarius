@@ -1,6 +1,5 @@
 #pragma once
 #include <aquarius/module/module_register.hpp>
-#include <aquarius/resource/config_tag_invoke.hpp>
 #include <aquarius/tcp.hpp>
 #include <proto/regist.virgo.h>
 
@@ -8,26 +7,31 @@
 
 namespace aquarius
 {
-	struct srv_config
-	{
-		std::string host;
-		int32_t port;
-	};
-
 	namespace serviced
 	{
+		struct srv_config
+		{
+			std::string host;
+			int32_t port;
+		};
+
+		inline static srv_config& create_srv()
+		{
+			static srv_config srv;
+
+			return srv;
+		}
+
 		AQUARIUS_MODULE_TOP(srvd_client)
 		{
-			using healty_check_func_t = std::function<asio::awaitable<void>(const std::string&, int32_t, bool)>;
+			using healty_check_func_t = std::function<void(const std::string&, int32_t, bool)>;
 
 			using subscribe_func_t = std::function<asio::awaitable<void>(const std::vector<instance>&)>;
 
 		public:
 			virtual bool init() override
 			{
-				srv_config srv;
-
-				cfg_value_from<srv_config>(srv);
+				srv_config& srv = create_srv();
 
 				host_ = srv.host;
 				port_ = srv.port;
@@ -35,18 +39,16 @@ namespace aquarius
 				return true;
 			}
 
-			virtual auto run() -> asio::awaitable<bool> override
+			virtual auto run(io_service_pool&) -> asio::awaitable<bool> override
 			{
-				client_ptr_ = std::make_shared<tcp_client>(co_await asio::this_coro::executor, 30ms);
+				client_ptr_ = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 
 				co_return (!co_await client_ptr_->async_connect(host_, static_cast<uint16_t>(port_)));
 			}
 
 			auto timer(std::chrono::milliseconds) -> asio::awaitable<void>
 			{
-				int req_ping = 0;
-
-				co_await client_ptr_->async_send(req_ping);
+				co_return;
 			}
 
 			auto publish(const std::string& group, const std::string& host, int32_t port) -> asio::awaitable<bool>
@@ -60,7 +62,7 @@ namespace aquarius
 				flex_buffer buffer{};
 				req->commit(buffer);
 
-				co_return !co_await client_ptr_->async_send(std::move(buffer));
+				co_return !co_await client_ptr_->async_send(buffer);
 			}
 
 			auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
@@ -75,7 +77,8 @@ namespace aquarius
 				co_await f(resp.body().instances());
 			}
 
-			void set_healty_check(const healty_check_func_t& func)
+			template<typename Func>
+			void set_healty_check(Func&& func)
 			{
 				healthy_check_func_ = func;
 			}
@@ -92,7 +95,7 @@ namespace aquarius
 			}
 
 		private:
-			std::shared_ptr<tcp_client> client_ptr_;
+			std::shared_ptr<tcp::client> client_ptr_;
 
 			std::string host_;
 

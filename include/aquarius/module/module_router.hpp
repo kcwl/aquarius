@@ -13,7 +13,8 @@
 
 namespace aquarius
 {
-	class module_router : public singleton<module_router>
+	template <typename Executor = asio::any_io_executor>
+	class module_router : public singleton<module_router<Executor>>
 	{
 	public:
 		module_router()
@@ -24,6 +25,11 @@ namespace aquarius
 		~module_router() = default;
 
 	public:
+		const Executor& get_executor()
+		{
+			return executor_;
+		}
+
 		template <typename Module>
 		bool regist(int priority = 0)
 		{
@@ -46,16 +52,28 @@ namespace aquarius
 
 		void run(io_service_pool& pool)
 		{
-			asio::co_spawn(pool.get_io_service(), [&] ()->asio::awaitable<void> 
-						   {
-							   for (auto& pr : routers_by_priority_)
-							   {
-								   for (auto& module_ptr : pr.second)
-								   {
-									   co_await run_one(pool.get_io_service(), module_ptr);
-								   }
-							   }
-						   }, asio::detached);
+			auto& io = pool.get_io_service();
+
+			attach_thread(io.get_executor());
+
+			asio::co_spawn(
+				get_executor(),
+				[&]() -> asio::awaitable<void>
+				{
+					for (auto& pr : routers_by_priority_)
+					{
+						for (auto& module_ptr : pr.second)
+						{
+							if (module_ptr.expired())
+							{
+								continue;
+							}
+
+							co_await run_one(pool, module_ptr.lock());
+						}
+					}
+				},
+				asio::detached);
 		}
 
 		template <typename T, typename R, typename Func>
@@ -77,7 +95,10 @@ namespace aquarius
 				co_return R{};
 			}
 
-			co_return co_await temp_module->template async_visit<R>(std::forward<Func>(f));
+			co_return co_await asio::co_spawn(
+				temp_module->get_executor(), [&, temp_module]() -> asio::awaitable<R>
+				{ co_return co_await temp_module->template async_visit<R>(std::forward<Func>(f)); },
+				asio::use_awaitable);
 		}
 
 		template <typename T, typename R, typename Func>
@@ -108,35 +129,64 @@ namespace aquarius
 			{
 				for (auto& module_ptr : pr.second)
 				{
-					if (!module_ptr)
+					if (module_ptr.expired())
+					{
 						continue;
+					}
 
-					// call timer coroutine (return awaitable) and ignore it to mimic previous behavior
-					module_ptr->timer(ms);
+					auto executor_ptr =
+						std::dynamic_pointer_cast<basic_executor_module<asio::any_io_executor>>(module_ptr.lock());
+
+					if (!executor_ptr)
+					{
+						continue;
+					}
+
+					asio::co_spawn(
+						executor_ptr->get_executor(), [&, executor_ptr]() -> asio::awaitable<void>
+						{ co_await executor_ptr->timer(ms); }, asio::detached);
 				}
 			}
 		}
 
 	private:
-		auto run_one(asio::io_context& io, std::shared_ptr<module_base> module_ptr) ->asio::awaitable<bool>
+		auto run_one(io_service_pool& pool, std::shared_ptr<module_base> module_ptr) -> asio::awaitable<bool>
 		{
 			if (!module_ptr)
 			{
 				co_return false;
 			}
 
-			if (!module_ptr->init())
+			auto ptr = std::dynamic_pointer_cast<basic_executor_module<asio::any_io_executor>>(module_ptr);
+
+			if (!ptr)
 			{
-				XLOG_WARNING() << "[" << module_ptr->name() << "] init error";
 				co_return false;
 			}
 
-			co_return co_await module_ptr->run();
+			ptr->attach_thread(pool.get_io_service().get_executor());
+
+			if (!ptr->init())
+			{
+				XLOG_WARNING() << "[" << ptr->name() << "] init error";
+				co_return false;
+			}
+
+			co_return co_await asio::co_spawn(
+				ptr->get_executor(), [&, ptr]() -> asio::awaitable<bool> { co_return co_await ptr->run(pool); },
+				asio::use_awaitable);
+		}
+
+		void attach_thread(const asio::any_io_executor& executor)
+		{
+			executor_ = executor;
 		}
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<module_base>> routers_by_name_;
 
-		std::map<int, std::vector<std::shared_ptr<module_base>>, std::greater<int>> routers_by_priority_;
+		std::map<int, std::vector<std::weak_ptr<module_base>>, std::greater<int>> routers_by_priority_;
+
+		asio::any_io_executor executor_;
 	};
 } // namespace aquarius
