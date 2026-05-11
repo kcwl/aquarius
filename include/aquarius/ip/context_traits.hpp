@@ -1,6 +1,6 @@
 #pragma once
-#include <aquarius/http.hpp>
-#include <aquarius/tcp.hpp>
+#include <aquarius/ip/http.hpp>
+#include <aquarius/ip/tcp.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 #include <aquarius/virgo/tcp_response.hpp>

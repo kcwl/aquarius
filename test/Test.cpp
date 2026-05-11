@@ -2,8 +2,6 @@
 #include "test_http.virgo.h"
 #include "test_tcp.virgo.h"
 #include <aquarius.hpp>
-#include <aquarius/http.hpp>
-#include <aquarius/tcp.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace std::chrono_literals;

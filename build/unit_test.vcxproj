@@ -186,17 +186,8 @@
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp" />
-    <ClInclude Include="..\include\aquarius\http.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\context_reg.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\http.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
     <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\context_traits.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_register.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
@@ -212,7 +203,6 @@
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
@@ -237,8 +227,6 @@
     <ClInclude Include="..\include\aquarius\tbl\remove_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
-    <ClInclude Include="..\include\aquarius\tcp.hpp" />
-    <ClInclude Include="..\include\aquarius\udp.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />

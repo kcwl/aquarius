@@ -6,9 +6,11 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/http.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
+#include <aquarius/ip/http.hpp>
+#include <aquarius/ip/tcp.hpp>
+#include <aquarius/ip/udp.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_register.hpp>
 #include <aquarius/module/module_router.hpp>
@@ -29,7 +31,6 @@
 #include <aquarius/tbl/remove_view.hpp>
 #include <aquarius/tbl/select_view.hpp>
 #include <aquarius/tbl/update_view.hpp>
-#include <aquarius/tcp.hpp>
 #include <aquarius/virgo/http_header.hpp>
 #include <aquarius/virgo/http_request.hpp>
 #include <aquarius/virgo/http_response.hpp>
