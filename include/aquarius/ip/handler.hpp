@@ -6,89 +6,84 @@
 
 namespace aquarius
 {
-	template <typename Response>
-	class basic_handler
-	{
-	public:
-		using request_t = Response;
+    template <typename Response>
+    class basic_handler
+    {
+    public:
+        using handle_message_t = Response;
 
-	public:
-		basic_handler(const std::string& name)
-			: name_(name)
-		{}
+    public:
+        basic_handler(const std::string& name)
+            : name_(name)
+        {}
 
-	public:
-		Response& response()
-		{
-			return response_;
-		}
+    public:
+        Response& response()
+        {
+            return response_;
+        }
 
-		std::string name() const
-		{
-			return name_;
-		}
+        std::string name() const
+        {
+            return name_;
+        }
 
-		virtual auto visit(flex_buffer& buffer) -> asio::awaitable<error_code>
-		{
-			response().consume(buffer);
+        virtual auto visit(flex_buffer& buffer) -> asio::awaitable<error_code>
+        {
+            response().consume(buffer);
 
-			co_return co_await this->handle();
-		}
+            co_return co_await this->handle();
+        }
 
-	protected:
-		virtual auto handle() -> asio::awaitable<error_code> = 0;
+    protected:
+        virtual auto handle() -> asio::awaitable<error_code> = 0;
 
-	private:
-		std::string name_;
+    private:
+        std::string name_;
 
-		Response response_;
-	};
+        Response response_;
+    };
 
-	template <typename Request, typename Response>
-	class handler : public basic_handler<Response>
-	{
-	public:
-		using base = basic_handler<Response>;
+    template <typename Request, typename Response>
+    class handler : public basic_handler<Response>
+    {
+    public:
+        using base = basic_handler<Response>;
 
-		using request_t = Request;
+        using handle_message_t = Request;
 
-	public:
-		handler(const std::string& name)
-			: base(name)
-			, request_ptr_(std::make_shared<Request>())
-		{}
+    public:
+        handler(const std::string& name)
+            : base(name)
+            , request_ptr_(std::make_shared<Request>())
+        {}
 
-	public:
-		virtual auto visit(flex_buffer& buffer) -> asio::awaitable<error_code>
-		{
-			request()->consume(buffer);
+    public:
+        virtual auto visit(flex_buffer& buffer) -> asio::awaitable<error_code>
+        {
+            request()->consume(buffer);
 
-			co_return co_await this->handle();
-		}
+            co_return co_await this->handle();
+        }
 
-		std::shared_ptr<request_t> request() const
-		{
-			return request_ptr_;
-		}
+        std::shared_ptr<Request> request() const
+        {
+            return request_ptr_;
+        }
 
-	private:
-		void make_response(error_code result)
-		{
-			this->response().result(result.value());
-		}
+    private:
+        std::shared_ptr<Request> request_ptr_;
 
-	private:
-		std::shared_ptr<request_t> request_ptr_;
+        std::string name_;
+    };
 
-		std::string name_;
-	};
 
 	template <typename Handler>
 	struct auto_handler_register
 	{
 		explicit auto_handler_register(std::string_view proto)
 		{
-			using context_type = context_traits<typename Handler::request_t, Handler>::type;
+			using context_type = context_traits<typename Handler::handle_message_t, Handler>::type;
 			mpc_put_context(std::string(proto), std::make_shared<context_type>());
 		}
 	};
