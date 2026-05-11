@@ -1,7 +1,7 @@
 #pragma once
 #include <aquarius/concepts.hpp>
+#include <aquarius/ip/context_reg.hpp>
 #include <aquarius/ip/context_traits.hpp>
-#include <aquarius/module/handler_channel.hpp>
 #include <expected>
 
 namespace aquarius
@@ -11,6 +11,7 @@ namespace aquarius
 	{
 	public:
 		using request_t = Response;
+
 	public:
 		basic_handler(const std::string& name)
 			: name_(name)
@@ -88,7 +89,7 @@ namespace aquarius
 		explicit auto_handler_register(std::string_view proto)
 		{
 			using context_type = context_traits<typename Handler::request_t, Handler>::type;
-			mpc_subscribe(std::string(proto), std::make_shared<context_type>());
+			mpc_put_context(std::string(proto), std::make_shared<context_type>());
 		}
 	};
 

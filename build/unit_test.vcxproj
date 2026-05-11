@@ -189,6 +189,7 @@
     <ClInclude Include="..\include\aquarius\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\context_reg.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
@@ -196,7 +197,7 @@
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\context_traits.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
-    <ClInclude Include="..\include\aquarius\module\handler_channel.hpp" />
+    <ClInclude Include="..\include\aquarius\module\context_reg.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_register.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />

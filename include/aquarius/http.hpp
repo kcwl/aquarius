@@ -7,8 +7,8 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
+#include <aquarius/ip/context_reg.hpp>
 #include <aquarius/ip/http/http_options_handler.hpp>
-#include <aquarius/module/handler_channel.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
@@ -107,7 +107,7 @@ namespace aquarius
 						session_ptr->get_executor(),
 						[&, r = std::move(router), src] -> asio::awaitable<void>
 						{
-							auto context = mpc_publish(r);
+							auto context = mpc_get_context(r);
 
 							if (!context)
 							{
@@ -203,7 +203,6 @@ namespace aquarius
 
 				if (!session_ptr->filling_buffer(std::atoi(src.data()), buffer))
 				{
-					
 				}
 
 				co_return ec;

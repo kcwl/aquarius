@@ -8,8 +8,8 @@
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/adaptor/raw_adaptor.hpp>
 #include <aquarius/ip/adaptor/ssl_adaptor.hpp>
+#include <aquarius/ip/context_reg.hpp>
 #include <aquarius/logger.hpp>
-#include <aquarius/module/handler_channel.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <expected>
 #include <type_traits>
@@ -73,15 +73,15 @@ namespace aquarius
 					session_ptr->get_executor(),
 					[&, this, r = std::move(router), src, session_ptr]() mutable -> asio::awaitable<void>
 					{
-						auto context = mpc_publish(r);
+						auto context = mpc_get_context(r);
 
 						if (!context)
 						{
 							co_return;
 						}
 
-						auto ptr = std::dynamic_pointer_cast<
-							basic_protocol_context<tcp, uint32_t, session_callback>>(context);
+						auto ptr =
+							std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(context);
 						if (!ptr)
 						{
 							co_return;
@@ -134,15 +134,16 @@ namespace aquarius
 						session_ptr->get_executor(),
 						[&, session_ptr, r = std::move(router), src]() mutable -> asio::awaitable<void>
 						{
-							auto context = mpc_publish(r);
+							auto context = mpc_get_context(r);
 
 							if (!context)
 							{
 								co_return;
 							}
 
-							auto ptr = std::dynamic_pointer_cast<
-								basic_protocol_context<tcp, uint32_t, session_callback>>(context);
+							auto ptr =
+								std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(
+									context);
 							if (!ptr)
 							{
 								co_return;
@@ -220,8 +221,7 @@ namespace aquarius
 		}
 
 		template <typename Handler, typename Func>
-		auto handle_request(flex_buffer& buffer, uint32_t src, Func&& func)
-			-> asio::awaitable<error_code>
+		auto handle_request(flex_buffer& buffer, uint32_t src, Func&& func) -> asio::awaitable<error_code>
 		{
 			auto handler_ptr = std::make_shared<Handler>();
 

@@ -9,10 +9,10 @@
 
 namespace aquarius
 {
-	template <typename Func>
-	class handler_channel_impl
+	template <typename Key, typename Func>
+	class node
 	{
-		struct node
+		struct node_impl
 		{
 			char key;
 
@@ -22,23 +22,23 @@ namespace aquarius
 
 			int32_t end;
 
-			std::vector<std::shared_ptr<node>> children;
+			std::vector<std::shared_ptr<node_impl>> children;
 		};
 
 	public:
 		using function_type = Func;
 
-		using key_t = std::string;
+		using key_t = Key;
 
 	public:
-		handler_channel_impl()
-			: root_ptr_(new node())
+		node()
+			: root_ptr_(std::make_shared<node_impl>())
 		{}
 
-		virtual ~handler_channel_impl() = default;
+		virtual ~node() = default;
 
 	public:
-		void add(key_t key, const function_type& func)
+		bool add(key_t key, const function_type& func)
 		{
 			auto cur_node = root_ptr_;
 
@@ -49,13 +49,13 @@ namespace aquarius
 
 				if (it == cur_node->children.end())
 				{
-					auto n = std::make_shared<node>(c);
+					auto n = std::make_shared<node_impl>(c);
 					cur_node->children.push_back(n);
 					cur_node = n;
 				}
 				else
 				{
-					cur_node = *it;
+					return false;
 				}
 
 				cur_node->next++;
@@ -63,6 +63,8 @@ namespace aquarius
 
 			cur_node->func = func;
 			cur_node->end++;
+
+			return true;
 		}
 
 		function_type find(key_t key)
@@ -92,59 +94,42 @@ namespace aquarius
 		}
 
 	protected:
-		std::shared_ptr<node> root_ptr_;
+		std::shared_ptr<node_impl> root_ptr_;
 	};
 
-	class context_base;
-
-	class handler_channel : public singleton<handler_channel>
+	class context_reg : public singleton<context_reg>
 	{
 	public:
-		using subscribe_func_t = std::shared_ptr<context_base>;
+		using node_t = std::shared_ptr<context_base>;
 
 	public:
-		std::shared_ptr<context_base> publish(const std::string& topic)
+		std::shared_ptr<context_base> get(const std::string& topic)
 		{
 			std::shared_lock lk(mutex_);
 
-			auto subscribe = impl_.find(topic);
-
-			if (!subscribe)
-			{
-				return nullptr;
-			}
-
-			return subscribe;
+			return impl_.find(topic);
 		}
 
-		bool subscribe(const std::string& topic, const subscribe_func_t& func)
+		bool put(const std::string& topic, const node_t& n)
 		{
 			std::unique_lock lk(mutex_);
 
-			auto subscribe = impl_.find(topic);
-			if (subscribe)
-			{
-				return false;
-			}
-
-			impl_.add(topic, func);
-
-			return true;
+			return impl_.add(topic, n);
 		}
 
 	private:
 		std::shared_mutex mutex_;
 
-		handler_channel_impl<subscribe_func_t> impl_;
+		node<std::string, node_t> impl_;
 	};
 
-	inline std::shared_ptr<context_base> mpc_publish(const std::string& topic)
+	inline std::shared_ptr<context_base> mpc_get_context(const std::string& topic)
 	{
-		return handler_channel::get_mutable_instance().publish(topic);
+		return context_reg::get_mutable_instance().get(topic);
 	}
 
-	inline bool mpc_subscribe(const std::string& topic, const handler_channel::subscribe_func_t& func)
+	inline bool mpc_put_context(const std::string& topic, const context_reg::node_t& n)
 	{
-		return handler_channel::get_mutable_instance().subscribe(topic, func);
+		return context_reg::get_mutable_instance().put(topic, n);
 	}
 } // namespace aquarius
