@@ -52,6 +52,13 @@ namespace aquarius
 		basic_module() = default;
 
 	public:
+		virtual std::string name() const final
+		{
+			constexpr auto module_name = detail::struct_name<T>();
+
+			return std::string(module_name);
+		}
+
 		template <typename R, typename Func>
 		auto async_visit(Func&& f) -> asio::awaitable<R>
 		{
@@ -65,12 +72,6 @@ namespace aquarius
 		}
 
 	public:
-		virtual std::string name() const final
-		{
-			constexpr auto module_name = detail::struct_name<T>();
-
-			return std::string(module_name);
-		}
 		virtual bool init() override
 		{
 			return true;

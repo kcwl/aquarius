@@ -177,9 +177,6 @@
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
       <Filter>include\aquarius\ip\adaptor</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\context_reg.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\test_http.virgo.h">
       <Filter>头文件</Filter>
     </ClInclude>

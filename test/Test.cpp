@@ -203,9 +203,9 @@ BOOST_AUTO_TEST_CASE(connecting)
 
 	aquarius::io_service_pool pool(1);
 
-	aquarius::module_router<>::get_mutable_instance().regist<aquarius::mysql_module>();
+	aquarius::module_router::get_mutable_instance().put<aquarius::mysql_module>();
 
-	aquarius::module_router<>::get_mutable_instance().run(pool);
+	aquarius::module_router::get_mutable_instance().run(pool);
 
 	std::this_thread::sleep_for(2s);
 

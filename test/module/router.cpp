@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_SUITE(ut_module_router)
 BOOST_AUTO_TEST_CASE(regist)
 {
 	module_router router;
-	auto result = router.regist<mock_module>();
+	auto result = router.put<mock_module>();
 
 	BOOST_TEST(result);
 }
@@ -68,11 +68,11 @@ BOOST_AUTO_TEST_CASE(regist)
 BOOST_AUTO_TEST_CASE(multi_regist)
 {
 	module_router router;
-	auto result = router.regist<mock_module>();
+	auto result = router.put<mock_module>();
 
 	BOOST_TEST(result);
 
-	result = router.regist<mock_module>();
+	result = router.put<mock_module>();
 
 	BOOST_TEST(!result);
 }
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(multi_regist)
 BOOST_AUTO_TEST_CASE(router_run)
 {
 	module_router router;
-	router.regist<mock_module>();
-	router.regist<mock_no_init_module>();
+	router.put<mock_module>();
+	router.put<mock_no_init_module>();
 
 	io_service_pool pool(1);
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(router_run)
 BOOST_AUTO_TEST_CASE(router_timer)
 {
 	module_router router;
-	router.regist<mock_module>();
+	router.put<mock_module>();
 
 	BOOST_CHECK_NO_THROW(router.timer(1s));
 }
@@ -98,13 +98,13 @@ BOOST_AUTO_TEST_CASE(router_timer)
 BOOST_AUTO_TEST_CASE(schedules)
 {
 	module_router router;
-	router.regist<mock_module>();
+	router.put<mock_module>();
 
 	auto f = [](mock_module* m) { return m->say(); };
 
 	BOOST_TEST((router.schedule<mock_module, bool>(f)));
 
-	router.regist<mock_direct_base_module>();
+	router.put<mock_direct_base_module>();
 
 	auto f1 = [](mock_direct_base_module*) { return true; };
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(schedules)
 BOOST_AUTO_TEST_CASE(async_schedules)
 {
 	module_router router;
-	router.regist<mock_module>();
+	router.put<mock_module>();
 
 	asio::io_context io{};
 
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(async_schedules)
 
 			BOOST_TEST(co_await (router.async_schedule<mock_module, bool>(f)));
 
-			router.regist<mock_direct_base_module>();
+			router.put<mock_direct_base_module>();
 
 			auto f1 = [](mock_direct_base_module* m) -> asio::awaitable<bool> { co_return true; };
 

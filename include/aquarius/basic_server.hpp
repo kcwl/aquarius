@@ -42,7 +42,7 @@ namespace aquarius
 
 			asio::co_spawn(acceptor_.get_executor(), start_accept(), asio::detached);
 
-			module_router<>::get_mutable_instance().run(io_service_pool_);
+			module_router::get_mutable_instance().run(io_service_pool_);
 		}
 
 		~basic_server() = default;
@@ -180,7 +180,7 @@ namespace aquarius
 						return;
 					}
 
-					module_router<>::get_mutable_instance().timer(global_time_dura_);
+					module_router::get_mutable_instance().timer(global_time_dura_);
 				});
 		}
 

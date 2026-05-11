@@ -197,7 +197,6 @@
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\context_traits.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
-    <ClInclude Include="..\include\aquarius\module\context_reg.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_register.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />

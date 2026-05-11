@@ -29,13 +29,13 @@ namespace aquarius
 					 class_type* m) mutable -> asio::awaitable<return_type>
 		{ return std::apply(std::bind_front(MemberFunc, m), std::move(tp)); };
 
-		auto executor = module_router<>::get_mutable_instance().get_executor();
+		auto executor = module_router::get_mutable_instance().get_executor();
 
 		co_return co_await asio::co_spawn(
 			executor,
-			[func = std::move(f)] () mutable -> asio::awaitable<return_type>
+			[func = std::move(f)]() mutable -> asio::awaitable<return_type>
 			{
-				co_return co_await module_router<>::get_mutable_instance().async_schedule<class_type, return_type>(
+				co_return co_await module_router::get_mutable_instance().async_schedule<class_type, return_type>(
 					/*task*/ func);
 			},
 			asio::use_awaitable);
@@ -49,16 +49,15 @@ namespace aquarius
 		using class_type = typename member_func_pointer<decltype(MemberFunc)>::class_type;
 
 		auto f = [tp = std::move(std::make_tuple(std::forward_like<Args>(args)...))](
-					 class_type* m) mutable -> asio::awaitable<return_type>
-		{ co_return std::apply(std::bind_front(MemberFunc, m), tp); };
+					 class_type* m) mutable -> return_type { return std::apply(std::bind_front(MemberFunc, m), tp); };
 
-		auto executor = module_router<>::get_mutable_instance().get_executor();
+		auto executor = module_router::get_mutable_instance().get_executor();
 
 		co_return co_await asio::co_spawn(
 			executor,
 			[func = std::move(f)]() -> asio::awaitable<return_type>
 			{
-				co_return module_router<>::get_mutable_instance().schedule<class_type, return_type>(
+				co_return module_router::get_mutable_instance().schedule<class_type, return_type>(
 					/*task*/ std::move(func));
 			},
 			asio::use_awaitable);

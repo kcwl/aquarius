@@ -13,9 +13,10 @@
 
 namespace aquarius
 {
-	template <typename Executor = asio::any_io_executor>
-	class module_router : public singleton<module_router<Executor>>
+	class module_router : public singleton<module_router>
 	{
+		using executor_t = asio::any_io_executor;
+
 	public:
 		module_router()
 			: routers_by_name_()
@@ -25,17 +26,17 @@ namespace aquarius
 		~module_router() = default;
 
 	public:
-		const Executor& get_executor()
+		const asio::strand<executor_t>& get_executor()
 		{
 			return executor_;
 		}
 
 		template <typename Module>
-		bool regist(int priority = 0)
+		bool put(int priority = 0)
 		{
 			auto module_ptr = std::make_shared<Module>();
 
-			auto name = module_ptr->name();
+			std::string name(detail::struct_name<Module>());
 
 			auto iter = routers_by_name_.find(name);
 
@@ -52,12 +53,10 @@ namespace aquarius
 
 		void run(io_service_pool& pool)
 		{
-			auto& io = pool.get_io_service();
-
-			attach_thread(io.get_executor());
+			executor_ = asio::make_strand(pool.get_io_service().get_executor());
 
 			asio::co_spawn(
-				get_executor(),
+				executor_,
 				[&]() -> asio::awaitable<void>
 				{
 					for (auto& pr : routers_by_priority_)
@@ -79,48 +78,27 @@ namespace aquarius
 		template <typename T, typename R, typename Func>
 		auto async_schedule(Func&& f) -> asio::awaitable<R>
 		{
-			constexpr auto module_name = detail::struct_name<T>();
-
-			auto iter = routers_by_name_.find(std::string(module_name));
-			if (iter == routers_by_name_.end())
+			auto module_ptr = get_module<T>();
+			if (!module_ptr)
 			{
-				XLOG_WARNING() << "[" << module_name << "] module not found";
-				co_return R{};
-			}
-
-			auto temp_module = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
-			if (!temp_module)
-			{
-				XLOG_WARNING() << "[" << module_name << "] task type not match";
 				co_return R{};
 			}
 
 			co_return co_await asio::co_spawn(
-				temp_module->get_executor(), [&, temp_module]() -> asio::awaitable<R>
-				{ co_return co_await temp_module->template async_visit<R>(std::forward<Func>(f)); },
-				asio::use_awaitable);
+				module_ptr->get_executor(), [module_ptr, func = std::move(f)]() mutable -> asio::awaitable<R>
+				{ co_return co_await module_ptr->template async_visit<R>(std::move(func)); }, asio::use_awaitable);
 		}
 
 		template <typename T, typename R, typename Func>
 		auto schedule(Func&& f) -> R
 		{
-			constexpr auto module_name = detail::struct_name<T>();
-
-			auto iter = routers_by_name_.find(std::string(module_name));
-			if (iter == routers_by_name_.end())
+			auto module_ptr = get_module<T>();
+			if (!module_ptr)
 			{
-				XLOG_WARNING() << "[" << module_name << "] module not found";
 				return R{};
 			}
 
-			auto temp_module = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
-			if (!temp_module)
-			{
-				XLOG_WARNING() << "[" << module_name << "] task type not match";
-				return R{};
-			}
-
-			return temp_module->template visit<R>(std::forward<Func>(f));
+			return module_ptr->template visit<R>(std::forward<Func>(f));
 		}
 
 		void timer(std::chrono::milliseconds ms)
@@ -177,9 +155,26 @@ namespace aquarius
 				asio::use_awaitable);
 		}
 
-		void attach_thread(const asio::any_io_executor& executor)
+		template <typename T>
+		std::shared_ptr<basic_module<T>> get_module()
 		{
-			executor_ = executor;
+			constexpr auto module_name = detail::struct_name<T>();
+
+			auto iter = routers_by_name_.find(std::string(module_name));
+			if (iter == routers_by_name_.end())
+			{
+				XLOG_WARNING() << "[" << module_name << "] module not found";
+				return nullptr;
+			}
+
+			auto module_ptr = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
+			if (!module_ptr)
+			{
+				XLOG_WARNING() << "[" << module_name << "] task type not match";
+				return nullptr;
+			}
+
+			return module_ptr;
 		}
 
 	private:
@@ -187,6 +182,6 @@ namespace aquarius
 
 		std::map<int, std::vector<std::weak_ptr<module_base>>, std::greater<int>> routers_by_priority_;
 
-		asio::any_io_executor executor_;
+		asio::strand<executor_t> executor_;
 	};
 } // namespace aquarius
