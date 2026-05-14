@@ -28,7 +28,7 @@ namespace aquarius
 	public:
 		const asio::strand<executor_t>& get_executor()
 		{
-			return executor_;
+			return *executor_;
 		}
 
 		template <typename Module>
@@ -53,10 +53,10 @@ namespace aquarius
 
 		void run(io_service_pool& pool)
 		{
-			executor_ = asio::make_strand(pool.get_io_service().get_executor());
+			executor_.emplace(asio::make_strand(pool.get_io_service().get_executor()));
 
 			asio::co_spawn(
-				executor_,
+				*executor_,
 				[&]() -> asio::awaitable<void>
 				{
 					for (auto& pr : routers_by_priority_)
@@ -182,6 +182,6 @@ namespace aquarius
 
 		std::map<int, std::vector<std::weak_ptr<module_base>>, std::greater<int>> routers_by_priority_;
 
-		asio::strand<executor_t> executor_;
+		std::optional<asio::strand<executor_t>> executor_;
 	};
 } // namespace aquarius

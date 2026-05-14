@@ -35,7 +35,7 @@ namespace aquarius
 
 			static constexpr auto arr = impl();
 
-			static constexpr std::string_view value{ arr.data(), arr.size() - 1 };
+			static constexpr std::string_view value = std::string_view(arr.data(), arr.size() - 1);
 		};
 	} // namespace detail
 

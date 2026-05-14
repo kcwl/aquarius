@@ -91,14 +91,18 @@ namespace aquarius
 			std::remove_cvref_t<T> value{};
 
 			uint8_t temp{};
-			buff.sgetn((char*)&temp, sizeof(temp));
 
-			value = temp;
-
-			if (value == static_cast<T>(flex_buffer::traits_type::eof()))
+			// ensure at least one byte available
+			if (buff.size() < 1)
 			{
 				throw std::out_of_range("buffer is not enough space");
 			}
+
+			// read first byte
+			auto len = static_cast<std::size_t>(buff.sgetn((char*)&temp, sizeof(temp)));
+			(void)len;
+
+			value = temp;
 
 			if (value >= 0x80)
 			{
@@ -106,22 +110,26 @@ namespace aquarius
 
 				int8_t temp_bit = 7;
 
-				buff.sgetn((char*)&temp, sizeof(temp));
-
-				while (temp > 0x7f)
+				// read continuation bytes
+				for (;;)
 				{
+					if (buff.size() < 1)
+					{
+						throw std::out_of_range("buffer is not enough space");
+					}
+
+					auto len2 = static_cast<std::size_t>(buff.sgetn((char*)&temp, sizeof(temp)));
+					(void)len2;
+
+					if ((temp & 0x80) == 0)
+					{
+						value += (static_cast<T>(temp) << temp_bit);
+						break;
+					}
+
 					value += static_cast<T>(temp & 0x7f) << temp_bit;
-
 					temp_bit += 7;
-					buff.sgetn((char*)&temp, sizeof(temp));
 				}
-
-				if (temp == flex_buffer::traits_type::eof())
-				{
-					throw std::out_of_range("buffer is not enough space");
-				}
-
-				value += (static_cast<T>(temp) << temp_bit);
 			}
 
 			return value;
@@ -142,12 +150,23 @@ namespace aquarius
 
 			constexpr auto value_size = sizeof(T);
 
-			auto len = buff.sgetn((char*)&value, value_size);
+			// ensure we have enough data available before attempting to read
+			if (buff.size() < value_size)
+			{
+				throw std::out_of_range("buffer is not enough space");
+			}
+
+			// read into a temporary buffer to avoid partial-fill UB
+			char tmp[value_size];
+
+			auto len = static_cast<std::size_t>(buff.sgetn(tmp, value_size));
 
 			if (len != value_size)
 			{
 				throw std::out_of_range("buffer is not enough space");
 			}
+
+			std::memcpy(&value, tmp, value_size);
 
 			return value;
 		}
@@ -219,7 +238,12 @@ namespace aquarius
 
 			auto size = sizeof(typename T::value_type);
 
-			buffer.sgetn((char*)&v.value, size);
+			auto len = static_cast<std::size_t>(buffer.sgetn((char*)&v.value, size));
+
+			if (len != size)
+			{
+				throw std::out_of_range("buffer is not enough space");
+			}
 
 			return v;
 		}

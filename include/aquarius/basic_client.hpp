@@ -176,7 +176,7 @@ namespace aquarius
 			return true;
 		}
 
-	private:
+	protected:
 		executor_t executor_;
 
 		std::shared_ptr<Session> session_ptr_;

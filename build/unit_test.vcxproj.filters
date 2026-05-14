@@ -55,6 +55,12 @@
     <Filter Include="源文件\tbl">
       <UniqueIdentifier>{d18ba868-bf48-44c1-b004-9cb7fd66cc8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\ip\http">
+      <UniqueIdentifier>{9370caa6-2f27-4317-824d-4a3ec778ce0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ip\adaptor">
+      <UniqueIdentifier>{75cfd86e-3c49-43bd-b8fe-75ced705eefb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -156,12 +162,6 @@
     <ClInclude Include="..\include\aquarius\tbl\mysql_type.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\test_http.virgo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\test_tcp.virgo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
@@ -198,20 +198,11 @@
     <ClInclude Include="..\include\aquarius\tbl\mysql_io_service.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\udp.hpp">
-      <Filter>include\aquarius\ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp">
       <Filter>include\aquarius\virgo</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\tcp_header.hpp">
       <Filter>include\aquarius\virgo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\module\module_register.hpp">
       <Filter>include\aquarius\module</Filter>
@@ -255,12 +246,6 @@
     <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\test\test_model.tbl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\aquarius\ip\adaptor\ssl_adaptor.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -272,111 +257,268 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\Test.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\io_service_pool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\session.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\ctx_handler.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\test_tcp.virgo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\test_http.virgo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\concat.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\crc.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\int_to_string.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\member_pointer.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\string_literal.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\struct_name.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\detail\uuid_generator.cpp">
-      <Filter>源文件\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\http_method.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\http_status.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\http_version.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\serialize\binary.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\serialize\json.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\serialize\kv.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\ip\raw_adaptor_test.cpp">
-      <Filter>源文件\ip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp">
-      <Filter>源文件\ip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\module\router.cpp">
-      <Filter>源文件\module</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\grep.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\select.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\insert.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\update.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\remove.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\tcp_protocol.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\http_header.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\virgo\tcp_header.cpp">
-      <Filter>源文件\virgo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\protocol.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
       <Filter>源文件</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\test\test_http.virgo">
+    <ClCompile Include="..\test\detail\ut_asio.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_concat.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_concat.hpp.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_config.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_crc.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_flex_buffer.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_int_to_string.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_make_endpoint.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_member_pointer.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_string_literal.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_struct_name.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_uuid_generator.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_context_reg.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_context_traits.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_handler.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_http.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_tcp.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ut_udp.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\http\ut_http_helper.cpp">
+      <Filter>源文件\ip\http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\http\ut_http_options_handler.cpp">
+      <Filter>源文件\ip\http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\adaptor\ut_raw_adaptor.cpp">
+      <Filter>源文件\ip\adaptor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\adaptor\ut_ssl_adaptor.cpp">
+      <Filter>源文件\ip\adaptor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_module_register.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_module_router.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_mysql_module.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_player_module.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_schedule.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_binary.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_cookie.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_json.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_kv.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_scalar_type.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_add_string.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_enter_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_grep_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_insert_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_mysql_type.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_remove_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_select_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_update_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_basic_http_protocol.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_method.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_request.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_response.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_status.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_version.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_request.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_response.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_response_commit.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\unittest.cpp">
       <Filter>源文件</Filter>
-    </None>
-    <None Include="..\test\test_tcp.virgo">
+    </ClCompile>
+    <ClCompile Include="..\test\ut_aquarius.cpp">
       <Filter>源文件</Filter>
-    </None>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_aquarius.hpp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_auto_detail.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_auto_router.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_auto_serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_client.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_client_more.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_context.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_protocol.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_serialize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_server.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_session.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_binary_more.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_client_error_paths.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_cmd_options.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_concepts.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_detail_make_endpoint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_detail_misc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_error_code.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_http_options.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_http_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_io_service_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_logger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_serialize_error_paths.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_serialize_extras.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_serialize_reflectable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_serialize_zigzag.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_singleton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
