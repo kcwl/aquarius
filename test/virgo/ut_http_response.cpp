@@ -11,6 +11,7 @@ struct SimpleBody
     std::string data;
     void serialize(flex_buffer& buf) const { buf.sputn(data.data(), data.size()); }
     void deserialize(flex_buffer& buf) { auto sb = buf.data(); data.assign((const char*)sb.data(), sb.size()); buf.consume(sb.size()); }
+    std::size_t byte_size() { return data.size() + 1; }
 };
 
 BOOST_AUTO_TEST_CASE(commit_header_line)

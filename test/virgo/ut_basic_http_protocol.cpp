@@ -12,6 +12,7 @@ struct SimpleBody
     std::string data;
     void serialize(flex_buffer& buf) const { buf.sputn(data.data(), data.size()); }
     void deserialize(flex_buffer& buf) { auto sb = buf.data(); data.assign((const char*)sb.data(), sb.size()); buf.consume(sb.size()); }
+    std::size_t byte_size() { return data.size() + 1; }
 };
 
 BOOST_AUTO_TEST_CASE(post_sets_content_length_and_roundtrip)
@@ -25,9 +26,9 @@ BOOST_AUTO_TEST_CASE(post_sets_content_length_and_roundtrip)
     proto.commit(buf);
 
     aquarius::basic_http_protocol<true, SimpleBody> copy;
-    bool ok = copy.consume(buf);
+    auto ec = copy.consume(buf);
 
-    BOOST_TEST(ok);
+    BOOST_TEST(!ec);
     BOOST_TEST(copy.body().data == "hello_world");
 }
 

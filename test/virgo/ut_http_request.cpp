@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_CASE(get_commits_command_header_with_body)
         void deserialize(flex_buffer&)
         {
         }
+        std::size_t byte_size() { return 1 + data.size() + 1; }
     };
 
     using Req = aquarius::http_request<"/test", Body>;

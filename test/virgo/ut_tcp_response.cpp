@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE(commit_and_consume)
     BOOST_TEST(buffer.size() > 0);
 
     resp_t other;
-    bool ok = other.consume(buffer);
-    BOOST_TEST(ok);
+    auto ec = other.consume(buffer);
+    BOOST_TEST(!ec);
     BOOST_TEST(other.result() == 42);
     BOOST_TEST(other.body().x == 7);
 }

@@ -255,6 +255,9 @@
     <ClInclude Include="..\include\aquarius\basic_context.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\virgo\error.hpp">
+      <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">

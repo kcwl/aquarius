@@ -35,9 +35,9 @@ BOOST_AUTO_TEST_CASE(commit_and_consume_roundtrip)
     proto.commit(buf);
 
     aquarius::basic_tcp_protocol<true, aquarius::tcp_header, SimpleBody> copy;
-    bool ok = copy.consume(buf);
+    auto ec = copy.consume(buf);
 
-    BOOST_TEST(ok);
+    BOOST_TEST(!ec);
     BOOST_TEST(copy.header().uuid() == 12345u);
     BOOST_TEST(copy.header().timestamp() == 67890);
     BOOST_TEST(copy.body().data == "payload");

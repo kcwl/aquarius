@@ -14,10 +14,12 @@ namespace aquarius
 	class http_header
 	{
 		constexpr static auto crlf = "\r\n"sv;
-
-		constexpr static auto seq_number = "Seq-Number"sv;
+		constexpr static auto seq_number = "Source-Seq"sv;
 		constexpr static auto http_content_length = "Content-Length"sv;
 		constexpr static auto http_content_type = "Content-Type"sv;
+		constexpr static auto http_connect = "Connection"sv;
+		constexpr static auto http_connect_alive = "keep-alive"sv;
+		constexpr static auto http_connect_close = "close"sv;
 
 		using key_t = std::string;
 
@@ -34,6 +36,10 @@ namespace aquarius
 			: fields_(other.fields_)
 		{}
 
+		http_header(http_header&& other) noexcept
+			: fields_(std::move(other.fields_))
+		{}
+
 		http_header& operator=(const http_header& other)
 		{
 			if (this != std::addressof(other))
@@ -43,10 +49,6 @@ namespace aquarius
 
 			return *this;
 		}
-
-		http_header(http_header&& other) noexcept
-			: fields_(std::move(other.fields_))
-		{}
 
 		http_header& operator=(http_header&& other) noexcept
 		{
@@ -59,7 +61,7 @@ namespace aquarius
 		}
 
 	public:
-		virtual error_code serialize(flex_buffer& buffer)
+		virtual void serialize(flex_buffer& buffer)
 		{
 			std::string headline{};
 
@@ -71,15 +73,11 @@ namespace aquarius
 			headline += "\r\n";
 
 			buffer.sputn(headline.data(), headline.size());
-
-			return error_code{};
 		}
 
-		virtual error_code deserialize(flex_buffer& buffer)
+		virtual void deserialize(flex_buffer& buffer)
 		{
-			error_code ec{};
-
-			auto span_buffer = std::span<char>((char*)buffer.data().data(), buffer.size());
+			auto span_buffer = std::string_view((char*)buffer.data().data(), buffer.size());
 
 			auto headers = span_buffer | std::views::split(crlf);
 
@@ -98,43 +96,39 @@ namespace aquarius
 
 				if (pos == std::string_view::npos)
 				{
-					ec = boost::asio::error::eof;
-
 					break;
 				}
 
 				auto key = str.substr(0, pos);
 				auto value = str.substr(pos + 1, str.size() - pos - 1);
 
-				fields_.emplace(std::string(key), value.substr(1));
+				fields_.emplace(key_t(key), value_t(value.substr(1)));
 			}
 
 			buffer.consume(length + crlf.size());
-
-			return ec;
 		}
 
 	public:
 		bool keep_alive() const
 		{
-			auto value = this->find("Connection");
+			auto value = this->find(key_t(http_connect));
 
 			return value == "keep-alive" ? true : false;
 		}
 
 		void keep_alive(bool k)
 		{
-			this->set_field("Connection", k ? "keep-alive" : "close");
+			this->set_field(key_t(http_connect), value_t(k ? http_connect_alive : http_connect_close));
 		}
 
 		std::string content_type() const
 		{
-			return find(std::string(http_content_type));
+			return find(key_t(http_content_type));
 		}
 
 		void content_type(const std::string& type)
 		{
-			return set_field(std::string(http_content_type), type);
+			return set_field(key_t(http_content_type), type);
 		}
 
 		void set_field(const key_t& key, const value_t& v)
@@ -144,22 +138,22 @@ namespace aquarius
 
 		uint32_t sequence() const
 		{
-			return to_integer<uint32_t>(find(std::string(seq_number)));
+			return to_integer<uint32_t>(find(key_t(seq_number)));
 		}
 
 		void sequence(uint32_t v)
 		{
-			set_field(std::string(seq_number), std::to_string(v));
+			set_field(key_t(seq_number), std::to_string(v));
 		}
 
 		void content_length(uint64_t len)
 		{
-			set_field(std::string(http_content_length), std::to_string(len));
+			set_field(key_t(http_content_length), std::to_string(len));
 		}
 
 		uint64_t content_length() const
 		{
-			auto value = find(std::string(http_content_length));
+			auto value = find(key_t(http_content_length));
 
 			if (value.empty())
 				return 0;
@@ -191,7 +185,7 @@ namespace aquarius
 		}
 
 	private:
-		std::map<std::string, std::string> fields_;
+		std::unordered_map<key_t, value_t> fields_;
 	};
 
 } // namespace aquarius

@@ -22,33 +22,6 @@ BOOST_AUTO_TEST_CASE(http_header_fields_and_accessors)
     h.content_type("text/plain");
     BOOST_TEST(h.content_type() == "text/plain");
 
-    {
-        std::cerr << "sizeof(http_header)=" << sizeof(aquarius::http_header) << "\n";
-        unsigned char* p = reinterpret_cast<unsigned char*>(&h);
-        for (size_t i = 0; i < std::min<size_t>(64, sizeof(aquarius::http_header)); ++i)
-        {
-            char buf[8];
-            sprintf(buf, "%02X", p[i]);
-            std::cerr << (i < 10 ? " " : "") << i << ":" << buf << " ";
-            if ((i + 1) % 8 == 0) std::cerr << "\n";
-        }
-        std::cerr << std::dec << "\n";
-    }
-    // Avoid calling `sequence()` before it's set; verify via find()
-    {
-        auto v = h.find("Seq-Number");
-        if (!v.empty()) {
-            std::string hex;
-            for (unsigned char c : v) {
-                char buf[8];
-                sprintf(buf, "%02X", c);
-                hex += buf;
-            }
-            BOOST_TEST_MESSAGE("Seq-Number raw: '" << v << "' hex=" << hex << " size=" << v.size());
-        } else {
-            BOOST_TEST_MESSAGE("Seq-Number empty");
-        }
-    }
     h.sequence(42);
     BOOST_TEST(h.sequence() == 42u);
 

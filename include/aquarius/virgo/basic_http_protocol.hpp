@@ -9,84 +9,133 @@
 
 namespace aquarius
 {
-	template <bool Request,typename Body, typename Allocator = std::allocator<Body>>
-	class basic_http_protocol : public basic_tcp_protocol<Request, http_header, Body, Allocator>
-	{
-	public:
-		using base = basic_tcp_protocol<Request, http_header, Body, Allocator>;
+    template <bool Request, typename Body>
+    class basic_http_protocol : public basic_tcp_protocol<Request, http_header, Body>
+    {
+    public:
+        using base_type = basic_tcp_protocol<Request, http_header, Body>;
 
-		using base::has_request;
+        using base_type::has_request;
 
-	public:
-		basic_http_protocol() = default;
+        constexpr static auto result_keyword = "Result"sv;
 
-		virtual ~basic_http_protocol() = default;
+    public:
+        basic_http_protocol()
+            : method_()
+        {
 
-		basic_http_protocol(const basic_http_protocol&) = delete;
+        }
 
-		basic_http_protocol& operator=(const basic_http_protocol&) = delete;
+        virtual ~basic_http_protocol() = default;
 
-		basic_http_protocol(basic_http_protocol&&) noexcept = default;
+        basic_http_protocol(const basic_http_protocol& other)
+            : base_type(std::move(other))
+            , method_(other.method_)
+        {
 
-		basic_http_protocol& operator=(basic_http_protocol&&) noexcept = default;
+        }
 
-	public:
-		virtual error_code commit(flex_buffer& buffer) override
-		{
-			this->commit_command_header(buffer);
+        basic_http_protocol(basic_http_protocol&& other)
+            : base_type(std::move(other))
+            , method_(std::exchange(other.method_, {}))
+        {
 
-			flex_buffer buf{};
+        }
 
-			if (this->method() != http_method::get)
-			{
-				this->body().serialize(buf);
+        basic_http_protocol& operator=(const basic_http_protocol& other) noexcept
+        {
+            if (std::addressof(other) != this)
+            {
+                base_type::operator=(std::move(other));
+                method_ = other.method_;
+            }
 
-				if (buf.size() > 2)
-				{
-					this->header().content_length(buf.size());
-				}
-			}
+            return *this;
+        }
 
-			auto ec = this->header().serialize(buffer);
+        basic_http_protocol& operator=(basic_http_protocol&& other) noexcept
+        {
+            if (std::addressof(other) != this)
+            {
+                base_type::operator=(std::move(other));
+                method_ = std::exchange(other.method_, {});
+            }
 
-			if (!ec)
-			{
-				if (this->method() != http_method::get)
-				{
-					if (this->header().content_length() != 0)
-					{
-						buffer.sputn((char*)buf.data().data(), buf.size());
-					}
-				}
-			}
+            return *this;
+        }
 
-			return ec;
-		}
+    public:
+        virtual error_code commit(flex_buffer& buffer) override
+        {
+            error_code ec{};
 
-		virtual bool consume(flex_buffer& buffer) override
-		{
-			if (this->header().deserialize(buffer))
-			{
-				return false;
-			}
+            if constexpr (!Request)
+            {
+                this->header().set_field(std::string(result_keyword), std::to_string(this->result()));
+            }
 
-			this->body().deserialize(buffer);
+            try
+            {
+                std::size_t bytes = this->body().byte_size();
 
-			return true;
-		}
+                if (this->method() != http_method::get && bytes != 0)
+                {
+                    this->header().content_length(bytes);
+                }
 
-	public:
-		void method(http_method m)
-		{
-			method_ = m;
-		}
+                this->header().serialize(buffer);
 
-		http_method& method()
-		{
-			return method_;
-		}
+                if (this->method() != http_method::get)
+                {
+                    if (bytes != 0)
+                    {
+                        this->body().serialize(buffer);
+                    }
+                }
+            }
+            catch (...)
+            {
+                ec = ip::error::commit;
+            }
 
-	private:
-		http_method method_;
-	};
+            return ec;
+        }
+
+        virtual error_code consume(flex_buffer& buffer) override
+        {
+            error_code ec{};
+
+            try
+            {
+                this->header().deserialize(buffer);
+
+                this->body().deserialize(buffer);
+            }
+            catch (...)
+            {
+                ec = ip::error::consume;
+            }
+
+            return ec;
+        }
+
+    public:
+        void method(http_method m)
+        {
+            method_ = m;
+        }
+
+        http_method& method()
+        {
+            return method_;
+        }
+
+        const http_method& method() const
+        {
+            return method_;
+        }
+
+    private:
+        http_method method_;
+    };
 } // namespace aquarius

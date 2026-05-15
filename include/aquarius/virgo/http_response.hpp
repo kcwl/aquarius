@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	template <typename Body, http_version Version = http_version::http1_1>
+	template <typename Body>
 	class http_response : public basic_http_protocol<false, Body>
 	{
 	public:
@@ -17,46 +17,12 @@ namespace aquarius
 
 		virtual ~http_response() = default;
 
-		http_response(const http_response&) = delete;
-		http_response& operator=(const http_response&) = delete;
+		http_response(const http_response&) = default;
 
 		http_response(http_response&&) noexcept = default;
+
+		http_response& operator=(const http_response&) = default;
+
 		http_response& operator=(http_response&&) noexcept = default;
-
-	public:
-		virtual error_code commit(flex_buffer& buffer) override
-		{
-			this->commit_command_header(buffer);
-
-			flex_buffer buf{};
-
-			this->body().serialize(buf);
-
-			if (buf.size() > 2)
-			{
-				this->header().content_length(buf.size());
-			}
-
-			auto ec = this->header().serialize(buffer);
-
-			if (!ec)
-			{
-				if (this->header().content_length() != 0)
-				{
-					buffer.sputn((char*)buf.data().data(), buf.size());
-				}
-			}
-
-			return ec;
-		}
-
-	protected:
-		virtual void commit_command_header(flex_buffer& buffer) override
-		{
-			std::string headerline = std::format("{} {} {}\r\n", version_to_string(Version),
-												 static_cast<int>(this->result()), status_to_string(this->result()));
-
-			buffer.sputn(headerline.c_str(), headerline.size());
-		}
 	};
 } // namespace aquarius
