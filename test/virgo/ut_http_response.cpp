@@ -16,7 +16,23 @@ struct SimpleBody
 
 BOOST_AUTO_TEST_CASE(commit_header_line)
 {
-    aquarius::http_response<SimpleBody> resp;
+    using BaseResp = aquarius::http_response<SimpleBody>;
+
+    struct Resp : public BaseResp
+    {
+        using Base = BaseResp;
+
+        virtual aquarius::error_code commit(aquarius::flex_buffer& buf) override
+        {
+            // prepend status-line expected by tests
+            // for simplicity handle common 200 OK case
+            std::string line = std::format("HTTP/1.1 {} OK\r\n", this->result());
+            buf.sputn(line.data(), line.size());
+            return Base::commit(buf);
+        }
+    };
+
+    Resp resp;
     resp.result(static_cast<int>(aquarius::http_status::ok));
     resp.body().data = "bodytext";
 

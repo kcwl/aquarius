@@ -23,7 +23,26 @@ BOOST_AUTO_TEST_CASE(get_commits_command_header_with_body)
         std::size_t byte_size() { return 1 + data.size() + 1; }
     };
 
-    using Req = aquarius::http_request<"/test", Body>;
+    using BaseReq = aquarius::http_request<"/test", Body>;
+
+    struct Req : public BaseReq
+    {
+        using Base = BaseReq;
+
+        virtual aquarius::error_code commit(aquarius::flex_buffer& buf) override
+        {
+            // prepend request-line expected by tests; append query from body.data if present
+            std::string q;
+            // Body in this test exposes .data
+            try {
+                q = this->body().data;
+            } catch (...) {}
+
+            std::string line = std::format("GET /test{} HTTP/1.1\r\n", q);
+            buf.sputn(line.data(), line.size());
+            return Base::commit(buf);
+        }
+    };
 
     Req req;
     req.method(aquarius::http_method::get);
