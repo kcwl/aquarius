@@ -64,7 +64,7 @@ namespace aquarius
 											   const std::string& router);
 
 			bool generate_response_alias_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
-												const std::string& message_name, const std::string protocol);
+												const std::string& message_name, const std::string protocol, const std::string& router);
 
 			bool scope_public(std::fstream& ofs);
 
