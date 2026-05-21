@@ -8,22 +8,18 @@ find_package(OpenSSL REQUIRED)
 # Collect all unit-test source files recursively. Match files starting with 'ut_'.
 file(GLOB_RECURSE UT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut_*.cpp")
 
-# Also include any top-level test files that may not start with 'ut_' but are tests
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp")
-	list(APPEND UT_SOURCES "unittest.cpp")
+# Path to test runner source that provides Boost.Test main
+set(UNITTEST_RUNNER ${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp)
+if(NOT EXISTS ${UNITTEST_RUNNER})
+	message(FATAL_ERROR "Missing test runner: ${UNITTEST_RUNNER}")
 endif()
 
 # Include paths used by the tests
 include_directories(${AQUARIUS_INCLUDE})
 include_directories(${AQUARIUS_PROTOCOL_INCLUDE})
 
-# Build a single unittest executable that includes all UT_SOURCES and the
-# header-only Boost.Test `unittest.cpp` which provides the test runner main.
-add_executable(unittest ${UT_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp)
-
-target_include_directories(unittest PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
-
-target_link_libraries(unittest PRIVATE
+# Common link libraries for each test target
+set(TEST_COMMON_LIBS
 	Boost::log_setup
 	Boost::log
 	Boost::thread
@@ -40,20 +36,36 @@ target_link_libraries(unittest PRIVATE
 	pthread
 )
 
-if(ENABLE_MYSQL)
-	target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
-	target_link_libraries(unittest PRIVATE mysql)
-endif()
+foreach(src IN LISTS UT_SOURCES)
+	# skip the runner itself if matched
+	if(src STREQUAL "unittest.cpp")
+		continue()
+	endif()
 
-if(ENABLE_SSL_TEST)
-	target_compile_definitions(unittest PUBLIC -DENABLE_SSL_TEST)
-endif()
+	# create a safe target name from the relative path: replace '/' with '_' and strip .cpp
+	string(REPLACE "/" "_" tgt_base ${src})
+	string(REPLACE ".cpp" "" tgt_base ${tgt_base})
+	set(target_name ${tgt_base})
 
-add_test(NAME unittest COMMAND unittest)
+	add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
+	target_include_directories(${target_name} PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
+	target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
 
-if(NOT WIN32)
-	set_tests_properties(unittest PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/gcc-16.1/lib64:/usr/local/lib:/usr/local/lib64:$ENV{LD_LIBRARY_PATH}")
-endif()
+	if(ENABLE_MYSQL)
+		target_compile_definitions(${target_name} PUBLIC -DENABLE_MYSQL)
+		target_link_libraries(${target_name} PRIVATE mysql)
+	endif()
+
+	if(ENABLE_SSL_TEST)
+		target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
+	endif()
+
+	add_test(NAME ${target_name} COMMAND ${target_name})
+
+	if(NOT WIN32)
+		set_tests_properties(${target_name} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/gcc-16.1/lib64:/usr/local/lib:/usr/local/lib64:$ENV{LD_LIBRARY_PATH}")
+	endif()
+endforeach()
 
 if(WIN32)
 #set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
@@ -64,8 +76,8 @@ endif()
 
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -r coverage.info "*/boost/*" -o coverage-no-boost.info
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
-	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch coverage-aquarius.info -o test-aquarius
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -c -d . -o "coverage.info" -b .
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -r coverage.info "*/boost/*" -o coverage-no-boost.info
+	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch,format coverage-aquarius.info -o test-aquarius
 )

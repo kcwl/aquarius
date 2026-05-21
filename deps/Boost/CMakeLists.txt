@@ -20,17 +20,16 @@ set(AQUARIUS_NEED_BOOST
 	unit_test_framework
 	log
 	log_setup
-	system
 	json
 	charconv
 	program_options
 	url
 )
 
-find_package(Boost 1.88 CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
+find_package(Boost 1.88 REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
 
 if(NOT Boost_FOUND)
-message(FATAR_ERROR "Found Boost ${Boost_VERSION}")
+message(FATAL_ERROR "Found Boost ${Boost_VERSION}")
 return()
 endif()
 
