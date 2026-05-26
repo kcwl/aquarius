@@ -2,7 +2,6 @@
 #include "gate_error_code.h"
 #include "payload.hpp"
 #include <aquarius.hpp>
-#include <aquarius/tcp.hpp>
 #include <proto/regist.virgo.h>
 
 namespace aquarius
@@ -19,7 +18,7 @@ namespace aquarius
 		public:
 			virtual bool init() override;
 
-			virtual auto run(io_service_pool& pool) -> asio::awaitable<bool> override;
+			virtual auto run() -> asio::awaitable<bool> override;
 
 		public:
 			template <typename Response, typename Request>

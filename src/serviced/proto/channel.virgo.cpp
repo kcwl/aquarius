@@ -3,6 +3,11 @@
 struct subs_list_req_body::impl
 {
 };
+subs_list_req_body::subs_list_req_body()
+	: impl_ptr_(std::make_shared<impl>())
+{}
+
+subs_list_req_body::~subs_list_req_body(){}
 
 void subs_list_req_body::serialize(aquarius::flex_buffer& buffer)
 {
@@ -18,8 +23,10 @@ struct subs_list_resp_body::impl
 	std::vector<string> keys;
 };
 subs_list_resp_body::subs_list_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
+
+subs_list_resp_body::~subs_list_resp_body(){}
 
 void subs_list_resp_body::serialize(aquarius::flex_buffer& buffer)
 {

@@ -20,12 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\login\login.cpp" />
+    <ClCompile Include="..\src\login\proto\login.virgo.cpp" />
     <ClCompile Include="..\src\login\srv_regist.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\login\proto\login.virgo.h" />
     <ClInclude Include="..\src\login\srv_regist.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\login\proto\login.virgo" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -115,12 +120,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../src;D:\boost_1_88_0;E:\openssl-lib\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../src;D:\boost_1_91_0;E:\openssl-lib\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\boost_1_88_0\stage\lib;E:\openssl-lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\boost_1_91_0\lib64-msvc-14.5;E:\openssl-lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

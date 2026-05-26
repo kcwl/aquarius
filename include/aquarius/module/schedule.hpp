@@ -29,7 +29,7 @@ namespace aquarius
 					 class_type* m) mutable -> asio::awaitable<return_type>
 		{ return std::apply(std::bind_front(MemberFunc, m), std::move(tp)); };
 
-		auto executor = module_router::get_mutable_instance().get_executor();
+		auto executor = asio::make_strand(co_await asio::this_coro::executor);
 
 		co_return co_await asio::co_spawn(
 			executor,

@@ -11,7 +11,7 @@ struct regist_req_body::impl
 	string version;
 };
 regist_req_body::regist_req_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 regist_req_body::~regist_req_body(){}
@@ -85,7 +85,7 @@ struct regist_resp_body::impl
 {
 };
 regist_resp_body::regist_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 regist_resp_body::~regist_resp_body(){}
@@ -106,7 +106,7 @@ struct subscribe_service_req_body::impl
 	string group;
 };
 subscribe_service_req_body::subscribe_service_req_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 subscribe_service_req_body::~subscribe_service_req_body(){}
@@ -133,7 +133,7 @@ struct subscribe_service_resp_body::impl
 	std::vector<instance> instances;
 };
 subscribe_service_resp_body::subscribe_service_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 subscribe_service_resp_body::~subscribe_service_resp_body(){}
@@ -160,7 +160,7 @@ struct broad_service_status_req_body::impl
 {
 };
 broad_service_status_req_body::broad_service_status_req_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 broad_service_status_req_body::~broad_service_status_req_body(){}
@@ -182,7 +182,7 @@ struct broad_service_status_resp_body::impl
 	bool healty;
 };
 broad_service_status_resp_body::broad_service_status_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 broad_service_status_resp_body::~broad_service_status_resp_body(){}

@@ -22,7 +22,7 @@ namespace aquarius
 
 			int32_t end;
 
-			std::vector<std::shared_ptr<node_impl>> children;
+			std::vector<node_impl*> children;
 		};
 
 	public:
@@ -32,10 +32,16 @@ namespace aquarius
 
 	public:
 		node()
-			: root_ptr_(std::make_shared<node_impl>())
+			: root_ptr_(new node_impl())
 		{}
 
-		virtual ~node() = default;
+		virtual ~node()
+		{
+			if (root_ptr_)
+			{
+				delete root_ptr_;
+			}
+		}
 
 	public:
 		bool add(key_t key, const function_type& func)
@@ -94,7 +100,7 @@ namespace aquarius
 		}
 
 	protected:
-		std::shared_ptr<node_impl> root_ptr_;
+		node_impl* root_ptr_;
 	};
 
 	class context_reg : public singleton<context_reg>
@@ -107,20 +113,28 @@ namespace aquarius
 		{
 			std::shared_lock lk(mutex_);
 
-			return impl_.find(topic);
+			auto iter = contexts_.find(topic);
+			if (iter == contexts_.end())
+			{
+				return nullptr;
+			}
+
+			return iter->second;
 		}
 
 		bool put(const std::string& topic, const node_t& n)
 		{
 			std::unique_lock lk(mutex_);
 
-			return impl_.add(topic, n);
+			auto [_, result] = contexts_.insert({ topic, n });
+
+			return result;
 		}
 
 	private:
 		std::shared_mutex mutex_;
 
-		node<std::string, node_t> impl_;
+		std::unordered_map<std::string, node_t> contexts_;
 	};
 
 	inline std::shared_ptr<context_base> mpc_get_context(const std::string& topic)

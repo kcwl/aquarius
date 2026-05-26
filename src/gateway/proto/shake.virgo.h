@@ -21,7 +21,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class shake_resp_body: public aquarius::tcp_serialize
 {
@@ -43,7 +43,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 

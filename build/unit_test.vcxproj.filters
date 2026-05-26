@@ -61,6 +61,15 @@
     <Filter Include="源文件\ip\adaptor">
       <UniqueIdentifier>{75cfd86e-3c49-43bd-b8fe-75ced705eefb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\aquarius\ip">
+      <UniqueIdentifier>{e4906138-bc73-45ba-832c-0bf3f5e8ad29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ip\adaptor">
+      <UniqueIdentifier>{4d79dbb9-4ec6-4abb-be19-4667f448304d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\aquarius\ip\http">
+      <UniqueIdentifier>{6dc62c01-100a-456d-95ba-b8d937e6ff21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -257,6 +266,36 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\virgo\error.hpp">
       <Filter>include\aquarius\virgo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\context_reg.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\context_traits.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\handler.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\tcp.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\udp.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp">
+      <Filter>include\aquarius\ip\adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp">
+      <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -56,7 +56,7 @@ namespace aquarius
 				resp.body().port() = customer_ptr->port();
 				resp.commit(buf);
 
-				auto ec = co_await mpc_async_call<&session_store_module::invoke>(sub.first, std::move(buf));
+				//auto ec = co_await mpc_async_call<&session_store_module::invoke>(sub.first, std::move(buf));
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace aquarius
 			resp.body().healty() = false;
 			resp.commit(buf);
 
-			co_await mpc_async_call<&session_store_module::invoke>(customer_ptr->id(), std::move(buf));
+			//co_await mpc_async_call<&session_store_module::invoke>(customer_ptr->id(), std::move(buf));
 		}
 
 		bool service_center_module::channel::empty() const

@@ -42,7 +42,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class regist_resp_body: public aquarius::tcp_serialize
 {
@@ -61,7 +61,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 struct instance
@@ -90,7 +90,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class subscribe_service_resp_body: public aquarius::tcp_serialize
 {
@@ -112,7 +112,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 class broad_service_status_req_body: public aquarius::tcp_serialize
@@ -132,7 +132,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class broad_service_status_resp_body: public aquarius::tcp_serialize
 {
@@ -163,7 +163,7 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 

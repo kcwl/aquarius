@@ -92,10 +92,9 @@ namespace aquarius
 							[session_ptr](asio::const_buffer buffer) -> asio::awaitable<error_code>
 							{ co_return co_await session_ptr->async_send(buffer); });
 
-						if (!ec)
+						if (ec)
 						{
 							XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
-							co_return;
 						}
 					},
 					asio::detached);
@@ -173,7 +172,7 @@ namespace aquarius
 
 			flex_buffer buffer{};
 
-			buffer.commit(sizeof(raw_header));
+			binary_parse{}.to_datas(Request::this_router, buffer);
 
 			request->commit(buffer);
 

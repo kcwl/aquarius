@@ -7,8 +7,8 @@ using namespace aquarius;
 class subs_list_req_body: public aquarius::tcp_serialize
 {
 public:
-	subs_list_req_body() = default;
-	virtual ~subs_list_req_body() = default;
+	subs_list_req_body();
+	virtual ~subs_list_req_body();
 
 	subs_list_req_body(subs_list_req_body&&) = default;
 	subs_list_req_body& operator=(subs_list_req_body&&) = default;
@@ -21,13 +21,13 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class subs_list_resp_body: public aquarius::tcp_serialize
 {
 public:
 	subs_list_resp_body();
-	virtual ~subs_list_resp_body() = default;
+	virtual ~subs_list_resp_body();
 
 	subs_list_resp_body(subs_list_resp_body&&) = default;
 	subs_list_resp_body& operator=(subs_list_resp_body&&) = default;
@@ -43,9 +43,9 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 
 using subs_list_tcp_request = aquarius::tcp_request<"9100", subs_list_req_body>;
-using subs_list_tcp_response = aquarius::tcp_response<subs_list_resp_body>;
+using subs_list_tcp_response = aquarius::tcp_response<"9100", subs_list_resp_body>;

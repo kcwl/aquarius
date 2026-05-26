@@ -1,27 +1,19 @@
 #pragma once
 #include <aquarius/module/module_register.hpp>
-#include <aquarius/tcp.hpp>
 #include <proto/regist.virgo.h>
 
 #define HEALTHY_CHECK_TOKEN(args) typename
+
+struct srv_config : aquarius::singleton<srv_config>
+{
+	std::string host;
+	int32_t port;
+};
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		struct srv_config
-		{
-			std::string host;
-			int32_t port;
-		};
-
-		inline static srv_config& create_srv()
-		{
-			static srv_config srv;
-
-			return srv;
-		}
-
 		AQUARIUS_MODULE_TOP(srvd_client)
 		{
 			using healty_check_func_t = std::function<void(const std::string&, int32_t, bool)>;
@@ -31,15 +23,13 @@ namespace aquarius
 		public:
 			virtual bool init() override
 			{
-				srv_config& srv = create_srv();
-
-				host_ = srv.host;
-				port_ = srv.port;
+				host_ = srv_config::get_mutable_instance().host;
+				port_ = srv_config::get_mutable_instance().port;
 
 				return true;
 			}
 
-			virtual auto run(io_service_pool&) -> asio::awaitable<bool> override
+			virtual auto run() -> asio::awaitable<bool> override
 			{
 				client_ptr_ = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 
@@ -77,8 +67,8 @@ namespace aquarius
 				co_await f(resp.body().instances());
 			}
 
-			template<typename Func>
-			void set_healty_check(Func&& func)
+			template <typename Func>
+			void set_healty_check(Func && func)
 			{
 				healthy_check_func_ = func;
 			}

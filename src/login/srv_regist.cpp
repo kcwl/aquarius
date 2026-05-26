@@ -3,12 +3,6 @@
 
 namespace aquarius
 {
-	CONFIG_MICRO(srv_config, cfg)
-	{
-		cfg.host = "127.0.0.1";
-		cfg.port = 3399;
-	}
-
 	namespace login
 	{
 		srv_regist::srv_regist()

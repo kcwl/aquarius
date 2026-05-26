@@ -13,38 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="proto">
-      <UniqueIdentifier>{63262f56-6ce9-40cc-b010-31ef7dba9ce5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\login\login.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\login\srv_regist.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
+    <ClCompile Include="..\src\aquarius-cli\aquarius-cli.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\login\proto\login.virgo.cpp">
-      <Filter>proto</Filter>
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\login\srv_regist.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\login\proto\login.virgo.h">
-      <Filter>proto</Filter>
+      <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\login\proto\login.virgo">
-      <Filter>proto</Filter>
-    </None>
   </ItemGroup>
 </Project>

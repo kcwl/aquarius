@@ -5,9 +5,8 @@
 
 int main(int argc, char* argv[])
 {
-	auto& srvd = aquarius::serviced::create_srv();
-	srvd.host = "127.0.0.1";
-	srvd.port = 3399;
+	srv_config::get_mutable_instance().host = "127.0.0.1";
+	srv_config::get_mutable_instance().port = 3399;
 
 	aquarius::cmd_options cmd("gateway");
 
@@ -19,10 +18,10 @@ int main(int argc, char* argv[])
 
 	cmd.load_options(argc, argv);
 
-	aquarius::tcp::server srv(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
+	aquarius::tcp::server server(cmd.option<uint16_t>("listen"), cmd.option<int32_t>("pool_size"),
 							 cmd.option<std::string>("name"));
 
-	srv.run();
+	server.run();
 
 	return 0;
 }

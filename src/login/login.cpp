@@ -3,11 +3,10 @@
 
 #include <iostream>
 #include <aquarius.hpp>
-#include <aquarius/tcp.hpp>
 
 int main()
 {
-    aquarius::tcp_server srv(3344, 10, "login");
+    aquarius::tcp::server srv(3344, 10, "login");
 
     srv.run();
 

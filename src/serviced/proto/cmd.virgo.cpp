@@ -6,8 +6,10 @@ struct cmd_op_req_body::impl
 	std::vector<string> paramers;
 };
 cmd_op_req_body::cmd_op_req_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
+
+cmd_op_req_body::~cmd_op_req_body(){}
 
 void cmd_op_req_body::serialize(aquarius::flex_buffer& buffer)
 {
@@ -39,8 +41,10 @@ struct cmd_op_resp_body::impl
 	string output;
 };
 cmd_op_resp_body::cmd_op_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
+
+cmd_op_resp_body::~cmd_op_resp_body(){}
 
 void cmd_op_resp_body::serialize(aquarius::flex_buffer& buffer)
 {

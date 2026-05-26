@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "samples", "samples.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "login", "login.vcxproj", "{842EC7B1-BBF5-4A96-954E-DE6FA08D7F18}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aquarius-cli", "aquarius-cli.vcxproj", "{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -76,6 +78,14 @@ Global
 		{842EC7B1-BBF5-4A96-954E-DE6FA08D7F18}.Release|x64.Build.0 = Release|x64
 		{842EC7B1-BBF5-4A96-954E-DE6FA08D7F18}.Release|x86.ActiveCfg = Release|Win32
 		{842EC7B1-BBF5-4A96-954E-DE6FA08D7F18}.Release|x86.Build.0 = Release|Win32
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Debug|x64.ActiveCfg = Debug|x64
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Debug|x64.Build.0 = Debug|x64
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Debug|x86.ActiveCfg = Debug|Win32
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Debug|x86.Build.0 = Debug|Win32
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x64.ActiveCfg = Release|x64
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x64.Build.0 = Release|x64
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x86.ActiveCfg = Release|Win32
+		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

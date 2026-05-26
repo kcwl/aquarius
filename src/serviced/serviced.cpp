@@ -1,9 +1,9 @@
-﻿#include <aquarius/tcp.hpp>
+﻿#include <aquarius.hpp>
 #include <iostream>
 
 int main()
 {
-	aquarius::tcp_server srv(3399, 10, "serviced");
+	aquarius::tcp::server srv(3399, 10, "serviced");
 
 	srv.run();
 

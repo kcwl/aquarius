@@ -15,7 +15,7 @@ namespace aquarius
 			return true;
 		}
 
-		auto client_pool::run(io_service_pool& pool) -> asio::awaitable<bool>
+		auto client_pool::run() -> asio::awaitable<bool>
 		{
 			// auto healthy_callback = [this](const std::string& host, int32_t port, bool healthy)
 			//{
@@ -73,7 +73,7 @@ namespace aquarius
 
 			for (auto& topic : resp.body().topics())
 			{
-				mpc_subscribe(topic, ctx);
+				mpc_put_context(topic, ctx);
 			}
 		}
 

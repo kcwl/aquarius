@@ -259,7 +259,7 @@ namespace aquarius
 																 std::shared_ptr<field_base>)
 		{
 			ofs << "\tstruct impl;" << std::endl;
-			ofs << "\tstd::unique_ptr<impl> impl_ptr_;" << std::endl;
+			ofs << "\tstd::shared_ptr<impl> impl_ptr_;" << std::endl;
 		}
 
 		bool cpp_generator::generate_member_variable_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
@@ -346,7 +346,7 @@ namespace aquarius
 
 			ofs << name << "::" << name << "()" << std::endl;
 
-			ofs << "\t: impl_ptr_(std::make_unique<impl>())" << std::endl;
+			ofs << "\t: impl_ptr_(std::make_shared<impl>())" << std::endl;
 
 			ofs << "{}" << std::endl;
 

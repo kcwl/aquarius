@@ -10,7 +10,7 @@ namespace aquarius
 	{
 		AQUARIUS_HANDLER(regist_tcp_request, regist_tcp_response, ctx_regist)
 		{
-			auto customer_ptr = std::make_shared<customer>(this->session());
+			auto customer_ptr = std::make_shared<customer>();
 
 			customer_ptr->name(request()->body().name());
 			customer_ptr->host(request()->body().host());
@@ -27,7 +27,7 @@ namespace aquarius
 
 		AQUARIUS_HANDLER(subscribe_service_tcp_request, subscribe_service_tcp_response, ctx_subscribe_service)
 		{
-			auto subscriber_ptr = std::make_shared<subscriber>(this->session());
+			auto subscriber_ptr = std::make_shared<subscriber>();
 
 			response().body().instances() = co_await mpc_async_call<&service_center_module::subscribe>(request()->body().group(), subscriber_ptr);
 

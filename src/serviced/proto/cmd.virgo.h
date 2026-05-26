@@ -8,7 +8,7 @@ class cmd_op_req_body: public aquarius::tcp_serialize
 {
 public:
 	cmd_op_req_body();
-	virtual ~cmd_op_req_body() = default;
+	virtual ~cmd_op_req_body();
 
 	cmd_op_req_body(cmd_op_req_body&&) = default;
 	cmd_op_req_body& operator=(cmd_op_req_body&&) = default;
@@ -27,13 +27,13 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 class cmd_op_resp_body: public aquarius::tcp_serialize
 {
 public:
 	cmd_op_resp_body();
-	virtual ~cmd_op_resp_body() = default;
+	virtual ~cmd_op_resp_body();
 
 	cmd_op_resp_body(cmd_op_resp_body&&) = default;
 	cmd_op_resp_body& operator=(cmd_op_resp_body&&) = default;
@@ -49,9 +49,9 @@ public:
 
 private:
 	struct impl;
-	std::unique_ptr<impl> impl_ptr_;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 
 using cmd_op_tcp_request = aquarius::tcp_request<"9200", cmd_op_req_body>;
-using cmd_op_tcp_response = aquarius::tcp_response<cmd_op_resp_body>;
+using cmd_op_tcp_response = aquarius::tcp_response<"9200", cmd_op_resp_body>;

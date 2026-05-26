@@ -4,7 +4,7 @@ struct shake_req_body::impl
 {
 };
 shake_req_body::shake_req_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 shake_req_body::~shake_req_body(){}
@@ -23,7 +23,7 @@ struct shake_resp_body::impl
 	std::vector<string> topics;
 };
 shake_resp_body::shake_resp_body()
-	: impl_ptr_(std::make_unique<impl>())
+	: impl_ptr_(std::make_shared<impl>())
 {}
 
 shake_resp_body::~shake_resp_body(){}

@@ -19,17 +19,12 @@ namespace aquarius
 
 		using acceptor = typename Session::acceptor;
 
-		using endpoint = typename acceptor::endpoint_type;
-
-		using ip_filter_func = std::function<bool(const std::string&)>;
-
 		using callback_func = std::function<asio::awaitable<void>(std::shared_ptr<Session>)>;
 
 	public:
 		explicit basic_server(int32_t port, int32_t io_service_pool_size, const std::string& name = {},
 							  std::chrono::milliseconds global_time_dura = 30ms)
-			: io_service_pool_size_(io_service_pool_size)
-			, io_service_pool_(io_service_pool_size_)
+			: io_service_pool_(io_service_pool_size)
 			, signals_(io_service_pool_.get_io_service(), SIGINT, SIGTERM)
 			, acceptor_(io_service_pool_.get_io_service(), detail::make_endpoint(static_cast<uint16_t>(port)))
 			, server_name_(name)
@@ -38,11 +33,7 @@ namespace aquarius
 		{
 			init_signal();
 
-			init_global_timer();
-
 			asio::co_spawn(acceptor_.get_executor(), start_accept(), asio::detached);
-
-			module_router::get_mutable_instance().run(io_service_pool_);
 		}
 
 		~basic_server() = default;
@@ -50,6 +41,13 @@ namespace aquarius
 	public:
 		void run()
 		{
+			auto& io = io_service_pool_.get_io_service();
+			asio::co_spawn(
+				io, []() -> asio::awaitable<void> { co_await module_router::get_mutable_instance().run(); },
+				asio::detached);
+
+			asio::co_spawn(io, [&]() -> asio::awaitable<void> { co_await init_global_timer(); }, asio::detached);
+
 			io_service_pool_.run();
 		}
 
@@ -63,19 +61,6 @@ namespace aquarius
 		bool enable() const
 		{
 			return acceptor_.is_open() && io_service_pool_.enable();
-		}
-
-		void set_ip_filter(const ip_filter_func& func)
-		{
-			ip_filter_ = func;
-		}
-
-		bool ip_filter(const std::string& host)
-		{
-			if (!ip_filter_)
-				return true;
-
-			return ip_filter_(host);
 		}
 
 		void set_accept_func(const callback_func& func)
@@ -111,7 +96,8 @@ namespace aquarius
 
 			for (;;)
 			{
-				auto sock = co_await acceptor_.async_accept(asio::redirect_error(asio::use_awaitable, ec));
+				auto sock = co_await acceptor_.async_accept(io_service_pool_.get_io_service(),
+															asio::redirect_error(asio::use_awaitable, ec));
 
 				if (!acceptor_.is_open())
 				{
@@ -123,27 +109,20 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
 
-				auto session_f = [session_ptr](asio::const_buffer buffer) -> asio::awaitable<error_code>
-				{ co_return co_await session_ptr->async_send(buffer); };
-
 				asio::co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr, this]() mutable -> asio::awaitable<void>
+					[session_ptr, this] -> asio::awaitable<void>
 					{
-						if (!ip_filter(session_ptr->remote_address()))
-						{
-							session_ptr->close();
-							co_return;
-						}
-
 						co_await accept_func(session_ptr);
 
 						auto ec = co_await session_ptr->accept();
 
 						if (ec)
 						{
-							close_func(session_ptr);
+							XLOG_ERROR() << "session[" << session_ptr->uuid() << "] is close";
 						}
+
+						close_func(session_ptr);
 
 						session_ptr->close();
 					},
@@ -169,24 +148,24 @@ namespace aquarius
 				});
 		}
 
-		void init_global_timer()
+		auto init_global_timer() -> asio::awaitable<void>
 		{
-			global_timer_.async_wait(
-				[this](error_code ec)
-				{
-					if (ec)
-					{
-						XLOG_ERROR() << "globale timer error: " << ec.what();
-						return;
-					}
+			error_code ec{};
+			for (;;)
+			{
+				co_await global_timer_.async_wait(asio::redirect_error(asio::use_awaitable, ec));
 
-					module_router::get_mutable_instance().timer(global_time_dura_);
-				});
+				if (ec)
+				{
+					XLOG_ERROR() << "globale timer error: " << ec.what();
+					break;
+				}
+
+				co_await module_router::get_mutable_instance().timer(global_time_dura_);
+			}
 		}
 
 	protected:
-		std::size_t io_service_pool_size_;
-
 		io_service_pool io_service_pool_;
 
 		asio::signal_set signals_;
@@ -198,8 +177,6 @@ namespace aquarius
 		std::chrono::milliseconds global_time_dura_;
 
 		asio::steady_timer global_timer_;
-
-		ip_filter_func ip_filter_;
 
 		callback_func accept_func_;
 

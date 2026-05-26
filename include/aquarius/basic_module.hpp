@@ -21,32 +21,11 @@ namespace aquarius
 
 		virtual auto timer(std::chrono::milliseconds) -> asio::awaitable<void> = 0;
 
-		virtual auto run(io_service_pool&) -> asio::awaitable<bool> = 0;
+		virtual auto run() -> asio::awaitable<bool> = 0;
 	};
 
-	template <typename Executor>
-	class basic_executor_module : public module_base
-	{
-	public:
-		basic_executor_module() = default;
-
-	public:
-		void attach_thread(const Executor& executor)
-		{
-			executor_ = executor;
-		}
-
-		const Executor& get_executor()
-		{
-			return executor_;
-		}
-
-	private:
-		Executor executor_;
-	};
-
-	template <typename T, typename Executor = asio::any_io_executor>
-	class basic_module : public basic_executor_module<Executor>
+	template <typename T>
+	class basic_module : public module_base
 	{
 	public:
 		basic_module() = default;
@@ -92,7 +71,7 @@ namespace aquarius
 			co_return;
 		}
 
-		virtual auto run(io_service_pool&) -> asio::awaitable<bool> override
+		virtual auto run() -> asio::awaitable<bool> override
 		{
 			co_return true;
 		}

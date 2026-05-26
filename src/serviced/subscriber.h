@@ -8,7 +8,7 @@ namespace aquarius
 		class subscriber
 		{
 		public:
-			subscriber(std::size_t id);
+			subscriber(std::size_t id = 0);
 
 		public:
 			std::size_t id() const;

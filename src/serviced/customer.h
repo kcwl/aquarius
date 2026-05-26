@@ -8,7 +8,7 @@ namespace aquarius
 		class customer
 		{
 		public:
-			customer(std::size_t id);
+			customer(std::size_t id = 0);
 
 			virtual ~customer() = default;
 
