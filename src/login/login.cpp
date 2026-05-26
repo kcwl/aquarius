@@ -3,10 +3,15 @@
 
 #include <iostream>
 #include <aquarius.hpp>
+#include <srvd_client.hpp>
+
+using namespace aquarius;
 
 int main()
 {
-    aquarius::tcp::server srv(3344, 10, "login");
+    srv_config::get_mutable_instance().host = "127.0.0.1";
+    srv_config::get_mutable_instance().port = 3399;
+    tcp::server srv(3344, 10, "login");
 
     srv.run();
 

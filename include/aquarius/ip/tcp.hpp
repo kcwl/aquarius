@@ -38,7 +38,7 @@ namespace aquarius
 		using ssl_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
 		using ssl_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
 
-		using session_callback = std::function<asio::awaitable<error_code>(std::array<asio::const_buffer,2>)>;
+		using session_callback = std::function<asio::awaitable<error_code>(std::array<asio::const_buffer, 2>)>;
 
 		template <typename Handler>
 		using context = basic_context<Handler, tcp, uint32_t, session_callback>;
@@ -69,35 +69,28 @@ namespace aquarius
 
 				XLOG_INFO() << "[accept] parse protocol router: " << router;
 
-				asio::co_spawn(
-					session_ptr->get_executor(),
-					[&, this, r = std::move(router), src, session_ptr]() mutable -> asio::awaitable<void>
-					{
-						auto context = mpc_get_context(r);
+				auto context = mpc_get_context(router);
 
-						if (!context)
-						{
-							co_return;
-						}
+				if (!context)
+				{
+					continue;
+				}
 
-						auto ptr =
-							std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(context);
-						if (!ptr)
-						{
-							co_return;
-						}
+				auto ptr = std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(context);
+				if (!ptr)
+				{
+					continue;
+				}
 
-						auto ec = co_await ptr->complete(
-							this, buffer, std::move(src),
-							[session_ptr]<typename ConstBufferSequence>(ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
-							{ co_return co_await session_ptr->async_send(buffer); });
+				ec = co_await ptr->complete(this, buffer, std::move(src),
+												 [session_ptr]<typename ConstBufferSequence>(
+													 ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
+												 { co_return co_await session_ptr->async_send(buffer); });
 
-						if (ec)
-						{
-							XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
-						}
-					},
-					asio::detached);
+				if (ec)
+				{
+					XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
+				}
 			}
 
 			if (ec != asio::error::eof)

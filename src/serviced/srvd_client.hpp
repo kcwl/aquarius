@@ -49,10 +49,13 @@ namespace aquarius
 				req->body().port() = port;
 				req->body().group() = group;
 
-				flex_buffer buffer{};
-				req->commit(buffer);
+				auto resp = co_await client_ptr_->async_call<regist_tcp_response>(req);
+				if (resp.result() != 0)
+				{
+					XLOG_ERROR() << "regist serviced failed! error:" << resp.result();
+				}
 
-				co_return !co_await client_ptr_->async_send(buffer);
+				co_return !resp.result();
 			}
 
 			auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>

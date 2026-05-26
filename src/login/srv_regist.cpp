@@ -12,7 +12,7 @@ namespace aquarius
 		bool srv_regist::init()
 		{
 			host_ = "127.0.0.1";
-			port_ = 3399;
+			port_ = 3344;
 
 			return true;
 		}
