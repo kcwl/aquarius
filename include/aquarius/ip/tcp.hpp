@@ -38,7 +38,7 @@ namespace aquarius
 		using ssl_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
 		using ssl_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
 
-		using session_callback = std::function<asio::awaitable<error_code>(asio::const_buffer)>;
+		using session_callback = std::function<asio::awaitable<error_code>(std::array<asio::const_buffer,2>)>;
 
 		template <typename Handler>
 		using context = basic_context<Handler, tcp, uint32_t, session_callback>;
@@ -89,7 +89,7 @@ namespace aquarius
 
 						auto ec = co_await ptr->complete(
 							this, buffer, std::move(src),
-							[session_ptr](asio::const_buffer buffer) -> asio::awaitable<error_code>
+							[session_ptr]<typename ConstBufferSequence>(ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
 							{ co_return co_await session_ptr->async_send(buffer); });
 
 						if (ec)
@@ -123,12 +123,12 @@ namespace aquarius
 					break;
 				}
 
+				auto router = binary_parse{}.from_datas<std::string>(buffer);
+
+				XLOG_INFO() << "[query] parse protocol router: " << router;
+
 				if (!session_ptr->filling_buffer(src, buffer))
 				{
-					auto router = binary_parse{}.from_datas<std::string>(buffer);
-
-					XLOG_INFO() << "[query] parse protocol router: " << router;
-
 					asio::co_spawn(
 						session_ptr->get_executor(),
 						[&, session_ptr, r = std::move(router), src]() mutable -> asio::awaitable<void>
@@ -232,6 +232,8 @@ namespace aquarius
 			}
 
 			flex_buffer resp_buffer{};
+			using response_t = std::remove_cvref_t<decltype(handler_ptr->response())>;
+			binary_parse{}.to_datas(response_t::this_router, resp_buffer);
 			handler_ptr->response().commit(resp_buffer);
 
 			raw_header header{ .length = static_cast<uint32_t>(resp_buffer.size()), .src = src };
@@ -239,7 +241,7 @@ namespace aquarius
 			std::array<asio::const_buffer, 2> buffers = { asio::buffer((char*)&header, sizeof(header)),
 														  resp_buffer.data() };
 
-			auto res = co_await func(asio::buffer(buffers.data(), buffers.size()));
+			auto res = co_await func(buffers);
 
 			if (res)
 			{
