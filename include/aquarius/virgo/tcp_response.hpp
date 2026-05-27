@@ -27,5 +27,13 @@ namespace aquarius
         tcp_response& operator=(const tcp_response& other) noexcept = default;
 
         tcp_response& operator=(tcp_response&& other) noexcept = default;
+
+    public:
+        virtual error_code commit(flex_buffer& buffer) override
+        {
+            binary_parse{}.to_datas(this_router, buffer);
+
+            return base_type::commit(buffer);
+        }
     };
 } // namespace aquarius

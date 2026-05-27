@@ -165,8 +165,6 @@ namespace aquarius
 
 			flex_buffer buffer{};
 
-			binary_parse{}.to_datas(Request::this_router, buffer);
-
 			request->commit(buffer);
 
 			header.length = static_cast<uint32_t>(buffer.size());
@@ -225,8 +223,7 @@ namespace aquarius
 			}
 
 			flex_buffer resp_buffer{};
-			using response_t = std::remove_cvref_t<decltype(handler_ptr->response())>;
-			binary_parse{}.to_datas(response_t::this_router, resp_buffer);
+
 			handler_ptr->response().commit(resp_buffer);
 
 			raw_header header{ .length = static_cast<uint32_t>(resp_buffer.size()), .src = src };
