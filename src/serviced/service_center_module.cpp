@@ -109,7 +109,12 @@ namespace aquarius
 			}
 			else
 			{
-				co_await channel_groups_[customer_ptr->group()]->publish(customer_ptr);
+				auto& ptr = channel_groups_[customer_ptr->group()];
+				if (!ptr)
+				{
+					ptr = std::make_shared<channel>();
+				}
+				co_await ptr->publish(customer_ptr);
 			}
 
 			customers_.insert({ customer_ptr->id(), customer_ptr });
