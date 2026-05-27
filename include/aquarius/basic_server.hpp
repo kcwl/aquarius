@@ -3,6 +3,7 @@
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
+#include <aquarius/ip/session_store.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/schedule.hpp>
@@ -108,6 +109,8 @@ namespace aquarius
 					break;
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
+
+				mpc_put_session(session_ptr->uuid(), [&] (flex_buffer& buffer)->asio::awaitable<void> { co_await session_ptr->async_send(buffer); });
 
 				asio::co_spawn(
 					acceptor_.get_executor(),

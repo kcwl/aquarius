@@ -15,8 +15,8 @@ namespace aquarius
 	class basic_protocol_context : public context_base
 	{
 	public:
-		using function_type =
-			std::function<asio::awaitable<error_code>(basic_protocol_context*, Protocol*, flex_buffer&, Args&&...)>;
+		using function_type = std::function<asio::awaitable<error_code>(basic_protocol_context*, Protocol*, std::size_t,
+																		flex_buffer&, Args&&...)>;
 
 	public:
 		basic_protocol_context(function_type func)
@@ -26,9 +26,10 @@ namespace aquarius
 		virtual ~basic_protocol_context() = default;
 
 	public:
-		auto complete(Protocol* proto, flex_buffer& buffer, Args&&... args) -> asio::awaitable<error_code>
+		auto complete(Protocol* proto, std::size_t session_id, flex_buffer& buffer, Args&&... args)
+			-> asio::awaitable<error_code>
 		{
-			co_return co_await func_(this, proto, buffer, std::forward<Args>(args)...);
+			co_return co_await func_(this, proto, session_id, buffer, std::forward<Args>(args)...);
 		}
 
 	private:
@@ -48,10 +49,10 @@ namespace aquarius
 		virtual ~basic_context() = default;
 
 	public:
-		static auto do_complete(base_type*, Protocol* proto, flex_buffer& buffer, Args&&... args)
-			-> asio::awaitable<error_code>
+		static auto do_complete(base_type*, Protocol* proto, std::size_t session_id, flex_buffer& buffer,
+								Args&&... args) -> asio::awaitable<error_code>
 		{
-			co_return co_await proto->template handle_request<Handler>(buffer, std::forward<Args>(args)...);
+			co_return co_await proto->template handle_request<Handler>(session_id, buffer, std::forward<Args>(args)...);
 		}
 	};
 } // namespace aquarius

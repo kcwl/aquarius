@@ -169,6 +169,7 @@
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_register.hpp" />

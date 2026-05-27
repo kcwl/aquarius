@@ -12,7 +12,7 @@ namespace aquarius
 		public:
 			using base_type = basic_protocol_context<Protocol, Args...>;
 
-			using transfer_func_t = std::function<asio::awaitable<error_code>(flex_buffer&, std::size_t)>;
+			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t,flex_buffer&)>;
 
 		public:
 			basic_transfer_context(Func&& func)
@@ -23,7 +23,7 @@ namespace aquarius
 			virtual ~basic_transfer_context() = default;
 
 		public:
-			static auto do_complete(base_type* ctx, Protocol* proto, flex_buffer& buffer, Args&&... args)
+			static auto do_complete(base_type* ctx, Protocol* proto, std::size_t session_id, flex_buffer& buffer, Args&&... args)
 				-> asio::awaitable<error_code>
 			{
 				auto context = static_cast<basic_transfer_context*>(ctx);
@@ -33,7 +33,7 @@ namespace aquarius
 					co_return gate_op::not_exist_in_pool;
 				}
 
-				co_return co_await context->func_(buffer, std::forward<Args>(args)...);
+				co_return co_await context->func_(session_id, buffer, std::forward<Args>(args)...);
 			}
 
 		private:

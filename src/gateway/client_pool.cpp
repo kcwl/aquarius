@@ -55,8 +55,7 @@ namespace aquarius
 
 			auto resp = co_await shake<shake_tcp_response>(host, port, request);
 
-			auto f = [inst = std::move(inst), this](flex_buffer& buffer,
-													std::size_t session_id) -> asio::awaitable<error_code>
+			auto f = [inst = std::move(inst), this](std::size_t session_id, flex_buffer& buffer) -> asio::awaitable<error_code>
 			{
 				// buffer.pubseekpos(0, std::ios::in);
 				// raw_header* header = (raw_header*)buffer.data().data();
@@ -69,7 +68,7 @@ namespace aquarius
 			};
 
 			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(f), tcp, std::size_t>>(std::move(f));
+				std::make_shared<basic_transfer_context<decltype(f), tcp>>(std::move(f));
 
 			for (auto& topic : resp.body().topics())
 			{

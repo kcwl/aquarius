@@ -297,6 +297,9 @@
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\session_store.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">

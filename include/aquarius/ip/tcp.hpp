@@ -82,7 +82,7 @@ namespace aquarius
 					continue;
 				}
 
-				ec = co_await ptr->complete(this, buffer, std::move(src),
+				ec = co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src),
 												 [session_ptr]<typename ConstBufferSequence>(
 													 ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
 												 { co_return co_await session_ptr->async_send(buffer); });
@@ -142,7 +142,7 @@ namespace aquarius
 							}
 
 							[[maybe_unused]] auto result =
-								co_await ptr->complete(this, buffer, std::move(src), session_callback{});
+								co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src), session_callback{});
 						},
 						asio::detached);
 				}
@@ -213,11 +213,11 @@ namespace aquarius
 		}
 
 		template <typename Handler, typename Func>
-		auto handle_request(flex_buffer& buffer, uint32_t src, Func&& func) -> asio::awaitable<error_code>
+		auto handle_request(std::size_t session_id, flex_buffer& buffer, uint32_t src, Func&& func) -> asio::awaitable<error_code>
 		{
 			auto handler_ptr = std::make_shared<Handler>();
 
-			auto ec = co_await handler_ptr->visit(buffer);
+			auto ec = co_await handler_ptr->visit(session_id, buffer);
 
 			if (ec)
 			{
