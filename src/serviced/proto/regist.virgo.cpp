@@ -100,7 +100,6 @@ void regist_resp_body::deserialize(aquarius::flex_buffer& buffer)
 	*this->impl_ptr_ = this->parse_from<regist_resp_body::impl>(buffer); 
 }
 
-
 struct subscribe_service_req_body::impl
 {
 	string group;
@@ -130,7 +129,7 @@ string& subscribe_service_req_body::group()
 }
 struct subscribe_service_resp_body::impl
 {
-	std::vector<instance> instances;
+	std::vector<uint64_t> instances;
 };
 subscribe_service_resp_body::subscribe_service_resp_body()
 	: impl_ptr_(std::make_shared<impl>())
@@ -147,11 +146,11 @@ void subscribe_service_resp_body::deserialize(aquarius::flex_buffer& buffer)
 {
 	*this->impl_ptr_ = this->parse_from<subscribe_service_resp_body::impl>(buffer); 
 }
-std::vector<instance> subscribe_service_resp_body::instances() const
+std::vector<uint64_t> subscribe_service_resp_body::instances() const
 {
 	return impl_ptr_->instances;
 }
-std::vector<instance>& subscribe_service_resp_body::instances()
+std::vector<uint64_t>& subscribe_service_resp_body::instances()
 {
 	return impl_ptr_->instances;
 }
@@ -177,8 +176,7 @@ void broad_service_status_req_body::deserialize(aquarius::flex_buffer& buffer)
 struct broad_service_status_resp_body::impl
 {
 	string group;
-	string host;
-	int32 port;
+	uint64 host_and_port;
 	bool healty;
 };
 broad_service_status_resp_body::broad_service_status_resp_body()
@@ -204,21 +202,13 @@ string& broad_service_status_resp_body::group()
 {
 	return impl_ptr_->group;
 }
-string broad_service_status_resp_body::host() const
+uint64 broad_service_status_resp_body::host_and_port() const
 {
-	return impl_ptr_->host;
+	return impl_ptr_->host_and_port;
 }
-string& broad_service_status_resp_body::host()
+uint64& broad_service_status_resp_body::host_and_port()
 {
-	return impl_ptr_->host;
-}
-int32 broad_service_status_resp_body::port() const
-{
-	return impl_ptr_->port;
-}
-int32& broad_service_status_resp_body::port()
-{
-	return impl_ptr_->port;
+	return impl_ptr_->host_and_port;
 }
 bool broad_service_status_resp_body::healty() const
 {

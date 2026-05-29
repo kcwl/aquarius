@@ -8,63 +8,81 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		bool client_pool::init()
-		{
-			group_ = "gateway";
-
-			return true;
-		}
+		client_pool::client_pool()
+			: group_("gateway")
+		{}
 
 		auto client_pool::run() -> asio::awaitable<bool>
 		{
-			// auto healthy_callback = [this](const std::string& host, int32_t port, bool healthy)
-			//{
-			//	if (!healthy)
-			//	{
-			//		this->remove(host, port);
-			//	}
-			//	else
-			//	{
-			//		asio::co_spawn(
-			//			get_executor(), [this, host, port]() -> asio::awaitable<void>
-			//			{ co_await this->add(host, port); }, asio::detached);
-			//	}
-			// };
+			auto healthy_callback = [this](uint64_t host_and_port, bool healthy) -> asio::awaitable<void>
+			{
+				if (!healthy)
+				{
+					this->remove(host_and_port);
+				}
+				else
+				{
+					co_await add(host_and_port);
+				}
+			};
 
-			// co_await
-			// mpc_call<&serviced::srvd_client::set_healty_check<decltype(healthy_callback)>>(healthy_callback);
+			co_await mpc_async_call<&serviced::srvd_client::set_healty_check<decltype(healthy_callback)>>(healthy_callback);
 
 			co_await mpc_async_call<&serviced::srvd_client::subscribe>(
-				group_, std::move([&](const std::vector<instance>& instances) -> asio::awaitable<void>
-								  { co_await this->make_instance_pool(instances); }));
+				group_, std::move(
+							[&](const std::vector<uint64_t>& instances) -> asio::awaitable<void>
+							{
+								for (auto& i : instances)
+								{
+									co_await this->add(i);
+								}
+							}));
 
 			co_return true;
 		}
 
-		auto client_pool::make_one_instance(const instance& c) -> asio::awaitable<void>
+		auto client_pool::invoke(uint64_t host_and_port, flex_buffer& req_buffer, flex_buffer& resp_buffer)
+			-> asio::awaitable<error_code>
 		{
-			co_return co_await make_one_instance_by_host(c.host, c.port);
+			std::shared_lock lk(mutex_);
+
+			auto iter = pool_.find(host_and_port);
+
+			if (iter == pool_.end())
+			{
+				co_return gate_op::not_exist_in_pool;
+			}
+
+			auto ptr = round_.invoke(iter->second);
+
+			co_return co_await ptr->async_call_buffer(req_buffer, resp_buffer);
 		}
 
-		auto client_pool::make_one_instance_by_host(const std::string& host, int32_t port) -> asio::awaitable<void>
+		auto client_pool::shake(uint64_t host_and_port) -> asio::awaitable<void>
 		{
-			flex_buffer req_buffer{};
-			auto inst = make_instance(host, port);
+			co_await add(host_and_port);
 
 			auto request = std::make_shared<shake_tcp_request>();
 
-			auto resp = co_await shake<shake_tcp_response>(host, port, request);
+			auto resp = co_await this->invoke<shake_tcp_response>(host_and_port, request);
 
-			auto f = [inst = std::move(inst), this](std::size_t session_id, flex_buffer& buffer) -> asio::awaitable<error_code>
+			auto f = [host_and_port, this](std::size_t session_id, flex_buffer& buffer,
+										   std::size_t src) -> asio::awaitable<error_code>
 			{
 				// buffer.pubseekpos(0, std::ios::in);
 				// raw_header* header = (raw_header*)buffer.data().data();
 				// regist_resp_func(
-				//	header->src, [session_id](flex_buffer resp) -> asio::awaitable<void>
-				//	{ co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
-				co_await this->invoke(inst, buffer);
+				//  header->src, [session_id](flex_buffer resp) -> asio::awaitable<void>
+				//  { co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
+				flex_buffer resp_buffer{};
+				auto ec = co_await this->invoke(host_and_port, buffer, resp_buffer);
 
-				co_return gate_op::success;
+				if (!ec)
+				{
+					co_await mpc_invoke_session(session_id, resp_buffer);
+				}
+
+				co_return ec;
 			};
 
 			std::shared_ptr<context_base> ctx =
@@ -76,13 +94,11 @@ namespace aquarius
 			}
 		}
 
-		auto client_pool::add(const std::string& host, int32_t port) -> asio::awaitable<void>
+		auto client_pool::add(uint64_t host_and_port) -> asio::awaitable<void>
 		{
 			std::unique_lock lk(mutex_);
 
-			auto instance = make_instance(host, port);
-
-			auto iter = pool_.find(instance);
+			auto iter = pool_.find(host_and_port);
 
 			if (iter != pool_.end())
 			{
@@ -90,6 +106,8 @@ namespace aquarius
 			}
 
 			iter->second.resize(max_connection);
+
+			auto [host, port] = instance_to_host(host_and_port);
 
 			for (auto& c : iter->second)
 			{
@@ -104,13 +122,11 @@ namespace aquarius
 			}
 		}
 
-		void client_pool::remove(const std::string& host, int32_t port)
+		void client_pool::remove(uint64_t host_and_port)
 		{
 			std::unique_lock lk(mutex_);
 
-			auto instance = make_instance(host, port);
-
-			auto iter = pool_.find(instance);
+			auto iter = pool_.find(host_and_port);
 
 			if (iter == pool_.end())
 			{
@@ -120,17 +136,12 @@ namespace aquarius
 			pool_.erase(iter);
 		}
 
-		auto client_pool::make_instance_pool(const std::vector<instance>& instances) -> asio::awaitable<void>
+		std::pair<std::string, int32_t> client_pool::instance_to_host(uint64_t host_and_port)
 		{
-			for (auto& c : instances)
-			{
-				co_await make_one_instance(c);
-			}
-		}
+			uint32_t host = host_and_port >> 32;
+			int32_t port = static_cast<int32_t>(host_and_port);
 
-		std::string client_pool::make_instance(const std::string& host, int32_t port)
-		{
-			return host + ":" + std::to_string(port);
+			return { asio::ip::address_v4(host).to_string(), port };
 		}
 	} // namespace gateway
 } // namespace aquarius

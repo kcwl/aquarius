@@ -7,8 +7,7 @@ namespace aquarius
 	{
 		AQUARIUS_BASIC_HANDLER(broad_service_status_tcp_response, ctx_broad_service_status)
 		{
-			co_await mpc_async_call<&client_pool::make_one_instance_by_host>(response().body().host(),
-																	 response().body().port());
+			co_await mpc_async_call<&client_pool::shake>(response().body().host_and_port());
 
 			co_return gate_op::success;
 		}

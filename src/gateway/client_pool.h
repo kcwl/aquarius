@@ -13,20 +13,18 @@ namespace aquarius
 			constexpr static std::size_t max_connection = 2;
 
 		public:
-			client_pool() = default;
+			client_pool();
 
 		public:
-			virtual bool init() override;
-
 			virtual auto run() -> asio::awaitable<bool> override;
 
 		public:
 			template <typename Response, typename Request>
-			auto invoke(const std::string& instance, std::shared_ptr<Request> request) -> asio::awaitable<Response>
+			auto invoke(uint64_t host_and_port, std::shared_ptr<Request> request) -> asio::awaitable<Response>
 			{
 				std::shared_lock lk(mutex_);
 
-				auto iter = pool_.find(instance);
+				auto iter = pool_.find(host_and_port);
 
 				if (iter == pool_.end())
 				{
@@ -35,52 +33,25 @@ namespace aquarius
 
 				auto ptr = round_.invoke(iter->second);
 
-				// 负载
 				co_return co_await ptr->template async_call<Response>(request);
 			}
 
-			auto invoke(const std::string& instance, flex_buffer& buffer) -> asio::awaitable<error_code>
-			{
-				std::shared_lock lk(mutex_);
+			auto invoke(uint64_t host_and_port, flex_buffer& req_buffer, flex_buffer& resp_buffer)
+				-> asio::awaitable<error_code>;
 
-				auto iter = pool_.find(instance);
-
-				if (iter == pool_.end())
-				{
-					co_return gate_op::not_exist_in_pool;
-				}
-
-				auto ptr = round_.invoke(iter->second);
-
-				co_return co_await ptr->async_send(buffer);
-			}
-
-			auto make_one_instance(const instance& c) ->asio::awaitable<void>;
-
-			auto make_one_instance_by_host(const std::string& host, int32_t port) ->asio::awaitable<void>;
+			auto shake(uint64_t host_and_port) -> asio::awaitable<void>;
 
 		private:
-			auto add(const std::string& host, int32_t port) -> asio::awaitable<void>;
+			auto add(uint64_t host_and_port) -> asio::awaitable<void>;
 
-			void remove(const std::string& host, int32_t port);
+			void remove(uint64_t host_and_port);
 
-			auto make_instance_pool(const std::vector<instance>& instances) -> asio::awaitable<void>;
-
-			std::string make_instance(const std::string& host, int32_t port);
-
-			template <typename Response, typename Request>
-			auto shake(const std::string& host, int32_t port, std::shared_ptr<Request> request)
-				-> asio::awaitable<Response>
-			{
-				co_await add(host, port);
-
-				co_return co_await invoke<Response>(make_instance(host, port), request);
-			}
+			std::pair<std::string, int32_t> instance_to_host(uint64_t host_and_port);
 
 		private:
 			std::shared_mutex mutex_;
 
-			std::map<std::string, std::vector<std::shared_ptr<tcp::client>>> pool_;
+			std::map<uint64_t, std::vector<std::shared_ptr<tcp::client>>> pool_;
 
 			std::string group_;
 

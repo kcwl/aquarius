@@ -15,12 +15,6 @@ message regist -> 9000
 	}
 }
 
-struct instance
-{
-	string host;
-	int32 port;
-}
-
 message subscribe_service -> 9001
 {
 	request
@@ -29,7 +23,7 @@ message subscribe_service -> 9001
 	}
 	response
 	{
-		repeated instance instances;
+		repeated uint64_t instances;
 	}
 }
 
@@ -39,8 +33,7 @@ message broad_service_status -> 9002
 	response
 	{
 		string group;
-		string host;
-		int32 port;
+		uint64 host_and_port;
 		bool healty;
 	}
 }

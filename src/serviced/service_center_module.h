@@ -21,7 +21,7 @@ namespace aquarius
 				channel() = default;
 
 			public:
-				auto subscribe(std::shared_ptr<subscriber> subscriber_ptr) -> asio::awaitable<std::vector<instance>>;
+				auto subscribe(std::shared_ptr<subscriber> subscriber_ptr) -> asio::awaitable<std::vector<uint64_t>>;
 
 				auto publish(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>;
 
@@ -47,7 +47,7 @@ namespace aquarius
 			auto publish(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>;
 
 			auto subscribe(const std::string& group, std::shared_ptr<subscriber> subscriber_ptr)
-				-> asio::awaitable<std::vector<instance>>;
+				-> asio::awaitable<std::vector<uint64_t>>;
 
 		private:
 			auto remove(std::shared_ptr<customer> customer_ptr)->asio::awaitable<void>;

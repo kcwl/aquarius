@@ -2,14 +2,24 @@
 #include "proto/regist.virgo.h"
 #include <aquarius.hpp>
 
+namespace
+{
+	uint64_t make_host_and_port(const std::string& host, int32_t port)
+	{
+		uint64_t host_u = asio::ip::address(asio::ip::make_address(host)).to_v4().to_uint();
+
+		return (host_u << 32) | port;
+	}
+}
+
 namespace aquarius
 {
 	namespace serviced
 	{
 		auto service_center_module::channel::subscribe(std::shared_ptr<subscriber> subscriber_ptr)
-			-> asio::awaitable<std::vector<instance>>
+			-> asio::awaitable<std::vector<uint64_t>>
 		{
-			std::vector<instance> result{};
+			std::vector<uint64_t> result{};
 
 			auto iter = subscribers_.find(subscriber_ptr->id());
 
@@ -29,8 +39,7 @@ namespace aquarius
 
 				result.push_back({});
 				auto& ins = result.back();
-				ins.host = cter.second.lock()->host();
-				ins.port = cter.second.lock()->port();
+				ins = make_host_and_port(cter.second.lock()->host(), cter.second.lock()->port());
 			}
 
 			co_return result;
@@ -52,8 +61,7 @@ namespace aquarius
 				flex_buffer buf{};
 				broad_service_status_tcp_response resp{};
 				resp.body().group() = customer_ptr->group();
-				resp.body().host() = customer_ptr->host();
-				resp.body().port() = customer_ptr->port();
+				resp.body().host_and_port() = make_host_and_port(customer_ptr->host(), customer_ptr->port());
 				resp.commit(buf);
 
 				co_await mpc_invoke_session(sub.first, buf);
@@ -84,12 +92,11 @@ namespace aquarius
 
 			flex_buffer buf{};
 			broad_service_status_tcp_response resp{};
-			resp.body().host() = customer_ptr->host();
-			resp.body().port() = customer_ptr->port();
+			resp.body().host_and_port() = make_host_and_port(customer_ptr->host(), customer_ptr->port());
 			resp.body().healty() = false;
 			resp.commit(buf);
 
-			//co_await mpc_async_call<&session_store_module::invoke>(customer_ptr->id(), std::move(buf));
+			 co_await mpc_invoke_session(customer_ptr->id(), buf);
 		}
 
 		bool service_center_module::channel::empty() const
@@ -121,7 +128,7 @@ namespace aquarius
 		}
 
 		auto service_center_module::subscribe(const std::string& group, std::shared_ptr<subscriber> subscriber_ptr)
-			-> asio::awaitable<std::vector<instance>>
+			-> asio::awaitable<std::vector<uint64_t>>
 		{
 			std::unique_lock lk(mutex_);
 
@@ -135,7 +142,7 @@ namespace aquarius
 			co_return co_await chan->subscribe(subscriber_ptr);
 		}
 
-		auto service_center_module::remove(std::shared_ptr<customer> customer_ptr) ->asio::awaitable<void>
+		auto service_center_module::remove(std::shared_ptr<customer> customer_ptr) -> asio::awaitable<void>
 		{
 			std::unique_lock lk(mutex_);
 

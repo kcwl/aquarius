@@ -64,12 +64,6 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-struct instance
-{
-	string host;
-	int32 port;
-};
-
 class subscribe_service_req_body: public aquarius::tcp_serialize
 {
 public:
@@ -107,8 +101,8 @@ public:
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
 
-	std::vector<instance> instances() const;
-	std::vector<instance>& instances();
+	std::vector<uint64_t> instances() const;
+	std::vector<uint64_t>& instances();
 
 private:
 	struct impl;
@@ -152,11 +146,8 @@ public:
 	string group() const;
 	string& group();
 
-	string host() const;
-	string& host();
-
-	int32 port() const;
-	int32& port();
+	uint64 host_and_port() const;
+	uint64& host_and_port();
 
 	bool healty() const;
 	bool& healty();

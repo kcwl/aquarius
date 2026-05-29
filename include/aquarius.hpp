@@ -9,6 +9,7 @@
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
 #include <aquarius/ip/http.hpp>
+#include <aquarius/ip/session_store.hpp>
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/ip/udp.hpp>
 #include <aquarius/logger.hpp>

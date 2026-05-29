@@ -179,6 +179,23 @@ namespace aquarius
 			co_return header.src;
 		}
 
+		template<typename Session>
+		auto send_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& req, flex_buffer& resp, error_code& ec)
+		{
+			raw_header header{};
+			header.src = detail::uuid_generator()();
+			header.length = static_cast<uint32_t>(req.size());
+
+			session_ptr->regist_resp_func(header.src, [&] (flex_buffer& buffer) { resp = flex_buffer(buffer); });
+
+			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
+													   req.data() };
+
+			ec = co_await session_ptr->async_send(buffers);
+
+			co_return header.src;
+		}
+
 		template <typename Session>
 		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t& src)
 			-> asio::awaitable<error_code>

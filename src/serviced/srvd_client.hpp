@@ -16,9 +16,9 @@ namespace aquarius
 	{
 		AQUARIUS_MODULE_TOP(srvd_client)
 		{
-			using healty_check_func_t = std::function<void(const std::string&, int32_t, bool)>;
+			using healty_check_func_t = std::function<asio::awaitable<void>(uint64_t, bool)>;
 
-			using subscribe_func_t = std::function<asio::awaitable<void>(const std::vector<instance>&)>;
+			using subscribe_func_t = std::function<asio::awaitable<void>(const std::vector<uint64_t>&)>;
 
 		public:
 			virtual bool init() override
@@ -71,9 +71,10 @@ namespace aquarius
 			}
 
 			template <typename Func>
-			void set_healty_check(Func && func)
+			auto set_healty_check(Func && func) ->asio::awaitable<void>
 			{
 				healthy_check_func_ = func;
+				co_return;
 			}
 
 			template <typename... Args>

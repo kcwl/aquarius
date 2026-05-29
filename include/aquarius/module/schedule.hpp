@@ -51,7 +51,7 @@ namespace aquarius
 		auto f = [tp = std::move(std::make_tuple(std::forward_like<Args>(args)...))](
 					 class_type* m) mutable -> return_type { return std::apply(std::bind_front(MemberFunc, m), tp); };
 
-		auto executor = module_router::get_mutable_instance().get_executor();
+		auto executor = asio::make_strand(co_await asio::this_coro::executor);
 
 		co_return co_await asio::co_spawn(
 			executor,
