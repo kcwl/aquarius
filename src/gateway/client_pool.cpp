@@ -41,23 +41,6 @@ namespace aquarius
 			co_return true;
 		}
 
-		auto client_pool::invoke(uint64_t host_and_port, flex_buffer& req_buffer, flex_buffer& resp_buffer)
-			-> asio::awaitable<error_code>
-		{
-			std::shared_lock lk(mutex_);
-
-			auto iter = pool_.find(host_and_port);
-
-			if (iter == pool_.end())
-			{
-				co_return gate_op::not_exist_in_pool;
-			}
-
-			auto ptr = round_.invoke(iter->second);
-
-			co_return co_await ptr->async_call_buffer(req_buffer, resp_buffer);
-		}
-
 		auto client_pool::shake(uint64_t host_and_port) -> asio::awaitable<void>
 		{
 			co_await add(host_and_port);
@@ -66,27 +49,19 @@ namespace aquarius
 
 			auto resp = co_await this->invoke<shake_tcp_response>(host_and_port, request);
 
-			auto f = [host_and_port, this](std::size_t session_id, flex_buffer& buffer,
-										   std::size_t src) -> asio::awaitable<error_code>
-			{
-				// buffer.pubseekpos(0, std::ios::in);
-				// raw_header* header = (raw_header*)buffer.data().data();
-				// regist_resp_func(
-				//  header->src, [session_id](flex_buffer resp) -> asio::awaitable<void>
-				//  { co_await mpc_async_call<&session_store_module::invoke>(session_id, std::move(resp)); });
-				flex_buffer resp_buffer{};
-				auto ec = co_await this->invoke(host_and_port, buffer, resp_buffer);
-
-				if (!ec)
+			auto f = [host_and_port, this] (std::size_t session_id, flex_buffer& buffer,
+											std::size_t src) -> asio::awaitable<error_code>
 				{
-					co_await mpc_invoke_session(session_id, resp_buffer);
-				}
+					auto ec = co_await this->invoke(host_and_port, buffer, [host_and_port, session_id] (flex_buffer& buf) ->asio::awaitable<void>
+													{
+														co_await mpc_invoke_session(session_id, buf);
+													});
 
-				co_return ec;
-			};
+					co_return ec;
+				};
 
 			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(f), tcp>>(std::move(f));
+				std::make_shared<basic_transfer_context<decltype(f), tcp, std::size_t>>(std::move(f));
 
 			for (auto& topic : resp.body().topics())
 			{

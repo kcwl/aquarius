@@ -83,9 +83,9 @@ namespace aquarius
 				}
 
 				ec = co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src),
-												 [session_ptr]<typename ConstBufferSequence>(
-													 ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
-												 { co_return co_await session_ptr->async_send(buffer); });
+											[session_ptr]<typename ConstBufferSequence>(
+												ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
+											{ co_return co_await session_ptr->async_send(buffer); });
 
 				if (ec)
 				{
@@ -141,8 +141,8 @@ namespace aquarius
 								co_return;
 							}
 
-							[[maybe_unused]] auto result =
-								co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src), session_callback{});
+							[[maybe_unused]] auto result = co_await ptr->complete(this, session_ptr->uuid(), buffer,
+																				  std::move(src), session_callback{});
 						},
 						asio::detached);
 				}
@@ -179,17 +179,17 @@ namespace aquarius
 			co_return header.src;
 		}
 
-		template<typename Session>
-		auto send_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& req, flex_buffer& resp, error_code& ec)
+		template <typename Session, typename Func>
+		auto send_buffer(std::shared_ptr<Session> session_ptr, flex_buffer& req, Func&& f, error_code& ec)
+			-> asio::awaitable<std::size_t>
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
 			header.length = static_cast<uint32_t>(req.size());
 
-			session_ptr->regist_resp_func(header.src, [&] (flex_buffer& buffer) { resp = flex_buffer(buffer); });
+			session_ptr->regist_resp_func(header.src, std::forward<Func>(f));
 
-			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
-													   req.data() };
+			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)), req.data() };
 
 			ec = co_await session_ptr->async_send(buffers);
 
@@ -228,7 +228,8 @@ namespace aquarius
 		}
 
 		template <typename Handler, typename Func>
-		auto handle_request(std::size_t session_id, flex_buffer& buffer, uint32_t src, Func&& func) -> asio::awaitable<error_code>
+		auto handle_request(std::size_t session_id, flex_buffer& buffer, uint32_t src, Func&& func)
+			-> asio::awaitable<error_code>
 		{
 			auto handler_ptr = std::make_shared<Handler>();
 

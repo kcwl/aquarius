@@ -36,8 +36,23 @@ namespace aquarius
 				co_return co_await ptr->template async_call<Response>(request);
 			}
 
-			auto invoke(uint64_t host_and_port, flex_buffer& req_buffer, flex_buffer& resp_buffer)
-				-> asio::awaitable<error_code>;
+			template<typename Func>
+			auto invoke(uint64_t host_and_port, flex_buffer& req_buffer, Func&& f)
+				-> asio::awaitable<error_code>
+			{
+				std::shared_lock lk(mutex_);
+
+				auto iter = pool_.find(host_and_port);
+
+				if (iter == pool_.end())
+				{
+					co_return gate_op::not_exist_in_pool;
+				}
+
+				auto ptr = round_.invoke(iter->second);
+
+				co_return co_await ptr->async_call_buffer(req_buffer, std::forward<Func>(f));
+			}
 
 			auto shake(uint64_t host_and_port) -> asio::awaitable<void>;
 

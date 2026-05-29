@@ -12,7 +12,7 @@ namespace aquarius
 		public:
 			using base_type = basic_protocol_context<Protocol, Args...>;
 
-			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t,flex_buffer&)>;
+			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t,flex_buffer&,std::size_t)>;
 
 		public:
 			basic_transfer_context(Func&& func)
