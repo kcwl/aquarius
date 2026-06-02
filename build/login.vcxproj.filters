@@ -30,6 +30,12 @@
     <ClCompile Include="..\src\login\proto\login.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\login\ctx_shake.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\login\srv_regist.h">
@@ -39,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\login\proto\login.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gateway\proto\shake.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>

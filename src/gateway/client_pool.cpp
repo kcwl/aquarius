@@ -80,11 +80,15 @@ namespace aquarius
 				co_return;
 			}
 
-			iter->second.resize(max_connection);
+			pool_.insert({ host_and_port , {} });
+
+			auto& back = pool_[host_and_port];
+
+			back.resize(max_connection);
 
 			auto [host, port] = instance_to_host(host_and_port);
 
-			for (auto& c : iter->second)
+			for (auto& c : back)
 			{
 				c = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 

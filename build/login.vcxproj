@@ -19,12 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
+    <ClCompile Include="..\src\login\ctx_shake.cpp" />
     <ClCompile Include="..\src\login\login.cpp" />
     <ClCompile Include="..\src\login\proto\login.virgo.cpp" />
     <ClCompile Include="..\src\login\srv_regist.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\gateway\proto\shake.virgo.h" />
     <ClInclude Include="..\src\login\proto\login.virgo.h" />
     <ClInclude Include="..\src\login\srv_regist.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />

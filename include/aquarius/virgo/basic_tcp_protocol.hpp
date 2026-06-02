@@ -131,6 +131,8 @@ namespace aquarius
 
 			try
 			{
+				parse_.to_datas<result_t>(this->result(), buffer);
+
 				this->header().serialize(buffer);
 
 				this->body().serialize(buffer);

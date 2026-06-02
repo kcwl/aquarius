@@ -131,6 +131,16 @@ namespace aquarius
 			return result;
 		}
 
+		void generate_topics(std::vector<std::string>& topics)
+		{
+			std::unique_lock lk(mutex_);
+
+			for (auto& ctx : contexts_)
+			{
+				topics.push_back(ctx.first);
+			}
+		}
+
 	private:
 		std::shared_mutex mutex_;
 
@@ -145,5 +155,10 @@ namespace aquarius
 	inline bool mpc_put_context(const std::string& topic, const context_reg::node_t& n)
 	{
 		return context_reg::get_mutable_instance().put(topic, n);
+	}
+
+	inline void mpc_generate_topics(std::vector<std::string>& topics)
+	{
+		return context_reg::get_mutable_instance().generate_topics(topics);
 	}
 } // namespace aquarius
