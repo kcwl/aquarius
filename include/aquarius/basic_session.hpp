@@ -240,6 +240,14 @@ namespace aquarius
 			co_return co_await proto_.send_buffer(this->shared_from_this(), req, std::forward<Func>(f), ec);
 		}
 
+		auto async_send_with_header(flex_buffer& buffer) -> asio::awaitable<error_code>
+		{
+			error_code ec{};
+			co_await proto_.async_send_with_header(this->shared_from_this(), buffer, ec);
+
+			co_return ec;
+		}
+
 		bool filling_buffer(std::size_t src, flex_buffer& buffer)
 		{
 			auto iter = buffers_.find(src);

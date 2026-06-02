@@ -6,7 +6,7 @@ namespace aquarius
 	namespace login
 	{
 		srv_regist::srv_regist()
-			: group_("login")
+			: group_("services")
 		{}
 
 		bool srv_regist::init()

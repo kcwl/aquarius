@@ -9,7 +9,7 @@ namespace aquarius
 	namespace gateway
 	{
 		client_pool::client_pool()
-			: group_("gateway")
+			: group_("services")
 		{}
 
 		auto client_pool::run() -> asio::awaitable<bool>

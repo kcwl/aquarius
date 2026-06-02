@@ -116,12 +116,12 @@ namespace aquarius
 					break;
 				}
 
-				auto router = binary_parse{}.from_datas<std::string>(buffer);
-
-				XLOG_INFO() << "[query] parse protocol router: " << router;
-
 				if (!session_ptr->filling_buffer(src, buffer))
 				{
+					auto router = binary_parse{}.from_datas<std::string>(buffer);
+
+					XLOG_INFO() << "[query] parse protocol router: " << router;
+
 					asio::co_spawn(
 						session_ptr->get_executor(),
 						[&, session_ptr, r = std::move(router), src]() mutable -> asio::awaitable<void>
@@ -194,6 +194,18 @@ namespace aquarius
 			ec = co_await session_ptr->async_send(buffers);
 
 			co_return header.src;
+		}
+
+		template<typename Session>
+		auto async_send_with_header(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, error_code& ec) -> asio::awaitable<void>
+		{
+			raw_header header{};
+			header.src = detail::uuid_generator()();
+			header.length = static_cast<uint32_t>(buffer.size());
+
+			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)), buffer.data()};
+
+			ec = co_await session_ptr->async_send(buffers);
 		}
 
 		template <typename Session>

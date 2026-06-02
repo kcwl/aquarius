@@ -110,7 +110,7 @@ namespace aquarius
 
 				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
 
-				mpc_put_session(session_ptr->uuid(), [&] (flex_buffer& buffer)->asio::awaitable<void> { co_await session_ptr->async_send(buffer); });
+				mpc_put_session(session_ptr->uuid(), [session_ptr] (flex_buffer& buffer)->asio::awaitable<void> { co_await session_ptr->async_send_with_header(buffer); });
 
 				asio::co_spawn(
 					acceptor_.get_executor(),
