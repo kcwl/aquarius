@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
+    <ClCompile Include="..\src\login\ctx_login.cpp" />
     <ClCompile Include="..\src\login\ctx_shake.cpp" />
     <ClCompile Include="..\src\login\login.cpp" />
     <ClCompile Include="..\src\login\proto\login.virgo.cpp" />

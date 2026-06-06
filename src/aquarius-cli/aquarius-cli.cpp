@@ -8,11 +8,11 @@ int main()
 {
     asio::io_context io{};
 
-    tcp::client cli(io, 30s);
+    auto cli = std::make_shared<tcp::client>(io, 30s);
 
     auto futuer = asio::co_spawn(io, [&] ()->asio::awaitable<void>
                    {
-                       auto ec = co_await cli.async_connect("127.0.0.1", 3399);
+                       auto ec = co_await cli->async_connect("127.0.0.1", 8100);
 
                        if (ec.value() == 0)
                        {
@@ -53,7 +53,7 @@ int main()
 
             asio::co_spawn(io, [&, request] ()->asio::awaitable<void>
                            {
-                               auto resp = co_await cli.async_call<login_tcp_response>(request);
+                               auto resp = co_await cli->async_call<login_tcp_response>(request);
 
                                if (resp.result() == 0)
                                {

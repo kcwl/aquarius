@@ -126,7 +126,7 @@ namespace aquarius
 		{
 			Response resp{};
 
-			auto f = [&] (flex_buffer& buffer) { resp.consume(buffer); };
+			auto f = [&] (flex_buffer& buffer)->asio::awaitable<void> { resp.consume(buffer); co_return; };
 
 			error_code ec{};
 
@@ -144,12 +144,12 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template<typename Func>
-		auto async_call_buffer(flex_buffer& req, Func&& f) -> asio::awaitable<error_code>
+		template<typename Func, typename ConstBufferSequence>
+		auto async_call_buffer(ConstBufferSequence&& req, Func&& f) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
-			auto src = co_await session_ptr_->send_buffer(req, std::forward<Func>(f), ec);
+			auto src = co_await session_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), std::forward<Func>(f), ec);
 
 			co_await session_ptr_->wait(src);
 

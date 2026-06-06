@@ -113,10 +113,16 @@ namespace aquarius
 		{
 			std::shared_lock lk(mutex_);
 
-			auto iter = contexts_.find(topic);
-			if (iter == contexts_.end())
+			auto iter = sys_contexts_.find(topic);
+			if (iter == sys_contexts_.end())
 			{
-				return nullptr;
+				auto it = contexts_.find(topic);
+				if (it == contexts_.end())
+				{
+					return nullptr;
+				}
+				
+				return it->second;
 			}
 
 			return iter->second;
@@ -127,6 +133,15 @@ namespace aquarius
 			std::unique_lock lk(mutex_);
 
 			auto [_, result] = contexts_.insert({ topic, n });
+
+			return result;
+		}
+
+		bool put_sys(const std::string& topic, const node_t& n)
+		{
+			std::unique_lock lk(mutex_);
+
+			auto [_, result] = sys_contexts_.insert({ topic, n });
 
 			return result;
 		}
@@ -145,6 +160,10 @@ namespace aquarius
 		std::shared_mutex mutex_;
 
 		std::unordered_map<std::string, node_t> contexts_;
+
+		std::shared_mutex sys_mutex_;
+
+		std::unordered_map<std::string, node_t> sys_contexts_;
 	};
 
 	inline std::shared_ptr<context_base> mpc_get_context(const std::string& topic)
@@ -152,9 +171,10 @@ namespace aquarius
 		return context_reg::get_mutable_instance().get(topic);
 	}
 
-	inline bool mpc_put_context(const std::string& topic, const context_reg::node_t& n)
+	inline bool mpc_put_context(const std::string& topic, const context_reg::node_t& n, bool system)
 	{
-		return context_reg::get_mutable_instance().put(topic, n);
+		return system ? context_reg::get_mutable_instance().put_sys(topic, n)
+					  : context_reg::get_mutable_instance().put(topic, n);
 	}
 
 	inline void mpc_generate_topics(std::vector<std::string>& topics)

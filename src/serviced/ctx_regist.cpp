@@ -8,7 +8,7 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		AQUARIUS_HANDLER(regist_tcp_request, regist_tcp_response, ctx_regist)
+		AQUARIUS_SYS_HANDLER(regist_tcp_request, regist_tcp_response, ctx_regist)
 		{
 			auto customer_ptr = std::make_shared<customer>(this->session());
 
@@ -25,7 +25,7 @@ namespace aquarius
 			co_return errc::success;
 		}
 
-		AQUARIUS_HANDLER(subscribe_service_tcp_request, subscribe_service_tcp_response, ctx_subscribe_service)
+		AQUARIUS_SYS_HANDLER(subscribe_service_tcp_request, subscribe_service_tcp_response, ctx_subscribe_service)
 		{
 			auto subscriber_ptr = std::make_shared<subscriber>(this->session());
 

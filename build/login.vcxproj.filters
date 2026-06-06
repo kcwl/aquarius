@@ -36,6 +36,9 @@
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\login\ctx_login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\login\srv_regist.h">

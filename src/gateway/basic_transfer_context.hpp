@@ -12,7 +12,7 @@ namespace aquarius
 		public:
 			using base_type = basic_protocol_context<Protocol, Args...>;
 
-			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t,flex_buffer&,std::size_t)>;
+			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t, std::array<asio::const_buffer, 2>,uint32_t,tcp::session_callback)>;
 
 		public:
 			basic_transfer_context(Func&& func)
@@ -33,7 +33,15 @@ namespace aquarius
 					co_return gate_op::not_exist_in_pool;
 				}
 
-				co_return co_await context->func_(session_id, buffer, std::forward<Args>(args)...);
+				flex_buffer router_buffer{};
+				binary_parse{}.to_datas(context->router(), router_buffer);
+
+				std::array<asio::const_buffer, 2> arrs{
+					router_buffer.data(),
+					buffer.data()
+				};
+
+				co_return co_await context->func_(session_id, arrs, std::forward<Args>(args)...);
 			}
 
 		private:

@@ -82,6 +82,8 @@ namespace aquarius
 					continue;
 				}
 
+				ptr->attach_router(router);
+
 				ec = co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src),
 											[session_ptr]<typename ConstBufferSequence>(
 												ConstBufferSequence&& buffer) -> asio::awaitable<error_code>
@@ -116,35 +118,29 @@ namespace aquarius
 					break;
 				}
 
-				if (!session_ptr->filling_buffer(src, buffer))
+				auto router = binary_parse{}.from_datas<std::string>(buffer);
+
+				XLOG_INFO() << "[query] parse protocol router: " << router;
+
+				if (!co_await session_ptr->filling_buffer(src, buffer))
 				{
-					auto router = binary_parse{}.from_datas<std::string>(buffer);
+					auto context = mpc_get_context(router);
 
-					XLOG_INFO() << "[query] parse protocol router: " << router;
+					if (!context)
+					{
+						continue;
+					}
 
-					asio::co_spawn(
-						session_ptr->get_executor(),
-						[&, session_ptr, r = std::move(router), src]() mutable -> asio::awaitable<void>
-						{
-							auto context = mpc_get_context(r);
+					auto ptr =
+						std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(context);
 
-							if (!context)
-							{
-								co_return;
-							}
+					if (!ptr)
+					{
+						continue;
+					}
 
-							auto ptr =
-								std::dynamic_pointer_cast<basic_protocol_context<tcp, uint32_t, session_callback>>(
-									context);
-							if (!ptr)
-							{
-								co_return;
-							}
-
-							[[maybe_unused]] auto result = co_await ptr->complete(this, session_ptr->uuid(), buffer,
-																				  std::move(src), session_callback{});
-						},
-						asio::detached);
+					[[maybe_unused]] auto result =
+						co_await ptr->complete(this, session_ptr->uuid(), buffer, std::move(src), session_callback{});
 				}
 			}
 
@@ -196,14 +192,38 @@ namespace aquarius
 			co_return header.src;
 		}
 
-		template<typename Session>
-		auto async_send_with_header(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, error_code& ec) -> asio::awaitable<void>
+		template <typename Session, typename Func, typename ConstBufferSequence>
+		auto send_buffer(std::shared_ptr<Session> session_ptr, ConstBufferSequence&& buffers, Func&& f, error_code& ec)
+			-> asio::awaitable<std::size_t>
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
+
+			for (auto& buf : buffers)
+			{
+				header.length += static_cast<uint32_t>(buf.size());
+			}
+
+			session_ptr->regist_resp_func(header.src, std::forward<Func>(f));
+
+			std::array<asio::const_buffer, 3> new_buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
+														   buffers[0], buffers[1]};
+
+			ec = co_await session_ptr->async_send(new_buffers);
+
+			co_return header.src;
+		}
+
+		template <typename Session>
+		auto async_send_with_header(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t src, error_code& ec)
+			-> asio::awaitable<void>
+		{
+			raw_header header{};
+			header.src = src;
 			header.length = static_cast<uint32_t>(buffer.size());
 
-			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)), buffer.data()};
+			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
+													   buffer.data() };
 
 			ec = co_await session_ptr->async_send(buffers);
 		}

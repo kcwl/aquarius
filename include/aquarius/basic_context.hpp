@@ -32,8 +32,20 @@ namespace aquarius
 			co_return co_await func_(this, proto, session_id, buffer, std::forward<Args>(args)...);
 		}
 
+		void attach_router(const std::string& router)
+		{
+			router_ = router;
+		}
+
+		std::string router() const
+		{
+			return router_;
+		}
+
 	private:
 		function_type func_;
+
+		std::string router_;
 	};
 
 	template <typename Handler, typename Protocol, typename... Args>

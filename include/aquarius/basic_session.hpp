@@ -27,7 +27,7 @@ namespace aquarius
 
 		struct callback
 		{
-			using func_t = std::function<void(flex_buffer&)>;
+			using func_t = std::function<asio::awaitable<void>(flex_buffer&)>;
 
 			func_t func;
 
@@ -234,21 +234,30 @@ namespace aquarius
 			co_return co_await proto_.send_request(this->shared_from_this(), request, std::forward<Func>(func), ec);
 		}
 
-		template<typename Func>
+		template <typename Func>
 		auto send_buffer(flex_buffer& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 		{
 			co_return co_await proto_.send_buffer(this->shared_from_this(), req, std::forward<Func>(f), ec);
 		}
 
-		auto async_send_with_header(flex_buffer& buffer) -> asio::awaitable<error_code>
+		template <typename Func, typename ConstBufferSequence>
+		auto send_buffer(ConstBufferSequence&& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+		{
+			co_return co_await proto_.send_buffer(this->shared_from_this(), std::forward<ConstBufferSequence>(req),
+												  std::forward<Func>(f), ec);
+		}
+
+		template <typename ConstBufferSequence>
+		auto async_send_with_header(ConstBufferSequence&& buffer, uint32_t src) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
-			co_await proto_.async_send_with_header(this->shared_from_this(), buffer, ec);
+			co_await proto_.async_send_with_header(this->shared_from_this(), std::forward<ConstBufferSequence>(buffer),
+												   src, ec);
 
 			co_return ec;
 		}
 
-		bool filling_buffer(std::size_t src, flex_buffer& buffer)
+		auto filling_buffer(std::size_t src, flex_buffer& buffer) -> asio::awaitable<bool>
 		{
 			auto iter = buffers_.find(src);
 
@@ -256,19 +265,19 @@ namespace aquarius
 			{
 				buffer_channel_.try_send(error_code{}, 0);
 
-				return false;
+				co_return false;
 			}
 
 			if (iter->second->func)
 			{
-				iter->second->func(buffer);
+				co_await iter->second->func(buffer);
 			}
 
 			iter->second->complete = true;
 
 			buffer_channel_.try_send(error_code{}, src);
 
-			return true;
+			co_return true;
 		}
 
 		template <typename Func>
