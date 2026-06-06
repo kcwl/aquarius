@@ -158,9 +158,9 @@ private:
 };
 
 
-using regist_tcp_request = aquarius::tcp_request<"9000", regist_req_body>;
-using regist_tcp_response = aquarius::tcp_response<"9000", regist_resp_body>;
-using subscribe_service_tcp_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
-using subscribe_service_tcp_response = aquarius::tcp_response<"9001", subscribe_service_resp_body>;
-using broad_service_status_tcp_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
-using broad_service_status_tcp_response = aquarius::tcp_response<"9002", broad_service_status_resp_body>;
+using regist_request = aquarius::tcp_request<"9000", regist_req_body>;
+using regist_response = aquarius::tcp_response<"9000", regist_resp_body>;
+using subscribe_service_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
+using subscribe_service_response = aquarius::tcp_response<"9001", subscribe_service_resp_body>;
+using broad_service_status_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
+using broad_service_status_response = aquarius::tcp_response<"9002", broad_service_status_resp_body>;

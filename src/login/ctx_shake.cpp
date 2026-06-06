@@ -5,7 +5,7 @@ namespace aquarius
 {
 	namespace login
 	{
-		AQUARIUS_SYS_HANDLER(shake_tcp_request, shake_tcp_response, ctx_shake)
+		AQUARIUS_SYS_HANDLER(shake_request, shake_response, ctx_shake)
 		{
 			mpc_generate_topics(response().body().topics());
 

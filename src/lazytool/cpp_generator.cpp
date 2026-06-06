@@ -288,7 +288,7 @@ namespace aquarius
 														  const std::string& message_name, const std::string protocol,
 														  const std::string& router)
 		{
-			ofs << "using " << message_name << "_" << protocol << "_request = aquarius::" << protocol << "_request<\""
+			ofs << "using " << message_name << "_request = aquarius::" << protocol << "_request<\""
 				<< router << "\", ";
 
 			ofs << field_ptr->name() << ">;" << std::endl;
@@ -299,7 +299,7 @@ namespace aquarius
 		bool cpp_generator::generate_response_alias_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
 														   const std::string& message_name, const std::string protocol, const std::string& router)
 		{
-			ofs << "using " << message_name << "_" << protocol << "_response = aquarius::" << protocol << "_response<";
+			ofs << "using " << message_name << "_response = aquarius::" << protocol << "_response<";
 
 			if (protocol == "tcp")
 			{

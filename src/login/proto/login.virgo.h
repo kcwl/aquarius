@@ -50,5 +50,5 @@ private:
 };
 
 
-using login_tcp_request = aquarius::tcp_request<"10000", login_req_body>;
-using login_tcp_response = aquarius::tcp_response<"10000", login_resp_body>;
+using login_request = aquarius::tcp_request<"10000", login_req_body>;
+using login_response = aquarius::tcp_response<"10000", login_resp_body>;

@@ -46,14 +46,14 @@ int main()
 
         if (input == "login")
         {
-            auto request = std::make_shared<login_tcp_request>();
+            auto request = std::make_shared<login_request>();
 
             request->body().username() = "test";
             request->body().password() = "test";
 
             asio::co_spawn(io, [&, request] ()->asio::awaitable<void>
                            {
-                               auto resp = co_await cli->async_call<login_tcp_response>(request);
+                               auto resp = co_await cli->async_call<login_response>(request);
 
                                if (resp.result() == 0)
                                {

@@ -47,5 +47,5 @@ private:
 };
 
 
-using subs_list_tcp_request = aquarius::tcp_request<"9100", subs_list_req_body>;
-using subs_list_tcp_response = aquarius::tcp_response<"9100", subs_list_resp_body>;
+using subs_list_request = aquarius::tcp_request<"9100", subs_list_req_body>;
+using subs_list_response = aquarius::tcp_response<"9100", subs_list_resp_body>;

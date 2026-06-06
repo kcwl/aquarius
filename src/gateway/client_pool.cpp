@@ -46,9 +46,9 @@ namespace aquarius
 		{
 			co_await add(host_and_port);
 
-			auto request = std::make_shared<shake_tcp_request>();
+			auto request = std::make_shared<shake_request>();
 
-			auto resp = co_await this->invoke<shake_tcp_response>(host_and_port, request);
+			auto resp = co_await this->invoke<shake_response>(host_and_port, request);
 
 			auto f = [host_and_port, this]<typename Func>(std::size_t session_id,
 														  std::array<asio::const_buffer, 2> buffers, std::size_t src,

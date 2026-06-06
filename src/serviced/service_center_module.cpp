@@ -59,7 +59,7 @@ namespace aquarius
 			for (const auto& sub : subscribers_)
 			{
 				flex_buffer buf{};
-				broad_service_status_tcp_response resp{};
+				broad_service_status_response resp{};
 				resp.body().group() = customer_ptr->group();
 				resp.body().host_and_port() = make_host_and_port(customer_ptr->host(), customer_ptr->port());
 				resp.commit(buf);
@@ -91,7 +91,7 @@ namespace aquarius
 			customers_.erase(iter);
 
 			flex_buffer buf{};
-			broad_service_status_tcp_response resp{};
+			broad_service_status_response resp{};
 			resp.body().host_and_port() = make_host_and_port(customer_ptr->host(), customer_ptr->port());
 			resp.body().healty() = false;
 			resp.commit(buf);

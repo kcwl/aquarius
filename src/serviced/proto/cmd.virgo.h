@@ -53,5 +53,5 @@ private:
 };
 
 
-using cmd_op_tcp_request = aquarius::tcp_request<"9200", cmd_op_req_body>;
-using cmd_op_tcp_response = aquarius::tcp_response<"9200", cmd_op_resp_body>;
+using cmd_op_request = aquarius::tcp_request<"9200", cmd_op_req_body>;
+using cmd_op_response = aquarius::tcp_response<"9200", cmd_op_resp_body>;

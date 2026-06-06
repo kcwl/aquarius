@@ -43,13 +43,13 @@ namespace aquarius
 
 			auto publish(const std::string& group, const std::string& host, int32_t port) -> asio::awaitable<bool>
 			{
-				auto req = std::make_shared<regist_tcp_request>();
+				auto req = std::make_shared<regist_request>();
 
 				req->body().host() = host;
 				req->body().port() = port;
 				req->body().group() = group;
 
-				auto resp = co_await client_ptr_->async_call<regist_tcp_response>(req);
+				auto resp = co_await client_ptr_->async_call<regist_response>(req);
 				if (resp.result() != 0)
 				{
 					XLOG_ERROR() << "regist serviced failed! error:" << resp.result();
@@ -61,11 +61,11 @@ namespace aquarius
 			auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
 			{
 				auto f = std::move(func);
-				auto req = std::make_shared<subscribe_service_tcp_request>();
+				auto req = std::make_shared<subscribe_service_request>();
 
 				req->body().group() = group;
 
-				auto resp = co_await client_ptr_->async_call<subscribe_service_tcp_response>(req);
+				auto resp = co_await client_ptr_->async_call<subscribe_service_response>(req);
 
 				co_await f(resp.body().instances());
 			}
