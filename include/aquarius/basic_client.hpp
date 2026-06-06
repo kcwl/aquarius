@@ -126,7 +126,7 @@ namespace aquarius
 		{
 			Response resp{};
 
-			auto f = [&] (flex_buffer& buffer)->asio::awaitable<void> { resp.consume(buffer); co_return; };
+			auto f = [&] (flex_buffer& buffer, const std::string&)->asio::awaitable<void> { resp.consume(buffer); co_return; };
 
 			error_code ec{};
 

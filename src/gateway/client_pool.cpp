@@ -26,7 +26,8 @@ namespace aquarius
 				}
 			};
 
-			co_await mpc_async_call<&serviced::srvd_client::set_healty_check<decltype(healthy_callback)>>(healthy_callback);
+			co_await mpc_async_call<&serviced::srvd_client::set_healty_check<decltype(healthy_callback)>>(
+				healthy_callback);
 
 			co_await mpc_async_call<&serviced::srvd_client::subscribe>(
 				group_, std::move(
@@ -49,19 +50,22 @@ namespace aquarius
 
 			auto resp = co_await this->invoke<shake_tcp_response>(host_and_port, request);
 
-			auto f = [host_and_port, this]<typename Func> (std::size_t session_id, std::array<asio::const_buffer, 2> buffers,
-											std::size_t src, Func&& f) -> asio::awaitable<error_code>
-				{
-					auto ec = co_await this->invoke(host_and_port, buffers, [host_and_port, session_id, src] (flex_buffer& buf) ->asio::awaitable<void>
-													{
-														co_await mpc_invoke_session(session_id, buf, src);
-													});
+			auto f = [host_and_port, this]<typename Func>(std::size_t session_id,
+														  std::array<asio::const_buffer, 2> buffers, std::size_t src,
+														  Func&& f) -> asio::awaitable<error_code>
+			{
+				auto ec =
+					co_await this->invoke(host_and_port, buffers,
+										  [host_and_port, session_id,
+										   src](flex_buffer& buf, const std::string& router) -> asio::awaitable<void>
+										  { co_await mpc_invoke_session(session_id, buf, router, src); });
 
-					co_return ec;
-				};
+				co_return ec;
+			};
 
 			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(f), tcp, uint32_t, tcp::session_callback>>(std::move(f));
+				std::make_shared<basic_transfer_context<decltype(f), tcp, uint32_t, tcp::session_callback>>(
+					std::move(f));
 
 			for (auto& topic : resp.body().topics())
 			{
@@ -80,7 +84,7 @@ namespace aquarius
 				co_return;
 			}
 
-			pool_.insert({ host_and_port , {} });
+			pool_.insert({ host_and_port, {} });
 
 			auto& back = pool_[host_and_port];
 

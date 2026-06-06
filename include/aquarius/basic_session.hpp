@@ -27,7 +27,7 @@ namespace aquarius
 
 		struct callback
 		{
-			using func_t = std::function<asio::awaitable<void>(flex_buffer&)>;
+			using func_t = std::function<asio::awaitable<void>(flex_buffer&, const std::string&)>;
 
 			func_t func;
 
@@ -248,16 +248,16 @@ namespace aquarius
 		}
 
 		template <typename ConstBufferSequence>
-		auto async_send_with_header(ConstBufferSequence&& buffer, uint32_t src) -> asio::awaitable<error_code>
+		auto async_send_with_header(ConstBufferSequence&& buffer, const std::string& router, uint32_t src) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 			co_await proto_.async_send_with_header(this->shared_from_this(), std::forward<ConstBufferSequence>(buffer),
-												   src, ec);
+												   src, router, ec);
 
 			co_return ec;
 		}
 
-		auto filling_buffer(std::size_t src, flex_buffer& buffer) -> asio::awaitable<bool>
+		auto filling_buffer(std::size_t src, flex_buffer& buffer, const std::string& router) -> asio::awaitable<bool>
 		{
 			auto iter = buffers_.find(src);
 
@@ -270,7 +270,7 @@ namespace aquarius
 
 			if (iter->second->func)
 			{
-				co_await iter->second->func(buffer);
+				co_await iter->second->func(buffer, router);
 			}
 
 			iter->second->complete = true;

@@ -8,10 +8,10 @@ namespace aquarius
 	class session_store : public singleton<session_store>
 	{
 	public:
-		using func_type = std::function<asio::awaitable<void>(flex_buffer&, uint32_t)>;
+		using func_type = std::function<asio::awaitable<void>(flex_buffer&,const std::string&, uint32_t)>;
 
 	public:
-		auto invoke(std::size_t session_id, flex_buffer& buffer, uint32_t src) -> asio::awaitable<void>
+		auto invoke(std::size_t session_id, flex_buffer& buffer, const std::string& router, uint32_t src) -> asio::awaitable<void>
 		{
 			std::shared_lock lk(mutex_);
 
@@ -21,7 +21,7 @@ namespace aquarius
 				co_return;
 			}
 
-			co_await iter->second(buffer, src);
+			co_await iter->second(buffer, router, src);
 		}
 
 		bool put(std::size_t session_id, const func_type& f)
@@ -39,14 +39,14 @@ namespace aquarius
 		std::unordered_map<std::size_t, func_type> sessions_;
 	};
 
-	inline auto mpc_invoke_session(std::size_t session_id, flex_buffer& buffer, uint32_t src = 0) -> asio::awaitable<void>
+	inline auto mpc_invoke_session(std::size_t session_id, flex_buffer& buffer, const std::string& router, uint32_t src = 0) -> asio::awaitable<void>
 	{
 		if (src == 0)
 		{
 			src = detail::uuid_generator()();
 		}
 
-		co_return co_await session_store::get_mutable_instance().invoke(session_id, buffer, src);
+		co_return co_await session_store::get_mutable_instance().invoke(session_id, buffer, router, src);
 	}
 
 	inline bool mpc_put_session(std::size_t session_id, const session_store::func_type& f)

@@ -38,7 +38,7 @@ namespace aquarius
 		using ssl_server = basic_server<basic_session<tcp, ssl_client_adaptor>>;
 		using ssl_client = basic_client<basic_session<tcp, ssl_server_adaptor>>;
 
-		using session_callback = std::function<asio::awaitable<error_code>(std::array<asio::const_buffer, 2>)>;
+		using session_callback = std::function<asio::awaitable<error_code>(const std::vector<asio::const_buffer>&)>;
 
 		template <typename Handler>
 		using context = basic_context<Handler, tcp, uint32_t, session_callback>;
@@ -122,7 +122,7 @@ namespace aquarius
 
 				XLOG_INFO() << "[query] parse protocol router: " << router;
 
-				if (!co_await session_ptr->filling_buffer(src, buffer))
+				if (!co_await session_ptr->filling_buffer(src, buffer, router))
 				{
 					auto context = mpc_get_context(router);
 
@@ -206,8 +206,12 @@ namespace aquarius
 
 			session_ptr->regist_resp_func(header.src, std::forward<Func>(f));
 
-			std::array<asio::const_buffer, 3> new_buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
-														   buffers[0], buffers[1]};
+			std::vector<asio::const_buffer>new_buffers{ asio::buffer((char*)&header, sizeof(raw_header)) };
+
+			for (auto& buf : buffers)
+			{
+				new_buffers.push_back(buf);
+			}
 
 			ec = co_await session_ptr->async_send(new_buffers);
 
@@ -215,15 +219,25 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		auto async_send_with_header(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t src, error_code& ec)
-			-> asio::awaitable<void>
+		auto async_send_with_header(std::shared_ptr<Session> session_ptr, flex_buffer& buffer, uint32_t src,
+									const std::string& router, error_code& ec) -> asio::awaitable<void>
 		{
+			flex_buffer router_buffer{};
+			binary_parse{}.to_datas(router, router_buffer);
+
 			raw_header header{};
 			header.src = src;
 			header.length = static_cast<uint32_t>(buffer.size());
 
-			std::array<asio::const_buffer, 2> buffers{ asio::buffer((char*)&header, sizeof(raw_header)),
-													   buffer.data() };
+			std::vector<asio::const_buffer> buffers{ asio::buffer((char*)&header, sizeof(raw_header))};
+
+			if (!router.empty())
+			{
+				buffers.push_back(router_buffer.data());
+				header.length += static_cast<uint32_t>(router_buffer.size());
+			}
+
+			buffers.push_back(buffer.data());
 
 			ec = co_await session_ptr->async_send(buffers);
 		}
@@ -278,7 +292,7 @@ namespace aquarius
 
 			raw_header header{ .length = static_cast<uint32_t>(resp_buffer.size()), .src = src };
 
-			std::array<asio::const_buffer, 2> buffers = { asio::buffer((char*)&header, sizeof(header)),
+			std::vector<asio::const_buffer> buffers = { asio::buffer((char*)&header, sizeof(header)),
 														  resp_buffer.data() };
 
 			auto res = co_await func(buffers);
