@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/singleton.hpp>
 #include <shared_mutex>
 
@@ -8,10 +9,11 @@ namespace aquarius
 	class session_store : public singleton<session_store>
 	{
 	public:
-		using func_type = std::function<asio::awaitable<void>(flex_buffer&,const std::string&, uint32_t)>;
+		using func_type = std::function<asio::awaitable<void>(flex_buffer&, const std::string&, uint32_t)>;
 
 	public:
-		auto invoke(std::size_t session_id, flex_buffer& buffer, const std::string& router, uint32_t src) -> asio::awaitable<void>
+		auto invoke(std::size_t session_id, flex_buffer& buffer, const std::string& router, uint32_t src)
+			-> asio::awaitable<void>
 		{
 			std::shared_lock lk(mutex_);
 
@@ -39,7 +41,8 @@ namespace aquarius
 		std::unordered_map<std::size_t, func_type> sessions_;
 	};
 
-	inline auto mpc_invoke_session(std::size_t session_id, flex_buffer& buffer, const std::string& router, uint32_t src = 0) -> asio::awaitable<void>
+	inline auto mpc_invoke_session(std::size_t session_id, flex_buffer& buffer, const std::string& router,
+								   uint32_t src = 0) -> asio::awaitable<void>
 	{
 		if (src == 0)
 		{

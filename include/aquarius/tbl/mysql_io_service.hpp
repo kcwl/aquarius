@@ -12,9 +12,8 @@ namespace aquarius
 	class mysql_io_service
 	{
 	public:
-		explicit mysql_io_service(const asio::any_io_executor& executor, boost::mysql::pool_params param)
-			: executor_(executor)
-			, param_(std::move(param))
+		explicit mysql_io_service(boost::mysql::pool_params param)
+			: param_(std::move(param))
 		{}
 
 		~mysql_io_service() = default;
@@ -30,9 +29,9 @@ namespace aquarius
 			return true;
 		}
 
-		void async_run()
+		auto async_run() -> asio::awaitable<void>
 		{
-			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(executor_, std::move(param_));
+			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(co_await asio::this_coro::executor, std::move(param_));
 
 			pool_ptr_->async_run(asio::detached);
 		}
