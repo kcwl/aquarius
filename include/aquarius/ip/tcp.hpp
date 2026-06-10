@@ -193,7 +193,7 @@ namespace aquarius
 		}
 
 		template <typename Session, typename Func, typename ConstBufferSequence>
-		auto send_buffer(std::shared_ptr<Session> session_ptr, ConstBufferSequence&& buffers, Func&& f, error_code& ec)
+		auto send_buffers(std::shared_ptr<Session> session_ptr, ConstBufferSequence&& buffers, Func&& f, error_code& ec)
 			-> asio::awaitable<std::size_t>
 		{
 			raw_header header{};

@@ -113,7 +113,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -228,92 +228,9 @@
     <Text Include="..\test\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\detail\ut_asio.cpp" />
-    <ClCompile Include="..\test\detail\ut_concat.cpp" />
-    <ClCompile Include="..\test\detail\ut_concat.hpp.cpp" />
-    <ClCompile Include="..\test\detail\ut_config.cpp" />
-    <ClCompile Include="..\test\detail\ut_crc.cpp" />
-    <ClCompile Include="..\test\detail\ut_flex_buffer.cpp" />
-    <ClCompile Include="..\test\detail\ut_int_to_string.cpp" />
-    <ClCompile Include="..\test\detail\ut_make_endpoint.cpp" />
-    <ClCompile Include="..\test\detail\ut_member_pointer.cpp" />
-    <ClCompile Include="..\test\detail\ut_string_literal.cpp" />
-    <ClCompile Include="..\test\detail\ut_struct_name.cpp" />
-    <ClCompile Include="..\test\detail\ut_uuid_generator.cpp" />
-    <ClCompile Include="..\test\ip\adaptor\ut_raw_adaptor.cpp" />
-    <ClCompile Include="..\test\ip\adaptor\ut_ssl_adaptor.cpp" />
-    <ClCompile Include="..\test\ip\http\ut_http_helper.cpp" />
-    <ClCompile Include="..\test\ip\http\ut_http_options_handler.cpp" />
-    <ClCompile Include="..\test\ip\ut_context_reg.cpp" />
-    <ClCompile Include="..\test\ip\ut_context_traits.cpp" />
-    <ClCompile Include="..\test\ip\ut_handler.cpp" />
-    <ClCompile Include="..\test\ip\ut_http.cpp" />
-    <ClCompile Include="..\test\ip\ut_tcp.cpp" />
-    <ClCompile Include="..\test\ip\ut_udp.cpp" />
-    <ClCompile Include="..\test\module\ut_module_register.cpp" />
-    <ClCompile Include="..\test\module\ut_module_router.cpp" />
-    <ClCompile Include="..\test\module\ut_mysql_module.cpp" />
-    <ClCompile Include="..\test\module\ut_player_module.cpp" />
-    <ClCompile Include="..\test\module\ut_schedule.cpp" />
-    <ClCompile Include="..\test\serialize\ut_binary.cpp" />
-    <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp" />
-    <ClCompile Include="..\test\serialize\ut_cookie.cpp" />
-    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp" />
-    <ClCompile Include="..\test\serialize\ut_json.cpp" />
-    <ClCompile Include="..\test\serialize\ut_kv.cpp" />
-    <ClCompile Include="..\test\serialize\ut_scalar_type.cpp" />
-    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp" />
-    <ClCompile Include="..\test\tbl\ut_add_string.cpp" />
-    <ClCompile Include="..\test\tbl\ut_enter_view.cpp" />
-    <ClCompile Include="..\test\tbl\ut_grep_view.cpp" />
-    <ClCompile Include="..\test\tbl\ut_insert_view.cpp" />
-    <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp" />
-    <ClCompile Include="..\test\tbl\ut_mysql_type.cpp" />
-    <ClCompile Include="..\test\tbl\ut_remove_view.cpp" />
-    <ClCompile Include="..\test\tbl\ut_select_view.cpp" />
-    <ClCompile Include="..\test\tbl\ut_update_view.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
-    <ClCompile Include="..\test\ut_aquarius.cpp" />
-    <ClCompile Include="..\test\ut_aquarius.hpp.cpp" />
-    <ClCompile Include="..\test\ut_auto_detail.cpp" />
-    <ClCompile Include="..\test\ut_auto_router.cpp" />
-    <ClCompile Include="..\test\ut_auto_serialize.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
-    <ClCompile Include="..\test\ut_basic_client_more.cpp" />
-    <ClCompile Include="..\test\ut_basic_context.cpp" />
-    <ClCompile Include="..\test\ut_basic_module.cpp" />
-    <ClCompile Include="..\test\ut_basic_protocol.cpp" />
-    <ClCompile Include="..\test\ut_basic_serialize.cpp" />
     <ClCompile Include="..\test\ut_basic_server.cpp" />
-    <ClCompile Include="..\test\ut_basic_session.cpp" />
-    <ClCompile Include="..\test\ut_binary_more.cpp" />
-    <ClCompile Include="..\test\ut_client_error_paths.cpp" />
-    <ClCompile Include="..\test\ut_cmd_options.cpp" />
-    <ClCompile Include="..\test\ut_concepts.cpp" />
-    <ClCompile Include="..\test\ut_detail_make_endpoint.cpp" />
-    <ClCompile Include="..\test\ut_detail_misc.cpp" />
-    <ClCompile Include="..\test\ut_error_code.cpp" />
-    <ClCompile Include="..\test\ut_http_options.cpp" />
-    <ClCompile Include="..\test\ut_http_parse.cpp" />
-    <ClCompile Include="..\test\ut_io_service_pool.cpp" />
-    <ClCompile Include="..\test\ut_logger.cpp" />
-    <ClCompile Include="..\test\ut_serialize_error_paths.cpp" />
-    <ClCompile Include="..\test\ut_serialize_extras.cpp" />
-    <ClCompile Include="..\test\ut_serialize_reflectable.cpp" />
-    <ClCompile Include="..\test\ut_serialize_zigzag.cpp" />
-    <ClCompile Include="..\test\ut_singleton.cpp" />
-    <ClCompile Include="..\test\virgo\ut_basic_http_protocol.cpp" />
-    <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_header.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_method.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_request.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_response.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_status.cpp" />
-    <ClCompile Include="..\test\virgo\ut_http_version.cpp" />
-    <ClCompile Include="..\test\virgo\ut_tcp_header.cpp" />
-    <ClCompile Include="..\test\virgo\ut_tcp_request.cpp" />
-    <ClCompile Include="..\test\virgo\ut_tcp_response.cpp" />
-    <ClCompile Include="..\test\virgo\ut_tcp_response_commit.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

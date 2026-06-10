@@ -149,7 +149,7 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			auto src = co_await session_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), std::forward<Func>(f), ec);
+			auto src = co_await session_ptr_->send_buffers(std::forward<ConstBufferSequence>(req), std::forward<Func>(f), ec);
 
 			co_await session_ptr_->wait(src);
 

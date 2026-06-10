@@ -241,7 +241,7 @@ namespace aquarius
 		}
 
 		template <typename Func, typename ConstBufferSequence>
-		auto send_buffer(ConstBufferSequence&& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+		auto send_buffers(ConstBufferSequence&& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 		{
 			co_return co_await proto_.send_buffer(this->shared_from_this(), std::forward<ConstBufferSequence>(req),
 												  std::forward<Func>(f), ec);
