@@ -11,8 +11,6 @@ namespace aquarius
 	template <typename Header, typename Body>
 	class basic_protocol : private boost::empty_value<Body>
 	{
-		static_assert(!std::is_pointer_v<Body>, "body must not be a pointer");
-
 	public:
 		using header_type = Header;
 		using body_type = Body;
@@ -30,9 +28,9 @@ namespace aquarius
 		}
 
 		basic_protocol(basic_protocol&& other) noexcept
-			: header_(std::exchange(other.header_, {}))
+			: header_(std::exchange(other.header_, header_type{}))
 		{
-			this->get() = std::exchange(other.get(), {});
+			this->get() = std::exchange(other.get(), body_type{});
 		}
 
 		basic_protocol& operator=(const basic_protocol& other)
@@ -50,8 +48,8 @@ namespace aquarius
 		{
 			if (this != std::addressof(other))
 			{
-				header_ = std::move(other.header_);
-				this->get() = std::exchange(other.get(), {});
+				header_ = std::exchange(other.header_, header_type{});
+				this->get() = std::exchange(other.get(), body_type{});
 			}
 			return *this;
 		}
