@@ -1,10 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-project(unittest LANGUAGES CXX)
-
-# Find Boost components and OpenSSL for proper imported targets
-find_package(Boost REQUIRED COMPONENTS log log_setup thread filesystem system date_time regex url json charconv unit_test_framework)
-find_package(OpenSSL REQUIRED)
-
 # Collect all unit-test source files recursively. Match files starting with 'ut_'.
 file(GLOB_RECURSE UT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut_*.cpp")
 
@@ -17,24 +10,6 @@ endif()
 # Include paths used by the tests
 include_directories(${AQUARIUS_INCLUDE})
 include_directories(${AQUARIUS_PROTOCOL_INCLUDE})
-
-# Common link libraries for each test target
-set(TEST_COMMON_LIBS
-	Boost::log_setup
-	Boost::log
-	Boost::thread
-	Boost::filesystem
-	Boost::system
-	Boost::date_time
-	Boost::regex
-	Boost::json
-	Boost::charconv
-	Boost::url
-	Boost::unit_test_framework
-	OpenSSL::SSL
-	OpenSSL::Crypto
-	pthread
-)
 
 foreach(src IN LISTS UT_SOURCES)
 	# skip the runner itself if matched
@@ -49,7 +24,8 @@ foreach(src IN LISTS UT_SOURCES)
 
 	add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
 	target_include_directories(${target_name} PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
-	target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
+	# target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
+	target_link_libraries(${target_name} PRIVATE boost)
 
 	if(ENABLE_MYSQL)
 		target_compile_definitions(${target_name} PUBLIC -DENABLE_MYSQL)
@@ -58,6 +34,7 @@ foreach(src IN LISTS UT_SOURCES)
 
 	if(ENABLE_SSL_TEST)
 		target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
+		target_link_libraries(${target_name} PRIVATE openssl)
 	endif()
 
 	add_test(NAME ${target_name} COMMAND ${target_name})
@@ -76,8 +53,8 @@ endif()
 
 add_custom_target(coverage 
 	COMMAND rm -rf test-aquarius
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -r coverage.info "*/boost/*" -o coverage-no-boost.info
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
-	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch,format coverage-aquarius.info -o test-aquarius
+	COMMAND lcov --ignore-errors empty,inconsistent,negative,mismatch,format,version -c -d . -o "coverage.info" -b .
+	COMMAND lcov --ignore-errors empty,inconsistent,negative,mismatch,format,version -r coverage.info "*/boost/*" -o coverage-no-boost.info
+	COMMAND lcov --ignore-errors empty,inconsistent,negative,mismatch,format,version -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
+	COMMAND genhtml --ignore-errors empty,inconsistent,negative,mismatch,format,version coverage-aquarius.info -o test-aquarius
 )
