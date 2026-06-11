@@ -4,44 +4,25 @@
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/logger.hpp>
-#include <expected>
 #include <map>
 
 namespace aquarius
 {
-	template <typename Protocol, template <typename> typename Adaptor>
-	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
+	template <typename Protocol>
+	class basic_session
 	{
 	public:
-		using socket = typename Protocol::socket;
+		using socket_type = typename Protocol::socket_type;
 
-		using endpoint = typename Protocol::endpoint;
-
-		using acceptor = typename Protocol::acceptor;
-
-		using resolver = typename Protocol::resolver;
+		using resolver_type = typename Protocol::resolver_type;
 
 		using duration = std::chrono::system_clock::duration;
 
-		using adaptor_t = Adaptor<socket>;
-
-		struct callback
-		{
-			using func_t = std::function<asio::awaitable<void>(flex_buffer&, const std::string&)>;
-
-			func_t func;
-
-			bool complete;
-		};
-
 	public:
-		explicit basic_session(socket _socket, duration timeout)
+		explicit basic_session(socket_type _socket, duration timeout)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
-			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
-			, proto_()
-			, buffer_channel_(get_executor())
 		{}
 
 		virtual ~basic_session() = default;
@@ -57,16 +38,19 @@ namespace aquarius
 			return uuid_;
 		}
 
+		duration timeout() const
+		{
+			return timeout_;
+		}
+
 		auto async_connect(const std::string& host, const std::string& port) -> asio::awaitable<error_code>
 		{
-			resolver resolve(this->get_executor());
+			resolver_type resolve(this->get_executor());
 
-			auto ec = co_await socket_adaptor_.async_connect(resolve.resolve(host, port), timeout_);
+			error_code ec{};
 
-			if (ec)
-			{
-				XLOG_ERROR() << "async_connect error: " << ec.what();
-			}
+			co_await asio::async_connect(socket_, resolve.resolve(host, port),
+										 asio::cancel_after(timeout_, asio::redirect_error(asio::use_awaitable, ec)));
 
 			co_return ec;
 		}
@@ -92,39 +76,18 @@ namespace aquarius
 
 			auto mutable_buffer = buffer.prepare(length);
 
-			co_await asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-									  asio::redirect_error(asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[async read] error: " << ec.what() << ", remote_address: " << remote_address();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
-
-				buffer.commit(length);
-			}
+			co_await asio::async_read(socket_, mutable_buffer, asio::redirect_error(asio::use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		auto async_read_util(flex_buffer& buffer, std::string_view delm, std::size_t& end_pos)
+		auto async_read_until(flex_buffer& buffer, std::string_view delm, std::size_t& end_pos)
 			-> asio::awaitable<error_code>
 		{
 			error_code ec;
 
-			end_pos = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), buffer, delm,
-															 asio::redirect_error(asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[async read util] error: " << ec.what() << ", remote_address: " << remote_address();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async read util] receive " << buffer.size() << " bytes";
-			}
+			end_pos =
+				co_await asio::async_read_until(socket_, buffer, delm, asio::redirect_error(asio::use_awaitable, ec));
 
 			co_return ec;
 		}
@@ -134,22 +97,12 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			co_await asio::async_write(socket_adaptor_.get_implement(), buffers,
-									   asio::redirect_error(asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[async send] error: " << ec.what();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async send] send buffers:" << buffers.size();
-			}
+			co_await asio::async_write(socket_, buffers, asio::redirect_error(asio::use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		bool close()
+		bool shutdown()
 		{
 			error_code ec;
 
@@ -160,151 +113,32 @@ namespace aquarius
 				XLOG_ERROR() << "[shutdown] error: " << ec.what();
 			}
 
-			socket_.close(ec);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[close] error: " << ec.what();
-			}
-
 			return !ec;
 		}
 
-		bool keep_alive(bool enable = true)
+		error_code keep_alive(bool enable)
 		{
 			error_code ec;
 
 			socket_.set_option(typename Protocol::keep_alive(enable), ec);
 
-			if (ec)
-			{
-				XLOG_ERROR() << "[keep alive] error: " << ec.what();
-			}
-
-			return !ec;
+			return ec;
 		}
 
-		bool set_nodelay(bool enable = true)
+		error_code set_nodelay(bool enable)
 		{
 			error_code ec;
 
 			socket_.set_option(typename Protocol::no_delay(enable), ec);
 
-			if (ec)
-			{
-				XLOG_ERROR() << "[set nodelay] error: " << ec.what();
-			}
-
-			return !ec;
-		}
-
-		auto accept() -> asio::awaitable<error_code>
-		{
-			auto ec = co_await this->socket_adaptor_.async_handshake(timeout_);
-
-			if (ec)
-			{
-				co_return ec;
-			}
-
-			co_return co_await proto_.accept(this->shared_from_this());
-		}
-
-		auto query() -> asio::awaitable<error_code>
-		{
-			co_return co_await proto_.query(this->shared_from_this());
-		}
-
-		auto wait(std::size_t src) -> asio::awaitable<void>
-		{
-			for (;;)
-			{
-				auto next_src = co_await buffer_channel_.async_receive(asio::use_awaitable);
-
-				if (next_src == src)
-				{
-					break;
-				}
-			}
-		}
-
-		template <typename Request, typename Func>
-		auto send_request(std::shared_ptr<Request> request, Func&& func, error_code& ec) -> asio::awaitable<std::size_t>
-		{
-			co_return co_await proto_.send_request(this->shared_from_this(), request, std::forward<Func>(func), ec);
-		}
-
-		template <typename Func>
-		auto send_buffer(flex_buffer& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
-		{
-			co_return co_await proto_.send_buffer(this->shared_from_this(), req, std::forward<Func>(f), ec);
-		}
-
-		template <typename Func, typename ConstBufferSequence>
-		auto send_buffers(ConstBufferSequence&& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
-		{
-			co_return co_await proto_.send_buffer(this->shared_from_this(), std::forward<ConstBufferSequence>(req),
-												  std::forward<Func>(f), ec);
-		}
-
-		template <typename ConstBufferSequence>
-		auto async_send_with_header(ConstBufferSequence&& buffer, const std::string& router, uint32_t src) -> asio::awaitable<error_code>
-		{
-			error_code ec{};
-			co_await proto_.async_send_with_header(this->shared_from_this(), std::forward<ConstBufferSequence>(buffer),
-												   src, router, ec);
-
-			co_return ec;
-		}
-
-		auto filling_buffer(std::size_t src, flex_buffer& buffer, const std::string& router) -> asio::awaitable<bool>
-		{
-			auto iter = buffers_.find(src);
-
-			if (iter == buffers_.end())
-			{
-				buffer_channel_.try_send(error_code{}, 0);
-
-				co_return false;
-			}
-
-			if (iter->second->func)
-			{
-				co_await iter->second->func(buffer, router);
-			}
-
-			iter->second->complete = true;
-
-			buffer_channel_.try_send(error_code{}, src);
-
-			co_return true;
-		}
-
-		template <typename Func>
-		void regist_resp_func(std::size_t src, Func&& func)
-		{
-			auto& cb = buffers_[src];
-			if (!cb)
-			{
-				cb = std::make_shared<callback>();
-			}
-
-			cb->func = func;
+			return ec;
 		}
 
 	protected:
-		socket socket_;
-
-		adaptor_t socket_adaptor_;
+		socket_type socket_;
 
 		std::size_t uuid_;
 
 		duration timeout_;
-
-		Protocol proto_;
-
-		asio::experimental::channel<void(error_code, std::size_t)> buffer_channel_;
-
-		std::map<std::size_t, std::shared_ptr<callback>> buffers_;
 	};
 } // namespace aquarius

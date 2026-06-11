@@ -155,6 +155,7 @@
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
     <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_ssl_session.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
@@ -232,6 +233,8 @@
     <ClCompile Include="..\test\ut_basic_client.cpp" />
     <ClCompile Include="..\test\ut_basic_protocol.cpp" />
     <ClCompile Include="..\test\ut_basic_server.cpp" />
+    <ClCompile Include="..\test\ut_basic_session.cpp" />
+    <ClCompile Include="..\test\ut_basic_ssl_session.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

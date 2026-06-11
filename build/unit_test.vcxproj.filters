@@ -300,6 +300,9 @@
     <ClInclude Include="..\include\aquarius\ip\session_store.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\basic_ssl_session.hpp">
+      <Filter>include\aquarius</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
@@ -317,6 +320,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\ut_basic_protocol.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_session.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ut_basic_ssl_session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

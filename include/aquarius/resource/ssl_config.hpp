@@ -5,6 +5,14 @@ namespace aquarius
 {
 	struct ssl_config
 	{
+		ssl_config()
+			: crt("crt/server.crt")
+			, key("crt/server.key")
+			, pem("crt/dh2048.pem")
+		{
+
+		}
+
 		std::string crt;
 		std::string key;
 		std::string pem;
