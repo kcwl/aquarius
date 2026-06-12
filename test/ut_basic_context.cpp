@@ -1,33 +1,83 @@
-#include <boost/test/unit_test.hpp>
 #include <aquarius/basic_context.hpp>
-#include <aquarius/detail/asio.hpp>
+#include <boost/test/unit_test.hpp>
 
 using namespace aquarius;
 
-struct Proto
-{
-    template <typename Handler, typename... Args>
-    asio::awaitable<error_code> handle_request(flex_buffer&, Args&&...)
-    {
-        co_return error_code{};
-    }
-};
-
 BOOST_AUTO_TEST_SUITE(ut_basic_context)
 
-BOOST_AUTO_TEST_CASE(complete_invokes_protocol_handle)
+struct mock_protocol
 {
-    //basic_context<int, Proto> ctx;
+	template <typename Handler>
+	auto handle_request(std::size_t, flex_buffer&, std::size_t) -> asio::awaitable<error_code>
+	{
+		co_return boost::asio::error::bad_descriptor;
+	}
+};
 
-    //asio::io_context ioc;
+BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
+{
+	basic_protocol_context<mock_protocol, std::size_t> ctx(
+		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t, flex_buffer&,
+		   std::size_t) -> asio::awaitable<error_code>
+		{
+			BOOST_TEST(true);
+			co_return error_code{};
+		});
 
-    //flex_buffer buf{};
+	asio::io_context io{};
+	auto future = asio::co_spawn(
+		io,
+		[ctx]() mutable -> asio::awaitable<void>
+		{
+			flex_buffer buffer{};
+			auto ec = co_await ctx.complete(nullptr, 0, buffer, 0);
 
-    //// run the coroutine returned by complete
-    //asio::co_spawn(ioc, ctx.complete((Proto*)nullptr, 0, buf), [&](std::exception_ptr, boost::system::error_code) {});
-    //ioc.run_for(std::chrono::milliseconds(1));
+			BOOST_TEST(!ec);
+		},
+		asio::use_future);
 
-    BOOST_TEST(true);
+	io.run();
+
+	future.get();
+}
+
+BOOST_AUTO_TEST_CASE(basic_protocol_router)
+{
+	basic_protocol_context<mock_protocol, std::size_t> ctx(
+		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t, flex_buffer&,
+		   std::size_t) -> asio::awaitable<error_code>
+		{
+			BOOST_TEST(true);
+			co_return error_code{};
+		});
+
+	ctx.attach_router("router");
+
+	BOOST_TEST(ctx.router() == "router");
+}
+
+struct mock_handler
+{};
+
+BOOST_AUTO_TEST_CASE(basic_context_ctor)
+{
+	basic_context<mock_handler, mock_protocol, std::size_t> ctx{};
+
+	asio::io_context io{};
+	auto future = asio::co_spawn(
+		io,
+		[ctx]() mutable -> asio::awaitable<void>
+		{
+			flex_buffer buffer{};
+			auto ec = co_await ctx.complete(nullptr, 0, buffer, 0);
+
+			BOOST_TEST(ec == boost::asio::error::bad_descriptor);
+		},
+		asio::use_future);
+
+	io.run();
+
+	future.get();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -364,5 +364,8 @@
     <ClCompile Include="..\test\detail\ut_uuid_generator.cpp">
       <Filter>源文件\detail</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\ut_basic_context.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

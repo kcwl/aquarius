@@ -242,6 +242,7 @@
     <ClCompile Include="..\test\detail\ut_uuid_generator.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
+    <ClCompile Include="..\test\ut_basic_context.cpp" />
     <ClCompile Include="..\test\ut_basic_protocol.cpp" />
     <ClCompile Include="..\test\ut_basic_server.cpp" />
     <ClCompile Include="..\test\ut_basic_session.cpp" />
