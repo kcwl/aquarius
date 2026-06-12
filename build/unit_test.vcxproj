@@ -235,6 +235,7 @@
     <ClCompile Include="..\test\ut_basic_server.cpp" />
     <ClCompile Include="..\test\ut_basic_session.cpp" />
     <ClCompile Include="..\test\ut_basic_ssl_session.cpp" />
+    <ClCompile Include="..\test\ut_io_service_pool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

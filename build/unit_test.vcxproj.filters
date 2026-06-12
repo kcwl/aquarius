@@ -328,5 +328,8 @@
     <ClCompile Include="..\test\ut_basic_ssl_session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\ut_io_service_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
