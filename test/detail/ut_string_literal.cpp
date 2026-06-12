@@ -11,9 +11,9 @@ BOOST_AUTO_TEST_CASE(string_literal_bind_param)
 {
     static_assert(aquarius::detail::string_literal<3>::size == 3);
 
-    auto v = aquarius::detail::bind_param<test_lit>::value;
+    constexpr auto v = aquarius::detail::bind_param<test_lit>::value;
 
-    BOOST_TEST(v == "ok"sv);
+    static_assert(v == "ok"sv);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

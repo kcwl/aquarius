@@ -1,11 +1,20 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/detail/member_pointer.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_detail_member_pointer)
+using namespace aquarius;
 
-BOOST_AUTO_TEST_CASE(compile)
+BOOST_AUTO_TEST_SUITE(ut_member_pointer_name)
+
+struct test_mock
 {
-    BOOST_TEST(true);
+    int value;
+};
+
+BOOST_AUTO_TEST_CASE(get_name)
+{
+    constexpr auto name = member_pointer_name_v<test_mock, &test_mock::value>;
+
+    static_assert(name == "value");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

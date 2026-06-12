@@ -7,14 +7,14 @@ BOOST_AUTO_TEST_CASE(int_to_string_values)
 {
     using namespace std::string_view_literals;
 
-    auto s0 = aquarius::detail::int_to_string<0>();
-    BOOST_TEST(s0 == "0"sv);
+    constexpr auto s0 = aquarius::detail::int_to_string<0>();
+    static_assert(s0 == "0"sv);
 
-    auto s7 = aquarius::detail::int_to_string<7>();
-    BOOST_TEST(s7 == "7"sv);
+    constexpr auto s7 = aquarius::detail::int_to_string<7>();
+    static_assert(s7 == "7"sv);
 
-    auto s123 = aquarius::detail::int_to_string<123>();
-    BOOST_TEST(s123 == "123"sv);
+    constexpr auto s123 = aquarius::detail::int_to_string<123>();
+    static_assert(s123 == "123"sv);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

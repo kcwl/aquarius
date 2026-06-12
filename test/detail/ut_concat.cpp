@@ -20,40 +20,40 @@ inline constexpr std::string_view c = "c"sv;
 
 BOOST_AUTO_TEST_CASE(concats)
 {
-    auto result = aquarius::concat_v<value1, value2>;
-    BOOST_TEST(result == "hello world"sv);
+    constexpr auto result = aquarius::concat_v<value1, value2>;
+    static_assert(result == "hello world"sv);
 
-    auto single_result = aquarius::concat_v<single>;
-    BOOST_TEST(single_result == "single"sv);
+    constexpr auto single_result = aquarius::concat_v<single>;
+    static_assert(single_result == "single"sv);
 
-    auto empty_result = aquarius::concat_v<>;
-    BOOST_TEST(empty_result.empty());
+    constexpr auto empty_result = aquarius::concat_v<>;
+    static_assert(empty_result.empty());
 
-    auto multi = aquarius::concat_v<a, empty, b>;
-    BOOST_TEST(multi == "ABC"sv);
+    constexpr auto multi = aquarius::concat_v<a, empty, b>;
+    static_assert(multi == "ABC"sv);
 
-    auto nul_concat = aquarius::concat_v<with_nul, c>;
-    BOOST_TEST(nul_concat.size() == with_nul.size() + 1);
-    BOOST_TEST(nul_concat == "a\0bc"sv);
+    constexpr auto nul_concat = aquarius::concat_v<with_nul, c>;
+    static_assert(nul_concat.size() == with_nul.size() + 1);
+    static_assert(nul_concat == "a\0bc"sv);
 }
 
 BOOST_AUTO_TEST_CASE(impl_and_arr_inspection)
 {
     auto arr = aquarius::detail::concat<value1, value2>::impl();
     constexpr auto expected = "hello world"sv;
-    BOOST_TEST(arr.size() == expected.size() + 1);
+    static_assert(arr.size() == expected.size() + 1);
     for (std::size_t i = 0; i < expected.size(); ++i)
         BOOST_TEST(arr[i] == expected[i]);
     BOOST_TEST(arr[expected.size()] == '\0');
 
     auto single_arr = aquarius::detail::concat<single>::arr;
-    BOOST_TEST(single_arr.size() == single.size() + 1);
-    BOOST_TEST(aquarius::concat_v<single> == "single"sv);
+    static_assert(single_arr.size() == single.size() + 1);
+    static_assert(aquarius::concat_v<single> == "single"sv);
 
-    auto empty_arr = aquarius::detail::concat<>::impl();
-    BOOST_TEST(empty_arr.size() == 1u);
-    BOOST_TEST(empty_arr[0] == '\0');
-    BOOST_TEST((aquarius::concat_v<>).empty());
+    constexpr auto empty_arr = aquarius::detail::concat<>::impl();
+    static_assert(empty_arr.size() == 1u);
+    static_assert(empty_arr[0] == '\0');
+    static_assert((aquarius::concat_v<>).empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

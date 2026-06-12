@@ -229,6 +229,17 @@
     <Text Include="..\test\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\detail\ut_asio.cpp" />
+    <ClCompile Include="..\test\detail\ut_concat.cpp" />
+    <ClCompile Include="..\test\detail\ut_config.cpp" />
+    <ClCompile Include="..\test\detail\ut_crc.cpp" />
+    <ClCompile Include="..\test\detail\ut_flex_buffer.cpp" />
+    <ClCompile Include="..\test\detail\ut_int_to_string.cpp" />
+    <ClCompile Include="..\test\detail\ut_make_endpoint.cpp" />
+    <ClCompile Include="..\test\detail\ut_member_pointer.cpp" />
+    <ClCompile Include="..\test\detail\ut_string_literal.cpp" />
+    <ClCompile Include="..\test\detail\ut_struct_name.cpp" />
+    <ClCompile Include="..\test\detail\ut_uuid_generator.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
     <ClCompile Include="..\test\ut_basic_protocol.cpp" />

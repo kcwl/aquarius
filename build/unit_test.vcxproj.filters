@@ -331,5 +331,38 @@
     <ClCompile Include="..\test\ut_io_service_pool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\detail\ut_asio.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_concat.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_config.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_crc.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_flex_buffer.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_int_to_string.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_make_endpoint.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_member_pointer.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_string_literal.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_struct_name.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\detail\ut_uuid_generator.cpp">
+      <Filter>源文件\detail</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

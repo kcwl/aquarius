@@ -5,7 +5,6 @@ BOOST_AUTO_TEST_SUITE(ut_detail_uuid_generator)
 
 BOOST_AUTO_TEST_CASE(compile_and_generate)
 {
-    // call constexpr or static methods if available; otherwise ensure header compiles
     BOOST_TEST(true);
 }
 

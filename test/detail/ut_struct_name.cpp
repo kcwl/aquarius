@@ -7,13 +7,16 @@ BOOST_AUTO_TEST_CASE(struct_name_contents)
 {
     using namespace std::string_view_literals;
 
-    auto int_name = aquarius::detail::struct_name<int>();
+    constexpr auto int_name = aquarius::detail::struct_name<int>();
     BOOST_TEST(int_name.find("int") != std::string_view::npos);
+
+    static_assert(int_name == "int"sv);
 
     struct LocalTest {};
 
-    auto local_name = aquarius::detail::struct_name<LocalTest>();
-    BOOST_TEST(local_name.find("LocalTest") != std::string_view::npos);
+    constexpr auto local_name = aquarius::detail::struct_name<LocalTest>();
+
+    static_assert(local_name == "LocalTest"sv);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

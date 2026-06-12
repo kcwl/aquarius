@@ -18,8 +18,15 @@ foreach(src IN LISTS UT_SOURCES)
 	endif()
 
 	# create a safe target name from the relative path: replace '/' with '_' and strip .cpp
-	string(REPLACE "/" "_" tgt_base ${src})
-	string(REPLACE ".cpp" "" tgt_base ${tgt_base})
+	# string(REPLACE "/" "_" tgt_base ${src})
+	string(REPLACE ".cpp" "" tgt_base ${src})
+
+	string(FIND ${tgt_base} "/" pos REVERSE)
+
+	math(EXPR pos "${pos} + 1" OUTPUT_FORMAT DECIMAL)
+
+	string(SUBSTRING ${tgt_base} ${pos} -1 tgt_base)
+
 	set(target_name ${tgt_base})
 
 	add_executable(${target_name} ${src} ${UNITTEST_RUNNER})

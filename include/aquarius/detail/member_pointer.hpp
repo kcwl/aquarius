@@ -28,4 +28,7 @@ namespace aquarius
 	{
 		constexpr static auto value = get_member_pointer_name<T, Ptr>();
 	};
+
+	template<typename T, auto Ptr>
+	constexpr static auto member_pointer_name_v = member_pointer_name<T, Ptr>::value;
 } // namespace aquarius
