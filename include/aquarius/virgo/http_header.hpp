@@ -88,7 +88,9 @@ namespace aquarius
 				auto str = std::string_view(header);
 
 				if (str.empty())
+				{
 					break;
+				}
 
 				length += (str.size() + crlf.size());
 
@@ -96,7 +98,7 @@ namespace aquarius
 
 				if (pos == std::string_view::npos)
 				{
-					break;
+					throw std::runtime_error("header field syntax failed");
 				}
 
 				auto key = str.substr(0, pos);

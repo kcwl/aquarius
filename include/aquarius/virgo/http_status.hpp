@@ -182,7 +182,7 @@ namespace aquarius
 
 		[[nodiscard]] const char* name() const noexcept override
 		{
-			return "serviced errc";
+			return "http status errc";
 		}
 
 		[[nodiscard]] std::string message(int err_code) const override

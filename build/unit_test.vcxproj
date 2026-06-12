@@ -248,7 +248,15 @@
     <ClCompile Include="..\test\ut_basic_session.cpp" />
     <ClCompile Include="..\test\ut_basic_ssl_session.cpp" />
     <ClCompile Include="..\test\ut_io_service_pool.cpp" />
+    <ClCompile Include="..\test\virgo\ut_basic_http_protocol.cpp" />
     <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp" />
+    <ClCompile Include="..\test\virgo\ut_error.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_header.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_method.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_request.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_response.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_status.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_version.cpp" />
     <ClCompile Include="..\test\virgo\ut_tcp_header.cpp" />
     <ClCompile Include="..\test\virgo\ut_tcp_request.cpp" />
     <ClCompile Include="..\test\virgo\ut_tcp_response.cpp" />

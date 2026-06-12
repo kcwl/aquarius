@@ -379,5 +379,29 @@
     <ClCompile Include="..\test\virgo\ut_tcp_response.cpp">
       <Filter>源文件\virgo</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_basic_http_protocol.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_method.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_request.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_response.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_status.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_http_version.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_error.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
