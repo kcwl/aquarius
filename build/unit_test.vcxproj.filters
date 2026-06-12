@@ -367,5 +367,17 @@
     <ClCompile Include="..\test\ut_basic_context.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_header.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_request.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\virgo\ut_tcp_response.cpp">
+      <Filter>源文件\virgo</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

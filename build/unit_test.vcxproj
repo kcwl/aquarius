@@ -248,6 +248,10 @@
     <ClCompile Include="..\test\ut_basic_session.cpp" />
     <ClCompile Include="..\test\ut_basic_ssl_session.cpp" />
     <ClCompile Include="..\test\ut_io_service_pool.cpp" />
+    <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_header.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_request.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_response.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

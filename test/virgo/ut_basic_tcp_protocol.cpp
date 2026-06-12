@@ -2,45 +2,104 @@
 #include <aquarius/virgo/basic_tcp_protocol.hpp>
 #include <aquarius/virgo/tcp_header.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_virgo_basic_tcp_protocol)
+using namespace aquarius;
 
-using aquarius::flex_buffer;
+BOOST_AUTO_TEST_SUITE(ut_basic_tcp_protocol)
 
-struct SimpleBody
+struct mock_header
 {
-    std::string data;
-
-    void serialize(flex_buffer& buf) const
+    error_code serialize(flex_buffer&)
     {
-        buf.sputn(data.data(), data.size());
+        return error_code{};
     }
 
-    void deserialize(flex_buffer& buf)
+    error_code deserialize(flex_buffer&)
     {
-        auto sb = buf.data();
-        data.assign((const char*)sb.data(), sb.size());
-        buf.consume(sb.size());
+        uuid = 1;
+        return error_code{};
     }
+
+    int uuid;
 };
 
-BOOST_AUTO_TEST_CASE(commit_and_consume_roundtrip)
+struct mock_body
 {
-    aquarius::basic_tcp_protocol<true, aquarius::tcp_header, SimpleBody> proto;
+    error_code serialize(flex_buffer&) { return error_code{}; }
 
-    proto.header().uuid(12345);
-    proto.header().timestamp(67890);
-    proto.body().data = "payload";
+    error_code deserialize(flex_buffer&)
+    {
+        value = 2;
+        return error_code{};
+    }
 
-    flex_buffer buf{};
-    proto.commit(buf);
+    int value;
+};
 
-    aquarius::basic_tcp_protocol<true, aquarius::tcp_header, SimpleBody> copy;
-    auto ec = copy.consume(buf);
+struct mock_failed_header
+{
+    error_code serialize(flex_buffer&)
+    {
+        throw std::runtime_error("failed header serialize");
+    }
+
+    error_code deserialize(flex_buffer&)
+    {
+        throw std::runtime_error("failed header deserialize");
+    }
+
+    int uuid;
+};
+
+struct mock_failed_body
+{
+    error_code serialize(flex_buffer&) { throw; }
+
+    error_code deserialize(flex_buffer&)
+    {
+        throw;
+    }
+
+    int value;
+};
+
+BOOST_AUTO_TEST_CASE(tcp_commit_failed)
+{
+    basic_tcp_protocol<true, "", mock_failed_header, mock_failed_body> proto{};
+
+    flex_buffer buffer{};
+    auto ec = proto.commit(buffer);
+
+    BOOST_TEST(ec == ip::error::commit);
+}
+
+BOOST_AUTO_TEST_CASE(tcp_commit_success)
+{
+    basic_tcp_protocol<true, "", mock_header, mock_body> proto{};
+
+    flex_buffer buffer{};
+    auto ec = proto.commit(buffer);
 
     BOOST_TEST(!ec);
-    BOOST_TEST(copy.header().uuid() == 12345u);
-    BOOST_TEST(copy.header().timestamp() == 67890);
-    BOOST_TEST(copy.body().data == "payload");
+}
+
+BOOST_AUTO_TEST_CASE(tcp_consume_failed)
+{
+    basic_tcp_protocol<true, "", mock_failed_header, mock_failed_body> proto{};
+
+    flex_buffer buffer{};
+    auto ec = proto.consume(buffer);
+
+    BOOST_TEST(ec == ip::error::consume);
+}
+
+BOOST_AUTO_TEST_CASE(tcp_consume_success)
+{
+    basic_tcp_protocol<true, "", mock_header, mock_body> proto{};
+
+    flex_buffer buffer{};
+    auto ec = proto.consume(buffer);
+
+    BOOST_TEST(!ec);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/virgo/tcp_header.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_virgo_tcp_header)
+BOOST_AUTO_TEST_SUITE(ut_tcp_header)
 
 using aquarius::flex_buffer;
 

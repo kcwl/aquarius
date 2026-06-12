@@ -4,7 +4,7 @@
 
 namespace aquarius
 {
-	template <bool Request, typename Header, typename Body>
+	template <bool Request, detail::string_literal Router, typename Header, typename Body>
 	class basic_tcp_protocol : public basic_protocol<Header, Body>
 	{
 	public:
@@ -15,6 +15,8 @@ namespace aquarius
 		using typename base_type::body_type;
 
 		constexpr static auto has_request = Request;
+
+		constexpr static auto this_router = detail::bind_param<Router>::value;
 
 	public:
 		basic_tcp_protocol() = default;
@@ -36,6 +38,8 @@ namespace aquarius
 
 			try
 			{
+				binary_parse{}.to_datas(this_router, buffer);
+
 				this->header().serialize(buffer);
 
 				this->body().serialize(buffer);
@@ -67,8 +71,8 @@ namespace aquarius
 		}
 	};
 
-	template <typename Header, typename Body>
-	class basic_tcp_protocol<false, Header, Body> : public basic_protocol<Header, Body>
+	template <detail::string_literal Router, typename Header, typename Body>
+	class basic_tcp_protocol<false, Router, Header, Body> : public basic_protocol<Header, Body>
 	{
 	public:
 		using base_type = basic_protocol<Header, Body>;
@@ -80,6 +84,8 @@ namespace aquarius
 		using result_t = int32_t;
 
 		constexpr static auto has_request = false;
+
+		constexpr static auto this_router = detail::bind_param<Router>::value;
 
 	public:
 		basic_tcp_protocol()
@@ -131,6 +137,8 @@ namespace aquarius
 
 			try
 			{
+				binary_parse{}.to_datas(this_router, buffer);
+
 				parse_.to_datas<result_t>(this->result(), buffer);
 
 				this->header().serialize(buffer);
