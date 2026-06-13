@@ -403,5 +403,14 @@
     <ClCompile Include="..\test\virgo\ut_error.cpp">
       <Filter>源文件\virgo</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\ut_basic_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_module_router.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\module\ut_schedule.cpp">
+      <Filter>源文件\module</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

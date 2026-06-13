@@ -50,10 +50,10 @@ namespace aquarius
 			auto& io = io_service_pool_.get_io_service();
 			asio::co_spawn(
 				io,
-				[]() -> asio::awaitable<void>
+				[&]() -> asio::awaitable<void>
 				{
 					XLOG_INFO() << "server module router start";
-					co_await module_router::get_mutable_instance().run();
+					co_await module_router::get_mutable_instance().run(io_service_pool_);
 				},
 				asio::detached);
 

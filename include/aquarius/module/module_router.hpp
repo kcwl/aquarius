@@ -15,7 +15,7 @@ namespace aquarius
 {
 	class module_router : public singleton<module_router>
 	{
-		using executor_t = asio::any_io_executor;
+		using module_type = basic_module<>;
 
 	public:
 		module_router()
@@ -29,6 +29,8 @@ namespace aquarius
 		template <typename Module>
 		bool put(int priority = 0)
 		{
+			std::unique_lock lk(mutex_);
+
 			auto module_ptr = std::make_shared<Module>();
 
 			std::string name(detail::struct_name<Module>());
@@ -46,8 +48,10 @@ namespace aquarius
 			return true;
 		}
 
-		auto run() -> asio::awaitable<void>
+		auto run(io_service_pool& pool) -> asio::awaitable<void>
 		{
+			std::shared_lock lk(mutex_);
+
 			for (auto& pr : routers_by_priority_)
 			{
 				for (auto& module_ptr : pr.second)
@@ -57,7 +61,7 @@ namespace aquarius
 						continue;
 					}
 
-					co_await run_one(module_ptr.lock());
+					co_await run_one(pool.get_io_service(), module_ptr.lock());
 				}
 			}
 		}
@@ -72,18 +76,6 @@ namespace aquarius
 			}
 
 			co_return co_await module_ptr->template async_visit<R>(std::forward<Func>(f));
-		}
-
-		template <typename T, typename R, typename Func>
-		auto schedule(Func&& f) -> R
-		{
-			auto module_ptr = get_module<T>();
-			if (!module_ptr)
-			{
-				return R{};
-			}
-
-			return module_ptr->template visit<R>(std::forward<Func>(f));
 		}
 
 		auto timer(std::chrono::milliseconds ms) -> asio::awaitable<void>
@@ -103,7 +95,7 @@ namespace aquarius
 		}
 
 	private:
-		auto run_one(std::shared_ptr<module_base> module_ptr) -> asio::awaitable<bool>
+		auto run_one(asio::io_context& io, std::shared_ptr<module_type> module_ptr) -> asio::awaitable<bool>
 		{
 			if (!module_ptr)
 			{
@@ -116,12 +108,18 @@ namespace aquarius
 				co_return false;
 			}
 
-			co_return co_await module_ptr->run();
+			module_ptr->attach(io.get_executor());
+
+			co_return co_await asio::co_spawn(
+				io, [module_ptr]() -> asio::awaitable<bool> { co_return co_await module_ptr->run(); },
+				asio::use_awaitable);
 		}
 
 		template <typename T>
-		std::shared_ptr<basic_module<T>> get_module()
+		std::shared_ptr<module<T>> get_module()
 		{
+			std::shared_lock lk(mutex_);
+
 			constexpr auto module_name = detail::struct_name<T>();
 
 			auto iter = routers_by_name_.find(std::string(module_name));
@@ -131,7 +129,7 @@ namespace aquarius
 				return nullptr;
 			}
 
-			auto module_ptr = std::dynamic_pointer_cast<basic_module<T>>(iter->second);
+			auto module_ptr = std::dynamic_pointer_cast<module<T>>(iter->second);
 			if (!module_ptr)
 			{
 				XLOG_WARNING() << "[" << module_name << "] task type not match";
@@ -142,8 +140,10 @@ namespace aquarius
 		}
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<module_base>> routers_by_name_;
+		std::shared_mutex mutex_;
 
-		std::map<int, std::vector<std::weak_ptr<module_base>>, std::greater<int>> routers_by_priority_;
+		std::unordered_map<std::string, std::shared_ptr<module_type>> routers_by_name_;
+
+		std::map<int, std::vector<std::weak_ptr<module_type>>, std::greater<int>> routers_by_priority_;
 	};
 } // namespace aquarius

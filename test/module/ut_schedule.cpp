@@ -1,27 +1,51 @@
-#include <boost/test/unit_test.hpp>
-#include <aquarius/module/schedule.hpp>
 #include <aquarius/module/module_router.hpp>
+#include <aquarius/module/schedule.hpp>
+#include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_module_schedule)
+using namespace aquarius;
+
+BOOST_AUTO_TEST_SUITE(ut_schedule)
+
+struct TestModule : public module<TestModule>
+{
+	auto foo() -> asio::awaitable<int>
+	{
+		co_return 5;
+	}
+};
 
 BOOST_AUTO_TEST_CASE(mpc_call_member_traits)
 {
-    struct TestModule : public aquarius::basic_module<TestModule>
-    {
-        int foo() { return 5; }
-    };
+	aquarius::module_router::get_mutable_instance().put<TestModule>(0);
 
-    // register module into router so get_module will find it
-    aquarius::module_router::get_mutable_instance().put<TestModule>(0);
+	using mp = aquarius::member_func_pointer<decltype(&TestModule::foo)>;
+	static_assert(std::is_same_v<mp::return_type, asio::awaitable<int>>);
+	static_assert(std::is_same_v<mp::class_type, TestModule>);
 
-    // call member pointer via helper; ensure compilation and basic behavior
-    // Note: mpc_call returns an awaitable; here we only check that the member_func_pointer
-    // traits compute correct types at compile time by instantiating them.
-    using mp = aquarius::member_func_pointer<decltype(&TestModule::foo)>;
-    static_assert(std::is_same_v<mp::return_type, int>);
-    static_assert(std::is_same_v<mp::class_type, TestModule>);
+	BOOST_TEST(true);
+}
 
-    BOOST_TEST(true);
+BOOST_AUTO_TEST_CASE(mpc_async_call_module)
+{
+	io_service_pool pool(2);
+
+	auto future = asio::co_spawn(
+		pool.get_io_service(),
+		[&]() -> asio::awaitable<int>
+		{
+			co_await aquarius::module_router::get_mutable_instance().run(pool);
+
+			co_return co_await mpc_async_call<&TestModule::foo>();
+		},
+		asio::use_future);
+
+	std::thread t([&] { pool.run(); });
+
+	BOOST_TEST(future.get() == 5);
+
+	pool.stop();
+
+	t.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
