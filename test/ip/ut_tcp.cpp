@@ -1,6 +1,6 @@
 #include "login.virgo.h"
-#include <aquarius.hpp>
 #include <boost/test/unit_test.hpp>
+#include <aquarius.hpp>
 
 BOOST_AUTO_TEST_SUITE(ut_tcp)
 

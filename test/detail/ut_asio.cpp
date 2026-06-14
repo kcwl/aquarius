@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <aquarius/detail/asio.hpp>
 
 BOOST_AUTO_TEST_SUITE(ut_asio)
 
