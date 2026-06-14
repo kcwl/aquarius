@@ -1,4 +1,3 @@
-#define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
@@ -181,9 +180,9 @@ BOOST_AUTO_TEST_SUITE(ut_basic_session)
 
 struct mock_protocol
 {
-	using socket_type = mock_socket;
+	using socket = mock_socket;
 
-	using resolver_type = asio::ip::tcp::resolver;
+	using resolver = asio::ip::tcp::resolver;
 
 	using no_delay = asio::ip::tcp::no_delay;
 
@@ -193,7 +192,7 @@ struct mock_protocol
 BOOST_AUTO_TEST_CASE(ctor)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 	auto executor = socket.get_executor();
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -205,7 +204,7 @@ BOOST_AUTO_TEST_CASE(ctor)
 BOOST_AUTO_TEST_CASE(remote_address)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 	auto executor = socket.get_executor();
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -216,9 +215,9 @@ BOOST_AUTO_TEST_CASE(remote_address)
 
 struct mock_failed_protocol
 {
-	using socket_type = mock_failed_socket;
+	using socket = mock_failed_socket;
 
-	using resolver_type = asio::ip::tcp::resolver;
+	using resolver = asio::ip::tcp::resolver;
 
 	using no_delay = asio::ip::tcp::no_delay;
 
@@ -228,7 +227,7 @@ struct mock_failed_protocol
 BOOST_AUTO_TEST_CASE(async_connect_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -250,7 +249,7 @@ BOOST_AUTO_TEST_CASE(async_connect_failed)
 BOOST_AUTO_TEST_CASE(async_connect_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -271,7 +270,7 @@ BOOST_AUTO_TEST_CASE(async_connect_success)
 BOOST_AUTO_TEST_CASE(async_read_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -294,7 +293,7 @@ BOOST_AUTO_TEST_CASE(async_read_failed)
 BOOST_AUTO_TEST_CASE(async_read_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -316,7 +315,7 @@ BOOST_AUTO_TEST_CASE(async_read_success)
 BOOST_AUTO_TEST_CASE(async_read_untl_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -340,7 +339,7 @@ BOOST_AUTO_TEST_CASE(async_read_untl_failed)
 BOOST_AUTO_TEST_CASE(async_read_untl_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -363,7 +362,7 @@ BOOST_AUTO_TEST_CASE(async_read_untl_success)
 BOOST_AUTO_TEST_CASE(async_send_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -386,7 +385,7 @@ BOOST_AUTO_TEST_CASE(async_send_failed)
 BOOST_AUTO_TEST_CASE(async_send_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -409,7 +408,7 @@ BOOST_AUTO_TEST_CASE(async_send_success)
 BOOST_AUTO_TEST_CASE(shutdown_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -419,7 +418,7 @@ BOOST_AUTO_TEST_CASE(shutdown_failed)
 BOOST_AUTO_TEST_CASE(shutdown_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -429,7 +428,7 @@ BOOST_AUTO_TEST_CASE(shutdown_success)
 BOOST_AUTO_TEST_CASE(keep_alive_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -439,7 +438,7 @@ BOOST_AUTO_TEST_CASE(keep_alive_failed)
 BOOST_AUTO_TEST_CASE(keep_alive_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 
@@ -449,7 +448,7 @@ BOOST_AUTO_TEST_CASE(keep_alive_success)
 BOOST_AUTO_TEST_CASE(set_nodelay_failed)
 {
 	asio::io_context io{};
-	auto socket = mock_failed_protocol::socket_type(io);
+	auto socket = mock_failed_protocol::socket(io);
 
 	basic_session<mock_failed_protocol> session(std::move(socket), 10ms);
 
@@ -459,7 +458,7 @@ BOOST_AUTO_TEST_CASE(set_nodelay_failed)
 BOOST_AUTO_TEST_CASE(set_nodelay_success)
 {
 	asio::io_context io{};
-	auto socket = mock_protocol::socket_type(io);
+	auto socket = mock_protocol::socket(io);
 
 	basic_session<mock_protocol> session(std::move(socket), 10ms);
 

@@ -4,7 +4,7 @@
 #include <aquarius/detail/make_endpoint.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
-#include <aquarius/ip/session_store.hpp>
+//#include <aquarius/ip/session_store.hpp>
 #include <aquarius/logger.hpp>
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/schedule.hpp>
@@ -13,15 +13,15 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
-	template <typename Session>
+	template <typename Protocol>
 	class basic_server
 	{
 	public:
-		using session_type = Session;
+		using protocol_type = Protocol;
 
-		using acceptor_type = typename session_type::acceptor_type;
+		using acceptor_type = typename protocol_type::acceptor;
 
-		using callback_func = std::function<asio::awaitable<void>(std::shared_ptr<session_type>)>;
+		using callback_func = std::function<asio::awaitable<void>(std::shared_ptr<protocol_type>)>;
 
 	public:
 		explicit basic_server(int32_t port, int32_t io_service_pool_size, const std::string& name = {},
@@ -75,6 +75,8 @@ namespace aquarius
 		{
 			acceptor_.close();
 
+			global_timer_.cancel();
+
 			io_service_pool_.stop();
 		}
 
@@ -83,13 +85,13 @@ namespace aquarius
 			accept_func_ = func;
 		}
 
-		auto accept_func(std::shared_ptr<session_type> session) -> asio::awaitable<void>
+		auto accept_func(std::shared_ptr<protocol_type> proto) -> asio::awaitable<void>
 		{
-			if (!accept_func_ || !session)
+			if (!accept_func_ || !proto)
 				co_return;
 
 			XLOG_INFO() << "invoke accept function";
-			co_await accept_func_(session);
+			co_await accept_func_(proto);
 		}
 
 		void set_close_func(const callback_func& func)
@@ -97,13 +99,13 @@ namespace aquarius
 			close_func_ = func;
 		}
 
-		auto close_func(std::shared_ptr<session_type> session) -> asio::awaitable<void>
+		auto close_func(std::shared_ptr<protocol_type> proto) -> asio::awaitable<void>
 		{
-			if (!close_func_ || !session)
+			if (!close_func_ || !proto)
 				co_return;
 
 			XLOG_INFO() << "invoke close function";
-			co_await close_func_(session);
+			co_await close_func_(proto);
 		}
 
 	private:
@@ -119,35 +121,35 @@ namespace aquarius
 				if (ec)
 					break;
 
-				auto session_ptr = std::make_shared<session_type>(std::move(sock), global_time_dura_);
+				auto proto_ptr = std::make_shared<protocol_type>(std::move(sock), global_time_dura_);
 
-				session_ptr->keep_alive(keep_alive_);
+				proto_ptr->keepalive(keep_alive_);
 
-				session_ptr->nodelay(nodelay_);
+				proto_ptr->nodelay(nodelay_);
 
-				XLOG_INFO() << "create session" << session_ptr->uuid() << "] success";
+				XLOG_INFO() << "create protocol" << proto_ptr->uuid() << "] success";
 
-				mpc_put_session(
-					session_ptr->uuid(),
-					[session_ptr](flex_buffer& buffer, const std::string&, uint32_t) -> asio::awaitable<void>
-					{ co_await session_ptr->async_send_with_header(buffer); });
+				//mpc_put_session(
+				//	session_ptr->uuid(),
+				//	[session_ptr](flex_buffer& buffer, const std::string&, uint32_t) -> asio::awaitable<void>
+				//	{ co_await session_ptr->async_send_with_header(buffer); });
 
 				asio::co_spawn(
 					acceptor_.get_executor(),
-					[session_ptr, this] -> asio::awaitable<void>
+					[proto_ptr, this] -> asio::awaitable<void>
 					{
-						co_await accept_func(session_ptr);
+						co_await accept_func(proto_ptr);
 
-						auto ec = co_await session_ptr->accept();
+						auto ec = co_await proto_ptr->accept();
 
 						if (ec)
 						{
-							XLOG_ERROR() << "session[" << session_ptr->uuid() << "] is close";
+							XLOG_ERROR() << "session[" << proto_ptr->uuid() << "] is close";
 						}
 
-						close_func(session_ptr);
+						close_func(proto_ptr);
 
-						session_ptr->close();
+						proto_ptr->shutdown();
 					},
 					asio::detached);
 			}

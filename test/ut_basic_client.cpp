@@ -16,12 +16,11 @@ public:
 public:
 	bool check_ctor(asio::io_context& context, std::chrono::milliseconds timeout)
 	{
-		return context.get_executor() == this->executor_ && timeout == this->timeout_;
+		return context.get_executor() == this->get_executor() && timeout == this->timeout_;
 	}
 };
 
 using namespace std::chrono_literals;
-
 
 struct mock_session
 {
@@ -58,7 +57,10 @@ public:
 		co_return error_code{};
 	}
 
-	void close() {}
+	bool shutdown()
+	{
+		return true;
+	}
 };
 
 BOOST_AUTO_TEST_CASE(client_async_connect_failed)
@@ -103,7 +105,8 @@ public:
 		co_return boost::asio::error::bad_descriptor;
 	}
 
-	void close() {}
+	void close()
+	{}
 };
 
 BOOST_AUTO_TEST_CASE(client_async_connect_success_and_query_failed)
@@ -166,7 +169,10 @@ public:
 		co_return;
 	}
 
-	void close() {}
+	bool shutdown()
+	{
+		return true;
+	}
 };
 
 class mock_send_request_success_session
@@ -183,7 +189,7 @@ public:
 	auto send_request(std::shared_ptr<Request>, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 	{
 		flex_buffer buffer{};
-		f(buffer,"");
+		f(buffer, "");
 		ec = error_code{};
 		co_return 0;
 	}
@@ -193,7 +199,10 @@ public:
 		co_return;
 	}
 
-	void close() {}
+	bool shutdown()
+	{
+		return true;
+	}
 };
 
 struct mock_request
@@ -279,7 +288,10 @@ public:
 		co_return;
 	}
 
-	void close() {}
+	bool shutdown()
+	{
+		return true;
+	}
 };
 
 BOOST_AUTO_TEST_CASE(async_call_buffer_falied)
@@ -294,7 +306,13 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_falied)
 		[cli]() -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await cli->async_call_buffer(buffer, [] (flex_buffer& buffer, const std::string&)->asio::awaitable<error_code> { BOOST_TEST(false); co_return error_code{}; });
+			auto ec = co_await cli->async_call_buffer(
+				buffer,
+				[](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
+				{
+					BOOST_TEST(false);
+					co_return error_code{};
+				});
 
 			BOOST_TEST(ec);
 		},
@@ -332,7 +350,10 @@ public:
 		co_return;
 	}
 
-	void close() {}
+	bool shutdown()
+	{
+		return true;
+	}
 };
 
 BOOST_AUTO_TEST_CASE(async_call_buffer_success)
@@ -347,7 +368,13 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_success)
 		[cli]() -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await cli->async_call_buffer(buffer, [] (flex_buffer& buffer, const std::string&)->asio::awaitable<error_code> { BOOST_TEST(true); co_return error_code{}; });
+			auto ec = co_await cli->async_call_buffer(
+				buffer,
+				[](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
+				{
+					BOOST_TEST(true);
+					co_return error_code{};
+				});
 
 			BOOST_TEST(!ec);
 		},

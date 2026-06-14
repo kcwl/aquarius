@@ -3,6 +3,7 @@ file(GLOB_RECURSE UT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut_*.cpp")
 
 # Path to test runner source that provides Boost.Test main
 set(UNITTEST_RUNNER ${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp)
+set(UNIITEST_TEST_PROTO ${CMAKE_CURRENT_SOURCE_DIR}/ip/login.virgo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/ip/ctx_login_test.cpp)
 if(NOT EXISTS ${UNITTEST_RUNNER})
 	message(FATAL_ERROR "Missing test runner: ${UNITTEST_RUNNER}")
 endif()
@@ -29,7 +30,11 @@ foreach(src IN LISTS UT_SOURCES)
 
 	set(target_name ${tgt_base})
 
-	add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
+	if(target_name STREQUAL "ut_tcp")
+		add_executable(${target_name} ${src} ${UNITTEST_RUNNER} ${UNIITEST_TEST_PROTO})
+	else()
+		add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
+	endif()
 	target_include_directories(${target_name} PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
 	# target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
 	target_link_libraries(${target_name} PRIVATE boost)

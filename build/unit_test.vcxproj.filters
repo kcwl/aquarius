@@ -40,26 +40,11 @@
     <Filter Include="源文件\detail">
       <UniqueIdentifier>{d87f2c58-6ae3-409a-b5a2-1f86af145f38}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\serialize">
-      <UniqueIdentifier>{5b4b50de-f482-4492-a43d-fdea78c34677}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\virgo">
       <UniqueIdentifier>{b2b59b4b-0cfa-4d83-827c-5ab8dcdf0540}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\ip">
-      <UniqueIdentifier>{5819bfb3-9a6f-4185-bd33-98dc34d2f5f4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\module">
       <UniqueIdentifier>{df698ff2-4b2b-45fc-a49b-a81c63f34dca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\tbl">
-      <UniqueIdentifier>{d18ba868-bf48-44c1-b004-9cb7fd66cc8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\ip\http">
-      <UniqueIdentifier>{9370caa6-2f27-4317-824d-4a3ec778ce0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\ip\adaptor">
-      <UniqueIdentifier>{75cfd86e-3c49-43bd-b8fe-75ced705eefb}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\aquarius\ip">
       <UniqueIdentifier>{e4906138-bc73-45ba-832c-0bf3f5e8ad29}</UniqueIdentifier>
@@ -69,6 +54,9 @@
     </Filter>
     <Filter Include="include\aquarius\ip\http">
       <UniqueIdentifier>{6dc62c01-100a-456d-95ba-b8d937e6ff21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ip">
+      <UniqueIdentifier>{951ee2fd-e590-4b79-965b-55af2e5d05d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +291,12 @@
     <ClInclude Include="..\include\aquarius\basic_ssl_session.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\handler_error.hpp">
+      <Filter>include\aquarius\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\ip\login.virgo.h">
+      <Filter>源文件\ip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt">
@@ -311,9 +305,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\ut_basic_server.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\unittest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\test\ut_basic_client.cpp">
@@ -412,5 +403,22 @@
     <ClCompile Include="..\test\module\ut_schedule.cpp">
       <Filter>源文件\module</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\ip\ut_tcp.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\ctx_login_test.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\ip\login.virgo.cpp">
+      <Filter>源文件\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\unittest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\test\ip\login.virgo">
+      <Filter>源文件\ip</Filter>
+    </None>
   </ItemGroup>
 </Project>

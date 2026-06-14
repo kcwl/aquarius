@@ -42,7 +42,6 @@ namespace aquarius
 			return session_id_;
 		}
 
-	protected:
 		virtual auto handle() -> asio::awaitable<error_code> = 0;
 
 	protected:
@@ -69,13 +68,9 @@ namespace aquarius
 		{}
 
 	public:
-		virtual auto visit(std::size_t session_id, flex_buffer& buffer) -> asio::awaitable<error_code>
+		virtual error_code visit(flex_buffer& buffer)
 		{
-			this->session_id_ = session_id;
-
-			request()->consume(buffer);
-
-			co_return co_await this->handle();
+			return request()->consume(buffer);
 		}
 
 		std::shared_ptr<Request> request() const

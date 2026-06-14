@@ -1,6 +1,6 @@
-#define BOOST_TEST_NO_MAIN
 #include <aquarius/basic_server.hpp>
 #include <boost/test/unit_test.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
 
 using namespace aquarius;
 
@@ -32,7 +32,7 @@ struct mock_acceptor
 
 struct mock_session
 {
-	using acceptor_type = mock_acceptor;
+	using acceptor = mock_acceptor;
 
 	template <typename Endpoint>
 	mock_session(asio::ip::tcp::socket, Endpoint&&)
@@ -43,10 +43,12 @@ struct mock_session
 		return 0;
 	}
 
-	void close()
-	{}
+	bool shutdown()
+	{
+		return true;
+	}
 
-	void keep_alive(bool)
+	void keepalive(bool)
 	{}
 
 	void nodelay(bool)
@@ -134,17 +136,19 @@ struct mock_failed_session
 	mock_failed_session(asio::ip::tcp::socket, Endpoint&&)
 	{}
 
-	using acceptor_type = mock_acceptor;
+	using acceptor = mock_acceptor;
 
 	std::size_t uuid() const
 	{
 		return 0;
 	}
 
-	void close()
-	{}
+	bool shutdown()
+	{
+		return true;
+	}
 
-	void keep_alive(bool)
+	void keepalive(bool)
 	{}
 
 	void nodelay(bool)
@@ -188,7 +192,7 @@ struct mock_success_acceptor
 
 struct mock_accept_failed_session
 {
-	using acceptor_type = mock_acceptor;
+	using acceptor = mock_acceptor;
 
 	template <typename Endpoint>
 	mock_accept_failed_session(asio::ip::tcp::socket, Endpoint&&)
@@ -199,14 +203,16 @@ struct mock_accept_failed_session
 		co_return boost::asio::error::bad_descriptor;
 	}
 
-	void keep_alive(bool)
+	void keepalive(bool)
 	{}
 
 	void nodelay(bool)
 	{}
 
-	void close()
-	{}
+	bool shutdown()
+	{
+		return true;
+	}
 
 	std::size_t uuid() const
 	{

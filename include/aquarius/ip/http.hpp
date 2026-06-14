@@ -5,8 +5,6 @@
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/adaptor/raw_adaptor.hpp>
-#include <aquarius/ip/adaptor/ssl_adaptor.hpp>
 #include <aquarius/ip/context_reg.hpp>
 #include <aquarius/ip/http/http_options_handler.hpp>
 #include <aquarius/virgo/http_method.hpp>
@@ -40,12 +38,10 @@ namespace aquarius
 
 		constexpr static std::size_t header_part = 3;
 
-		using session = basic_session<http, raw_adaptor>;
-		using client = basic_client<session>;
-		using server = basic_server<session>;
+		using session = basic_session<http>;
 
-		using ssl_client = basic_client<basic_session<http, ssl_client_adaptor>>;
-		using ssl_server = basic_client<basic_session<http, ssl_server_adaptor>>;
+		using client = basic_client<http>;
+		using server = basic_server<http>;
 
 		using session_callback = std::function<asio::awaitable<error_code>(asio::const_buffer)>;
 

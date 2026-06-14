@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(get_name)
 {
     constexpr auto name = member_pointer_name_v<test_mock, &test_mock::value>;
 
-    static_assert(name == "value");
+    BOOST_TEST(name == "value");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

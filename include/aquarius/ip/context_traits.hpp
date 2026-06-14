@@ -10,19 +10,19 @@ namespace aquarius
 	template <typename Message, typename Handler>
 	struct context_traits;
 
-	template <auto Router, typename Body, typename Handler>
+	template <detail::string_literal Router, typename Body, typename Handler>
 	struct context_traits<tcp_request<Router, Body>, Handler>
 	{
 		using type = tcp::context<Handler>;
 	};
 
-	template <auto Router, typename Body, typename Handler>
+	template <detail::string_literal Router, typename Body, typename Handler>
 	struct context_traits<tcp_response<Router, Body>, Handler>
 	{
 		using type = tcp::context<Handler>;
 	};
 
-	template <auto Router, typename Body, typename Handler>
+	template <detail::string_literal Router, typename Body, typename Handler>
 	struct context_traits<http_request<Router, Body>, Handler>
 	{
 		using type = http::context<Handler>;

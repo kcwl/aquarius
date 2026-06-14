@@ -1,4 +1,3 @@
-#define BOOST_TEST_NO_MAIN
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/error_code.hpp>

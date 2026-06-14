@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/detail/string_literal.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_detail_string_literal)
+BOOST_AUTO_TEST_SUITE(ut_string_literal)
 
 using namespace std::string_view_literals;
 
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(string_literal_bind_param)
 
     constexpr auto v = aquarius::detail::bind_param<test_lit>::value;
 
-    static_assert(v == "ok"sv);
+    BOOST_TEST(v == "ok"sv);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

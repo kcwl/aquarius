@@ -1,4 +1,3 @@
-#define BOOST_TEST_NO_MAIN
 #include <aquarius/basic_protocol.hpp>
 #include <boost/test/unit_test.hpp>
 

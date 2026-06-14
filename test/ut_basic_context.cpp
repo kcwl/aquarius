@@ -7,8 +7,8 @@ BOOST_AUTO_TEST_SUITE(ut_basic_context)
 
 struct mock_protocol
 {
-	template <typename Handler>
-	auto handle_request(std::size_t, flex_buffer&, std::size_t) -> asio::awaitable<error_code>
+	template <typename Handler, typename Func>
+	auto handle_request(std::shared_ptr<Handler> handler_ptr, Func&& func) -> asio::awaitable<error_code>
 	{
 		co_return boost::asio::error::bad_descriptor;
 	}
@@ -17,7 +17,7 @@ struct mock_protocol
 BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 {
 	basic_protocol_context<mock_protocol, std::size_t> ctx(
-		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t, flex_buffer&,
+		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*,
 		   std::size_t) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 		[ctx]() mutable -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await ctx.complete(nullptr, 0, buffer, 0);
+			auto ec = co_await ctx.complete(nullptr, 0);
 
 			BOOST_TEST(!ec);
 		},
@@ -44,8 +44,7 @@ BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 BOOST_AUTO_TEST_CASE(basic_protocol_router)
 {
 	basic_protocol_context<mock_protocol, std::size_t> ctx(
-		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t, flex_buffer&,
-		   std::size_t) -> asio::awaitable<error_code>
+		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
 			co_return error_code{};
@@ -57,7 +56,12 @@ BOOST_AUTO_TEST_CASE(basic_protocol_router)
 }
 
 struct mock_handler
-{};
+{
+	error_code visit(flex_buffer&)
+	{
+		return error_code{};
+	}
+};
 
 BOOST_AUTO_TEST_CASE(basic_context_ctor)
 {
@@ -69,7 +73,7 @@ BOOST_AUTO_TEST_CASE(basic_context_ctor)
 		[ctx]() mutable -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await ctx.complete(nullptr, 0, buffer, 0);
+			auto ec = co_await ctx.complete(nullptr, 0);
 
 			BOOST_TEST(ec == boost::asio::error::bad_descriptor);
 		},

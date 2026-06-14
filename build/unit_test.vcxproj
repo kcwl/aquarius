@@ -167,6 +167,7 @@
     <ClInclude Include="..\include\aquarius\ip\context_reg.hpp" />
     <ClInclude Include="..\include\aquarius\ip\context_traits.hpp" />
     <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\handler_error.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
+    <ClInclude Include="..\test\ip\login.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />
@@ -240,6 +242,9 @@
     <ClCompile Include="..\test\detail\ut_string_literal.cpp" />
     <ClCompile Include="..\test\detail\ut_struct_name.cpp" />
     <ClCompile Include="..\test\detail\ut_uuid_generator.cpp" />
+    <ClCompile Include="..\test\ip\ctx_login_test.cpp" />
+    <ClCompile Include="..\test\ip\login.virgo.cpp" />
+    <ClCompile Include="..\test\ip\ut_tcp.cpp" />
     <ClCompile Include="..\test\module\ut_module_router.cpp" />
     <ClCompile Include="..\test\module\ut_schedule.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
@@ -263,6 +268,9 @@
     <ClCompile Include="..\test\virgo\ut_tcp_header.cpp" />
     <ClCompile Include="..\test\virgo\ut_tcp_request.cpp" />
     <ClCompile Include="..\test\virgo\ut_tcp_response.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\test\ip\login.virgo" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

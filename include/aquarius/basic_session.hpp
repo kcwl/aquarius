@@ -12,9 +12,9 @@ namespace aquarius
 	class basic_session
 	{
 	public:
-		using socket_type = typename Protocol::socket_type;
+		using socket_type = typename Protocol::socket;
 
-		using resolver_type = typename Protocol::resolver_type;
+		using resolver = typename Protocol::resolver;
 
 		using duration = std::chrono::system_clock::duration;
 
@@ -45,7 +45,7 @@ namespace aquarius
 
 		auto async_connect(const std::string& host, const std::string& port) -> asio::awaitable<error_code>
 		{
-			resolver_type resolve(this->get_executor());
+			resolver resolve(this->get_executor());
 
 			error_code ec{};
 
@@ -77,6 +77,11 @@ namespace aquarius
 			auto mutable_buffer = buffer.prepare(length);
 
 			co_await asio::async_read(socket_, mutable_buffer, asio::redirect_error(asio::use_awaitable, ec));
+
+			if (!ec)
+			{
+				buffer.commit(length);
+			}
 
 			co_return ec;
 		}
