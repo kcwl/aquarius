@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/resource/mysql_config.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_resource_mysql_config)
+BOOST_AUTO_TEST_SUITE(ut_mysql_config)
 
 BOOST_AUTO_TEST_CASE(create_and_modify)
 {

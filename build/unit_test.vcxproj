@@ -247,6 +247,9 @@
     <ClCompile Include="..\test\ip\ut_tcp.cpp" />
     <ClCompile Include="..\test\module\ut_module_router.cpp" />
     <ClCompile Include="..\test\module\ut_schedule.cpp" />
+    <ClCompile Include="..\test\resource\ut_http_config.cpp" />
+    <ClCompile Include="..\test\resource\ut_mysql_config.cpp" />
+    <ClCompile Include="..\test\resource\ut_ssl_config.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
     <ClCompile Include="..\test\ut_basic_context.cpp" />

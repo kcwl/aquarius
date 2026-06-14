@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <aquarius/resource/http_config.hpp>
 
-BOOST_AUTO_TEST_SUITE(ut_resource_http_config)
+BOOST_AUTO_TEST_SUITE(ut_http_config)
 
 BOOST_AUTO_TEST_CASE(check_origin_method_headers)
 {
@@ -20,6 +20,20 @@ BOOST_AUTO_TEST_CASE(check_origin_method_headers)
 
     BOOST_TEST(cfg.check_headers("X-Test,Content-Type"));
     BOOST_TEST(!cfg.check_headers("X-Other"));
+}
+
+BOOST_AUTO_TEST_CASE(check_method_empty)
+{
+    auto& cfg = aquarius::create_http();
+
+    BOOST_TEST(!cfg.check_method(""));
+}
+
+BOOST_AUTO_TEST_CASE(check_headers_empty)
+{
+    auto& cfg = aquarius::create_http();
+
+    BOOST_TEST(!cfg.check_headers(""));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

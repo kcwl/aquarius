@@ -58,6 +58,9 @@
     <Filter Include="源文件\ip">
       <UniqueIdentifier>{951ee2fd-e590-4b79-965b-55af2e5d05d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\resource">
+      <UniqueIdentifier>{b3c8f5a4-b133-4012-9a37-283850367116}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -414,6 +417,15 @@
     </ClCompile>
     <ClCompile Include="..\test\unittest.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\resource\ut_http_config.cpp">
+      <Filter>源文件\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\resource\ut_mysql_config.cpp">
+      <Filter>源文件\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\resource\ut_ssl_config.cpp">
+      <Filter>源文件\resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
