@@ -16,12 +16,12 @@ namespace aquarius
 #define AQUARIUS_MODULE(m)                                                                                             \
 	class m;                                                                                                           \
 	[[maybe_unused]] inline static aquarius::auto_module_register<m> __auto_register_##m;                              \
-	class m : public basic_module<m>
+	class m : public aquarius::module<m>
 
 #define AQUARIUS_MODULE_PRI(m, p)                                                                                      \
 	class m;                                                                                                           \
 	[[maybe_unused]] inline static aquarius::auto_module_register<m> __auto_register_##m(p);                           \
-	class m : public basic_module<m>
+	class m : public aquarius::module<m>
 
 
 #define AQUARIUS_MODULE_TOP(m) AQUARIUS_MODULE_PRI(m, std::numeric_limits<int>::max())

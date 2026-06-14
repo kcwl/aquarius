@@ -31,7 +31,7 @@ namespace aquarius
 
 			virtual auto run() -> asio::awaitable<bool> override
 			{
-				client_ptr_ = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
+				client_ptr_ = std::make_shared<tcp::client>(this->executor_, 30ms);
 
 				co_return (!co_await client_ptr_->async_connect(host_, static_cast<uint16_t>(port_)));
 			}

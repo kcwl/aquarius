@@ -11,7 +11,7 @@ namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	template <typename Protocol>
+	template <typename Protocol, typename Executor = asio::any_io_executor>
 	class basic_client : public std::enable_shared_from_this<basic_client<Protocol>>
 	{
 		using protocol_type = Protocol;
@@ -22,9 +22,15 @@ namespace aquarius
 
 		using callback_t = std::function<void(std::shared_ptr<protocol_type>)>;
 
+		using executor_type = Executor;
+
 	public:
 		basic_client(asio::io_context& context, std::chrono::milliseconds timeout)
-			: io_context_(context)
+			: basic_client(context.get_executor(), timeout)
+		{}
+
+		basic_client(const executor_type& executor, std::chrono::milliseconds timeout)
+			: executor_(executor)
 			, proto_ptr_(nullptr)
 			, close_func_()
 			, accept_func_()
@@ -36,7 +42,7 @@ namespace aquarius
 	public:
 		auto get_executor()
 		{
-			return io_context_.get_executor();
+			return executor_;
 		}
 		auto async_connect(const std::string& host, uint16_t port) -> asio::awaitable<error_code>
 		{
@@ -192,7 +198,7 @@ namespace aquarius
 		}
 
 	protected:
-		asio::io_context& io_context_;
+		executor_type executor_;
 
 		std::shared_ptr<protocol_type> proto_ptr_;
 
