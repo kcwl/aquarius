@@ -258,6 +258,15 @@
     <ClCompile Include="..\test\serialize\ut_kv.cpp" />
     <ClCompile Include="..\test\serialize\ut_scalar_type.cpp" />
     <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp" />
+    <ClCompile Include="..\test\tbl\ut_add_string.cpp" />
+    <ClCompile Include="..\test\tbl\ut_enter_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_grep_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_insert_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp" />
+    <ClCompile Include="..\test\tbl\ut_mysql_type.cpp" />
+    <ClCompile Include="..\test\tbl\ut_remove_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_select_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_update_view.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
     <ClCompile Include="..\test\ut_basic_context.cpp" />

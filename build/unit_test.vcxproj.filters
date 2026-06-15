@@ -64,6 +64,9 @@
     <Filter Include="源文件\serialize">
       <UniqueIdentifier>{f030e66c-57e6-4cd4-bf19-b03ce9b47fc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\tbl">
+      <UniqueIdentifier>{464ed375-1bac-4d73-9713-4812d95bbc11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -453,6 +456,33 @@
     </ClCompile>
     <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp">
       <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_add_string.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_enter_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_grep_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_insert_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_mysql_type.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_remove_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_select_view.cpp">
+      <Filter>源文件\tbl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tbl\ut_update_view.cpp">
+      <Filter>源文件\tbl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
