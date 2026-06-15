@@ -28,24 +28,12 @@ namespace aquarius
 			return name_;
 		}
 
-		virtual auto visit(std::size_t session_id, flex_buffer& buffer) -> asio::awaitable<error_code>
+		virtual error_code visit(flex_buffer& buffer)
 		{
-			session_id_ = session_id;
-
-			response().consume(buffer);
-
-			co_return co_await this->handle();
-		}
-
-		std::size_t session() const
-		{
-			return session_id_;
+			return response().consume(buffer);
 		}
 
 		virtual auto handle() -> asio::awaitable<error_code> = 0;
-
-	protected:
-		std::size_t session_id_;
 
 	private:
 		std::string name_;

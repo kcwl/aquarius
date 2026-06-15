@@ -12,7 +12,9 @@ namespace aquarius
 		public:
 			using base_type = basic_protocol_context<Protocol, Args...>;
 
-			using transfer_func_t = std::function<asio::awaitable<error_code>(std::size_t, std::array<asio::const_buffer, 2>,uint32_t,tcp::session_callback)>;
+			using session_callback = typename Protocol::session_callback;
+
+			using transfer_func_t = std::function<asio::awaitable<error_code>(flex_buffer&, const session_callback&)>;
 
 		public:
 			basic_transfer_context(Func&& func)
@@ -23,8 +25,7 @@ namespace aquarius
 			virtual ~basic_transfer_context() = default;
 
 		public:
-			static auto do_complete(base_type* ctx, Protocol* proto, std::size_t session_id, flex_buffer& buffer, Args&&... args)
-				-> asio::awaitable<error_code>
+			static auto do_complete(base_type* ctx, Protocol* proto, Args&&... args) -> asio::awaitable<error_code>
 			{
 				auto context = static_cast<basic_transfer_context*>(ctx);
 
@@ -33,19 +34,20 @@ namespace aquarius
 					co_return gate_op::not_exist_in_pool;
 				}
 
-				flex_buffer router_buffer{};
-				binary_parse{}.to_datas(context->router(), router_buffer);
+				co_return co_await context->func_(context->buffer_, std::forward<Args>(args)...);
+			}
 
-				std::array<asio::const_buffer, 2> arrs{
-					router_buffer.data(),
-					buffer.data()
-				};
+			virtual error_code visit(flex_buffer& buffer) override
+			{
+				buffer_.sputn((char*)buffer.data().data(), buffer.size());
 
-				co_return co_await context->func_(session_id, arrs, std::forward<Args>(args)...);
+				return error_code{};
 			}
 
 		private:
 			transfer_func_t func_;
+
+			flex_buffer buffer_;
 		};
 
 		template <typename Func, typename Protocol, typename... Args>

@@ -50,22 +50,18 @@ namespace aquarius
 
 			auto resp = co_await this->invoke<shake_response>(host_and_port, request);
 
-			auto f = [host_and_port, this]<typename Func>(std::size_t session_id,
-														  std::array<asio::const_buffer, 2> buffers, std::size_t src,
+			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer,
 														  Func&& f) -> asio::awaitable<error_code>
 			{
-				auto ec =
-					co_await this->invoke(host_and_port, buffers,
-										  [host_and_port, session_id,
-										   src](flex_buffer& buf, const std::string& router) -> asio::awaitable<void>
-										  { co_await mpc_invoke_session(session_id, buf, router, src); });
+				auto ec = co_await this->invoke(host_and_port, buffer,
+												[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<void>
+												{ co_await func(buf); });
 
 				co_return ec;
 			};
 
 			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(f), tcp, uint32_t, tcp::session_callback>>(
-					std::move(f));
+				std::make_shared<basic_transfer_context<decltype(ctx_func), tcp, tcp::session_callback>>(std::move(ctx_func));
 
 			for (auto& topic : resp.body().topics())
 			{

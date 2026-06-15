@@ -36,7 +36,7 @@ namespace aquarius
 				co_return co_await ptr->template async_call<Response>(request);
 			}
 
-			template<typename Func, typename ConstBufferSequence>
+			template <typename Func, typename ConstBufferSequence>
 			auto invoke(uint64_t host_and_port, ConstBufferSequence&& req_buffer, Func&& f)
 				-> asio::awaitable<error_code>
 			{
@@ -51,7 +51,8 @@ namespace aquarius
 
 				auto ptr = round_.invoke(iter->second);
 
-				co_return co_await ptr->async_call_buffer(std::forward<ConstBufferSequence>(req_buffer), std::forward<Func>(f));
+				co_return co_await ptr->async_call_buffer(std::forward<ConstBufferSequence>(req_buffer),
+														  std::forward<Func>(f));
 			}
 
 			auto shake(uint64_t host_and_port) -> asio::awaitable<void>;
