@@ -46,4 +46,17 @@ BOOST_AUTO_TEST_CASE(integer_and_string_roundtrip)
     }
 }
 
+BOOST_AUTO_TEST_CASE(empty_throw)
+{
+    aquarius::flex_buffer buffer{};
+
+    aquarius::binary_parse bp;
+
+    BOOST_REQUIRE_THROW(bp.from_datas<uint32_t>(buffer), std::out_of_range);
+
+    buffer.sputc(0x80);
+
+    BOOST_REQUIRE_THROW(bp.from_datas<uint32_t>(buffer), std::out_of_range);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

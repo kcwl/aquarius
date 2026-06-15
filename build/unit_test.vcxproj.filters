@@ -61,6 +61,9 @@
     <Filter Include="源文件\resource">
       <UniqueIdentifier>{b3c8f5a4-b133-4012-9a37-283850367116}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\serialize">
+      <UniqueIdentifier>{f030e66c-57e6-4cd4-bf19-b03ce9b47fc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\aquarius.hpp">
@@ -426,6 +429,30 @@
     </ClCompile>
     <ClCompile Include="..\test\resource\ut_ssl_config.cpp">
       <Filter>源文件\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_binary.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_cookie.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_json.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_kv.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_scalar_type.cpp">
+      <Filter>源文件\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp">
+      <Filter>源文件\serialize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

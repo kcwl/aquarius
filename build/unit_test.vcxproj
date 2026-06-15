@@ -250,6 +250,14 @@
     <ClCompile Include="..\test\resource\ut_http_config.cpp" />
     <ClCompile Include="..\test\resource\ut_mysql_config.cpp" />
     <ClCompile Include="..\test\resource\ut_ssl_config.cpp" />
+    <ClCompile Include="..\test\serialize\ut_binary.cpp" />
+    <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp" />
+    <ClCompile Include="..\test\serialize\ut_cookie.cpp" />
+    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp" />
+    <ClCompile Include="..\test\serialize\ut_json.cpp" />
+    <ClCompile Include="..\test\serialize\ut_kv.cpp" />
+    <ClCompile Include="..\test\serialize\ut_scalar_type.cpp" />
+    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp" />
     <ClCompile Include="..\test\unittest.cpp" />
     <ClCompile Include="..\test\ut_basic_client.cpp" />
     <ClCompile Include="..\test\ut_basic_context.cpp" />

@@ -178,9 +178,6 @@ namespace aquarius
 
 			auto size = from_datas<std::size_t>(buff);
 
-			if (size == 0)
-				return value;
-
 			value.resize(size);
 
 			for (std::size_t i = 0; i < size; ++i)
@@ -197,9 +194,6 @@ namespace aquarius
 			T value{};
 
 			auto size = from_datas<std::size_t>(buff);
-
-			if (size == 0)
-				return value;
 
 			for (std::size_t i = 0; i < size; ++i)
 			{
@@ -221,12 +215,7 @@ namespace aquarius
 			std::string value{};
 			value.resize(size);
 
-			std::size_t sz = buff.sgetn(value.data(), value.size());
-
-			if (sz != size)
-			{
-				throw std::out_of_range("buffer is not enough space");
-			}
+			buff.sgetn(value.data(), value.size());
 
 			return value;
 		}

@@ -23,4 +23,15 @@ BOOST_AUTO_TEST_CASE(json_value_from_object_and_basic_parse)
     BOOST_TEST(v.is_string());
 }
 
+BOOST_AUTO_TEST_CASE(check_to_array_failed)
+{
+    aquarius::json::value v{};
+    auto& obj = v.emplace_object();
+    obj.emplace("hello", "world");
+
+    auto vec = aquarius::json_value_to_array(v);
+
+    BOOST_TEST(vec.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
