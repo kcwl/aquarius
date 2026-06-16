@@ -50,11 +50,11 @@ namespace aquarius
 
 			auto resp = co_await this->invoke<shake_response>(host_and_port, request);
 
-			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer,
+			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer, const std::string& router,
 																 Func&& f) -> asio::awaitable<error_code>
 			{
 				auto ec = co_await this->invoke(
-					host_and_port, buffer,
+					host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<void>
 					{ co_await func(buf); });
 

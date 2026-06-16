@@ -37,7 +37,7 @@ namespace aquarius
 			}
 
 			template <typename Func, typename ConstBufferSequence>
-			auto invoke(uint64_t host_and_port, ConstBufferSequence&& req_buffer, Func&& f)
+			auto invoke(uint64_t host_and_port, ConstBufferSequence&& req_buffer,const std::string& router, Func&& f)
 				-> asio::awaitable<error_code>
 			{
 				std::shared_lock lk(mutex_);
@@ -51,7 +51,7 @@ namespace aquarius
 
 				auto ptr = round_.invoke(iter->second);
 
-				co_return co_await ptr->async_call_buffer(std::forward<ConstBufferSequence>(req_buffer),
+				co_return co_await ptr->async_call_buffer(std::forward<ConstBufferSequence>(req_buffer), router,
 														  std::forward<Func>(f));
 			}
 

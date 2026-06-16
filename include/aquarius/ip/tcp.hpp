@@ -235,7 +235,7 @@ namespace aquarius
 		}
 
 		template <typename Func>
-		auto send_buffer(flex_buffer& req, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+		auto send_buffer(flex_buffer& req, const std::string& router, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
@@ -243,10 +243,21 @@ namespace aquarius
 
 			regist_resp_func(header.src, std::forward<Func>(f));
 
+			flex_buffer router_buffer{};
+			if (!router.empty())
+			{
+				binary_parse{}.to_datas(router, router_buffer);
+				header.length += static_cast<uint32_t>(router_buffer.size());
+			}
+
 			std::vector<asio::const_buffer> buffers{};
 
 			commit_raw_header(buffers, header);
-
+			if (!router.empty())
+			{
+				buffers.push_back(router_buffer.data());
+			}
+			
 			buffers.push_back(req.data());
 
 			ec = co_await session_ptr_->async_send(buffers);
@@ -257,6 +268,8 @@ namespace aquarius
 		template <typename Handler, typename Func>
 		auto handle_request(std::shared_ptr<Handler> handler_ptr, Func&& func) -> asio::awaitable<error_code>
 		{
+			handler_ptr->attach_session(func);
+
 			auto ec = co_await handler_ptr->handle();
 
 			if (ec)
@@ -346,6 +359,8 @@ namespace aquarius
 			}
 
 			iter->second->complete = true;
+
+			buffers_.erase(iter);
 
 			buffer_channel_.try_send(error_code{}, src);
 

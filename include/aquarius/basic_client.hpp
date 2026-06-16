@@ -151,12 +151,12 @@ namespace aquarius
 		}
 
 		template <typename Func, typename ConstBufferSequence>
-		auto async_call_buffer(ConstBufferSequence&& req, Func&& f) -> asio::awaitable<error_code>
+		auto async_call_buffer(ConstBufferSequence&& req, const std::string router, Func&& f) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
 			auto src =
-				co_await proto_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), std::forward<Func>(f), ec);
+				co_await proto_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), router, std::forward<Func>(f), ec);
 
 			co_await proto_ptr_->wait(src);
 

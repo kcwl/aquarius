@@ -14,7 +14,7 @@ namespace aquarius
 
 			using session_callback = typename base_type::session_callback;
 
-			using transfer_func_t = std::function<asio::awaitable<error_code>(flex_buffer&, const session_callback&)>;
+			using transfer_func_t = std::function<asio::awaitable<error_code>(flex_buffer&, const std::string&, const session_callback&)>;
 
 		public:
 			basic_transfer_context(Func&& func)
@@ -34,7 +34,7 @@ namespace aquarius
 					co_return gate_op::not_exist_in_pool;
 				}
 
-				co_return co_await context->func_(context->buffer_, cb);
+				co_return co_await context->func_(context->buffer_, context->router(), cb);
 			}
 
 			virtual error_code visit(flex_buffer& buffer) override

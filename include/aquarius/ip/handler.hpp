@@ -12,6 +12,8 @@ namespace aquarius
 	public:
 		using handle_message_t = Response;
 
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+
 	public:
 		basic_handler(const std::string& name)
 			: name_(name)
@@ -33,12 +35,24 @@ namespace aquarius
 			return response().consume(buffer);
 		}
 
+		void attach_session(const session_callback& cb)
+		{
+			cb_ = cb;
+		}
+
+		session_callback session()
+		{
+			return cb_;
+		}
+
 		virtual auto handle() -> asio::awaitable<error_code> = 0;
 
 	private:
 		std::string name_;
 
 		Response response_;
+
+		session_callback cb_;
 	};
 
 	template <typename Request, typename Response>

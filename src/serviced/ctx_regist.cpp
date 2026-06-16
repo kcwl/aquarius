@@ -2,13 +2,13 @@
 #include "error.hpp"
 #include "proto/channel.virgo.h"
 #include "service_center_module.h"
-#include "session_handler.hpp"
+#include <aquarius/ip/handler.hpp>
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		AQUARIUS_SYS_SERVICED_HANDLER(regist_request, regist_response, ctx_regist)
+		AQUARIUS_SYS_HANDLER(regist_request, regist_response, ctx_regist)
 		{
 			auto customer_ptr = std::make_shared<customer>(detail::uuid_generator()());
 
@@ -27,7 +27,7 @@ namespace aquarius
 			co_return errc::success;
 		}
 
-		AQUARIUS_SYS_SERVICED_HANDLER(subscribe_service_request, subscribe_service_response, ctx_subscribe_service)
+		AQUARIUS_SYS_HANDLER(subscribe_service_request, subscribe_service_response, ctx_subscribe_service)
 		{
 			auto subscriber_ptr = std::make_shared<subscriber>(detail::uuid_generator()());
 
