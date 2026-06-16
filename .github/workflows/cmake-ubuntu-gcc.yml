@@ -46,32 +46,35 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build_coverage" >> "$GITHUB_OUTPUT"
 
-    - name: cache boost
-      id: cache-boost
-      uses: actions/cache@v4
-      env:
-        cache-name: boost-module
-      with:
-        path: '${{ runner.workspace }}/boost_1_88_0'
-        key: ${{ runner.os }}-build-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
+    # - name: cache boost
+    #   id: cache-boost
+    #   uses: actions/cache@v4
+    #   env:
+    #     cache-name: boost-module
+    #   with:
+    #     path: '${{ runner.workspace }}/boost_1_88_0'
+    #     key: ${{ runner.os }}-build-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
 
-    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
-      name: Boost Setup
-      run: |
-        wget -P ${{ runner.workspace }} https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
-        cd ${{ runner.workspace }}
-        tar zxvf boost_1_88_0.tar.gz
-        cd boost_1_88_0
-        sudo ./bootstrap.sh
-        sudo ./b2
+    # - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
+    #   name: Boost Setup
+    #   run: |
+    #     wget -P ${{ runner.workspace }} https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+    #     cd ${{ runner.workspace }}
+    #     tar zxvf boost_1_88_0.tar.gz
+    #     cd boost_1_88_0
+    #     sudo ./bootstrap.sh
+    #     sudo ./b2
 
-    - name: Boost Install
+    # - name: Boost Install
+    #   run: |
+    #     cd ${{ runner.workspace }}/boost_1_88_0
+    #     sudo ./b2 install
+    #     echo $PATH
+    #     export PATH=$PATH:/usr/local/lib
+    #     sudo ldconfig
+    - name: install boost-1.90
       run: |
-        cd ${{ runner.workspace }}/boost_1_88_0
-        sudo ./b2 install
-        echo $PATH
-        export PATH=$PATH:/usr/local/lib
-        sudo ldconfig
+        sudo apt install -y libboost1.90-dev
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
@@ -98,7 +101,8 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCOVERAGE=true
+        -DCOVERAGE=ON
+        -DENABLE_SSL_TEST=ON
         -DENABLE_MYSQL_TEST=true
         -S ${{ github.workspace }}
 
