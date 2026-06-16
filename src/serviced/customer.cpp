@@ -139,5 +139,15 @@ namespace aquarius
 		{
 			version_ = version;
 		}
+
+		void customer::attach_session(const session_callback& cb)
+		{
+			cb_ = cb;
+		}
+
+		auto customer::invoke_session(flex_buffer& buffer) -> asio::awaitable<error_code>
+		{
+			co_return co_await cb_(buffer);
+		}
 	} // namespace serviced
 } // namespace aquarius

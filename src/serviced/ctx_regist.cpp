@@ -2,15 +2,15 @@
 #include "error.hpp"
 #include "proto/channel.virgo.h"
 #include "service_center_module.h"
-#include <aquarius.hpp>
+#include "session_handler.hpp"
 
 namespace aquarius
 {
 	namespace serviced
 	{
-		AQUARIUS_SYS_HANDLER(regist_request, regist_response, ctx_regist)
+		AQUARIUS_SYS_SERVICED_HANDLER(regist_request, regist_response, ctx_regist)
 		{
-			auto customer_ptr = std::make_shared<customer>(this->session());
+			auto customer_ptr = std::make_shared<customer>(detail::uuid_generator()());
 
 			customer_ptr->name(request()->body().name());
 			customer_ptr->host(request()->body().host());
@@ -20,16 +20,21 @@ namespace aquarius
 			customer_ptr->weight(request()->body().weight());
 			customer_ptr->version(request()->body().version());
 
+			customer_ptr->attach_session(this->session());
+
 			co_await mpc_async_call<&service_center_module::publish>(customer_ptr);
 
 			co_return errc::success;
 		}
 
-		AQUARIUS_SYS_HANDLER(subscribe_service_request, subscribe_service_response, ctx_subscribe_service)
+		AQUARIUS_SYS_SERVICED_HANDLER(subscribe_service_request, subscribe_service_response, ctx_subscribe_service)
 		{
-			auto subscriber_ptr = std::make_shared<subscriber>(this->session());
+			auto subscriber_ptr = std::make_shared<subscriber>(detail::uuid_generator()());
 
-			response().body().instances() = co_await mpc_async_call<&service_center_module::subscribe>(request()->body().group(), subscriber_ptr);
+			subscriber_ptr->attach_session(this->session());
+
+			response().body().instances() =
+				co_await mpc_async_call<&service_center_module::subscribe>(request()->body().group(), subscriber_ptr);
 
 			co_return errc::success;
 		}

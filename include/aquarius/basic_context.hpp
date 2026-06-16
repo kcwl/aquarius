@@ -13,11 +13,13 @@ namespace aquarius
 		virtual ~context_base() = default;
 	};
 
-	template <typename Protocol, typename... Args>
+	template <typename Protocol>
 	class basic_protocol_context : public context_base
 	{
 	public:
-		using function_type = std::function<asio::awaitable<error_code>(basic_protocol_context*, Protocol*, Args&&...)>;
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+
+		using function_type = std::function<asio::awaitable<error_code>(basic_protocol_context*, Protocol*, const session_callback&)>;
 
 	public:
 		basic_protocol_context(function_type func)
@@ -27,9 +29,9 @@ namespace aquarius
 		virtual ~basic_protocol_context() = default;
 
 	public:
-		auto complete(Protocol* proto, Args&&... args) -> asio::awaitable<error_code>
+		auto complete(Protocol* proto, const session_callback& cb) -> asio::awaitable<error_code>
 		{
-			co_return co_await func_(this, proto, std::forward<Args>(args)...);
+			co_return co_await func_(this, proto, cb);
 		}
 
 		void attach_router(const std::string& router)
@@ -54,23 +56,25 @@ namespace aquarius
 		std::string router_;
 	};
 
-	template <typename Handler, typename Protocol, typename... Args>
-	class basic_context : public basic_protocol_context<Protocol, Args...>
+	template <typename Handler, typename Protocol>
+	class basic_context : public basic_protocol_context<Protocol>
 	{
 	public:
-		using base_type = basic_protocol_context<Protocol, Args...>;
+		using base_type = basic_protocol_context<Protocol>;
 
 		using handler_type = Handler;
+		
+		using session_callback = typename base_type::session_callback;
 
 	public:
 		basic_context()
-			: base_type(&basic_context<Handler, Protocol, Args...>::do_complete)
+			: base_type(&basic_context<Handler, Protocol>::do_complete)
 		{}
 
 		virtual ~basic_context() = default;
 
 	public:
-		static auto do_complete(base_type* base, Protocol* proto, Args&&... args) -> asio::awaitable<error_code>
+		static auto do_complete(base_type* base, Protocol* proto, const session_callback& cb) -> asio::awaitable<error_code>
 		{
 			auto ptr = static_cast<basic_context*>(base);
 
@@ -79,7 +83,7 @@ namespace aquarius
 				co_return handle_error::not_exist;
 			}
 
-			co_return co_await proto->template handle_request<Handler>(ptr->handler_ptr_, std::forward<Args>(args)...);
+			co_return co_await proto->template handle_request<Handler>(ptr->handler_ptr_, cb);
 		}
 
 		virtual error_code visit(flex_buffer& buffer) override

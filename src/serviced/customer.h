@@ -1,4 +1,8 @@
 #pragma once
+#include <aquarius/detail/asio.hpp>
+#include <aquarius/detail/flex_buffer.hpp>
+#include <aquarius/error_code.hpp>
+#include <functional>
 #include <string>
 
 namespace aquarius
@@ -8,7 +12,10 @@ namespace aquarius
 		class customer
 		{
 		public:
-			customer(std::size_t id = 0);
+			using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+
+		public:
+			customer(std::size_t id);
 
 			virtual ~customer() = default;
 
@@ -63,6 +70,10 @@ namespace aquarius
 
 			void version(const std::string& version);
 
+			void attach_session(const session_callback& cb);
+
+			auto invoke_session(flex_buffer& buffer) -> asio::awaitable<error_code>;
+
 		private:
 			std::size_t id_;
 
@@ -81,6 +92,8 @@ namespace aquarius
 			int32_t weight_;
 
 			std::string version_;
+
+			session_callback cb_;
 		};
 	} // namespace serviced
 } // namespace aquarius

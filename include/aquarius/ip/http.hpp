@@ -43,10 +43,8 @@ namespace aquarius
 		using client = basic_client<http>;
 		using server = basic_server<http>;
 
-		using session_callback = std::function<asio::awaitable<error_code>(asio::const_buffer)>;
-
 		template <typename Handler>
-		using context = basic_context<Handler, http, uint32_t, http_method, session_callback>;
+		using context = basic_context<Handler, http>;
 
 		template <typename Session>
 		auto accept(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
@@ -110,8 +108,7 @@ namespace aquarius
 								co_return;
 							}
 
-							auto ptr = std::dynamic_pointer_cast<
-								basic_protocol_context<http, uint32_t, http_method, session_callback>>(context);
+							auto ptr = std::dynamic_pointer_cast<basic_protocol_context<http>>(context);
 							if (!ptr)
 							{
 								co_return;

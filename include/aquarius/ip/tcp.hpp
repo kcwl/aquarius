@@ -29,10 +29,8 @@ namespace aquarius
 
 		using duration = typename session_type::duration;
 
-		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
-
 		template <typename Handler>
-		using context = basic_context<Handler, tcp, session_callback>;
+		using context = basic_context<Handler, tcp>;
 
 		using client = basic_client<tcp>;
 
@@ -96,7 +94,7 @@ namespace aquarius
 					continue;
 				}
 
-				auto ptr = std::dynamic_pointer_cast<basic_protocol_context<tcp, session_callback>>(context);
+				auto ptr = std::dynamic_pointer_cast<basic_protocol_context<tcp>>(context);
 				if (!ptr)
 				{
 					continue;
@@ -170,7 +168,7 @@ namespace aquarius
 						continue;
 					}
 
-					auto ptr = std::dynamic_pointer_cast<basic_protocol_context<tcp, session_callback>>(context);
+					auto ptr = std::dynamic_pointer_cast<basic_protocol_context<tcp>>(context);
 
 					if (!ptr)
 					{
@@ -183,7 +181,9 @@ namespace aquarius
 
 					asio::co_spawn(
 						session_ptr_->get_executor(), [this, self, ptr]() -> asio::awaitable<void>
-						{ co_await ptr->complete(this, session_callback{}); }, asio::detached);
+						{
+							co_await ptr->complete(this, {});
+						}, asio::detached);
 				}
 			}
 
