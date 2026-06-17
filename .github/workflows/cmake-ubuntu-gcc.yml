@@ -26,11 +26,11 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-26.04]
         build_type: [Debug, Release]
         c_compiler: [gcc]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             c_compiler: gcc
             cpp_compiler: g++
 
@@ -74,9 +74,8 @@ jobs:
     #     sudo ldconfig
     - name: install depends
       run: |
-        sudo add-apt-repository ppa:kcwl-ppa/libboost1.89-dev
         sudo apt update
-        sudo apt install -y libboost1.89-dev lcov
+        sudo apt install -y libboost1.90-dev lcov
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
