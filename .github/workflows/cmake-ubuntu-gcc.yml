@@ -72,9 +72,10 @@ jobs:
     #     echo $PATH
     #     export PATH=$PATH:/usr/local/lib
     #     sudo ldconfig
-    - name: install boost-1.90
+    - name: install depends
       run: |
-        sudo apt install -y libboost1.90-dev
+        sudo apt update
+        sudo apt install -y libboost1.90-dev lcov
 
     - name: install mysql
       uses: ankane/setup-mysql@v1
@@ -85,11 +86,6 @@ jobs:
     - name: create unittest table
       run: |
         sudo mysql -D unittest -e 'create table if not exists person(id int, age int)'
-        
-    - name: setup lcov
-      shell: bash
-      run: |
-        sudo apt-get install -y lcov
 
 
     - name: Configure CMake
