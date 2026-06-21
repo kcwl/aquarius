@@ -1,34 +1,20 @@
 #pragma once
-#include <aquarius/module/module.hpp>
+#include <aquarius/module/module_register.hpp>
 #include <string>
-#include <vector>
 
 namespace aquarius
 {
 	namespace gateway
 	{
-		class firewall_module : public no_config_module<firewall_module>
+		AQUARIUS_MODULE(firewall_module)
 		{
 		public:
-			firewall_module(io_context& io, const std::string& name);
+			firewall_module() = default;
 
 		public:
-			virtual bool init() override;
+			auto check_ip(const std::string& ip) -> asio::awaitable<bool>;
 
-		public:
-			bool check_ip(const std::string& ip);
-
-			bool check_mac(const std::string& mac);
-
-		private:
-			void get_ip_addrs();
-
-			void get_macs();
-
-		private:
-			std::vector<std::string> ip_addrs_;
-
-			std::vector<std::string> macs_;
+			auto check_mac(const std::string& mac) -> asio::awaitable<bool>;
 		};
 	} // namespace gateway
 } // namespace aquarius

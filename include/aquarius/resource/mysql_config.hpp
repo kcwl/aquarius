@@ -1,5 +1,4 @@
 #pragma once
-#include <aquarius/resource/config_tag_invoke.hpp>
 #include <string>
 
 namespace aquarius
@@ -17,6 +16,12 @@ namespace aquarius
 		int reconnect;
 		bool enable_transaction;
 	};
-}
+
+	inline static mysql_config& create_mysql()
+	{
+		static mysql_config mysql;
+		return mysql;
+	}
+} // namespace aquarius
 
 #define MYSQL_CONFIG_INVOKE(cfg) CONFIG_MICRO(aquarius::mysql_config, cfg)

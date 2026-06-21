@@ -4,6 +4,9 @@
 #include <boost/pfr.hpp>
 #include <sstream>
 
+template <auto Ptr>
+class grep_view;
+
 namespace aquarius
 {
 	class update_view

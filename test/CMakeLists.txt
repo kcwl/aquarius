@@ -1,73 +1,72 @@
-project(unittest)
+	# Collect all unit-test source files recursively. Match files starting with 'ut_'.
+	file(GLOB_RECURSE UT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut_*.cpp")
 
-file(GLOB TEST_SRCS "*.h")
+	# Path to test runner source that provides Boost.Test main
+	set(UNITTEST_RUNNER ${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp)
+	set(UNIITEST_TEST_PROTO ${CMAKE_CURRENT_SOURCE_DIR}/ip/login.virgo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/ip/ctx_login_test.cpp)
+	if(NOT EXISTS ${UNITTEST_RUNNER})
+		message(FATAL_ERROR "Missing test runner: ${UNITTEST_RUNNER}")
+	endif()
 
-file(GLOB TEST_MAIN
-	"*.cpp"
-	"./detail/*.cpp"
-	"./ip/*.cpp"
-	"./module/*.cpp"
-	"./resouce/*.cpp"
-	"./serialize/*.cpp"
-	"./tbl/*.cpp"
-	"./virgo/*.cpp"
-)
+	# Include paths used by the tests
+	include_directories(${AQUARIUS_INCLUDE})
+	include_directories(${AQUARIUS_PROTOCOL_INCLUDE})
 
-include_directories(${AQUARIUS_INCLUDE})
+	foreach(src IN LISTS UT_SOURCES)
+		# skip the runner itself if matched
+		if(src STREQUAL "unittest.cpp")
+			continue()
+		endif()
 
-include_directories(${AQUARIUS_PROTOCOL_INCLUDE})
+		# create a safe target name from the relative path: replace '/' with '_' and strip .cpp
+		# string(REPLACE "/" "_" tgt_base ${src})
+		string(REPLACE ".cpp" "" tgt_base ${src})
 
-add_executable(unittest ${TEST_SRCS} ${TEST_MAIN})
+		string(FIND ${tgt_base} "/" pos REVERSE)
 
-target_link_libraries(unittest PUBLIC boost openssl)
+		math(EXPR pos "${pos} + 1" OUTPUT_FORMAT DECIMAL)
 
+		string(SUBSTRING ${tgt_base} ${pos} -1 tgt_base)
 
-if(WIN32)
-target_compile_options(unittest PUBLIC /bigobj)
-target_compile_definitions(unittest PUBLIC -DWIN32_LEAN_AND_MEAN -D_WIN32_WINNT=0x0A00)
-if(USE_WIN7_FOR_BOOST_LOG)
-message(STATUS "Set Config USE_WIN7_FOR_BOOST_LOG")
-target_compile_definitions(unittest PUBLIC -DUSE_WIN7_FOR_BOOST_LOG)
-endif()
+		set(target_name ${tgt_base})
 
-endif()
+		if(target_name STREQUAL "ut_tcp")
+			add_executable(${target_name} ${src} ${UNITTEST_RUNNER} ${UNIITEST_TEST_PROTO})
+		else()
+			add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
+		endif()
+		target_include_directories(${target_name} PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
+		# target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
+		target_link_libraries(${target_name} PRIVATE boost)
 
-if(COVERAGE)
-message(STATUS "gcov")
-target_compile_options(unittest PUBLIC -fprofile-arcs -ftest-coverage)
-target_link_libraries(unittest PUBLIC gcov)
-endif()
+		if(ENABLE_MYSQL)
+			target_compile_definitions(${target_name} PUBLIC -DENABLE_MYSQL)
+			target_link_libraries(${target_name} PRIVATE mysql)
+		endif()
 
-if(ENABLE_MYSQL)
-message(STATUS "enable mysql")
-target_compile_definitions(unittest PUBLIC -DENABLE_MYSQL)
-target_link_libraries(unittest PUBLIC mysql)
-endif()
+		if(ENABLE_SSL_TEST)
+			target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
+			target_link_libraries(${target_name} PRIVATE openssl)
+		endif()
 
-if(ENABLE_SSL_TEST)
-message(STATUS "enable ssl test")
-target_compile_definitions(unittest PUBLIC -DENABLE_SSL_TEST)
-endif()
+		add_test(NAME ${target_name} COMMAND ${target_name})
 
+		if(NOT WIN32)
+			set_tests_properties(${target_name} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/gcc-16.1/lib64:/usr/local/lib:/usr/local/lib64:$ENV{LD_LIBRARY_PATH}")
+		endif()
+	endforeach()
 
+	if(WIN32)
+	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
+	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
+	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:mysql>)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+	endif()
 
-
-add_test(
-	NAME unittest COMMAND unittest
-)
-
-if(WIN32)
-#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
-#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
-#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:mysql>)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-endif()
-
-add_custom_target(coverage 
-	COMMAND rm -rf test-aquarius
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -c -d . -o "coverage.info" -b .
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -r coverage.info "*/boost/*" -o coverage-no-boost.info
-	COMMAND lcov --ignore-errors inconsistent,negative,mismatch -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
-	COMMAND genhtml --ignore-errors inconsistent,negative,mismatch coverage-aquarius.info -o test-aquarius
-)
-
+	add_custom_target(coverage 
+		COMMAND rm -rf test-aquarius
+		COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format,version -c -d . -o "coverage.info" -b .
+		COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format,version -r coverage.info "*/boost/*" -o coverage-no-boost.info
+		COMMAND lcov --ignore-errors inconsistent,negative,mismatch,format,version -e coverage-no-boost.info "*/include/aquarius/*" -o coverage-aquarius.info
+		COMMAND genhtml --ignore-errors inconsistent,negative,mismatch,format,version coverage-aquarius.info -o test-aquarius
+	)

@@ -1,90 +1,51 @@
 #pragma once
-#include <aquarius.hpp>
+#include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/virgo/tcp_request.hpp>
+#include <aquarius/virgo/tcp_response.hpp>
+using namespace aquarius;
 
-class subscribe_req_body : public aquarius::tcp_serialize
+class subs_list_req_body: public aquarius::tcp_serialize
 {
 public:
-	subscribe_req_body();
-	virtual ~subscribe_req_body() = default;
+	subs_list_req_body();
+	virtual ~subs_list_req_body();
 
-public:
-	bool operator==(const subscribe_req_body & other) const; 
+	subs_list_req_body(subs_list_req_body&&) = default;
+	subs_list_req_body& operator=(subs_list_req_body&&) = default;
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
-public:
-	string topic;
-	string payload;
-};
 
-class subscribe_resp_body : public aquarius::tcp_serialize
+private:
+	struct impl;
+	std::shared_ptr<impl> impl_ptr_;
+};
+class subs_list_resp_body: public aquarius::tcp_serialize
 {
 public:
-	subscribe_resp_body() = default;
-	virtual ~subscribe_resp_body() = default;
+	subs_list_resp_body();
+	virtual ~subs_list_resp_body();
 
-public:
-	bool operator==(const subscribe_resp_body & other) const; 
+	subs_list_resp_body(subs_list_resp_body&&) = default;
+	subs_list_resp_body& operator=(subs_list_resp_body&&) = default;
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
 
 	virtual void deserialize(aquarius::flex_buffer& buffer) override;
 
-public:
-};
 
-class transfer_req_body : public aquarius::tcp_serialize
-{
-public:
-	transfer_req_body();
-	virtual ~transfer_req_body() = default;
+	std::vector<string> keys() const;
+	std::vector<string>& keys();
 
-public:
-	bool operator==(const transfer_req_body & other) const; 
-
-public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
-
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
-public:
-	string topic;
-	bytes feedbuf;
-};
-
-class transfer_resp_body : public aquarius::tcp_serialize
-{
-public:
-	transfer_resp_body();
-	virtual ~transfer_resp_body() = default;
-
-public:
-	bool operator==(const transfer_resp_body & other) const; 
-
-public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
-
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
-
-public:
-	bytes feedbuf;
+private:
+	struct impl;
+	std::shared_ptr<impl> impl_ptr_;
 };
 
 
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const subscribe_req_body& local);
-subscribe_req_body tag_invoke(const aquarius::json::value_to_tag<subscribe_req_body>&, const aquarius::json::value& jv);
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const subscribe_resp_body& local);
-subscribe_resp_body tag_invoke(const aquarius::json::value_to_tag<subscribe_resp_body>&, const aquarius::json::value& jv);
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const transfer_req_body& local);
-transfer_req_body tag_invoke(const aquarius::json::value_to_tag<transfer_req_body>&, const aquarius::json::value& jv);
-void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const transfer_resp_body& local);
-transfer_resp_body tag_invoke(const aquarius::json::value_to_tag<transfer_resp_body>&, const aquarius::json::value& jv);
-
-using subscribe_request = aquarius::virgo::tcp_request<"10000", subscribe_req_body>;
-using subscribe_response = aquarius::virgo::tcp_response<subscribe_resp_body>;
-using transfer_request = aquarius::virgo::tcp_request<"10001", transfer_req_body>;
-using transfer_response = aquarius::virgo::tcp_response<transfer_resp_body>;
+using subs_list_request = aquarius::tcp_request<"9100", subs_list_req_body>;
+using subs_list_response = aquarius::tcp_response<"9100", subs_list_resp_body>;

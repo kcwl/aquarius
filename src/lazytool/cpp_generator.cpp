@@ -209,20 +209,9 @@ namespace aquarius
 
 		bool cpp_generator::generate_construction_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
-			ofs << "\t" << field_ptr->name() << "()";
+			ofs << "\t" << field_ptr->name() << "();" << std::endl;
 
-			if (field_ptr->fields().empty())
-			{
-				ofs << " = default;";
-			}
-			else
-			{
-				ofs << ";";
-			}
-
-			ofs << std::endl;
-
-			ofs << "\t" << "virtual ~" << field_ptr->name() << "() = default;" << std::endl;
+			ofs << "\t" << "virtual ~" << field_ptr->name() << "();" << std::endl;
 
 			ofs << std::endl;
 
@@ -270,7 +259,7 @@ namespace aquarius
 																 std::shared_ptr<field_base>)
 		{
 			ofs << "\tstruct impl;" << std::endl;
-			ofs << "\tstd::unique_ptr<impl> impl_ptr_;" << std::endl;
+			ofs << "\tstd::shared_ptr<impl> impl_ptr_;" << std::endl;
 		}
 
 		bool cpp_generator::generate_member_variable_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
@@ -290,7 +279,7 @@ namespace aquarius
 			generate_request_alias_define(ofs, field_ptr->get<message_field::tag_request>(), field_ptr->name(),
 										  protocol, field_ptr->router());
 			generate_response_alias_define(ofs, field_ptr->get<message_field::tag_response>(), field_ptr->name(),
-										   protocol);
+										   protocol, field_ptr->router());
 
 			return true;
 		}
@@ -299,7 +288,7 @@ namespace aquarius
 														  const std::string& message_name, const std::string protocol,
 														  const std::string& router)
 		{
-			ofs << "using " << message_name << "_" << protocol << "_request = aquarius::" << protocol << "_request<\""
+			ofs << "using " << message_name << "_request = aquarius::" << protocol << "_request<\""
 				<< router << "\", ";
 
 			ofs << field_ptr->name() << ">;" << std::endl;
@@ -308,9 +297,14 @@ namespace aquarius
 		}
 
 		bool cpp_generator::generate_response_alias_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
-														   const std::string& message_name, const std::string protocol)
+														   const std::string& message_name, const std::string protocol, const std::string& router)
 		{
-			ofs << "using " << message_name << "_" << protocol << "_response = aquarius::" << protocol << "_response<";
+			ofs << "using " << message_name << "_response = aquarius::" << protocol << "_response<";
+
+			if (protocol == "tcp")
+			{
+				ofs << "\"" << router << "\", ";
+			}
 
 			ofs << field_ptr->name() << ">;" << std::endl;
 
@@ -348,16 +342,17 @@ namespace aquarius
 
 		bool cpp_generator::generate_construction_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
-			if (field_ptr->fields().empty() || !field_ptr)
-				return false;
-
 			auto name = field_ptr->name();
 
 			ofs << name << "::" << name << "()" << std::endl;
 
-			ofs << "\t: impl_ptr_(std::make_unique<impl>())" << std::endl;
+			ofs << "\t: impl_ptr_(std::make_shared<impl>())" << std::endl;
 
 			ofs << "{}" << std::endl;
+
+			ofs << std::endl;
+
+			ofs << name << "::~" << name << "(){}" << std::endl;
 
 			return true;
 		}
@@ -408,12 +403,12 @@ namespace aquarius
 			{
 				if (has_type)
 				{
-					ofs << "\t*this = this->parse_" << direction << "<" << data_ptr->name()
+					ofs << "\t*this->impl_ptr_ = this->parse_" << direction << "<" << data_ptr->name() <<"::impl"
 						<< ">(buffer); " << std::endl;
 				}
 				else
 				{
-					ofs << "\tthis->parse_" << direction << "(*this, buffer);" << std::endl;
+					ofs << "\tthis->parse_" << direction << "(*this->impl_ptr_, buffer);" << std::endl;
 				}
 			};
 
@@ -456,8 +451,6 @@ namespace aquarius
 						ofs << "\t}" << std::endl;
 						ofs << "\telse" << std::endl;
 						ofs << "\t{" << std::endl;
-
-						bool first = true;
 
 						for (auto& m : field_ptr->fields())
 						{

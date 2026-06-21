@@ -11,7 +11,8 @@
 
 namespace aquarius
 {
-	inline auto mpc_http_options(flex_buffer& buffer) -> asio::awaitable<std::expected<flex_buffer, error_code>>
+	template<typename Session>
+	inline auto mpc_http_options(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
 	{
 		http_header header{};
 
@@ -33,23 +34,21 @@ namespace aquarius
 
 			auto request_headers = header.find("Access-Control-Request-Headers");
 
-			http_config cfg{};
-
-			cfg_value_from<http_config>(cfg);
+			http_config& cfg = create_http();
 
 			if (!cfg.check_origin(origin))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			if (!cfg.check_method(request_methods))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			if (!cfg.check_headers(request_headers))
 			{
-				co_return std::unexpected(http_status::forbidden);
+				co_return http_status::forbidden;
 			}
 
 			resp_header.set_field("Access-Control-Allow-Origin", cfg.control_allow_origin);
@@ -65,6 +64,6 @@ namespace aquarius
 			resp_header.serialize(resp_buffer);
 		}
 
-		co_return resp_buffer;
+		co_return co_await session_ptr->async_send(resp_buffer);
 	}
 } // namespace aquarius

@@ -20,31 +20,29 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gateway\auth_module.cpp" />
-    <ClCompile Include="..\src\gateway\auth_schedule.cpp" />
-    <ClCompile Include="..\src\gateway\ctx_login.cpp" />
+    <ClCompile Include="..\src\gateway\client_pool.cpp" />
+    <ClCompile Include="..\src\gateway\ctx_serviced.cpp" />
     <ClCompile Include="..\src\gateway\firewall_module.cpp" />
-    <ClCompile Include="..\src\gateway\firewall_schedule.cpp" />
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
-    <ClCompile Include="..\src\gateway\proto\login.virgo.cpp" />
-    <ClCompile Include="..\src\gateway\transfer_module.cpp" />
-    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp" />
+    <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h" />
-    <ClInclude Include="..\src\gateway\auth_schedule.h" />
+    <ClInclude Include="..\src\gateway\basic_transfer_context.hpp" />
+    <ClInclude Include="..\src\gateway\client_pool.h" />
     <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\gate_error_code.h" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />
-    <ClInclude Include="..\src\gateway\firewall_schedule.h" />
+    <ClInclude Include="..\src\gateway\payload.hpp" />
     <ClInclude Include="..\src\gateway\player.h" />
-    <ClInclude Include="..\src\gateway\proto\login.virgo.h" />
-    <ClInclude Include="..\src\gateway\server.hpp" />
-    <ClInclude Include="..\src\gateway\table\account.tbl.h" />
-    <ClInclude Include="..\src\gateway\transfer_module.h" />
-    <ClInclude Include="..\src\gateway\transfer_schedule.hpp" />
-    <ClInclude Include="..\src\serviced\proto\channel.virgo.h" />
+    <ClInclude Include="..\src\gateway\proto\shake.virgo.h" />
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\gateway\proto\shake.virgo" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -129,18 +127,18 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;ENABLE_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_88_0;E:\openssl-lib\include;E:\软件\mysql84\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_91_0;E:\openssl-lib\include;E:\软件\mysql84\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_91_0\lib64-msvc-14.5;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;mysqlclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

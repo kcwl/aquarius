@@ -113,11 +113,11 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;ENABLE_MYSQL_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_88_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;../src;E:\openssl-lib\include;D:\boost_1_91_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -125,7 +125,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_88_0\stage\lib;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_91_0\lib64-msvc-14.5;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -151,56 +151,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\protocol.cpp" />
-    <ClCompile Include="..\test\detail\concat.cpp" />
-    <ClCompile Include="..\test\detail\crc.cpp" />
-    <ClCompile Include="..\test\detail\flex_buffer.cpp" />
-    <ClCompile Include="..\test\detail\int_to_string.cpp" />
-    <ClCompile Include="..\test\detail\member_pointer.cpp" />
-    <ClCompile Include="..\test\detail\string_literal.cpp" />
-    <ClCompile Include="..\test\detail\struct_name.cpp" />
-    <ClCompile Include="..\test\detail\uuid_generator.cpp" />
-    <ClCompile Include="..\test\ip\handler.cpp" />
-    <ClCompile Include="..\test\ip\http.cpp" />
-    <ClCompile Include="..\test\ip\raw_adaptor_test.cpp" />
-    <ClCompile Include="..\test\ip\ssl_adaptor_test.cpp" />
-    <ClCompile Include="..\test\ip\tcp.cpp" />
-    <ClCompile Include="..\test\module\channel.cpp" />
-    <ClCompile Include="..\test\module\router.cpp" />
-    <ClCompile Include="..\test\resource\invoke.cpp" />
-    <ClCompile Include="..\test\serialize\binary.cpp" />
-    <ClCompile Include="..\test\serialize\json.cpp" />
-    <ClCompile Include="..\test\serialize\kv.cpp" />
-    <ClCompile Include="..\test\tbl\grep.cpp" />
-    <ClCompile Include="..\test\tbl\insert.cpp" />
-    <ClCompile Include="..\test\tbl\remove.cpp" />
-    <ClCompile Include="..\test\tbl\select.cpp" />
-    <ClCompile Include="..\test\tbl\update.cpp" />
-    <ClCompile Include="..\test\test_http.virgo.cpp" />
-    <ClCompile Include="..\test\test_tcp.virgo.cpp" />
-    <ClCompile Include="..\test\virgo\http_header.cpp" />
-    <ClCompile Include="..\test\virgo\http_method.cpp" />
-    <ClCompile Include="..\test\virgo\http_status.cpp" />
-    <ClCompile Include="..\test\virgo\http_version.cpp" />
-    <ClCompile Include="..\test\virgo\tcp_header.cpp" />
-    <ClCompile Include="..\test\virgo\tcp_protocol.cpp" />
     <ClInclude Include="..\include\aquarius.hpp" />
     <ClInclude Include="..\include\aquarius\basic_client.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_context.hpp" />
     <ClInclude Include="..\include\aquarius\basic_module.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_ssl_session.hpp" />
     <ClInclude Include="..\include\aquarius\concepts.hpp" />
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
+    <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\context_reg.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\context_traits.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\handler_error.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp" />
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
+    <ClInclude Include="..\include\aquarius\ip\session_store.hpp" />
     <ClInclude Include="..\include\aquarius\ip\tcp.hpp" />
     <ClInclude Include="..\include\aquarius\ip\udp.hpp" />
-    <ClInclude Include="..\include\aquarius\module\handler_channel.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_register.hpp" />
     <ClInclude Include="..\include\aquarius\module\module_router.hpp" />
     <ClInclude Include="..\include\aquarius\module\player_module.hpp" />
@@ -216,12 +189,10 @@
     <ClInclude Include="..\include\aquarius\detail\config.hpp" />
     <ClInclude Include="..\include\aquarius\detail\crc.hpp" />
     <ClInclude Include="..\include\aquarius\io_service_pool.hpp" />
-    <ClInclude Include="..\include\aquarius\ip\handler.hpp" />
     <ClInclude Include="..\include\aquarius\detail\string_literal.hpp" />
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\module\mysql_module.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\config_tag_invoke.hpp" />
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\ssl_config.hpp" />
@@ -244,6 +215,7 @@
     <ClInclude Include="..\include\aquarius\tbl\update_view.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_http_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\basic_tcp_protocol.hpp" />
+    <ClInclude Include="..\include\aquarius\virgo\error.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_header.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_method.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_request.hpp" />
@@ -253,24 +225,72 @@
     <ClInclude Include="..\include\aquarius\virgo\tcp_request.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\tcp_response.hpp" />
     <ClInclude Include="..\include\aquarius\virgo\http_version.hpp" />
-    <ClCompile Include="..\test\ctx_handler.cpp" />
-    <ClCompile Include="..\test\io_service_pool.cpp" />
-    <ClCompile Include="..\test\client.cpp" />
-    <ClCompile Include="..\test\session.cpp" />
-    <ClInclude Include="..\test\test_http.virgo.h" />
-    <ClInclude Include="..\test\test_model.tbl.h" />
-    <ClInclude Include="..\test\test_tcp.virgo.h" />
-    <ClInclude Include="include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\test\Test.cpp" />
+    <ClInclude Include="..\test\ip\login.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\test\test_http.virgo" />
-    <None Include="..\test\test_tcp.virgo" />
+    <ClCompile Include="..\test\detail\ut_asio.cpp" />
+    <ClCompile Include="..\test\detail\ut_concat.cpp" />
+    <ClCompile Include="..\test\detail\ut_config.cpp" />
+    <ClCompile Include="..\test\detail\ut_crc.cpp" />
+    <ClCompile Include="..\test\detail\ut_flex_buffer.cpp" />
+    <ClCompile Include="..\test\detail\ut_int_to_string.cpp" />
+    <ClCompile Include="..\test\detail\ut_make_endpoint.cpp" />
+    <ClCompile Include="..\test\detail\ut_member_pointer.cpp" />
+    <ClCompile Include="..\test\detail\ut_string_literal.cpp" />
+    <ClCompile Include="..\test\detail\ut_struct_name.cpp" />
+    <ClCompile Include="..\test\detail\ut_uuid_generator.cpp" />
+    <ClCompile Include="..\test\ip\ctx_login_test.cpp" />
+    <ClCompile Include="..\test\ip\login.virgo.cpp" />
+    <ClCompile Include="..\test\ip\ut_tcp.cpp" />
+    <ClCompile Include="..\test\module\ut_module_router.cpp" />
+    <ClCompile Include="..\test\module\ut_schedule.cpp" />
+    <ClCompile Include="..\test\resource\ut_http_config.cpp" />
+    <ClCompile Include="..\test\resource\ut_mysql_config.cpp" />
+    <ClCompile Include="..\test\resource\ut_ssl_config.cpp" />
+    <ClCompile Include="..\test\serialize\ut_binary.cpp" />
+    <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp" />
+    <ClCompile Include="..\test\serialize\ut_cookie.cpp" />
+    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp" />
+    <ClCompile Include="..\test\serialize\ut_json.cpp" />
+    <ClCompile Include="..\test\serialize\ut_kv.cpp" />
+    <ClCompile Include="..\test\serialize\ut_scalar_type.cpp" />
+    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp" />
+    <ClCompile Include="..\test\tbl\ut_add_string.cpp" />
+    <ClCompile Include="..\test\tbl\ut_enter_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_grep_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_insert_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp" />
+    <ClCompile Include="..\test\tbl\ut_mysql_type.cpp" />
+    <ClCompile Include="..\test\tbl\ut_remove_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_select_view.cpp" />
+    <ClCompile Include="..\test\tbl\ut_update_view.cpp" />
+    <ClCompile Include="..\test\unittest.cpp" />
+    <ClCompile Include="..\test\ut_basic_client.cpp" />
+    <ClCompile Include="..\test\ut_basic_context.cpp" />
+    <ClCompile Include="..\test\ut_basic_module.cpp" />
+    <ClCompile Include="..\test\ut_basic_protocol.cpp" />
+    <ClCompile Include="..\test\ut_basic_server.cpp" />
+    <ClCompile Include="..\test\ut_basic_session.cpp" />
+    <ClCompile Include="..\test\ut_basic_ssl_session.cpp" />
+    <ClCompile Include="..\test\ut_io_service_pool.cpp" />
+    <ClCompile Include="..\test\virgo\ut_basic_http_protocol.cpp" />
+    <ClCompile Include="..\test\virgo\ut_basic_tcp_protocol.cpp" />
+    <ClCompile Include="..\test\virgo\ut_error.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_header.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_method.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_request.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_response.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_status.cpp" />
+    <ClCompile Include="..\test\virgo\ut_http_version.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_header.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_request.cpp" />
+    <ClCompile Include="..\test\virgo\ut_tcp_response.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\test\ip\login.virgo" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

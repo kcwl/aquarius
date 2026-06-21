@@ -5,39 +5,14 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		firewall_module::firewall_module(io_context& io, const std::string& name)
-			: no_config_module<firewall_module>(io, name)
-		{}
-
-		bool firewall_module::init()
+		auto firewall_module::check_ip(const std::string& ip) -> asio::awaitable<bool>
 		{
-			get_ip_addrs();
-
-			get_macs();
-
-			return true;
+			co_return true;
 		}
 
-		bool firewall_module::check_ip(const std::string& ip)
+		auto firewall_module::check_mac(const std::string& mac) -> asio::awaitable<bool>
 		{
-			return std::find(ip_addrs_.begin(), ip_addrs_.end(), ip) == ip_addrs_.end();
-		}
-
-		bool firewall_module::check_mac(const std::string& mac)
-		{
-			return std::find(macs_.begin(), macs_.end(), mac) == macs_.end();
-		}
-
-		void firewall_module::get_ip_addrs()
-		{
-			return;
-		}
-
-		void firewall_module::get_macs()
-		{
-			return;
+			co_return true;
 		}
 	} // namespace gateway
 } // namespace aquarius
-
-AQUARIUS_MODULE_NAMESPACE(aquarius::gateway, firewall_module)

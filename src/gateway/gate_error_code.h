@@ -11,6 +11,8 @@ namespace aquarius
 		{
 			success,
 			auth_failed,
+			pedding,
+			not_exist_in_pool
 		};
 
 		std::string_view from_error_string(gate_op e);
@@ -25,7 +27,7 @@ namespace aquarius
 			[[nodiscard]] std::string message(int err_code) const override;
 		};
 
-		static gate_op_error_category& get_serialize_error_category();
+		static gate_op_error_category& get_gate_op_error_category();
 
 		error_code make_error_code(gate_op ec);
 	} // namespace gateway

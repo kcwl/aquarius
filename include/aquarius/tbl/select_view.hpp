@@ -2,6 +2,7 @@
 #include <aquarius/detail/concat.hpp>
 #include <aquarius/detail/member_pointer.hpp>
 #include <aquarius/detail/struct_name.hpp>
+#include <aquarius/tbl/grep_view.hpp>
 #include <string>
 
 namespace aquarius
@@ -10,26 +11,27 @@ namespace aquarius
 	class select_view
 	{
 	public:
+		constexpr static auto sp = ","sv;
+
 		constexpr static auto make_member_names()
 		{
-			constexpr static auto sp = ","sv;
 			auto f = [] { return concat_v<concat_v<member_pointer_name<T, Args>::value, sp>...>; };
 
-			constexpr static auto result = f();
+			constexpr auto result = f();
 
 			return result.substr(0, result.size() - 1);
 		}
 
 		constexpr static auto membes = make_member_names();
 
+		constexpr static auto name = detail::struct_name<T>();
+		constexpr static auto sel = "select * from "sv;
+
+		constexpr static auto part_sel = "select "sv;
+		constexpr static auto from = " from "sv;
+
 		constexpr static auto make_content()
 		{
-			constexpr static auto name = detail::struct_name<T>();
-			constexpr static auto sel = "select * from "sv;
-
-			constexpr static auto part_sel = "select "sv;
-			constexpr static auto from = " from "sv;
-
 			if constexpr (sizeof...(Args) == 0)
 			{
 				return concat_v<sel, name>;
@@ -45,9 +47,7 @@ namespace aquarius
 	public:
 		select_view()
 			: has_condition_(false)
-		{
-			
-		}
+		{}
 
 		select_view& operator()()
 		{

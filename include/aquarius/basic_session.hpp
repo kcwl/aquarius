@@ -3,31 +3,25 @@
 #include <aquarius/detail/flex_buffer.hpp>
 #include <aquarius/detail/uuid_generator.hpp>
 #include <aquarius/error_code.hpp>
-#include <expected>
+#include <aquarius/logger.hpp>
+#include <map>
 
 namespace aquarius
 {
-	template <typename Protocol, template<typename>typename Adaptor>
-	class basic_session : public std::enable_shared_from_this<basic_session<Protocol, Adaptor>>
+	template <typename Protocol>
+	class basic_session
 	{
 	public:
-		using socket = typename Protocol::socket;
-
-		using endpoint = typename Protocol::endpoint;
-
-		using acceptor = typename Protocol::acceptor;
+		using socket_type = typename Protocol::socket;
 
 		using resolver = typename Protocol::resolver;
 
 		using duration = std::chrono::system_clock::duration;
 
-		using adaptor_t = Adaptor<socket>;
-
 	public:
-		explicit basic_session(socket _socket, duration timeout)
+		explicit basic_session(socket_type _socket, duration timeout)
 			: socket_(std::move(_socket))
 			, timeout_(timeout)
-			, socket_adaptor_(socket_)
 			, uuid_(detail::uuid_generator()())
 		{}
 
@@ -44,16 +38,19 @@ namespace aquarius
 			return uuid_;
 		}
 
+		duration timeout() const
+		{
+			return timeout_;
+		}
+
 		auto async_connect(const std::string& host, const std::string& port) -> asio::awaitable<error_code>
 		{
 			resolver resolve(this->get_executor());
 
-			auto ec = co_await socket_adaptor_.async_connect(resolve.resolve(host, port), timeout_);
+			error_code ec{};
 
-			if (ec)
-			{
-				XLOG_ERROR() << "async_connect error: " << ec.what();
-			}
+			co_await asio::async_connect(socket_, resolve.resolve(host, port),
+										 asio::cancel_after(timeout_, asio::redirect_error(asio::use_awaitable, ec)));
 
 			co_return ec;
 		}
@@ -79,62 +76,38 @@ namespace aquarius
 
 			auto mutable_buffer = buffer.prepare(length);
 
-			co_await asio::async_read(socket_adaptor_.get_implement(), mutable_buffer,
-									  asio::redirect_error(asio::use_awaitable, ec));
+			co_await asio::async_read(socket_, mutable_buffer, asio::redirect_error(asio::use_awaitable, ec));
 
-			if (ec)
+			if (!ec)
 			{
-				XLOG_ERROR() << "[async read] error: " << ec.what() << ", remote_address: " << remote_address();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async read] receive " << length << " bytes";
-
 				buffer.commit(length);
 			}
 
 			co_return ec;
 		}
 
-		auto async_read_util(flex_buffer& buffer, std::string_view delm, std::size_t& end_pos) -> asio::awaitable<error_code>
+		auto async_read_until(flex_buffer& buffer, std::string_view delm, std::size_t& end_pos)
+			-> asio::awaitable<error_code>
 		{
 			error_code ec;
 
-			end_pos = co_await boost::asio::async_read_until(socket_adaptor_.get_implement(), flex_buffer_ref(buffer),
-															   delm, asio::redirect_error(asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[async read util] error: " << ec.what() << ", remote_address: " << remote_address();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async read util] receive " << buffer.size() << " bytes";
-			}
+			end_pos =
+				co_await asio::async_read_until(socket_, buffer, delm, asio::redirect_error(asio::use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
+		template <typename ConstBufferSequence>
+		auto async_send(ConstBufferSequence&& buffers) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
-			co_await socket_adaptor_.get_implement().async_write_some(buffer.data(),
-																	  asio::redirect_error(asio::use_awaitable, ec));
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[async send] error: " << ec.what();
-			}
-			else
-			{
-				XLOG_DEBUG() << "[async send] send " << buffer.size() << " bytes";
-			}
+			co_await asio::async_write(socket_, buffers, asio::redirect_error(asio::use_awaitable, ec));
 
 			co_return ec;
 		}
 
-		bool close()
+		bool shutdown()
 		{
 			error_code ec;
 
@@ -145,65 +118,29 @@ namespace aquarius
 				XLOG_ERROR() << "[shutdown] error: " << ec.what();
 			}
 
-			socket_.close(ec);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[close] error: " << ec.what();
-			}
-
 			return !ec;
 		}
 
-		bool keep_alive(bool enable = true)
+		error_code keep_alive(bool enable)
 		{
 			error_code ec;
 
 			socket_.set_option(typename Protocol::keep_alive(enable), ec);
 
-			if (ec)
-			{
-				XLOG_ERROR() << "[keep alive] error: " << ec.what();
-			}
-
-			return !ec;
+			return ec;
 		}
 
-		bool set_nodelay(bool enable = true)
+		error_code set_nodelay(bool enable)
 		{
 			error_code ec;
 
 			socket_.set_option(typename Protocol::no_delay(enable), ec);
 
-			if (ec)
-			{
-				XLOG_ERROR() << "[set nodelay] error: " << ec.what();
-			}
-
-			return !ec;
-		}
-
-		auto accept() -> asio::awaitable<error_code>
-		{
-			auto ec = co_await this->socket_adaptor_.async_handshake(timeout_);
-
-			if (ec)
-			{
-				co_return ec;
-			}
-
-			co_return co_await Protocol::accept(this->shared_from_this());
-		}
-
-		auto query() -> asio::awaitable<std::expected<flex_buffer, error_code>>
-		{
-			co_return co_await Protocol::query(this->shared_from_this());
+			return ec;
 		}
 
 	protected:
-		socket socket_;
-
-		adaptor_t socket_adaptor_;
+		socket_type socket_;
 
 		std::size_t uuid_;
 

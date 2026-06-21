@@ -1,6 +1,8 @@
 add_library(boost INTERFACE)
 target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
+set(Boost_NO_BOOST_CMAKE ON)
+
 if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 
@@ -20,23 +22,22 @@ set(AQUARIUS_NEED_BOOST
 	unit_test_framework
 	log
 	log_setup
-	system
 	json
 	charconv
 	program_options
 	url
 )
 
-find_package(Boost 1.88 CONFIG REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
+find_package(Boost 1.88 REQUIRED COMPONENTS ${AQUARIUS_NEED_BOOST})
 
 if(NOT Boost_FOUND)
-message(FATAR_ERROR "Found Boost ${Boost_VERSION}")
+message(FATAL_ERROR "Found Boost ${Boost_VERSION}")
 return()
 endif()
 
 message(STATUS "Found Boost ${Boost_VERSION}")
 
-target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::system Boost::program_options Boost::json Boost::charconv Boost::url)
+target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::program_options Boost::json Boost::charconv Boost::url)
 
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})
 endif()

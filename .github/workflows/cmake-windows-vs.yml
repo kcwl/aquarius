@@ -49,17 +49,17 @@ jobs:
       env:
         cache-name: boost-module
       with:
-        path: '${{ runner.workspace }}\boost_1_88_0'
-        key: ${{ runner.os }}-build-${{env.cache-name}}-1.88
+        path: '${{ runner.workspace }}\boost_1_90_0'
+        key: ${{ runner.os }}-build-${{env.cache-name}}-1.90
 
     - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
       name: Boost Setup
       shell: pwsh
       run: |
         cd  ${{ runner.workspace }}
-        curl -o boost_1_88_0.zip https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip
-        7z x boost_1_88_0.zip
-        cd boost_1_88_0
+        curl -o boost_1_90_0.zip https://archives.boost.io/release/1.90.0/source/boost_1_90_0.zip
+        7z x boost_1_90_0.zip
+        cd boost_1_90_0
         ./bootstrap.bat
         ./b2 link=shared address-model=64
 
@@ -82,7 +82,8 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DENABLE_MYSQL_TEST=true
-        -DBOOST_ROOT=${{ runner.workspace }}\boost_1_88_0
+        -DENABLE_SSL_TEST=ON
+        -DBOOST_ROOT=${{ runner.workspace }}\boost_1_90_0
         -S ${{ github.workspace }}
         
     - name: Build

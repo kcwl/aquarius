@@ -2,45 +2,64 @@
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/detail/struct_name.hpp>
 #include <aquarius/error_code.hpp>
+#include <aquarius/io_service_pool.hpp>
 #include <chrono>
 #include <string>
 
 namespace aquarius
 {
-	class module_base
+	template <typename Executor = asio::any_io_executor>
+	class basic_module
 	{
+	public:
+		using executor_type = Executor;
+
 	public:
 		virtual std::string name() const = 0;
 
-		virtual bool init() = 0;
+		virtual bool init()
+		{
+			return true;
+		}
 
-		virtual void stop() = 0;
+		virtual void stop()
+		{}
 
-		virtual bool enable() = 0;
+		virtual bool enable()
+		{
+			return true;
+		}
 
-		virtual void timer(std::chrono::milliseconds) = 0;
+		virtual auto timer(std::chrono::milliseconds) -> asio::awaitable<void>
+		{
+			co_return;
+		}
 
-		virtual auto run() -> asio::awaitable<bool> = 0;
+		virtual auto run() -> asio::awaitable<bool>
+		{
+			co_return true;
+		}
+
+	public:
+		void attach(const executor_type& executor)
+		{
+			executor_ = executor;
+		}
+
+	protected:
+		executor_type executor_;
 	};
 
 	template <typename T>
-	class basic_module : public module_base
+	class module : public basic_module<>
 	{
-	public:
-		basic_module() = default;
+		using base_type = basic_module<>;
 
 	public:
-		template <typename R, typename Func>
-		auto async_visit(Func&& f) -> asio::awaitable<R>
-		{
-			co_return co_await std::forward<Func>(f)(_this());
-		}
+		using executor_type = typename base_type::executor_type;
 
-		template <typename R, typename Func>
-		auto visit(Func&& f) -> R
-		{
-			return std::forward<Func>(f)(_this());
-		}
+	public:
+		module() = default;
 
 	public:
 		virtual std::string name() const final
@@ -49,29 +68,13 @@ namespace aquarius
 
 			return std::string(module_name);
 		}
-		virtual bool init() override
-		{
-			return true;
-		}
 
-		virtual void stop() override
+		template <typename R, typename Func>
+		auto async_visit(Func&& f) -> asio::awaitable<R>
 		{
-			return;
-		}
-
-		virtual bool enable() override
-		{
-			return true;
-		}
-
-		virtual void timer(std::chrono::milliseconds) override
-		{
-			return;
-		}
-
-		virtual auto run() -> asio::awaitable<bool> override
-		{
-			co_return true;
+			co_return co_await asio::co_spawn(
+				this->executor_, [func = std::move(f), this] mutable -> asio::awaitable<R>
+				{ co_return co_await func(_this()); }, asio::use_awaitable);
 		}
 
 	private:

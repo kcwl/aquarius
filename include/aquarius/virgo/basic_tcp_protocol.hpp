@@ -1,118 +1,114 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
+#include <aquarius/virgo/error.hpp>
 
 namespace aquarius
 {
-	template <bool Request, typename Header, typename Body, typename Allocator = std::allocator<Body>>
-	class basic_tcp_protocol : public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+	template <bool Request, detail::string_literal Router, typename Header, typename Body>
+	class basic_tcp_protocol : public basic_protocol<Header, Body>
 	{
 	public:
-		using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+		using base_type = basic_protocol<Header, Body>;
 
-		using typename base::header_t;
+		using typename base_type::header_type;
 
-		using typename base::body_t;
+		using typename base_type::body_type;
 
 		constexpr static auto has_request = Request;
+
+		constexpr static auto this_router = detail::bind_param<Router>::value;
 
 	public:
 		basic_tcp_protocol() = default;
 
 		virtual ~basic_tcp_protocol() = default;
 
-		basic_tcp_protocol(const basic_tcp_protocol& other) = delete;
-
-		basic_tcp_protocol& operator=(const basic_tcp_protocol& other) = delete;
+		basic_tcp_protocol(const basic_tcp_protocol& other) = default;
 
 		basic_tcp_protocol(basic_tcp_protocol&& other) noexcept = default;
+
+		basic_tcp_protocol& operator=(const basic_tcp_protocol& other) = default;
 
 		basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept = default;
 
 	public:
 		virtual error_code commit(flex_buffer& buffer) override
 		{
-			buffer.commit(sizeof(uint32_t));
+			error_code ec{};
 
-			commit_command_header(buffer);
-
-			this->header().serialize(buffer);
-
-			this->body().serialize(buffer);
-
-			auto pos = buffer.tellp();
-
-			auto size = pos - sizeof(uint32_t);
-
-			buffer.pubseekpos(0, std::ios::out);
-
-			buffer.sputn((char*)&size, sizeof(uint32_t));
-
-			buffer.pubseekpos(pos, std::ios::out);
-
-			return error_code{};
-		}
-
-		virtual bool consume(flex_buffer& buffer)
-		{
-			if (this->header().deserialize(buffer))
+			try
 			{
-				return false;
+				binary_parse{}.to_datas(this_router, buffer);
+
+				this->header().serialize(buffer);
+
+				this->body().serialize(buffer);
+			}
+			catch (...)
+			{
+				ec = ip::error::commit;
 			}
 
-			this->body().deserialize(buffer);
-
-			return true;
+			return ec;
 		}
 
-	protected:
-		virtual void commit_command_header(flex_buffer&)
+		virtual error_code consume(flex_buffer& buffer) override
 		{
-			return;
+			error_code ec{};
+
+			try
+			{
+				this->header().deserialize(buffer);
+
+				this->body().deserialize(buffer);
+			}
+			catch (...)
+			{
+				ec = ip::error::consume;
+			}
+
+			return ec;
 		}
 	};
 
-	template <typename Header, typename Body, typename Allocator>
-	class basic_tcp_protocol<false, Header, Body, Allocator>
-		: public basic_protocol<Header, std::add_pointer_t<Body>, Allocator>
+	template <detail::string_literal Router, typename Header, typename Body>
+	class basic_tcp_protocol<false, Router, Header, Body> : public basic_protocol<Header, Body>
 	{
 	public:
-		using base = basic_protocol<Header, std::add_pointer_t<Body>, Allocator>;
+		using base_type = basic_protocol<Header, Body>;
 
-		using typename base::header_t;
+		using typename base_type::header_type;
 
-		using typename base::body_t;
-
-		using version_t = int32_t;
+		using typename base_type::body_type;
 
 		using result_t = int32_t;
 
 		constexpr static auto has_request = false;
 
-		//   using length_offset_t = uint16_t;
+		constexpr static auto this_router = detail::bind_param<Router>::value;
 
 	public:
 		basic_tcp_protocol()
-			: base()
+			: base_type()
 			, result_()
+			, parse_()
 		{}
 
 		virtual ~basic_tcp_protocol() = default;
 
-		basic_tcp_protocol(const basic_tcp_protocol& other) = delete;
-
-		basic_tcp_protocol& operator=(const basic_tcp_protocol& other) = delete;
-
 		basic_tcp_protocol(basic_tcp_protocol&& other) noexcept
-			: base(std::move(other))
+			: base_type(std::move(other))
 			, result_(std::exchange(other.result_, 0))
+			, parse_(std::exchange(other.parse_, {}))
 		{}
 
 		basic_tcp_protocol& operator=(basic_tcp_protocol&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				base::operator=(std::move(other));
+				base_type::operator=(std::move(other));
 				result_ = std::exchange(other.result_, 0);
+				parse_ = std::exchange(other.parse_, {});
 			}
 
 			return *this;
@@ -137,48 +133,49 @@ namespace aquarius
 	public:
 		virtual error_code commit(flex_buffer& buffer) override
 		{
-			buffer.commit(sizeof(uint32_t));
+			error_code ec{};
 
-			commit_command_header(buffer);
-
-			this->header().serialize(buffer);
-
-			this->body().serialize(buffer);
-
-			auto pos = buffer.tellp();
-
-			auto size = pos - sizeof(uint32_t);
-
-			buffer.pubseekpos(0, std::ios::out);
-
-			buffer.sputn((char*)&size, sizeof(uint32_t));
-
-			buffer.pubseekpos(pos, std::ios::out);
-
-			return error_code{};
-		}
-
-		virtual bool consume(flex_buffer& buffer) override
-		{
-			this->result() = binary_parse().from_datas<result_t>(buffer);
-
-			if (this->header().deserialize(buffer))
+			try
 			{
-				return false;
+				binary_parse{}.to_datas(this_router, buffer);
+
+				parse_.to_datas<result_t>(this->result(), buffer);
+
+				this->header().serialize(buffer);
+
+				this->body().serialize(buffer);
+			}
+			catch (...)
+			{
+				ec = ip::error::commit;
 			}
 
-			this->body().deserialize(buffer);
-
-			return true;
+			return ec;
 		}
 
-	protected:
-		virtual void commit_command_header(flex_buffer&)
+		virtual error_code consume(flex_buffer& buffer) override
 		{
-			return;
+			error_code ec{};
+
+			try
+			{
+				this->result() = parse_.from_datas<result_t>(buffer);
+
+				this->header().deserialize(buffer);
+
+				this->body().deserialize(buffer);
+			}
+			catch (...)
+			{
+				ec = ip::error::consume;
+			}
+
+			return ec;
 		}
 
 	private:
 		result_t result_;
+
+		binary_parse parse_;
 	};
 } // namespace aquarius

@@ -1,12 +1,39 @@
-message regist:tcp -> 11000
+message regist -> 9000
 {
 	request
 	{
-		int32 protocol;
-		string ip_addr;
+		string name;
+		string host;
 		int32 port;
+		bool healthy;
+		string group;
+		int32 weight;
+		string version;
 	}
 	response
 	{
+	}
+}
+
+message subscribe_service -> 9001
+{
+	request
+	{
+		string group;
+	}
+	response
+	{
+		repeated uint64_t instances;
+	}
+}
+
+message broad_service_status -> 9002
+{
+	request{}
+	response
+	{
+		string group;
+		uint64 host_and_port;
+		bool healty;
 	}
 }

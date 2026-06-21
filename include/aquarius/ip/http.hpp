@@ -1,13 +1,12 @@
 #pragma once
 #include <aquarius/basic_client.hpp>
+#include <aquarius/basic_context.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
-#include <aquarius/ip/adaptor/raw_adaptor.hpp>
-#include <aquarius/ip/adaptor/ssl_adaptor.hpp>
+#include <aquarius/ip/context_reg.hpp>
 #include <aquarius/ip/http/http_options_handler.hpp>
-#include <aquarius/module/handler_channel.hpp>
 #include <aquarius/virgo/http_method.hpp>
 #include <aquarius/virgo/http_status.hpp>
 #include <boost/url.hpp>
@@ -39,8 +38,16 @@ namespace aquarius
 
 		constexpr static std::size_t header_part = 3;
 
+		using session = basic_session<http>;
+
+		using client = basic_client<http>;
+		using server = basic_server<http>;
+
+		template <typename Handler>
+		using context = basic_context<Handler, http>;
+
 		template <typename Session>
-		static auto accept(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
+		auto accept(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
@@ -73,9 +80,7 @@ namespace aquarius
 
 				if (method == http_method::options)
 				{
-					auto resp = co_await mpc_http_options(buffer);
-
-					co_await session_ptr->async_send(std::move(*resp));
+					ec = co_await mpc_http_options(session_ptr, buffer);
 				}
 				else
 				{
@@ -88,18 +93,44 @@ namespace aquarius
 
 					ec = co_await recv(session_ptr, buffer);
 
+					std::string_view header_str((char*)buffer.data().data(), buffer.size());
+
+					auto src = parse_key(header_str, "source-seq");
+
 					asio::co_spawn(
 						session_ptr->get_executor(),
-						[&, r = std::move(router)] -> asio::awaitable<void>
+						[&, r = std::move(router), src] -> asio::awaitable<void>
 						{
-							auto resp_buf = co_await mpc_publish(std::move(r), buffer, static_cast<int>(method));
+							auto context = mpc_get_context(r);
 
-							if (!resp_buf.has_value())
+							if (!context)
 							{
 								co_return;
 							}
 
-							co_await session_ptr->async_send(std::move(*resp_buf));
+							auto ptr = std::dynamic_pointer_cast<basic_protocol_context<http>>(context);
+							if (!ptr)
+							{
+								co_return;
+							}
+
+							if (src.empty())
+							{
+								co_return;
+							}
+
+							auto src_i = std::atoi(src.data());
+
+							auto ec = co_await ptr->complete(
+								this, buffer, std::move(src_i), std::move(method),
+								[session_ptr](asio::const_buffer buffer) -> asio::awaitable<error_code>
+								{ co_return co_await session_ptr->async_send(buffer); });
+
+							if (ec.value() != static_cast<int>(http_status::ok))
+							{
+								XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
+								co_return;
+							}
 						},
 						asio::detached);
 				}
@@ -114,51 +145,65 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto query(std::shared_ptr<Session> session_ptr)
-			-> asio::awaitable<std::expected<flex_buffer, error_code>>
+		auto query(std::shared_ptr<Session> session_ptr) -> asio::awaitable<error_code>
 		{
-			flex_buffer buffer{};
-
-			std::size_t end_pos{};
-
-			auto ec = co_await session_ptr->async_read_util(buffer, two_crlf, end_pos);
-
-			if (ec)
+			for (;;)
 			{
-				co_return buffer;
+				flex_buffer buffer{};
+
+				std::size_t end_pos{};
+
+				auto ec = co_await session_ptr->async_read_util(buffer, two_crlf, end_pos);
+
+				if (ec)
+				{
+					co_return ec;
+				}
+
+				ec = co_await recv(session_ptr, buffer);
+
+				if (ec)
+				{
+					XLOG_ERROR() << "[query buffer] error: " << ec.what();
+					co_return ec;
+				}
+
+				std::string_view header_line((char*)buffer.data().data(), buffer.size());
+				auto pos = header_line.find_first_of(crlf);
+
+				auto [version, status] = parse_command_line<false>(header_line.substr(0, pos), ec);
+
+				if (ec)
+				{
+					co_return ec;
+				}
+
+				if (status != http_status::ok)
+				{
+					co_return status;
+				}
+
+				buffer.consume(pos);
+
+				std::string_view header_str((char*)buffer.data().data(), buffer.size());
+
+				auto src = parse_key(header_str, "source-seq");
+
+				if (src.empty())
+				{
+					co_return ec;
+				}
+
+				if (!session_ptr->filling_buffer(std::atoi(src.data()), buffer))
+				{
+				}
+
+				co_return ec;
 			}
-
-			ec = co_await recv(session_ptr, buffer);
-
-			if (ec)
-			{
-				XLOG_ERROR() << "[query buffer] error: " << ec.what();
-				co_return flex_buffer{};
-			}
-
-			std::string_view header_line((char*)buffer.data().data(), buffer.size());
-			auto pos = header_line.find_first_of(crlf);
-
-			auto [version, status] = parse_command_line<false>(header_line.substr(0, pos), ec);
-
-			if (ec)
-			{
-				co_return flex_buffer{};
-			}
-
-			if (status != http_status::ok)
-			{
-				co_return flex_buffer{};
-			}
-
-			buffer.consume(pos);
-
-			co_return std::move(buffer);
 		}
 
-	private:
 		template <typename Session>
-		static auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
+		auto recv(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
@@ -191,7 +236,7 @@ namespace aquarius
 		}
 
 		template <bool Server>
-		static auto parse_command_line(std::string_view header_span, error_code& ec)
+		auto parse_command_line(std::string_view header_span, error_code& ec)
 		{
 			using result_t =
 				std::conditional_t<Server,
@@ -257,7 +302,7 @@ namespace aquarius
 			}
 		}
 
-		static std::string_view parse_key(std::string_view header_str, const std::string& key)
+		std::string_view parse_key(std::string_view header_str, const std::string& key)
 		{
 			std::string_view result{};
 
@@ -280,7 +325,7 @@ namespace aquarius
 		}
 
 		template <typename Session>
-		static auto make_error_response(std::shared_ptr<Session> session_ptr, error_code ec) -> asio::awaitable<void>
+		auto make_error_response(std::shared_ptr<Session> session_ptr, error_code ec) -> asio::awaitable<void>
 		{
 			auto resp_header = std::format("{} {} {}", version_to_string(global_http_version), ec.value(),
 										   status_to_string(ec.value()));
@@ -288,12 +333,53 @@ namespace aquarius
 			error_buffer.sputn(resp_header.c_str(), resp_header.size());
 			co_await session_ptr->async_send(std::move(error_buffer));
 		}
+
+		template <typename Handler, typename Func>
+		auto handle_request(flex_buffer& buffer, uint32_t src, http_method method, Func&& func)
+			-> asio::awaitable<error_code>
+		{
+			auto handler_ptr = std::make_shared<Handler>();
+
+			handler_ptr->request()->method(method);
+			handler_ptr->request()->body().set_method(method);
+
+			auto ec = co_await handler_ptr->visit(buffer);
+
+			if (ec)
+			{
+				co_return ec;
+			}
+
+			flex_buffer resp_buffer{};
+			handler_ptr->response().header().set_field("source-seq", std::to_string(src));
+			handler_ptr->response().commit(resp_buffer);
+
+			auto res = co_await func(resp_buffer.data());
+
+			if (res)
+			{
+				XLOG_ERROR() << "[http handle_request] async_send error:" << ec.what();
+			}
+
+			co_return res;
+		}
+
+		template <typename Session, typename Request, typename Func>
+		auto send_request(std::shared_ptr<Session> session_ptr, std::shared_ptr<Request> request, Func&& func,
+						  error_code& ec) -> asio::awaitable<std::size_t>
+		{
+			flex_buffer buffer{};
+
+			auto src = detail::uuid_generator()();
+			request->header().set_field("source-seq", std::to_string(src));
+
+			request->commit(buffer);
+
+			session_ptr->regist_resp_func(src, func);
+
+			ec = co_await session_ptr->async_send(buffer);
+
+			co_return src;
+		}
 	};
-
-	using http_session = basic_session<http, raw_adaptor>;
-	using http_client = basic_client<http_session>;
-	using http_server = basic_server<http_session>;
-
-	using https_client_session = basic_session<http, ssl_client_adaptor>;
-	using https_server_session = basic_session<http, ssl_server_adaptor>;
 } // namespace aquarius

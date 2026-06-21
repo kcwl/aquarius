@@ -11,8 +11,8 @@ namespace aquarius
 {
 	enum class http_method
 	{
-		get,
 		post,
+		get,
 		options,
 		head,
 		put,
@@ -59,7 +59,7 @@ namespace aquarius
 		is >> method;
 
 		[[maybe_unused]] auto res =
-			string_to_method(method).and_then([&](auto method) -> std::expected<void, error_code> { m = method; });
+			string_to_method(method).and_then([&] (auto method) -> std::expected<bool, error_code> { m = method; return true; });
 
 		return is;
 	}

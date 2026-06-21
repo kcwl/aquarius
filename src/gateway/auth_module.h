@@ -1,18 +1,18 @@
 #pragma once
-#include <aquarius/module/module.hpp>
+#include <aquarius/module/module_register.hpp>
 #include <string>
 
 namespace aquarius
 {
 	namespace gateway
 	{
-		class auth_module : public no_config_module<auth_module>
+		AQUARIUS_MODULE(auth_module)
 		{
 		public:
-			auth_module(io_context& io, const std::string& name);
+			auth_module() = default;
 
 		public:
-			auto auth(const std::string& username, const std::string& password) ->awaitable<bool>;
+			auto auth(const std::string& username, const std::string& password) -> asio::awaitable<bool>;
 		};
 	} // namespace gateway
 } // namespace aquarius

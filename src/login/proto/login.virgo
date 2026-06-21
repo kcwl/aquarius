@@ -1,0 +1,12 @@
+
+message login -> 10000
+{
+	request
+	{
+		string username;
+		string password;
+	}
+	response
+	{
+	}
+}

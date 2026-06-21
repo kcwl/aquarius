@@ -56,11 +56,6 @@ namespace aquarius
 			enable_ = false;
 		}
 
-		std::size_t pool_size() const
-		{
-			return pool_size_;
-		}
-
 		void stop()
 		{
 			for (auto& io_service : io_services_)
@@ -87,7 +82,7 @@ namespace aquarius
 			return io_service;
 		}
 
-		std::size_t size() const
+		std::size_t capacity() const
 		{
 			return pool_size_;
 		}

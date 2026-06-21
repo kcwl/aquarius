@@ -8,151 +8,78 @@
 
 namespace aquarius
 {
-	template <typename Header, typename Body, typename Allocator>
-	class basic_protocol : public boost::empty_value<Body>
+	template <typename Header, typename Body>
+	class basic_protocol : private boost::empty_value<Body>
 	{
-		static_assert(std::is_pointer_v<Body>, "body must be a regular pointer");
-
 	public:
-		using header_t = Header;
-		using body_t = std::remove_pointer_t<Body>;
-		using base_body = boost::empty_value<Body>;
+		using header_type = Header;
+		using body_type = Body;
 
 	public:
 		basic_protocol()
-			: basic_protocol(Allocator())
-		{}
-		basic_protocol(const Allocator& alloc)
-			: base_body()
+			: boost::empty_value<Body>()
 			, header_()
-			, alloc_(alloc)
-			, method_(0)
+		{}
+
+		basic_protocol(const basic_protocol& other)
+			: header_(other.header_)
 		{
-			this->get() = alloc_.allocate(1);
-			::new (static_cast<void*>(this->get())) body_t();
+			this->get() = other.get();
 		}
-
-		basic_protocol(const basic_protocol& other) = delete;
-
-		basic_protocol& operator=(const basic_protocol& other) = delete;
 
 		basic_protocol(basic_protocol&& other) noexcept
-			: header_(std::exchange(other.header_, {}))
-			, alloc_(std::move(other.alloc_))
-			, method_(std::exchange(other.method_, 0))
+			: header_(std::exchange(other.header_, header_type{}))
 		{
-			this->get() = std::exchange(other.get(), nullptr);
+			this->get() = std::exchange(other.get(), body_type{});
 		}
+
+		basic_protocol& operator=(const basic_protocol& other)
+		{
+			if (this != std::addressof(other))
+			{
+				header_ = other.header_;
+				this->get() = other.get();
+			}
+
+			return *this;
+		}
+
 		basic_protocol& operator=(basic_protocol&& other) noexcept
 		{
 			if (this != std::addressof(other))
 			{
-				header_ = std::move(other.header_);
-				this->get() = std::exchange(other.get(), nullptr);
-				alloc_ = std::move(other.alloc_);
-				method_ = std::exchange(other.method_, 0);
+				header_ = std::exchange(other.header_, header_type{});
+				this->get() = std::exchange(other.get(), body_type{});
 			}
 			return *this;
 		}
-		virtual ~basic_protocol()
-		{
-			if (this->get())
-			{
-				alloc_.deallocate(this->get(), 1);
-				this->get() = nullptr;
-			}
-		}
+
+		virtual ~basic_protocol() = default;
 
 	public:
-		virtual error_code commit(flex_buffer&)
-		{
-			return error_code{};
-		}
+		virtual error_code commit(flex_buffer&) = 0;
 
-		virtual bool consume(flex_buffer& buffer)
-		{
-			if (this->header().deserialize(buffer))
-			{
-				return false;
-			}
-
-			this->body().deserialize(buffer);
-
-			return true;
-		}
-
-		void method(int m)
-		{
-			method_ = m;
-		}
-
-		int method() const
-		{
-			return method_;
-		}
-
-		int& method()
-		{
-			return method_;
-		}
+		virtual error_code consume(flex_buffer&) = 0;
 
 	public:
-		header_t& header()
+		header_type& header()
 		{
 			return header_;
 		}
-		const header_t& header() const
+		const header_type& header() const
 		{
 			return header_;
 		}
-		body_t& body()
+		body_type& body()
 		{
-			return *this->get();
+			return this->get();
 		}
-		const body_t& body() const
+		const body_type& body() const
 		{
-			return *this->get();
+			return this->get();
 		}
 
 	private:
-		header_t header_;
-
-		Allocator alloc_;
-
-		int method_;
-	};
-
-	struct null_header
-	{
-		bool serialize(flex_buffer&)
-		{
-			return true;
-		}
-		bool deserialize(flex_buffer&)
-		{
-			return true;
-		}
-		std::size_t content_length()
-		{
-			return 0;
-		}
-		std::size_t sequence()
-		{
-			return 0;
-		}
-		void sequence(uint32_t)
-		{}
-	};
-
-	struct null_body
-	{
-		bool serialize(flex_buffer&)
-		{
-			return true;
-		}
-		bool deserialize(flex_buffer&)
-		{
-			return true;
-		}
+		header_type header_;
 	};
 } // namespace aquarius

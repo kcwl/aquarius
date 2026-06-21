@@ -11,25 +11,27 @@ namespace aquarius
 {
 	using namespace std::chrono_literals;
 
-	template <typename Session, typename Executor = asio::any_io_executor>
-	class basic_client
+	template <typename Protocol, typename Executor = asio::any_io_executor>
+	class basic_client : public std::enable_shared_from_this<basic_client<Protocol>>
 	{
-		using socket = Session::socket;
+		using protocol_type = Protocol;
 
-		using resolver = Session::resolver;
+		using socket = typename protocol_type::socket;
 
-		using callback_t = std::function<void(std::shared_ptr<Session>)>;
+		using resolver = protocol_type::resolver;
 
-		using executor_t = Executor;
+		using callback_t = std::function<void(std::shared_ptr<protocol_type>)>;
+
+		using executor_type = Executor;
 
 	public:
 		basic_client(asio::io_context& context, std::chrono::milliseconds timeout)
 			: basic_client(context.get_executor(), timeout)
 		{}
 
-		basic_client(const executor_t& e, std::chrono::milliseconds timeout)
-			: executor_(e)
-			, session_ptr_(nullptr)
+		basic_client(const executor_type& executor, std::chrono::milliseconds timeout)
+			: executor_(executor)
+			, proto_ptr_(nullptr)
 			, close_func_()
 			, accept_func_()
 			, host_()
@@ -38,15 +40,15 @@ namespace aquarius
 		{}
 
 	public:
-		executor_t get_executor() const
+		auto get_executor()
 		{
 			return executor_;
 		}
 		auto async_connect(const std::string& host, uint16_t port) -> asio::awaitable<error_code>
 		{
-			session_ptr_ = std::make_shared<Session>(std::move(socket(this->get_executor())), this->get_timeout());
+			proto_ptr_ = std::make_shared<protocol_type>(std::move(socket(this->get_executor())), this->get_timeout());
 
-			auto ec = co_await session_ptr_->async_connect(host, std::to_string(port));
+			auto ec = co_await proto_ptr_->async_connect(host, std::to_string(port));
 
 			if (!make_error(ec))
 			{
@@ -54,36 +56,38 @@ namespace aquarius
 				port_ = port;
 
 				accept_invoke();
+
+				auto self = this->shared_from_this();
+
+				asio::co_spawn(
+					get_executor(),
+					[&, this, self]() -> asio::awaitable<void>
+					{
+						for (;;)
+						{
+							auto ec = co_await proto_ptr_->query();
+
+							if (ec)
+							{
+								break;
+							}
+						}
+					},
+					asio::detached);
 			}
 
 			co_return ec;
 		}
 
-		auto reconnect() -> asio::awaitable<error_code>
+		auto async_send(flex_buffer& buffer) -> asio::awaitable<error_code>
 		{
-			co_return co_await async_connect(host_, port_);
-		}
-
-		auto async_send(flex_buffer&& buffer) -> asio::awaitable<error_code>
-		{
-			co_return co_await session_ptr_->async_send(std::move(buffer));
-		}
-
-		std::string remote_address() const
-		{
-			return session_ptr_->remote_address();
-		}
-
-		int remote_port() const
-		{
-			return session_ptr_->remote_port();
+			co_return co_await proto_ptr_->async_send(buffer);
 		}
 
 		void close()
 		{
-			session_ptr_->close();
-
-			std::shared_ptr<Session>().swap(session_ptr_);
+			proto_ptr_->shutdown();
+			proto_ptr_.reset();
 		}
 
 		std::chrono::milliseconds get_timeout() const
@@ -102,7 +106,7 @@ namespace aquarius
 			if (!close_func_)
 				return;
 
-			close_func_(session_ptr_);
+			close_func_(proto_ptr_);
 		}
 
 		template <typename Func>
@@ -116,11 +120,53 @@ namespace aquarius
 			if (!accept_func_)
 				return;
 
-			accept_func_(session_ptr_);
+			accept_func_(proto_ptr_);
 		}
 
 		template <typename Response, typename Request>
-		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<Response>
+		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
+		{
+			Response resp{};
+
+			auto f = [&](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
+			{
+				resp.consume(buffer);
+				co_return error_code{};
+			};
+
+			error_code ec{};
+
+			auto src = co_await proto_ptr_->send_request(req, f, ec);
+
+			if (make_error(ec))
+			{
+				co_return resp;
+			}
+
+			co_await proto_ptr_->wait(src);
+
+			make_error(ec);
+
+			co_return resp;
+		}
+
+		template <typename Func, typename ConstBufferSequence>
+		auto async_call_buffer(ConstBufferSequence&& req, const std::string router, Func&& f) -> asio::awaitable<error_code>
+		{
+			error_code ec{};
+
+			auto src =
+				co_await proto_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), router, std::forward<Func>(f), ec);
+
+			co_await proto_ptr_->wait(src);
+
+			make_error(ec);
+
+			co_return ec;
+		}
+
+		template <typename Request>
+		auto async_send(std::shared_ptr<Request> req) -> asio::awaitable<bool>
 		{
 			flex_buffer buffer{};
 
@@ -128,26 +174,9 @@ namespace aquarius
 
 			auto ec = co_await async_send(std::move(buffer));
 
-			Response resp{};
+			make_error(ec);
 
-			if (make_error(ec))
-			{
-				co_return resp;
-			}
-
-			auto result = co_await session_ptr_->query();
-
-			if (!result.has_value())
-			{
-				if (make_error(result.error()))
-				{
-					co_return resp;
-				}
-			}
-
-			resp.consume(*result);
-
-			co_return resp;
+			co_return !ec;
 		}
 
 	protected:
@@ -163,19 +192,19 @@ namespace aquarius
 
 			close_invoke();
 
-			session_ptr_->close();
+			proto_ptr_->shutdown();
 
 			return true;
 		}
 
-	private:
-		executor_t executor_;
+	protected:
+		executor_type executor_;
 
-		std::shared_ptr<Session> session_ptr_;
+		std::shared_ptr<protocol_type> proto_ptr_;
 
-		std::function<void(std::shared_ptr<Session>)> close_func_;
+		callback_t close_func_;
 
-		std::function<void(std::shared_ptr<Session>)> accept_func_;
+		callback_t accept_func_;
 
 		std::string host_;
 

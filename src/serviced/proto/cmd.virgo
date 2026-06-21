@@ -1,8 +1,9 @@
-message cmd_op:tcp -> 10001
+message cmd_op -> 9200
 {
 	request
 	{
-		bytes input;
+		string command;
+		repeated string paramers;
 	}
 	response
 	{
