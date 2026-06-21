@@ -46,9 +46,9 @@ jobs:
     - name: Setup Boost1.90
       shell: bash
       run: |
-      cd ${{runner.workspace}}
-      curl -o boost_1_90_0.exe https://archives.boost.io/release/1.90.0/binaries/boost_1_90_0-msvc-14.3-64.exe
-      boost_1_90_0.exe
+        cd ${{ runner.workspace }}
+        curl -o boost_1_90_0.exe https://archives.boost.io/release/1.90.0/binaries/boost_1_90_0-msvc-14.3-64.exe
+        boost_1_90_0.exe
 
     # - name: cache boost
     #   id: cache-boost
