@@ -46,7 +46,9 @@ jobs:
     - name: Setup Boost1.90
       shell: bash
       run: |
+        echo "start boost install"
         curl -o boost_1_90_0.exe https://archives.boost.io/release/1.90.0/binaries/boost_1_90_0-msvc-14.3-64.exe
+        echo "finish boost download"
         ./boost_1_90_0.exe
 
     # - name: cache boost
