@@ -128,10 +128,10 @@ namespace aquarius
 		{
 			Response resp{};
 
-			auto f = [&](flex_buffer& buffer, const std::string&) -> asio::awaitable<void>
+			auto f = [&](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
 			{
 				resp.consume(buffer);
-				co_return;
+				co_return error_code{};
 			};
 
 			error_code ec{};

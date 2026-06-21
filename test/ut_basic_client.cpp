@@ -36,14 +36,14 @@ BOOST_AUTO_TEST_CASE(ctor)
 	BOOST_TEST(cli.check_ctor(io, timeout));
 }
 
-class mock_connect_failed_session
+class mock_connect_failed_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_connect_failed_session(socket, std::chrono::milliseconds)
+	mock_connect_failed_protocol(socket, std::chrono::milliseconds)
 	{}
 
 public:
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(client_async_connect_failed)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_connect_failed_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_connect_failed_protocol>>(io, timeout);
 
 	auto future = asio::co_spawn(
 		io,
@@ -85,14 +85,14 @@ BOOST_AUTO_TEST_CASE(client_async_connect_failed)
 	future.get();
 }
 
-class mock_connect_success_session
+class mock_connect_success_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_connect_success_session(socket, std::chrono::milliseconds)
+	mock_connect_success_protocol(socket, std::chrono::milliseconds)
 	{}
 
 	auto async_connect(const std::string&, const std::string&) -> asio::awaitable<error_code>
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(client_async_connect_success_and_query_failed)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_connect_failed_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_connect_failed_protocol>>(io, timeout);
 
 	cli->set_close_func([](auto session) { BOOST_TEST(session); });
 
@@ -147,14 +147,14 @@ BOOST_AUTO_TEST_CASE(client_invoke_accept_and_close)
 	cli.close_invoke();
 }
 
-class mock_send_request_failed_session
+class mock_send_request_failed_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_send_request_failed_session(socket, std::chrono::milliseconds)
+	mock_send_request_failed_protocol(socket, std::chrono::milliseconds)
 	{}
 
 	template <typename Request, typename Func>
@@ -175,14 +175,14 @@ public:
 	}
 };
 
-class mock_send_request_success_session
+class mock_send_request_success_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_send_request_success_session(socket, std::chrono::milliseconds)
+	mock_send_request_success_protocol(socket, std::chrono::milliseconds)
 	{}
 
 	template <typename Request, typename Func>
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(async_call_request_falied)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_send_request_failed_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_send_request_failed_protocol>>(io, timeout);
 
 	auto future = asio::co_spawn(
 		io,
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(async_call_request_success)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_send_request_success_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_send_request_success_protocol>>(io, timeout);
 
 	auto future = asio::co_spawn(
 		io,
@@ -259,18 +259,18 @@ BOOST_AUTO_TEST_CASE(async_call_request_success)
 		asio::use_future);
 }
 
-class mock_send_buffer_failed_session
+class mock_send_buffer_failed_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_send_buffer_failed_session(socket, std::chrono::milliseconds)
+	mock_send_buffer_failed_protocol(socket, std::chrono::milliseconds)
 	{}
 
-	template <typename Request, typename Func>
-	auto send_buffer(flex_buffer&, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+	template <typename Func>
+	auto send_buffer(flex_buffer&, const std::string&, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 	{
 		ec = boost::asio::error::bad_descriptor;
 		co_return 0;
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_falied)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_send_buffer_failed_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_send_buffer_failed_protocol>>(io, timeout);
 
 	auto future = asio::co_spawn(
 		io,
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_falied)
 		{
 			flex_buffer buffer{};
 			auto ec = co_await cli->async_call_buffer(
-				buffer,
+				buffer, std::string{},
 				[](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
 				{
 					BOOST_TEST(false);
@@ -319,21 +319,21 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_falied)
 		asio::use_future);
 }
 
-class mock_send_buffer_success_session
+class mock_send_buffer_success_protocol
 {
 public:
 	using socket = asio::ip::tcp::socket;
 	using resolver = asio::ip::tcp::resolver;
 
 public:
-	mock_send_buffer_success_session(socket, std::chrono::milliseconds)
+	mock_send_buffer_success_protocol(socket, std::chrono::milliseconds)
 	{}
 
-	template <typename Request, typename Func>
-	auto send_buffer(flex_buffer&, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+	template <typename Func>
+	auto send_buffer(flex_buffer&,const std::string& r, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
 	{
 		flex_buffer buffer{};
-		f(buffer);
+		f(buffer,r);
 		ec = error_code{};
 		co_return 0;
 	}
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_success)
 	asio::io_context io{};
 	auto timeout = 10ms;
 
-	auto cli = std::make_shared<basic_client<mock_send_buffer_success_session>>(io, timeout);
+	auto cli = std::make_shared<basic_client<mock_send_buffer_success_protocol>>(io, timeout);
 
 	auto future = asio::co_spawn(
 		io,
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE(async_call_buffer_success)
 		{
 			flex_buffer buffer{};
 			auto ec = co_await cli->async_call_buffer(
-				buffer,
+				buffer,"",
 				[](flex_buffer& buffer, const std::string&) -> asio::awaitable<error_code>
 				{
 					BOOST_TEST(true);

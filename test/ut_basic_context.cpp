@@ -16,9 +16,8 @@ struct mock_protocol
 
 BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 {
-	basic_protocol_context<mock_protocol, std::size_t> ctx(
-		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*,
-		   std::size_t) -> asio::awaitable<error_code>
+	basic_protocol_context<mock_protocol> ctx(
+		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, Callback&) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
 			co_return error_code{};
@@ -43,8 +42,8 @@ BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 
 BOOST_AUTO_TEST_CASE(basic_protocol_router)
 {
-	basic_protocol_context<mock_protocol, std::size_t> ctx(
-		[](basic_protocol_context<mock_protocol, std::size_t>*, mock_protocol*, std::size_t) -> asio::awaitable<error_code>
+	basic_protocol_context<mock_protocol> ctx(
+		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, Callback&) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
 			co_return error_code{};
@@ -65,7 +64,7 @@ struct mock_handler
 
 BOOST_AUTO_TEST_CASE(basic_context_ctor)
 {
-	basic_context<mock_handler, mock_protocol, std::size_t> ctx{};
+	basic_context<mock_handler, mock_protocol> ctx{};
 
 	asio::io_context io{};
 	auto future = asio::co_spawn(

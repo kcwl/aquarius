@@ -44,7 +44,7 @@ namespace aquarius
 
 		struct callback
 		{
-			using func_t = std::function<asio::awaitable<void>(flex_buffer&, const std::string&)>;
+			using func_t = std::function<asio::awaitable<error_code>(flex_buffer&, const std::string&)>;
 
 			func_t func;
 
