@@ -1,4 +1,4 @@
-#include "client_pool.h"
+#include "http_client_pool.h"
 #include "basic_transfer_context.hpp"
 #include "gate_error_code.h"
 #include "proto/shake.virgo.h"
@@ -8,11 +8,11 @@ namespace aquarius
 {
 	namespace gateway
 	{
-		client_pool::client_pool()
+		http_client_pool::http_client_pool()
 			: group_("services")
 		{}
 
-		auto client_pool::run() -> asio::awaitable<bool>
+		auto http_client_pool::run() -> asio::awaitable<bool>
 		{
 			auto healthy_callback = [this](uint64_t host_and_port, bool healthy) -> asio::awaitable<void>
 			{
@@ -42,13 +42,13 @@ namespace aquarius
 			co_return true;
 		}
 
-		auto client_pool::shake(uint64_t host_and_port) -> asio::awaitable<void>
+		auto http_client_pool::shake(uint64_t host_and_port) -> asio::awaitable<void>
 		{
 			co_await add(host_and_port);
 
 			auto request = std::make_shared<shake_request>();
 
-			auto resp = co_await this->invoke<shake_response>(host_and_port, request);
+			auto resp = co_await this->invoke<shake_response>(host_and_port, request, http_method::post, http_version::http1_1);
 
 			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer, const std::string& router,
 																 Func&& f) -> asio::awaitable<error_code>
@@ -56,13 +56,13 @@ namespace aquarius
 				auto ec = co_await this->invoke(
 					host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<error_code>
-					{ co_return co_await func(buf); });
+					{ co_return co_await func(buf); },http_method::post, http_version::http1_1);
 
 				co_return ec;
 			};
 
 			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(ctx_func), tcp>>(std::move(ctx_func));
+				std::make_shared<basic_transfer_context<decltype(ctx_func), http>>(std::move(ctx_func));
 
 			for (auto& topic : resp.body().topics())
 			{
@@ -70,7 +70,7 @@ namespace aquarius
 			}
 		}
 
-		auto client_pool::add(uint64_t host_and_port) -> asio::awaitable<void>
+		auto http_client_pool::add(uint64_t host_and_port) -> asio::awaitable<void>
 		{
 			std::unique_lock lk(mutex_);
 
@@ -91,7 +91,7 @@ namespace aquarius
 
 			for (auto& c : back)
 			{
-				c = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
+				c = std::make_shared<http::client>(co_await asio::this_coro::executor, 30ms);
 
 				auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
 
@@ -102,7 +102,7 @@ namespace aquarius
 			}
 		}
 
-		void client_pool::remove(uint64_t host_and_port)
+		void http_client_pool::remove(uint64_t host_and_port)
 		{
 			std::unique_lock lk(mutex_);
 
@@ -116,7 +116,7 @@ namespace aquarius
 			pool_.erase(iter);
 		}
 
-		std::pair<std::string, int32_t> client_pool::instance_to_host(uint64_t host_and_port)
+		std::pair<std::string, int32_t> http_client_pool::instance_to_host(uint64_t host_and_port)
 		{
 			uint32_t host = host_and_port >> 32;
 			int32_t port = static_cast<int32_t>(host_and_port);

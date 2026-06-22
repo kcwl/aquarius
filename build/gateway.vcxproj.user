@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--listen 8100 --name gateway --proto http1.1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArgumentsHistory>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArgumentsHistory>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399|--listen 8100 --name gateway --proto http1.1|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>--listen 8100 --name gateway --pool_size 5 --transfer 127.0.0.1:3399</LocalDebuggerCommandArguments>

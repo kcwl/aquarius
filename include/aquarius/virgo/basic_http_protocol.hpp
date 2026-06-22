@@ -63,7 +63,9 @@ namespace aquarius
 
 			try
 			{
-				std::size_t bytes = this->body().byte_size();
+				flex_buffer body_buffer{};
+				this->body().serialize(body_buffer);
+				std::size_t bytes = body_buffer.size();
 
 				if (this->method() != http_method::get && bytes != 0)
 				{
@@ -74,7 +76,7 @@ namespace aquarius
 
 				if (this->method() != http_method::get && bytes != 0)
 				{
-					this->body().serialize(buffer);
+					buffer.sputn((char*)body_buffer.data().data(), body_buffer.size());
 				}
 			}
 			catch (...)
