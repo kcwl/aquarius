@@ -29,6 +29,8 @@ namespace aquarius
 
 		using duration = typename session_type::duration;
 
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+
 		template <typename Handler>
 		using context = basic_context<Handler, tcp>;
 

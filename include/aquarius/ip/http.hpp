@@ -45,7 +45,9 @@ namespace aquarius
 		using server = basic_server<http>;
 
 		template <typename Handler>
-		using context = basic_context<Handler, http>;
+		using context = basic_context<Handler, http, http_method>;
+
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&, int)>;
 
 		using duration = typename session_type::duration;
 
@@ -129,7 +131,7 @@ namespace aquarius
 						continue;
 					}
 
-					auto ptr = std::dynamic_pointer_cast<basic_protocol_context<http>>(context);
+					auto ptr = std::dynamic_pointer_cast<basic_protocol_context<http, http_method>>(context);
 					if (!ptr)
 					{
 						continue;
@@ -142,8 +144,16 @@ namespace aquarius
 					auto self = this->shared_from_this();
 
 					ec =
-						co_await ptr->complete(this, [this, self](flex_buffer& buffer) -> asio::awaitable<error_code>
-											   { co_return co_await session_ptr_->async_send(buffer); });
+						co_await ptr->complete(this, [this, self, version](flex_buffer& buffer, int result) -> asio::awaitable<error_code>
+											   { 
+												   std::string raw_header = std::format("{} {} {}", version_to_string(version), result, status_to_string(result));
+
+												   std::vector<asio::const_buffer> buffers{};
+												   commit_raw_header(buffers, raw_header);
+
+												   buffers.push_back(buffer.data());
+
+												   co_return co_await session_ptr_->async_send(buffer); }, std::move(method));
 
 					if (ec.value() != static_cast<int>(http_status::ok))
 					{
@@ -363,15 +373,13 @@ namespace aquarius
 		}
 
 		template <typename Handler, typename Func>
-		auto handle_request(flex_buffer& buffer, uint32_t src, http_method method, Func&& func)
+		auto handle_request(std::shared_ptr<Handler> handler_ptr, Func&& func, http_method method)
 			-> asio::awaitable<error_code>
 		{
-			auto handler_ptr = std::make_shared<Handler>();
-
 			handler_ptr->request()->method(method);
 			handler_ptr->request()->body().set_method(method);
 
-			auto ec = co_await handler_ptr->visit(buffer);
+			auto ec = co_await handler_ptr->handle();
 
 			if (ec)
 			{
@@ -379,10 +387,9 @@ namespace aquarius
 			}
 
 			flex_buffer resp_buffer{};
-			handler_ptr->response().header().set_field("source-seq", std::to_string(src));
 			handler_ptr->response().commit(resp_buffer);
 
-			auto res = co_await func(resp_buffer.data());
+			auto res = co_await func(resp_buffer, ec.value());
 
 			if (res)
 			{

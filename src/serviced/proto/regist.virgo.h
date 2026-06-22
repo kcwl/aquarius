@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/serialize/tcp_serialize.hpp>
-#include <aquarius/virgo/tcp_request.hpp>
-#include <aquarius/virgo/tcp_response.hpp>
+#include <aquarius/serialize/http_serialize.hpp>
+#include <aquarius/virgo/http_request.hpp>
+#include <aquarius/virgo/http_response.hpp>
 using namespace aquarius;
 
-class regist_req_body: public aquarius::tcp_serialize
+class regist_req_body: public aquarius::http_serialize
 {
 public:
 	regist_req_body();
@@ -12,6 +12,9 @@ public:
 
 	regist_req_body(regist_req_body&&) = default;
 	regist_req_body& operator=(regist_req_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const regist_req_body& local);
+	friend regist_req_body tag_invoke(const aquarius::json::value_to_tag<regist_req_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -44,7 +47,7 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class regist_resp_body: public aquarius::tcp_serialize
+class regist_resp_body: public aquarius::http_serialize
 {
 public:
 	regist_resp_body();
@@ -52,6 +55,9 @@ public:
 
 	regist_resp_body(regist_resp_body&&) = default;
 	regist_resp_body& operator=(regist_resp_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const regist_resp_body& local);
+	friend regist_resp_body tag_invoke(const aquarius::json::value_to_tag<regist_resp_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -64,7 +70,7 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-class subscribe_service_req_body: public aquarius::tcp_serialize
+class subscribe_service_req_body: public aquarius::http_serialize
 {
 public:
 	subscribe_service_req_body();
@@ -72,6 +78,9 @@ public:
 
 	subscribe_service_req_body(subscribe_service_req_body&&) = default;
 	subscribe_service_req_body& operator=(subscribe_service_req_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const subscribe_service_req_body& local);
+	friend subscribe_service_req_body tag_invoke(const aquarius::json::value_to_tag<subscribe_service_req_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -86,7 +95,7 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class subscribe_service_resp_body: public aquarius::tcp_serialize
+class subscribe_service_resp_body: public aquarius::http_serialize
 {
 public:
 	subscribe_service_resp_body();
@@ -94,6 +103,9 @@ public:
 
 	subscribe_service_resp_body(subscribe_service_resp_body&&) = default;
 	subscribe_service_resp_body& operator=(subscribe_service_resp_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const subscribe_service_resp_body& local);
+	friend subscribe_service_resp_body tag_invoke(const aquarius::json::value_to_tag<subscribe_service_resp_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -109,7 +121,7 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-class broad_service_status_req_body: public aquarius::tcp_serialize
+class broad_service_status_req_body: public aquarius::http_serialize
 {
 public:
 	broad_service_status_req_body();
@@ -117,6 +129,9 @@ public:
 
 	broad_service_status_req_body(broad_service_status_req_body&&) = default;
 	broad_service_status_req_body& operator=(broad_service_status_req_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const broad_service_status_req_body& local);
+	friend broad_service_status_req_body tag_invoke(const aquarius::json::value_to_tag<broad_service_status_req_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -128,7 +143,7 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class broad_service_status_resp_body: public aquarius::tcp_serialize
+class broad_service_status_resp_body: public aquarius::http_serialize
 {
 public:
 	broad_service_status_resp_body();
@@ -136,6 +151,9 @@ public:
 
 	broad_service_status_resp_body(broad_service_status_resp_body&&) = default;
 	broad_service_status_resp_body& operator=(broad_service_status_resp_body&&) = default;
+private:
+	friend void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const broad_service_status_resp_body& local);
+	friend broad_service_status_resp_body tag_invoke(const aquarius::json::value_to_tag<broad_service_status_resp_body>&, const aquarius::json::value& jv);
 
 public:
 	virtual void serialize(aquarius::flex_buffer& buffer) override;
@@ -158,9 +176,9 @@ private:
 };
 
 
-using regist_request = aquarius::tcp_request<"9000", regist_req_body>;
-using regist_response = aquarius::tcp_response<"9000", regist_resp_body>;
-using subscribe_service_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
-using subscribe_service_response = aquarius::tcp_response<"9001", subscribe_service_resp_body>;
-using broad_service_status_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
-using broad_service_status_response = aquarius::tcp_response<"9002", broad_service_status_resp_body>;
+using regist_request = aquarius::http_request<"9000", regist_req_body>;
+using regist_response = aquarius::http_response<regist_resp_body>;
+using subscribe_service_request = aquarius::http_request<"9001", subscribe_service_req_body>;
+using subscribe_service_response = aquarius::http_response<subscribe_service_resp_body>;
+using broad_service_status_request = aquarius::http_request<"9002", broad_service_status_req_body>;
+using broad_service_status_response = aquarius::http_response<broad_service_status_resp_body>;
