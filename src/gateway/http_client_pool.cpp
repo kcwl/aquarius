@@ -56,7 +56,7 @@ namespace aquarius
 				auto ec = co_await this->invoke(
 					host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<error_code>
-					{ co_return co_await func(buf); },http_method::post, http_version::http1_1);
+					{ co_return co_await func(buf, 0); },http_method::post, http_version::http1_1);
 
 				co_return ec;
 			};

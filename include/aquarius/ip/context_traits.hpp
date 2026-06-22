@@ -2,6 +2,7 @@
 #include <aquarius/ip/http.hpp>
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/virgo/http_request.hpp>
+#include <aquarius/virgo/http_response.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 #include <aquarius/virgo/tcp_response.hpp>
 
@@ -24,6 +25,12 @@ namespace aquarius
 
 	template <detail::string_literal Router, typename Body, typename Handler>
 	struct context_traits<http_request<Router, Body>, Handler>
+	{
+		using type = http::context<Handler>;
+	};
+
+	template <typename Body, typename Handler>
+	struct context_traits<http_response<Body>, Handler>
 	{
 		using type = http::context<Handler>;
 	};

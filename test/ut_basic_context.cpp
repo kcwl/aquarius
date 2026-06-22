@@ -7,6 +7,7 @@ BOOST_AUTO_TEST_SUITE(ut_basic_context)
 
 struct mock_protocol
 {
+	using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
 	template <typename Handler, typename Func>
 	auto handle_request(std::shared_ptr<Handler> handler_ptr, Func&& func) -> asio::awaitable<error_code>
 	{
