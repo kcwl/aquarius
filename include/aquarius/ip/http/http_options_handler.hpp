@@ -11,14 +11,13 @@
 
 namespace aquarius
 {
-	template<typename Session>
-	inline auto mpc_http_options(std::shared_ptr<Session> session_ptr, flex_buffer& buffer) -> asio::awaitable<error_code>
+	inline error_code mpc_http_options(flex_buffer& buffer)
 	{
+		http_config& cfg = create_http();
+
 		http_header header{};
 
 		header.deserialize(buffer);
-
-		flex_buffer resp_buffer{};
 
 		http_header resp_header{};
 
@@ -26,44 +25,34 @@ namespace aquarius
 
 		if (origin.empty())
 		{
-			resp_header.set_field("Allow", "GET,POST");
+			resp_header.set_field("Allow", cfg.control_allow_methods);
 		}
 		else
 		{
-			auto request_methods = header.find("Access-Control-Request-Methods");
+			auto request_methods = header.find("Access-Control-Request-Method");
 
 			auto request_headers = header.find("Access-Control-Request-Headers");
 
-			http_config& cfg = create_http();
-
-			if (!cfg.check_origin(origin))
+			if (!cfg.check_origin(origin) || !cfg.check_method(request_methods) || !cfg.check_headers(request_headers))
 			{
-				co_return http_status::forbidden;
-			}
-
-			if (!cfg.check_method(request_methods))
-			{
-				co_return http_status::forbidden;
-			}
-
-			if (!cfg.check_headers(request_headers))
-			{
-				co_return http_status::forbidden;
+				return http_status::forbidden;
 			}
 
 			resp_header.set_field("Access-Control-Allow-Origin", cfg.control_allow_origin);
 			resp_header.set_field("Access-Control-Request-Methods", cfg.control_allow_methods);
 			resp_header.set_field("Access-Control-Allow-Headers", cfg.control_allow_headers);
 			resp_header.set_field("Access-Control-Max-Age", cfg.control_max_age);
-			resp_header.set_field("Access-Control-Allow-Credentials", cfg.control_allow_credentials ? "true" : "false");
 
-			auto headline = make_response_command_header(http_status::no_content);
+			auto with_credential = header.find("withCredentials");
+			if (!with_credential.empty())
+			{
+				resp_header.set_field("Access-Control-Allow-Credentials",
+									  cfg.control_allow_credentials ? "true" : "false");
+			}
 
-			resp_buffer.sputn(headline.c_str(), headline.size());
-
-			resp_header.serialize(resp_buffer);
+			resp_header.serialize(buffer);
 		}
 
-		co_return co_await session_ptr->async_send(resp_buffer);
+		return http_status::no_content;
 	}
 } // namespace aquarius

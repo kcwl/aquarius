@@ -32,7 +32,7 @@ namespace aquarius
 		bool check_method(std::string_view methods)
 		{
 			if (methods.empty())
-				return false;
+				return true;
 
 			auto op = methods | std::views::split(',');
 

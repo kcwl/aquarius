@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 {
     po::options_description cmd("login");
 
-    std::string name("gateway");
+    std::string name("login");
     int32_t pool_size = static_cast<int32_t>(std::thread::hardware_concurrency());
 
     cmd.add_options()("help", "print help message");

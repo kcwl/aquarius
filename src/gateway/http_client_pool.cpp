@@ -48,7 +48,7 @@ namespace aquarius
 
 			auto request = std::make_shared<shake_request>();
 
-			auto resp = co_await this->invoke<shake_response>(host_and_port, request, http_method::post, http_version::http1_1);
+			auto resp = co_await this->invoke<shake_response>(host_and_port, request, http_method::post);
 
 			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer, const std::string& router,
 																 Func&& f) -> asio::awaitable<error_code>
@@ -56,7 +56,9 @@ namespace aquarius
 				auto ec = co_await this->invoke(
 					host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<error_code>
-					{ co_return co_await func(buf, 0); },http_method::post, http_version::http1_1);
+					{
+						co_return co_await func(buf, 0);
+					}, http_method::post);
 
 				co_return ec;
 			};

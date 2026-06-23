@@ -8,6 +8,13 @@ using namespace aquarius::gateway;
 
 int main(int argc, char* argv[])
 {
+    auto& http = create_http();
+    http.control_allow_origin = "http://localhost:5173";
+    http.control_allow_methods = "POST,GET,PUT";
+    http.control_allow_credentials = true;
+    http.control_max_age = "86400";
+    http.control_allow_headers = "content-type";
+
     po::options_description cmd("gateway");
 
     std::string name("gateway");
