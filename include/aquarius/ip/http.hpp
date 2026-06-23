@@ -113,7 +113,8 @@ namespace aquarius
 
 				if (method == http_method::options)
 				{
-					co_await make_response(mpc_http_options(buffer).value(), buffer.data());
+					ec = mpc_http_options(buffer);
+					co_await make_response(ec.value(), buffer.data());
 
 					continue;
 				}
