@@ -45,9 +45,6 @@
     <ClCompile Include="..\src\gateway\ctx_serviced.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\gateway\http_client_pool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gateway\auth_module.h">
@@ -78,12 +75,6 @@
       <Filter>proto</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\basic_transfer_context.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\gateway\global_config.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\gateway\http_client_pool.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

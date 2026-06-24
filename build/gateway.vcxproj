@@ -25,7 +25,6 @@
     <ClCompile Include="..\src\gateway\firewall_module.cpp" />
     <ClCompile Include="..\src\gateway\gateway.cpp" />
     <ClCompile Include="..\src\gateway\gate_error_code.cpp" />
-    <ClCompile Include="..\src\gateway\http_client_pool.cpp" />
     <ClCompile Include="..\src\gateway\player.cpp" />
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
@@ -37,8 +36,6 @@
     <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\gate_error_code.h" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />
-    <ClInclude Include="..\src\gateway\global_config.hpp" />
-    <ClInclude Include="..\src\gateway\http_client_pool.h" />
     <ClInclude Include="..\src\gateway\payload.hpp" />
     <ClInclude Include="..\src\gateway\player.h" />
     <ClInclude Include="..\src\gateway\proto\shake.virgo.h" />

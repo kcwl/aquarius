@@ -51,7 +51,7 @@ namespace aquarius
 		template <typename Handler>
 		using context = basic_context<Handler, http, http_method>;
 
-		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&, int)>;
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&, error_code)>;
 
 		using duration = typename session_type::duration;
 
@@ -107,14 +107,14 @@ namespace aquarius
 
 				if (ec)
 				{
-					co_await make_response(ec.value());
+					co_await make_response(ec);
 					continue;
 				}
 
 				if (method == http_method::options)
 				{
 					ec = mpc_http_options(buffer);
-					co_await make_response(ec.value(), buffer.data());
+					co_await make_response(ec, buffer.data());
 
 					continue;
 				}
@@ -137,6 +137,7 @@ namespace aquarius
 
 				if (!context)
 				{
+					co_await make_response(http_status::bad_request);
 					continue;
 				}
 
@@ -151,7 +152,7 @@ namespace aquarius
 				auto self = this->shared_from_this();
 
 				ec = co_await ptr->complete(
-					this, [this, self](flex_buffer& buffer, int result) -> asio::awaitable<error_code>
+					this, [this, self](flex_buffer& buffer, error_code result) -> asio::awaitable<error_code>
 					{ co_return co_await this->make_response(result, buffer.data()); }, std::move(method));
 
 				if (ec.value() != static_cast<int>(http_status::ok))
@@ -365,7 +366,7 @@ namespace aquarius
 			flex_buffer resp_buffer{};
 			handler_ptr->response().commit(resp_buffer);
 
-			auto res = co_await func(resp_buffer, ec.value());
+			auto res = co_await func(resp_buffer, ec);
 
 			if (res)
 			{
@@ -469,20 +470,20 @@ namespace aquarius
 		void commit_raw_request_header(flex_buffer& buffer, http_method method, const std::string& path)
 		{
 			std::string raw_header =
-				std::format("{} {} {}", method_to_string(method), path, version_to_string(version));
+				std::format("{} {} {}\r\n", method_to_string(method), path, version_to_string(version));
 
 			buffer.sputn(raw_header.c_str(), raw_header.size());
 		}
 
-		void commit_raw_response_header(flex_buffer& buffer, int result)
+		void commit_raw_response_header(flex_buffer& buffer, error_code result)
 		{
 			std::string raw_header =
-				std::format("{} {} {}\r\n", version_to_string(version), result, status_to_string(result));
+				std::format("{} {} {}\r\n", version_to_string(version), result.value(), status_to_string(result.value()));
 
 			buffer.sputn(raw_header.c_str(), raw_header.size());
 		}
 
-		auto make_response(int result, const asio::const_buffer& buffer = {}) -> asio::awaitable<error_code>
+		auto make_response(error_code result, const asio::const_buffer& buffer = {}) -> asio::awaitable<error_code>
 		{
 			std::vector<asio::const_buffer> buffers{};
 			flex_buffer header_buffer{};
@@ -494,6 +495,10 @@ namespace aquarius
 			if (buffer.size() != 0)
 			{
 				buffers.push_back(buffer);
+			}
+			else
+			{
+				buffers.push_back(asio::const_buffer(crlf.data(), crlf.size()));
 			}
 
 			co_return co_await session_ptr_->async_send(buffers);

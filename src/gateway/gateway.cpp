@@ -1,10 +1,8 @@
 ﻿#include <aquarius.hpp>
 #include <iostream>
 #include <srvd_client.hpp>
-#include "global_config.hpp"
 
 namespace po = boost::program_options;
-using namespace aquarius::gateway;
 
 int main(int argc, char* argv[])
 {
@@ -34,7 +32,7 @@ int main(int argc, char* argv[])
     po::store(po::parse_command_line(argc, argv, cmd), vm);
     po::notify(vm);
 
-    auto& proto = global_config::get_mutable_instance().proto;
+    std::string proto{};
 
 
     if (vm.count("help"))
@@ -66,7 +64,7 @@ int main(int argc, char* argv[])
 
     if (vm.count("proto"))
     {
-        global_config::get_mutable_instance().proto = vm["proto"].as<std::string>();
+        proto = vm["proto"].as<std::string>();
     }
     else
     {

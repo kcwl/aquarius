@@ -1,6 +1,5 @@
 #pragma once
 #include "gate_error_code.h"
-#include "global_config.hpp"
 #include "payload.hpp"
 #include <aquarius.hpp>
 #include <proto/regist.virgo.h>
@@ -17,11 +16,6 @@ namespace aquarius
 			client_pool();
 
 		public:
-			virtual bool enable() override
-			{
-				return global_config::get_const_instance().proto == "tcp";
-			}
-
 			virtual auto run() -> asio::awaitable<bool> override;
 
 		public:

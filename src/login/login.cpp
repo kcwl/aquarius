@@ -1,120 +1,105 @@
 ﻿// login.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include <iostream>
 #include <aquarius.hpp>
+#include <iostream>
 #include <srvd_client.hpp>
 
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-    po::options_description cmd("login");
+	po::options_description cmd("login");
 
-    std::string name("login");
-    int32_t pool_size = static_cast<int32_t>(std::thread::hardware_concurrency());
+	std::string name("login");
+	int32_t pool_size = static_cast<int32_t>(std::thread::hardware_concurrency());
 
-    cmd.add_options()("help", "print help message");
-    cmd.add_options()("listen", po::value<uint16_t>(), "listen port");
-    cmd.add_options()("pool_size", po::value<int32_t>(&pool_size), "pool thread size");
-    cmd.add_options()("name", po::value<std::string>(&name), "server name");
-    cmd.add_options()("proto", po::value<std::string>(), "proto that tcp and http1.1");
-    cmd.add_options()("srvd_host", po::value<std::string>(), "serviced host");
-    cmd.add_options()("srvd_port", po::value<uint16_t>(), "serviced port");
+	cmd.add_options()("help", "print help message");
+	cmd.add_options()("listen", po::value<uint16_t>(), "listen port");
+	cmd.add_options()("pool_size", po::value<int32_t>(&pool_size), "pool thread size");
+	cmd.add_options()("name", po::value<std::string>(&name), "server name");
+	cmd.add_options()("srvd_host", po::value<std::string>(), "serviced host");
+	cmd.add_options()("srvd_port", po::value<uint16_t>(), "serviced port");
 
-    uint16_t port{};
+	uint16_t port{};
 
-    po::variables_map vm{};
-    po::store(po::parse_command_line(argc, argv, cmd), vm);
-    po::notify(vm);
+	po::variables_map vm{};
+	po::store(po::parse_command_line(argc, argv, cmd), vm);
+	po::notify(vm);
 
-    std::string proto{};
+	std::string proto{};
 
+	if (vm.count("help"))
+	{
+		std::cout << cmd;
+		return 0;
+	}
 
-    if (vm.count("help"))
-    {
-        std::cout << cmd;
-        return 0;
-    }
+	if (vm.count("listen"))
+	{
+		port = vm["listen"].as<uint16_t>();
+	}
+	else
+	{
+		std::cout << "the listen port is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
 
-    if (vm.count("listen"))
-    {
-        port = vm["listen"].as<uint16_t>();
-    }
-    else
-    {
-        std::cout << "the listen port is invalid\n";
-        std::cout << cmd;
-        return 0;
-    }
+	if (vm.count("pool_size"))
+	{
+		pool_size = vm["pool_size"].as<int32_t>();
+	}
 
-    if (vm.count("pool_size"))
-    {
-        pool_size = vm["pool_size"].as<int32_t>();
-    }
+	if (vm.count("name"))
+	{
+		name = vm["name"].as<std::string>();
+	}
 
-    if (vm.count("name"))
-    {
-        name = vm["name"].as<std::string>();
-    }
+	if (vm.count("proto"))
+	{
+		proto = vm["proto"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the proto is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
 
-    if (vm.count("proto"))
-    {
-        proto = vm["proto"].as<std::string>();
-    }
-    else
-    {
-        std::cout << "the proto is invalid\n";
-        std::cout << cmd;
-        return 0;
-    }
+	if (vm.count("srvd_host"))
+	{
+		srv_config::get_mutable_instance().host = vm["srvd_host"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the srvd_host is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
 
-    if (vm.count("srvd_host"))
-    {
-        srv_config::get_mutable_instance().host = vm["srvd_host"].as<std::string>();
-    }
-    else
-    {
-        std::cout << "the srvd_host is invalid\n";
-        std::cout << cmd;
-        return 0;
-    }
+	if (vm.count("srvd_port"))
+	{
+		srv_config::get_mutable_instance().port = vm["srvd_port"].as<uint16_t>();
+	}
+	else
+	{
+		std::cout << "the srvd_port is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
 
-    if (vm.count("srvd_port"))
-    {
-        srv_config::get_mutable_instance().port = vm["srvd_port"].as<uint16_t>();
-    }
-    else
-    {
-        std::cout << "the srvd_port is invalid\n";
-        std::cout << cmd;
-        return 0;
-    }
+	aquarius::tcp::server server(port, pool_size, name);
 
-    if (proto == "tcp")
-    {
-        aquarius::tcp::server server(port, pool_size, name);
+	server.run();
 
-        server.run();
-    }
-    else if (proto == "http1.1")
-    {
-        aquarius::http::server server(port, pool_size, name);
-
-        server.run();
-    }
-    else
-    {
-        std::cout << "the proto [" << proto << "] not support!\n";
-    }
-
-    return 0;
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
 // 调试程序: F5 或调试 >“开始调试”菜单
 
-// 入门使用技巧: 
+// 入门使用技巧:
 //   1. 使用解决方案资源管理器窗口添加/管理文件
 //   2. 使用团队资源管理器窗口连接到源代码管理
 //   3. 使用输出窗口查看生成输出和其他消息
