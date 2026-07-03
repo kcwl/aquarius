@@ -1,5 +1,6 @@
 #pragma once
 #include <aquarius/basic_protocol.hpp>
+#include <aquarius/serialize/serialization.hpp>
 #include <aquarius/virgo/error.hpp>
 
 namespace aquarius
@@ -42,7 +43,26 @@ namespace aquarius
 
 				this->header().serialize(buffer);
 
-				this->body().serialize(buffer);
+				switch (static_cast<serialize_way>(this->header().way()))
+				{
+					case serialize_way::binary:
+						{
+							this->body().to_binary(buffer);
+						}
+						break;
+					case serialize_way::json:
+						{
+							this->body().to_json(buffer);
+						}
+						break;
+					case serialize_way::kv:
+						{
+							this->body().to_kv(buffer);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			catch (...)
 			{
@@ -60,7 +80,28 @@ namespace aquarius
 			{
 				this->header().deserialize(buffer);
 
-				this->body().deserialize(buffer);
+				this->header().serialize(buffer);
+
+				switch (static_cast<serialize_way>(this->header().way()))
+				{
+					case serialize_way::binary:
+						{
+							this->body().from_binary(buffer);
+						}
+						break;
+					case serialize_way::json:
+						{
+							this->body().from_json(buffer);
+						}
+						break;
+					case serialize_way::kv:
+						{
+							this->body().from_kv(buffer);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			catch (...)
 			{
@@ -143,7 +184,26 @@ namespace aquarius
 
 				this->header().serialize(buffer);
 
-				this->body().serialize(buffer);
+				switch (static_cast<serialize_way>(this->header().way()))
+				{
+					case serialize_way::binary:
+						{
+							this->body().to_binary(buffer);
+						}
+						break;
+					case serialize_way::json:
+						{
+							this->body().to_json(buffer);
+						}
+						break;
+					case serialize_way::kv:
+						{
+							this->body().to_kv(buffer);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			catch (...)
 			{
@@ -163,7 +223,26 @@ namespace aquarius
 
 				this->header().deserialize(buffer);
 
-				this->body().deserialize(buffer);
+				switch (static_cast<serialize_way>(this->header().way()))
+				{
+					case serialize_way::binary:
+						{
+							this->body().from_binary(buffer);
+						}
+						break;
+					case serialize_way::json:
+						{
+							this->body().from_json(buffer);
+						}
+						break;
+					case serialize_way::kv:
+						{
+							this->body().from_kv(buffer);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			catch (...)
 			{
