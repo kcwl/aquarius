@@ -8,7 +8,7 @@ namespace aquarius
 	struct binary_parse
 	{
 		template <integer_t T>
-		void to_datas(const T& value, flex_buffer& buff)
+		static void to_datas(const T& value, flex_buffer& buff)
 		{
 			auto temp = value;
 
@@ -22,7 +22,7 @@ namespace aquarius
 		}
 
 		template <zig_zag T>
-		void to_datas(const T& value, flex_buffer& buff)
+		static void to_datas(const T& value, flex_buffer& buff)
 		{
 			uint64_t temp = (value << 1) ^ (value >> (sizeof(T) * 8 - 1));
 
@@ -30,7 +30,7 @@ namespace aquarius
 		}
 
 		template <pod_t T>
-		void to_datas(T value, flex_buffer& buff)
+		static void to_datas(T value, flex_buffer& buff)
 		{
 			constexpr auto size = sizeof(T);
 
@@ -38,7 +38,7 @@ namespace aquarius
 		}
 
 		template <repeated_t T>
-		void to_datas(const T& value, flex_buffer& buff)
+		static void to_datas(const T& value, flex_buffer& buff)
 		{
 			to_datas(value.size(), buff);
 
@@ -49,7 +49,7 @@ namespace aquarius
 		}
 
 		template <map_t T>
-		void to_datas(const T& value, flex_buffer& buffer)
+		static void to_datas(const T& value, flex_buffer& buffer)
 		{
 			to_datas(value.size(), buffer);
 
@@ -61,7 +61,7 @@ namespace aquarius
 		}
 
 		template <fixed_t T>
-		void to_datas(const T& v, flex_buffer& buffer)
+		static void to_datas(const T& v, flex_buffer& buffer)
 		{
 			auto size = sizeof(v.value);
 
@@ -69,7 +69,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		void to_datas(const T& value, flex_buffer& buff)
+		static void to_datas(const T& value, flex_buffer& buff)
 		{
 			to_datas(value.size(), buff);
 
@@ -77,7 +77,7 @@ namespace aquarius
 		}
 
 		template <reflectable T>
-		void to_datas(const T& value, flex_buffer& buff)
+		static void to_datas(const T& value, flex_buffer& buff)
 		{
 			auto to_binary_impl = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{ (to_datas(boost::pfr::get<I, T>(value), buff), ...); };
@@ -86,7 +86,7 @@ namespace aquarius
 		}
 
 		template <integer_t T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			std::remove_cvref_t<T> value{};
 
@@ -136,7 +136,7 @@ namespace aquarius
 		}
 
 		template <zig_zag T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			uint64_t temp = from_datas<uint64_t>(buff);
 
@@ -144,7 +144,7 @@ namespace aquarius
 		}
 
 		template <pod_t T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			T value{};
 
@@ -172,7 +172,7 @@ namespace aquarius
 		}
 
 		template <repeated_t T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			T value{};
 
@@ -189,7 +189,7 @@ namespace aquarius
 		}
 
 		template <map_t T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			T value{};
 
@@ -208,7 +208,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			auto size = from_datas<std::size_t>(buff);
 
@@ -221,7 +221,7 @@ namespace aquarius
 		}
 
 		template <fixed_t T>
-		T from_datas(flex_buffer& buffer)
+		static T from_datas(flex_buffer& buffer)
 		{
 			T v{};
 
@@ -238,7 +238,7 @@ namespace aquarius
 		}
 
 		template <reflectable T>
-		auto from_datas(flex_buffer& buff) -> T
+		static auto from_datas(flex_buffer& buff) -> T
 		{
 			auto from_binary_impl = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{ return T{ from_datas<boost::pfr::tuple_element_t<I, T>>(buff)... }; };

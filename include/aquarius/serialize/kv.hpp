@@ -10,7 +10,7 @@ namespace aquarius
 	{
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
-		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
+		static void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + std::to_string(value);
 
@@ -18,7 +18,7 @@ namespace aquarius
 		}
 
 		template <boolean T>
-		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
+		static void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + (value ? "true" : "false");
 
@@ -26,7 +26,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
+		static void to_datas(const T& value, flex_buffer& buffer, const std::string& name)
 		{
 			auto str = name + "=" + value;
 
@@ -34,14 +34,14 @@ namespace aquarius
 		}
 
 		template<typename T>
-		void to_datas(const T&, flex_buffer&, const std::string& = {})
+		static void to_datas(const T&, flex_buffer&, const std::string& = {})
 		{
 			return;
 		}
 
 		template <typename T>
 		requires(integer_t<T> || zig_zag<T>)
-		T from_datas(flex_buffer& buffer, const std::string& name)
+		static T from_datas(flex_buffer& buffer, const std::string& name)
 		{
 			std::stringstream ss{};
 
@@ -63,7 +63,7 @@ namespace aquarius
 
 		template <typename T>
 		requires(boolean<T>)
-		T from_datas(flex_buffer& buffer, const std::string& name)
+		static T from_datas(flex_buffer& buffer, const std::string& name)
 		{
 			auto key = get_first_range<'='>(buffer);
 
@@ -79,7 +79,7 @@ namespace aquarius
 		}
 
 		template <string_t T>
-		T from_datas(flex_buffer& buffer, const std::string& name)
+		static T from_datas(flex_buffer& buffer, const std::string& name)
 		{
 			auto key = get_first_range<'='>(buffer);
 
@@ -98,7 +98,13 @@ namespace aquarius
 		}
 
 		template<typename T>
-		T from_datas(flex_buffer&, const std::string&)
+		static T from_datas(flex_buffer&, const std::string&)
+		{
+			return T{};
+		}
+
+		template<typename T, typename U>
+		static T from_datas(flex_buffer&, U&&)
 		{
 			return T{};
 		}
