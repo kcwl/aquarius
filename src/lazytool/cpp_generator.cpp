@@ -16,8 +16,7 @@ namespace aquarius
 
 				if (field->type() == struct_type::message)
 				{
-					result =
-						generate_message(header, source, std::dynamic_pointer_cast<message_field>(field), protocol);
+					result = generate_message(header, source, std::dynamic_pointer_cast<message_field>(field));
 				}
 				else if (field->type() == struct_type::structure)
 				{
@@ -26,37 +25,6 @@ namespace aquarius
 				else if (field->type() == struct_type::enumture)
 				{
 					result = generate_normal_data(header, source, field);
-				}
-			}
-
-			header << "\n";
-
-			if (protocol == "http")
-			{
-				for (const auto& field : fields)
-				{
-					if (field->type() == struct_type::message)
-					{
-						auto field_ptr = std::dynamic_pointer_cast<message_field>(field);
-
-						auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
-						{
-							((generate_from_tag(source, field_ptr->get<I>(), true),
-							  generate_to_tag(source, field_ptr->get<I>(), true)),
-							 ...);
-							;
-						};
-
-						f(std::make_index_sequence<message_field::message_part>());
-					}
-					else if (field->type() == struct_type::structure || field->type() == struct_type::enumture)
-					{
-						generate_json_from_define(header, field->name());
-						generate_json_to_define(header, field->name());
-
-						generate_from_tag(source, field);
-						generate_to_tag(source, field);
-					}
 				}
 			}
 
@@ -80,12 +48,12 @@ namespace aquarius
 		}
 
 		bool cpp_generator::generate_message(std::fstream& header, std::fstream& source,
-											 std::shared_ptr<message_field> field_ptr, const std::string& protocol)
+											 std::shared_ptr<message_field> field_ptr)
 		{
 			auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
 			{
-				(generate_data_field_define(header, field_ptr->get<I>(), protocol), ...);
-				(genetate_source(source, field_ptr->get<I>(), protocol), ...);
+				(generate_data_field_define(header, field_ptr->get<I>()), ...);
+				(genetate_source(source, field_ptr->get<I>()), ...);
 			};
 
 			f(std::make_index_sequence<message_field::message_part>{});
@@ -95,15 +63,43 @@ namespace aquarius
 		bool cpp_generator::generate_normal_data(std::fstream& header, std::fstream&,
 												 std::shared_ptr<field_base> field_ptr, const std::string& suffix)
 		{
+			auto f = [&header, field_ptr, suffix] ()
+				{
+					header << "AQUARIUS_SERIALIZE_";
+
+					if (field_ptr->type() == struct_type::enumture)
+					{
+						header << "ENUM";
+					}
+					else/* if (field_ptr->type() == struct_type::structure)*/
+					{
+						header << "STRUCT";
+					}
+
+					header << "(" << field_ptr->name();
+					
+					if (!suffix.empty())
+					{
+						header <<suffix;
+					}
+					
+					header << ", (";
+
+					for (auto& f : field_ptr->fields())
+					{
+						header << f.second << ", ";
+					}
+
+					if (!field_ptr->fields().empty())
+					{
+						header.seekp(-2, std::ios::cur);
+					}
+
+					header << "))\n";
+				};
+
 			generate_header(header, field_ptr, suffix);
 			header << std::endl << "{" << std::endl;
-
-			// if (field_ptr->type() != struct_type::enumture)
-			//{
-			//   generate_equal_define(header, field_ptr);
-			//   header << std::endl;
-			//   generate_equal_src(source, field_ptr);
-			// }
 
 			char end = ';';
 			if (field_ptr->type() == struct_type::enumture)
@@ -111,36 +107,30 @@ namespace aquarius
 
 			generate_member_variable_define(header, field_ptr, end);
 
-			header << "};\n";
+			if (!suffix.empty())
+			{
+				f();
+				header << "};\n";
+			}
+			else
+			{
+				header << "};\n";
+				f();
+			}
 
 			return true;
 		}
 
-		bool cpp_generator::generate_data_field_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
-													   const std::string& protocol)
+		bool cpp_generator::generate_data_field_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
 			generate_header(ofs, field_ptr);
 
-			generate_inheritance_serialize_define(ofs, protocol);
+			generate_inheritance_serialize_define(ofs);
 
 			ofs << "{" << std::endl;
 
 			scope_public(ofs);
 			generate_construction_define(ofs, field_ptr);
-
-			// scope_public(ofs);
-			// generate_equal_define(ofs, field_ptr);
-
-			if (protocol == "http")
-			{
-				scope_private(ofs);
-				ofs << "\tfriend ";
-				generate_json_from_define(ofs, field_ptr->name());
-				ofs << "\tfriend ";
-				generate_json_to_define(ofs, field_ptr->name());
-			}
-
-			ofs << std::endl;
 
 			scope_public(ofs);
 			generate_serialize_method_define(ofs);
@@ -168,11 +158,11 @@ namespace aquarius
 
 			switch (field_ptr->type())
 			{
+			case struct_type::enumture:
+				ofs << "enum class ";
+				break;
 			case struct_type::structure:
 				ofs << "struct ";
-				break;
-			case struct_type::enumture:
-				ofs << "enum ";
 				break;
 			case struct_type::request:
 			case struct_type::response:
@@ -188,23 +178,9 @@ namespace aquarius
 			return true;
 		}
 
-		void cpp_generator::generate_inheritance_serialize_define(std::fstream& ofs, const std::string& protocol)
+		void cpp_generator::generate_inheritance_serialize_define(std::fstream& ofs)
 		{
-			constexpr static auto http_serialize_inheritance = "aquarius::http_serialize"sv;
-			constexpr static auto tcp_serialize_inheritance = "aquarius::tcp_serialize"sv;
-
-			ofs << ": public ";
-
-			if (protocol == "http")
-			{
-				ofs << http_serialize_inheritance;
-			}
-			else if (protocol == "tcp")
-			{
-				ofs << tcp_serialize_inheritance;
-			}
-
-			ofs << std::endl;
+			ofs << ": public aquarius::serialization\n";
 		}
 
 		bool cpp_generator::generate_construction_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
@@ -230,10 +206,17 @@ namespace aquarius
 
 		bool cpp_generator::generate_serialize_method_define(std::fstream& ofs)
 		{
-			ofs << "\tvirtual void serialize(aquarius::flex_buffer& buffer) override;" << std::endl;
-			ofs << std::endl;
-			ofs << "\tvirtual void deserialize(aquarius::flex_buffer& buffer) override;" << std::endl;
-			ofs << std::endl;
+			auto f = [&](const std::string& func_name)
+			{
+				ofs << "\tvirtual void to_" << func_name << "(aquarius::flex_buffer& buffer) override;" << std::endl;
+				ofs << std::endl;
+				ofs << "\tvirtual void from_" << func_name << "(aquarius::flex_buffer& buffer) override;" << std::endl;
+				ofs << std::endl;
+			};
+
+			f("binary");
+			f("json");
+			f("kv");
 
 			return true;
 		}
@@ -255,8 +238,7 @@ namespace aquarius
 			return true;
 		}
 
-		void cpp_generator::generate_impl_member_variable_define(std::fstream& ofs,
-																 std::shared_ptr<field_base>)
+		void cpp_generator::generate_impl_member_variable_define(std::fstream& ofs, std::shared_ptr<field_base>)
 		{
 			ofs << "\tstruct impl;" << std::endl;
 			ofs << "\tstd::shared_ptr<impl> impl_ptr_;" << std::endl;
@@ -288,8 +270,7 @@ namespace aquarius
 														  const std::string& message_name, const std::string protocol,
 														  const std::string& router)
 		{
-			ofs << "using " << message_name << "_request = aquarius::" << protocol << "_request<\""
-				<< router << "\", ";
+			ofs << "using " << message_name << "_request = aquarius::" << protocol << "_request<\"" << router << "\", ";
 
 			ofs << field_ptr->name() << ">;" << std::endl;
 
@@ -297,7 +278,8 @@ namespace aquarius
 		}
 
 		bool cpp_generator::generate_response_alias_define(std::fstream& ofs, std::shared_ptr<field_base> field_ptr,
-														   const std::string& message_name, const std::string protocol, const std::string& router)
+														   const std::string& message_name, const std::string protocol,
+														   const std::string& router)
 		{
 			ofs << "using " << message_name << "_response = aquarius::" << protocol << "_response<";
 
@@ -325,15 +307,13 @@ namespace aquarius
 			return true;
 		}
 
-		bool cpp_generator::genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol)
+		bool cpp_generator::genetate_source(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
 			generate_normal_data(ofs, ofs, field_ptr, "::impl");
 
 			generate_construction_src(ofs, field_ptr);
 
-			// generate_equal_src(ofs, field_ptr);
-
-			generate_serialize_method_src(ofs, field_ptr, protocol);
+			generate_serialize_method_src(ofs, field_ptr);
 
 			generate_member_func_src(ofs, field_ptr);
 
@@ -395,86 +375,170 @@ namespace aquarius
 		//  return true;
 		//}
 
-		bool cpp_generator::generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr, const std::string& protocol)
+		bool cpp_generator::generate_serialize_method_src(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
 		{
 			ofs << std::endl;
 
-			auto tcp_f = [&](const std::string& direction, std::shared_ptr<field_base> data_ptr, bool has_type = false)
+			generate_seialize_method_binary(ofs, field_ptr);
+			generate_seialize_method_json(ofs, field_ptr);
+			generate_seialize_method_kv(ofs, field_ptr);
+
+			return true;
+		}
+
+		bool cpp_generator::generate_seialize_method_binary(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
+		{
+			auto to_func = [&]()
 			{
-				if (has_type)
+				ofs << "void " << field_ptr->name() << "::to_binary(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
 				{
-					ofs << "\t*this->impl_ptr_ = this->parse_" << direction << "<" << data_ptr->name() <<"::impl"
-						<< ">(buffer); " << std::endl;
+					for (auto& field : field_ptr->fields())
+					{
+						ofs << "\tbinary_parse::to_datas(impl_ptr_->" << field.second << ", buffer);\n";
+					}
 				}
-				else
-				{
-					ofs << "\tthis->parse_" << direction << "(*this->impl_ptr_, buffer);" << std::endl;
-				}
+
+				ofs << "}\n";
 			};
 
-			auto http_f = [&] (const std::string& direction, std::shared_ptr<field_base> data_ptr, bool has_type = false)
+			auto from_func = [&]()
+			{
+				ofs << "void " << field_ptr->name() << "::from_binary(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
 				{
-					if (!has_type)
+					for (auto& field : field_ptr->fields())
 					{
-						ofs << "\tif(this->method() == http_method::post)" << std::endl;
-						ofs << "\t{" << std::endl;
-						ofs <<"\t\tjson_base::parse_." << direction<< "_datas<" << data_ptr->name() << ">(*this, buffer); " << std::endl;
-						ofs << "\t}" << std::endl;
-						ofs << "\telse" << std::endl;
-						ofs << "\t{" << std::endl;
-						
-						bool first = true;
-
-						for (auto& m : field_ptr->fields())
-						{
-							if (first)
-							{
-								ofs << "\t\tbuffer.sputc('?');";
-								first = false;
-							}
-							else
-							{
-								ofs << "\t\tbuffer.sputc('&');";
-							}
-
-							ofs << std::endl;
-							ofs << "\t\tkv_base::parse_" << direction << "(impl_ptr_->" << m.second << ", buffer,\"" << m.second << "\");" << std::endl;
-						}
-
-						ofs << "\t}" << std::endl;
+						ofs << "\timpl_ptr_->" << field.second << " = binary_parse::from_datas<" << field.first
+							<< ">(buffer);\n";
 					}
-					else
+				}
+
+				ofs << "}\n";
+			};
+
+			to_func();
+
+			from_func();
+
+			return true;
+		}
+
+		bool cpp_generator::generate_seialize_method_json(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
+		{
+			auto to_func = [&]()
+			{
+				ofs << "void " << field_ptr->name() << "::to_json(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
+				{
+					ofs << "\tjson::value jv{};\n";
+					ofs << "\tauto& jv_obj = jv.emplace_object();\n";
+
+					for (auto& [key, value] : field_ptr->fields())
 					{
-						ofs << "\tif(this->method() == http_method::post)" << std::endl;
-						ofs << "\t{" << std::endl;
-						ofs << "\t\t*this = json_base::parse_." << direction << "_datas<" << data_ptr->name() << ">(buffer); " << std::endl;
-						ofs << "\t}" << std::endl;
-						ofs << "\telse" << std::endl;
-						ofs << "\t{" << std::endl;
+						if (generate_from_int(ofs, key, value, true))
+							continue;
 
-						for (auto& m : field_ptr->fields())
-						{
-							ofs << "\t\timpl_ptr_->"<<m.second << " = kv_base::parse_" << direction << "<"<< m.first << ">(buffer, \""<< m.second << "\");" << std::endl;
-						}
+						if (generate_from_string(ofs, key, value, true))
+							continue;
 
-						ofs << "\t}" << std::endl;
+						if (generate_from_array(ofs, key, value, true))
+							continue;
+
+						generate_from_object(ofs, key, value, true);
 					}
-				};
+					ofs << "\tauto json_str = json::serialize(jv);\n";
+					ofs << "\tbuffer.sputn(json_str.data(), json_str.size());\n";
+				}
 
-			ofs << "void " << field_ptr->name() << "::serialize(aquarius::flex_buffer& buffer)" << std::endl;
-			ofs << "{" << std::endl;
+				ofs << "}\n";
+			};
 
-			protocol == "tcp" ? tcp_f("to", field_ptr):http_f("to", field_ptr);
+			auto from_func = [&]()
+			{
+				ofs << "void " << field_ptr->name() << "::from_json(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
+				{
+					ofs << "\tjson::value jv = json::parse(std::string((char*)buffer.data().data(), buffer.size()));\n";
+					ofs << "\tauto jv_obj = jv.try_as_object();\n";
+					ofs << "\tif(jv_obj.has_error())\n";
+					ofs << "\t{\n";
+					ofs << "\t\treturn;\n";
+					ofs << "\t}\n";
 
-			ofs << "}" << std::endl;
+					for (auto& [key, value] : field_ptr->fields())
+					{
+						if (generate_to_int(ofs, key, value, true))
+							continue;
 
-			ofs << std::endl;
-			ofs << "void " << field_ptr->name() << "::deserialize(aquarius::flex_buffer& buffer)" << std::endl;
-			ofs << "{" << std::endl;
+						if (generate_to_string(ofs, key, value, true))
+							continue;
 
-			protocol == "tcp" ? tcp_f("from", field_ptr, true) : http_f("from", field_ptr, true);
+						if (generate_to_array(ofs, key, value, true))
+							continue;
 
-			ofs << "}" << std::endl;
+						generate_to_object(ofs, key, value, true);
+					}
+				}
+
+				ofs << "}\n";
+			};
+
+			to_func();
+			from_func();
+
+			return true;
+		}
+
+		bool cpp_generator::generate_seialize_method_kv(std::fstream& ofs, std::shared_ptr<field_base> field_ptr)
+		{
+			auto to_func = [&]()
+			{
+				ofs << "void " << field_ptr->name() << "::to_kv(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
+				{
+					int loop = 0;
+					for (auto& field : field_ptr->fields())
+					{
+						if (loop++ == 0)
+						{
+							ofs << "\tbuffer.sputc('?');\n";
+						}
+						else
+						{
+							ofs << "buffer.sputc('=');\n";
+						}
+						ofs << "\tkv_parse::to_datas(impl_ptr_->" << field.second << ", buffer);\n";
+					}
+				}
+
+				ofs << "}\n";
+			};
+
+			auto from_func = [&]()
+			{
+				ofs << "void " << field_ptr->name() << "::from_kv(flex_buffer& buffer)\n";
+				ofs << "{\n";
+				if (!field_ptr->fields().empty())
+				{
+					for (auto& field : field_ptr->fields())
+					{
+						ofs << "\timpl_ptr_->" << field.second << " = kv_parse::from_datas<" << field.first
+							<< ">(buffer, impl_ptr_->" << field.second << ");\n";
+					}
+				}
+
+				ofs << "}\n";
+			};
+
+			to_func();
+
+			from_func();
 
 			return true;
 		}
@@ -503,73 +567,6 @@ namespace aquarius
 			return true;
 		}
 
-		void cpp_generator::generate_to_tag(std::fstream& ofs, std::shared_ptr<field_base> parser, bool has_impl)
-		{
-			ofs << std::endl;
-
-			ofs << parser->name() << " tag_invoke(const aquarius::json::value_to_tag<" << parser->name()
-				<< ">&, const aquarius::json::value& jv)" << std::endl;
-			ofs << "{" << std::endl;
-			ofs << "\t" << parser->name() << " result{};" << std::endl;
-			ofs << "\tauto obj = jv.try_as_object();" << std::endl;
-			ofs << "\tif(obj->empty())" << std::endl;
-			ofs << "\t\treturn {};" << std::endl;
-
-			for (auto& [key, value] : parser->fields())
-			{
-				if (generate_to_int(ofs, key, value, has_impl))
-					continue;
-
-				if (generate_to_string(ofs, key, value, has_impl))
-					continue;
-
-				if (generate_to_array(ofs, key, value, has_impl))
-					continue;
-
-				generate_to_object(ofs, key, value, has_impl);
-			}
-
-			ofs << "\treturn result;" << std::endl;
-
-			ofs << "}" << std::endl;
-		}
-
-		void cpp_generator::generate_from_tag(std::fstream& ofs, std::shared_ptr<field_base> parser, bool has_impl)
-		{
-			ofs << std::endl;
-			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
-				<< parser->name() << "& local)" << std::endl;
-			ofs << "{" << std::endl;
-			ofs << "\tauto& jv_obj = jv.emplace_object();" << std::endl;
-
-			for (auto& [key, value] : parser->fields())
-			{
-				if (generate_from_int(ofs, key, value, has_impl))
-					continue;
-
-				if (generate_from_string(ofs, key, value, has_impl))
-					continue;
-
-				if (generate_from_array(ofs, key, value, has_impl))
-					continue;
-
-				generate_from_object(ofs, key, value, has_impl);
-			}
-			ofs << "}" << std::endl;
-		}
-
-		void cpp_generator::generate_json_from_define(std::fstream& ofs, const std::string& field_name)
-		{
-			ofs << "void tag_invoke(const aquarius::json::value_from_tag&, aquarius::json::value& jv, const "
-				<< field_name << "& local);" << std::endl;
-		}
-
-		void cpp_generator::generate_json_to_define(std::fstream& ofs, const std::string& field_name)
-		{
-			ofs << field_name << " tag_invoke(const aquarius::json::value_to_tag<" << field_name
-				<< ">&, const aquarius::json::value& jv);" << std::endl;
-		}
-
 		bool cpp_generator::generate_to_int(std::fstream& ofs, const std::string& type, const std::string& value,
 											bool has_impl)
 		{
@@ -580,14 +577,14 @@ namespace aquarius
 
 			if (type == "int32" || type == "uint32" || type == "float" || type == "uint64")
 			{
-				ofs << "\tresult.";
+				ofs << "\t";
 
 				if (has_impl)
 				{
 					ofs << "impl_ptr_->";
 				}
 
-				ofs << value << " = static_cast<" << type << ">(obj->at(\"" << value << "\").as_";
+				ofs << value << " = static_cast<" << type << ">(jv_obj->at(\"" << value << "\").as_";
 
 				if (type == "int32" || type == "uint32" || type == "uint64")
 					ofs << "int64";
@@ -598,14 +595,14 @@ namespace aquarius
 			}
 			else if (type == "int64" || type == "double" || type == "bool")
 			{
-				ofs << "\tresult.";
+				ofs << "\t";
 
 				if (has_impl)
 				{
 					ofs << "impl_ptr_->";
 				}
 
-				ofs << value << " = obj->at(\"" << value << "\").as_" << type << "();" << std::endl;
+				ofs << value << " = jv_obj->at(\"" << value << "\").as_" << type << "();" << std::endl;
 			}
 
 			return true;
@@ -619,14 +616,14 @@ namespace aquarius
 			if (ty != json_type::string)
 				return false;
 
-			ofs << "\tresult.";
+			ofs << "\t";
 
 			if (has_impl)
 			{
 				ofs << "impl_ptr_->";
 			}
 
-			ofs << value << " = static_cast<" << type << ">(obj->at(\"" << value << "\").as_string());" << std::endl;
+			ofs << value << " = static_cast<" << type << ">(jv_obj->at(\"" << value << "\").as_string());" << std::endl;
 
 			return true;
 		}
@@ -639,14 +636,14 @@ namespace aquarius
 			if (ty != json_type::array)
 				return false;
 
-			ofs << "\tresult.";
+			ofs << "\t";
 
 			if (has_impl)
 			{
 				ofs << "impl_ptr_->";
 			}
 
-			ofs << value << " = aquarius::json_value_to_array(obj->at(\"" << value << "\"));" << std::endl;
+			ofs << value << " = aquarius::json_value_to_array(jv_obj->at(\"" << value << "\"));" << std::endl;
 
 			return true;
 		}
@@ -659,14 +656,15 @@ namespace aquarius
 			if (ty != json_type::object)
 				return false;
 
-			ofs << "\tresult.";
+			ofs << "\t";
 
 			if (has_impl)
 			{
 				ofs << "impl_ptr_->";
 			}
 
-			ofs << value << " = aquarius::json::value_to<" << type << ">(obj->at(\"" << value << "\"));" << std::endl;
+			ofs << value << " = aquarius::json::value_to<" << type << ">(jv_obj->at(\"" << value << "\"));"
+				<< std::endl;
 
 			return true;
 		}
@@ -679,7 +677,7 @@ namespace aquarius
 			if (ty != json_type::integer)
 				return false;
 
-			ofs << "\tjv_obj.emplace(\"" << value << "\", local.";
+			ofs << "\tjv_obj.emplace(\"" << value << "\", ";
 
 			if (has_impl)
 			{
@@ -699,7 +697,7 @@ namespace aquarius
 			if (ty != json_type::string)
 				return false;
 
-			ofs << "\tjv_obj.emplace(\"" << value << "\", local.";
+			ofs << "\tjv_obj.emplace(\"" << value << "\", ";
 
 			if (has_impl)
 			{
@@ -719,7 +717,7 @@ namespace aquarius
 			if (ty != json_type::array)
 				return false;
 
-			ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_array(local.";
+			ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_array(";
 
 			if (has_impl)
 			{
@@ -739,7 +737,7 @@ namespace aquarius
 			if (ty != json_type::object)
 				return false;
 
-			ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_object<" << type << ">(local.";
+			ofs << "\tjv_obj.emplace(\"" << value << "\", aquarius::json_value_from_object<" << type << ">(";
 
 			if (has_impl)
 			{

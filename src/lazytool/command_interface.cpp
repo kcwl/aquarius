@@ -71,12 +71,17 @@ namespace aquarius
 				}
 
 				header << "#pragma once\n";
-				header << "#include <aquarius/serialize/"<<protocol_<<"_serialize.hpp>\n";
+				header << "#include <aquarius/serialize/serialization.hpp>\n";
 				header << "#include <aquarius/virgo/"<<protocol_<<"_request.hpp>\n";
 				header << "#include <aquarius/virgo/"<<protocol_<<"_response.hpp>\n";
 				header << "using namespace aquarius;\n";
 
 				source << "#include \"" << target_path.filename().string() << ".h\"\n";
+				source << "#include <aquarius/serialize/binary.hpp>\n";
+				source << "#include <aquarius/serialize/json.hpp>\n";
+				source << "#include <aquarius/serialize/kv.hpp>\n";
+				source << std::endl;
+				source << "using namespace aquarius;\n";
 
 				it->second->run(header, source, datas, protocol_);
 			}
