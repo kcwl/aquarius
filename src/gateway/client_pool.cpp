@@ -1,5 +1,6 @@
 #include "client_pool.h"
 #include "basic_transfer_context.hpp"
+#include "convert.hpp"
 #include "gate_error_code.h"
 #include "proto/shake.virgo.h"
 #include <srvd_client.hpp>
@@ -35,7 +36,7 @@ namespace aquarius
 							{
 								for (auto& i : instances)
 								{
-									co_await this->add(i);
+									co_await this->shake(i);
 								}
 							}));
 
@@ -50,19 +51,20 @@ namespace aquarius
 
 			auto resp = co_await this->invoke<shake_response>(host_and_port, request);
 
-			auto ctx_func = [host_and_port, this]<typename Func>(flex_buffer& buffer, const std::string& router,
-																 Func&& f) -> asio::awaitable<error_code>
+			auto ctx_func = [host_and_port, this]<typename Func>(
+								flex_buffer& buffer, const std::string& router, Func&& f) -> asio::awaitable<error_code>
 			{
-				auto ec = co_await this->invoke(
+				co_return co_await this->invoke(
 					host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<error_code>
-					{ co_return co_await func(buf); });
-
-				co_return ec;
+					{
+						flex_buffer out{};
+						auto ec = convert<tcp, http>::apply(buf, out);
+						co_return co_await func(out,ec);
+					});
 			};
 
-			std::shared_ptr<context_base> ctx =
-				std::make_shared<basic_transfer_context<decltype(ctx_func), tcp>>(std::move(ctx_func));
+			std::shared_ptr<context_base> ctx = std::make_shared<basic_transfer_context<http, http_method>>(ctx_func);
 
 			for (auto& topic : resp.body().topics())
 			{

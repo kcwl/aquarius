@@ -1,10 +1,10 @@
 #pragma once
-#include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/serialize/serialization.hpp>
 #include <aquarius/virgo/tcp_request.hpp>
 #include <aquarius/virgo/tcp_response.hpp>
 using namespace aquarius;
 
-class regist_req_body: public aquarius::tcp_serialize
+class regist_req_body: public aquarius::serialization
 {
 public:
 	regist_req_body();
@@ -12,11 +12,18 @@ public:
 
 	regist_req_body(regist_req_body&&) = default;
 	regist_req_body& operator=(regist_req_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 	string name() const;
@@ -44,7 +51,7 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class regist_resp_body: public aquarius::tcp_serialize
+class regist_resp_body: public aquarius::serialization
 {
 public:
 	regist_resp_body();
@@ -52,11 +59,18 @@ public:
 
 	regist_resp_body(regist_resp_body&&) = default;
 	regist_resp_body& operator=(regist_resp_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 private:
@@ -64,7 +78,7 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-class subscribe_service_req_body: public aquarius::tcp_serialize
+class subscribe_service_req_body: public aquarius::serialization
 {
 public:
 	subscribe_service_req_body();
@@ -72,11 +86,18 @@ public:
 
 	subscribe_service_req_body(subscribe_service_req_body&&) = default;
 	subscribe_service_req_body& operator=(subscribe_service_req_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 	string group() const;
@@ -86,7 +107,7 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class subscribe_service_resp_body: public aquarius::tcp_serialize
+class subscribe_service_resp_body: public aquarius::serialization
 {
 public:
 	subscribe_service_resp_body();
@@ -94,11 +115,18 @@ public:
 
 	subscribe_service_resp_body(subscribe_service_resp_body&&) = default;
 	subscribe_service_resp_body& operator=(subscribe_service_resp_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 	std::vector<uint64_t> instances() const;
@@ -109,7 +137,7 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-class broad_service_status_req_body: public aquarius::tcp_serialize
+class broad_service_status_req_body: public aquarius::serialization
 {
 public:
 	broad_service_status_req_body();
@@ -117,18 +145,25 @@ public:
 
 	broad_service_status_req_body(broad_service_status_req_body&&) = default;
 	broad_service_status_req_body& operator=(broad_service_status_req_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class broad_service_status_resp_body: public aquarius::tcp_serialize
+class broad_service_status_resp_body: public aquarius::serialization
 {
 public:
 	broad_service_status_resp_body();
@@ -136,11 +171,18 @@ public:
 
 	broad_service_status_resp_body(broad_service_status_resp_body&&) = default;
 	broad_service_status_resp_body& operator=(broad_service_status_resp_body&&) = default;
-
 public:
-	virtual void serialize(aquarius::flex_buffer& buffer) override;
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
-	virtual void deserialize(aquarius::flex_buffer& buffer) override;
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
 	string group() const;
@@ -156,7 +198,6 @@ private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-
 
 using regist_request = aquarius::tcp_request<"9000", regist_req_body>;
 using regist_response = aquarius::tcp_response<"9000", regist_resp_body>;

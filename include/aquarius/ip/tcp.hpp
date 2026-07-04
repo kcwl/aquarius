@@ -104,35 +104,27 @@ namespace aquarius
 
 				ptr->attach_router(router);
 
-				ptr->visit(buffer);
-
 				auto self = this->shared_from_this();
 
-				asio::co_spawn(
-					session_ptr_->get_executor(),
-					[ptr, src, this, self]() -> asio::awaitable<void>
-					{
-						auto ec = co_await ptr->complete(this,
-														 [this, src](flex_buffer& buffer) -> asio::awaitable<error_code>
-														 {
-															 raw_header header{};
-															 header.src = src;
-															 header.length = static_cast<uint32_t>(buffer.size());
+				ec = co_await ptr->complete(this, buffer,
+												 [this, src](flex_buffer& buffer) -> asio::awaitable<error_code>
+												 {
+													 raw_header header{};
+													 header.src = src;
+													 header.length = static_cast<uint32_t>(buffer.size());
 
-															 std::vector<asio::const_buffer> buffers{};
-															 commit_raw_header(buffers, header);
+													 std::vector<asio::const_buffer> buffers{};
+													 commit_raw_header(buffers, header);
 
-															 buffers.push_back(buffer.data());
+													 buffers.push_back(buffer.data());
 
-															 co_return co_await session_ptr_->async_send(buffers);
-														 });
+													 co_return co_await session_ptr_->async_send(buffers);
+												 });
 
-						if (ec)
-						{
-							XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
-						}
-					},
-					asio::detached);
+				if (ec)
+				{
+					XLOG_ERROR() << "[mpc_publish] publish error:" << ec.what();
+				}
 			}
 
 			if (ec != asio::error::eof)
@@ -181,11 +173,7 @@ namespace aquarius
 
 					auto self = this->shared_from_this();
 
-					asio::co_spawn(
-						session_ptr_->get_executor(), [this, self, ptr]() -> asio::awaitable<void>
-						{
-							co_await ptr->complete(this, {});
-						}, asio::detached);
+					co_await ptr->complete(this,buffer, {});
 				}
 			}
 
@@ -237,7 +225,8 @@ namespace aquarius
 		}
 
 		template <typename Func>
-		auto send_buffer(flex_buffer& req, const std::string& router, Func&& f, error_code& ec) -> asio::awaitable<std::size_t>
+		auto send_buffer(flex_buffer& req, const std::string& router, Func&& f, error_code& ec)
+			-> asio::awaitable<std::size_t>
 		{
 			raw_header header{};
 			header.src = detail::uuid_generator()();
@@ -259,7 +248,7 @@ namespace aquarius
 			{
 				buffers.push_back(router_buffer.data());
 			}
-			
+
 			buffers.push_back(req.data());
 
 			ec = co_await session_ptr_->async_send(buffers);
@@ -272,18 +261,13 @@ namespace aquarius
 		{
 			handler_ptr->attach_session(func);
 
-			auto ec = co_await handler_ptr->handle();
-
-			if (ec)
-			{
-				co_return ec;
-			}
+			handler_ptr->response().result() = (co_await handler_ptr->handle()).value();
 
 			flex_buffer resp_buffer{};
 
 			handler_ptr->response().commit(resp_buffer);
 
-			co_return co_await func(resp_buffer);
+			co_return co_await handler_ptr->session()(resp_buffer);
 		}
 
 		auto wait(std::size_t src) -> asio::awaitable<void>

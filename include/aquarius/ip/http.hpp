@@ -147,12 +147,12 @@ namespace aquarius
 					continue;
 				}
 
-				ptr->visit(buffer);
+				ptr->attach_router(router);
 
 				auto self = this->shared_from_this();
 
 				ec = co_await ptr->complete(
-					this, [this, self](flex_buffer& buffer, error_code result) -> asio::awaitable<error_code>
+					this, buffer, [this, self](flex_buffer& buffer, error_code result) -> asio::awaitable<error_code>
 					{ co_return co_await this->make_response(result, buffer.data()); }, std::move(method));
 
 				if (ec.value() != static_cast<int>(http_status::ok))
@@ -477,8 +477,8 @@ namespace aquarius
 
 		void commit_raw_response_header(flex_buffer& buffer, error_code result)
 		{
-			std::string raw_header =
-				std::format("{} {} {}\r\n", version_to_string(version), result.value(), status_to_string(result.value()));
+			std::string raw_header = std::format("{} {} {}\r\n", version_to_string(version), result.value(),
+												 status_to_string(result.value()));
 
 			buffer.sputn(raw_header.c_str(), raw_header.size());
 		}

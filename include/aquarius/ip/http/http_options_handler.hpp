@@ -11,6 +11,20 @@
 
 namespace aquarius
 {
+	inline void set_options_header(http_header& header, bool with_credential, http_config& cfg)
+	{
+		header.set_field("Access-Control-Allow-Origin", cfg.control_allow_origin);
+		header.set_field("Access-Control-Request-Methods", cfg.control_allow_methods);
+		header.set_field("Access-Control-Allow-Headers", cfg.control_allow_headers);
+		header.set_field("Access-Control-Max-Age", cfg.control_max_age);
+
+		if (with_credential)
+		{
+			header.set_field("Access-Control-Allow-Credentials",
+								  cfg.control_allow_credentials ? "true" : "false");
+		}
+	}
+
 	inline error_code mpc_http_options(flex_buffer& buffer)
 	{
 		http_config& cfg = create_http();
@@ -38,17 +52,9 @@ namespace aquarius
 				return http_status::forbidden;
 			}
 
-			resp_header.set_field("Access-Control-Allow-Origin", cfg.control_allow_origin);
-			resp_header.set_field("Access-Control-Request-Methods", cfg.control_allow_methods);
-			resp_header.set_field("Access-Control-Allow-Headers", cfg.control_allow_headers);
-			resp_header.set_field("Access-Control-Max-Age", cfg.control_max_age);
-
 			auto with_credential = header.find("withCredentials");
-			if (!with_credential.empty())
-			{
-				resp_header.set_field("Access-Control-Allow-Credentials",
-									  cfg.control_allow_credentials ? "true" : "false");
-			}
+
+			set_options_header(resp_header, !with_credential.empty(), cfg);
 
 			resp_header.serialize(buffer);
 		}

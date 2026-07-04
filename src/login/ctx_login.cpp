@@ -9,7 +9,7 @@ namespace aquarius
 		{
 			XLOG_INFO() << "login success!";
 
-			co_return error_code{};
+			co_return http_status::ok;
 		}
 	}
 }

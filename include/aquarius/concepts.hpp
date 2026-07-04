@@ -81,7 +81,7 @@ namespace aquarius
 	concept repeated_t = is_vector<std::remove_cvref_t<T>>::value;
 
 	template <typename T>
-	concept zig_zag = disjunction_same_as<T, int32_t, int64_t>;
+	concept zig_zag = disjunction_same_as<T, int16_t, int32_t, int64_t>;
 
 	template <typename T>
 	concept fixed_t = disjunction_same_as<T, fixed32, fixed64>;

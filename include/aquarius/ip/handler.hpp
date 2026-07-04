@@ -45,6 +45,13 @@ namespace aquarius
 			return cb_;
 		}
 
+		void generate_members(std::vector<std::string>& member_names, std::vector<std::string>& member_types)
+		{
+			member_names = response_.get_member_names();
+
+			member_types = response_.get_member_types();
+		}
+
 		virtual auto handle() -> asio::awaitable<error_code> = 0;
 
 	private:
@@ -134,10 +141,10 @@ namespace aquarius
 		__request::this_router);                                                                                       \
 	__AQUARIUS_HANDLER_IMPL(__handler, __request, __response)
 
-#define AQUARIUS_SYS_HANDLER(__request, __response, __handler)                                                             \
+#define AQUARIUS_SYS_HANDLER(__request, __response, __handler)                                                         \
 	class __handler;                                                                                                   \
 	[[maybe_unused]] static aquarius::auto_handler_register<__handler> __auto_register_##__handler(                    \
-		__request::this_router, true);                                                                                       \
+		__request::this_router, true);                                                                                 \
 	__AQUARIUS_HANDLER_IMPL(__handler, __request, __response)
 
 #define AQUARIUS_BASIC_HANDLER(__response, __handler)                                                                  \
