@@ -36,6 +36,36 @@ struct mock_body
 		return error_code{};
 	}
 
+	error_code from_binary(flex_buffer&)
+	{
+		return error_code{};
+	}
+
+	error_code to_binary(flex_buffer&)
+	{
+		throw std::runtime_error("failed body deserialize");;
+	}
+	error_code from_json(flex_buffer&)
+	{
+		return error_code{};
+	}
+
+	error_code to_json(flex_buffer&)
+	{
+		value = 2;
+		return error_code{};
+	}
+	error_code from_kv(flex_buffer&)
+	{
+		return error_code{};
+	}
+
+	error_code to_kv(flex_buffer&)
+	{
+		value = 2;
+		return error_code{};
+	}
+
 	std::size_t byte_size()
 	{
 		return 1;
@@ -61,15 +91,35 @@ struct mock_failed_header
 
 struct mock_failed_body
 {
-	error_code serialize(flex_buffer&)
+	error_code from_binary(flex_buffer&)
 	{
 		throw std::runtime_error("failed body serialize");;
 	}
 
-	error_code deserialize(flex_buffer&)
+	error_code to_binary(flex_buffer&)
 	{
 		throw std::runtime_error("failed body deserialize");;
 	}
+	error_code from_json(flex_buffer&)
+	{
+		throw std::runtime_error("failed body serialize");;
+	}
+
+	error_code to_json(flex_buffer&)
+	{
+		throw std::runtime_error("failed body deserialize");;
+	}
+	error_code from_kv(flex_buffer&)
+	{
+		throw std::runtime_error("failed body serialize");;
+	}
+
+	error_code to_kv(flex_buffer&)
+	{
+		throw std::runtime_error("failed body deserialize");;
+	}
+
+
 
 	std::size_t byte_size()
 	{

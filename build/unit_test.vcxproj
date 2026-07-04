@@ -160,7 +160,6 @@
     <ClInclude Include="..\include\aquarius\detail\asio.hpp" />
     <ClInclude Include="..\include\aquarius\detail\flex_buffer.hpp" />
     <ClInclude Include="..\include\aquarius\detail\member_pointer.hpp" />
-    <ClInclude Include="..\include\aquarius\basic_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp" />
     <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp" />
@@ -196,13 +195,12 @@
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\ssl_config.hpp" />
+    <ClInclude Include="..\include\aquarius\serialize\serialization.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\cookie.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\json.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\kv.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\scalar_type.hpp" />
-    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp" />
     <ClInclude Include="..\include\aquarius\singleton.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\add_string.hpp" />
     <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp" />

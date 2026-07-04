@@ -144,9 +144,6 @@
     <ClInclude Include="..\include\aquarius\detail\struct_name.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\basic_serialize.hpp">
-      <Filter>include\aquarius</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_protocol.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -231,9 +228,6 @@
     <ClInclude Include="..\include\aquarius\serialize\scalar_type.hpp">
       <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\tcp_serialize.hpp">
-      <Filter>include\aquarius\serialize</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp">
       <Filter>include\aquarius\resource</Filter>
     </ClInclude>
@@ -242,9 +236,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp">
       <Filter>include\aquarius\resource</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\serialize\http_serialize.hpp">
-      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\concepts.hpp">
       <Filter>include\aquarius</Filter>
@@ -305,6 +296,9 @@
     </ClInclude>
     <ClInclude Include="..\test\ip\login.virgo.h">
       <Filter>源文件\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\serialize\serialization.hpp">
+      <Filter>include\aquarius\serialize</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
