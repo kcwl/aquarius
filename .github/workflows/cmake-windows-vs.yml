@@ -63,15 +63,15 @@ jobs:
         ./bootstrap.bat
         ./b2 link=shared address-model=64
 
-    - name: install mysql
-      uses: ankane/setup-mysql@v1
-      with: 
-         mysql-version: 8.0
-         database: unittest
+    # - name: install mysql
+    #   uses: ankane/setup-mysql@v1
+    #   with: 
+    #      mysql-version: 8.0
+    #      database: unittest
 
-    - name: create unittest table
-      run: |
-        mysql -D unittest -e 'create table if not exists person(id int, age int)'
+    # - name: create unittest table
+    #   run: |
+    #     mysql -D unittest -e 'create table if not exists person(id int, age int)'
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
