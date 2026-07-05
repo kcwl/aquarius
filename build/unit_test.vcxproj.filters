@@ -49,9 +49,6 @@
     <Filter Include="include\aquarius\ip">
       <UniqueIdentifier>{e4906138-bc73-45ba-832c-0bf3f5e8ad29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\aquarius\ip\adaptor">
-      <UniqueIdentifier>{4d79dbb9-4ec6-4abb-be19-4667f448304d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\aquarius\ip\http">
       <UniqueIdentifier>{6dc62c01-100a-456d-95ba-b8d937e6ff21}</UniqueIdentifier>
     </Filter>
@@ -273,20 +270,11 @@
     <ClInclude Include="..\include\aquarius\ip\udp.hpp">
       <Filter>include\aquarius\ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\raw_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\adaptor\ssl_adaptor.hpp">
-      <Filter>include\aquarius\ip\adaptor</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_options_handler.hpp">
       <Filter>include\aquarius\ip\http</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\ip\http\http_helper.hpp">
       <Filter>include\aquarius\ip\http</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\ip\session_store.hpp">
-      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\basic_ssl_session.hpp">
       <Filter>include\aquarius</Filter>
@@ -299,6 +287,9 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\serialize\serialization.hpp">
       <Filter>include\aquarius\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\aquarius\ip\handler_reg.hpp">
+      <Filter>include\aquarius\ip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

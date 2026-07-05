@@ -3,7 +3,6 @@
 #include <aquarius/basic_context.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
-#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/ip/context_reg.hpp>
 #include <aquarius/ip/http/http_options_handler.hpp>
