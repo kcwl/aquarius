@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "login", "login.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aquarius-cli", "aquarius-cli.vcxproj", "{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "database", "database.vcxproj", "{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -88,6 +90,14 @@ Global
 		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x64.Build.0 = Release|x64
 		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x86.ActiveCfg = Release|Win32
 		{A3E27E94-2B62-4CDC-AF3E-EE37043CD58E}.Release|x86.Build.0 = Release|Win32
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Debug|x64.ActiveCfg = Debug|x64
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Debug|x64.Build.0 = Debug|x64
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Debug|x86.ActiveCfg = Debug|Win32
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Debug|x86.Build.0 = Debug|Win32
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Release|x64.ActiveCfg = Release|x64
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Release|x64.Build.0 = Release|x64
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Release|x86.ActiveCfg = Release|Win32
+		{D9ED8FC0-E2AB-469D-950E-2683CC2B516B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
