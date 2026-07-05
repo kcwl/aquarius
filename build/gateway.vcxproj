@@ -33,6 +33,7 @@
     <ClInclude Include="..\src\gateway\auth_module.h" />
     <ClInclude Include="..\src\gateway\basic_transfer_context.hpp" />
     <ClInclude Include="..\src\gateway\client_pool.h" />
+    <ClInclude Include="..\src\gateway\convert.hpp" />
     <ClInclude Include="..\src\gateway\default_selector.hpp" />
     <ClInclude Include="..\src\gateway\gate_error_code.h" />
     <ClInclude Include="..\src\gateway\firewall_module.h" />

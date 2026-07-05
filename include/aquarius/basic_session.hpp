@@ -107,6 +107,15 @@ namespace aquarius
 			co_return ec;
 		}
 
+		auto async_send_some(flex_buffer& buffer) -> asio::awaitable<error_code>
+		{
+			error_code ec{};
+
+			co_await socket_.async_write_some(buffer.data(), asio::redirect_error(asio::use_awaitable, ec));
+
+			co_return ec;
+		}
+
 		bool shutdown()
 		{
 			error_code ec;

@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include <ranges>
+#include <aquarius/singleton.hpp>
 
 namespace aquarius
 {
-	struct http_config
+	struct http_config : singleton<http_config>
 	{
 		std::string root_dir;
 		std::string control_allow_origin;
@@ -32,7 +33,7 @@ namespace aquarius
 		bool check_method(std::string_view methods)
 		{
 			if (methods.empty())
-				return false;
+				return true;
 
 			auto op = methods | std::views::split(',');
 
@@ -68,10 +69,6 @@ namespace aquarius
 
 	inline static http_config& create_http()
 	{
-		static http_config http;
-
-		return http;
+		return http_config::get_mutable_instance();
 	}
 } // namespace aquarius
-
-#define HTTP_CONFIG_INVOKE(cfg) CONFIG_MICRO(aquarius::http_config, cfg)

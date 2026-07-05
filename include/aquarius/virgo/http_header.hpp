@@ -28,16 +28,19 @@ namespace aquarius
 	public:
 		http_header()
 			: fields_()
+			, way_()
 		{}
 
 		virtual ~http_header() = default;
 
 		http_header(const http_header& other)
 			: fields_(other.fields_)
+			, way_(other.way_)
 		{}
 
 		http_header(http_header&& other) noexcept
 			: fields_(std::move(other.fields_))
+			, way_(other.way_)
 		{}
 
 		http_header& operator=(const http_header& other)
@@ -45,6 +48,7 @@ namespace aquarius
 			if (this != std::addressof(other))
 			{
 				fields_ = other.fields_;
+				way_ = other.way_;
 			}
 
 			return *this;
@@ -55,6 +59,7 @@ namespace aquarius
 			if (this != std::addressof(other))
 			{
 				fields_ = std::move(other.fields_);
+				way_ = std::move(other.way_);
 			}
 
 			return *this;
@@ -173,6 +178,19 @@ namespace aquarius
 			return iter->second;
 		}
 
+		int16_t way() const
+		{
+			return way_;
+		}
+		int16_t& way()
+		{
+			return way_;
+		}
+		void way(int16_t value)
+		{
+			way_ = value;
+		}
+
 	private:
 		template <typename T>
 		T to_integer(const std::string& value) const
@@ -188,6 +206,8 @@ namespace aquarius
 
 	private:
 		std::unordered_map<key_t, value_t> fields_;
+
+		int16_t way_;
 	};
 
 } // namespace aquarius

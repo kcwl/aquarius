@@ -1,13 +1,13 @@
 #pragma once
 #include <aquarius/basic_client.hpp>
 #include <aquarius/basic_module.hpp>
-#include <aquarius/basic_serialize.hpp>
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/cmd_options.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
+#include <aquarius/ip/handler_reg.hpp>
 #include <aquarius/ip/http.hpp>
 #include <aquarius/ip/tcp.hpp>
 #include <aquarius/ip/udp.hpp>
@@ -19,10 +19,9 @@
 #include <aquarius/resource/mysql_config.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/cookie.hpp>
-#include <aquarius/serialize/http_serialize.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/serialize/kv.hpp>
-#include <aquarius/serialize/tcp_serialize.hpp>
+#include <aquarius/serialize/serialization.hpp>
 #include <aquarius/singleton.hpp>
 #include <aquarius/tbl/enter_view.hpp>
 #include <aquarius/tbl/grep_view.hpp>

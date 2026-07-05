@@ -7,6 +7,7 @@ BOOST_AUTO_TEST_SUITE(ut_basic_context)
 
 struct mock_protocol
 {
+	using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
 	template <typename Handler, typename Func>
 	auto handle_request(std::shared_ptr<Handler> handler_ptr, Func&& func) -> asio::awaitable<error_code>
 	{
@@ -17,7 +18,8 @@ struct mock_protocol
 BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 {
 	basic_protocol_context<mock_protocol> ctx(
-		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, Callback&) -> asio::awaitable<error_code>
+		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, flex_buffer&,
+							  Callback&) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
 			co_return error_code{};
@@ -29,7 +31,7 @@ BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 		[ctx]() mutable -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await ctx.complete(nullptr, 0);
+			auto ec = co_await ctx.complete(nullptr, buffer, 0);
 
 			BOOST_TEST(!ec);
 		},
@@ -43,7 +45,8 @@ BOOST_AUTO_TEST_CASE(basic_protocol_context_ctor)
 BOOST_AUTO_TEST_CASE(basic_protocol_router)
 {
 	basic_protocol_context<mock_protocol> ctx(
-		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, Callback&) -> asio::awaitable<error_code>
+		[]<typename Callback>(basic_protocol_context<mock_protocol>*, mock_protocol*, flex_buffer&,
+							  Callback&) -> asio::awaitable<error_code>
 		{
 			BOOST_TEST(true);
 			co_return error_code{};
@@ -72,9 +75,9 @@ BOOST_AUTO_TEST_CASE(basic_context_ctor)
 		[ctx]() mutable -> asio::awaitable<void>
 		{
 			flex_buffer buffer{};
-			auto ec = co_await ctx.complete(nullptr, 0);
+			auto ec = co_await ctx.complete(nullptr, buffer, 0);
 
-			BOOST_TEST(ec == boost::asio::error::bad_descriptor);
+			BOOST_TEST(!ec);
 		},
 		asio::use_future);
 

@@ -1,5 +1,5 @@
 
-message login -> 10000
+message login -> /login
 {
 	request
 	{

@@ -77,15 +77,15 @@ jobs:
         sudo apt update
         sudo apt install -y libboost1.90-all-dev lcov
 
-    - name: install mysql
-      uses: ankane/setup-mysql@v1
-      with: 
-         mysql-version: 8.0
-         database: unittest
+    # - name: install mysql
+    #   uses: ankane/setup-mysql@v1
+    #   with: 
+    #      mysql-version: 8.0
+    #      database: unittest
 
-    - name: create unittest table
-      run: |
-        sudo mysql -D unittest -e 'create table if not exists person(id int, age int)'
+    # - name: create unittest table
+    #   run: |
+    #     sudo mysql -D unittest -e 'create table if not exists person(id int, age int)'
 
 
     - name: Configure CMake
@@ -99,7 +99,6 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCOVERAGE=ON
         -DENABLE_SSL_TEST=ON
-        -DENABLE_MYSQL_TEST=true
         -S ${{ github.workspace }}
 
     - name: Build

@@ -63,7 +63,9 @@ namespace aquarius
 
 			try
 			{
-				std::size_t bytes = this->body().byte_size();
+				flex_buffer body_buffer{};
+				this->body().to_json(body_buffer);
+				std::size_t bytes = body_buffer.size();
 
 				if (this->method() != http_method::get && bytes != 0)
 				{
@@ -74,7 +76,7 @@ namespace aquarius
 
 				if (this->method() != http_method::get && bytes != 0)
 				{
-					this->body().serialize(buffer);
+					buffer.sputn((char*)body_buffer.data().data(), body_buffer.size());
 				}
 			}
 			catch (...)
@@ -93,7 +95,26 @@ namespace aquarius
 			{
 				this->header().deserialize(buffer);
 
-				this->body().deserialize(buffer);
+				switch (static_cast<serialize_way>(this->header().way()))
+				{
+					case serialize_way::binary:
+						{
+							this->body().from_binary(buffer);
+						}
+						break;
+					case serialize_way::json:
+						{
+							this->body().from_json(buffer);
+						}
+						break;
+					case serialize_way::kv:
+						{
+							this->body().from_kv(buffer);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			catch (...)
 			{

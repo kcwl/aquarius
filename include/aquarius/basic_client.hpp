@@ -123,8 +123,8 @@ namespace aquarius
 			accept_func_(proto_ptr_);
 		}
 
-		template <typename Response, typename Request>
-		auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
+		template <typename Response, typename Request, typename... Args>
+		auto async_call(std::shared_ptr<Request> req, Args&&... args) -> asio::awaitable<Response>
 		{
 			Response resp{};
 
@@ -136,7 +136,7 @@ namespace aquarius
 
 			error_code ec{};
 
-			auto src = co_await proto_ptr_->send_request(req, f, ec);
+			auto src = co_await proto_ptr_->send_request(req, f, ec, std::forward<Args>(args)...);
 
 			if (make_error(ec))
 			{
@@ -150,13 +150,13 @@ namespace aquarius
 			co_return resp;
 		}
 
-		template <typename Func, typename ConstBufferSequence>
-		auto async_call_buffer(ConstBufferSequence&& req, const std::string router, Func&& f) -> asio::awaitable<error_code>
+		template <typename Func, typename ConstBufferSequence, typename... Args>
+		auto async_call_buffer(ConstBufferSequence&& req, const std::string router, Func&& f, Args&&... args) -> asio::awaitable<error_code>
 		{
 			error_code ec{};
 
 			auto src =
-				co_await proto_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), router, std::forward<Func>(f), ec);
+				co_await proto_ptr_->send_buffer(std::forward<ConstBufferSequence>(req), router, std::forward<Func>(f), ec, std::forward<Args>(args)...);
 
 			co_await proto_ptr_->wait(src);
 

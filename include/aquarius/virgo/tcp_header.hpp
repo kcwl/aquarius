@@ -12,6 +12,7 @@ namespace aquarius
 		tcp_header()
 			: uuid_(0)
 			, timestamp_(0)
+			, way_()
 		{}
 
 		virtual ~tcp_header() = default;
@@ -19,6 +20,7 @@ namespace aquarius
 		tcp_header(const tcp_header& other)
 			: uuid_(other.uuid_)
 			, timestamp_(other.timestamp_)
+			, way_(other.way_)
 		{}
 
 		tcp_header& operator=(const tcp_header& other)
@@ -27,6 +29,7 @@ namespace aquarius
 			{
 				uuid_ = other.uuid_;
 				timestamp_ = other.timestamp_;
+				way_ = other.way_;
 			}
 
 			return *this;
@@ -35,6 +38,7 @@ namespace aquarius
 		tcp_header(tcp_header&& other) noexcept
 			: uuid_(std::exchange(other.uuid_, 0))
 			, timestamp_(std::exchange(other.timestamp_, 0))
+			, way_(std::exchange(other.way_, int16_t{}))
 		{}
 
 		tcp_header& operator=(tcp_header&& other) noexcept
@@ -43,6 +47,7 @@ namespace aquarius
 			{
 				uuid_ = std::exchange(other.uuid_, 0);
 				timestamp_ = std::exchange(other.timestamp_, 0);
+				way_ = std::exchange(other.way_, int16_t{});
 			}
 
 			return *this;
@@ -55,6 +60,8 @@ namespace aquarius
 
 			parse_.to_datas(timestamp_, buffer);
 
+			parse_.to_datas<int16_t>(way_, buffer);
+
 			return error_code{};
 		}
 
@@ -63,6 +70,8 @@ namespace aquarius
 			uuid_ = parse_.from_datas<uint64_t>(buffer);
 
 			timestamp_ = parse_.from_datas<int64_t>(buffer);
+
+			way_ = parse_.from_datas<int16_t>(buffer);
 
 			return error_code{};
 		}
@@ -94,10 +103,25 @@ namespace aquarius
 			timestamp_ = value;
 		}
 
+		int16_t way() const
+		{
+			return way_;
+		}
+		int16_t& way()
+		{
+			return way_;
+		}
+		void way(int16_t value)
+		{
+			way_ = value;
+		}
+
 	private:
 		uint64_t uuid_;
 
 		int64_t timestamp_;
+
+		int16_t way_;
 
 		binary_parse parse_;
 	};
