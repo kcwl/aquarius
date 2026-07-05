@@ -111,7 +111,7 @@ namespace aquarius
 
 	private:
 		template <char... args>
-		std::string get_first_range(flex_buffer& buffer)
+		static std::string get_first_range(flex_buffer& buffer)
 		{
 			auto sp = std::span<char>((char*)buffer.data().data(), buffer.data().size());
 

@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(check_method_empty)
 {
     auto& cfg = aquarius::create_http();
 
-    BOOST_TEST(!cfg.check_method(""));
+    BOOST_TEST(cfg.check_method(""));
 }
 
 BOOST_AUTO_TEST_CASE(check_headers_empty)

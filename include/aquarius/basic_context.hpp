@@ -92,6 +92,8 @@ namespace aquarius
 			asio::co_spawn(co_await asio::this_coro::executor,
 						   proto->template handle_request<Handler>(ptr->handler_ptr_, cb, std::forward<Args>(args)...),
 						   asio::detached);
+
+			co_return error_code{};
 		}
 
 	private:

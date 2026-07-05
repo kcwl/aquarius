@@ -261,7 +261,9 @@ namespace aquarius
 		}
 
 		template <bool Server>
-		auto parse_command_line(std::string_view header_span, error_code& ec)
+		auto parse_command_line(std::string_view header_span, error_code& ec) ->std::conditional_t<Server,
+								   std::tuple<http_method, boost::system::result<boost::urls::url_view>, http_version>,
+								   std::tuple<http_version, http_status>>
 		{
 			using result_t =
 				std::conditional_t<Server,

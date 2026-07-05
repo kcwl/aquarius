@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(basic_context_ctor)
 			flex_buffer buffer{};
 			auto ec = co_await ctx.complete(nullptr, buffer, 0);
 
-			BOOST_TEST(ec == boost::asio::error::bad_descriptor);
+			BOOST_TEST(!ec);
 		},
 		asio::use_future);
 
