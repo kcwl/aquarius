@@ -14,26 +14,3 @@ message regist -> 9000
 	{
 	}
 }
-
-message subscribe_service -> 9001
-{
-	request
-	{
-		string group;
-	}
-	response
-	{
-		repeated uint64_t instances;
-	}
-}
-
-message broad_service_status -> 9002
-{
-	request{}
-	response
-	{
-		string group;
-		uint64 host_and_port;
-		bool healty;
-	}
-}

@@ -18,7 +18,8 @@ namespace aquarius
 			no_player,
 			create_client_error,
 			channel_not_find,
-			not_subscriber
+			not_subscriber,
+			not_exist_in_pool,
 		};
 
 		inline std::string_view db_result_map(int result)
@@ -31,7 +32,8 @@ namespace aquarius
 				{ static_cast<int>(errc::no_player), "no player"sv },
 				{ static_cast<int>(errc::create_client_error), "create client error"sv },
 				{ static_cast<int>(errc::channel_not_find), "channel not find"sv },
-				{ static_cast<int>(errc::not_subscriber), "not subscriber"sv }
+				{ static_cast<int>(errc::not_subscriber), "not subscriber"sv },
+				{ static_cast<int>(errc::not_exist_in_pool), "not exist in pool"sv }
 			};
 
 			return db_results[result];
