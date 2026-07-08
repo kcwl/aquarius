@@ -9,8 +9,6 @@ namespace aquarius
 		auto client_pool::shake(const std::string& group, uint64_t host_and_port, const std::string& name, bool healthy,
 								int32_t weight, const std::string& version) -> asio::awaitable<void>
 		{
-			std::unique_lock lk(mutex_);
-
 			co_await add(group, host_and_port, name, healthy, weight, version);
 
 			auto request = std::make_shared<shake_request>();
@@ -38,8 +36,6 @@ namespace aquarius
 
 		void client_pool::remove(const std::string& group, uint64_t host_and_port)
 		{
-			std::unique_lock lk(mutex_);
-
 			auto iter = pool_.find(group);
 
 			if (iter == pool_.end())
@@ -61,12 +57,15 @@ namespace aquarius
 		auto client_pool::add(const std::string& group, uint64_t host_and_port, const std::string& name, bool healthy,
 							  int32_t weight, const std::string& version) -> asio::awaitable<void>
 		{
-			std::unique_lock lk(mutex_);
-
 			auto& g = pool_[group];
 			g.push_back({});
 
 			auto& back = g.back();
+
+			if (!back)
+			{
+				back = std::make_shared<client_info>();
+			}
 
 			back->host_port = host_and_port;
 			back->name = name;
