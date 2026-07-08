@@ -1,0 +1,12 @@
+message cmd_op -> 9200
+{
+	request
+	{
+		string command;
+		repeated string paramers;
+	}
+	response
+	{
+		string output;
+	}
+}

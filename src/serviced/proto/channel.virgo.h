@@ -1,0 +1,64 @@
+#pragma once
+#include <aquarius/serialize/serialization.hpp>
+#include <aquarius/virgo/tcp_request.hpp>
+#include <aquarius/virgo/tcp_response.hpp>
+using namespace aquarius;
+
+class subs_list_req_body: public aquarius::serialization
+{
+public:
+	subs_list_req_body();
+	virtual ~subs_list_req_body();
+
+	subs_list_req_body(subs_list_req_body&&) = default;
+	subs_list_req_body& operator=(subs_list_req_body&&) = default;
+public:
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
+
+
+private:
+	struct impl;
+	std::shared_ptr<impl> impl_ptr_;
+};
+class subs_list_resp_body: public aquarius::serialization
+{
+public:
+	subs_list_resp_body();
+	virtual ~subs_list_resp_body();
+
+	subs_list_resp_body(subs_list_resp_body&&) = default;
+	subs_list_resp_body& operator=(subs_list_resp_body&&) = default;
+public:
+	virtual void to_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_binary(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_json(aquarius::flex_buffer& buffer) override;
+
+	virtual void to_kv(aquarius::flex_buffer& buffer) override;
+
+	virtual void from_kv(aquarius::flex_buffer& buffer) override;
+
+
+	std::vector<string> keys() const;
+	std::vector<string>& keys();
+
+private:
+	struct impl;
+	std::shared_ptr<impl> impl_ptr_;
+};
+
+using subs_list_request = aquarius::tcp_request<"9100", subs_list_req_body>;
+using subs_list_response = aquarius::tcp_response<"9100", subs_list_resp_body>;

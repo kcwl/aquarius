@@ -1,0 +1,11 @@
+message subs_list -> 9100
+{
+	request
+	{
+		
+	}
+	response
+	{
+		repeated string keys;
+	}
+}

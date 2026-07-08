@@ -14,3 +14,15 @@ message regist -> 9000
 	{
 	}
 }
+
+message publish -> 9001
+{
+	request
+	{
+		repeated string topics;
+	}
+	response
+	{
+		
+	}
+}
