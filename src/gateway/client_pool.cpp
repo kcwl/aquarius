@@ -15,6 +15,8 @@ namespace aquarius
 
 		auto client_pool::run() -> asio::awaitable<bool>
 		{
+			co_await mpc_async_call<&serviced::srvd_client::publish>(group_, "127.0.0.1", 3399);
+			
 			auto request = std::make_shared<shake_request>();
 
 			auto resp =
@@ -34,7 +36,7 @@ namespace aquarius
 				{
 					flex_buffer out{};
 #ifdef HTTP_GATEWAY
-					auto ec = convert<tcp, http>::apply(buf, out);
+					auto ec = convert::from_tcp_to_http(buf, out);
 					co_return co_await func(out, ec);
 #else
 					co_return co_await func(buf);

@@ -9,7 +9,7 @@ namespace aquarius
 	public:
 		using handle_message_t = Response;
 
-		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&, const std::string&)>;
 
 	public:
 		basic_handler(const std::string& name)

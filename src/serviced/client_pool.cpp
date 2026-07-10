@@ -20,9 +20,9 @@ namespace aquarius
 			{
 				co_return co_await this->invoke(
 					group, host_and_port, buffer, router,
-					[func = std::move(f)](flex_buffer& buf, const std::string&) -> asio::awaitable<error_code>
+					[func = std::move(f)](flex_buffer& buf, const std::string& r) -> asio::awaitable<error_code>
 					{
-						co_return co_await func(buf);
+						co_return co_await func(buf, r);
 					});
 			};
 
@@ -30,7 +30,7 @@ namespace aquarius
 
 			for (auto& topic : resp.body().topics())
 			{
-				mpc_put_context(topic, ctx, true);
+				mpc_put_context(topic, ctx, false);
 			}
 		}
 

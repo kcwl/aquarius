@@ -41,7 +41,7 @@ namespace aquarius
 				{
 					flex_buffer transfer_buffer{};
 
-					convert<http, tcp>::apply(buffer, transfer_buffer);
+					convert::from_http_to_tcp(method, buffer, transfer_buffer);
 
 					co_return co_await context->func_(transfer_buffer, context->router(), cb);
 				}

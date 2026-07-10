@@ -59,6 +59,9 @@
     <ClCompile Include="..\src\serviced\proto\shake.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\serviced\ctx_shake.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\serviced\proto\regist.virgo">

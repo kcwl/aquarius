@@ -10,10 +10,13 @@ namespace aquarius
 	{
 		AQUARIUS_SYS_HANDLER(regist_request, regist_response, ctx_regist)
 		{
-			co_await mpc_async_call<&client_pool::shake>(
-				request()->body().group(), make_host_and_port(request()->body().host(), request()->body().port()),
-				request()->body().name(), request()->body().healthy(), request()->body().weight(),
-				request()->body().version());
+			if (request()->body().group() != "gateway")
+			{
+				co_await mpc_async_call<&client_pool::shake>(
+					request()->body().group(), make_host_and_port(request()->body().host(), request()->body().port()),
+					request()->body().name(), request()->body().healthy(), request()->body().weight(),
+					request()->body().version());
+			}
 
 			co_return errc::success;
 		}
