@@ -48,6 +48,9 @@
     <ClCompile Include="..\src\database\proto\execute_sql.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\login\permission_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\login\srv_regist.h">
@@ -77,12 +80,18 @@
     <ClInclude Include="..\src\login\payload.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\login\permission_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\login\proto\login.virgo">
       <Filter>proto</Filter>
     </None>
     <None Include="..\src\login\sql\account.sql">
+      <Filter>sql</Filter>
+    </None>
+    <None Include="..\src\login\sql\permissions.sql">
       <Filter>sql</Filter>
     </None>
   </ItemGroup>
