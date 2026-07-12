@@ -171,12 +171,6 @@
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\mysql_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -427,9 +421,6 @@
     <ClCompile Include="..\test\serialize\ut_cookie.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\serialize\ut_json.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
@@ -437,9 +428,6 @@
       <Filter>源文件\serialize</Filter>
     </ClCompile>
     <ClCompile Include="..\test\serialize\ut_scalar_type.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tbl\ut_add_string.cpp">
