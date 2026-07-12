@@ -3,9 +3,12 @@
 
 #include <aquarius.hpp>
 #include <iostream>
-#include <srvd_client.hpp>
+#include <serviced/srvd_client.hpp>
+#include "mysql_config.hpp"
 
 namespace po = boost::program_options;
+
+using namespace aquarius::db;
 
 int main(int argc, char* argv[])
 {
@@ -20,6 +23,11 @@ int main(int argc, char* argv[])
 	cmd.add_options()("name", po::value<std::string>(&name), "server name");
 	cmd.add_options()("srvd_host", po::value<std::string>(), "serviced host");
 	cmd.add_options()("srvd_port", po::value<uint16_t>(), "serviced port");
+	cmd.add_options()("db_host", po::value<std::string>(), "database host");
+	cmd.add_options()("db_port", po::value<uint16_t>(), "database port");
+	cmd.add_options()("db_user", po::value<std::string>(), "database user");
+	cmd.add_options()("db_passwd", po::value<std::string>(), "database password");
+	cmd.add_options()("db_schema", po::value<std::string>(), "database schema");
 
 	uint16_t port{};
 
@@ -74,6 +82,61 @@ int main(int argc, char* argv[])
 	else
 	{
 		std::cout << "the srvd_port is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
+
+	if (vm.count("db_host"))
+	{
+		mysql_config::get_mutable_instance().host = vm["db_host"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the db_host is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
+
+	if (vm.count("db_port"))
+	{
+		mysql_config::get_mutable_instance().port = vm["db_port"].as<uint16_t>();
+	}
+	else
+	{
+		std::cout << "the db_port is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
+
+	if (vm.count("db_user"))
+	{
+		mysql_config::get_mutable_instance().user = vm["db_user"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the db_user is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
+
+	if (vm.count("db_passwd"))
+	{
+		mysql_config::get_mutable_instance().password = vm["db_passwd"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the db_passwd is invalid\n";
+		std::cout << cmd;
+		return 0;
+	}
+
+	if (vm.count("db_schema"))
+	{
+		mysql_config::get_mutable_instance().db = vm["db_schema"].as<std::string>();
+	}
+	else
+	{
+		std::cout << "the db_schema is invalid\n";
 		std::cout << cmd;
 		return 0;
 	}

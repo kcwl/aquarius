@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/module/module_register.hpp>
-#include <proto/regist.virgo.h>
+#include <serviced/proto/regist.virgo.h>
 
 #define HEALTHY_CHECK_TOKEN(args) typename
 

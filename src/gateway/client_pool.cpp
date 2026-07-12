@@ -3,7 +3,7 @@
 #include "convert.hpp"
 #include "gate_error_code.h"
 #include "proto/shake.virgo.h"
-#include <srvd_client.hpp>
+#include <serviced/srvd_client.hpp>
 
 namespace aquarius
 {
@@ -16,7 +16,7 @@ namespace aquarius
 		auto client_pool::run() -> asio::awaitable<bool>
 		{
 			co_await mpc_async_call<&serviced::srvd_client::publish>(group_, "127.0.0.1", 3399);
-			
+
 			auto request = std::make_shared<shake_request>();
 
 			auto resp =
@@ -44,7 +44,8 @@ namespace aquarius
 				};
 
 				co_return co_await mpc_async_call<
-					&serviced::srvd_client::async_call_buffer<decltype(tf), flex_buffer&>>(std::ref(buffer), router, tf);
+					&serviced::srvd_client::async_call_buffer<decltype(tf), flex_buffer&>>(std::ref(buffer), router,
+																						   tf);
 			};
 
 			std::shared_ptr<context_base> ctx = std::make_shared<basic_transfer_context<
@@ -57,6 +58,7 @@ namespace aquarius
 
 			for (auto& topic : topics)
 			{
+				XLOG_INFO() << "Regist Context: " << topic;
 				mpc_put_context(topic, ctx, true);
 			}
 

@@ -30,6 +30,7 @@ namespace aquarius
 
 			for (auto& topic : resp.body().topics())
 			{
+				XLOG_INFO() << "Register Context " << topic;
 				mpc_put_context(topic, ctx, false);
 			}
 		}

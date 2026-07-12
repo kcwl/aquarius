@@ -1,0 +1,23 @@
+message query_sql -> 7000
+{
+	request
+	{
+		string sql;
+	}
+	response
+	{
+		repeated string results;
+	}
+}
+
+message execute_sql -> 7001
+{
+	request
+	{
+		string sql;
+	}
+	response
+	{
+		int32 affected;
+	}
+}

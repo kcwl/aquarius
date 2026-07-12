@@ -1,5 +1,5 @@
 #include "client_pool.h"
-#include <proto/regist.virgo.h>
+#include <serviced/proto/regist.virgo.h>
 
 namespace aquarius
 {
