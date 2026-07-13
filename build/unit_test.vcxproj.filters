@@ -225,9 +225,6 @@
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
       <Filter>include\aquarius\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp">
-      <Filter>include\aquarius\resource</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\concepts.hpp">
       <Filter>include\aquarius</Filter>
     </ClInclude>
@@ -406,9 +403,6 @@
     <ClCompile Include="..\test\resource\ut_http_config.cpp">
       <Filter>源文件\resource</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\resource\ut_mysql_config.cpp">
-      <Filter>源文件\resource</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\resource\ut_ssl_config.cpp">
       <Filter>源文件\resource</Filter>
     </ClCompile>
@@ -431,9 +425,6 @@
       <Filter>源文件\serialize</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tbl\ut_add_string.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\ut_enter_view.cpp">
       <Filter>源文件\tbl</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tbl\ut_grep_view.cpp">

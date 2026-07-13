@@ -43,25 +43,33 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: cache boost
-      id: cache-boost
-      uses: actions/cache@v4
-      env:
-        cache-name: boost-module
-      with:
-        path: '${{ runner.workspace }}\boost_1_90_0'
-        key: ${{ runner.os }}-build-${{env.cache-name}}-1.90
+    # - name: cache boost
+    #   id: cache-boost
+    #   uses: actions/cache@v4
+    #   env:
+    #     cache-name: boost-module
+    #   with:
+    #     path: '${{ runner.workspace }}\boost_1_90_0'
+    #     key: ${{ runner.os }}-build-${{env.cache-name}}-1.90
 
-    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
-      name: Boost Setup
-      shell: pwsh
-      run: |
-        cd  ${{ runner.workspace }}
-        curl -o boost_1_90_0.zip https://archives.boost.io/release/1.90.0/source/boost_1_90_0.zip
-        7z x boost_1_90_0.zip
-        cd boost_1_90_0
-        ./bootstrap.bat
-        ./b2 link=shared address-model=64
+    # - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
+    #   name: Boost Setup
+    #   shell: pwsh
+    #   run: |
+    #     cd  ${{ runner.workspace }}
+    #     curl -o boost_1_90_0.zip https://archives.boost.io/release/1.90.0/source/boost_1_90_0.zip
+    #     7z x boost_1_90_0.zip
+    #     cd boost_1_90_0
+    #     ./bootstrap.bat
+    #     ./b2 link=shared address-model=64
+
+    - name: Install Boost
+      uses: MarkusJx/install-boost@v2.6
+      id: install-boost
+      with:
+        boost_version: 1.90.0
+        platform_version: 2026
+        toolset: msvc
 
     # - name: install mysql
     #   uses: ankane/setup-mysql@v1
@@ -83,7 +91,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DENABLE_MYSQL_TEST=true
         -DENABLE_SSL_TEST=ON
-        -DBOOST_ROOT=${{ runner.workspace }}\boost_1_90_0
+        -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
         -S ${{ github.workspace }}
         
     - name: Build

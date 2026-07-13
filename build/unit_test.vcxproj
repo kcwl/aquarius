@@ -190,7 +190,6 @@
     <ClInclude Include="..\include\aquarius\error_code.hpp" />
     <ClInclude Include="..\include\aquarius\logger.hpp" />
     <ClInclude Include="..\include\aquarius\resource\http_config.hpp" />
-    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp" />
     <ClInclude Include="..\include\aquarius\resource\ssl_config.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\serialization.hpp" />
     <ClInclude Include="..\include\aquarius\serialize\binary.hpp" />
@@ -242,7 +241,6 @@
     <ClCompile Include="..\test\module\ut_module_router.cpp" />
     <ClCompile Include="..\test\module\ut_schedule.cpp" />
     <ClCompile Include="..\test\resource\ut_http_config.cpp" />
-    <ClCompile Include="..\test\resource\ut_mysql_config.cpp" />
     <ClCompile Include="..\test\resource\ut_ssl_config.cpp" />
     <ClCompile Include="..\test\serialize\ut_binary.cpp" />
     <ClCompile Include="..\test\serialize\ut_binary_parse_ext.cpp" />
@@ -251,7 +249,6 @@
     <ClCompile Include="..\test\serialize\ut_kv.cpp" />
     <ClCompile Include="..\test\serialize\ut_scalar_type.cpp" />
     <ClCompile Include="..\test\tbl\ut_add_string.cpp" />
-    <ClCompile Include="..\test\tbl\ut_enter_view.cpp" />
     <ClCompile Include="..\test\tbl\ut_grep_view.cpp" />
     <ClCompile Include="..\test\tbl\ut_insert_view.cpp" />
     <ClCompile Include="..\test\tbl\ut_mysql_io_service.cpp" />

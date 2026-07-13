@@ -44,10 +44,8 @@
 			target_link_libraries(${target_name} PRIVATE mysql)
 		endif()
 
-		if(ENABLE_SSL_TEST)
-			target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
-			target_link_libraries(${target_name} PRIVATE openssl)
-		endif()
+		target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
+		target_link_libraries(${target_name} PRIVATE openssl)
 
 		add_test(NAME ${target_name} COMMAND ${target_name})
 
