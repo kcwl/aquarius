@@ -89,5 +89,59 @@ namespace aquarius
 		std::stringstream complete_sql_;
 	};
 
+	class insert_multi_view
+	{
+	public:
+		template <typename T>
+		insert_multi_view& operator()(const std::vector<T>& value)
+		{
+			if (!value.empty())
+			{
+				complete_sql_.str("");
+
+				constexpr auto struct_name = aquarius::detail::struct_name<std::remove_cvref_t<T>>();
+
+				complete_sql_ << "insert into " << struct_name << "(";
+
+				using type = std::remove_cvref_t<T>;
+
+				constexpr static auto size = boost::pfr::tuple_size_v<type>;
+
+				auto type_f = [&]<std::size_t... I>(std::index_sequence<I...>)
+				{ ((complete_sql_ << boost::pfr::get_name<I, type>() << (size != I + 1 ? "," : "")), ...); };
+
+				type_f(std::make_index_sequence<size>{});
+
+				complete_sql_ << ") values";
+
+				for (auto& v : value)
+				{
+					auto f = [&]<std::size_t... I>(std::index_sequence<I...>)
+					{
+						complete_sql_ << "(";
+						((complete_sql_ << add_string(boost::pfr::get<I, type>(v)) << (size != I + 1 ? "," : "")), ...);
+						complete_sql_ << "),";
+					};
+
+					f(std::make_index_sequence<size>{});
+				}
+
+				complete_sql_.seekp(-1, std::ios::cur);
+			}
+
+			return *this;
+		}
+
+		operator std::string() const
+		{
+			return complete_sql_.str();
+		}
+
+	private:
+		std::stringstream complete_sql_;
+	};
+
 	inline static insert_view insert_v;
+
+	inline static insert_multi_view insert_multi_v;
 } // namespace aquarius

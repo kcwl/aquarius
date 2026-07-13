@@ -5,90 +5,147 @@ namespace aquarius
 {
 	namespace login
 	{
-		auto permisson_module::run() -> asio::awaitable<bool>
+		auto permission_module::run() -> asio::awaitable<bool>
 		{
 			co_await load_permission();
+
+			co_await load_permission_desc();
 
 			co_return true;
 		}
 
-		bool permisson_module::check(int64_t role_id, const std::string& perm)
+		auto permission_module::add_desc(const std::vector<std::string>& perms) -> asio::awaitable<bool>
 		{
-			auto iter = perms_.find(role_id);
-			if (iter == perms_.end())
-			{
-				return false;
-			}
-
-			auto it =
-				std::find_if(iter->second.begin(), iter->second.end(), [&](auto& p) { return p->permissions == perm; });
-
-			return it == iter->second.end();
-		}
-
-		auto permisson_module::create(int64_t role_id, const std::vector<std::string>& perms) -> asio::awaitable<void>
-		{
-			std::vector<permisson> result{};
+			std::vector<perm_desc> pd{};
 			for (auto& p : perms)
 			{
-				result.push_back({});
-				auto& back = result.back();
-				back.role_id = role_id;
-				back.permissions = p;
+				pd.push_back({ index_++, p });
 			}
 
-			co_await sql_insert(result);
-		}
+			auto affected = co_await (insert_multi_v(pd) | enter);
 
-		auto permisson_module::update(int64_t id, const std::string& perm) -> asio::awaitable<bool>
-		{
-			auto iter = id_perms_.find(id);
-			if (iter == id_perms_.end())
+			if (affected != perms.size())
 			{
 				co_return false;
 			}
 
-			auto tmp = iter->second->permissions;
-			iter->second->permissions = perm;
+			for (auto& p : pd)
+			{
+				perm_descs_.insert({ p.id, p.perm });
+			}
 
-			auto affected = co_await sql_update(*iter->second);
+			co_return true;
+		}
+
+		auto permission_module::add_role(int64_t id, const std::vector<int64_t>& perms) -> asio::awaitable<bool>
+		{
+			std::vector<permission> pd{};
+			for (auto& p : perms)
+			{
+				pd.push_back({ perm_index_++, id, p });
+			}
+
+			auto affected = co_await (insert_multi_v(pd) | enter);
+
+			if (affected != perms.size())
+			{
+				co_return false;
+			}
+
+			for (auto& p : pd)
+			{
+				auto& perm = perms_[p.role_id];
+
+				perm.push_back(std::make_shared<permission>(p.id, p.role_id, p.perm_id));
+			}
+
+			co_return true;
+		}
+
+		auto permission_module::remove(int64_t id) -> asio::awaitable<bool>
+		{
+			auto iter = perm_descs_.find(id);
+
+			if (iter == perm_descs_.end())
+			{
+				co_return false;
+			}
+
+			auto affected = co_await (remove_v<perm_desc>() | grep<&perm_desc::id> == id | enter);
 
 			if (affected == 0)
 			{
-				iter->second->permissions = tmp;
-			}
-		}
-
-		auto permisson_module::remove(int64_t id) -> asio::awaitable<void>
-		{
-			auto iter = id_perms_.find(id);
-
-			if (iter == id_perms_.end())
-			{
-				co_return;
+				co_return false;
 			}
 
-			co_await sql_remove(*iter->second);
+			perm_descs_.erase(iter);
 		}
 
-		std::vector<std::string> permisson_module::view(int64_t role_id) const
+		auto permission_module::remove_role(int64_t role_id) -> asio::awaitable<bool>
 		{
-			std::vector<std::string> result;
 			auto iter = perms_.find(role_id);
-			if (iter != perms_.end())
+
+			if (iter == perms_.end())
 			{
-				for (auto& p : iter->second)
-				{
-					result.push_back(p->permissions);
-				}
+				co_return false;
 			}
 
-			return result;
+			auto affected = co_await (remove_v<permission>() | grep<&permission::role_id> == role_id | enter);
+
+			if (affected == 0)
+			{
+				co_return false;
+			}
+
+			perms_.erase(iter);
 		}
 
-		auto permisson_module::load_permission() -> asio::awaitable<void>
+		auto permission_module::update(int64_t id, const std::string& perm) -> asio::awaitable<bool>
 		{
-			auto res = co_await (select_v<permisson>() | enter);
+			auto iter = perm_descs_.find(id);
+			if (iter == perm_descs_.end())
+			{
+				co_return false;
+			}
+
+			auto affected = co_await (update_v(perm_desc{ iter->first, iter->second }) | enter);
+
+			if (affected == 0)
+			{
+				co_return false;
+			}
+
+			iter->second = perm;
+		}
+
+		auto permission_module::view(int64_t id) const -> asio::awaitable<std::string>
+		{
+			auto iter = perm_descs_.find(id);
+			if (iter == perm_descs_.end())
+			{
+				co_return std::string{};
+			}
+
+			co_return iter->second;
+		}
+
+		auto permission_module::check(int64_t role_id, int64_t perm) -> asio::awaitable<bool>
+		{
+			auto iter = perms_.find(role_id);
+
+			if (iter == perms_.end())
+			{
+				co_return false;
+			}
+
+			auto it = std::find_if(iter->second.begin(), iter->second.end(), [&] (auto p) { return p->perm_id == perm; });
+
+			co_return it != iter->second.end();
+		}
+
+		auto permission_module::load_permission() -> asio::awaitable<void>
+		{
+			auto res = co_await (select_v<permission>() | enter);
 
 			for (auto& r : res)
 			{
@@ -96,55 +153,32 @@ namespace aquarius
 			}
 		}
 
-		void permisson_module::fill_permissions(const permisson& perms)
+		auto permission_module::load_permission_desc() -> asio::awaitable<void>
+		{
+			auto res = co_await (select_v<perm_desc> | enter);
+
+			for (auto& r : res)
+			{
+				fill_permissions_desc(r);
+			}
+		}
+
+		void permission_module::fill_permissions(const permission& perms)
 		{
 			auto& p = perms_[perms.role_id];
 
-			p.push_back(std::make_shared<permisson>());
+			p.push_back(std::make_shared<permission>());
 
 			auto& ptr = p.back();
 
-			ptr->id = perms.id;
-			ptr->role_id = perms.role_id;
-			ptr->permissions = perms.permissions;
-
-			auto& id_ptr = id_perms_[perms.id];
-			if (id_ptr)
-			{
-				id_ptr.reset();
-			}
-
-			id_ptr = ptr;
+			*ptr = perms;
 		}
 
-		auto permisson_module::sql_insert(const std::vector<permisson>& perms) -> asio::awaitable<void>
+		void permission_module::fill_permissions_desc(const perm_desc& perms)
 		{
-			auto affected = co_await (insert_v(perms) | enter);
+			auto& perm = perm_descs_[perms.id];
 
-			if (affected != 0)
-			{
-				for (auto& r : perms)
-				{
-					fill_permissions(r);
-				}
-			}
-		}
-
-		auto permisson_module::sql_update(const permisson& p) -> asio::awaitable<std::size_t>
-		{
-			co_return co_await (update_v(p) | enter);
-		}
-
-		auto permisson_module::sql_remove(const permisson& p) -> asio::awaitable<void>
-		{
-			auto affected = co_await (remove_v<permisson>() | grep<&permisson::id> == p.id | enter);
-
-			if (affected != 0)
-			{
-				perms_.erase(p.role_id);
-
-				id_perms_.erase(p.id);
-			}
+			perm = perms.perm;
 		}
 	} // namespace login
 } // namespace aquarius

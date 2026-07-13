@@ -1,0 +1,34 @@
+message query_permission -> /permission/query
+{
+	request
+	{
+		sint64 user_id;
+	}
+	response
+	{
+		repeated string permissions;
+	}
+}
+
+message check_permission -> /permission/check
+{
+	request
+	{
+		sint64 user_id;
+		sint64 permission;
+	}
+	response
+	{
+	}
+}
+
+message add_permission -> /permission/add
+{
+	request
+	{
+		sint64 user_id;
+		repeated sint64 permissions;
+	}
+	response
+	{}
+}

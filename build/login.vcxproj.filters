@@ -27,9 +27,6 @@
     <ClCompile Include="..\src\login\srv_regist.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\login\proto\login.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
@@ -51,12 +48,24 @@
     <ClCompile Include="..\src\login\permission_module.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\login\proto\permission.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\login\ctx_permission.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\login\user_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\login\user.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\login\srv_regist.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\login\proto\login.virgo.h">
@@ -83,6 +92,18 @@
     <ClInclude Include="..\src\login\permission_module.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\login\proto\permission.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\login\user_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\login\user.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\login\proto\login.virgo">
@@ -93,6 +114,9 @@
     </None>
     <None Include="..\src\login\sql\permissions.sql">
       <Filter>sql</Filter>
+    </None>
+    <None Include="..\src\login\proto\permission.virgo">
+      <Filter>proto</Filter>
     </None>
   </ItemGroup>
 </Project>

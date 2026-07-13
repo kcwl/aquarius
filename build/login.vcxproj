@@ -23,11 +23,15 @@
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
     <ClCompile Include="..\src\login\auth_module.cpp" />
     <ClCompile Include="..\src\login\ctx_login.cpp" />
+    <ClCompile Include="..\src\login\ctx_permission.cpp" />
     <ClCompile Include="..\src\login\ctx_shake.cpp" />
     <ClCompile Include="..\src\login\login.cpp" />
     <ClCompile Include="..\src\login\permission_module.cpp" />
     <ClCompile Include="..\src\login\proto\login.virgo.cpp" />
+    <ClCompile Include="..\src\login\proto\permission.virgo.cpp" />
     <ClCompile Include="..\src\login\srv_regist.cpp" />
+    <ClCompile Include="..\src\login\user.cpp" />
+    <ClCompile Include="..\src\login\user_module.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -38,11 +42,15 @@
     <ClInclude Include="..\src\login\error.hpp" />
     <ClInclude Include="..\src\login\payload.hpp" />
     <ClInclude Include="..\src\login\permission_module.h" />
+    <ClInclude Include="..\src\login\user.h" />
+    <ClInclude Include="..\src\login\user_module.h" />
     <ClInclude Include="..\src\login\proto\login.virgo.h" />
+    <ClInclude Include="..\src\login\proto\permission.virgo.h" />
     <ClInclude Include="..\src\login\srv_regist.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\src\login\proto\permission.virgo" />
     <None Include="..\src\login\proto\login.virgo" />
     <None Include="..\src\login\sql\account.sql" />
     <None Include="..\src\login\sql\permissions.sql" />

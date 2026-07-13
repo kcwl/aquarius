@@ -78,6 +78,11 @@ namespace aquarius
 		co_return co_await etv.execute(static_cast<std::string>(v));
 	}
 
+	inline auto operator|(const insert_multi_view& v, enter_view& etv) -> asio::awaitable<std::size_t>
+	{
+		co_return co_await etv.execute(static_cast<std::string>(v));
+	}
+
 	inline auto operator|(const update_view& v, enter_view& etv) -> asio::awaitable<std::size_t>
 	{
 		co_return co_await etv.execute(static_cast<std::string>(v));

@@ -1,46 +1,61 @@
 #pragma once
+#pragma once
 #include <aquarius.hpp>
 
 namespace aquarius
 {
 	namespace login
 	{
-		struct permisson
+		struct permission
 		{
 			int64_t id;
 			int64_t role_id;
-			std::string permissions;
+			int64_t perm_id;
 		};
 
-		AQUARIUS_MODULE(permisson_module)
+		struct perm_desc
+		{
+			int64_t id;
+			std::string perm;
+		};
+
+		AQUARIUS_MODULE(permission_module)
 		{
 		public:
 			virtual auto run() -> asio::awaitable<bool> override;
 
 		public:
-			bool check(int64_t role_id, const std::string& perm);
+			auto add_desc(const std::vector<std::string>& perms) -> asio::awaitable<bool>;
 
-			auto create(int64_t role_id, const std::vector<std::string>& perms) -> asio::awaitable<void>;
+			auto add_role(int64_t role_id, const std::vector<int64_t>& perms) -> asio::awaitable<bool>;
+
+			auto remove(int64_t id) -> asio::awaitable<bool>;
+
+			auto remove_role(int64_t role_id) -> asio::awaitable<bool>;
 
 			auto update(int64_t id, const std::string& perm) -> asio::awaitable<bool>;
 
-			auto remove(int64_t id) -> asio::awaitable<void>;
+			auto view(int64_t id) const -> asio::awaitable<std::string>;
 
-			std::vector<std::string> view(int64_t role_id) const;
+			auto check(int64_t role_id, int64_t perm) -> asio::awaitable<bool>;
 
 		private:
 			auto load_permission() -> asio::awaitable<void>;
 
-			void fill_permissions(const permisson& perms);
+			auto load_permission_desc() -> asio::awaitable<void>;
 
-			auto sql_insert(const std::vector<permisson>& perms) -> asio::awaitable<void>;
-			auto sql_update(const permisson& p) -> asio::awaitable<std::size_t>;
-			auto sql_remove(const permisson& p) -> asio::awaitable<void>;
+			void fill_permissions(const permission& perms);
+
+			void fill_permissions_desc(const perm_desc& perms);
 
 		private:
-			std::map<int64_t, std::vector<std::shared_ptr<permisson>>> perms_;
+			std::map<int64_t, std::vector<std::shared_ptr<permission>>> perms_;
 
-			std::map<int64_t, std::shared_ptr<permisson>> id_perms_;
+			std::map<int64_t, std::string> perm_descs_;
+
+			int64_t index_;
+
+			int64_t perm_index_;
 		};
 	} // namespace login
 } // namespace aquarius
