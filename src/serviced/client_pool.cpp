@@ -16,14 +16,12 @@ namespace aquarius
 			auto resp = co_await this->invoke<shake_response>(group, host_and_port, request);
 
 			auto ctx_func = [host_and_port, this, group]<typename Func>(flex_buffer& buffer, const std::string& router,
-																 Func&& f) -> asio::awaitable<error_code>
+																		Func&& f) -> asio::awaitable<error_code>
 			{
 				co_return co_await this->invoke(
 					group, host_and_port, buffer, router,
 					[func = std::move(f)](flex_buffer& buf, const std::string& r) -> asio::awaitable<error_code>
-					{
-						co_return co_await func(buf, r);
-					});
+					{ co_return co_await func(buf, r); });
 			};
 
 			std::shared_ptr<context_base> ctx = std::make_shared<basic_transfer_context<tcp>>(ctx_func);
@@ -80,7 +78,23 @@ namespace aquarius
 			{
 				c = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 
-				auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
+				c->set_close_func(
+					[group, host_and_port, this] (auto)->asio::awaitable<void>
+					{
+						auto& clients = pool_[group];
+
+						auto iter = std::find_if(clients.begin(), clients.end(),
+												 [host_and_port] (auto cli) { return cli->host_port == host_and_port; });
+
+						if (iter == clients.end())
+						{
+							co_return;
+						}
+
+						clients.erase(iter);
+					});
+
+					auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
 
 				if (ec)
 				{
