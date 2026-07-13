@@ -64,7 +64,7 @@ jobs:
     #     ./b2 link=shared address-model=64
 
     - name: Install Boost
-      uses: MarkusJx/install-boost@v2.6
+      uses: MarkusJx/install-boost@v2
       id: install-boost
       with:
         boost_version: 1.90.0
