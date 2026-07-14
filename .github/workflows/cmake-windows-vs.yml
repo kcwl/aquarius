@@ -64,7 +64,7 @@ jobs:
         cp -r b2/src boost_1_90_0/tools/build
         cd boost_1_90_0
         ./bootstrap.bat
-        ./b2 link=shared address-model=64
+        ./b2 link=shared address-model=64 install
 
     # - name: install mysql
     #   uses: ankane/setup-mysql@v1
