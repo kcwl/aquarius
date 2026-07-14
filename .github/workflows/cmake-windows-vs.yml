@@ -60,7 +60,7 @@ jobs:
         curl -o boost_1_90_0.zip https://archives.boost.io/release/1.90.0/source/boost_1_90_0.zip
         7z x boost_1_90_0.zip
         git clone https://github.com/bfgroup/b2.git
-        rm -rf boost_1_90_0/tools/build/src
+        rm -r boost_1_90_0/tools/build/src
         cp -r b2/src boost_1_90_0/tools/build
         cd boost_1_90_0
         ./bootstrap.bat
