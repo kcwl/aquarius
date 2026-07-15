@@ -3,7 +3,6 @@
 
 	# Path to test runner source that provides Boost.Test main
 	set(UNITTEST_RUNNER ${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp)
-	set(UNIITEST_TEST_PROTO ${CMAKE_CURRENT_SOURCE_DIR}/ip/login.virgo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/ip/ctx_login_test.cpp)
 	if(NOT EXISTS ${UNITTEST_RUNNER})
 		message(FATAL_ERROR "Missing test runner: ${UNITTEST_RUNNER}")
 	endif()
@@ -31,36 +30,23 @@
 		set(target_name ${tgt_base})
 
 		if(target_name STREQUAL "ut_tcp")
-			add_executable(${target_name} ${src} ${UNITTEST_RUNNER} ${UNIITEST_TEST_PROTO})
+			add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
 		else()
 			add_executable(${target_name} ${src} ${UNITTEST_RUNNER})
 		endif()
 		target_include_directories(${target_name} PRIVATE ${AQUARIUS_INCLUDE} ${AQUARIUS_PROTOCOL_INCLUDE})
-		# target_link_libraries(${target_name} PRIVATE ${TEST_COMMON_LIBS})
+
 		target_link_libraries(${target_name} PRIVATE boost)
 
-		if(ENABLE_MYSQL)
-			target_compile_definitions(${target_name} PUBLIC -DENABLE_MYSQL)
-			target_link_libraries(${target_name} PRIVATE mysql)
-		endif()
-
-		target_compile_definitions(${target_name} PUBLIC -DENABLE_SSL_TEST)
 		target_link_libraries(${target_name} PRIVATE openssl)
 
 		add_test(NAME ${target_name} COMMAND ${target_name})
-
-		if(NOT WIN32)
-			set_tests_properties(${target_name} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/gcc-16.1/lib64:/usr/local/lib:/usr/local/lib64:$ENV{LD_LIBRARY_PATH}")
-		endif()
 	endforeach()
 
 	if(WIN32)
-	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:unittest>)
-	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:boost>)
-	#set_property(TEST unittest PROPERTY ENVIRONMENT_MODIFICATION PATH=path_list_append:$<TARGET_RUNTIME_DLL_DIRS:mysql>)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 	
-	target_compile_definitions(${target_name} PUBLIC -D_WIN32_WINNT=0x0A00)
+	add_definitions(-D_WIN32_WINNT=0x0A00)
 	endif()
 
 	add_custom_target(coverage 
