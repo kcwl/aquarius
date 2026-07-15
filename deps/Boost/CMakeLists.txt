@@ -1,7 +1,7 @@
 add_library(boost INTERFACE)
 target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
-set(Boost_NO_BOOST_CMAKE ON)
+#set(Boost_NO_BOOST_CMAKE ON)
 
 if(WIN32)
 cmake_policy(SET CMP0074 NEW)

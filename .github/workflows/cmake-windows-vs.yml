@@ -89,14 +89,14 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
     
-    # - name: cache boost
-    #   id: cache-boost
-    #   uses: actions/cache@v4
-    #   env:
-    #     cache-name: boost-module
-    #   with:
-    #     path: '${{ runner.workspace }}\boost_1_90_0'
-    #     key: ${{ runner.os }}-build-${{env.cache-name}}-1.90
+    - name: cache boost
+      id: cache-boost
+      uses: actions/cache@v4
+      env:
+        cache-name: boost-module
+      with:
+        path: '${{ runner.workspace }}\boost_1_90_0'
+        key: ${{ runner.os }}-build-${{env.cache-name}}-1.90
     
     # - if: ${{ steps.cache-boost.outputs.cache-hit != 'true'}}
     #   name: Boost Setup
