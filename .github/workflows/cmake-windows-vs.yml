@@ -46,7 +46,7 @@ jobs:
       run: |
         cd  ${{ runner.workspace }}
         curl -o boost_1_91_0.zip https://archives.boost.io/release/1.91.0/source/boost_1_91_0.zip
-        7z x boost_1_1_0.zip
+        7z x boost_1_91_0.zip
         git clone https://github.com/bfgroup/b2.git
         rm -r boost_1_91_0/tools/build/src
         cp -r b2/src boost_1_91_0/tools/build
