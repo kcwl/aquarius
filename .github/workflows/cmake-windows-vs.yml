@@ -24,7 +24,6 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [windows-latest]
-        build_type: [Debug, Release]
         c_compiler: [cl]
         include:
           - os: windows-latest
@@ -53,7 +52,7 @@ jobs:
         cp -r b2/src boost_1_90_0/tools/build
         cd boost_1_90_0
         ./bootstrap.bat
-        ./b2 link=shared address-model=64
+        ./b2 link=shared address-model=64 --disable-multilib
 
   workflow-job:
     needs: boost-install-job
