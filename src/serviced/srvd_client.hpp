@@ -1,6 +1,6 @@
 #pragma once
 #include <aquarius/module/module_register.hpp>
-#include <proto/regist.virgo.h>
+#include <serviced/proto/regist.virgo.h>
 
 #define HEALTHY_CHECK_TOKEN(args) typename
 
@@ -58,20 +58,34 @@ namespace aquarius
 				co_return !resp.result();
 			}
 
-			auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
+			//auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
+			//{
+			//	auto f = std::move(func);
+			//	auto req = std::make_shared<subscribe_service_request>();
+
+			//	req->body().group() = group;
+
+			//	auto resp = co_await client_ptr_->async_call<subscribe_service_response>(req);
+
+			//	co_await f(resp.body().instances());
+			//}
+
+			template <typename Response, typename Request>
+			auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>
 			{
-				auto f = std::move(func);
-				auto req = std::make_shared<subscribe_service_request>();
+				co_return co_await client_ptr_->async_call<Response>(req);
+			}
 
-				req->body().group() = group;
-
-				auto resp = co_await client_ptr_->async_call<subscribe_service_response>(req);
-
-				co_await f(resp.body().instances());
+			template <typename Func, typename ConstBufferSequence, typename... Args>
+			auto async_call_buffer(ConstBufferSequence && req, const std::string router, Func&& f, Args&&... args)
+				-> asio::awaitable<error_code>
+			{
+				co_return co_await client_ptr_->async_call_buffer(std::forward<ConstBufferSequence>(req), router,
+																  std::forward<Func>(f), std::forward<Args>(args)...);
 			}
 
 			template <typename Func>
-			auto set_healty_check(Func && func) ->asio::awaitable<void>
+			auto set_healty_check(Func && func) -> asio::awaitable<void>
 			{
 				healthy_check_func_ = func;
 				co_return;

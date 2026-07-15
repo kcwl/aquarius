@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\database\proto\execute_sql.virgo.cpp" />
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp" />
+    <ClCompile Include="..\src\login\auth_module.cpp" />
     <ClCompile Include="..\src\login\ctx_login.cpp" />
     <ClCompile Include="..\src\login\ctx_shake.cpp" />
     <ClCompile Include="..\src\login\login.cpp" />
@@ -28,13 +30,19 @@
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\database\proto\execute_sql.virgo.h" />
     <ClInclude Include="..\src\gateway\proto\shake.virgo.h" />
+    <ClInclude Include="..\src\login\auth_module.h" />
+    <ClInclude Include="..\src\login\enter_view.hpp" />
+    <ClInclude Include="..\src\login\error.hpp" />
+    <ClInclude Include="..\src\login\payload.hpp" />
     <ClInclude Include="..\src\login\proto\login.virgo.h" />
     <ClInclude Include="..\src\login\srv_regist.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\login\proto\login.virgo" />
+    <None Include="..\src\login\sql\account.sql" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -125,6 +133,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../src;D:\boost_1_91_0;E:\openssl-lib\include;$(SolutionDir)../src/serviced;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

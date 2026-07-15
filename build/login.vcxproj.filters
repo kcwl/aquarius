@@ -16,6 +16,9 @@
     <Filter Include="proto">
       <UniqueIdentifier>{63262f56-6ce9-40cc-b010-31ef7dba9ce5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sql">
+      <UniqueIdentifier>{db9e9897-d984-452d-80ee-5bd5cef5ed76}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\login\login.cpp">
@@ -39,6 +42,12 @@
     <ClCompile Include="..\src\login\ctx_login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\login\auth_module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\database\proto\execute_sql.virgo.cpp">
+      <Filter>proto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\login\srv_regist.h">
@@ -53,10 +62,28 @@
     <ClInclude Include="..\src\gateway\proto\shake.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\login\auth_module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\login\error.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\login\enter_view.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\database\proto\execute_sql.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\login\payload.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\login\proto\login.virgo">
       <Filter>proto</Filter>
+    </None>
+    <None Include="..\src\login\sql\account.sql">
+      <Filter>sql</Filter>
     </None>
   </ItemGroup>
 </Project>

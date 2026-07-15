@@ -80,8 +80,6 @@ namespace aquarius
 			{
 				this->header().deserialize(buffer);
 
-				this->header().serialize(buffer);
-
 				switch (static_cast<serialize_way>(this->header().way()))
 				{
 					case serialize_way::binary:

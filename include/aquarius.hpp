@@ -4,6 +4,7 @@
 #include <aquarius/basic_server.hpp>
 #include <aquarius/basic_session.hpp>
 #include <aquarius/cmd_options.hpp>
+#include <aquarius/detail/asio.hpp>
 #include <aquarius/error_code.hpp>
 #include <aquarius/io_service_pool.hpp>
 #include <aquarius/ip/handler.hpp>
@@ -16,14 +17,12 @@
 #include <aquarius/module/module_router.hpp>
 #include <aquarius/module/schedule.hpp>
 #include <aquarius/resource/http_config.hpp>
-#include <aquarius/resource/mysql_config.hpp>
 #include <aquarius/serialize/binary.hpp>
 #include <aquarius/serialize/cookie.hpp>
 #include <aquarius/serialize/json.hpp>
 #include <aquarius/serialize/kv.hpp>
 #include <aquarius/serialize/serialization.hpp>
 #include <aquarius/singleton.hpp>
-#include <aquarius/tbl/enter_view.hpp>
 #include <aquarius/tbl/grep_view.hpp>
 #include <aquarius/tbl/insert_view.hpp>
 #include <aquarius/tbl/mysql_type.hpp>

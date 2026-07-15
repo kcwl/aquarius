@@ -171,12 +171,6 @@
     <ClInclude Include="..\include\aquarius\tbl\select_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\aquarius\tbl\enter_view.hpp">
-      <Filter>include\aquarius\tbl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\module\mysql_module.hpp">
-      <Filter>include\aquarius\module</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\aquarius\tbl\insert_view.hpp">
       <Filter>include\aquarius\tbl</Filter>
     </ClInclude>
@@ -230,9 +224,6 @@
     </ClInclude>
     <ClInclude Include="..\include\aquarius\detail\asio.hpp">
       <Filter>include\aquarius\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\aquarius\resource\mysql_config.hpp">
-      <Filter>include\aquarius\resource</Filter>
     </ClInclude>
     <ClInclude Include="..\include\aquarius\concepts.hpp">
       <Filter>include\aquarius</Filter>
@@ -412,9 +403,6 @@
     <ClCompile Include="..\test\resource\ut_http_config.cpp">
       <Filter>源文件\resource</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\resource\ut_mysql_config.cpp">
-      <Filter>源文件\resource</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\resource\ut_ssl_config.cpp">
       <Filter>源文件\resource</Filter>
     </ClCompile>
@@ -427,9 +415,6 @@
     <ClCompile Include="..\test\serialize\ut_cookie.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\serialize\ut_http_serialize.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\serialize\ut_json.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
@@ -439,13 +424,7 @@
     <ClCompile Include="..\test\serialize\ut_scalar_type.cpp">
       <Filter>源文件\serialize</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\serialize\ut_tcp_serialize.cpp">
-      <Filter>源文件\serialize</Filter>
-    </ClCompile>
     <ClCompile Include="..\test\tbl\ut_add_string.cpp">
-      <Filter>源文件\tbl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tbl\ut_enter_view.cpp">
       <Filter>源文件\tbl</Filter>
     </ClCompile>
     <ClCompile Include="..\test\tbl\ut_grep_view.cpp">

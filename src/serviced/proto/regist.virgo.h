@@ -78,14 +78,14 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-class subscribe_service_req_body: public aquarius::serialization
+class publish_req_body: public aquarius::serialization
 {
 public:
-	subscribe_service_req_body();
-	virtual ~subscribe_service_req_body();
+	publish_req_body();
+	virtual ~publish_req_body();
 
-	subscribe_service_req_body(subscribe_service_req_body&&) = default;
-	subscribe_service_req_body& operator=(subscribe_service_req_body&&) = default;
+	publish_req_body(publish_req_body&&) = default;
+	publish_req_body& operator=(publish_req_body&&) = default;
 public:
 	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
@@ -100,21 +100,21 @@ public:
 	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
-	string group() const;
-	string& group();
+	std::vector<string> topics() const;
+	std::vector<string>& topics();
 
 private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
 };
-class subscribe_service_resp_body: public aquarius::serialization
+class publish_resp_body: public aquarius::serialization
 {
 public:
-	subscribe_service_resp_body();
-	virtual ~subscribe_service_resp_body();
+	publish_resp_body();
+	virtual ~publish_resp_body();
 
-	subscribe_service_resp_body(subscribe_service_resp_body&&) = default;
-	subscribe_service_resp_body& operator=(subscribe_service_resp_body&&) = default;
+	publish_resp_body(publish_resp_body&&) = default;
+	publish_resp_body& operator=(publish_resp_body&&) = default;
 public:
 	virtual void to_binary(aquarius::flex_buffer& buffer) override;
 
@@ -128,71 +128,6 @@ public:
 
 	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
-
-	std::vector<uint64_t> instances() const;
-	std::vector<uint64_t>& instances();
-
-private:
-	struct impl;
-	std::shared_ptr<impl> impl_ptr_;
-};
-
-class broad_service_status_req_body: public aquarius::serialization
-{
-public:
-	broad_service_status_req_body();
-	virtual ~broad_service_status_req_body();
-
-	broad_service_status_req_body(broad_service_status_req_body&&) = default;
-	broad_service_status_req_body& operator=(broad_service_status_req_body&&) = default;
-public:
-	virtual void to_binary(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_binary(aquarius::flex_buffer& buffer) override;
-
-	virtual void to_json(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_json(aquarius::flex_buffer& buffer) override;
-
-	virtual void to_kv(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_kv(aquarius::flex_buffer& buffer) override;
-
-
-private:
-	struct impl;
-	std::shared_ptr<impl> impl_ptr_;
-};
-class broad_service_status_resp_body: public aquarius::serialization
-{
-public:
-	broad_service_status_resp_body();
-	virtual ~broad_service_status_resp_body();
-
-	broad_service_status_resp_body(broad_service_status_resp_body&&) = default;
-	broad_service_status_resp_body& operator=(broad_service_status_resp_body&&) = default;
-public:
-	virtual void to_binary(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_binary(aquarius::flex_buffer& buffer) override;
-
-	virtual void to_json(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_json(aquarius::flex_buffer& buffer) override;
-
-	virtual void to_kv(aquarius::flex_buffer& buffer) override;
-
-	virtual void from_kv(aquarius::flex_buffer& buffer) override;
-
-
-	string group() const;
-	string& group();
-
-	uint64 host_and_port() const;
-	uint64& host_and_port();
-
-	bool healty() const;
-	bool& healty();
 
 private:
 	struct impl;
@@ -201,7 +136,5 @@ private:
 
 using regist_request = aquarius::tcp_request<"9000", regist_req_body>;
 using regist_response = aquarius::tcp_response<"9000", regist_resp_body>;
-using subscribe_service_request = aquarius::tcp_request<"9001", subscribe_service_req_body>;
-using subscribe_service_response = aquarius::tcp_response<"9001", subscribe_service_resp_body>;
-using broad_service_status_request = aquarius::tcp_request<"9002", broad_service_status_req_body>;
-using broad_service_status_response = aquarius::tcp_response<"9002", broad_service_status_resp_body>;
+using publish_request = aquarius::tcp_request<"9001", publish_req_body>;
+using publish_response = aquarius::tcp_response<"9001", publish_resp_body>;

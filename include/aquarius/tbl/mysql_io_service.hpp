@@ -9,10 +9,12 @@ using namespace std::chrono_literals;
 
 namespace aquarius
 {
+	namespace mysql = boost::mysql;
+
 	class mysql_io_service
 	{
 	public:
-		explicit mysql_io_service(boost::mysql::pool_params param)
+		explicit mysql_io_service(mysql::pool_params param)
 			: param_(std::move(param))
 		{}
 
@@ -31,7 +33,8 @@ namespace aquarius
 
 		auto async_run() -> asio::awaitable<void>
 		{
-			pool_ptr_ = std::make_shared<boost::mysql::connection_pool>(co_await asio::this_coro::executor, std::move(param_));
+			pool_ptr_ =
+				std::make_shared<boost::mysql::connection_pool>(co_await asio::this_coro::executor, std::move(param_));
 
 			pool_ptr_->async_run(asio::detached);
 		}
@@ -91,6 +94,34 @@ namespace aquarius
 				for (const auto r : result.rows())
 				{
 					make_result<T>(results, r);
+				}
+			}
+
+			co_return results;
+		}
+
+		auto async_query_only(std::string_view sql, error_code& ec) -> asio::awaitable<std::vector<std::string>>
+		{
+			auto conn_ptr = co_await pool_ptr_->async_get_connection(
+				asio::cancel_after(1s, asio::redirect_error(asio::use_awaitable, ec)));
+
+			std::vector<std::string> results{};
+
+			if (ec)
+			{
+				co_return results;
+			}
+
+			boost::mysql::results result{};
+
+			co_await conn_ptr->async_execute(sql, result,
+											 asio::cancel_after(1s, asio::redirect_error(asio::use_awaitable, ec)));
+
+			if (!ec)
+			{
+				for (const auto r : result.rows())
+				{
+					make_bytes_result(results, r);
 				}
 			}
 
@@ -183,6 +214,18 @@ namespace aquarius
 			ss >> result;
 
 			results.push_back(result);
+		}
+
+		template <typename Row>
+		void make_bytes_result(std::vector<std::string>& results, const Row& row)
+		{
+			std::stringstream ss{};
+			for (std::size_t i = 0; i < row.size(); ++i)
+			{
+				ss.str("");
+				ss << row[i];
+				results.push_back(ss.str());
+			}
 		}
 
 		template <typename T, typename Field>

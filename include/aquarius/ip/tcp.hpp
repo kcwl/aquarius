@@ -29,7 +29,7 @@ namespace aquarius
 
 		using duration = typename session_type::duration;
 
-		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&)>;
+		using session_callback = std::function<asio::awaitable<error_code>(flex_buffer&, const std::string&)>;
 
 		template <typename Handler>
 		using context = basic_context<Handler, tcp>;
@@ -107,7 +107,7 @@ namespace aquarius
 				auto self = this->shared_from_this();
 
 				ec = co_await ptr->complete(this, buffer,
-												 [this, src](flex_buffer& buffer) -> asio::awaitable<error_code>
+												 [this, src](flex_buffer& buffer, const std::string& r) -> asio::awaitable<error_code>
 												 {
 													 raw_header header{};
 													 header.src = src;
@@ -115,6 +115,13 @@ namespace aquarius
 
 													 std::vector<asio::const_buffer> buffers{};
 													 commit_raw_header(buffers, header);
+													 flex_buffer tmp{};
+													 if (!r.empty())
+													 {
+														 binary_parse{}.to_datas(r, tmp);
+														 buffers.push_back(tmp.data());
+														 header.length += static_cast<uint32_t>(tmp.size());
+													 }
 
 													 buffers.push_back(buffer.data());
 
@@ -261,13 +268,17 @@ namespace aquarius
 		{
 			handler_ptr->attach_session(func);
 
-			handler_ptr->response().result() = (co_await handler_ptr->handle()).value();
+			auto ec = co_await handler_ptr->handle();
+
+			handler_ptr->response().result(ec.value());
 
 			flex_buffer resp_buffer{};
 
+			handler_ptr->response().header().way(handler_ptr->request()->header().way());
+
 			handler_ptr->response().commit(resp_buffer);
 
-			co_return co_await handler_ptr->session()(resp_buffer);
+			co_return co_await handler_ptr->session()(resp_buffer, {});
 		}
 
 		auto wait(std::size_t src) -> asio::awaitable<void>

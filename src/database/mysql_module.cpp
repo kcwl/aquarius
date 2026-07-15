@@ -1,41 +1,25 @@
-#pragma once
-#ifdef ENABLE_MYSQL
-#include <aquarius/basic_module.hpp>
-#include <aquarius/module/module_register.hpp>
-#include <aquarius/resource/mysql_config.hpp>
-#include <aquarius/tbl/mysql_io_service.hpp>
+#include "mysql_module.h"
 
 namespace aquarius
 {
-	AQUARIUS_MODULE(mysql_module)
+	namespace db
 	{
-		using sql_op_t = mysql_io_service;
-
-	public:
-		mysql_module()
+		mysql_module::mysql_module()
 			: index_(0)
 			, mutex_()
 			, connector_(nullptr)
 		{}
 
-		virtual ~mysql_module() = default;
-
-	public:
-		virtual bool init() override
-		{
-			return true;
-		}
-
-		virtual auto run() -> asio::awaitable<bool> override
+		auto mysql_module::run() -> asio::awaitable<bool>
 		{
 			mysql_config& cfg = create_mysql();
 
-			boost::mysql::pool_params params{};
+			mysql::pool_params params{};
 			params.server_address.emplace_host_and_port(cfg.host, static_cast<uint16_t>(cfg.port));
 			params.username = cfg.user;
 			params.password = cfg.password;
 			params.database = cfg.db;
-			params.ssl = boost::mysql::ssl_mode::disable;
+			params.ssl = mysql::ssl_mode::disable;
 
 			connector_ = std::make_shared<sql_op_t>(std::move(params));
 
@@ -44,12 +28,11 @@ namespace aquarius
 			co_return true;
 		}
 
-		template <typename T>
-		auto async_query(std::string_view sql) -> asio::awaitable<std::vector<T>>
+		auto mysql_module::async_query_only(std::string_view sql) -> asio::awaitable<std::vector<std::string>>
 		{
 			error_code ec{};
 
-			auto results = co_await connector_->template async_query<T>(sql, ec);
+			auto results = co_await connector_->async_query_only(sql, ec);
 
 			if (ec)
 			{
@@ -59,7 +42,7 @@ namespace aquarius
 			co_return results;
 		}
 
-		auto async_execute(std::string_view sql) -> asio::awaitable<std::size_t>
+		auto mysql_module::async_execute(std::string_view sql) -> asio::awaitable<std::size_t>
 		{
 			error_code ec{};
 
@@ -73,7 +56,7 @@ namespace aquarius
 			co_return results;
 		}
 
-		auto async_multi_execute(const std::vector<std::string>& sqls) -> asio::awaitable<std::size_t>
+		auto mysql_module::async_multi_execute(const std::vector<std::string>& sqls) -> asio::awaitable<std::size_t>
 		{
 			error_code ec{};
 
@@ -94,13 +77,5 @@ namespace aquarius
 
 			co_return sqls.size();
 		}
-
-	private:
-		std::size_t index_;
-
-		std::mutex mutex_;
-
-		std::shared_ptr<sql_op_t> connector_;
-	};
-} // namespace aquarius
-#endif
+	}
+}

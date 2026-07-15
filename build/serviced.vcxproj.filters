@@ -21,25 +21,25 @@
     <ClInclude Include="..\src\serviced\error.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\proto\channel.virgo.h">
-      <Filter>proto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\proto\cmd.virgo.h">
-      <Filter>proto</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\customer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\service_center_module.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\serviced\subscriber.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\serviced\srvd_client.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\client_pool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\payload.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\make_host_and_port.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\proto\shake.virgo.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\serviced\basic_transfer_context.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,33 +50,24 @@
     <ClCompile Include="..\src\serviced\ctx_regist.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\proto\channel.virgo.cpp">
-      <Filter>proto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\serviced\proto\cmd.virgo.cpp">
-      <Filter>proto</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\service_center_module.cpp">
+    <ClCompile Include="..\src\serviced\client_pool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\customer.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\src\serviced\proto\shake.virgo.cpp">
+      <Filter>proto</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\subscriber.cpp">
+    <ClCompile Include="..\src\serviced\ctx_shake.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\serviced\proto\channel.virgo">
-      <Filter>proto</Filter>
-    </None>
-    <None Include="..\src\serviced\proto\cmd.virgo">
-      <Filter>proto</Filter>
-    </None>
     <None Include="..\src\serviced\proto\regist.virgo">
+      <Filter>proto</Filter>
+    </None>
+    <None Include="..\src\serviced\proto\shake.virgo">
       <Filter>proto</Filter>
     </None>
   </ItemGroup>

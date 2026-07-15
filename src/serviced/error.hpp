@@ -18,7 +18,8 @@ namespace aquarius
 			no_player,
 			create_client_error,
 			channel_not_find,
-			not_subscriber
+			not_subscriber,
+			not_exist_in_pool,
 		};
 
 		inline std::string_view db_result_map(int result)
@@ -31,18 +32,17 @@ namespace aquarius
 				{ static_cast<int>(errc::no_player), "no player"sv },
 				{ static_cast<int>(errc::create_client_error), "create client error"sv },
 				{ static_cast<int>(errc::channel_not_find), "channel not find"sv },
-				{ static_cast<int>(errc::not_subscriber), "not subscriber"sv }
+				{ static_cast<int>(errc::not_subscriber), "not subscriber"sv },
+				{ static_cast<int>(errc::not_exist_in_pool), "not exist in pool"sv }
 			};
 
 			return db_results[result];
 		}
 
-		class db_result_category : public std::error_category
+		class db_result_category : public boost::system::error_category
 		{
 		public:
-			constexpr db_result_category() noexcept
-				: std::error_category(_Generic_addr)
-			{}
+			constexpr db_result_category() = default;
 
 			[[nodiscard]] const char* name() const noexcept override
 			{
@@ -55,9 +55,15 @@ namespace aquarius
 			}
 		};
 
-		inline aquarius::error_code make_error_code(errc result)
+		static db_result_category& get_db_result_category()
 		{
-			return aquarius::error_code(std::error_code(static_cast<int>(result), db_result_category()));
+			static db_result_category category;
+			return category;
+		}
+
+		inline error_code make_error_code(errc result)
+		{
+			return error_code(static_cast<int>(result), get_db_result_category());
 		}
 	} // namespace serviced
 } // namespace aquarius

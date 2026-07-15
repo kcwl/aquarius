@@ -1,6 +1,6 @@
 ﻿#include <aquarius.hpp>
 #include <iostream>
-#include <srvd_client.hpp>
+#include <serviced/srvd_client.hpp>
 
 namespace po = boost::program_options;
 

@@ -5,7 +5,7 @@ namespace aquarius
 {
 	namespace login
 	{
-		AQUARIUS_MODULE(srv_regist)
+		AQUARIUS_MODULE_PRI(srv_regist, 3)
 		{
 		public:
 			srv_regist();

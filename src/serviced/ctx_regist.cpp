@@ -1,8 +1,8 @@
-#include "customer.h"
+#include "client_pool.h"
 #include "error.hpp"
-#include "proto/channel.virgo.h"
-#include "service_center_module.h"
-#include <aquarius/ip/handler.hpp>
+#include "make_host_and_port.hpp"
+#include "proto/regist.virgo.h"
+#include <aquarius.hpp>
 
 namespace aquarius
 {
@@ -10,34 +10,15 @@ namespace aquarius
 	{
 		AQUARIUS_SYS_HANDLER(regist_request, regist_response, ctx_regist)
 		{
-			auto customer_ptr = std::make_shared<customer>(detail::uuid_generator()());
-
-			customer_ptr->name(request()->body().name());
-			customer_ptr->host(request()->body().host());
-			customer_ptr->port(request()->body().port());
-			customer_ptr->healthy(request()->body().healthy());
-			customer_ptr->group(request()->body().group());
-			customer_ptr->weight(request()->body().weight());
-			customer_ptr->version(request()->body().version());
-
-			customer_ptr->attach_session(this->session());
-
-			co_await mpc_async_call<&service_center_module::publish>(customer_ptr);
+			if (request()->body().group() != "gateway")
+			{
+				co_await mpc_async_call<&client_pool::shake>(
+					request()->body().group(), make_host_and_port(request()->body().host(), request()->body().port()),
+					request()->body().name(), request()->body().healthy(), request()->body().weight(),
+					request()->body().version());
+			}
 
 			co_return errc::success;
 		}
-
-		AQUARIUS_SYS_HANDLER(subscribe_service_request, subscribe_service_response, ctx_subscribe_service)
-		{
-			auto subscriber_ptr = std::make_shared<subscriber>(detail::uuid_generator()());
-
-			subscriber_ptr->attach_session(this->session());
-
-			response().body().instances() =
-				co_await mpc_async_call<&service_center_module::subscribe>(request()->body().group(), subscriber_ptr);
-
-			co_return errc::success;
-		}
-
 	} // namespace serviced
 } // namespace aquarius
