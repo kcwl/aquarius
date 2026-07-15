@@ -1,22 +1,22 @@
 add_library(boost INTERFACE)
 target_compile_options(boost INTERFACE -DBOOST_ALL_DYN_LINK)
 
-#set(Boost_NO_BOOST_CMAKE ON)
+set(Boost_NO_BOOST_CMAKE ON)
 
 if(WIN32)
 cmake_policy(SET CMP0074 NEW)
 
-#file(GLOB BOOST_DYN_LINKS "${BOOST_ROOT}/stage/lib/*.lib")
+file(GLOB BOOST_DYN_LINKS "${BOOST_ROOT}/stage/lib/*.lib")
 
-#target_link_libraries(boost INTERFACE ${BOOST_DYN_LINKS})
+target_link_libraries(boost INTERFACE ${BOOST_DYN_LINKS})
 
-#target_link_directories(boost INTERFACE "${BOOST_ROOT}/stage/lib/")
+target_link_directories(boost INTERFACE "${BOOST_ROOT}/stage/lib/")
 
-#target_include_directories(boost INTERFACE ${BOOST_ROOT})
+target_include_directories(boost INTERFACE ${BOOST_ROOT})
 
-#message(STATUS "Boost ROOT ${BOOST_ROOT}")
+message(STATUS "Boost ROOT ${BOOST_ROOT}")
 
-endif()
+else()
 
 set(AQUARIUS_NEED_BOOST 
 	unit_test_framework
@@ -40,4 +40,4 @@ message(STATUS "Found Boost ${Boost_VERSION}")
 target_link_libraries(boost INTERFACE Boost::unit_test_framework Boost::log Boost::log_setup Boost::program_options Boost::json Boost::charconv Boost::url)
 
 target_include_directories(boost INTERFACE ${Boost_INCLUDE_DIRS})
-
+endif()
