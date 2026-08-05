@@ -1,1 +1,5 @@
 add_subdirectory(lazytool)
+add_subdirectory(gateway)
+add_subdirectory(http_gateway)
+# add_subdirectory(serviced)
+# add_subdirectory(database)
