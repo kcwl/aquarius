@@ -1,4 +1,4 @@
-#include "client_pool.h"
+#include "srvd_bridge.h"
 #include <serviced/proto/regist.virgo.h>
 
 namespace aquarius
@@ -9,7 +9,7 @@ namespace aquarius
 		{
 			auto& topics = request()->body().topics();
 
-			co_await mpc_async_call<&client_pool::set_topics>(topics);
+			co_await mpc_async_call<&srvd_bridge::set_topics>(topics);
 
 			co_return gate_op::success;
 		}

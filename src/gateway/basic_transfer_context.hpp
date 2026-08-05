@@ -1,5 +1,4 @@
 #pragma once
-#include "convert.hpp"
 #include "gate_error_code.h"
 #include <aquarius.hpp>
 
@@ -27,8 +26,8 @@ namespace aquarius
 			virtual ~basic_transfer_context() = default;
 
 		public:
-			static auto do_complete(base_type* ctx, Protocol* proto, flex_buffer& buffer, const session_callback& cb,
-									http_method method) -> asio::awaitable<error_code>
+			static auto do_complete(base_type* ctx, Protocol* proto, flex_buffer& buffer, const session_callback& cb)
+				-> asio::awaitable<error_code>
 			{
 				auto context = static_cast<basic_transfer_context*>(ctx);
 
@@ -37,18 +36,7 @@ namespace aquarius
 					co_return gate_op::not_exist_in_pool;
 				}
 
-				if constexpr (std::same_as<Protocol, http>)
-				{
-					flex_buffer transfer_buffer{};
-
-					convert::from_http_to_tcp(method, buffer, transfer_buffer);
-
-					co_return co_await context->func_(transfer_buffer, context->router(), cb);
-				}
-				else
-				{
-					co_return co_await context->func_(buffer, context->router(), cb);
-				}
+				co_return co_await context->func_(buffer, context->router(), cb);
 			}
 
 		private:

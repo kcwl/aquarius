@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include <set>
+#include <memory>
 #include <aquarius/detail/uuid_generator.hpp>
 
 namespace aquarius

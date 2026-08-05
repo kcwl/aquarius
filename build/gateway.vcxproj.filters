@@ -33,7 +33,7 @@
     <ClCompile Include="..\src\gateway\gate_error_code.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\gateway\client_pool.cpp">
+    <ClCompile Include="..\src\gateway\srvd_bridge.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gateway\proto\shake.virgo.cpp">
@@ -62,7 +62,7 @@
     <ClInclude Include="..\src\gateway\gate_error_code.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\client_pool.h">
+    <ClInclude Include="..\src\gateway\srvd_bridge.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gateway\proto\shake.virgo.h">
@@ -77,13 +77,13 @@
     <ClInclude Include="..\src\gateway\basic_transfer_context.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\gateway\convert.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\gateway\proto\shake.virgo">
       <Filter>proto</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\gateway\CMakeLists.txt" />
   </ItemGroup>
 </Project>
