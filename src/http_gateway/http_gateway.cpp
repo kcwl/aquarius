@@ -63,17 +63,6 @@ int main(int argc, char* argv[]) {
         name = vm["name"].as<std::string>();
     }
 
-    if (vm.count("proto"))
-    {
-        proto = vm["proto"].as<std::string>();
-    }
-    else
-    {
-        std::cout << "the proto is invalid\n";
-        std::cout << cmd;
-        return 0;
-    }
-
     if (vm.count("srvd_host"))
     {
         srv_config::get_mutable_instance().host = vm["srvd_host"].as<std::string>();
