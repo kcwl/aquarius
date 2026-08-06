@@ -156,6 +156,9 @@
     <None Include="..\src\serviced\proto\regist.virgo" />
     <None Include="..\src\serviced\proto\shake.virgo" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\serviced\CMakeLists.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

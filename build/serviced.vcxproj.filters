@@ -71,4 +71,7 @@
       <Filter>proto</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\serviced\CMakeLists.txt" />
+  </ItemGroup>
 </Project>

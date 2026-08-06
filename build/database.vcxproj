@@ -39,6 +39,9 @@
   <ItemGroup>
     <None Include="..\src\database\proto\execute_sql.virgo" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\database\CMakeLists.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
