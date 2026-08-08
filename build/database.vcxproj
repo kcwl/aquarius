@@ -135,13 +135,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0A00;BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;D:\boost_1_91_0;E:\openssl-lib\include;E:\软件\mysql84\include;$(SolutionDir)../src/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../include;$(SolutionDir)../3rd/aquarius_protocol/include;E:\boost_1_91_0;E:\openssl-lib\include;C:\Program Files\MySQL\MySQL Server 8.0\include;$(SolutionDir)../src/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\openssl-lib\lib;D:\boost_1_91_0\lib64-msvc-14.5;E:\软件\mysql84\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\openssl-lib\lib;E:\boost_1_91_0\lib64-msvc-14.5;C:\Program Files\MySQL\MySQL Server 8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libssl.lib;libcrypto.lib;mysqlclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>

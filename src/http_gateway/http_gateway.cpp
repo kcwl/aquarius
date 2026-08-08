@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     cmd.add_options()("name", po::value<std::string>(&name), "server name");
     cmd.add_options()("srvd_host", po::value<std::string>(), "serviced host");
     cmd.add_options()("srvd_port", po::value<uint16_t>(), "serviced port");
-    cmd.add_options()("allow_origin", po::value<std::vector<std::string>>(), "cros allowed origins");
+    cmd.add_options()("allow_origins", po::value<std::string>(), "cros allowed origins");
     cmd.add_options()("allow_methods", po::value<std::string>(), "cros allowed methods");
     cmd.add_options()("credential", po::value<bool>(), "cros allowed");
     cmd.add_options()("max_age", po::value<std::string>(), "cros max age");
@@ -85,14 +85,14 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    if (vm.count("allow_origin"))
+    if (vm.count("allow_origins"))
     {
-        http.control_allow_origin = vm["allow_origin"].as<std::string>();
+        http.control_allow_origin = vm["allow_origins"].as<std::string>();
     }
 
     if (vm.count("allow_methods"))
     {
-        http.control_allow_methods = vm["allow_origin"].as<std::string>();
+        http.control_allow_methods = vm["allow_methods"].as<std::string>();
     }
 
     if (vm.count("credential"))
