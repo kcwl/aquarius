@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\database\ctx_shake.cpp" />
     <ClCompile Include="..\src\database\ctx_sql.cpp" />
     <ClCompile Include="..\src\database\database.cpp" />
     <ClCompile Include="..\src\database\mysql_module.cpp" />

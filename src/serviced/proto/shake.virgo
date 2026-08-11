@@ -1,6 +1,15 @@
-message shake -> 8000
+message shake -> /shake
 {
-	request{}
+	request
+	{
+		string host;
+		int32 port;
+		string name;
+		string group;
+		sint32 weight;
+		string version;
+		repeated string topics;
+	}
 	response
 	{
 		repeated string topics;

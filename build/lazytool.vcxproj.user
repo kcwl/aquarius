@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>E:\wise-run\backend\wise-run\proto/employee.virgo --cpp_out=../src/gateway/proto --protocol=tcp</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArgumentsHistory>test_tcp.virgo --input_dir=../test --cpp_out=../test --protocol=tcp|test_http.virgo --input_dir=../test --cpp_out=../test --protocol=http|test_http.virgo --input_dir=../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|test_http.virgo ../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArgumentsHistory>test_http.virgo --input_dir=../test --cpp_out=../test --protocol=http|test_http.virgo --input_dir=../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|test_http.virgo ../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|../src/gateway/proto/shake.virgo --cpp_out=../src/gateway/proto --protocol=tcp|E:\wise-run\backend\wise-run\proto/employee.virgo --cpp_out=../src/gateway/proto --protocol=tcp|</LocalDebuggerCommandArgumentsHistory>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>

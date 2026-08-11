@@ -12,9 +12,9 @@ using namespace aquarius::db;
 
 int main(int argc, char* argv[])
 {
-	po::options_description cmd("gateway");
+	po::options_description cmd("database");
 
-	std::string name("gateway");
+	std::string name("database");
 	int32_t pool_size = static_cast<int32_t>(std::thread::hardware_concurrency());
 
 	cmd.add_options()("help", "print help message");
@@ -29,13 +29,9 @@ int main(int argc, char* argv[])
 	cmd.add_options()("db_passwd", po::value<std::string>(), "database password");
 	cmd.add_options()("db_schema", po::value<std::string>(), "database schema");
 
-	uint16_t port{};
-
 	po::variables_map vm{};
 	po::store(po::parse_command_line(argc, argv, cmd), vm);
 	po::notify(vm);
-
-	std::string proto{};
 
 	if (vm.count("help"))
 	{
@@ -45,7 +41,7 @@ int main(int argc, char* argv[])
 
 	if (vm.count("listen"))
 	{
-		port = vm["listen"].as<uint16_t>();
+		srv_config::get_mutable_instance().port = vm["listen"].as<uint16_t>();
 	}
 	else
 	{
@@ -66,7 +62,7 @@ int main(int argc, char* argv[])
 
 	if (vm.count("srvd_host"))
 	{
-		srv_config::get_mutable_instance().host = vm["srvd_host"].as<std::string>();
+		srv_config::get_mutable_instance().srvd_host = vm["srvd_host"].as<std::string>();
 	}
 	else
 	{
@@ -77,7 +73,7 @@ int main(int argc, char* argv[])
 
 	if (vm.count("srvd_port"))
 	{
-		srv_config::get_mutable_instance().port = vm["srvd_port"].as<uint16_t>();
+		srv_config::get_mutable_instance().srvd_port = vm["srvd_port"].as<uint16_t>();
 	}
 	else
 	{
@@ -141,7 +137,9 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	aquarius::tcp::server server(port, pool_size, name);
+	srv_config::get_mutable_instance().local_server_name = name;
+
+	aquarius::tcp::server server(srv_config::get_mutable_instance().port, pool_size, name);
 
 	server.run();
 }

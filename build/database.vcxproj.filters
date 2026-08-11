@@ -33,9 +33,6 @@
     <ClCompile Include="..\src\database\srv_regist.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\database\ctx_shake.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>

@@ -20,14 +20,22 @@ namespace aquarius
 			auto set_topics(const std::vector<std::string>& topics) -> asio::awaitable<bool>;
 
 		private:
-			std::pair<std::string, int32_t> instance_to_host(uint64_t host_and_port);
-
-		private:
 			std::string group_;
 
 			std::string srvd_host_;
 
 			int32_t srvd_port_;
+
+			std::string host_;
+
+			int16_t port_;
+
+			int32_t weight_;
+
+			int32_t version_;
+
+			std::string local_server_name_;
 		};
+
 	} // namespace gateway
 } // namespace aquarius

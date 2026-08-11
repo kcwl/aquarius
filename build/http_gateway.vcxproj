@@ -154,8 +154,8 @@
     <ClCompile Include="..\src\http_gateway\gate_error_code.cpp" />
     <ClCompile Include="..\src\http_gateway\http_gateway.cpp" />
     <ClCompile Include="..\src\http_gateway\player.cpp" />
-    <ClCompile Include="..\src\http_gateway\proto\shake.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
+    <ClCompile Include="..\src\serviced\proto\shake.virgo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\http_gateway\auth_module.h" />
@@ -167,14 +167,11 @@
     <ClInclude Include="..\src\http_gateway\gate_error_code.h" />
     <ClInclude Include="..\src\http_gateway\payload.hpp" />
     <ClInclude Include="..\src\http_gateway\player.h" />
-    <ClInclude Include="..\src\http_gateway\proto\shake.virgo.h" />
     <ClInclude Include="..\src\serviced\proto\regist.virgo.h" />
+    <ClInclude Include="..\src\serviced\proto\shake.virgo.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\src\http_gateway\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\http_gateway\proto\shake.virgo" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

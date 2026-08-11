@@ -6,55 +6,9 @@ namespace aquarius
 {
 	namespace serviced
 	{
-		auto client_pool::shake(const std::string& group, uint64_t host_and_port, const std::string& name, bool healthy,
-								int32_t weight, const std::string& version) -> asio::awaitable<void>
-		{
-			co_await add(group, host_and_port, name, healthy, weight, version);
-
-			auto request = std::make_shared<shake_request>();
-
-			auto resp = co_await this->invoke<shake_response>(group, host_and_port, request);
-
-			auto ctx_func = [host_and_port, this, group]<typename Func>(flex_buffer& buffer, const std::string& router,
-																		Func&& f) -> asio::awaitable<error_code>
-			{
-				co_return co_await this->invoke(
-					group, host_and_port, buffer, router,
-					[func = std::move(f)](flex_buffer& buf, const std::string& r) -> asio::awaitable<error_code>
-					{ co_return co_await func(buf, r); });
-			};
-
-			std::shared_ptr<context_base> ctx = std::make_shared<basic_transfer_context<tcp>>(ctx_func);
-
-			for (auto& topic : resp.body().topics())
-			{
-				XLOG_INFO() << "Register Context " << topic;
-				mpc_put_context(topic, ctx, false);
-			}
-		}
-
-		void client_pool::remove(const std::string& group, uint64_t host_and_port)
-		{
-			auto iter = pool_.find(group);
-
-			if (iter == pool_.end())
-			{
-				return;
-			}
-
-			auto it = std::find_if(iter->second.begin(), iter->second.end(),
-								   [&](auto client_ptr) { return client_ptr->host_port == host_and_port; });
-
-			if (it == iter->second.end())
-			{
-				return;
-			}
-
-			iter->second.erase(it);
-		}
-
-		auto client_pool::add(const std::string& group, uint64_t host_and_port, const std::string& name, bool healthy,
-							  int32_t weight, const std::string& version) -> asio::awaitable<void>
+		auto client_pool::add(const std::string& group, const std::string& host, uint16_t port, const std::string& name,
+							  int32_t weight, const std::string& version, const std::vector<std::string>& topics)
+			-> asio::awaitable<bool>
 		{
 			auto& g = pool_[group];
 			g.push_back({});
@@ -66,49 +20,92 @@ namespace aquarius
 				back = std::make_shared<client_info>();
 			}
 
-			back->host_port = host_and_port;
+			back->host = host;
+			back->port = port;
 			back->name = name;
-			back->healthy = healthy;
+			back->healthy = true;
 			back->version = version;
+			back->topics = topics;
 			back->clients.resize(max_connection);
-
-			auto [host, port] = instance_to_host(host_and_port);
 
 			for (auto& c : back->clients)
 			{
 				c = std::make_shared<tcp::client>(co_await asio::this_coro::executor, 30ms);
 
-				c->set_close_func(
-					[group, host_and_port, this] (auto)->asio::awaitable<void>
-					{
-						auto& clients = pool_[group];
+				c->set_close_func([group, host, port, this](auto) -> asio::awaitable<void>
+								  { co_return this->remove(group, host, port); });
 
-						auto iter = std::find_if(clients.begin(), clients.end(),
-												 [host_and_port] (auto cli) { return cli->host_port == host_and_port; });
-
-						if (iter == clients.end())
-						{
-							co_return;
-						}
-
-						clients.erase(iter);
-					});
-
-					auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
+				auto ec = co_await c->async_connect(host, static_cast<uint16_t>(port));
 
 				if (ec)
 				{
-					co_return;
+					XLOG_ERROR() << "async connect [" << host << ":" << port << "] failed! " << ec.message();
+					co_return false;
 				}
 			}
+
+			co_return true;
 		}
 
-		std::pair<std::string, int32_t> client_pool::instance_to_host(uint64_t host_and_port)
+		auto client_pool::generate_topics(std::vector<std::string>& topics) -> asio::awaitable<bool>
 		{
-			uint32_t host = host_and_port >> 32;
-			int32_t port = static_cast<int32_t>(host_and_port);
+			for (auto& [_, clients] : pool_)
+			{
+				for (auto& c : clients)
+				{
+					std::copy(c->topics.begin(), c->topics.end(), std::back_inserter(topics));
+				}
+			}
 
-			return { asio::ip::address_v4(host).to_string(), port };
+			co_return !topics.empty();
+		}
+
+		void client_pool::remove(const std::string& group, const std::string& host, uint16_t port)
+		{
+			auto& clients = pool_[group];
+
+			auto iter = std::find_if(clients.begin(), clients.end(),
+									 [host, port](auto cli) { return cli->host == host && cli->port == port; });
+
+			if (iter == clients.end())
+			{
+				return;
+			}
+
+			clients.erase(iter);
+		}
+
+		std::shared_ptr<tcp::client> client_pool::get_client(const std::string& group,
+																		  const std::string& host, uint16_t port)
+		{
+			auto iter = pool_.find(group);
+
+			if (iter == pool_.end())
+			{
+				return nullptr;
+			}
+
+			if (host.empty() || port == 0)
+			{
+				auto info_ptr = round_robin<client_info>{}.invoke(iter->second);
+
+				if (!info_ptr)
+				{
+					return nullptr;
+				}
+
+				return round_robin<tcp::client>{}.invoke(info_ptr->clients);
+			}
+
+			auto it = std::find_if(iter->second.begin(), iter->second.end(), [&](auto client_ptr)
+								   { return client_ptr->host == host && client_ptr->port == port; });
+
+			if (it == iter->second.end())
+			{
+				return nullptr;
+			}
+
+			return round_robin<tcp::client>{}.invoke((*it)->clients);
 		}
 	} // namespace serviced
 } // namespace aquarius

@@ -7,7 +7,12 @@
 struct srv_config : aquarius::singleton<srv_config>
 {
 	std::string host;
-	int32_t port;
+	uint16_t port;
+	std::string srvd_host;
+	uint16_t srvd_port;
+	int32_t weight;
+	std::string version;
+	std::string local_server_name;
 };
 
 namespace aquarius
@@ -18,13 +23,11 @@ namespace aquarius
 		{
 			using healty_check_func_t = std::function<asio::awaitable<void>(uint64_t, bool)>;
 
-			using subscribe_func_t = std::function<asio::awaitable<void>(const std::vector<uint64_t>&)>;
-
 		public:
 			virtual bool init() override
 			{
-				host_ = srv_config::get_mutable_instance().host;
-				port_ = srv_config::get_mutable_instance().port;
+				host_ = srv_config::get_mutable_instance().srvd_host;
+				port_ = srv_config::get_mutable_instance().srvd_port;
 
 				return true;
 			}
@@ -40,35 +43,6 @@ namespace aquarius
 			{
 				co_return;
 			}
-
-			auto publish(const std::string& group, const std::string& host, int32_t port) -> asio::awaitable<bool>
-			{
-				auto req = std::make_shared<regist_request>();
-
-				req->body().host() = host;
-				req->body().port() = port;
-				req->body().group() = group;
-
-				auto resp = co_await client_ptr_->async_call<regist_response>(req);
-				if (resp.result() != 0)
-				{
-					XLOG_ERROR() << "regist serviced failed! error:" << resp.result();
-				}
-
-				co_return !resp.result();
-			}
-
-			//auto subscribe(const std::string& group, subscribe_func_t func) -> asio::awaitable<void>
-			//{
-			//	auto f = std::move(func);
-			//	auto req = std::make_shared<subscribe_service_request>();
-
-			//	req->body().group() = group;
-
-			//	auto resp = co_await client_ptr_->async_call<subscribe_service_response>(req);
-
-			//	co_await f(resp.body().instances());
-			//}
 
 			template <typename Response, typename Request>
 			auto async_call(std::shared_ptr<Request> req) -> asio::awaitable<Response>

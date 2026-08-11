@@ -1,4 +1,5 @@
 #pragma once
+#include "error.hpp"
 #include <aquarius.hpp>
 
 namespace aquarius

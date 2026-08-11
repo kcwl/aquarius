@@ -1,8 +1,0 @@
-message shake -> 8000
-{
-	request{}
-	response
-	{
-		repeated string topics;
-	}
-}

@@ -47,9 +47,6 @@
     <ClCompile Include="..\src\serviced\serviced.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\ctx_regist.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>

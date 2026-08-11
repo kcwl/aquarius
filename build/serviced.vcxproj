@@ -146,7 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\serviced\client_pool.cpp" />
-    <ClCompile Include="..\src\serviced\ctx_regist.cpp" />
     <ClCompile Include="..\src\serviced\ctx_shake.cpp" />
     <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp" />
     <ClCompile Include="..\src\serviced\proto\shake.virgo.cpp" />

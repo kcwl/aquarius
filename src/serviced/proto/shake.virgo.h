@@ -26,6 +26,27 @@ public:
 	virtual void from_kv(aquarius::flex_buffer& buffer) override;
 
 
+	string host() const;
+	string& host();
+
+	int32 port() const;
+	int32& port();
+
+	string name() const;
+	string& name();
+
+	string group() const;
+	string& group();
+
+	sint32 weight() const;
+	sint32& weight();
+
+	string version() const;
+	string& version();
+
+	std::vector<string> topics() const;
+	std::vector<string>& topics();
+
 private:
 	struct impl;
 	std::shared_ptr<impl> impl_ptr_;
@@ -60,5 +81,5 @@ private:
 	std::shared_ptr<impl> impl_ptr_;
 };
 
-using shake_request = aquarius::tcp_request<"8000", shake_req_body>;
-using shake_response = aquarius::tcp_response<"8000", shake_resp_body>;
+using shake_request = aquarius::tcp_request<"/shake", shake_req_body>;
+using shake_response = aquarius::tcp_response<"/shake", shake_resp_body>;

@@ -39,10 +39,10 @@
     <ClCompile Include="..\src\http_gateway\player.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\http_gateway\proto\shake.virgo.cpp">
+    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\serviced\proto\regist.virgo.cpp">
+    <ClCompile Include="..\src\serviced\proto\shake.virgo.cpp">
       <Filter>proto</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,19 +74,14 @@
     <ClInclude Include="..\src\http_gateway\player.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\http_gateway\proto\shake.virgo.h">
+    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\serviced\proto\regist.virgo.h">
+    <ClInclude Include="..\src\serviced\proto\shake.virgo.h">
       <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\src\http_gateway\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\http_gateway\proto\shake.virgo">
-      <Filter>proto</Filter>
-    </None>
   </ItemGroup>
 </Project>
