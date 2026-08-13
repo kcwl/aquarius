@@ -81,6 +81,10 @@ namespace aquarius
 			if (!ec)
 			{
 				buffer.commit(length);
+				XLOG_DEBUG() << "read from [" << remote_address() << ":" << remote_port() << "] " << length << " bytes!"
+							 << ec
+					? ec.message()
+					: "";
 			}
 
 			co_return ec;
@@ -102,7 +106,12 @@ namespace aquarius
 		{
 			error_code ec{};
 
-			co_await asio::async_write(socket_, buffers, asio::redirect_error(asio::use_awaitable, ec));
+			auto bytes = co_await asio::async_write(socket_, buffers, asio::redirect_error(asio::use_awaitable, ec));
+
+			XLOG_DEBUG() << "send buffers to [" << this->remote_address() << ":" << this->remote_port() << "] " << bytes
+						 << " bytes!" << ec
+				? ec.message()
+				: "";
 
 			co_return ec;
 		}

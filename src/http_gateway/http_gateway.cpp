@@ -27,14 +27,9 @@ int main(int argc, char* argv[]) {
     cmd.add_options()("max_age", po::value<std::string>(), "cros max age");
     cmd.add_options()("allow_headers", po::value<std::string>(), "cros allowed headers");
 
-    uint16_t port{};
-
     po::variables_map vm{};
     po::store(po::parse_command_line(argc, argv, cmd), vm);
     po::notify(vm);
-
-    std::string proto{};
-
 
     if (vm.count("help"))
     {
@@ -44,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     if (vm.count("listen"))
     {
-        port = vm["listen"].as<uint16_t>();
+        srv_config::get_mutable_instance().port = vm["listen"].as<uint16_t>();
     }
     else
     {
@@ -65,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     if (vm.count("srvd_host"))
     {
-        srv_config::get_mutable_instance().host = vm["srvd_host"].as<std::string>();
+        srv_config::get_mutable_instance().srvd_host = vm["srvd_host"].as<std::string>();
     }
     else
     {
@@ -76,7 +71,7 @@ int main(int argc, char* argv[]) {
 
     if (vm.count("srvd_port"))
     {
-        srv_config::get_mutable_instance().port = vm["srvd_port"].as<uint16_t>();
+        srv_config::get_mutable_instance().srvd_port = vm["srvd_port"].as<uint16_t>();
     }
     else
     {
@@ -110,7 +105,7 @@ int main(int argc, char* argv[]) {
         http.control_allow_headers = vm["allow_headers"].as<std::string>();
     }
 
-    aquarius::http::server server(port, pool_size, name);
+    aquarius::http::server server(srv_config::get_mutable_instance().port, pool_size, name);
 
     server.run();
 

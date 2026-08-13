@@ -26,7 +26,7 @@ namespace aquarius
             srvd_host_ = srv_config::get_mutable_instance().srvd_host;
             srvd_port_ = srv_config::get_mutable_instance().srvd_port;
 
-            host_ = srv_config::get_mutable_instance().host;
+            host_ = /*srv_config::get_mutable_instance().host*/"127.0.0.1";
             port_ = srv_config::get_mutable_instance().port;
 
             weight_ = srv_config::get_mutable_instance().weight;

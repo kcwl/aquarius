@@ -236,10 +236,6 @@ namespace aquarius
 					ec = co_await session_ptr_->async_read(buffer, remain_size);
 				}
 			}
-			else
-			{
-				ec = asio::error::eof;
-			}
 
 			co_return ec;
 		}

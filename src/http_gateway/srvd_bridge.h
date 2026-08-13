@@ -32,7 +32,7 @@ namespace aquarius
 
 			int32_t weight_;
 
-			int32_t version_;
+			std::string version_;
 
 			std::string local_server_name_;
 		};
